@@ -105,6 +105,8 @@ public class Modifier extends Feature {
         = "model.modifier.shipTradePenalty";
     public static final String SMALL_MOVEMENT_PENALTY
         = "model.modifier.smallMovementPenalty";
+    public static final String SOL
+        = "model.modifier.SoL";
     public static final String TILE_TYPE_CHANGE_PRODUCTION
         = "model.modifier.tileTypeChangeProduction";
     public static final String TRADE_BONUS

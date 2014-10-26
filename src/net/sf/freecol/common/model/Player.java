@@ -1570,18 +1570,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets the effective amount of liberty points this player has.
-     * That is, the normal liberty amount post application of
-     * modifiers.
-     *
-     * @return The effective amount of liberty points.
-     */
-    public int getEffectiveLiberty() {
-        return (int)applyModifiers((float)getLiberty(), getGame().getTurn(),
-                                   Modifier.LIBERTY);
-    }
-
-    /**
      * Sets the current amount of liberty this player has.
      *
      * @param liberty The new amount of liberty.
@@ -1755,7 +1743,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *     needs in order to recruit the next <code>FoundingFather</code>.
      */
     public int getRemainingFoundingFatherCost() {
-        return getTotalFoundingFatherCost() - getEffectiveLiberty();
+        return getTotalFoundingFatherCost() - getLiberty();
     }
 
     /**

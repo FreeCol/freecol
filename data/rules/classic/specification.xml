@@ -2255,8 +2255,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.simonBolivar" type="political"
                      weight1="0" weight2="4" weight3="6">
-      <modifier id="model.modifier.liberty" index="40"
-                type="percentage" value="20"/>
+      <modifier id="model.modifier.SoL" type="additive" value="20"/>
     </founding-father>
     <founding-father id="model.foundingFather.benjaminFranklin" type="political"
                      weight1="5" weight2="5" weight3="5">

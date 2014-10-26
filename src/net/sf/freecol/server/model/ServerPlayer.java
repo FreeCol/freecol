@@ -800,7 +800,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         
         for (Colony c : getColonies()) {
-            score += c.getEffectiveLiberty();
+            score += c.getLiberty();
         }
 
         score += SCORE_FOUNDING_FATHER * getFathers().size();

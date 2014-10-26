@@ -311,16 +311,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Gets the effective liberty following modifiers.
-     *
-     * @return The current effective liberty.
-     */
-    public int getEffectiveLiberty() {
-        return (int)applyModifiers((float)getLiberty(), getGame().getTurn(),
-                                   getOwner().getModifiers(Modifier.LIBERTY));
-    }
-
-    /**
      * Gets the production bonus of the colony.
      *
      * @return The current production bonus of the colony.
@@ -1346,7 +1336,7 @@ public class Colony extends Settlement implements Nameable {
         int uc = getUnitCount();
         oldSonsOfLiberty = sonsOfLiberty;
         oldTories = tories;
-        sonsOfLiberty = calculateSoLPercentage(uc, getEffectiveLiberty());
+        sonsOfLiberty = calculateSoLPercentage(uc, getLiberty());
         tories = uc - calculateRebels(uc, sonsOfLiberty);
     }
 
@@ -1358,16 +1348,18 @@ public class Colony extends Settlement implements Nameable {
      * @param liberty The amount of liberty.
      * @return The percentage of SoLs, negative if not calculable.
      */
-    private static int calculateSoLPercentage(int uc, int liberty) {
+    private int calculateSoLPercentage(int uc, int liberty) {
         if (uc <= 0) return -1;
 
-        int membership = (liberty * 100) / (LIBERTY_PER_REBEL * uc);
-        if (membership < 0) {
-            membership = 0;
-        } else if (membership > 100) {
-            membership = 100;
+        float membership = (liberty * 100.0f) / (LIBERTY_PER_REBEL * uc);
+        membership = applyModifiers(membership, getGame().getTurn(),
+                                    getOwner().getModifiers(Modifier.SOL));
+        if (membership < 0.0f) {
+            membership = 0.0f;
+        } else if (membership > 100.0f) {
+            membership = 100.0f;
         }
-        return membership;
+        return (int)membership;
     }
 
     /**
@@ -1376,7 +1368,7 @@ public class Colony extends Settlement implements Nameable {
      * @return The percentage of SoLs, negative if not calculable.
      */
     public int getSoLPercentage() {
-        return calculateSoLPercentage(getUnitCount(), getEffectiveLiberty());
+        return calculateSoLPercentage(getUnitCount(), getLiberty());
     }
 
     /**
@@ -1536,7 +1528,7 @@ public class Colony extends Settlement implements Nameable {
         final int goodGovernment
             = spec.getInteger(GameOptions.GOOD_GOVERNMENT_LIMIT);
 
-        int rebelPercent = calculateSoLPercentage(unitCount, getEffectiveLiberty());
+        int rebelPercent = calculateSoLPercentage(unitCount, getLiberty());
         int rebelCount = calculateRebels(unitCount, rebelPercent);
         int loyalistCount = unitCount - rebelCount;
 

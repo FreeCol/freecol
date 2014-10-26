@@ -2036,11 +2036,17 @@ public final class Specification {
         // Bolivar changed from being an event to a liberty modifier.
         FoundingFather bolivar
             = getFoundingFather("model.foundingFather.simonBolivar");
+        boolean bolivarAdd = false;
         if (!bolivar.getEvents().isEmpty()) {
             bolivar.setEvents(Collections.<Event>emptyList());
-            bolivar.addModifier(new Modifier(Modifier.LIBERTY, 20,
-                    Modifier.ModifierType.PERCENTAGE, bolivar,
-                    Modifier.FATHER_PRODUCTION_INDEX));
+            bolivarAdd = true;
+        } else if (bolivar.hasModifier(Modifier.LIBERTY)) {
+            bolivar.removeModifiers(Modifier.LIBERTY);
+            bolivarAdd = true;
+        }
+        if (bolivarAdd) {
+            bolivar.addModifier(new Modifier(Modifier.SOL, 20,
+                    Modifier.ModifierType.ADDITIVE, bolivar, 0));
         }
 
         // Nation FOUND_COLONY -> FOUNDS_COLONIES

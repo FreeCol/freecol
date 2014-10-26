@@ -346,12 +346,12 @@ public class ServerColonyTest extends FreeColTestCase {
         colony.addGoods(bellsType, 7);
         bells += 7;
         assertEquals(bells, colony.getGoodsCount(bellsType));
-        assertEquals(bells, colony.getEffectiveLiberty());
+        assertEquals(bells, colony.getLiberty());
 
         colony.removeGoods(bellsType, 5);
         bells -= 5;
         assertEquals(bells, colony.getGoodsCount(bellsType));
-        assertEquals(bells, colony.getEffectiveLiberty());
+        assertEquals(bells, colony.getLiberty());
 
         int crosses = colony.getTotalProductionOf(crossesType)
             - colony.getConsumptionOf(crossesType);

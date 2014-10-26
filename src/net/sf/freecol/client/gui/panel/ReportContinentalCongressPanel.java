@@ -88,7 +88,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             for (Colony colony : player.getColonies()) {
                 total += colony.getNetProductionOf(bellsType);
             }
-            int bells = player.getEffectiveLiberty();
+            int bells = player.getLiberty();
             int required = player.getTotalFoundingFatherCost();
             progressBar.update(0, required, bells, total);
             recruitingPanel.add(progressBar, "wrap 20");

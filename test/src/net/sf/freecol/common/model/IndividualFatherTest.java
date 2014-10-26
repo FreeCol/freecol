@@ -90,30 +90,41 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
-        Colony colony = getStandardColony(4);
+        final int pop = 5;
+        Colony colony = getStandardColony(pop);
         Player player = colony.getOwner();
         List<AbstractGoods> empty = new ArrayList<AbstractGoods>();
         Building townHall = colony.getBuilding(townHallType);
 
+        // Zero to start
         assertEquals(0, colony.getLiberty());
-        assertEquals(0, colony.getEffectiveLiberty());
-        final int inc = 400;
+        assertEquals(0, colony.getSoL());
+
+        // Add enough to raise 2 out of 5 to rebels => 40%
+        int inc = 2 * Colony.LIBERTY_PER_REBEL;
         colony.addLiberty(inc);
         assertEquals(inc, colony.getLiberty());
-        assertEquals(inc, colony.getEffectiveLiberty());
+        assertEquals(100 * inc / (pop * Colony.LIBERTY_PER_REBEL),
+                     colony.getSoL());
 
+        // Add Bolivar and check that percentage is 20% higher
         player.addFather(simonBolivar);
-
+        colony.addLiberty(0); // provoke recalculation
         assertEquals(inc, colony.getLiberty());
-        assertEquals(inc + inc/5, colony.getEffectiveLiberty());
+        assertEquals(100 * inc / (pop * Colony.LIBERTY_PER_REBEL) + 20,
+                     colony.getSoL());
 
-        Set<Modifier> modifierSet = player.getModifiers(Modifier.LIBERTY);
+        // Is the modifier present
+        Set<Modifier> modifierSet = player.getModifiers(Modifier.SOL);
         assertEquals(1, modifierSet.size());
         Modifier bolivarModifier = modifierSet.iterator().next();
         assertEquals(simonBolivar, bolivarModifier.getSource());
 
-        assertEquals(inc, player.getLiberty());
-        assertEquals(inc + inc/5, player.getEffectiveLiberty());
+        // Check that SoL stops at 100%
+        colony.addLiberty(pop * Colony.LIBERTY_PER_REBEL);
+        assertEquals(inc + pop * Colony.LIBERTY_PER_REBEL,
+                     player.getLiberty());
+        assertEquals(100, player.getSoL());
     }
 
     public void testBrebeuf() {
