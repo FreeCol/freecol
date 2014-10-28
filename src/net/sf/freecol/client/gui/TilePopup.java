@@ -35,6 +35,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ReportPanel;
@@ -53,8 +54,8 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.util.LogBuilder;
-
 
 
 /**
@@ -137,6 +138,7 @@ public final class TilePopup extends JPopupMenu {
             }
 
             // Add move to Europe entry if the unit can do so
+            final InGameController igc = freeColClient.getInGameController();
             if (unitTile == tile && activeUnit.hasHighSeasMove()) {
                 JMenuItem europeMenuItem
                     = new JMenuItem(Messages.message(StringTemplate
@@ -146,12 +148,62 @@ public final class TilePopup extends JPopupMenu {
                             if (!freeColClient.currentPlayerIsMyPlayer()) {
                                 return;
                             }
-                            freeColClient.getInGameController()
-                                .moveTo(activeUnit, player.getEurope());
+                            igc.moveTo(activeUnit, player.getEurope());
                         }
                     });
                 add(europeMenuItem);
                 hasAnItem = true;
+            }
+
+            // Add state changes if present
+            if (unitTile == tile) {
+                JMenuItem ji = null;
+                if (activeUnit.checkSetState(UnitState.ACTIVE)) {
+                    ji = new JMenuItem(Messages.message("activateUnit"));
+                    ji.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent event) {
+                                if (activeUnit.checkSetState(UnitState.ACTIVE)) {
+                                    igc.changeState(activeUnit, Unit.UnitState.ACTIVE);
+                                }
+                            }
+                        });
+                    add(ji);
+                    hasAnItem = true;
+                }
+                if (activeUnit.checkSetState(UnitState.FORTIFYING)) {
+                    ji = new JMenuItem(Messages.message("fortifyUnit"));
+                    ji.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent event) {
+                                if (activeUnit.checkSetState(UnitState.FORTIFYING)) {
+                                    igc.changeState(activeUnit, Unit.UnitState.FORTIFYING);
+                                }
+                            }
+                        });
+                    add(ji);
+                    hasAnItem = true;
+                }
+                if (activeUnit.checkSetState(UnitState.SKIPPED)) {
+                    ji = new JMenuItem(Messages.message("skipUnit"));
+                    ji.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent event) {
+                                if (activeUnit.checkSetState(UnitState.SKIPPED)) {
+                                    igc.changeState(activeUnit, Unit.UnitState.SKIPPED);
+                                }
+                            }
+                        });
+                    add(ji);
+                    hasAnItem = true;
+                }
+                if (activeUnit.getDestination() != null) {
+                    ji = new JMenuItem(Messages.message("clearUnitOrders"));
+                    ji.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent event) {
+                                igc.setDestination(activeUnit, null);
+                            }
+                        });
+                    add(ji);
+                    hasAnItem = true;
+                }
             }
             if (hasAnItem) addSeparator();
         }
@@ -174,6 +226,7 @@ public final class TilePopup extends JPopupMenu {
         Container currentMenu = this;
         boolean moreUnits = false;
         List<Unit> units = tile.getUnitList();
+        Unit firstUnit = tile.getFirstUnit();
         Collections.sort(units, ReportPanel.getUnitTypeComparator());
         for (final Unit currentUnit : units) {
 
@@ -192,7 +245,7 @@ public final class TilePopup extends JPopupMenu {
                 !currentUnit.isDamaged(), false);
         }
 
-        if (tile.getUnitCount() > 1 && player.owns(tile.getFirstUnit())) {
+        if (tile.getUnitCount() > 1 && player.owns(firstUnit)) {
             if (moreUnits) addSeparator();
             JMenuItem activateAllItem = new JMenuItem(Messages
                 .message(StringTemplate.template("activateAllUnits")));
