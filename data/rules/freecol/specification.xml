@@ -183,6 +183,9 @@
         <booleanOption id="model.option.teleportREF" defaultValue="false"/>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
+        <!-- Is colony bell accumulation capped when 100% rebels achieved? -->
+        <booleanOption id="model.option.bellAccumulationCapped"
+                       defaultValue="false"/>
         <!-- Does the Custom House sell boycotted goods -->
         <booleanOption id="model.option.customIgnoreBoycott"
                        defaultValue="false"/>

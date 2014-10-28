@@ -1161,6 +1161,9 @@ public final class FreeColServer {
             "model.difficulty.cheat", 4, true);
         addIntegerOption(GameOptions.EQUIP_PIONEER_CHEAT,
             "model.difficulty.cheat", 10, true);
+
+        addBooleanOption(GameOptions.BELL_ACCUMULATION_CAPPED,
+            "gameOptions.colony", false, false);
     }
 
     private void addOptionGroup(String id, boolean difficulty) {

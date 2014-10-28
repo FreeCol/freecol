@@ -102,6 +102,10 @@ public class GameOptions {
 
     // Colony group
 
+    /** Is bell accumulation capped when 100% rebels achieved? */
+    public static final String BELL_ACCUMULATION_CAPPED
+        = "model.option.bellAccumulationCapped";
+
     /** Does the Custom House sell boycotted goods? */
     public static final String CUSTOM_IGNORE_BOYCOTT
         = "model.option.customIgnoreBoycott";

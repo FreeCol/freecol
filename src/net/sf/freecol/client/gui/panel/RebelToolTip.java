@@ -31,6 +31,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -93,19 +94,22 @@ public class RebelToolTip extends JToolTip {
             for (JLabel j : labels) add(j);
         }
 
+        boolean capped = spec.getBoolean(GameOptions.BELL_ACCUMULATION_CAPPED)
+            && colony.getSoL() >= 100;
         final int liberty = colony.getLiberty();
         final int modulo = liberty % Colony.LIBERTY_PER_REBEL;
         final int width = (int)getPreferredSize().getWidth() - 32;
         FreeColProgressBar progress
             = new FreeColProgressBar(freeColClient.getGUI(), null, 0, 
-                Colony.LIBERTY_PER_REBEL, modulo, libertyProduction);
+                Colony.LIBERTY_PER_REBEL, modulo,
+                ((capped) ? 0 : libertyProduction));
         progress.setPreferredSize(new Dimension(width, 20));
         add(progress, "span 3");
 
         double turnsNext = -1.0;
         double turns100 = -1.0;
         double turns50 = -1.0;
-        if (libertyProduction > 0) {
+        if (libertyProduction > 0 && !capped) {
             int requiredLiberty = Colony.LIBERTY_PER_REBEL - modulo;
 
             turnsNext = (1 + requiredLiberty) / (double)libertyProduction;

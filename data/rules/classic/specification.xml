@@ -3539,6 +3539,9 @@
                        defaultValue="2" minimumValue="0" />
       </optionGroup>
       <optionGroup id="gameOptions.colony">
+        <!-- Is colony bell accumulation capped when 100% rebels achieved? -->
+        <booleanOption id="model.option.bellAccumulationCapped"
+                       defaultValue="true"/>
         <!-- Does the Custom House sell boycotted goods -->
         <booleanOption id="model.option.customIgnoreBoycott"
                        defaultValue="true"/>

@@ -39,6 +39,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.util.LogBuilder;
@@ -1322,10 +1323,23 @@ public class Colony extends Settlement implements Nameable {
      * @param amount An amount of liberty.
      */
     public void modifyLiberty(int amount) {
-        liberty += amount;
+        // Produced liberty always applies to the player (for FFs etc)
         getOwner().modifyLiberty(amount);
+
+        liberty += amount;
+        // Liberty can not meaningfully go negative.
+        liberty = Math.max(0, liberty);
+
         updateSoL();
         updateProductionBonus();
+
+        // If the bell accumulation cap option is set, and the colony
+        // has reached 100%, liberty can not rise higher.
+        boolean capped = getSpecification()
+            .getBoolean(GameOptions.BELL_ACCUMULATION_CAPPED);
+        if (capped && sonsOfLiberty >= 100) {
+            liberty = LIBERTY_PER_REBEL * getUnitCount();
+        }
     }
 
     /**
