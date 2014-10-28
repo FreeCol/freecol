@@ -470,6 +470,7 @@ public class Unit extends GoodsLocation
      *     the new value.
      */
     public boolean checkSetState(UnitState s) {
+        if (getState() == s) return false;
         switch (s) {
         case ACTIVE:
             return true;
@@ -486,8 +487,7 @@ public class Unit extends GoodsLocation
         case SENTRY:
             return true;
         case SKIPPED:
-            if (getState() == UnitState.ACTIVE) return true;
-            // Fall through
+            return getState() == UnitState.ACTIVE;
         default:
             logger.warning("Invalid unit state: " + s);
             return false;
