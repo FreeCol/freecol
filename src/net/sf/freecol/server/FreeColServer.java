@@ -1066,6 +1066,7 @@ public final class FreeColServer {
     }
 
     /**
+     * Add option to capture units under repair in a colony.
      * Establish a new unknown enemy player.
      *
      * @param game The <code>Game</code> to establish the enemy within.

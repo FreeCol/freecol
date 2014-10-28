@@ -617,6 +617,11 @@ public class Unit extends GoodsLocation
         // before finishing with it
         for (Unit u : getUnitList()) u.changeOwner(owner);
 
+        if (getTeacher() != null && !canBeStudent(getTeacher())) {
+            getTeacher().setStudent(null);
+            setTeacher(null);
+        }
+
         if (oldOwner != null) oldOwner.removeUnit(this);
         if (owner != null) owner.addUnit(this);
 

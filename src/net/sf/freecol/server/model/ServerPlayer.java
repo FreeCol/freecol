@@ -3032,10 +3032,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     private void csDamageColonyShips(Unit attacker, Colony colony,
                                      ChangeSet cs) {
+        boolean captureRepairing = getSpecification()
+            .getBoolean(GameOptions.CAPTURE_UNITS_UNDER_REPAIR);
         List<Unit> units = colony.getTile().getUnitList();
         while (!units.isEmpty()) {
             Unit unit = units.remove(0);
-            if (unit.isNaval()) csDamageShipAttack(attacker, unit, cs);
+            if (unit.isNaval() && !(captureRepairing && unit.isDamaged())) {
+                csDamageShipAttack(attacker, unit, cs);
+            }
         }
     }
 
@@ -3768,10 +3772,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csSinkColonyShips(Unit attacker, Colony colony, ChangeSet cs) {
+        boolean captureRepairing = getSpecification()
+            .getBoolean(GameOptions.CAPTURE_UNITS_UNDER_REPAIR);
         List<Unit> units = colony.getTile().getUnitList();
         while (!units.isEmpty()) {
             Unit unit = units.remove(0);
-            if (unit.isNaval()) {
+            if (unit.isNaval() && !(captureRepairing && unit.isDamaged())) {
                 csSinkShipAttack(attacker, unit, cs);
             }
         }
@@ -4182,7 +4188,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
             }
         }
-        if (!unit.changeType(mainType)) {
+        if (mainType != unit.getType() && !unit.changeType(mainType)) {
             throw new IllegalStateException("Type change failure: " + unit
                 + " -> " + mainType);
         }

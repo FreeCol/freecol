@@ -186,6 +186,9 @@
         <!-- Is colony bell accumulation capped when 100% rebels achieved? -->
         <booleanOption id="model.option.bellAccumulationCapped"
                        defaultValue="false"/>
+        <!-- Capture units under repair when a colony is captured? -->
+        <booleanOption id="model.option.captureUnitsUnderRepair"
+                       defaultValue="true"/>
         <!-- Does the Custom House sell boycotted goods -->
         <booleanOption id="model.option.customIgnoreBoycott"
                        defaultValue="false"/>

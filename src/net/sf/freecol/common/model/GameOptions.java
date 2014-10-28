@@ -111,6 +111,10 @@ public class GameOptions {
     public static final String BELL_ACCUMULATION_CAPPED
         = "model.option.bellAccumulationCapped";
 
+    /** Capture units under repair with colony. */
+    public static final String CAPTURE_UNITS_UNDER_REPAIR
+        = "model.option.captureUnitsUnderRepair";
+
     /** Does the Custom House sell boycotted goods? */
     public static final String CUSTOM_IGNORE_BOYCOTT
         = "model.option.customIgnoreBoycott";

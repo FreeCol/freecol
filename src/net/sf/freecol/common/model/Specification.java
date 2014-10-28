@@ -2464,6 +2464,8 @@ public final class Specification {
         // @compat 0.11.0
         ret |= checkBooleanOption(GameOptions.BELL_ACCUMULATION_CAPPED,
                                   GameOptions.GAMEOPTIONS_COLONY, false);
+        ret |= checkBooleanOption(GameOptions.CAPTURE_UNITS_UNDER_REPAIR,
+                                  GameOptions.GAMEOPTIONS_COLONY, false);
         // end @compat 0.11.0
 
         return ret;
