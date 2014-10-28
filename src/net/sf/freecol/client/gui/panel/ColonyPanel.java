@@ -883,6 +883,7 @@ public final class ColonyPanel extends PortPanel
 
         getGUI().removeFromCanvas(this);
         getGUI().getMapViewer().restartBlinking();
+        getGUI().updateMapControls();
 
         // Talk to the controller last, allow all the cleanup to happen first.
         if (abandon) getController().abandonColony(colony);
