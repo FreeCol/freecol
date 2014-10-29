@@ -21,6 +21,8 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 
+import java.io.File;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;

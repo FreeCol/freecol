@@ -447,19 +447,12 @@ public final class Specification {
             group = new OptionGroup(this);
             group.readFromXML(xr);
             if (!optionId.equals(group.getId())) {
-                try {
-                    group = group.getOptionGroup(optionId);
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "Options file " + file.getPath()
-                        + " does not contain expected group " + optionId, e);
-                    group = null;
-                }
-            }
-            if (group != null) {
-                getOptionGroup(optionId).setValue(group);
-                logger.info("Loaded " + optionId + " options from file "
-                    + file.getPath());
-            }
+                Option op = group.getOption(optionId);
+                group = (op instanceof OptionGroup) ? (OptionGroup)op : null;
+            }                   
+            logger.info("Loaded " + optionId + " group from file "
+                + file.getPath() 
+                + ((group == null) ? " failed" : " succeeded"));
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to load OptionGroup "
                 + optionId + " from " + file.getName(), e);
@@ -467,6 +460,50 @@ public final class Specification {
             if (xr != null) xr.close();
         }
         return group;
+    }
+
+    /**
+     * Merge an option group into the spec.
+     *
+     * @param group The <code>OptionGroup</code> to merge.
+     * @return The merged <code>OptionGroup</code> from this
+     *     <code>Specification</code>.
+     */
+    public OptionGroup mergeGroup(OptionGroup group) {
+        OptionGroup realGroup = allOptionGroups.get(group.getId());
+        if (realGroup == null || !realGroup.isEditable()) return realGroup;
+
+        for (Option o : group.getOptions()) {
+            if (o instanceof OptionGroup) {
+                mergeGroup((OptionGroup)o);
+            } else {
+                realGroup.add(o);
+            }
+        }
+        return realGroup;
+    }
+                
+    /**
+     * Save a limited set of options to a file.
+     *
+     * Useful to save the user game and map generator options before
+     * starting a new game.
+     *
+     * @param group The <code>OptionGroup</code> to save.
+     * @param file The <code>File</code> to save to.
+     * @return The <code>OptionGroup</code> saved, or null on error.
+     */
+    public OptionGroup saveOptionsFile(OptionGroup group, File file) {
+        if (group != null) {
+            try {
+                return (group.save(file, FreeColXMLWriter.WriteScope.toSave(),
+                                   true)) ? group : null;
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to save option group "
+                    + group.getId() + " to " + file.getName(), e);
+            }
+        }
+        return null;
     }
 
     /**

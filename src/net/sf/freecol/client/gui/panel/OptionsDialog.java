@@ -187,36 +187,12 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the load succeeded.
      */
     protected boolean load(File file) {
-        boolean ret = false;
-        FreeColXMLReader xr = null;
-        try {
-            xr = new FreeColXMLReader(new FileInputStream(file));
-            xr.nextTag();
-            // TODO: read into group rather than specification
-            OptionGroup group = new OptionGroup(getSpecification());
-            group.readFromXML(xr);
-            String expect = getOptionGroupId();
-            if (!expect.equals(group.getId())) {
-                try {
-                    group = group.getOptionGroup(expect);
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "Options file " + file.getPath()
-                        + " does not contain expected group " + expect, e);
-                }
-            }
-            if (group != null) {
-                getSpecification().getOptionGroup(expect).setValue(group);
-                logger.info("Loaded options from file " + file.getPath());
-                reset(group);
-                ret = true;
-            }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to load OptionGroup "
-                + getOptionGroupId() + " from " + file.getName(), e);
-        } finally {
-            if (xr != null) xr.close();
-        }
-        return ret;
+        OptionGroup og = getSpecification()
+            .loadOptionsFile(getOptionGroupId(), file);
+        if (og == null) return false;
+
+        reset(group);
+        return true;
     }
 
     /**
@@ -226,15 +202,13 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the save succeeded.
      */
     protected boolean save(File file) {
-        try {
-            return group.save(file, FreeColXMLWriter.WriteScope.toSave(),
-                              false);
-        } catch (FileNotFoundException e) {
-            logger.log(Level.WARNING, "Save failed", e);
-            StringTemplate t = StringTemplate.template("failedToSave")
-                .addName("%name%", file.getPath());
-            getGUI().showInformationMessage(t);
-        }
+        OptionGroup og = getSpecification()
+            .saveOptionsFile(this.group, file);
+        if (og != null) return true;
+
+        StringTemplate t = StringTemplate.template("failedToSave")
+            .addName("%name%", file.getPath());
+        getGUI().showInformationMessage(t);
         return false;
     }
 

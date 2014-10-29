@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
@@ -87,10 +88,24 @@ public final class StartGamePanel extends FreeColPanel {
 
         if (singlePlayer || getMyPlayer().isAdmin()) {
             Specification spec = getSpecification();
-            spec.loadOptionsFile(GameOptions.getXMLElementTagName(),
-                FreeColDirectories.getOptionsFile(FreeColDirectories.GAME_OPTIONS_FILE_NAME));
-            spec.loadOptionsFile(MapGeneratorOptions.getXMLElementTagName(),
-                FreeColDirectories.getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME));
+
+            String gtag = GameOptions.getXMLElementTagName();
+            File gof = FreeColDirectories
+                .getOptionsFile(FreeColDirectories.GAME_OPTIONS_FILE_NAME);
+            OptionGroup gog = (gof.exists()) ? spec.loadOptionsFile(gtag, gof)
+                : null;
+            gog = (gog != null) ? spec.mergeGroup(gog)
+                : spec.getOptionGroup(gtag);
+            spec.saveOptionsFile(gog, gof);
+
+            String mtag = MapGeneratorOptions.getXMLElementTagName();
+            File mof = FreeColDirectories
+                .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
+            OptionGroup mog = (mof.exists()) ? spec.loadOptionsFile(mtag, mof)
+                : null;
+            mog = (mog != null) ? spec.mergeGroup(mog)
+                : spec.getOptionGroup(mtag);
+            spec.saveOptionsFile(mog, mof);
         }
 
         NationOptions nationOptions = getGame().getNationOptions();
