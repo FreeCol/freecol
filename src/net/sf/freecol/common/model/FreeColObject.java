@@ -913,13 +913,7 @@ public abstract class FreeColObject
      * @exception FileNotFoundException
      */
     public boolean save(File file) throws FileNotFoundException {
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
-            return save(fos, WriteScope.toSave(), false);
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-        }
+        return save(file, WriteScope.toSave());
     }
 
     /**
@@ -931,10 +925,23 @@ public abstract class FreeColObject
      * @exception FileNotFoundException
      */
     public boolean save(File file, WriteScope scope) throws FileNotFoundException {
+        return save(file, scope, false);
+    }
+
+    /**
+     * Writes the object to the given file.
+     *
+     * @param file The <code>File</code> to write to.
+     * @param scope The <code>WriteScope</code> to use.
+     * @param pretty Attempt to indent the output nicely.
+     * @return True if the save proceeded without error.
+     * @exception FileNotFoundException
+     */
+    public boolean save(File file, WriteScope scope, boolean pretty) throws FileNotFoundException {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(file);
-            return save(fos, scope, false);
+            return save(fos, scope, pretty);
         } finally {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
