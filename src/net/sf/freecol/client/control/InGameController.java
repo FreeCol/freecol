@@ -4021,6 +4021,11 @@ public final class InGameController implements NetworkConstants {
     public void payForBuilding(Colony colony) {
         if (!requireOurTurn()) return;
 
+        if (!getSpecification().getBoolean(GameOptions.PAY_FOR_BUILDING)) {
+            gui.showErrorMessage("payForBuilding.disabled");
+            return;
+        }
+
         if (!colony.canPayToFinishBuilding()) {
             gui.showErrorMessage("notEnoughGold");
             return;

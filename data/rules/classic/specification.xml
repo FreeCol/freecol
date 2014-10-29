@@ -3555,6 +3555,10 @@
         <!-- Can colonies be founded during the war of independence? -->
         <booleanOption id="model.option.foundColonyDuringRebellion"
                        defaultValue="false"/>
+        <!-- Can colony buildings be completed quickly by paying for the
+             missing goods? -->
+        <booleanOption id="model.option.payForBuilding"
+                       defaultValue="true"/>
         <!-- Overflow hammer and cross production is preserved? -->
         <booleanOption id="model.option.saveProductionOverflow"
                        defaultValue="true"/>

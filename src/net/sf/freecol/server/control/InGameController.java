@@ -3634,6 +3634,11 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element payForBuilding(ServerPlayer serverPlayer, Colony colony) {
+        if (!getGame().getSpecification()
+            .getBoolean(GameOptions.PAY_FOR_BUILDING)) {
+            return DOMMessage.clientError(Messages.message("payForBuilding.disabled"));
+        }
+
         BuildableType build = colony.getCurrentlyBuilding();
         if (build == null) {
             return DOMMessage.clientError("Colony " + colony.getId()

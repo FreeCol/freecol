@@ -131,6 +131,13 @@ public class GameOptions {
         = "model.option.foundColonyDuringRebellion";
 
     /**
+     * Can colony buildings be completed quickly by paying for the
+     * missing goods?
+     */
+    public static final String PAY_FOR_BUILDING
+        = "model.option.payForBuilding";
+
+    /**
      * Does a hammer surplus after a build completes accumulate to
      * the next build?
      */

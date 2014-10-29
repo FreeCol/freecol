@@ -74,6 +74,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -423,8 +424,11 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     }
 
     private void updateBuyBuildingButton() {
+        final boolean pay = getSpecification()
+            .getBoolean(GameOptions.PAY_FOR_BUILDING);
+
         DefaultListModel current = (DefaultListModel) buildQueueList.getModel();
-        if (current.getSize() == 0) {
+        if (current.getSize() == 0 || !pay) {
             buyBuilding.setEnabled(false);
         } else {
             buyBuilding.setEnabled(colony.canPayToFinishBuilding((BuildableType) current.getElementAt(0)));

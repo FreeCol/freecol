@@ -2466,6 +2466,8 @@ public final class Specification {
                                   GameOptions.GAMEOPTIONS_COLONY, false);
         ret |= checkBooleanOption(GameOptions.CAPTURE_UNITS_UNDER_REPAIR,
                                   GameOptions.GAMEOPTIONS_COLONY, false);
+        ret |= checkBooleanOption(GameOptions.PAY_FOR_BUILDING,
+                                  GameOptions.GAMEOPTIONS_COLONY, true);
         // end @compat 0.11.0
 
         return ret;
