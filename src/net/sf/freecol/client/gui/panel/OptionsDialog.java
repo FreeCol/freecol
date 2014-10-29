@@ -226,18 +226,14 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the save succeeded.
      */
     protected boolean save(File file) {
-        FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(file);
-            return group.save(fos, FreeColXMLWriter.WriteScope.toSave(),
+            return group.save(file, FreeColXMLWriter.WriteScope.toSave(),
                               false);
         } catch (FileNotFoundException e) {
             logger.log(Level.WARNING, "Save failed", e);
             StringTemplate t = StringTemplate.template("failedToSave")
                 .addName("%name%", file.getPath());
             getGUI().showInformationMessage(t);
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
         return false;
     }
