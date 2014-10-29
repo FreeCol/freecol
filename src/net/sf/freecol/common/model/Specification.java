@@ -71,6 +71,9 @@ public final class Specification {
 
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
+    /** The difficulty levels option group is special. */
+    private static final String DIFFICULTY_LEVELS = "difficultyLevels";
+
     /** Roles backward compatibility fragment. */
     public static final String ROLES_COMPAT_FILE_NAME = "roles-compat.xml";
 
@@ -651,6 +654,20 @@ public final class Specification {
     }
 
     /**
+     * Disable editing of some critical option groups.
+     */
+    public void disableEditing() {
+        for (String s : new String[] {
+                GameOptions.getXMLElementTagName(),
+                MapGeneratorOptions.getXMLElementTagName(),
+                DIFFICULTY_LEVELS
+            }) {
+            OptionGroup og = allOptionGroups.get(s);
+            if (og != null) og.setEditable(false);
+        }
+    }
+
+    /**
      * Generate the dynamic options.
      *
      * Only call this in the server.  If clients call it the European
@@ -939,7 +956,7 @@ public final class Specification {
      */
     public void fixOptionGroup(OptionGroup optionGroup, boolean difficulty) {
         if (difficulty) {
-            for (Option option : allOptionGroups.get("difficultyLevels")
+            for (Option option : allOptionGroups.get(DIFFICULTY_LEVELS)
                      .getOptions()) {
                 if (option instanceof OptionGroup) {
                     OptionGroup level = (OptionGroup) option;
@@ -1514,7 +1531,8 @@ public final class Specification {
      */
     public List<OptionGroup> getDifficultyLevels() {
         List<OptionGroup> result = new ArrayList<OptionGroup>();
-        for (Option option : allOptionGroups.get("difficultyLevels").getOptions()) {
+        for (Option option : allOptionGroups.get(DIFFICULTY_LEVELS)
+                 .getOptions()) {
             if (option instanceof OptionGroup) {
                 result.add((OptionGroup) option);
             }
@@ -2060,7 +2078,7 @@ public final class Specification {
         // Fix REF roles, soldier -> infantry, dragoon -> cavalry
         // Older specs (<= 0.10.5 ?) had refSize directly under difficulty
         // level, later moved it under the monarch group.
-        for (Option o : allOptionGroups.get("difficultyLevels").getOptions()) {
+        for (Option o : allOptionGroups.get(DIFFICULTY_LEVELS).getOptions()) {
             if (!(o instanceof OptionGroup)) continue;
             Option monarch = ((OptionGroup)o)
                 .getOption("model.difficulty.monarch");
@@ -2084,7 +2102,7 @@ public final class Specification {
 
         // Fix all other UnitListOptions
         List<Option> todo
-            = new ArrayList<Option>(allOptionGroups.get("difficultyLevels")
+            = new ArrayList<Option>(allOptionGroups.get(DIFFICULTY_LEVELS)
                                                    .getOptions());
         while (!todo.isEmpty()) {
             Option o = todo.remove(0);

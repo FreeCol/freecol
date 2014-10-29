@@ -1030,15 +1030,8 @@ public final class FreeColServer {
         // end @compat
 
         // Ensure that critical option groups can not be edited.
-        try {
-            specification = getSpecification();
-            specification.getMapGeneratorOptions().setEditable(false);
-            specification.getGameOptions().setEditable(false);
-            specification.getOptionGroup("difficultyLevels").setEditable(false);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to set option groups read-only.",
-                e);
-        }
+        specification = getSpecification();
+        specification.disableEditing();
 
         // AI initialization.
         AIMain aiMain = getAIMain();
