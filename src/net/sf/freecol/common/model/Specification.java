@@ -343,7 +343,7 @@ public final class Specification {
         this();
         initialized = false;
         load(xr);
-        fixup010x();
+        applyFixes();
         clean("load from stream");
         initialized = true;
     }
@@ -371,7 +371,7 @@ public final class Specification {
         this();
         initialized = false;
         load(in);
-        fixup010x();
+        applyFixes();
         clean("load from InputStream");
         initialized = true;
     }
@@ -1760,148 +1760,26 @@ public final class Specification {
     }
 
 
-    // Serialization
-
-    private static final String BUILDING_TYPES_TAG = "building-types";
-    private static final String DIFFICULTY_LEVEL_TAG = "difficultyLevel";
-    private static final String DISASTERS_TAG = "disasters";
-    private static final String EUROPEAN_NATION_TYPES_TAG = "european-nation-types";
-    private static final String EVENTS_TAG = "events";
-    private static final String FOUNDING_FATHERS_TAG = "founding-fathers";
-    private static final String GOODS_TYPES_TAG = "goods-types";
-    private static final String INDIAN_NATION_TYPES_TAG = "indian-nation-types";
-    private static final String MODIFIERS_TAG = "modifiers";
-    private static final String NATIONS_TAG = "nations";
-    private static final String OPTIONS_TAG = "options";
-    private static final String RESOURCE_TYPES_TAG = "resource-types";
-    private static final String ROLES_TAG = "roles";
-    private static final String TILE_TYPES_TAG = "tile-types";
-    private static final String TILEIMPROVEMENT_TYPES_TAG = "tileimprovement-types";
-    private static final String UNIT_TYPES_TAG = "unit-types";
-    private static final String VERSION_TAG = "version";
-    // @compat 0.10.x
-    private static final String EQUIPMENT_TYPES_TAG = "equipment-types";
-    // end @compat 0.10.x
-
+    // Backward compatibility fixes.
+    // We do not pretend to fix everything, some specs are just too broken,
+    // or some changes too radical.  But we make an effort.
 
     /**
-     * Write an XML-representation of this object to the given stream.
-     *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
-     * @exception XMLStreamException if there are any problems writing
-     *      to the stream.
+     * Apply all the special fixes to bring older specifications up to
+     * date.
      */
-    protected void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        // Start element
-        xw.writeStartElement(getXMLElementTagName());
-
-        // Add attributes
-        xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
-        if (difficultyLevel != null) {
-            xw.writeAttribute(DIFFICULTY_LEVEL_TAG, difficultyLevel);
-        }
-        if (version != null) {
-            xw.writeAttribute(VERSION_TAG, version);
-        }
-
-        // copy the order of section in specification.xml
-        writeSection(xw, MODIFIERS_TAG, specialModifiers);
-        writeSection(xw, EVENTS_TAG, events);
-        writeSection(xw, DISASTERS_TAG, disasters);
-        writeSection(xw, GOODS_TYPES_TAG, goodsTypeList);
-        writeSection(xw, RESOURCE_TYPES_TAG, resourceTypeList);
-        writeSection(xw, TILE_TYPES_TAG, tileTypeList);
-        writeSection(xw, ROLES_TAG, roles);
-        writeSection(xw, TILEIMPROVEMENT_TYPES_TAG, tileImprovementTypeList);
-        writeSection(xw, UNIT_TYPES_TAG, unitTypeList);
-        writeSection(xw, BUILDING_TYPES_TAG, buildingTypeList);
-        writeSection(xw, FOUNDING_FATHERS_TAG, foundingFathers);
-        writeSection(xw, EUROPEAN_NATION_TYPES_TAG, europeanNationTypes);
-        writeSection(xw, EUROPEAN_NATION_TYPES_TAG, REFNationTypes);
-        writeSection(xw, INDIAN_NATION_TYPES_TAG, indianNationTypes);
-        writeSection(xw, NATIONS_TAG, nations);
-
-        // option tree has been flattened
-        xw.writeStartElement(OPTIONS_TAG);
-        for (OptionGroup item : allOptionGroups.values()) {
-            if ("".equals(item.getGroup())) {
-                item.toXML(xw);
-            }
-        }
-        xw.writeEndElement();
-
-        // End element
-        xw.writeEndElement();
-
-    }
-
-    private <T extends FreeColObject> void writeSection(FreeColXMLWriter xw,
-        String section, Collection<T> items) throws XMLStreamException {
-        xw.writeStartElement(section);
-
-        for (T item : items) item.toXML(xw);
-
-        xw.writeEndElement();
-    }
-
-    /**
-     * Initializes this object from its XML-representation.
-     *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @exception XMLStreamException if there are any problems reading
-     *     the stream.
-     */
-    public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
-        String newId = xr.readId();
-        if (id == null) id = newId; // don't overwrite id with parent id!
-
-        if (difficultyLevel == null) {
-            difficultyLevel = xr.getAttribute(DIFFICULTY_LEVEL_TAG,
-                                              (String)null);
-        }
-
-        version = xr.getAttribute(VERSION_TAG, (String)null);
-
-        logger.fine("Reading specification " + newId
-            + " difficulty=" + difficultyLevel
-            + " version=" + version);
-
-        String parentId = xr.getAttribute(FreeColGameObjectType.EXTENDS_TAG,
-                                          (String)null);
-        if (parentId != null) {
-            try {
-                FreeColTcFile parent = new FreeColTcFile(parentId);
-                load(parent.getSpecificationInputStream());
-                initialized = false;
-            } catch (IOException e) {
-                throw new XMLStreamException("Failed to open parent specification: ", e);
-            }
-        }
-
-        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String childName = xr.getLocalName();
-            logger.finest("Found child named " + childName);
-            // @compat 0.10.x
-            // Ideally we would handle role backward compatibility in
-            // the type reader triggered by the "roles" section of the
-            // spec.  Alas, specs pre-0.10.6 had no roles section.
-            // The next section after roles in modern specs is
-            // "equipment-types", which is also the first place roles
-            // are referred to directly, and better still is completely
-            // replaced by roles in 0.11.x.  So this is the last chance
-            // to fix any role omissions.
-            if ("equipment-types".equals(childName)) fixupRoles();
-            // end @compat 0.10.x
-            ChildReader reader = readerMap.get(childName);
-            if (reader == null) {
-                logger.warning("No reader found for: " + childName);
-            } else {  
-                reader.readChildren(xr);
-            }
-        }
+    private void applyFixes() {
+        fixup010x();
+        fixup011x();
     }
 
     // @compat 0.10.x
+    /**
+     * Handle the reworking of roles that landed in 0.11.0.
+     *
+     * Deliberately not part of applyFixes(), this is called from readFromXML
+     * which can most accurately determine whether it is needed.
+     */
     private void fixupRoles() {
         boolean zero10X;
         try {
@@ -1928,6 +1806,9 @@ public final class Specification {
             + " with roles: " + join(" ", roles));
     }
 
+    /**
+     * Specification backward compatibility for 0.10.x releases.
+     */
     private void fixup010x() {
         // @compat 0.10.1
         String[] years = new String[] {
@@ -2033,7 +1914,7 @@ public final class Specification {
                 }
             }
         }
-        // end @compat
+        // end @compat 0.10.5
 
         // @compat 0.10.7
         // Require the scopes added to founding fathers in git.8971674
@@ -2049,22 +1930,6 @@ public final class Specification {
             for (Modifier m : father.getModifiers(e.getValue())) {
                 m.requireNegatedPersonScope();
             }
-        }
-
-        // Bolivar changed from being an event to a liberty modifier.
-        FoundingFather bolivar
-            = getFoundingFather("model.foundingFather.simonBolivar");
-        boolean bolivarAdd = false;
-        if (!bolivar.getEvents().isEmpty()) {
-            bolivar.setEvents(Collections.<Event>emptyList());
-            bolivarAdd = true;
-        } else if (bolivar.hasModifier(Modifier.LIBERTY)) {
-            bolivar.removeModifiers(Modifier.LIBERTY);
-            bolivarAdd = true;
-        }
-        if (bolivarAdd) {
-            bolivar.addModifier(new Modifier(Modifier.SOL, 20,
-                    Modifier.ModifierType.ADDITIVE, bolivar, 0));
         }
 
         // Nation FOUND_COLONY -> FOUNDS_COLONIES
@@ -2294,6 +2159,172 @@ public final class Specification {
         // end @compat 0.10.7
     }
     // end @compat 0.10.x
+
+    // @compat 0.11.0
+    /**
+     * Specification backward compatibility for 0.11.x releases.
+     */
+    private void fixup011x() {
+        // Bolivar changed from being an event, then to a liberty modifier,
+        // and now to a SoL% modifier.
+        FoundingFather bolivar
+            = getFoundingFather("model.foundingFather.simonBolivar");
+        boolean bolivarAdd = false;
+        if (!bolivar.getEvents().isEmpty()) {
+            bolivar.setEvents(Collections.<Event>emptyList());
+            bolivarAdd = true;
+        } else if (bolivar.hasModifier(Modifier.LIBERTY)) {
+            bolivar.removeModifiers(Modifier.LIBERTY);
+            bolivarAdd = true;
+        }
+        if (bolivarAdd) {
+            bolivar.addModifier(new Modifier(Modifier.SOL, 20,
+                    Modifier.ModifierType.ADDITIVE, bolivar, 0));
+        }
+    }
+    // end @compat 0.11.x
+
+
+    // Serialization
+
+    private static final String BUILDING_TYPES_TAG = "building-types";
+    private static final String DIFFICULTY_LEVEL_TAG = "difficultyLevel";
+    private static final String DISASTERS_TAG = "disasters";
+    private static final String EUROPEAN_NATION_TYPES_TAG = "european-nation-types";
+    private static final String EVENTS_TAG = "events";
+    private static final String FOUNDING_FATHERS_TAG = "founding-fathers";
+    private static final String GOODS_TYPES_TAG = "goods-types";
+    private static final String INDIAN_NATION_TYPES_TAG = "indian-nation-types";
+    private static final String MODIFIERS_TAG = "modifiers";
+    private static final String NATIONS_TAG = "nations";
+    private static final String OPTIONS_TAG = "options";
+    private static final String RESOURCE_TYPES_TAG = "resource-types";
+    private static final String ROLES_TAG = "roles";
+    private static final String TILE_TYPES_TAG = "tile-types";
+    private static final String TILEIMPROVEMENT_TYPES_TAG = "tileimprovement-types";
+    private static final String UNIT_TYPES_TAG = "unit-types";
+    private static final String VERSION_TAG = "version";
+    // @compat 0.10.x
+    private static final String EQUIPMENT_TYPES_TAG = "equipment-types";
+    // end @compat 0.10.x
+
+
+    /**
+     * Write an XML-representation of this object to the given stream.
+     *
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @exception XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Start element
+        xw.writeStartElement(getXMLElementTagName());
+
+        // Add attributes
+        xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
+        if (difficultyLevel != null) {
+            xw.writeAttribute(DIFFICULTY_LEVEL_TAG, difficultyLevel);
+        }
+        if (version != null) {
+            xw.writeAttribute(VERSION_TAG, version);
+        }
+
+        // copy the order of section in specification.xml
+        writeSection(xw, MODIFIERS_TAG, specialModifiers);
+        writeSection(xw, EVENTS_TAG, events);
+        writeSection(xw, DISASTERS_TAG, disasters);
+        writeSection(xw, GOODS_TYPES_TAG, goodsTypeList);
+        writeSection(xw, RESOURCE_TYPES_TAG, resourceTypeList);
+        writeSection(xw, TILE_TYPES_TAG, tileTypeList);
+        writeSection(xw, ROLES_TAG, roles);
+        writeSection(xw, TILEIMPROVEMENT_TYPES_TAG, tileImprovementTypeList);
+        writeSection(xw, UNIT_TYPES_TAG, unitTypeList);
+        writeSection(xw, BUILDING_TYPES_TAG, buildingTypeList);
+        writeSection(xw, FOUNDING_FATHERS_TAG, foundingFathers);
+        writeSection(xw, EUROPEAN_NATION_TYPES_TAG, europeanNationTypes);
+        writeSection(xw, EUROPEAN_NATION_TYPES_TAG, REFNationTypes);
+        writeSection(xw, INDIAN_NATION_TYPES_TAG, indianNationTypes);
+        writeSection(xw, NATIONS_TAG, nations);
+
+        // option tree has been flattened
+        xw.writeStartElement(OPTIONS_TAG);
+        for (OptionGroup item : allOptionGroups.values()) {
+            if ("".equals(item.getGroup())) {
+                item.toXML(xw);
+            }
+        }
+        xw.writeEndElement();
+
+        // End element
+        xw.writeEndElement();
+
+    }
+
+    private <T extends FreeColObject> void writeSection(FreeColXMLWriter xw,
+        String section, Collection<T> items) throws XMLStreamException {
+        xw.writeStartElement(section);
+
+        for (T item : items) item.toXML(xw);
+
+        xw.writeEndElement();
+    }
+
+    /**
+     * Initializes this object from its XML-representation.
+     *
+     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @exception XMLStreamException if there are any problems reading
+     *     the stream.
+     */
+    public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
+        String newId = xr.readId();
+        if (id == null) id = newId; // don't overwrite id with parent id!
+
+        if (difficultyLevel == null) {
+            difficultyLevel = xr.getAttribute(DIFFICULTY_LEVEL_TAG,
+                                              (String)null);
+        }
+
+        version = xr.getAttribute(VERSION_TAG, (String)null);
+
+        logger.fine("Reading specification " + newId
+            + " difficulty=" + difficultyLevel
+            + " version=" + version);
+
+        String parentId = xr.getAttribute(FreeColGameObjectType.EXTENDS_TAG,
+                                          (String)null);
+        if (parentId != null) {
+            try {
+                FreeColTcFile parent = new FreeColTcFile(parentId);
+                load(parent.getSpecificationInputStream());
+                initialized = false;
+            } catch (IOException e) {
+                throw new XMLStreamException("Failed to open parent specification: ", e);
+            }
+        }
+
+        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String childName = xr.getLocalName();
+            logger.finest("Found child named " + childName);
+            // @compat 0.10.x
+            // Ideally we would handle role backward compatibility in
+            // the type reader triggered by the "roles" section of the
+            // spec.  Alas, specs pre-0.10.6 had no roles section.
+            // The next section after roles in modern specs is
+            // "equipment-types", which is also the first place roles
+            // are referred to directly, and better still is completely
+            // replaced by roles in 0.11.x.  So this is the last chance
+            // to fix any role omissions.
+            if ("equipment-types".equals(childName)) fixupRoles();
+            // end @compat 0.10.x
+            ChildReader reader = readerMap.get(childName);
+            if (reader == null) {
+                logger.warning("No reader found for: " + childName);
+            } else {  
+                reader.readChildren(xr);
+            }
+        }
+    }
 
     /**
      * Gets the tag name of the root element representing this object.
