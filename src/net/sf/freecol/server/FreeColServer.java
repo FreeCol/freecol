@@ -246,9 +246,6 @@ public final class FreeColServer {
         game = new ServerGame(specification);
         game.setNationOptions(new NationOptions(specification));
         game.initializeCitiesOfCibola(random);
-        // @compat 0.10.x
-        fixGameOptions();
-        // end @compat
 
         if (publicServer) {
             updateMetaServer(true); // Throws NoRouteToServerException
@@ -1013,10 +1010,6 @@ public final class FreeColServer {
         // end @compat 0.10.x
 
         // @compat 0.10.x
-        fixGameOptions();
-        // end @compat
-
-        // @compat 0.10.x
         game.getMap().resetContiguity();
         // end @compat
 
@@ -1070,144 +1063,6 @@ public final class FreeColServer {
         }
 
         return game;
-    }
-
-    /**
-     * Add a default value for options new to each version that are
-     * not part of the difficulty settings.  Annotate with save format
-     * version where introduced.
-     */
-    private void fixGameOptions() {
-        Specification spec = game.getSpecification();
-
-        // @compat 0.10.x
-        // Introduced: SAVEGAME_VERSION == 12
-        addBooleanOption(GameOptions.ENHANCED_MISSIONARIES,
-            "gameOptions.map", false, false);
-        // Introduced: SAVEGAME_VERSION == 12
-        addBooleanOption(GameOptions.CONTINUE_FOUNDING_FATHER_RECRUITMENT,
-            "gameOptions.map", false, false);
-        // Introduced: SAVEGAME_VERSION == 12
-        addIntegerOption(GameOptions.SETTLEMENT_LIMIT_MODIFIER,
-            "gameOptions.map", 0, false);
-        // Introduced: SAVEGAME_VERSION == 12
-        addIntegerOption(GameOptions.STARTING_POSITIONS,
-            "gameOptions.map", 0, false);
-        // Introduced: SAVEGAME_VERSION == 12
-        addBooleanOption(GameOptions.TELEPORT_REF,
-            "gameOptions.map", false, false);
-        // Introduced: SAVEGAME_VERSION == 12
-        addIntegerOption(GameOptions.SHIP_TRADE_PENALTY,
-            "gameOptions.map", -30, false);
-        if (spec.getModifiers(Modifier.SHIP_TRADE_PENALTY) == null) {
-            spec.addModifier(new Modifier(Modifier.SHIP_TRADE_PENALTY,
-                    -30.0f, Modifier.ModifierType.PERCENTAGE,
-                    Specification.SHIP_TRADE_PENALTY_SOURCE));
-        }
-        // Introduced: SAVEGAME_VERSION == 12
-        addBooleanOption(GameOptions.ENABLE_UPKEEP,
-            "gameOptions.colony", false, false);
-        addIntegerOption(GameOptions.NATURAL_DISASTERS,
-            "gameOptions.colony", 0, false);
-        // Introduced: SAVEGAME_VERSION == 12
-        addOptionGroup("model.difficulty.cheat", true);
-        addIntegerOption(GameOptions.LIFT_BOYCOTT_CHEAT,
-            "model.difficulty.cheat", 10, true);
-        addIntegerOption(GameOptions.EQUIP_SCOUT_CHEAT,
-            "model.difficulty.cheat", 10, true);
-        addIntegerOption(GameOptions.LAND_UNIT_CHEAT,
-            "model.difficulty.cheat", 10, true);
-        addIntegerOption(GameOptions.OFFENSIVE_NAVAL_UNIT_CHEAT,
-            "model.difficulty.cheat", 10, true);
-        addIntegerOption(GameOptions.TRANSPORT_NAVAL_UNIT_CHEAT,
-            "model.difficulty.cheat", 10, true);
-        // Introduced: SAVEGAME_VERSION == 12
-        addIntegerOption(GameOptions.GIFT_PROBABILITY,
-            "gameOptions.map", 5, false);
-        addIntegerOption(GameOptions.DEMAND_PROBABILITY,
-            "gameOptions.map", 10, false);
-        // Introduced: SAVEGAME_VERSION == 12
-        addBooleanOption(GameOptions.EMPTY_TRADERS,
-            "gameOptions.map", false, false);
-        // end @compat
-
-        // Introduced: SAVEGAME_VERSION == 13
-        addIntegerOption(GameOptions.DESTROY_SETTLEMENT_SCORE,
-            "model.difficulty.natives", -5, true);
-        addBooleanOption(GameOptions.ONLY_NATURAL_IMPROVEMENTS,
-            "gameOptions.colony", true, false);
-        addIntegerOption(GameOptions.PEACE_PROBABILITY,
-            "gameOptions.map", 90, false);
-        addIntegerOption(GameOptions.INITIAL_IMMIGRATION,
-            "gameOptions.map", 15, false);
-        addIntegerOption(GameOptions.EUROPEAN_UNIT_IMMIGRATION_PENALTY,
-            "gameOptions.map", -4, false);
-        addIntegerOption(GameOptions.PLAYER_IMMIGRATION_BONUS,
-            "gameOptions.map", 2, false);
-        addIntegerOption(GameOptions.BAD_RUMOUR,
-            "model.difficulty.other", 23, true);
-        addIntegerOption(GameOptions.GOOD_RUMOUR,
-            "model.difficulty.other", 48, true);
-        addBooleanOption(GameOptions.FOUND_COLONY_DURING_REBELLION,
-            "gameOptions.colony", true, false);
-        addIntegerOption(GameOptions.OFFENSIVE_LAND_UNIT_CHEAT,
-            "model.difficulty.cheat", 4, true);
-        addIntegerOption(GameOptions.EQUIP_PIONEER_CHEAT,
-            "model.difficulty.cheat", 10, true);
-
-        addBooleanOption(GameOptions.BELL_ACCUMULATION_CAPPED,
-            "gameOptions.colony", false, false);
-    }
-
-    private void addOptionGroup(String id, boolean difficulty) {
-        Specification spec = game.getSpecification();
-        try {
-            spec.getOptionGroup(id);
-        } catch(Exception e) {
-            spec.fixOptionGroup(new OptionGroup(id, spec), difficulty);
-        }
-    }
-
-    private void addBooleanOption(String id, String gr, boolean defaultValue,
-                                  boolean difficulty) {
-        BooleanOption op = new BooleanOption(id, game.getSpecification());
-        op.setGroup(gr);
-        op.setValue(defaultValue);
-        addOption(op, difficulty);
-    }
-
-    private void addIntegerOption(String id, String gr, int defaultValue,
-                                  boolean difficulty) {
-        IntegerOption op = new IntegerOption(id, game.getSpecification());
-        op.setGroup(gr);
-        op.setValue(defaultValue);
-        addOption(op, difficulty);
-    }
-
-    private void addStringOption(String id, String gr, String defaultValue,
-                                 boolean difficulty) {
-        StringOption op = new StringOption(id, game.getSpecification());
-        op.setGroup(gr);
-        op.setValue(defaultValue);
-        addOption(op, difficulty);
-    }
-
-    private void addOption(AbstractOption option, boolean difficulty) {
-        Specification spec = game.getSpecification();
-        if (!spec.hasOption(option.getId())) {
-            spec.addAbstractOption(option);
-            if (difficulty) {
-                for (OptionGroup level : spec.getDifficultyLevels()) {
-                    if (level.hasOptionGroup()) {
-                        level.getOptionGroup(option.getGroup()).add(option);
-                    } else {
-                        level.add(option);
-                    }
-                }
-            } else {
-                spec.getOptionGroup(option.getGroup()).add(option);
-            }
-        }
     }
 
     /**

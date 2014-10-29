@@ -31,6 +31,36 @@ import net.sf.freecol.server.generator.MapGenerator;
  */
 public class MapGeneratorOptions {
 
+
+    /** Map generator options import group. */
+    public static final String MAPGENERATOROPTIONS_IMPORT
+        = "mapGeneratorOptions.import";
+
+    /** Option for setting a file to be imported (map etc). */
+    public static final String IMPORT_FILE 
+        = "model.option.importFile";
+
+    /** Option for using the terrain imported from a file. */
+    public static final String IMPORT_TERRAIN 
+        = "model.option.importTerrain";
+
+    /** Option for using the bonuses imported from a file. */
+    public static final String IMPORT_BONUSES 
+        = "model.option.importBonuses";
+
+    /** Option for using the lost city rumours imported from a file. */
+    public static final String IMPORT_RUMOURS 
+        = "model.option.importRumours";
+
+    /** Option for using the settlements imported from a file. */
+    public static final String IMPORT_SETTLEMENTS 
+        = "model.option.importSettlements";
+
+
+    /** Map generator options land generator group. */
+    public static final String MAPGENERATOROPTIONS_LAND_GENERATOR
+        = "mapGeneratorOptions.landGenerator";
+
     /** Option for setting the map width. */
     public static final String MAP_WIDTH
         = "model.option.mapWidth";
@@ -42,6 +72,39 @@ public class MapGeneratorOptions {
     /** Option for setting the land mass of the map. */
     public static final String LAND_MASS
         = "model.option.landMass";
+
+    /** Option for setting the type of land generator to be used. */
+    public static final String LAND_GENERATOR_TYPE 
+        = "model.option.landGeneratorType";
+    public static final int LAND_GENERATOR_CLASSIC     = 0,
+                            LAND_GENERATOR_CONTINENT   = 1,
+                            LAND_GENERATOR_ARCHIPELAGO = 2,
+                            LAND_GENERATOR_ISLANDS     = 3;
+
+    /** Option for setting the preferred distance to the map edge. */
+    public static final String PREFERRED_DISTANCE_TO_EDGE
+        = "model.option.preferredDistanceToEdge";
+
+    /** Option for setting the maximum distance to the map edge. */
+    public static final String MAXIMUM_DISTANCE_TO_EDGE
+        = "model.option.maximumDistanceToEdge";
+
+    /** Option for setting the distance to the high seas. */
+    public static final String DISTANCE_TO_HIGH_SEA
+        = "model.option.distanceToHighSea";
+
+
+    /** Map generator options terrain generator group. */
+    public static final String MAPGENERATOROPTIONS_TERRAIN_GENERATOR
+        = "mapGeneratorOptions.terrainGenerator";
+
+    /** The minimum latitude of the map. */
+    public static final String MINIMUM_LATITUDE 
+        = "model.option.minimumLatitude";
+
+    /** The maximum latitude of the map. */
+    public static final String MAXIMUM_LATITUDE 
+        = "model.option.maximumLatitude";
 
     /** Option for setting the number of rivers on the map. */
     public static final String RIVER_NUMBER
@@ -78,53 +141,6 @@ public class MapGeneratorOptions {
                             TEMPERATURE_WARM      = 3,
                             TEMPERATURE_HOT       = 4;
 
-    /** Option for setting a file to be imported (map etc). */
-    public static final String IMPORT_FILE 
-        = "model.option.importFile";
-
-    /** Option for using the terrain imported from a file. */
-    public static final String IMPORT_TERRAIN 
-        = "model.option.importTerrain";
-
-    /** Option for using the bonuses imported from a file. */
-    public static final String IMPORT_BONUSES 
-        = "model.option.importBonuses";
-
-    /** Option for using the lost city rumours imported from a file. */
-    public static final String IMPORT_RUMOURS 
-        = "model.option.importRumours";
-
-    /** Option for using the settlements imported from a file. */
-    public static final String IMPORT_SETTLEMENTS 
-        = "model.option.importSettlements";
-
-    /** Option for setting the type of land generator to be used. */
-    public static final String LAND_GENERATOR_TYPE 
-        = "model.option.landGeneratorType";
-    public static final int LAND_GENERATOR_CLASSIC     = 0,
-                            LAND_GENERATOR_CONTINENT   = 1,
-                            LAND_GENERATOR_ARCHIPELAGO = 2,
-                            LAND_GENERATOR_ISLANDS     = 3;
-
-    /** Option for setting the preferred distance to the map edge. */
-    public static final String PREFERRED_DISTANCE_TO_EDGE
-        = "model.option.preferredDistanceToEdge";
-
-    /** Option for setting the maximum distance to the map edge. */
-    public static final String MAXIMUM_DISTANCE_TO_EDGE
-        = "model.option.maximumDistanceToEdge";
-
-    /** Option for setting the distance to the high seas. */
-    public static final String DISTANCE_TO_HIGH_SEA
-        = "model.option.distanceToHighSea";
-
-    /** The minimum latitude of the map. */
-    public static final String MINIMUM_LATITUDE 
-        = "model.option.minimumLatitude";
-
-    /** The maximum latitude of the map. */
-    public static final String MAXIMUM_LATITUDE 
-        = "model.option.maximumLatitude";
 
 
     /**

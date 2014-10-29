@@ -58,6 +58,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.UnitListOption;
+import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -332,6 +333,7 @@ public final class Specification {
         readerMap.put(MODIFIERS_TAG, new ModifierReader());
         readerMap.put(OPTIONS_TAG, new OptionReader());
     }
+
 
     /**
      * Creates a new Specification object by loading it from the
@@ -644,6 +646,7 @@ public final class Specification {
             + ", " + allModifiers.size() + " Modifiers"
             + ", " + nations.size() + " Nations"
             + ", " + allOptions.size() + " Options"
+            + ", " + allOptionGroups.size() + " Option Groups"
             + ", " + resourceTypeList.size() + " ResourceTypes"
             + ", " + roles.size() + " Roles"
             + ", " + roleChanges.size() + " Roles-that-can-change"
@@ -675,7 +678,8 @@ public final class Specification {
      */
     public void generateDynamicOptions() {
         logger.finest("Generating dynamic options.");
-        OptionGroup prices = new OptionGroup("gameOptions.prices", this);
+        OptionGroup prices = new OptionGroup(GameOptions.GAMEOPTIONS_PRICES, this);
+        allOptionGroups.put(prices.getId(), prices);
         for (GoodsType goodsType : goodsTypeList) {
             String name = goodsType.getSuffix("model.goods.");
             String base = "model.option." + name + ".";
@@ -949,34 +953,6 @@ public final class Specification {
     }
 
     /**
-     * Fix up missing option groups.
-     *
-     * @param optionGroup The missing <code>OptionGroup</code>.
-     * @param difficulty If true, add the option group to the difficulty levels.
-     */
-    public void fixOptionGroup(OptionGroup optionGroup, boolean difficulty) {
-        if (difficulty) {
-            for (Option option : allOptionGroups.get(DIFFICULTY_LEVELS)
-                     .getOptions()) {
-                if (option instanceof OptionGroup) {
-                    OptionGroup level = (OptionGroup) option;
-                    if (level.hasOptionGroup()) {
-                        level.add(optionGroup);
-                    } else {
-                        for (Option o : optionGroup.getOptions()) {
-                            level.add(o);
-                        }
-                    }
-                }
-            }
-        } else {
-            if (!allOptionGroups.containsKey(optionGroup.getId())) {
-                allOptionGroups.put(optionGroup.getId(), optionGroup);
-            }
-        }
-    }
-
-    /**
      * Adds an <code>OptionGroup</code> to this specification.
      *
      * @param optionGroup The <code>OptionGroup</code> to add.
@@ -989,9 +965,9 @@ public final class Specification {
         while (iter.hasNext()) {
             Option option = iter.next();
             if (option instanceof OptionGroup) {
-                allOptionGroups.put(option.getId(), (OptionGroup) option);
+                allOptionGroups.put(option.getId(), (OptionGroup)option);
                 if (recursive) {
-                    addOptionGroup((OptionGroup) option, true);
+                    addOptionGroup((OptionGroup)option, true);
                 }
             } else {
                 addAbstractOption((AbstractOption) option);
@@ -1004,7 +980,7 @@ public final class Specification {
      *
      * @param abstractOption The <code>AbstractOption</code> to add.
      */
-    public void addAbstractOption(AbstractOption abstractOption) {
+    private void addAbstractOption(AbstractOption abstractOption) {
         // Add the option
         allOptions.put(abstractOption.getId(), abstractOption);
     }
@@ -1509,7 +1485,6 @@ public final class Specification {
 
 
     // @compat 0.10.x -- EquipmentTypes --
-
     /**
      * Get an equipment type by identifier.
      * Still needed by backward compatibility code in Unit.readChild.
@@ -1765,12 +1740,13 @@ public final class Specification {
     // or some changes too radical.  But we make an effort.
 
     /**
-     * Apply all the special fixes to bring older specifications up to
-     * date.
+     * Apply all the special fixes to bring older specifications up to date.
      */
     private void applyFixes() {
-        fixup010x();
-        fixup011x();
+        fixDifficultyOptions();
+        fixGameOptions();
+        fixMapGeneratorOptions();
+        fixSpec();
     }
 
     // @compat 0.10.x
@@ -1780,7 +1756,7 @@ public final class Specification {
      * Deliberately not part of applyFixes(), this is called from readFromXML
      * which can most accurately determine whether it is needed.
      */
-    private void fixupRoles() {
+    private void fixRoles() {
         boolean zero10X;
         try {
             zero10X = Double.parseDouble(version) < 0.86;
@@ -1802,106 +1778,22 @@ public final class Specification {
         List<String> roles = new ArrayList<String>();
         for (Role r : getRoles()) roles.add(r.getId());
         logger.info("Loading role backward compatibility fragment: "
-            + ROLES_COMPAT_FILE_NAME
-            + " with roles: " + join(" ", roles));
+            + ROLES_COMPAT_FILE_NAME + " with roles: " + join(" ", roles));
     }
+    // end @compat 0.10.x
 
     /**
-     * Specification backward compatibility for 0.10.x releases.
+     * Specification backward compatibility for the spec in general.
      */
-    private void fixup010x() {
-        // @compat 0.10.1
-        String[] years = new String[] {
-            "startingYear", "seasonYear", "mandatoryColonyYear",
-            "lastYear", "lastColonialYear"
-        };
-        int[] values = new int[] { 1492, 1600, 1600, 1850, 1800 };
-        for (int index = 0; index < years.length; index++) {
-            String id = "model.option." + years[index];
-            if (allOptions.get(id) == null) {
-                IntegerOption option = new IntegerOption(id, this);
-                option.setValue(values[index]);
-                allOptions.put(id, option);
-            }
+    private void fixSpec() {
+        if (getModifiers(Modifier.SHIP_TRADE_PENALTY) == null) {
+            addModifier(new Modifier(Modifier.SHIP_TRADE_PENALTY,
+                                     -30.0f, Modifier.ModifierType.PERCENTAGE,
+                                     Specification.SHIP_TRADE_PENALTY_SOURCE));
         }
         // end @compat
 
-        // @compat 0.10.5
-        String id = GameOptions.INTERVENTION_BELLS;
-        if (allOptions.get(id) == null) {
-            IntegerOption interventionBells = new IntegerOption(id, this);
-            interventionBells.setValue(5000);
-            allOptions.put(id, interventionBells);
-        }
-        id = GameOptions.INTERVENTION_TURNS;
-        if (allOptions.get(id) == null) {
-            IntegerOption interventionTurns = new IntegerOption(id, this);
-            interventionTurns.setValue(52);
-            allOptions.put(id, interventionTurns);
-        }
-        id = GameOptions.INTERVENTION_FORCE;
-        if (allOptions.get(id) == null) {
-            UnitListOption interventionForce = new UnitListOption(id, this);
-            AbstractUnitOption regulars
-                = new AbstractUnitOption(id + ".regulars", this);
-            regulars.setValue(new AbstractUnit("model.unit.colonialRegular",
-                                               "model.role.soldier", 2));
-            interventionForce.getValue().add(regulars);
-            AbstractUnitOption dragoons
-                = new AbstractUnitOption(id + ".dragoons", this);
-            dragoons.setValue(new AbstractUnit("model.unit.colonialRegular",
-                                               "model.role.dragoon", 2));
-            interventionForce.getValue().add(dragoons);
-            AbstractUnitOption artillery
-                = new AbstractUnitOption(id + ".artillery", this);
-            artillery.setValue(new AbstractUnit("model.unit.artillery",
-                                                DEFAULT_ROLE_ID, 2));
-            interventionForce.getValue().add(artillery);
-            AbstractUnitOption menOfWar
-                = new AbstractUnitOption(id + ".menOfWar", this);
-            menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
-                                               DEFAULT_ROLE_ID, 2));
-            interventionForce.getValue().add(menOfWar);
-            allOptions.put(id, interventionForce);
-        }
-        id = GameOptions.MERCENARY_FORCE;
-        if (allOptions.get(id) == null) {
-            UnitListOption mercenaryForce = new UnitListOption(id, this);
-            AbstractUnitOption regulars
-                = new AbstractUnitOption(id + ".regulars", this);
-            regulars.setValue(new AbstractUnit("model.unit.veteranSoldier",
-                                               "model.role.soldier", 2));
-            mercenaryForce.getValue().add(regulars);
-            AbstractUnitOption dragoons
-                = new AbstractUnitOption(id + ".dragoons", this);
-            dragoons.setValue(new AbstractUnit("model.unit.veteranSoldier",
-                                               "model.role.dragoon", 2));
-            mercenaryForce.getValue().add(dragoons);
-            AbstractUnitOption artillery
-                = new AbstractUnitOption(id + ".artillery", this);
-            artillery.setValue(new AbstractUnit("model.unit.artillery",
-                                                DEFAULT_ROLE_ID, 2));
-            mercenaryForce.getValue().add(artillery);
-            AbstractUnitOption menOfWar
-                = new AbstractUnitOption(id + ".menOfWar", this);
-            menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
-                                               DEFAULT_ROLE_ID, 2));
-            mercenaryForce.getValue().add(menOfWar);
-            allOptions.put(id, mercenaryForce);
-        }
-        id = GameOptions.GOOD_GOVERNMENT_LIMIT;
-        if (allOptions.get(id) == null) {
-            IntegerOption goodGovernmentLimit = new IntegerOption(id, this);
-            goodGovernmentLimit.setValue(50);
-            allOptions.put(id, goodGovernmentLimit);
-        }
-        id = GameOptions.VERY_GOOD_GOVERNMENT_LIMIT;
-        if (allOptions.get(id) == null) {
-            IntegerOption veryGoodGovernmentLimit = new IntegerOption(id, this);
-            veryGoodGovernmentLimit.setValue(100);
-            allOptions.put(id, veryGoodGovernmentLimit);
-        }
-
+        // @compat 0.10.7
         // model.ability.missionary was split into distinct parts,
         // which should be fixed by the roles work, but the Brebeuf
         // scope was left hanging.
@@ -1914,9 +1806,7 @@ public final class Specification {
                 }
             }
         }
-        // end @compat 0.10.5
 
-        // @compat 0.10.7
         // Require the scopes added to founding fathers in git.8971674
         fatherGoodsFixMap.clear();
         fatherGoodsFixMap.put("model.foundingFather.thomasJefferson",
@@ -1943,12 +1833,10 @@ public final class Specification {
         // Fix REF roles, soldier -> infantry, dragoon -> cavalry
         // Older specs (<= 0.10.5 ?) had refSize directly under difficulty
         // level, later moved it under the monarch group.
-        for (Option o : allOptionGroups.get(DIFFICULTY_LEVELS).getOptions()) {
-            if (!(o instanceof OptionGroup)) continue;
-            Option monarch = ((OptionGroup)o)
-                .getOption("model.difficulty.monarch");
+        for (OptionGroup level : getDifficultyLevels()) {
+            Option monarch = level.getOption(GameOptions.DIFFICULTY_MONARCH);
             Option refSize = ((OptionGroup)((monarch instanceof OptionGroup)
-                    ? monarch : o)).getOption("model.option.refSize");
+                    ? monarch : level)).getOption(GameOptions.REF_FORCE);
             if (refSize == null
                 || !(refSize instanceof UnitListOption)) continue;
             for (AbstractUnit au
@@ -1966,9 +1854,8 @@ public final class Specification {
         }
 
         // Fix all other UnitListOptions
-        List<Option> todo
-            = new ArrayList<Option>(allOptionGroups.get(DIFFICULTY_LEVELS)
-                                                   .getOptions());
+        List<Option> todo = new ArrayList<Option>();
+        for (OptionGroup og : getDifficultyLevels()) todo.add(og);
         while (!todo.isEmpty()) {
             Option o = todo.remove(0);
             if (o instanceof OptionGroup) {
@@ -2107,8 +1994,8 @@ public final class Specification {
         }
 
         // 0.10.x had no unknown enemy nation, just an unknown enemy player
-        if (getNation("model.nation.unknownEnemy") == null) {
-            Nation ue = new Nation("model.nation.unknownEnemy", this);
+        if (getNation(Nation.UNKNOWN_NATION_ID) == null) {
+            Nation ue = new Nation(Nation.UNKNOWN_NATION_ID, this);
             ue.setColor(Nation.UNKNOWN_NATION_COLOR);
         }
 
@@ -2155,16 +2042,9 @@ public final class Specification {
                 }
             }
         }
-
         // end @compat 0.10.7
-    }
-    // end @compat 0.10.x
 
-    // @compat 0.11.0
-    /**
-     * Specification backward compatibility for 0.11.x releases.
-     */
-    private void fixup011x() {
+        // @compat 0.11.0
         // Bolivar changed from being an event, then to a liberty modifier,
         // and now to a SoL% modifier.
         FoundingFather bolivar
@@ -2181,8 +2061,442 @@ public final class Specification {
             bolivar.addModifier(new Modifier(Modifier.SOL, 20,
                     Modifier.ModifierType.ADDITIVE, bolivar, 0));
         }
+        // end @compat 0.11.x
     }
-    // end @compat 0.11.x
+
+    /**
+     * Backward compatibility code to make sure this specification
+     * contains a default value for every difficulty option.
+     *
+     * When a new difficulty option is added to the spec, add a
+     * sensible default here.
+     *
+     * @return True if an option was missing and added.
+     */
+    private boolean fixDifficultyOptions() {
+        boolean ret = false;
+        String id;
+        AbstractOption op;
+        OptionGroup og;
+        UnitListOption ulo;
+
+        // SAVEGAME_VERSION == 11
+
+        // For 0.10.6 we moved from a three level structure:
+        //   difficultyLevels/<difficulty>/<option>
+        // to a four level structure
+        //   difficultyLevels/<difficulty>/<group>/<option>
+        // so add the groups in, and move the options that could be present
+        // in anything up to 0.10.5 into their destination groups.
+        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_IMMIGRATION,
+            GameOptions.CROSSES_INCREMENT,
+            GameOptions.RECRUIT_PRICE_INCREASE,
+            GameOptions.LOWER_CAP_INCREASE,
+            GameOptions.PRICE_INCREASE + ".artillery",
+            GameOptions.PRICE_INCREASE_PER_TYPE,
+            GameOptions.EXPERT_STARTING_UNITS,
+            GameOptions.IMMIGRANTS);
+        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_NATIVES,
+            GameOptions.LAND_PRICE_FACTOR,
+            GameOptions.NATIVE_CONVERT_PROBABILITY,
+            GameOptions.BURN_PROBABILITY,
+            GameOptions.NATIVE_DEMANDS,
+            GameOptions.RUMOUR_DIFFICULTY,
+            GameOptions.SHIP_TRADE_PENALTY,
+            GameOptions.BUILD_ON_NATIVE_LAND,
+            GameOptions.SETTLEMENT_NUMBER);
+        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_MONARCH,
+            GameOptions.MONARCH_MEDDLING,
+            GameOptions.TAX_ADJUSTMENT,
+            GameOptions.MERCENARY_PRICE,
+            GameOptions.MAXIMUM_TAX,
+            GameOptions.MONARCH_SUPPORT,
+            GameOptions.TREASURE_TRANSPORT_FEE,
+            GameOptions.REF_FORCE,
+            GameOptions.INTERVENTION_BELLS,
+            GameOptions.INTERVENTION_TURNS,
+            GameOptions.INTERVENTION_FORCE,
+            GameOptions.MERCENARY_FORCE);
+        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_GOVERNMENT,
+            GameOptions.BAD_GOVERNMENT_LIMIT,
+            GameOptions.VERY_BAD_GOVERNMENT_LIMIT,
+            GameOptions.GOOD_GOVERNMENT_LIMIT,
+            GameOptions.VERY_GOOD_GOVERNMENT_LIMIT);
+        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_OTHER,
+            GameOptions.STARTING_MONEY,
+            GameOptions.FOUNDING_FATHER_FACTOR,
+            GameOptions.ARREARS_FACTOR,
+            GameOptions.UNITS_THAT_USE_NO_BELLS,
+            GameOptions.TILE_PRODUCTION);
+        ret |= checkDifficultyOptionGroup(GameOptions.DIFFICULTY_CHEAT,
+            GameOptions.LIFT_BOYCOTT_CHEAT,
+            GameOptions.EQUIP_SCOUT_CHEAT,
+            GameOptions.LAND_UNIT_CHEAT,
+            GameOptions.OFFENSIVE_NAVAL_UNIT_CHEAT,
+            GameOptions.TRANSPORT_NAVAL_UNIT_CHEAT);
+
+        // @compat 0.10.0
+        // This used to be a game option.
+        ret |= checkDifficultyIntegerOption(GameOptions.SHIP_TRADE_PENALTY,
+                                            GameOptions.DIFFICULTY_NATIVES,
+                                            -30);
+        // end @compat 0.10.0
+
+        // SAVEGAME_VERSION == 12
+
+        // @compat 0.10.4
+        id = GameOptions.REF_FORCE; // Yes, really "refSize"
+        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_MONARCH);
+        if (ulo != null) {
+            AbstractUnitOption regulars
+                = new AbstractUnitOption(id + ".regulars", this);
+            regulars.setValue(new AbstractUnit("model.unit.kingsRegular",
+                                               "model.role.infantry", 31));
+            ulo.getValue().add(regulars);
+            AbstractUnitOption dragoons
+                = new AbstractUnitOption(id + ".dragoons", this);
+            dragoons.setValue(new AbstractUnit("model.unit.kingsRegular",
+                                               "model.role.cavalry", 15));
+            ulo.getValue().add(dragoons);
+            AbstractUnitOption artillery
+                = new AbstractUnitOption(id + ".artillery", this);
+            artillery.setValue(new AbstractUnit("model.unit.artillery",
+                                                DEFAULT_ROLE_ID, 14));
+            ulo.getValue().add(artillery);
+            AbstractUnitOption menOfWar
+                = new AbstractUnitOption(id + ".menOfWar", this);
+            menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
+                                               DEFAULT_ROLE_ID, 8));
+            ulo.getValue().add(menOfWar);
+            ret = true;
+        }
+        id = GameOptions.IMMIGRANTS;
+        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_IMMIGRATION);
+        if (ulo != null) {
+            AbstractUnitOption i1
+                = new AbstractUnitOption(id + ".1", this);
+            i1.setValue(new AbstractUnit("model.unit.masterCarpenter",
+                                         DEFAULT_ROLE_ID, 1));
+            ulo.getValue().add(i1);
+            ret = true;
+        }
+        // end @compat 0.10.4
+
+        // @compat 0.10.5
+        ret |= checkDifficultyIntegerOption(GameOptions.INTERVENTION_BELLS,
+                                            GameOptions.DIFFICULTY_MONARCH,
+                                            5000);
+        ret |= checkDifficultyIntegerOption(GameOptions.INTERVENTION_TURNS,
+                                            GameOptions.DIFFICULTY_MONARCH,
+                                            52);
+        id = GameOptions.INTERVENTION_FORCE;
+        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_MONARCH);
+        if (ulo != null) {
+            AbstractUnitOption regulars
+                = new AbstractUnitOption(id + ".regulars", this);
+            regulars.setValue(new AbstractUnit("model.unit.colonialRegular",
+                                               "model.role.soldier", 2));
+            ulo.getValue().add(regulars);
+            AbstractUnitOption dragoons
+                = new AbstractUnitOption(id + ".dragoons", this);
+            dragoons.setValue(new AbstractUnit("model.unit.colonialRegular",
+                                               "model.role.dragoon", 2));
+            ulo.getValue().add(dragoons);
+            AbstractUnitOption artillery
+                = new AbstractUnitOption(id + ".artillery", this);
+            artillery.setValue(new AbstractUnit("model.unit.artillery",
+                                                DEFAULT_ROLE_ID, 2));
+            ulo.getValue().add(artillery);
+            AbstractUnitOption menOfWar
+                = new AbstractUnitOption(id + ".menOfWar", this);
+            menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
+                                               DEFAULT_ROLE_ID, 2));
+            ulo.getValue().add(menOfWar);
+            ret = true;
+        }
+        id = GameOptions.MERCENARY_FORCE;
+        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_MONARCH);
+        if (ulo != null) {
+            AbstractUnitOption regulars
+                = new AbstractUnitOption(id + ".regulars", this);
+            regulars.setValue(new AbstractUnit("model.unit.veteranSoldier",
+                                               "model.role.soldier", 2));
+            ulo.getValue().add(regulars);
+            AbstractUnitOption dragoons
+                = new AbstractUnitOption(id + ".dragoons", this);
+            dragoons.setValue(new AbstractUnit("model.unit.veteranSoldier",
+                                               "model.role.dragoon", 2));
+            ulo.getValue().add(dragoons);
+            AbstractUnitOption artillery
+                = new AbstractUnitOption(id + ".artillery", this);
+            artillery.setValue(new AbstractUnit("model.unit.artillery",
+                                                DEFAULT_ROLE_ID, 2));
+            ulo.getValue().add(artillery);
+            AbstractUnitOption menOfWar
+                = new AbstractUnitOption(id + ".menOfWar", this);
+            menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
+                                               DEFAULT_ROLE_ID, 2));
+            ulo.getValue().add(menOfWar);
+            ret = true;
+        }
+        ret |= checkDifficultyIntegerOption(GameOptions.GOOD_GOVERNMENT_LIMIT,
+                                            GameOptions.DIFFICULTY_GOVERNMENT,
+                                            50);
+        ret |= checkDifficultyIntegerOption(GameOptions.VERY_GOOD_GOVERNMENT_LIMIT,
+                                            GameOptions.DIFFICULTY_GOVERNMENT,
+                                            100);
+        ret |= checkDifficultyIntegerOption(GameOptions.LIFT_BOYCOTT_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT,
+                                            10);
+        ret |= checkDifficultyIntegerOption(GameOptions.EQUIP_SCOUT_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT,
+                                            10);
+        ret |= checkDifficultyIntegerOption(GameOptions.LAND_UNIT_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT,
+                                            10);
+        ret |= checkDifficultyIntegerOption(GameOptions.OFFENSIVE_NAVAL_UNIT_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT,
+                                            10);
+        ret |= checkDifficultyIntegerOption(GameOptions.TRANSPORT_NAVAL_UNIT_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT,
+                                            10);
+        // end @compat 0.10.5
+
+        // SAVEGAME_VERSION == 13
+
+        // @compat 0.10.7
+        ret |= checkDifficultyIntegerOption(GameOptions.DESTROY_SETTLEMENT_SCORE,
+                                            GameOptions.DIFFICULTY_NATIVES,
+                                            -5);
+        ret |= checkDifficultyIntegerOption(GameOptions.BAD_RUMOUR,
+                                            GameOptions.DIFFICULTY_OTHER,
+                                            23);
+        ret |= checkDifficultyIntegerOption(GameOptions.GOOD_RUMOUR,
+                                            GameOptions.DIFFICULTY_OTHER,
+                                            48);
+        ret |= checkDifficultyIntegerOption(GameOptions.OFFENSIVE_LAND_UNIT_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT,
+                                            4);
+        ret |= checkDifficultyIntegerOption(GameOptions.EQUIP_PIONEER_CHEAT,
+                                            GameOptions.DIFFICULTY_CHEAT,
+                                            10);
+        // end @compat 0.10.7
+
+        return ret;
+    }
+
+    private boolean checkDifficultyOptionGroup(String gr, String... ids) {
+        LogBuilder lb = new LogBuilder(64);
+        lb.add("Check group ", gr);
+        lb.mark();
+        boolean ret = false;
+        for (OptionGroup level : getDifficultyLevels()) {
+            Option op = level.getOption(gr);
+            OptionGroup og;
+            if (op instanceof OptionGroup) {
+                og = (OptionGroup)op;
+            } else {
+                og = new OptionGroup(gr, this);
+                level.add(og);
+                og.setGroup(level.getId());
+                ret = true;
+                lb.add(", added to ", level.getId());
+            }
+            for (String id : ids) {
+                op = level.remove(id);
+                if (op != null) {
+                    if (op instanceof AbstractOption) {
+                        ((AbstractOption)op).setGroup(og.getId());
+                    }
+                    og.add(op);
+                    lb.add(" + ", id);
+                    ret = true;
+                }
+            }
+        }
+        if (lb.grew()) lb.log(logger, Level.INFO);
+        return ret;
+    }
+
+    private boolean checkDifficultyIntegerOption(String id, String gr,
+                                                 int defaultValue) {
+        boolean ret = false;
+        for (OptionGroup level : getDifficultyLevels()) {
+            Option op = level.getOption(gr);
+            if (op instanceof OptionGroup) {
+                OptionGroup og = (OptionGroup)op;
+                if ((op = og.getOption(id)) != null) continue;
+                IntegerOption iop = new IntegerOption(id, this);
+                iop.setGroup(gr);
+                iop.setValue(defaultValue);
+                og.add(iop);
+                ret = true;
+            }
+        }
+        return ret;
+    }
+        
+    private UnitListOption checkDifficultyUnitListOption(String id, String gr) {
+        UnitListOption ulo = null;
+        for (OptionGroup level : getDifficultyLevels()) {
+            Option op = level.getOption(gr);
+            if (op instanceof OptionGroup) {
+                OptionGroup og = (OptionGroup)op;
+                if ((op = og.getOption(id)) != null) return null;
+                if (ulo == null) ulo = new UnitListOption(id, this);
+                og.add(ulo);
+            }
+        }
+        return ulo;
+    }
+
+    /**
+     * Backward compatibility code to make sure this specification
+     * contains a default value for every game option.
+     *
+     * When a new game option is added to the spec, add a sensible
+     * default here.
+     *
+     * @return True if an option was missing and added.
+     */
+    public boolean fixGameOptions() {
+        boolean ret = false;
+        // SAVEGAME_VERSION == 11
+
+        // @compat 0.10.0
+        ret |= checkOptionGroup(GameOptions.GAMEOPTIONS_YEAR);
+        String[] years = new String[] {
+            GameOptions.STARTING_YEAR,
+            GameOptions.SEASON_YEAR,
+            GameOptions.MANDATORY_COLONY_YEAR,
+            GameOptions.LAST_YEAR,
+            GameOptions.LAST_COLONIAL_YEAR,
+        };
+        int[] values = new int[] { 1492, 1600, 1600, 1850, 1800 };
+        for (int index = 0; index < years.length; index++) {
+            ret |= checkIntegerOption(years[index],
+                                      GameOptions.GAMEOPTIONS_YEAR,
+                                      values[index]);
+        }
+        ret |= checkBooleanOption(GameOptions.ENHANCED_MISSIONARIES,
+                                  GameOptions.GAMEOPTIONS_MAP, false);
+        ret |= checkBooleanOption(GameOptions.CONTINUE_FOUNDING_FATHER_RECRUITMENT,
+                                  GameOptions.GAMEOPTIONS_MAP, false);
+        ret |= checkIntegerOption(GameOptions.SETTLEMENT_LIMIT_MODIFIER,
+                                  GameOptions.GAMEOPTIONS_MAP, 0);
+        ret |= checkBooleanOption(GameOptions.SETTLEMENT_ACTIONS_CONTACT_CHIEF,
+                                  GameOptions.GAMEOPTIONS_MAP, false);
+        ret |= checkIntegerOption(GameOptions.STARTING_POSITIONS,
+                                  GameOptions.GAMEOPTIONS_MAP, 0);
+        ret |= checkBooleanOption(GameOptions.TELEPORT_REF,
+                                  GameOptions.GAMEOPTIONS_MAP, false);
+        // end @compat 0.10.0
+
+        // SAVEGAME_VERSION == 12
+
+        // @compat 0.10.5
+        ret |= checkBooleanOption(GameOptions.ENABLE_UPKEEP,
+                                  GameOptions.GAMEOPTIONS_COLONY, false);
+        ret |= checkIntegerOption(GameOptions.NATURAL_DISASTERS,
+                                  GameOptions.GAMEOPTIONS_COLONY, 0);
+        ret |= checkIntegerOption(GameOptions.GIFT_PROBABILITY,
+                                  GameOptions.GAMEOPTIONS_MAP, 5);
+        ret |= checkIntegerOption(GameOptions.DEMAND_PROBABILITY,
+                                  GameOptions.GAMEOPTIONS_MAP, 10);
+        ret |= checkBooleanOption(GameOptions.EMPTY_TRADERS,
+                                  GameOptions.GAMEOPTIONS_MAP, false);
+        // end @compat 0.10.5
+
+        // SAVEGAME_VERSION == 13
+
+        // @compat 0.10.7
+        ret |= checkBooleanOption(GameOptions.ONLY_NATURAL_IMPROVEMENTS,
+                                  GameOptions.GAMEOPTIONS_COLONY, true);
+        ret |= checkIntegerOption(GameOptions.PEACE_PROBABILITY,
+                                  GameOptions.GAMEOPTIONS_MAP, 90);
+        ret |= checkIntegerOption(GameOptions.INITIAL_IMMIGRATION,
+                                  GameOptions.GAMEOPTIONS_MAP, 15);
+        ret |= checkIntegerOption(GameOptions.EUROPEAN_UNIT_IMMIGRATION_PENALTY,
+                                  GameOptions.GAMEOPTIONS_MAP, -4);
+        ret |= checkIntegerOption(GameOptions.PLAYER_IMMIGRATION_BONUS,
+                                  GameOptions.GAMEOPTIONS_MAP, 2);
+        ret |= checkBooleanOption(GameOptions.FOUND_COLONY_DURING_REBELLION,
+                                  GameOptions.GAMEOPTIONS_COLONY, true);
+        // end @compat 0.10.7
+
+        // @compat 0.11.0
+        ret |= checkBooleanOption(GameOptions.BELL_ACCUMULATION_CAPPED,
+                                  GameOptions.GAMEOPTIONS_COLONY, false);
+        // end @compat 0.11.0
+
+        return ret;
+    }
+
+    /**
+     * Backward compatibility code to make sure this specification
+     * contains a default value for every map option.
+     *
+     * When a new map option is added to the spec, add a sensible
+     * default here.
+     *
+     * @return True if an option was missing and added.
+     */
+    public boolean fixMapGeneratorOptions() {
+        boolean ret = false;
+        // SAVEGAME_VERSION == 11
+
+        // @compat 0.10.0
+        ret |= checkIntegerOption(MapGeneratorOptions.MINIMUM_LATITUDE,
+                                  MapGeneratorOptions.MAPGENERATOROPTIONS_TERRAIN_GENERATOR,
+                                  -90);
+        ret |= checkIntegerOption(MapGeneratorOptions.MAXIMUM_LATITUDE,
+                                  MapGeneratorOptions.MAPGENERATOROPTIONS_TERRAIN_GENERATOR,
+                                  90);
+        // end @compat 0.10.0
+
+        // SAVEGAME_VERSION == 12
+        // SAVEGAME_VERSION == 13
+
+        return ret;
+    }
+
+    private boolean checkOptionGroup(String id) {
+        if (allOptionGroups.containsKey(id)) return false;
+        OptionGroup og = new OptionGroup(id, this);
+        allOptionGroups.put(id, og);
+        return true;
+    }
+
+    private boolean checkBooleanOption(String id, String gr, boolean defaultValue) {
+        if (hasOption(id)) return false;
+        BooleanOption op = new BooleanOption(id, this);
+        op.setGroup(gr);
+        op.setValue(defaultValue);
+        return checkOption(op);
+    }
+
+    private boolean checkIntegerOption(String id, String gr, int defaultValue) {
+        if (hasOption(id)) return false;
+        IntegerOption op = new IntegerOption(id, this);
+        op.setGroup(gr);
+        op.setValue(defaultValue);
+        return checkOption(op);
+    }
+
+    private boolean checkStringOption(String id, String gr, String defaultValue) {
+        if (hasOption(id)) return false;
+        StringOption op = new StringOption(id, this);
+        op.setGroup(gr);
+        op.setValue(defaultValue);
+        return checkOption(op);
+    }
+
+    private boolean checkOption(AbstractOption option) {
+        getOptionGroup(option.getGroup()).add(option);
+        addAbstractOption(option);
+        return true;
+    }
+        
 
 
     // Serialization
@@ -2315,7 +2629,7 @@ public final class Specification {
             // are referred to directly, and better still is completely
             // replaced by roles in 0.11.x.  So this is the last chance
             // to fix any role omissions.
-            if ("equipment-types".equals(childName)) fixupRoles();
+            if ("equipment-types".equals(childName)) fixRoles();
             // end @compat 0.10.x
             ChildReader reader = readerMap.get(childName);
             if (reader == null) {

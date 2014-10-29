@@ -209,6 +209,18 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
+     * Remove an option.
+     *
+     * @param id The identifier of the option to remove.
+     * @return The <code>Option</code> removed if any.
+     */
+    public Option remove(String id) {
+        Option op = optionMap.remove(id);
+        if (op != null) options.remove(op);
+        return op;
+    }
+
+    /**
      * Removes all of the <code>Option</code>s from this
      * <code>OptionGroup</code>.
      */

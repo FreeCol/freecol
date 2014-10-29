@@ -27,8 +27,10 @@ package net.sf.freecol.common.model;
  */
 public class GameOptions {
 
-    // Map group
-
+    /** Map game option group. */
+    public static final String GAMEOPTIONS_MAP
+        = "gameOptions.map";
+    
     /** The number of turns to sail between Europe and the New World. */
     public static final String TURNS_TO_SAIL
         = "model.option.turnsToSail";
@@ -100,7 +102,10 @@ public class GameOptions {
     public static final String PLAYER_IMMIGRATION_BONUS
         = "model.option.playerImmigrationBonus";
 
-    // Colony group
+
+    /** Colony game option group. */
+    public static final String GAMEOPTIONS_COLONY
+        = "gameOptions.colony";
 
     /** Is bell accumulation capped when 100% rebels achieved? */
     public static final String BELL_ACCUMULATION_CAPPED
@@ -157,7 +162,9 @@ public class GameOptions {
     // public static final String HAMMER_PRICE = "hammerPrice";
 
 
-    // Victory conditions group
+    /** Victory conditions game option group. */
+    public static final String GAMEOPTIONS_VICTORY_CONDITIONS
+        = "gameOptions.victoryConditions";
 
     /**
      * Victory condition: Should the <code>Player</code> who first
@@ -181,7 +188,9 @@ public class GameOptions {
         = "model.option.victoryDefeatHumans";
 
 
-    // Year group
+    /** Year game option group. */
+    public static final String GAMEOPTIONS_YEAR
+        = "gameOptions.year";
 
     /**
      * The year in which the game starts. At the moment, changing this
@@ -215,7 +224,19 @@ public class GameOptions {
         = "model.option.lastColonialYear";
 
 
-    // Immigration (difficulty) group
+    /**
+     * Prices game option group.
+     * This group is synthesized at game initialization.
+     */
+    public static final String GAMEOPTIONS_PRICES
+        = "gameOptions.prices";
+    
+
+    // Difficulty options are effectively special multi-valued game options.
+
+    /** Immigration (difficulty) group. */
+    public static final String DIFFICULTY_IMMIGRATION
+        = "model.difficulty.immigration";
 
     /** Rate cross requirement increases. */
     public static final String CROSSES_INCREMENT
@@ -228,6 +249,10 @@ public class GameOptions {
     /** Lower bound on the recruitment price. */
     public static final String LOWER_CAP_INCREASE
         = "model.option.lowerCapIncrease";
+
+    /** A price increase prefix. */
+    public static final String PRICE_INCREASE
+        = "model.option.priceIncrease";
 
     /** Are there price increases specific to unit type. */
     public static final String PRICE_INCREASE_PER_TYPE
@@ -242,7 +267,9 @@ public class GameOptions {
         = "model.option.immigrants";
 
 
-    // Native (difficulty) group
+    /** Native (difficulty) group. */
+    public static final String DIFFICULTY_NATIVES
+        = "model.difficulty.natives";
 
     /** Base multiplier from land productivity to price. */
     public static final String LAND_PRICE_FACTOR
@@ -292,7 +319,9 @@ public class GameOptions {
         = "model.option.settlementNumber";
 
 
-    // Monarch (difficulty) group
+    /** Monarch (difficulty) group. */
+    public static final String DIFFICULTY_MONARCH
+        = "model.difficulty.monarch";
 
     /**
      * The grace period at the start of the game before the monarch
@@ -342,7 +371,9 @@ public class GameOptions {
         = "model.option.mercenaryForce";
 
 
-    // Government (difficulty) group
+    /** Government (difficulty) group. */
+    public static final String DIFFICULTY_GOVERNMENT
+        = "model.difficulty.government";
 
     /** The percent SoL to achieve "bad" government. */
     public static final String BAD_GOVERNMENT_LIMIT
@@ -361,7 +392,9 @@ public class GameOptions {
         = "model.option.veryGoodGovernmentLimit";
 
 
-    // Other (difficulty) group
+    /** Other (difficulty) group. */
+    public static final String DIFFICULTY_OTHER
+        = "model.difficulty.other";
 
     /** The amount of money each player will receive before the game starts. */
     public static final String STARTING_MONEY
@@ -392,7 +425,9 @@ public class GameOptions {
         = "model.option.goodRumour";
 
 
-    // Cheat (difficulty) group
+    /** Cheat (difficulty) group. */
+    public static final String DIFFICULTY_CHEAT
+        = "model.difficulty.cheat";
 
     public static final String LIFT_BOYCOTT_CHEAT
         = "model.option.liftBoycottCheat";
