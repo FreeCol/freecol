@@ -76,8 +76,23 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     }
 
 
+    private void requireUnitType() {
+        this.unitType = new UnitTypeOption(getId() + ".unitType",
+                                           getSpecification());
+    }
+
+    private void requireRole() {
+        this.role = new StringOption(getId() + ".role",
+                                     getSpecification());
+    }
+
+    private void requireNumber() {
+        this.number = new IntegerOption(getId() + ".number",
+                                        getSpecification());
+    }
+
     /**
-     * Get the unit type.
+     * Get the unit type option.
      *
      * @return The <code>UnitTypeOption</code> containing the unit type.
      */
@@ -86,7 +101,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     }
 
     /**
-     * Get the role.
+     * Get the role option.
      *
      * @return The <code>StringOption</code> containing the role.
      */
@@ -95,7 +110,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     }
 
     /**
-     * Get the number.
+     * Get the number option.
      *
      * @return The <code>IntegerOption</code> containing the number.
      */
@@ -110,9 +125,8 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      * {@inheritDoc}
      */
     public AbstractUnitOption clone() {
-        Specification spec = getSpecification();
-        AbstractUnitOption result
-            = new AbstractUnitOption(getId(), getSpecification());
+        final Specification spec = getSpecification();
+        AbstractUnitOption result = new AbstractUnitOption(getId(), spec);
         result.setValues(this);
         if (value != null) {
             AbstractUnit au = new AbstractUnit(value.getType(spec),
@@ -136,8 +150,21 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      * {@inheritDoc}
      */
     public void setValue(AbstractUnit value) {
+        final Specification spec = getSpecification();
         final AbstractUnit oldValue = this.value;
         this.value = value;
+        if (value == null) {
+            this.unitType = null;
+            this.role = null;
+            this.number = null;
+        } else {
+            requireUnitType();
+            this.unitType.setValue(value.getType(spec));
+            requireRole();
+            this.role.setValue(value.getRoleId());
+            requireNumber();
+            this.number.setValue(value.getNumber());
+        }
 
         if (isDefined && (((value == null) != (oldValue == null))
                 || (value != null && !value.equals(oldValue)))) {
@@ -215,15 +242,15 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         final String tag = xr.getLocalName();
 
         if (NUMBER_TAG.equals(tag)) {
-            number = new IntegerOption(getId() + ".number", spec);
+            requireNumber();
             number.readFromXML(xr);
 
         } else if (ROLE_TAG.equals(tag)) {
-            role = new StringOption(getId() + ".role", spec);
+            requireRole();
             role.readFromXML(xr);
 
         } else if (UNIT_TYPE_TAG.equals(tag)) {
-            unitType = new UnitTypeOption(getId() + ".unitType", spec);
+            requireUnitType();
             unitType.readFromXML(xr);
 
         } else {
