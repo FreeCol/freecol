@@ -1975,7 +1975,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         if (!father.getModifiers().isEmpty()) {
             cs.add(See.only(this), this);
-            // deSoto is special
+            // Some modifiers are special
             if (father.hasModifier(Modifier.LINE_OF_SIGHT_BONUS)) {
                 List<Tile> tiles = new ArrayList<Tile>();
                 for (Colony c : getColonies()) {
@@ -1991,7 +1991,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
                 cs.add(See.only(this), tiles);
                 visibilityChange = true;
-            }
+            } else if (father.hasModifier(Modifier.SOL)) {
+                for (Colony c : getColonies()) {
+                    c.addLiberty(0); // Kick the SoL and production bonus
+                    c.invalidateCache();
+                }
+            } else {
+                boolean recache = false;
+                for (Modifier m : father.getModifiers()) {
+                    recache |= m.getId().startsWith("model.goods.");
+                }
+                for (Colony c : getColonies()) c.invalidateCache();
+            }                
         }
 
         for (Event event : father.getEvents()) {
