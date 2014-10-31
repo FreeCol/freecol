@@ -155,12 +155,16 @@ public class ServerIndianSettlement extends IndianSettlement
 
         // Check for braves converted by missionaries
         float convert = getConvertProgress();
-        convert += missionary.applyModifiers(missionary.getType().getSkill(),
-                                             turn, Modifier.CONVERSION_SKILL);
+        float cMiss = missionary.applyModifiers(missionary.getType().getSkill(),
+                                                turn, Modifier.CONVERSION_SKILL);
         // The convert rate increases by a percentage of the current alarm.
         int alarm = Math.min(getAlarm(other).getValue(), Tension.TENSION_MAX);
-        convert += missionary.applyModifiers(alarm, turn,
-                                             Modifier.CONVERSION_ALARM_RATE);
+        float cAlarm = missionary.applyModifiers(alarm, turn,
+            Modifier.CONVERSION_ALARM_RATE);
+        convert += cMiss + (cAlarm - alarm);
+        logger.finest("Conversion at " + getName() + " alarm=" + alarm
+            + " " + convert
+            + " = " + getConvertProgress() + " + " + cMiss + " + " + cAlarm);
         Settlement colony = tile.getNearestSettlement(other,
             MAX_CONVERT_DISTANCE, true);
         if (convert < (float)getType().getConvertThreshold()
