@@ -975,7 +975,8 @@ public final class InGameController implements NetworkConstants {
                     if (!moveDirection(unit, path.getDirection(), false)) {
                         return false;
                     }
-                    if (unit.getTile().getDiscoverableRegion() != null) {
+                    if (unit.hasTile()
+                        && unit.getTile().getDiscoverableRegion() != null) {
                         // Break up the goto to allow region naming to occur,
                         // BR#2707
                         return false;

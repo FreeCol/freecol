@@ -467,17 +467,11 @@ public class Region extends FreeColGameObject implements Nameable {
 
         xw.writeAttribute(TYPE_TAG, type);
 
-        if (prediscovered) {
-            xw.writeAttribute(PREDISCOVERED_TAG, prediscovered);
-        }
+        xw.writeAttribute(PREDISCOVERED_TAG, prediscovered);
 
-        if (claimable) {
-            xw.writeAttribute(CLAIMABLE_TAG, claimable);
-        }
+        xw.writeAttribute(CLAIMABLE_TAG, claimable);
 
-        if (discoverable) {
-            xw.writeAttribute(DISCOVERABLE_TAG, discoverable);
-        }
+        xw.writeAttribute(DISCOVERABLE_TAG, discoverable);
 
         if (parent != null) {
             xw.writeAttribute(PARENT_TAG, parent);
