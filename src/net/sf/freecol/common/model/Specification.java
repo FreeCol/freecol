@@ -1505,6 +1505,33 @@ public final class Specification {
     }
 
     /**
+     * Get the missionary role.
+     *
+     * @return The missionary <code>Role</code>.
+     */
+    public Role getMissionaryRole() {
+        return getRoleWithAbility(Ability.ESTABLISH_MISSION, null);
+    }
+
+    /**
+     * Get the pioneer role.
+     *
+     * @return The pioneer <code>Role</code>.
+     */
+    public Role getPioneerRole() {
+        return getRoleWithAbility(Ability.IMPROVE_TERRAIN, null);
+    }
+
+    /**
+     * Get the scout role.
+     *
+     * @return The scout <code>Role</code>.
+     */
+    public Role getScoutRole() {
+        return getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null);
+    }
+
+    /**
      * Get any possible role change when a unit with a given role captures
      * the role-equipment of another unit.
      *

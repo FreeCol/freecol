@@ -514,7 +514,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (u.hasDefaultRole()
                     && u.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                     cheatGold(europe.priceGoods(u.getGoodsDifference(scoutRole, 1)), lb);
-                    if (getAIUnit(u).equipForRole("model.role.scout")) {
+                    if
+            (getAIUnit(u).equipForRole(spec.getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null))) {
                         lb.add(" to equip scout ", u, ", ");
                         player.logCheat("Equip scout " + u.toShortString());
                     }
@@ -530,7 +531,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (u.hasDefaultRole()
                     && u.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                     cheatGold(europe.priceGoods(u.getGoodsDifference(pioneerRole, 1)), lb);
-                    if (getAIUnit(u).equipForRole("model.role.pioneer")) {
+                    if (getAIUnit(u).equipForRole(spec.getRoleWithAbility(Ability.IMPROVE_TERRAIN, null))) {
                         lb.add(" to equip pioneer ", u, ", ");
                         player.logCheat("Equip pioneer " + u.toShortString());
                     }
@@ -2195,7 +2196,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         Location loc = MissionaryMission.findTarget(aiUnit, missionaryRange,
                                                     true);
         if (loc == null) {
-            aiUnit.equipForRole(Specification.DEFAULT_ROLE_ID);
+            aiUnit.equipForRole(getSpecification().getDefaultRole());
             return null;
         }
         return new MissionaryMission(getAIMain(), aiUnit, loc);
@@ -2218,7 +2219,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (target == null) {
             Unit unit = aiUnit.getUnit();
             if (unit.isInEurope() || unit.getSettlement() != null) {
-                aiUnit.equipForRole(Specification.DEFAULT_ROLE_ID);
+                aiUnit.equipForRole(getSpecification().getDefaultRole());
             }
             return null;
         }
@@ -2253,7 +2254,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (loc == null) {
             Unit unit = aiUnit.getUnit();
             if (unit.isInEurope() || unit.getSettlement() != null) {
-                aiUnit.equipForRole(Specification.DEFAULT_ROLE_ID);
+                aiUnit.equipForRole(getSpecification().getDefaultRole());
             }
             return null;
         }            

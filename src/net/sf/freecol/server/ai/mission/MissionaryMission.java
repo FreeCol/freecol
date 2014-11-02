@@ -215,7 +215,7 @@ public class MissionaryMission extends Mission {
             if (!unit.hasAbility(Ability.ESTABLISH_MISSION)
                 && (((FreeColGameObject)unit.getLocation())
                     .hasAbility(Ability.DRESS_MISSIONARY))) {
-                aiUnit.equipForRole("model.role.missionary");
+                aiUnit.equipForRole(unit.getSpecification().getMissionaryRole());
             }
             reason = (unit.hasAbility(Ability.ESTABLISH_MISSION))
                 ? null

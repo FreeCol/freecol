@@ -383,27 +383,26 @@ public class AIUnit extends TransportableAIObject {
      * (possibly requiring a purchase, which may fail due to lack of gold
      * or boycotts in effect).
      *
-     * @param roleId The role identifier.
+     * @param role The <code>Role</code> to equip for identifier.
      * @return True if the role change was successful.
      */
-    public boolean equipForRole(String roleId) {
+    public boolean equipForRole(Role role) {
         final Specification spec = getSpecification();
-        Role r = spec.getRole(roleId);
         final Player player = unit.getOwner();
         Location loc = upLoc(unit.getLocation());
         if (!(loc instanceof UnitLocation)) return false;
-        int count = r.getMaximumCount();
+        int count = role.getMaximumCount();
         if (count > 0) {
             for (; count > 0; count--) {
-                List<AbstractGoods> req = unit.getGoodsDifference(r, count);
+                List<AbstractGoods> req = unit.getGoodsDifference(role, count);
                 int price = ((UnitLocation)loc).priceGoods(req);
                 if (price < 0) continue;
                 if (player.checkGold(price)) break;
             }
             if (count <= 0) return false;
         }
-        return AIMessage.askEquipForRole(this, r, count)
-            && unit.getRole() == r && unit.getRoleCount() == count;
+        return AIMessage.askEquipForRole(this, role, count)
+            && unit.getRole() == role && unit.getRoleCount() == count;
     }
 
 

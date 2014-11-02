@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
@@ -230,7 +231,8 @@ public class ScoutingMission extends Mission {
         String reason = invalidReason(aiUnit);
         return (reason != null) ? reason
             : (canScoutNatives(aiUnit)
-                || aiUnit.equipForRole("model.role.scout")
+                || aiUnit.equipForRole(aiUnit.getUnit().getSpecification()
+                    .getScoutRole())
                 || aiUnit.getUnit().hasAbility(Ability.EXPERT_SCOUT)) ? null
             : "unit-unprepared-to-SCOUT";
     }
@@ -459,7 +461,7 @@ public class ScoutingMission extends Mission {
         if (newTarget == null
             || (completed instanceof Colony && newTarget == completed)) {
             if (completed instanceof Colony && canScoutNatives(aiUnit)) {
-                aiUnit.equipForRole(Specification.DEFAULT_ROLE_ID);
+                aiUnit.equipForRole(getSpecification().getDefaultRole());
             }
             return lbFail(lb, false, ", found no targets");
         }

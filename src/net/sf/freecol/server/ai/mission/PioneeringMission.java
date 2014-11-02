@@ -354,8 +354,9 @@ public class PioneeringMission extends Mission {
         if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
         if (!hasTools(aiUnit)
-            && !aiUnit.equipForRole("model.role.pioneer"))
+            && !aiUnit.equipForRole(unit.getSpecification().getPioneerRole())) {
             return "unit-could-not-equip";
+        }
         return (hasTools(aiUnit) || unit.hasAbility(Ability.EXPERT_PIONEER))
             ? null
             : "unit-missing-tools";
@@ -521,7 +522,7 @@ public class PioneeringMission extends Mission {
     @Override
     protected Mission lbFail(LogBuilder lb, boolean cont, Object... reasons) {
         if (hasTools() && getUnit().getColony() != null) {
-            getAIUnit().equipForRole(Specification.DEFAULT_ROLE_ID);
+            getAIUnit().equipForRole(getSpecification().getDefaultRole());
         }
         return super.lbFail(lb, false, reasons);
     }
@@ -590,7 +591,8 @@ public class PioneeringMission extends Mission {
 
             // Try to equip
             lbAt(lb);
-            if (aiUnit.equipForRole("model.role.pioneer") && hasTools()) {
+            if (aiUnit.equipForRole(getSpecification().getPioneerRole())
+                && hasTools()) {
                 lb.add(", equips");
                 newTarget = findTarget(aiUnit, 10, false);
                 if (newTarget == null) {
