@@ -24,6 +24,8 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.server.generator.MapGenerator;
 
 
@@ -66,10 +68,12 @@ public class NewEmptyMapAction extends MapboardAction {
     public void actionPerformed(ActionEvent e) {
         Dimension size = getGUI().showMapSizeDialog();
         if (size == null) return;
-        MapGenerator mapGenerator = getFreeColClient().getFreeColServer()
-            .getMapGenerator();
-        mapGenerator.createEmptyMap(getGame(), size.width, size.height);
-        getGUI().setFocus(getGame().getMap().getTile(1,1));
+        final Game game = getGame();
+        Map map = getFreeColClient().getFreeColServer()
+            .createEmptyMap(game, size.width, size.height);
+        game.setMap(map);
+        Tile tile = map.getTile(size.width/2, size.height/2);
+        getGUI().setFocus(tile);
         getFreeColClient().updateActions();
         getGUI().refresh();
     }

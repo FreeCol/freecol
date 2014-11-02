@@ -71,9 +71,8 @@ public class SaveLoadTest extends FreeColTestCase {
         ServerTestHelper.stopServer();
 
         FreeColServer server = ServerTestHelper.startServer(false, true);
-        MapGenerator mapGenerator = server.getMapGenerator();
-        ((FileOption) mapGenerator.getMapGeneratorOptions()
-            .getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(file);
+        server.getSpecification().getMapGeneratorOptions()
+            .getOption(MapGeneratorOptions.IMPORT_FILE).setValue(file);
         Controller c = server.getController();
         assertNotNull(c);
         assertTrue(c instanceof PreGameController);
@@ -83,8 +82,8 @@ public class SaveLoadTest extends FreeColTestCase {
         } catch (FreeColException e) {
             fail(e.getMessage());
         }
-        ((FileOption) mapGenerator.getMapGeneratorOptions()
-            .getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
+        server.getSpecification().getMapGeneratorOptions()
+            .getOption(MapGeneratorOptions.IMPORT_FILE).setValue(null);
 
         assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
         assertNotNull(server.getGame());

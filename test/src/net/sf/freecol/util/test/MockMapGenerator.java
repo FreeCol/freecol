@@ -40,13 +40,16 @@ import net.sf.freecol.server.generator.MapGenerator;
 
 public class MockMapGenerator implements MapGenerator {
 
+    private Game game;
     private Map map;
+
 	
-    public MockMapGenerator(Map map) {
+    public MockMapGenerator(Game game, Map map) {
+        this.game = game;
         this.map = map;
     }
 	
-    public void createMap(Game game) throws FreeColException {
+    public Map createMap() {
         // For all map descendents in the old game, move them to the
         // new game.
         Game oldGame = map.getGame();
@@ -70,14 +73,12 @@ public class MockMapGenerator implements MapGenerator {
                 game.setFreeColGameObject(fcgo.getId(), fcgo);
             }
         }
+        return map;
     }
 
-    public void createEmptyMap(Game game, int width, int height) {
+    public Map createEmptyMap(int width, int height) {
         // do nothing yet
-    }
-	
-    public OptionGroup getMapGeneratorOptions() {
-        return null;
+        return map;
     }
 	
     public void setMap(Map map) {

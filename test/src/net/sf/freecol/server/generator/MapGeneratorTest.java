@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
+import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -55,7 +56,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
+        MapGenerator gen = new SimpleMapGenerator(g, new Random(1));
 
         for (Nation n : spec().getNations()) {
             if (n.getType().isEuropean() && !n.getType().isREF()
@@ -64,11 +65,7 @@ public class MapGeneratorTest extends FreeColTestCase {
             }
         }
 
-        try {
-            gen.createMap(g);
-        } catch (FreeColException e) {
-            fail(e.getMessage());
-        }
+        gen.createMap();
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -83,23 +80,19 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
+        MapGenerator gen = new SimpleMapGenerator(g, new Random(1));
         Nation nation = spec().getNation("model.nation.dutch");
 
         g.addPlayer(new ServerPlayer(g, nation.getType().getNameKey(), false, nation, null, null));
 
-        try {
-            gen.createMap(g);
-        } catch (FreeColException e) {
-            fail(e.getMessage());
-        }
+        gen.createMap();
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
 
-        assertEquals(gen.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_WIDTH),
+        assertEquals(g.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_WIDTH),
                      g.getMap().getWidth());
-        assertEquals(gen.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_HEIGHT),
+        assertEquals(g.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_HEIGHT),
                      g.getMap().getHeight());
 
     }
@@ -113,7 +106,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
+        MapGenerator gen = new SimpleMapGenerator(g, new Random(1));
 
         // Apply the difficulty level
         //spec().applyDifficultyLevel("model.difficulty.medium");
@@ -129,11 +122,7 @@ public class MapGeneratorTest extends FreeColTestCase {
             players.add(p);
         }
 
-        try {
-            gen.createMap(g);
-        } catch (FreeColException e) {
-            fail(e.getMessage());
-        }
+        gen.createMap();
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -141,9 +130,9 @@ public class MapGeneratorTest extends FreeColTestCase {
         // Map of correct size?
         Map m = g.getMap();
         assertEquals(m.getWidth(),
-                     gen.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_WIDTH));
+                     g.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_WIDTH));
         assertEquals(m.getHeight(),
-                     gen.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_HEIGHT));
+                     g.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_HEIGHT));
 
         // Sufficient land?
         int land = 0;
@@ -153,13 +142,13 @@ public class MapGeneratorTest extends FreeColTestCase {
             total++;
         }
         // Land Mass requirement fulfilled?
-        assertTrue(100 * land / total >= gen.getMapGeneratorOptions()
+        assertTrue(100 * land / total >= g.getMapGeneratorOptions()
                    .getInteger(MapGeneratorOptions.LAND_MASS));
 
         // Does the wholeMapIterator visit all fields?
         assertEquals(total,
-                     gen.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_WIDTH)
-                     * gen.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_HEIGHT));
+                     g.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_WIDTH)
+                     * g.getMapGeneratorOptions().getInteger(MapGeneratorOptions.MAP_HEIGHT));
     }
 
     /**
@@ -172,7 +161,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         Game g = new ServerGame(spec());
         g.setNationOptions(new NationOptions(spec()));
 
-        MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
+        MapGenerator gen = new SimpleMapGenerator(g, new Random(1));
 
         Vector<Player> players = new Vector<Player>();
 
@@ -185,11 +174,7 @@ public class MapGeneratorTest extends FreeColTestCase {
             players.add(p);
         }
 
-        try {
-            gen.createMap(g);
-        } catch (FreeColException e) {
-            fail(e.getMessage());
-        }
+        gen.createMap();
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -212,37 +197,27 @@ public class MapGeneratorTest extends FreeColTestCase {
         }
     }
 
+    /**
+     * Make sure we can import all distributed maps.
+     */
     public void testImportMap() {
-        /**
-         * Make sure we can import all distributed maps.
-         */
-        Game g = new ServerGame(spec());
-        MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
+        Game game = new ServerGame(spec());
+        MapGenerator gen = new SimpleMapGenerator(game, new Random(1));
         File mapDir = new File("data/maps/");
         for (File importFile : mapDir.listFiles(FreeCol.freeColSaveFileFilter)) {
-            ((FileOption) gen.getMapGeneratorOptions().getOption(MapGeneratorOptions.IMPORT_FILE))
+            ((FileOption)spec().getOption(MapGeneratorOptions.IMPORT_FILE))
                 .setValue(importFile);
-            try {
-                gen.createMap(g);
-            } catch (FreeColException e) {
-                e.printStackTrace();
-                fail("Failed to import file " + importFile.getName()
-                    + ": " + e.getMessage());
-            }
+            assertNotNull(gen.createMap());
         }
+        // Clear import file option
+        ((FileOption)spec().getOption(MapGeneratorOptions.IMPORT_FILE))
+            .setValue(null);
     }
 
     public void testRegions() {
-        // Reset import file option value (set by previous tests)
-        ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
-
         Game game = new ServerGame(spec());
-        MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
-        try {
-            gen.createMap(game);
-        } catch (FreeColException e) {
-            fail(e.getMessage());
-        }
+        MapGenerator gen = new SimpleMapGenerator(game, new Random(1));
+        gen.createMap();
 
         Map map = game.getMap();
         Region pacific = map.getRegion("model.region.pacific");

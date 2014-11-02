@@ -64,6 +64,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
@@ -80,6 +81,7 @@ import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.util.Utils;
@@ -178,14 +180,13 @@ public final class FreeColServer {
     /** The name of this server. */
     private String name;
 
-
-    /** Stores the current state of the game. */
+    /** The current state of the game. */
     private GameState gameState = GameState.STARTING_GAME;
 
     // Networking:
     private Server server;
 
-    // Control:
+    // Controllers
     private final UserConnectionHandler userConnectionHandler;
 
     private final PreGameController preGameController;
@@ -196,13 +197,16 @@ public final class FreeColServer {
 
     private final InGameController inGameController;
 
-    private ServerGame game;
-
+    /** The AI controller. */
     private AIMain aiMain;
 
-    private MapGenerator mapGenerator;
+    /** The game underway. */
+    private ServerGame game;
 
-    /** The private provider for random numbers. */
+    /** The map generator. */
+    private MapGenerator mapGenerator = null;
+
+    /** The internal provider of random numbers. */
     private Random random = null;
 
     /** The game integrity state. */
@@ -232,20 +236,20 @@ public final class FreeColServer {
         this.port = port;
         this.name = name;
 
-        server = serverStart(port); // Throws IOException
+        this.server = serverStart(port); // Throws IOException
 
-        userConnectionHandler = new UserConnectionHandler(this);
-        preGameController = new PreGameController(this);
-        preGameInputHandler = new PreGameInputHandler(this);
-        inGameInputHandler = new InGameInputHandler(this);
+        this.userConnectionHandler = new UserConnectionHandler(this);
+        this.preGameController = new PreGameController(this);
+        this.preGameInputHandler = new PreGameInputHandler(this);
+        this.inGameInputHandler = new InGameInputHandler(this);
 
-        random = new Random(FreeColSeed.getFreeColSeed(true));
-        inGameController = new InGameController(this, random);
-        mapGenerator = new SimpleMapGenerator(random, specification);
-
-        game = new ServerGame(specification);
+        this.random = new Random(FreeColSeed.getFreeColSeed(true));
+        this.game = new ServerGame(specification);
         game.setNationOptions(new NationOptions(specification));
         game.initializeCitiesOfCibola(random);
+        
+        this.inGameController = new InGameController(this, random);
+        this.mapGenerator = new SimpleMapGenerator(game, random);
 
         if (publicServer) {
             updateMetaServer(true); // Throws NoRouteToServerException
@@ -277,29 +281,31 @@ public final class FreeColServer {
         this.port = port;
         this.name = name;
 
-        server = serverStart(port); // Throws IOException
+        this.server = serverStart(port); // Throws IOException
 
-        userConnectionHandler = new UserConnectionHandler(this);
-        preGameController = new PreGameController(this);
-        preGameInputHandler = new PreGameInputHandler(this);
-        inGameInputHandler = new InGameInputHandler(this);
+        this.userConnectionHandler = new UserConnectionHandler(this);
+        this.preGameController = new PreGameController(this);
+        this.preGameInputHandler = new PreGameInputHandler(this);
+        this.inGameInputHandler = new InGameInputHandler(this);
 
-        game = loadGame(savegame, specification, server);
+        this.game = loadGame(savegame, specification, server);
         // NationOptions will be read from the saved game.
         TransactionSession.clearAll();
+
         // Replace the PRNG in the game if it is missing or a command line
         // option was present.
-        long seed = FreeColSeed.getFreeColSeed(random == null);
+        long seed = FreeColSeed.getFreeColSeed(this.random == null);
         if (seed != FreeColSeed.DEFAULT_SEED) {
             this.random = new Random(seed);
         }
-        inGameController = new InGameController(this, random);
-        mapGenerator = new SimpleMapGenerator(random, getSpecification());
+        this.inGameController = new InGameController(this, random);
+        this.mapGenerator = null;
 
         if (publicServer) {
             updateMetaServer(true); // Throws NoRouteToServerException
         }
     }
+
 
     /**
      * Is the user playing in single player mode?
@@ -535,6 +541,24 @@ public final class FreeColServer {
     }
 
     /**
+     * Get the map generator.
+     *
+     * @return The <code>MapGenerator</code>.
+     */
+    public MapGenerator getMapGenerator() {
+        return this.mapGenerator;
+    }
+
+    /**
+     * Set the map generator.
+     *
+     * @param mapGenerator The new <code>MapGenerator</code>.
+     */
+    public void setMapGenerator(MapGenerator mapGenerator) {
+        this.mapGenerator = mapGenerator;
+    }
+
+    /**
      * Gets the server random number generator.
      *
      * @return The server random number generator.
@@ -550,26 +574,6 @@ public final class FreeColServer {
      */
     public void setServerRandom(Random random) {
         this.random = random;
-    }
-
-    /**
-     * Gets the <code>MapGenerator</code> this <code>FreeColServer</code> is
-     * using when creating random maps.
-     *
-     * @return The <code>MapGenerator</code>.
-     */
-    public MapGenerator getMapGenerator() {
-        return mapGenerator;
-    }
-
-    /**
-     * Sets the <code>MapGenerator</code> this <code>FreeColServer</code> is
-     * using when creating random maps.
-     *
-     * @param mapGenerator The <code>MapGenerator</code>.
-     */
-    public void setMapGenerator(MapGenerator mapGenerator) {
-        this.mapGenerator = mapGenerator;
     }
 
     /**
@@ -862,13 +866,42 @@ public final class FreeColServer {
     }
 
     /**
-     * Reads just the game part from a save game.
+     * Read just the game part from a file.
      *
      * When the specification is not supplied, the one found in the saved
      * game will be used.
      *
-     * This routine exists apart from loadGame so that the map generator
-     * can load the predefined maps.
+     * @param file The <code>File</code> to read from.
+     * @param specification An optional <code>Specification</code> to use.
+     * @param server Use this (optional) server to load into.
+     * @return The game found in the stream.
+     */
+    public static ServerGame readGame(File file, Specification spec,
+                                      FreeColServer server) {
+        ServerGame g = null;
+        try {
+            g = FreeColServer.readGame(new FreeColSavegameFile(file),
+                                       spec, server);
+            logger.info("Imported file " + file.getPath());
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Import failed for " + file.getPath(), e);
+        }
+
+        // If importing as a result of "Start Game" in the map editor,
+        // consume the file.
+        File startGame = FreeColDirectories.getStartMapFile();
+        if (startGame != null
+            && startGame.getPath().equals(file.getPath())) {
+            file.delete();
+        }
+        return g;
+    }
+
+    /**
+     * Reads just the game part from a save game from a stream.
+     *
+     * When the specification is not supplied, the one found in the saved
+     * game will be used.
      *
      * @param fis The stream to read from.
      * @param specification An optional <code>Specification</code> to use.
@@ -1083,6 +1116,20 @@ public final class FreeColServer {
     }
 
     /**
+     * Create an empty map.
+     *
+     * Public for the map generator.
+     *
+     * @param game The <code>Game</code> to create the map for.
+     * @param width The map width.
+     * @param height The map height.
+     * @return The new empty <code>Map</code>.
+     */
+    public Map createEmptyMap(Game game, int width, int height) {
+        return getMapGenerator().createEmptyMap(width, height);
+    }
+
+    /**
      * Builds a new game using the parameters that exist in the game
      * as it stands.
      *
@@ -1097,18 +1144,8 @@ public final class FreeColServer {
         // We need a fake unknown enemy player
         establishUnknownEnemy(game);
 
-        // Save the old GameOptions as possibly set by clients..
-        // TODO: This might not be the best way to do it, the
-        // createMap should not really use the entire loadGame method.
-        OptionGroup gameOptions = spec.getGameOptions();
-        Element oldGameOptions = gameOptions.toXMLElement(DOMMessage.createMessage("oldGameOptions").getOwnerDocument());
-
-        // Make the map.
-        getMapGenerator().createMap(game);
-
-        // Restore the GameOptions that may have been overwritten by
-        // loadGame in createMap
-        gameOptions.readFromXMLElement(oldGameOptions);
+        // Create the map.
+        game.setMap(getMapGenerator().createMap());
 
         // Initial stances and randomizations for all players.
         spec.generateDynamicOptions();
@@ -1131,7 +1168,7 @@ public final class FreeColServer {
 
         // Ensure that option groups can not be edited any more.
         spec.getMapGeneratorOptions().setEditable(false);
-        gameOptions.setEditable(false);
+        spec.getGameOptions().setEditable(false);
         spec.getOptionGroup("difficultyLevels").setEditable(false);
 
         // Let the AIMain scan for objects it should be managing.

@@ -171,26 +171,20 @@ public final class MapEditorController {
     public void newMap() {
         final Game game = freeColClient.getGame();
         final Specification spec = game.getSpecification();
-        final MapGenerator mapGenerator = freeColClient.getFreeColServer()
-            .getMapGenerator();
 
         OptionGroup mgo = gui.showMapGeneratorOptionsDialog(true);
         if (mgo == null) return;
         game.setMapGeneratorOptions(mgo);
 
-        try {
-            if (spec.getDifficultyOptionGroup() == null) {
-                spec.applyDifficultyLevel(FreeCol.getDifficulty());
-            }
-            mapGenerator.createMap(game);
-            requireNativeNations(game);
-            gui.setFocus(game.getMap().getTile(1,1));
-            freeColClient.updateActions();
-            gui.refresh();
-        } catch (FreeColException e) {
-            gui.closeMenus();
-            gui.showErrorMessage(e.getMessage());
+        if (spec.getDifficultyOptionGroup() == null) {
+            spec.applyDifficultyLevel(FreeCol.getDifficulty());
         }
+        Map map = freeColClient.getFreeColServer().getMapGenerator()
+            .createMap();
+        requireNativeNations(game);
+        gui.setFocus(game.getMap().getTile(1,1));
+        freeColClient.updateActions();
+        gui.refresh();
     }
 
     /**

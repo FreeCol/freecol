@@ -20,9 +20,7 @@
 package net.sf.freecol.server.generator;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.LandMap;
-import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.model.Map;
 
 /**
  * Creates maps and sets the starting locations for the players.
@@ -30,29 +28,19 @@ import net.sf.freecol.common.option.OptionGroup;
 public interface MapGenerator {
 
     /**
-     * Gets the options used when generating the map.
-     * @return The <code>MapGeneratorOptions</code>.
-     */
-    public abstract OptionGroup getMapGeneratorOptions();
-
-    /**
-     * Creates a <code>Map</code> for the given <code>Game</code>.
+     * Create an empty map.
      *
-     * The <code>Map</code> is added to the <code>Game</code> after
-     * it is created.
-     *
-     * @param game The <code>Game</code> to create the map for.
      * @param width The map width.
      * @param height The map height.
-     * @see net.sf.freecol.common.model.Map
+     * @return A new empty <code>Map</code>.
      */
-    public abstract void createEmptyMap(Game game, int width, int height);
+    public abstract Map createEmptyMap(int width, int height);
 
     /**
      * Creates the map with the current set options
      *
-     * @param game The <code>Game</code> to create the map for.
+     * @return The new <code>Map</code>.
      * @exception FreeColException if an error occurs
      */
-    public abstract void createMap(Game game) throws FreeColException;
+    public abstract Map createMap();
 }

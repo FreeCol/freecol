@@ -185,7 +185,7 @@ public final class ServerTestHelper {
     public static Game startServerGame(Map map, Specification spec) {
         stopServerGame();
         FreeColServer serv = startServer(false, true, spec);
-        serv.setMapGenerator(new MockMapGenerator(map));
+        serv.setMapGenerator(new MockMapGenerator(serv.getGame(), map));
         PreGameController pgc = (PreGameController) serv.getController();
         try {
             pgc.startGame();

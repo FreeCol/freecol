@@ -65,39 +65,51 @@ public class TerrainGenerator {
     public static final int PACIFIC_SCORE_VALUE = 100;
     public static final int LAND_REGION_MAX_SIZE = 75;
 
-    /**
-     * The map options group.
-     */
-    private final OptionGroup mapOptions;
+    /** The Game to generate for. */
+    private final Game game;
+
+    /** The game to selectively import from. */
+    private final Game importGame;
 
     /**
      * The pseudo-random number source to use.
+     *
      * Uses of the PRNG are usually logged in FreeCol, but the use is
-     * so intense here and this code is called pre-game, so we intentionally
-     * skip the logging here.
+     * so intense here and this code is called pre-game, so we
+     * intentionally skip the logging here.
      */
     private final Random random;
 
-    // Cache of land and ocean tile types.
+    /** The cached map generator options. */
+    private final OptionGroup mapOptions;
+
+    /** The cache of the Specification. */
+    private final Specification spec;
+
+    /** The cached land and ocean tile types. */
     private ArrayList<TileType> landTileTypes = null;
     private ArrayList<TileType> oceanTileTypes = null;
 
-    // Cache of geographic regions
+    /** The cache of geographic regions. */
     private ServerRegion[] geographicRegions = null;
 
 
     /**
      * Creates a new <code>TerrainGenerator</code>.
      *
-     * @param mapGeneratorOptions The <code>OptionGroup</code>
-     *     containing the options for the map generator.
+     * @param game The <code>Game</code> to generate for.
+     * @param importGame A <code>Game</code> to selectively import from.
      * @param random A <code>Random</code> number source.
      * @see #createMap
      */
-    public TerrainGenerator(OptionGroup mapGeneratorOptions, Random random) {
-        this.mapOptions = mapGeneratorOptions;
+    public TerrainGenerator(Game game, Game importGame, Random random) {
+        this.game = game;
+        this.importGame = importGame;
         this.random = random;
+        this.mapOptions = game.getMapGeneratorOptions();
+        this.spec = game.getSpecification();
     }
+
 
     // Utilities
 
@@ -139,34 +151,31 @@ public class TerrainGenerator {
     /**
      * Creates a random tile for the specified position.
      *
-     * @param game The <code>Game</code> to create the tile in.
      * @param x The tile x coordinate.
      * @param y The tile y coordinate.
      * @param landMap A boolean array defining where the land is.
      * @param latitude The tile latitude.
      * @return The created tile.
      */
-    private Tile createTile(Game game, int x, int y, LandMap landMap,
-                            int latitude) {
+    private Tile createTile(int x, int y, LandMap landMap, int latitude) {
         return (landMap.isLand(x, y))
-            ? new Tile(game, getRandomLandTileType(game, latitude), x, y)
-            : new Tile(game, getRandomOceanTileType(game, latitude), x, y);
+            ? new Tile(game, getRandomLandTileType(latitude), x, y)
+            : new Tile(game, getRandomOceanTileType(latitude), x, y);
     }
 
     /**
      * Gets a random land tile type based on the latitude.
      *
-     * @param game the Game
      * @param latitude The location of the tile relative to the north/south
      *     poles and equator:
      *     0 is the mid-section of the map (equator)
      *     +/-90 is on the bottom/top of the map (poles).
      * @return A suitable random land tile type.
      */
-    private TileType getRandomLandTileType(Game game, int latitude) {
+    private TileType getRandomLandTileType(int latitude) {
         if (landTileTypes == null) {
             landTileTypes = new ArrayList<TileType>();
-            for (TileType type : game.getSpecification().getTileTypeList()) {
+            for (TileType type : spec.getTileTypeList()) {
                 if (type.isElevation() || type.isWater()) {
                     // do not generate elevated and water tiles at this time
                     // they are created separately
@@ -175,20 +184,19 @@ public class TerrainGenerator {
                 landTileTypes.add(type);
             }
         }
-        return getRandomTileType(game, landTileTypes, latitude);
+        return getRandomTileType(landTileTypes, latitude);
     }
 
     /**
      * Gets a random ocean tile type.
      *
-     * @param game The <code>Game</code> to query for tile types.
      * @param latitude The latitude of the proposed tile.
      * @return A suitable random ocean tile type.
      */
-    private TileType getRandomOceanTileType(Game game, int latitude) {
+    private TileType getRandomOceanTileType(int latitude) {
         if (oceanTileTypes == null) {
             oceanTileTypes = new ArrayList<TileType>();
-            for (TileType type : game.getSpecification().getTileTypeList()) {
+            for (TileType type : spec.getTileTypeList()) {
                 if (type.isWater()
                     && type.isHighSeasConnected()
                     && !type.isDirectlyHighSeasConnected()) {
@@ -196,7 +204,7 @@ public class TerrainGenerator {
                 }
             }
         }
-        return getRandomTileType(game, oceanTileTypes, latitude);
+        return getRandomTileType(oceanTileTypes, latitude);
     }
 
     /**
@@ -204,13 +212,12 @@ public class TerrainGenerator {
      *
      * TODO: Can be used for mountains and rivers too.
      *
-     * @param game The <code>Game</code> to find the type in.
      * @param candidates A list of <code>TileType</code>s to use for
      *     calculations.
      * @param latitude The tile latitude.
      * @return A suitable <code>TileType</code>.
      */
-    private TileType getRandomTileType(Game game, List<TileType> candidates,
+    private TileType getRandomTileType(List<TileType> candidates,
                                        int latitude) {
         // decode options
         final int forestChance
@@ -340,156 +347,7 @@ public class TerrainGenerator {
     }
 
 
-    // Main functionality, create the map.
-
-    /**
-     * Creates a <code>Map</code> for the given <code>Game</code>.
-     *
-     * The <code>Map</code> is added to the <code>Game</code> after
-     * it is created.
-     *
-     * @param game The <code>Game</code> to add the map to.
-     * @param landMap The <code>LandMap</code> to use as a template.
-     * @see Map
-     */
-    public void createMap(Game game, LandMap landMap) {
-        createMap(game, null, landMap);
-    }
-
-    /**
-     * Creates a <code>Map</code> for the given <code>Game</code>.
-     *
-     * The <code>Map</code> is added to the <code>Game</code> after
-     * it is created.
-     *
-     * @param game The <code>Game</code> to add the map to.
-     * @param importGame The <code>Game</code> to import information form.
-     * @param landMap The <code>LandMap</code> to use as a template.
-     * @see Map
-     */
-    public void createMap(Game game, Game importGame, LandMap landMap) {
-        final Specification spec = game.getSpecification();
-        final int width = landMap.getWidth();
-        final int height = landMap.getHeight();
-        final boolean importTerrain = (importGame != null)
-            && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
-        final boolean importBonuses = (importGame != null)
-            && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
-
-        boolean mapHasLand = false;
-        Map map = new Map(game, width, height);
-        int minimumLatitude = mapOptions
-            .getInteger(MapGeneratorOptions.MINIMUM_LATITUDE);
-        int maximumLatitude = mapOptions
-            .getInteger(MapGeneratorOptions.MAXIMUM_LATITUDE);
-        // make sure the values are in range
-        minimumLatitude = limitToRange(minimumLatitude, -90, 90);
-        maximumLatitude = limitToRange(maximumLatitude, -90, 90);
-        map.setMinimumLatitude(Math.min(minimumLatitude, maximumLatitude));
-        map.setMaximumLatitude(Math.max(minimumLatitude, maximumLatitude));
-
-        java.util.Map<String, ServerRegion> regionMap
-            = new HashMap<String, ServerRegion>();
-        if (importTerrain) { // Import the regions
-            String ids = "";
-            for (Region r : importGame.getMap().getRegions()) {
-                ServerRegion region = new ServerRegion(game, r);
-                map.putRegion(region);
-                regionMap.put(r.getId(), region);
-                ids += " " + region.getNameKey();
-            }
-            for (Region r : importGame.getMap().getRegions()) {
-                ServerRegion region = regionMap.get(r.getId());
-                Region x = r.getParent();
-                if (x != null) x = regionMap.get(x.getId());
-                region.setParent(x);
-                for (Region c : r.getChildren()) {
-                    x = regionMap.get(c.getId());
-                    if (x != null) region.addChild(x);
-                }
-            }
-            logger.info("Imported regions: " + ids);
-        }
-
-        List<Tile> fixRegions = new ArrayList<Tile>();
-        for (int y = 0; y < height; y++) {
-            int latitude = map.getLatitude(y);
-            for (int x = 0; x < width; x++) {
-                if (landMap.isLand(x, y)) mapHasLand = true;
-                Tile t, importTile = null;
-                if (importTerrain
-                    && importGame.getMap().isValid(x, y)
-                    && (importTile = importGame.getMap().getTile(x, y)) != null
-                    && importTile.isLand() == landMap.isLand(x, y)) {
-                    String id = importTile.getType().getId();
-                    t = new Tile(game, spec.getTileType(id), x, y);
-                    if (importTile.getMoveToEurope() != null) {
-                        t.setMoveToEurope(importTile.getMoveToEurope());
-                    }
-                    if (importTile.getTileItemContainer() != null) {
-                        TileItemContainer container
-                            = new TileItemContainer(game, t);
-                        // TileItemContainer copies every natural item
-                        // including Resource unless importBonuses ==
-                        // false Rumors and roads are not copied
-                        container.copyFrom(importTile.getTileItemContainer(),
-                            importBonuses, true);
-                        t.setTileItemContainer(container);
-                    }
-                    Region r = importTile.getRegion();
-                    if (r == null) {
-                        fixRegions.add(t);
-                    } else {
-                        ServerRegion ours = regionMap.get(r.getId());
-                        if (ours == null) {
-                            logger.warning("Could not set tile region "
-                                + r.getId() + " for tile: " + t);
-                            fixRegions.add(t);
-                        } else {
-                            ours.addTile(t);
-                        }
-                    }
-                } else {
-                    t = createTile(game, x, y, landMap, latitude);
-                }
-                map.setTile(t, x, y);
-            }
-        }
-        game.setMap(map);
-        geographicRegions = getStandardRegions(map);
-
-        if (importTerrain) {
-            if (!fixRegions.isEmpty()) { // Fix the tiles missing regions.
-                createOceanRegions(map);
-                createLakeRegions(map);
-                createLandRegions(map);
-            }
-        } else {
-            createOceanRegions(map);
-            map.resetHighSeas(
-                mapOptions.getInteger(MapGeneratorOptions.DISTANCE_TO_HIGH_SEA),
-                mapOptions.getInteger(MapGeneratorOptions.MAXIMUM_DISTANCE_TO_EDGE));
-            if (mapHasLand) {
-                createMountains(map);
-                createRivers(map);
-                createLakeRegions(map);
-                createLandRegions(map);
-            }
-        }
-
-        // Add the bonuses only after the map is completed.
-        // Otherwise we risk creating resources on fields where they
-        // don't belong (like sugar in large rivers or tobaco on hills).
-        for (Tile tile : map.getAllTiles()) {
-            perhapsAddBonus(tile, !importBonuses);
-            if (!tile.isLand()) {
-                encodeStyle(tile);
-            }
-        }
-
-        map.resetContiguity();
-        map.resetHighSeasCount();
-    }
+    // Create map entities
 
     /**
      * Creates ocean map regions in the given Map.
@@ -500,7 +358,6 @@ public class TerrainGenerator {
      * @param map The <code>Map</code> to work on.
      */
     private void createOceanRegions(Map map) {
-        Game game = map.getGame();
         ServerRegion pacific = (ServerRegion)map
             .getRegion("model.region.pacific");
         ServerRegion northPacific = (ServerRegion)map
@@ -669,8 +526,6 @@ public class TerrainGenerator {
      * @return An array of the standard geographic regions.
      */
     private ServerRegion[] getStandardRegions(Map map) {
-        final Game game = map.getGame();
-
         // Create arctic/antarctic regions first, but only if they do
         // not exist in on the map already.  This allows for example
         // the imported Caribbean map to have arctic/antarctic regions
@@ -819,8 +674,6 @@ public class TerrainGenerator {
      * @param map The <code>Map</code> to work on.
      */
     private void createLandRegions(Map map) {
-        Game game = map.getGame();
-
         // Create "explorable" land regions
         int continents = 0;
         boolean[][] landmap = new boolean[map.getWidth()][map.getHeight()];
@@ -926,7 +779,7 @@ public class TerrainGenerator {
             do {
                 id = "model.region.land" + Integer.toString(landIndex++);
             } while (map.getRegion(id) != null);
-            landregions[c] = new ServerRegion(map.getGame(), id,
+            landregions[c] = new ServerRegion(game, id,
                 Region.RegionType.LAND, null);
             landregions[c].setDiscoverable(true);
             map.putRegion(landregions[c]);
@@ -988,7 +841,6 @@ public class TerrainGenerator {
         logger.fine("Maximum length of mountain ranges is " + maximumLength);
 
         // lookup the resources from specification
-        final Specification spec = map.getSpecification();
         TileType hills = spec.getTileType("model.tile.hills");
         TileType mountains = spec.getTileType("model.tile.mountains");
         if (hills == null || mountains == null) {
@@ -1020,7 +872,7 @@ public class TerrainGenerator {
                     if (!t.isLand()) continue nextTry;
                 }
 
-                ServerRegion mountainRegion = new ServerRegion(map.getGame(),
+                ServerRegion mountainRegion = new ServerRegion(game,
                     "model.region.mountain" + tries,
                     Region.RegionType.MOUNTAIN, startTile.getRegion());
                 mountainRegion.setDiscoverable(true);
@@ -1102,7 +954,6 @@ public class TerrainGenerator {
      * @param map The <code>Map</code> to create rivers on.
      */
     private void createRivers(Map map) {
-        final Specification spec = map.getSpecification();
         final TileImprovementType riverType
             = spec.getTileImprovementType("model.improvement.river");
         final int number = getApproximateLandCount()
@@ -1126,7 +977,7 @@ public class TerrainGenerator {
                 }
                 if (riverMap.get(tile) == null) {
                     // no river here yet
-                    ServerRegion riverRegion = new ServerRegion(map.getGame(),
+                    ServerRegion riverRegion = new ServerRegion(game,
                         "model.region.river" + i, Region.RegionType.RIVER,
                         tile.getRegion());
                     riverRegion.setDiscoverable(true);
@@ -1166,6 +1017,8 @@ public class TerrainGenerator {
      * @param map The <code>Map</code> to work on.
      */
     private void createLakeRegions(Map map) {
+        final TileType lakeType = spec.getTileType("model.tile.lake");
+
         // Create the water map, and find any tiles that are water but
         // not part of any region (such as the oceans).  These are
         // lake tiles.
@@ -1281,7 +1134,7 @@ public class TerrainGenerator {
             // In Col1, ocean tiles with less than 3 land neighbours
             // produce 2 fish, all others produce 4 fish
             if (adjacentLand > 2) {
-                t.add(new TileImprovement(t.getGame(), t, fishBonusLandType));
+                t.add(new TileImprovement(game, t, fishBonusLandType));
             }
 
             // In Col1, the ocean tile in front of a river mouth would
@@ -1289,7 +1142,7 @@ public class TerrainGenerator {
             // TODO: This probably has some false positives, means
             // river tiles that are NOT a river mouth next to this tile!
             if (!t.hasRiver() && adjacentRiver) {
-                t.add(new TileImprovement(t.getGame(), t, fishBonusRiverType));
+                t.add(new TileImprovement(game, t, fishBonusRiverType));
             }
 
             if (t.getType().isHighSeasConnected()) {
@@ -1323,13 +1176,18 @@ public class TerrainGenerator {
         int quantity = (minValue == maxValue) ? maxValue
             : (minValue + randomInt(logger, "Rsiz", random, 
                                     maxValue - minValue + 1));
-        return new Resource(tile.getGame(), tile, resourceType, quantity);
+        return new Resource(game, tile, resourceType, quantity);
     }
 
     /**
      * Sets the style of the tiles.
      * Only relevant to water tiles for now.
      * Public because it is used in the river generator.
+     *
+     * @compat 0.10.x
+     * Only still public to allow reencoding tile styles when loading
+     * pre-save-v-12 savegames.
+     * end @compat 0.10.x
      *
      * @param tile The <code>Tile</code> to set the style of.
      */
@@ -1365,5 +1223,137 @@ public class TerrainGenerator {
             index++;
         }
         tile.setStyle(result);
+    }
+
+    // Main functionality, create the map.
+
+    /**
+     * Creates a <code>Map</code>.
+     *
+     * @param landMap The <code>LandMap</code> to use as a template.
+     * @return The new <code>Map</code>.
+     */
+    public Map createMap(LandMap landMap) {
+        final int width = landMap.getWidth();
+        final int height = landMap.getHeight();
+        final boolean importTerrain = (importGame != null)
+            && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
+        final boolean importBonuses = (importGame != null)
+            && mapOptions.getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
+
+        boolean mapHasLand = false;
+        Map map = new Map(game, width, height);
+        int minimumLatitude = mapOptions
+            .getInteger(MapGeneratorOptions.MINIMUM_LATITUDE);
+        int maximumLatitude = mapOptions
+            .getInteger(MapGeneratorOptions.MAXIMUM_LATITUDE);
+        // make sure the values are in range
+        minimumLatitude = limitToRange(minimumLatitude, -90, 90);
+        maximumLatitude = limitToRange(maximumLatitude, -90, 90);
+        map.setMinimumLatitude(Math.min(minimumLatitude, maximumLatitude));
+        map.setMaximumLatitude(Math.max(minimumLatitude, maximumLatitude));
+
+        java.util.Map<String, ServerRegion> regionMap
+            = new HashMap<String, ServerRegion>();
+        if (importTerrain) { // Import the regions
+            String ids = "";
+            for (Region r : importGame.getMap().getRegions()) {
+                ServerRegion region = new ServerRegion(game, r);
+                map.putRegion(region);
+                regionMap.put(r.getId(), region);
+                ids += " " + region.getNameKey();
+            }
+            for (Region r : importGame.getMap().getRegions()) {
+                ServerRegion region = regionMap.get(r.getId());
+                Region x = r.getParent();
+                if (x != null) x = regionMap.get(x.getId());
+                region.setParent(x);
+                for (Region c : r.getChildren()) {
+                    x = regionMap.get(c.getId());
+                    if (x != null) region.addChild(x);
+                }
+            }
+            logger.info("Imported regions: " + ids);
+        }
+
+        List<Tile> fixRegions = new ArrayList<Tile>();
+        for (int y = 0; y < height; y++) {
+            int latitude = map.getLatitude(y);
+            for (int x = 0; x < width; x++) {
+                if (landMap.isLand(x, y)) mapHasLand = true;
+                Tile t, importTile = null;
+                if (importTerrain
+                    && importGame.getMap().isValid(x, y)
+                    && (importTile = importGame.getMap().getTile(x, y)) != null
+                    && importTile.isLand() == landMap.isLand(x, y)) {
+                    String id = importTile.getType().getId();
+                    t = new Tile(game, spec.getTileType(id), x, y);
+                    if (importTile.getMoveToEurope() != null) {
+                        t.setMoveToEurope(importTile.getMoveToEurope());
+                    }
+                    if (importTile.getTileItemContainer() != null) {
+                        TileItemContainer container
+                            = new TileItemContainer(game, t);
+                        // TileItemContainer copies every natural item
+                        // including Resource unless importBonuses ==
+                        // false Rumors and roads are not copied
+                        container.copyFrom(importTile.getTileItemContainer(),
+                            importBonuses, true);
+                        t.setTileItemContainer(container);
+                    }
+                    Region r = importTile.getRegion();
+                    if (r == null) {
+                        fixRegions.add(t);
+                    } else {
+                        ServerRegion ours = regionMap.get(r.getId());
+                        if (ours == null) {
+                            logger.warning("Could not set tile region "
+                                + r.getId() + " for tile: " + t);
+                            fixRegions.add(t);
+                        } else {
+                            ours.addTile(t);
+                        }
+                    }
+                } else {
+                    t = createTile(x, y, landMap, latitude);
+                }
+                map.setTile(t, x, y);
+            }
+        }
+        game.setMap(map);
+        geographicRegions = getStandardRegions(map);
+
+        if (importTerrain) {
+            if (!fixRegions.isEmpty()) { // Fix the tiles missing regions.
+                createOceanRegions(map);
+                createLakeRegions(map);
+                createLandRegions(map);
+            }
+        } else {
+            createOceanRegions(map);
+            map.resetHighSeas(
+                mapOptions.getInteger(MapGeneratorOptions.DISTANCE_TO_HIGH_SEA),
+                mapOptions.getInteger(MapGeneratorOptions.MAXIMUM_DISTANCE_TO_EDGE));
+            if (mapHasLand) {
+                createMountains(map);
+                createRivers(map);
+                createLakeRegions(map);
+                createLandRegions(map);
+            }
+        }
+
+        // Add the bonuses only after the map is completed.
+        // Otherwise we risk creating resources on fields where they
+        // don't belong (like sugar in large rivers or tobaco on hills).
+        for (Tile tile : map.getAllTiles()) {
+            perhapsAddBonus(tile, !importBonuses);
+            if (!tile.isLand()) {
+                encodeStyle(tile);
+            }
+        }
+
+        map.resetContiguity();
+        map.resetHighSeasCount();
+        return map;
     }
 }
