@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
@@ -253,9 +252,7 @@ public class EuropeanNationType extends NationType {
                                             Specification.DEFAULT_ROLE_ID);
 
             // @compat 0.10.7
-            if (roleId.indexOf('.') < 0) {
-                roleId = "model.role." + roleId;
-            }
+            roleId = Role.fixRoleId(roleId);
             // end @compat
 
             boolean ex = xr.getAttribute(EXPERT_STARTING_UNITS_TAG, false);

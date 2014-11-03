@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIMain;
@@ -839,9 +840,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
         if (attrib == null) {
             return defaultValue;
         }
-        if (attrib.indexOf('.') < 0) {
-            attrib = "model.role." + attrib.toLowerCase(Locale.US);
-        }
+        attrib = Role.fixRoleId(attrib);
         return spec.getType(attrib, returnClass);
     }
     // end @compat

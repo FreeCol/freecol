@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -182,6 +183,21 @@ public class Role extends BuildableType {
         return (Specification.DEFAULT_ROLE_ID.equals(roleId)) ? null
             : "model.unit.role." + getRoleSuffix(roleId);
     }
+
+    // @compat 0.10.7
+    /**
+     * Fix a role id.
+     *
+     * @param The role id to fix.
+     * @return The fixed role id.
+     */
+    public static String fixRoleId(String roleId) {
+        if (roleId.indexOf('.') < 0) {
+            roleId = "model.role." + roleId.toLowerCase(Locale.US);
+        }
+        return roleId;
+    }
+    // end @compat
 
     /**
      * Get the downgraded role from this one.
