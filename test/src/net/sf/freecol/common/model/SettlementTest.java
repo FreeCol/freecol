@@ -28,6 +28,21 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class SettlementTest extends FreeColTestCase {
 
+    private static final GoodsType horsesType
+        = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType musketsType
+        = spec().getGoodsType("model.goods.muskets");
+
+    private static final Role dragoonRole
+        = spec().getRole("model.role.dragoon");
+    private static final Role mountedBraveRole
+        = spec().getRole("model.role.mountedBrave");
+    private static final Role nativeDragoonRole
+        = spec().getRole("model.role.nativeDragoon");
+    private static final Role soldierRole
+        = spec().getRole("model.role.soldier");
+
+
     public void testSettlementRadius() throws FreeColException {
 
         Game game = getStandardGame();
@@ -131,5 +146,69 @@ public class SettlementTest extends FreeColTestCase {
         colony.addBuilding(tower);
 
         assertEquals(4, colony.getLineOfSight());
+    }
+
+    public void testCanImproveUnitMilitaryRole() {
+        Game game = getGame();
+        Map map = getTestMap();
+        game.setMap(map);
+        Colony colony = getStandardColony(4);
+
+        // Colony has no equipment for the unit
+        Unit colonist = colony.getUnitList().get(0);
+        assertFalse(colony.canImproveUnitMilitaryRole(colonist));
+        
+        // Colony has some equipment, but not enough
+        colony.addGoods(musketsType, 40);
+        assertFalse(colony.canImproveUnitMilitaryRole(colonist));
+
+        // Colony now has enough equipment
+        colony.addGoods(musketsType, 10);
+        assertTrue(colony.canProvideGoods(soldierRole.getRequiredGoods()));
+        assertTrue(colony.canImproveUnitMilitaryRole(colonist));
+
+        // Equipping succeeds, colony can no longer improve
+        assertTrue(colony.equipForRole(colonist, soldierRole, 1));
+        assertFalse(colony.canImproveUnitMilitaryRole(colonist));
+
+        // Adding more muskets does not help
+        colony.addGoods(musketsType, 100);
+        assertFalse(colony.canImproveUnitMilitaryRole(colonist));
+
+        // But adding horses does
+        colony.addGoods(horsesType, 100);
+        assertTrue(colony.canImproveUnitMilitaryRole(colonist));
+
+        // Unless now a dragoon
+        assertTrue(colony.equipForRole(colonist, dragoonRole, 1));
+        assertFalse(colony.canImproveUnitMilitaryRole(colonist));
+
+        // Repeat previous tests for natives
+        Player arawak = game.getPlayer("model.nation.arawak");
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game)
+            .player(arawak).initialBravesInCamp(4);
+        IndianSettlement settlement = builder.build();
+
+        Unit brave = settlement.getUnitList().get(0);
+        assertFalse(settlement.canImproveUnitMilitaryRole(brave));
+        
+        settlement.addGoods(horsesType, 20);
+        assertFalse(settlement.canImproveUnitMilitaryRole(brave));
+
+        settlement.addGoods(horsesType, 10); // avoid breeding number
+        assertTrue(settlement.canImproveUnitMilitaryRole(brave));
+
+        assertTrue(settlement.equipForRole(brave, mountedBraveRole, 1));
+        assertFalse(settlement.canImproveUnitMilitaryRole(brave));
+
+        settlement.addGoods(horsesType, 100);
+        assertFalse(settlement.canImproveUnitMilitaryRole(brave));
+
+        settlement.addGoods(musketsType, 100);
+        assertTrue(settlement.canImproveUnitMilitaryRole(brave));
+
+        assertTrue(settlement.equipForRole(brave, nativeDragoonRole, 1));
+        assertFalse(settlement.canImproveUnitMilitaryRole(brave));
     }
 }

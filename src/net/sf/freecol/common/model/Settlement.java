@@ -413,6 +413,30 @@ public abstract class Settlement extends GoodsLocation
             : hasAbility(Ability.BOMBARD_SHIPS);
     }
 
+    /**
+     * Can this settlement provide the goods to improve a given unit's
+     * role?
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return True if the unit could upgrade its role at this settlement.
+     */
+    public boolean canImproveUnitMilitaryRole(Unit unit) {
+        final Specification spec = getSpecification();
+        final Role role = unit.getRole();
+
+        // Get the military roles that are superior to the current role
+        List<Role> military = spec.getMilitaryRoles();
+        int index = military.indexOf(role);
+        if (index >= 0) military = military.subList(0, index);
+
+        // To succeed, there must exist an available role for the unit
+        // where the extra equipment for the role is present.
+        for (Role r : unit.getAvailableRoles(military)) {
+            if (canProvideGoods(unit.getGoodsDifference(r, 1))) return true;
+        }
+        return false;
+    }
+
 
     // Override FreeColObject
 

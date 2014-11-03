@@ -437,10 +437,6 @@ public class NativeAIPlayer extends AIPlayer {
         final Player player = getPlayer();
         final Specification spec = getSpecification();
         final int turnNumber = getGame().getTurn().getNumber();
-        final List<AbstractGoods> scoutEq = spec.getRole("model.role.mountedBrave")
-            .getRequiredGoods();
-        final List<AbstractGoods> soldierEq = spec.getRole("model.role.armedBrave")
-            .getRequiredGoods();
         List<AIUnit> aiUnits = getAIUnits();
 
         lb.mark();
@@ -482,9 +478,7 @@ public class NativeAIPlayer extends AIPlayer {
                 }
                 reasons.put(unit, "Defend-" + settlement.getName());
 
-            } else if (is != null
-                && ((!unit.isMounted() && is.canProvideGoods(scoutEq))
-                    || (!unit.isArmed() && is.canProvideGoods(soldierEq)))) {
+            } else if (is != null && is.canImproveUnitMilitaryRole(unit)) {
                 // Go home for new equipment if the home settlement has it
                 if (!(m instanceof DefendSettlementMission)
                     || ((DefendSettlementMission)m).getTarget() != is) {
