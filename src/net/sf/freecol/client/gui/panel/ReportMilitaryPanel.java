@@ -72,10 +72,9 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
     protected void gatherData() {
         for (Unit unit : getMyPlayer().getUnits()) {
             if (unit.isOffensiveUnit() && !unit.isNaval()) {
-                String key = "model.role.dragoon".equals(unit.getRole().getId())
-                    ? "dragoons"
-                    : "model.role.soldier".equals(unit.getRole().getId())
-                    ? "soldiers"
+                String key = (unit.isArmed() && unit.isMounted()) ? "dragoons"
+                    : (unit.isArmed()) ? "soldiers"
+                    : (unit.isMounted()) ? "scouts"
                     : "others";
                 addUnit(unit, key);
             }
@@ -128,15 +127,18 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
                  unitType.getOffence() > 0)) {
                 if (unitType.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                     scoutUnits.add(new AbstractUnit(unitType,
-                            "model.role.scout", getCount("scouts", unitType)));
+                            "model.role.scout",
+                            getCount("scouts", unitType)));
                     dragoonUnits.add(new AbstractUnit(unitType,
-                            "model.role.dragoon", getCount("dragoons", unitType)));
+                            "model.role.dragoon",
+                            getCount("dragoons", unitType)));
                     soldierUnits.add(new AbstractUnit(unitType,
-                            "model.role.soldier", getCount("soldiers", unitType)));
+                            "model.role.soldier",
+                            getCount("soldiers", unitType)));
                 } else {
                     units.add(new AbstractUnit(unitType,
-                                               Specification.DEFAULT_ROLE_ID,
-                                               getCount("others", unitType)));
+                            Specification.DEFAULT_ROLE_ID,
+                            getCount("others", unitType)));
                 }
             }
         }
