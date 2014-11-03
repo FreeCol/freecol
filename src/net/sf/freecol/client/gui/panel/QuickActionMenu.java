@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -562,49 +563,17 @@ public final class QuickActionMenu extends JPopupMenu {
      * equipment types.  However, its time to release, and we should avoid
      * string changes.  Get rid of this post 0.11.0-release.
      */
-    private JMenuItem fakeRoleItem(final UnitLabel unitLabel,
-                                   final Role from, final int fromCount, 
-                                   final Role to, final int toCount,
-                                   final int price) {
-        String key = null;
-        AbstractGoods change = null;
-
-        if ("model.role.missionary".equals(to.getId())) {
-            key = "model.equipment.missionary.add";
-        } else if ("model.role.dragoon".equals(to.getId())) {
-            key = "model.equipment.dragoon";
-        } else {
-            List<AbstractGoods> need = Role.getGoodsDifference(from, fromCount,
-                                                               to, toCount);
-            switch (need.size()) {
-            case 0:
-                key = "model.equipment.missionary.remove";
-                break;
-            case 1:
-                change = need.get(0);
-                break;
-            default:
-                if (to.isDefaultRole()) {
-                    key = "model.equipment.removeAll";
-                } else {
-                    for (AbstractGoods ag : need) {
-                        if (ag.getAmount() > 0) {
-                            change = ag;
-                            break;
-                        }
-                    }
-                }
-                break;
-            }
+    private JMenuItem createRoleItem(final UnitLabel unitLabel,
+                                     final Role from, final int fromCount, 
+                                     final Role to, final int toCount,
+                                     final int price) {
+        // Get the text
+        String key = "model.role.change." + to.getSuffix();
+        if (!Messages.containsKey(key)) {
+            // Fall back to the full "from"."to" key
+            key = "model.role.change." + from.getSuffix()
+                + "." + to.getSuffix();
         }
-        if (change != null) {
-            key = "model.equipment."
-                + lastPart(change.getType().getId(), ".")
-                + ((change.getAmount() < 0) ? ".remove" : ".add");
-        }
-        if (key == null) return null;
-
-        final InGameController igc = freeColClient.getInGameController();
         String text = Messages.message(key);
         if (price > 0) {
             text += " ("
@@ -612,12 +581,32 @@ public final class QuickActionMenu extends JPopupMenu {
                     .addAmount("%amount%", price))
                 + ")";
         }
-        JMenuItem item = new JMenuItem(text);
-        if (change != null) {
-            final ImageLibrary imageLibrary = gui.getImageLibrary();
-            item.setIcon(imageLibrary.getScaledGoodsImageIcon(change.getType(),
-                                                              0.66f));
+
+        // Get an icon
+        AbstractGoods change = null;
+        List<AbstractGoods> need = Role.getGoodsDifference(from, fromCount,
+                                                           to, toCount);
+        switch (need.size()) {
+        case 0:
+            break;
+        case 1:
+            change = need.get(0);
+            break;
+        default:
+            for (AbstractGoods ag : need) {
+                if (ag.getAmount() > 0) {
+                    change = ag;
+                    break;
+                }
+            }
+            break;
         }
+        final ImageLibrary imageLibrary = gui.getImageLibrary();
+        Icon icon = (change == null) ? null
+            : imageLibrary.getScaledGoodsImageIcon(change.getType(), 0.66f);
+
+        JMenuItem item = new JMenuItem(text, icon);
+        final InGameController igc = freeColClient.getInGameController();
         item.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     igc.equipUnitForRole(unitLabel.getUnit(), to, toCount);
@@ -646,15 +635,15 @@ public final class QuickActionMenu extends JPopupMenu {
         final Role role = unit.getRole();
         final int roleCount = unit.getRoleCount();
         boolean separatorNeeded = false;
-        JMenuItem newItem;
 
         UnitLocation uloc = (unit.isInEurope()) ? unit.getOwner().getEurope()
             : unit.getSettlement();
         if (uloc == null) return false;
         for (Role r : unit.getAvailableRoles(null)) {
             if (r == role) continue;
+            JMenuItem newItem;
             if (r.isDefaultRole()) { // Always valid
-                newItem = fakeRoleItem(unitLabel, role, roleCount, r, 0, 0);
+                newItem = createRoleItem(unitLabel, role, roleCount, r, 0, 0);
             } else {
                 newItem = null;
                 for (int count = r.getMaximumCount(); count > 0; count--) {
@@ -662,8 +651,8 @@ public final class QuickActionMenu extends JPopupMenu {
                     int price = uloc.priceGoods(req);
                     if (price < 0) continue;
                     if (unit.getOwner().checkGold(price)) {
-                        newItem = fakeRoleItem(unitLabel, role, roleCount,
-                                               r, count, price);
+                        newItem = createRoleItem(unitLabel, role, roleCount,
+                                                 r, count, price);
                         break;
                     }
                 }
