@@ -418,9 +418,9 @@ public abstract class Settlement extends GoodsLocation
      * role?
      *
      * @param unit The <code>Unit</code> to check.
-     * @return True if the unit could upgrade its role at this settlement.
+     * @return The <code>Role</code> that this settlement could provide.
      */
-    public boolean canImproveUnitMilitaryRole(Unit unit) {
+    public Role canImproveUnitMilitaryRole(Unit unit) {
         final Specification spec = getSpecification();
         final Role role = unit.getRole();
 
@@ -432,9 +432,9 @@ public abstract class Settlement extends GoodsLocation
         // To succeed, there must exist an available role for the unit
         // where the extra equipment for the role is present.
         for (Role r : unit.getAvailableRoles(military)) {
-            if (canProvideGoods(unit.getGoodsDifference(r, 1))) return true;
+            if (canProvideGoods(unit.getGoodsDifference(r, 1))) return r;
         }
-        return false;
+        return null;
     }
 
 

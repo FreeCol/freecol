@@ -234,9 +234,6 @@ public class NativeAIPlayer extends AIPlayer {
      */
     public void equipBraves(IndianSettlement is, LogBuilder lb) {
         final Specification spec = getSpecification();
-        final Role nativeDragoon = spec.getRole("model.role.nativeDragoon");
-        final Role armedBrave = spec.getRole("model.role.armedBrave");
-        final Role mountedBrave = spec.getRole("model.role.mountedBrave");
 
         // Find all the units
         List<Unit> units = is.getUnitList();
@@ -248,21 +245,13 @@ public class NativeAIPlayer extends AIPlayer {
 
         boolean moreHorses = true, moreMuskets = true;
         for (Unit u : units) {
-            Role old = u.getRole();
-            if (!u.isArmed() && moreMuskets) {
-                Role r = (u.isMounted()) ? nativeDragoon : armedBrave;
-                moreMuskets = is.priceGoods(u.getGoodsDifference(r, 1)) == 0
-                    && getAIUnit(u).equipForRole(r);
+            Role r = is.canImproveUnitMilitaryRole(u);
+            if (r != null) {
+                Role old = u.getRole();
+                if (getAIUnit(u).equipForRole(r) && u.getRole() != old) {
+                    lb.add(u, " upgraded from ", old.getSuffix(), ", ");
+                }
             }
-            if (!u.isMounted() && moreHorses) {
-                Role r = (u.isArmed()) ? nativeDragoon : mountedBrave;
-                moreHorses = is.priceGoods(u.getGoodsDifference(r, 1)) == 0
-                    && getAIUnit(u).equipForRole(r);
-            }
-            if (u.getRole() != old) {
-                lb.add(u, " upgraded from ", old.getSuffix(), ", ");
-            }
-            if (!moreHorses && !moreMuskets) break;
         }
     }
 
@@ -478,7 +467,8 @@ public class NativeAIPlayer extends AIPlayer {
                 }
                 reasons.put(unit, "Defend-" + settlement.getName());
 
-            } else if (is != null && is.canImproveUnitMilitaryRole(unit)) {
+            } else if (is != null
+                && is.canImproveUnitMilitaryRole(unit) != null) {
                 // Go home for new equipment if the home settlement has it
                 if (!(m instanceof DefendSettlementMission)
                     || ((DefendSettlementMission)m).getTarget() != is) {
