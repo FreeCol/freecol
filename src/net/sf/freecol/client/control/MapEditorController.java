@@ -192,11 +192,9 @@ public final class MapEditorController {
      * and saves the game.
      */
     public void saveGame() {
-        String fileName = "my_map.fsg";
-        final File file = gui.showSaveDialog(FreeColDirectories.getSaveDirectory(), fileName);
-        if (file != null) {
-            saveGame(file);
-        }
+        File file = gui.showSaveDialog(FreeColDirectories.getSaveDirectory(),
+                                       FreeColDirectories.MAP_FILE_NAME);
+        if (file != null) saveGame(file);
     }
 
     /**
