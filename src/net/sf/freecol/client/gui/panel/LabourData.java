@@ -487,17 +487,17 @@ public class LabourData {
         summary.total.add(unitLocation);
     }
 
-    private void incrementOutsideWorker(UnitData unitData, Unit unit, LocationData.Getter getter) {
+    private void incrementOutsideWorker(UnitData unitData, Unit unit,
+                                        LocationData.Getter getter) {
         String roleId = unit.getRole().getId();
         UnitData workingAs = null;
-        if ("model.role.dragoon".equals(roleId)
-            || "model.role.soldier".equals(roleId)) {
+        if (unit.isArmed()) {
             workingAs = soldier;
-        } else if ("model.role.missionary".equals(roleId)) {
+        } else if (unit.hasAbility(Ability.ESTABLISH_MISSION)) {
             workingAs = missionary;
-        } else if ("model.role.pioneer".equals(roleId)) {
+        } else if (unit.hasAbility(Ability.IMPROVE_TERRAIN)) {
             workingAs = pioneer;
-        } else if ("model.role.scout".equals(roleId)) {
+        } else if (unit.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
             workingAs = scout;
         }
         if (workingAs == null) {
