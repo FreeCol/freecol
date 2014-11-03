@@ -1563,13 +1563,16 @@ public class Unit extends GoodsLocation
      *     of capturing the loser equipment.
      */
     public Role canCaptureEquipment(Role role) {
-        Role newRole;
-        return (hasAbility(Ability.CAPTURE_EQUIPMENT)
-            && (newRole = getSpecification().getRoleChange(getRole(), role))
-                != null
-            && roleIsAvailable(newRole))
-            ? newRole
-            : null;
+        if (!hasAbility(Ability.CAPTURE_EQUIPMENT)) return null;
+        final Specification spec = getSpecification();
+        final Role oldRole = getRole();
+        for (Role r : getAvailableRoles(spec.getMilitaryRoles())) {
+            for (Role.RoleChange rc : r.getRoleChanges()) {
+                if (rc.getFrom(spec) == oldRole
+                    && rc.getCapture(spec) == role) return r;
+            }
+        }
+        return null;
     }
 
     /**

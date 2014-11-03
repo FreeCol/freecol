@@ -244,10 +244,6 @@ public final class Specification {
     private UnitType fastestLandUnitType = null;
     private UnitType fastestNavalUnitType = null;
 
-    // Derived from Role.RoleChange records
-    private final Map<Role, Map<Role, Role>> roleChanges
-        = new HashMap<Role, Map<Role, Role>>();
-
     /* Other containers. */
 
     // @compat 0.10.7
@@ -645,29 +641,6 @@ public final class Specification {
             logger.log(Level.WARNING, "Failed to set year options", e);
         }
 
-        // Initialize the valid role-changes-by-capture
-        roleChanges.clear();
-        for (Role role : getRoles()) {
-            for (Role.RoleChange rc : role.getRoleChanges()) {
-                Role from = rc.getFrom(this);
-                if (from == null) {
-                    logger.warning("Invalid role change from: " + rc.from);
-                    continue;
-                }
-                Role capture = rc.getCapture(this);
-                if (capture == null) {
-                    logger.warning("Invalid role change capture: " + rc.capture);
-                    continue;
-                }
-                Map<Role, Role> change = roleChanges.get(from);
-                if (change == null) {
-                    change = new HashMap<Role, Role>();
-                    roleChanges.put(from, change);
-                }
-                change.put(capture, role);
-            }
-        }
-
         logger.info("Specification clean following " + why + " complete"
             + ", starting year=" + Turn.getStartingYear()
             + ", season year=" + Turn.getSeasonYear()
@@ -686,7 +659,6 @@ public final class Specification {
             + ", " + allOptionGroups.size() + " Option Groups"
             + ", " + resourceTypeList.size() + " ResourceTypes"
             + ", " + roles.size() + " Roles"
-            + ", " + roleChanges.size() + " Roles-that-can-change"
             + ", " + tileTypeList.size() + " TileTypes"
             + ", " + tileImprovementTypeList.size() + " TileImprovementTypes"
             + ", " + unitTypeList.size() + " UnitTypes"
@@ -1529,22 +1501,6 @@ public final class Specification {
      */
     public Role getScoutRole() {
         return getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null);
-    }
-
-    /**
-     * Get any possible role change when a unit with a given role captures
-     * the role-equipment of another unit.
-     *
-     * @param from The current <code>Role</code> of the capturing
-     *     <code>Unit</code>.
-     * @param other The current <code>Role</code> of the <code>Unit</code>
-     *     being attacked.
-     * @return Any <code>Role</code> that the capturing <code>Unit</code>
-     *     may now assume.
-     */
-    public Role getRoleChange(Role from, Role other) {
-        Map<Role, Role> change = roleChanges.get(from);
-        return (change == null) ? null : change.get(other);
     }
 
     /**
