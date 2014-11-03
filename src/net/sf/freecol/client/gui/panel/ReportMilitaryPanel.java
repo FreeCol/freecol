@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
@@ -70,13 +71,14 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
      * {@inheritDoc}
      */
     protected void gatherData() {
+        final List<Role> militaryRoles = getSpecification().getMilitaryRoles();
         for (Unit unit : getMyPlayer().getUnits()) {
-            if (unit.isOffensiveUnit() && !unit.isNaval()) {
-                String key = (unit.isArmed() && unit.isMounted()) ? "dragoons"
-                    : (unit.isArmed()) ? "soldiers"
-                    : (unit.isMounted()) ? "scouts"
-                    : "others";
-                addUnit(unit, key);
+            if (unit.isNaval()) continue;
+            Role role = unit.getRole();
+            if (militaryRoles.contains(role)
+                || unit.hasAbility(Ability.EXPERT_SOLDIER)
+                || unit.isOffensiveUnit()) {
+                addUnit(unit, role.getId());
             }
         }
     }
@@ -109,7 +111,10 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
         final Specification spec = getSpecification();
         final Player player = getMyPlayer();
         final UnitType defaultType = spec.getDefaultUnitType();
-        
+        List<Role> militaryRoles = spec.getMilitaryRoles();
+        // default role is valid because of artillery and disarmed experts
+        militaryRoles.add(spec.getDefaultRole());
+
         StringTemplate t;
         t = StringTemplate.template("report.military.forces")
             .addStringTemplate("%nation%", player.getNationName());
@@ -117,43 +122,21 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         List<AbstractUnit> units = new ArrayList<AbstractUnit>();
-        List<AbstractUnit> scoutUnits = new ArrayList<AbstractUnit>();
-        List<AbstractUnit> dragoonUnits = new ArrayList<AbstractUnit>();
-        List<AbstractUnit> soldierUnits = new ArrayList<AbstractUnit>();
-        for (UnitType unitType : spec.getUnitTypeList()) {
-            if (unitType.isAvailableTo(player) &&
-                !unitType.hasAbility(Ability.NAVAL_UNIT) &&
-                (unitType.hasAbility(Ability.EXPERT_SOLDIER) ||
-                 unitType.getOffence() > 0)) {
-                if (unitType.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-                    scoutUnits.add(new AbstractUnit(unitType,
-                            "model.role.scout",
-                            getCount("scouts", unitType)));
-                    dragoonUnits.add(new AbstractUnit(unitType,
-                            "model.role.dragoon",
-                            getCount("dragoons", unitType)));
-                    soldierUnits.add(new AbstractUnit(unitType,
-                            "model.role.soldier",
-                            getCount("soldiers", unitType)));
-                } else {
-                    units.add(new AbstractUnit(unitType,
-                            Specification.DEFAULT_ROLE_ID,
-                            getCount("others", unitType)));
+        for (Role r : militaryRoles) {
+            for (UnitType unitType : spec.getUnitTypeList()) {
+                if (unitType.isAvailableTo(player)
+                    && !unitType.isNaval()
+                    && (unitType.hasAbility(Ability.EXPERT_SOLDIER)
+                        || unitType.isOffensive())) {
+                    int count = getCount(r.getId(), unitType);
+                    if (count > 0) {
+                        units.add(new AbstractUnit(unitType, r.getId(), count));
+                    }
                 }
             }
         }
-        dragoonUnits.add(new AbstractUnit(defaultType,
-                "model.role.dragoon", getCount("dragoons", defaultType)));
-        soldierUnits.add(new AbstractUnit(defaultType,
-                "model.role.soldier", getCount("soldiers", defaultType)));
-        scoutUnits.add(new  AbstractUnit(defaultType,
-                "model.role.scout", getCount("scouts", defaultType)));
-        units.addAll(dragoonUnits);
-        units.addAll(soldierUnits);
-        units.addAll(scoutUnits);
-
-        for (AbstractUnit unit : units) {
-            reportPanel.add(createUnitTypeLabel(unit), "sg");
+        for (AbstractUnit au : units) {
+            reportPanel.add(createUnitTypeLabel(au), "sg");
         }
     }
 }
