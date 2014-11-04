@@ -1113,7 +1113,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this is a REF player.
      */
     public boolean isREF() {
-        return nationType != null && nationType.isREF();
+        return playerType == PlayerType.ROYAL;
     }
 
     /**
