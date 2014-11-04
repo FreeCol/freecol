@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
@@ -285,7 +286,10 @@ public final class ConnectController {
         LoginMessage msg = freeColClient.askServer().login(user,
             FreeCol.getVersion());
         Game game;
-        if (msg == null || (game = msg.getGame()) == null) return false;
+        if (msg == null || (game = msg.getGame()) == null) {
+            gui.showErrorMessage("server.couldNotLogin");
+            return false;
+        }
 
         // This completes the client's view of the spec with options
         // obtained from the server difficulty.  It should not be
@@ -295,6 +299,8 @@ public final class ConnectController {
         Player player = game.getPlayerByName(user);
         if (player == null) {
             logger.warning("New game does not contain player: " + user);
+            gui.showErrorMessage(StringTemplate.template("server.noSuchPlayer")
+                .addName("%player%", user));
             return false;
         }
         freeColClient.setMyPlayer(player);
@@ -320,7 +326,7 @@ public final class ConnectController {
                         activeUnit.getOwner().setNextActiveUnit(activeUnit);
                         gui.setActiveUnit(activeUnit);
                     } else {
-                    gui.setSelectedTile(entryTile, false);
+                        gui.setSelectedTile(entryTile, false);
                     }
                 } else {
                     gui.setSelectedTile(entryTile, false);
@@ -409,12 +415,12 @@ public final class ConnectController {
             // Disable this check if you need to debug a multiplayer client.
             // TODO: allow if the server is in debug mode.
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-                // TODO: gui.showErrorMessage("Can not connect to existing game in debug mode");
+                gui.showErrorMessage("connectController.debugConnect");
                 return false;
             }
             List<String> names = getVacantPlayers(host, port);
             if (names == null || names.isEmpty()) {
-                // TODO: gui.showErrorMessage("no names")
+                gui.showErrorMessage("connectController.noPlayers");
                 return false;
             }
 
@@ -429,14 +435,14 @@ public final class ConnectController {
             if (id == null) return false; // User cancelled
 
             if (!login(id + ".ruler", host, port)) {
-                // TODO: gui.showErrorMessage() or better, have login() do it
+                // login() shows error messages
                 return false;
             }
             freeColClient.setSinglePlayer(false);
             break;
 
         case ENDING_GAME: default:
-            // TODO: gui.showErrorMessage("game is ending");
+            gui.showErrorMessage("connectController.ending");
             return false;
         }
         return true;
