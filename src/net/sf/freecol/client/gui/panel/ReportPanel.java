@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -171,8 +172,10 @@ public class ReportPanel extends FreeColPanel {
                 getGUI().showColonyPanel((Colony)object, null);
             } else if (object instanceof Europe) {
                 getGUI().showEuropePanel();
+            } else if (object instanceof IndianSettlement) {
+                getGUI().showIndianSettlementPanel((IndianSettlement)object);
             } else if (object instanceof Tile) {
-                getGUI().setFocus(((Tile) object));
+                getGUI().setFocus(((Tile)object));
             } else {
                 getGUI().showColopediaPanel(command);
             }
