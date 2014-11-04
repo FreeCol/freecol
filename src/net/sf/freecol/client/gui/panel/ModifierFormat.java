@@ -20,7 +20,9 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.text.DecimalFormat;
+
 import javax.swing.JLabel;
+
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Feature;
@@ -36,16 +38,18 @@ import net.sf.freecol.common.model.Turn;
 
 public class ModifierFormat {
 
-    /** Generic unknown result.  TODO: transfer to strings file. */
-    private static final String UNKNOWN = "???";
-
     /** The decimal format to use for Modifiers. */
     private static final DecimalFormat modifierFormat
         = new DecimalFormat("0.00");
 
 
+    public static final String getUnknownValue() {
+        return Messages.message("model.modifier.unknown");
+    }
+
     public static final String format(double value) {
-        return (value == Modifier.UNKNOWN) ? UNKNOWN
+        return (value == Modifier.UNKNOWN)
+            ? getUnknownValue()
             : modifierFormat.format(value);
     }
 
@@ -77,7 +81,7 @@ public class ModifierFormat {
     }
 
     private static String getSourceName(FreeColObject source) {
-        if (source == null) return UNKNOWN;
+        if (source == null) return getUnknownValue();
 
         String result = null;
         if (result == null && source instanceof Nameable) {
