@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Image;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -125,27 +126,39 @@ public class TerrainDetailPanel
         panel.add(localizedLabel("colopedia.terrain.defenseBonus"));
         panel.add(new JLabel(defenseBonus));
 
-        panel.add(localizedLabel("colopedia.terrain.production"));
+        panel.add(localizedLabel("colopedia.terrain.unattendedProduction"));
+        addProduction(panel, tileType.getPossibleProduction(true));
 
-        List<AbstractGoods> production = tileType.getPossibleProduction();
-        if (!production.isEmpty()) {
-            AbstractGoods goods = production.get(0);
-            if (production.size() > 1) {
-                panel.add(getGoodsButton(goods.getType(), goods.getAmount()),
-                                "span, split " + production.size());
-                for (int index = 1; index < production.size(); index++) {
-                    goods = production.get(index);
-                    panel.add(getGoodsButton(goods.getType(), goods.getAmount()));
-                }
-            } else {
-                panel.add(getGoodsButton(goods.getType(), goods.getAmount()), "span");
-            }
-        } else {
-            panel.add(new JLabel(), "wrap");
-        }
+        panel.add(localizedLabel("colopedia.terrain.colonistProduction"));
+        addProduction(panel, tileType.getPossibleProduction(false));
 
         panel.add(localizedLabel("colopedia.terrain.description"));
-        panel.add(GUI.getDefaultTextArea(Messages.message(tileType.getDescriptionKey()), 20),
+        panel.add(GUI.getDefaultTextArea(Messages.getDescription(tileType), 20),
                   "span, growx");
+    }
+
+    private void addProduction(JPanel panel, List<AbstractGoods> production) {
+        if (production.isEmpty()) {
+            panel.add(new JLabel(), "wrap");
+        } else {
+            // Drop the zero amount production (which need resources to work)
+            Iterator<AbstractGoods> it = production.iterator();
+            while (it.hasNext()) {
+                AbstractGoods ag = it.next();
+                if (ag.getAmount() <= 0) it.remove();
+            }
+
+            AbstractGoods ag = production.get(0);
+            if (production.size() > 1) {
+                panel.add(getGoodsButton(ag.getType(), ag.getAmount()),
+                          "span, split " + production.size());
+                for (int index = 1; index < production.size(); index++) {
+                    ag = production.get(index);
+                    panel.add(getGoodsButton(ag.getType(), ag.getAmount()));
+                }
+            } else {
+                panel.add(getGoodsButton(ag.getType(), ag.getAmount()), "span");
+            }
+        }
     }
 }

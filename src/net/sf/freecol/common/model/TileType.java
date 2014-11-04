@@ -399,12 +399,13 @@ public final class TileType extends FreeColGameObjectType {
      * production values.  Planning and production routines should use
      * {@link #getPotentialProduction(GoodsType, UnitType)}
      *
+     * @param unattended Select unattended production.
      * @return A list of produced <code>AbstractGoods</code>.
      */
-    public List<AbstractGoods> getPossibleProduction() {
+    public List<AbstractGoods> getPossibleProduction(boolean unattended) {
         List<AbstractGoods> production = new ArrayList<AbstractGoods>();
-        for (ProductionType productionType : getAvailableProductionTypes(true)) {
-            List<AbstractGoods> outputs = productionType.getOutputs();
+        for (ProductionType pt : getAvailableProductionTypes(unattended)) {
+            List<AbstractGoods> outputs = pt.getOutputs();
             if (!outputs.isEmpty()) production.addAll(outputs);
         }
         return production;
