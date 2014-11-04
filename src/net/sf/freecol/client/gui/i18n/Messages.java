@@ -758,18 +758,19 @@ public class Messages {
         }
 
         if (addEquipment) {
-            List<AbstractGoods> requiredGoods
-                = role.getRequiredGoods(unit.getRoleCount());
-            if (requiredGoods.isEmpty()) {
-                // FIXME: hack for missionary
-                if ("model.role.missionary".equals(role.getId())) {
-                    extra = message(StringTemplate
-                        .template("model.goods.goodsAmount")
-                        .add("%goods%", "model.equipment.missionary.name")
-                        .addAmount("%amount%", 1));
-                }
+            StringTemplate g = StringTemplate.label("");
+            String equipmentKey = role.getId() + ".equipment";
+            if (Messages.containsKey(equipmentKey)) {
+                // Currently only used for missionary which does not
+                // have equipment that directly corresponds to goods.
+                g.addStringTemplate(StringTemplate
+                    .template("model.goods.goodsAmount")
+                    .add("%goods%", equipmentKey)
+                    .addAmount("%amount%", 1));
             } else {
-                StringTemplate g = StringTemplate.label("");
+                // Other roles can be characterized by their goods.
+                List<AbstractGoods> requiredGoods
+                    = role.getRequiredGoods(unit.getRoleCount());
                 boolean first = true;
                 for (AbstractGoods ag : requiredGoods) {
                     if (first) first = false; else g.addName(" ");
@@ -778,8 +779,8 @@ public class Messages {
                         .addName("%goods%", ag.getType())
                         .addAmount("%amount%", ag.getAmount()));
                 }
-                extra = message(g);
             }
+            extra = message(g);
             roleName = typeName;
         }
 
