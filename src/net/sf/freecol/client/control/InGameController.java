@@ -3329,7 +3329,7 @@ public final class InGameController implements NetworkConstants {
         if (act == null) return true; // Cancelled
         switch (act) {
         case FOREIGN_COLONY_ATTACK:
-            return moveAttack(unit, direction);
+            return moveAttackSettlement(unit, direction);
         case FOREIGN_COLONY_NEGOTIATE:
             Player player = unit.getOwner();
             DiplomaticTrade agreement
