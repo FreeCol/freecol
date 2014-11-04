@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -33,6 +34,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.RandomUtils.*;
 
 
 /**
@@ -85,13 +87,13 @@ public class Nation extends FreeColGameObjectType {
      * A list of European nation names, where model.nation.X.name exists.
      * Used by getNonPlayerNation().
      */
-    public static final List<String> EUROPEAN_NATIONS = makeUnmodifiableList(
+    private static final List<String> EUROPEAN_NATIONS = makeUnmodifiableList(
         // Original Col1 nations
         "dutch", "english", "french", "spanish",
         // FreeCol's additions
         "danish", "portuguese", "swedish", "russian",
         // other European non-player nations
-        "austrian", "prussian", "turkish");
+        "austrian", "german", "prussian", "turkish");
 
     /** The nation type, European, native, etc. */
     private NationType type;
@@ -239,6 +241,27 @@ public class Nation extends FreeColGameObjectType {
         return ret;
     }
 
+    /**
+     * Get a random player name key that is not in use by an active player.
+     *
+     * @param game The current <code>Game</code>.
+     * @param random A pseudo-random number source.
+     * @return A player name key, or an empty string on failure.
+     */
+    public static String getRandomNonPlayerNationNameKey(Game game,
+                                                         Random random) {
+        int nations = EUROPEAN_NATIONS.size();
+        int start = randomInt(logger, "Random nation", random, nations);
+        for (int index = 0; index < nations; index++) {
+            String nationId = "model.nation."
+                + EUROPEAN_NATIONS.get((start + index) % nations);
+            if (game.getPlayer(nationId) == null) {
+                return Messages.nameKey(nationId);
+            }
+        }
+        // this should never happen
+        return "";
+    }
 
     // Serialization
 

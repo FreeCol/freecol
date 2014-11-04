@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Modifier;
@@ -147,7 +148,7 @@ public abstract class FreeColGameObjectType extends FreeColObject
      * @return A description key.
      */
     public final String getDescriptionKey() {
-        return getId() + ".description";
+        return Messages.descriptionKey(getId());
     }
 
     /**
@@ -166,7 +167,7 @@ public abstract class FreeColGameObjectType extends FreeColObject
 
     /**
      * Gets the usual suffix of this object's identifier, that is
-     * everything after the last ".".
+     * everything after the last '.'.
      *
      * @return The usual identifier suffix.
      */
@@ -194,7 +195,7 @@ public abstract class FreeColGameObjectType extends FreeColObject
      * @return A message key.
      */
     public final String getNameKey() {
-        return getId() + ".name";
+        return Messages.nameKey(getId());
     }
 
 

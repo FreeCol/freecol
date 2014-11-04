@@ -115,7 +115,7 @@ public final class ReportIndianPanel extends ReportPanel {
         label = localizedLabel("report.indian.typeOfSettlements");
         label.setFont(GUI.DEFAULT_BOLD_FONT);
         reportPanel.add(label);
-        reportPanel.add(localizedLabel(opponent.getNationType().getCapitalType().getId() + ".name"), "left, wrap");
+        reportPanel.add(localizedLabel(Messages.nameKey(opponent.getNationType().getCapitalType().getId())), "left, wrap");
         label = localizedLabel("report.indian.numberOfSettlements");
         reportPanel.add(label);
         label.setFont(GUI.DEFAULT_BOLD_FONT);

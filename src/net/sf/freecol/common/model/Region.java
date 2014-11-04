@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamConstants;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
@@ -220,8 +221,8 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return A region type key.
      */
     public String getTypeNameKey() {
-        return "model.region." + type.toString().toLowerCase(Locale.US)
-            + ".name";
+        return Messages.nameKey("model.region."
+            + type.toString().toLowerCase(Locale.US));
     }
 
     /**

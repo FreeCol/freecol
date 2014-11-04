@@ -606,8 +606,12 @@ public class Messages {
         return getBestDescription(object.getId());
     }
 
-    private static String nameKey(String id) {
+    public static String nameKey(String id) {
         return id + NAME_SUFFIX;
+    }
+
+    public static String descriptionKey(String id) {
+        return id + DESCRIPTION_SUFFIX;
     }
 
     public static String getName(String id) {
@@ -615,7 +619,7 @@ public class Messages {
     }
 
     public static String getDescription(String id) {
-        return message(id + DESCRIPTION_SUFFIX);
+        return message(descriptionKey(id));
     }
 
     public static String getShortDescription(String id) {

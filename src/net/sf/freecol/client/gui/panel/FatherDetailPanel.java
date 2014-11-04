@@ -109,7 +109,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
         } catch (IllegalArgumentException e) {
             // this is not a founding father
             panel.setLayout(new MigLayout("wrap 1, align center", "align center"));
-            JLabel header = localizedLabel(id + ".name");
+            JLabel header = localizedLabel(Messages.nameKey(id));
             header.setFont(GUI.SMALL_HEADER_FONT);
             panel.add(header, "align center, wrap 20");
             if (getId().equals(id)) {

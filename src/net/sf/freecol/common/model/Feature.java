@@ -26,6 +26,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
@@ -36,7 +37,7 @@ import net.sf.freecol.common.util.Utils;
  * that can be applied to any action within the game, most obviously
  * combat.
  */
-public abstract class Feature extends FreeColObject {
+public abstract class Feature extends FreeColObject implements Named {
 
     /** The source of this Feature, e.g. a UnitType. */
     private FreeColObject source;
@@ -77,15 +78,6 @@ public abstract class Feature extends FreeColObject {
         this.duration = other.duration;
         this.temporary = other.temporary;
         setScopes(other.getScopes());
-    }
-
-    /**
-     * Gets a name key for this feature.
-     *
-     * @return A name key.
-     */
-    public String getNameKey() {
-        return getId() + ".name";
     }
 
     /**
@@ -290,6 +282,16 @@ public abstract class Feature extends FreeColObject {
             || source instanceof FoundingFather
             || source instanceof NationType) return false;
         return true;
+    }
+
+
+    // Interface Named
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getNameKey() {
+        return Messages.nameKey(getId());
     }
 
 

@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -257,7 +258,7 @@ public class HighScore extends FreeColObject {
      * @return The old name key.
      */
     public final String getOldNationNameKey() {
-        return nationId + ".name";
+        return Messages.nameKey(nationId);
     }
 
     /**

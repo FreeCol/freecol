@@ -1007,20 +1007,6 @@ public final class InGameController extends Controller {
         return template;
     }
 
-    private String getNonPlayerNation() {
-        int nations = Nation.EUROPEAN_NATIONS.size();
-        int start = randomInt(logger, "Random nation", random, nations);
-        for (int index = 0; index < nations; index++) {
-            String nationId = "model.nation."
-                + Nation.EUROPEAN_NATIONS.get((start + index) % nations);
-            if (getGame().getPlayer(nationId) == null) {
-                return nationId + ".name";
-            }
-        }
-        // this should never happen
-        return "";
-    }
-
     /**
      * Resolves a tax raise.
      *
@@ -1050,7 +1036,8 @@ public final class InGameController extends Controller {
     private void csMonarchAction(final ServerPlayer serverPlayer,
                                  MonarchAction action, ChangeSet cs) {
         final Monarch monarch = serverPlayer.getMonarch();
-        final Specification spec = getGame().getSpecification();
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
         boolean valid = monarch.actionIsValid(action);
         if (!valid) return;
         String messageId = "model.monarch.action." + action;
@@ -1072,7 +1059,8 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%goods%", goods.getType().getLabel())
                 .addAmount("%amount%", taxRaise);
             if (action == MonarchAction.RAISE_TAX_WAR) {
-                template = template.add("%nation%", getNonPlayerNation());
+                template = template.add("%nation%",
+                    Nation.getRandomNonPlayerNationNameKey(game, random));
             } else if (action == MonarchAction.RAISE_TAX_ACT) {
                 template = template.addAmount("%number%",
                     randomInt(logger, "Tax act goods", random, 6))
@@ -1092,7 +1080,8 @@ public final class InGameController extends Controller {
                 .addAmount("%difference%", oldTax - taxLower)
                 .addAmount("%newTax%", taxLower);
             if (action == MonarchAction.LOWER_TAX_WAR) {
-                template = template.add("%nation%", getNonPlayerNation());
+                template = template.add("%nation%",
+                    Nation.getRandomNonPlayerNationNameKey(game, random));
             } else {
                 template = template.addAmount("%number%",
                     randomInt(logger, "Lower tax reason", random, 5));
@@ -1358,7 +1347,8 @@ public final class InGameController extends Controller {
         // Do not use UnitType.getTargetType.
         java.util.Map<UnitType, UnitType> upgrades
             = new HashMap<UnitType, UnitType>();
-        final Specification spec = getGame().getSpecification();
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
         for (UnitType unitType : spec.getUnitTypeList()) {
             UnitType upgrade = unitType.getTargetType(ChangeType.INDEPENDENCE,
                                                       serverPlayer);
@@ -1410,11 +1400,12 @@ public final class InGameController extends Controller {
         ServerPlayer refPlayer = createREFPlayer(serverPlayer);
         // Update the intervention force
         serverPlayer.getMonarch().updateInterventionForce();
+        String otherKey = Nation.getRandomNonPlayerNationNameKey(game, random);
         cs.addMessage(See.only(serverPlayer),
                       new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                        "declareIndependence.interventionForce",
                                        serverPlayer)
-                      .add("%nation%", getNonPlayerNation())
+                      .add("%nation%", otherKey)
                       .addAmount("%number%", spec.getInteger(GameOptions.INTERVENTION_BELLS)));
 
         // Now the REF is ready, we can dispose of the European connection.

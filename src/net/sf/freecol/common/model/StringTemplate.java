@@ -26,6 +26,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
@@ -293,7 +294,7 @@ public class StringTemplate extends FreeColObject {
     public StringTemplate addName(String key, FreeColObject object) {
         if (templateType == TemplateType.TEMPLATE) {
             addKey(key);
-            addReplacement(new StringTemplate(object.getId() + ".name",
+            addReplacement(new StringTemplate(Messages.nameKey(object.getId()),
                                               TemplateType.KEY));
         } else {
             throw new IllegalArgumentException("Cannot add key-value pair to StringTemplate type "

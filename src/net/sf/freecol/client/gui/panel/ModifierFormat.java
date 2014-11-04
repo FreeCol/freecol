@@ -131,7 +131,7 @@ public class ModifierFormat {
                 }
                 if (key != null) {
                     label += (scope.isMatchNegated() ? " !" : " ")
-                        + Messages.message(key + ".name") + ",";
+                        + Messages.getName(key) + ",";
                 }
             }
         }

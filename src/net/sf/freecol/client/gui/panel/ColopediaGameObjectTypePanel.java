@@ -78,7 +78,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
      * @return a String value
      */
     public String getName() {
-        return Messages.message(id + ".name");
+        return Messages.getName(id);
     }
 
     protected String getId() {
@@ -112,7 +112,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
      * @param types a List of FreeColGameObjectTypes
      */
     public void addSubTrees(DefaultMutableTreeNode root, String id, List<T> types) {
-        String name = Messages.message(id + ".name");
+        String name = Messages.getName(id);
         DefaultMutableTreeNode node =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, id, name, null));
         int width = 0;
@@ -207,7 +207,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
             // not a production bonus
             JLabel label = new JLabel(ModifierFormat.getFeatureAsString(modifier) + ": "
                                       + ModifierFormat.getModifierAsString(modifier));
-            label.setToolTipText(Messages.message(modifier.getId() + ".shortDescription"));
+            label.setToolTipText(Messages.getShortDescription(modifier));
             return label;
         }
     }
@@ -215,7 +215,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     public JLabel getAbilityComponent(Ability ability) {
         if (ability.getValue()) {
             JLabel label = new JLabel(ModifierFormat.getFeatureAsString(ability));
-            label.setToolTipText(Messages.message(ability.getId() + ".shortDescription"));
+            label.setToolTipText(Messages.getShortDescription(ability));
             return label;
         } else {
             return null;
@@ -228,7 +228,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
         for (Entry<String, Boolean> entry
                  : buildableType.getRequiredAbilities().entrySet()) {
             doc.insertString(doc.getLength(),
-                             Messages.message(entry.getKey() + ".name"),
+                             Messages.getName(entry.getKey()),
                              doc.getStyle("regular"));
             requiredTypes.clear();
             for (FreeColGameObjectType type : getSpecification()

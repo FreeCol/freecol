@@ -192,13 +192,13 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
                                               .toLowerCase())));
 
         panel.add(localizedLabel("colopedia.nationType.typeOfSettlements"));
-        panel.add(new JLabel(Messages.message(nationType.getCapitalType().getId() + ".name"),
+        panel.add(new JLabel(Messages.getName(nationType.getCapitalType()),
                              new ImageIcon(getLibrary().getSettlementImage(nationType.getCapitalType())),
                              SwingConstants.CENTER));
 
         List<String> regionNames = new ArrayList<String>();
         for (String regionName : nationType.getRegionNames()) {
-            regionNames.add(Messages.message(regionName + ".name"));
+            regionNames.add(Messages.getName(regionName));
         }
         panel.add(localizedLabel("colopedia.nationType.regions"));
         panel.add(new JLabel(join(", ", regionNames)));

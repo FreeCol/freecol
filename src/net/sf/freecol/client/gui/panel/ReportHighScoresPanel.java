@@ -100,7 +100,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
                     : highScore.getOldNationNameKey()));
             reportPanel.add(localizedLabel("report.highScores.nationType"),
                             "skip");
-            reportPanel.add(localizedLabel(highScore.getNationTypeId() + ".name"));
+            reportPanel.add(localizedLabel(Messages.nameKey(highScore.getNationTypeId())));
             reportPanel.add(localizedLabel("report.highScores.units"),
                             "skip");
             reportPanel.add(new JLabel(String.valueOf(highScore.getUnits())));

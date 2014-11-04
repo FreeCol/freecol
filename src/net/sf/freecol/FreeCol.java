@@ -882,7 +882,7 @@ public final class FreeCol {
     public static String selectDifficulty(String arg) {
         for (String d : DIFFICULTIES) {
             String key = "model.difficulty." + d;
-            String value = Messages.message(key + ".name");
+            String value = Messages.getName(key);
             if (value.equals(arg)) {
                 setDifficulty(key);
                 return key;
@@ -919,7 +919,7 @@ public final class FreeCol {
         String s = "";
         for (String d : DIFFICULTIES) {
             String key = "model.difficulty." + d;
-            String value = Messages.message(key + ".name");
+            String value = Messages.getName(key);
             s += "," + value;
         }
         return s.substring(1);

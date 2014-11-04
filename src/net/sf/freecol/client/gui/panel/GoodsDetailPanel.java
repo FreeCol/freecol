@@ -164,7 +164,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
                 panel.add(localizedLabel("colopedia.goods.equipment"), "newline 20");
                 int count = 0;
                 for (Role role : roles) {
-                    JLabel label = localizedLabel(role.getId() + ".name");
+                    JLabel label = localizedLabel(Messages.getName(role));
                     if (count > 0 && count % 3 == 0) {
                         panel.add(label, "skip");
                     } else {

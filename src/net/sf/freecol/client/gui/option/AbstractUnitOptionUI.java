@@ -156,7 +156,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
 
         @Override
         public void setLabelValues(JLabel label, Object value) {
-            label.setText(Messages.message(((String) value) + ".name"));
+            label.setText(Messages.getName((String)value));
         }
     }
 
@@ -176,9 +176,9 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
                 && !Specification.DEFAULT_ROLE_ID.equals(au.getRoleId())) {
                 key = au.getRoleId();
             }
-            StringTemplate template = StringTemplate.template(key + ".name")
+            StringTemplate template = StringTemplate.template(Messages.nameKey(key))
                 .addAmount("%number%", au.getNumber())
-                .add("%unit%", au.getId() + ".name");
+                .add("%unit%", Messages.nameKey(au.getId()));
             label.setText(Integer.toString(au.getNumber()) + " "
                           + Messages.message(template));
         }

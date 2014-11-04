@@ -72,15 +72,14 @@ public abstract class FreeColAction extends AbstractAction
      * @param id The object identifier for this action.
      */
     protected FreeColAction(FreeColClient freeColClient, String id) {
-        super(Messages.message(id + ".name"));
+        super(Messages.getName(id));
 
         this.freeColClient = freeColClient;
 
         putValue(ACTION_ID, id);
 
-        String descriptionKey = id + ".shortDescription";
-        String shortDescription = Messages.message(descriptionKey);
-        if (!shortDescription.equals(descriptionKey)) {
+        String shortDescription = Messages.getDescription(id);
+        if (!shortDescription.equals(Messages.descriptionKey(id))) {
             putValue(SHORT_DESCRIPTION, shortDescription);
         }
 

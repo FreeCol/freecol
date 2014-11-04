@@ -56,7 +56,7 @@ public final class ReportNavalPanel extends ReportUnitPanel {
     protected void addREFUnits() {
         final Player player = getMyPlayer();
         final Specification spec = getSpecification();
-        reportPanel.add(new JLabel(Messages.message(player.getNation().getREFNation().getId() + ".name")),
+        reportPanel.add(new JLabel(Messages.getName(player.getNation().getREFNation())),
                         "span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 

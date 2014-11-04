@@ -82,7 +82,7 @@ public class ConceptDetailPanel extends FreeColPanel
 
 
     public String getName() {
-        return Messages.message(id + ".name");
+        return Messages.getName(id);
     }
 
     /**
@@ -98,7 +98,7 @@ public class ConceptDetailPanel extends FreeColPanel
         List<DefaultMutableTreeNode> nodes = new ArrayList<DefaultMutableTreeNode>();
         for (String concept : concepts) {
             String nodeId = "colopedia.concepts." + concept;
-            String nodeName = Messages.message(nodeId + ".name");
+            String nodeName = Messages.getName(nodeId);
             nodes.add(new DefaultMutableTreeNode(new ColopediaTreeItem(this, nodeId, nodeName, null)));
         }
         Collections.sort(nodes, nodeComparator);
@@ -121,12 +121,12 @@ public class ConceptDetailPanel extends FreeColPanel
 
         panel.setLayout(new MigLayout("wrap 1, center"));
 
-        JLabel header = localizedLabel(id + ".name");
+        JLabel header = localizedLabel(Messages.nameKey(id));
         header.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(header, "align center, wrap 20");
 
         //panel.add(getDefaultTextArea(Messages.message(id + ".description"), 40));
-        JEditorPane editorPane = new JEditorPane("text/html", Messages.message(id + ".description")) {
+        JEditorPane editorPane = new JEditorPane("text/html", Messages.getDescription(id)) {
 
             @Override
             public void paintComponent(Graphics g) {

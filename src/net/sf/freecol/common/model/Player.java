@@ -818,7 +818,7 @@ public class Player extends FreeColGameObject implements Nameable {
         return (playerType == PlayerType.REBEL
                 || playerType == PlayerType.INDEPENDENT)
             ? StringTemplate.name(independentNationName)
-            : StringTemplate.key(nationId + ".name");
+            : StringTemplate.key(Messages.nameKey(nationId));
     }
 
     /**
@@ -878,7 +878,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public StringTemplate getMarketName() {
         return (getEurope() == null)
             ? StringTemplate.key("model.market.independent")
-            : StringTemplate.key(nationId + ".europe");
+            : StringTemplate.key(getEuropeNameKey());
     }
 
     /**
