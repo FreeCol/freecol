@@ -771,6 +771,17 @@ public final class QuickActionMenu extends JPopupMenu {
             });
         this.add(name);
 
+        int amount = (player.getMarket() == null) ? 0
+            : player.getMarket().getSalePrice(goods.getType(), 
+                                              goods.getAmount());
+        if (amount > 0) amount -= amount * player.getTax() / 100;
+        if (amount > 0) {
+            JMenuItem price = new JMenuItem(Messages.message(StringTemplate
+                    .template("quickActionMenu.profit")
+                    .addAmount("%amount%", amount)));
+            this.add(price);
+        }
+        
         if (goods.getLocation() instanceof Colony) {
             Colony colony = (Colony)goods.getLocation();
             addLoadItems(goods, colony.getTile());
