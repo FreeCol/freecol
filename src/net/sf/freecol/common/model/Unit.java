@@ -3389,7 +3389,14 @@ public class Unit extends GoodsLocation
 
         // UnitType modifiers always apply
         for (Modifier m : unitType.getModifiers(id, fcgot, turn)) {
-            m.setModifierIndex(Modifier.UNIT_COMBAT_INDEX);
+            switch (m.getType()) {
+            case ADDITIVE:
+                m.setModifierIndex(Modifier.UNIT_ADDITIVE_COMBAT_INDEX);
+                break;
+            default:
+                m.setModifierIndex(Modifier.UNIT_NORMAL_COMBAT_INDEX);
+                break;
+            }
             result.add(m);
         }
 

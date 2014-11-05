@@ -140,7 +140,8 @@ public class Modifier extends Feature {
 
     // Specific combat indicies
     public static final int BASE_COMBAT_INDEX = 10;
-    public static final int UNIT_COMBAT_INDEX = 20;
+    public static final int UNIT_ADDITIVE_COMBAT_INDEX = 20;
+    public static final int UNIT_NORMAL_COMBAT_INDEX = 40;
     public static final int ROLE_COMBAT_INDEX = 30;
     public static final int GENERAL_COMBAT_INDEX = 50;
 

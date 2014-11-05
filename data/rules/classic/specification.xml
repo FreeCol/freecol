@@ -1425,10 +1425,10 @@
       <ability id="model.ability.mercenaryUnit" value="true"/>
       <ability id="model.ability.expertSoldier" value="true"/>
       <ability id="model.ability.supportUnit" value="true"/>
-      <modifier id="model.modifier.offence" index="20"
+      <modifier id="model.modifier.offence" index="40"
                 type="percentage" value="50"/>
       <modifier id="model.modifier.defence"
-                type="percentage" value="50" index="20"/>
+                type="percentage" value="50" index="40"/>
       <upgrade unit="model.unit.colonialRegular" promotion="100" independence="100"/>
       <downgrade unit="model.unit.freeColonist" capture="100" clearSkill="100"/>
     </unit-type>
