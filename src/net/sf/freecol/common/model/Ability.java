@@ -173,6 +173,10 @@ public final class Ability extends Feature {
     public static final String CARRY_UNITS
         = "model.ability.carryUnits";
 
+    /** Restrict some buildings to only be buildable on the coast. */
+    public static final String COASTAL_ONLY
+        = "model.ability.coastalOnly";
+
     /**
      * The ability of certain consumers (e.g. BuildQueues) to consume
      * a large amount of goods at once instead of turn by turn.

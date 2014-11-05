@@ -119,6 +119,10 @@ public class GameOptions {
     public static final String CUSTOM_IGNORE_BOYCOTT
         = "model.option.customIgnoreBoycott";
 
+    /** Custom Houses only allowed in coastal colonies? */
+    public static final String CUSTOMS_ON_COAST
+        = "model.option.customsOnCoast";
+
     /**
      * Whether experts have connections, producing without raw
      * materials in factories.

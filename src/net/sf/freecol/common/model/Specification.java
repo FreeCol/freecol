@@ -641,6 +641,13 @@ public final class Specification {
             logger.log(Level.WARNING, "Failed to set year options", e);
         }
 
+        // Apply the customs on coast restriction
+        boolean customsOnCoast = getBoolean(GameOptions.CUSTOMS_ON_COAST);
+        for (Ability a : getBuildingType("model.building.customHouse")
+                 .getAbilities(Ability.COASTAL_ONLY)) {
+            a.setValue(customsOnCoast);
+        }
+
         logger.info("Specification clean following " + why + " complete"
             + ", starting year=" + Turn.getStartingYear()
             + ", season year=" + Turn.getSeasonYear()
@@ -2098,6 +2105,12 @@ public final class Specification {
             bolivar.addModifier(new Modifier(Modifier.SOL, 20,
                     Modifier.ModifierType.ADDITIVE, bolivar, 0));
         }
+
+        // The COASTAL_ONLY attribute was added to customs house.
+        BuildingType customs = getBuildingType("model.building.customHouse");
+        if (!customs.hasAbility(Ability.COASTAL_ONLY)) {
+            customs.addAbility(new Ability(Ability.COASTAL_ONLY, null, false));
+        }
         // end @compat 0.11.x
     }
 
@@ -2469,6 +2482,8 @@ public final class Specification {
         ret |= checkBooleanOption(GameOptions.PAY_FOR_BUILDING,
                                   GameOptions.GAMEOPTIONS_COLONY, true);
         ret |= checkBooleanOption(GameOptions.CLEAR_HAMMERS_ON_CONSTRUCTION_SWITCH,
+                                  GameOptions.GAMEOPTIONS_COLONY, false);
+        ret |= checkBooleanOption(GameOptions.CUSTOMS_ON_COAST,
                                   GameOptions.GAMEOPTIONS_COLONY, false);
         // end @compat 0.11.0
 

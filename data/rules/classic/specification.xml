@@ -2123,6 +2123,7 @@
       <required-goods id="model.goods.tools" value="50"/>
       <required-ability id="model.ability.buildCustomHouse"/>
       <ability id="model.ability.export" value="true"/>
+      <ability id="model.ability.coastalOnly" value="false"/>
     </building-type>
   </building-types>
 
@@ -3547,9 +3548,12 @@
         <!-- Capture units under repair when a colony is captured? -->
         <booleanOption id="model.option.captureUnitsUnderRepair"
                        defaultValue="false"/>
-        <!-- Does the Custom House sell boycotted goods -->
+        <!-- Does the Customs House sell boycotted goods? -->
         <booleanOption id="model.option.customIgnoreBoycott"
                        defaultValue="true"/>
+        <!-- Customs houses can only be constructed in coastal colonies? -->
+        <booleanOption id="model.option.customsOnCoast"
+                       defaultValue="false"/>
         <!-- Whether experts have connections, producing without raw
              materials in factories -->
         <booleanOption id="model.option.expertsHaveConnections"

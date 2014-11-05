@@ -76,6 +76,7 @@ public class Colony extends Settlement implements Nameable {
         MISSING_BUILD_ABILITY,
         MISSING_ABILITY,
         WRONG_UPGRADE,
+        COASTAL,
         LIMIT_EXCEEDED
     }
 
@@ -1128,6 +1129,9 @@ public class Colony extends Settlement implements Nameable {
             return NoBuildReason.NOT_BUILDABLE;
         } else if (buildableType.getRequiredPopulation() > getUnitCount()) {
             return NoBuildReason.POPULATION_TOO_SMALL;
+        } else if (buildableType.hasAbility(Ability.COASTAL_ONLY)
+            && !getTile().isCoastland()) {
+            return NoBuildReason.COASTAL;
         } else {
             for (Entry<String, Boolean> entry
                      : buildableType.getRequiredAbilities().entrySet()) {

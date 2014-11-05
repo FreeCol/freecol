@@ -352,6 +352,11 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 continue;
             }
 
+            if (buildingType.hasAbility(Ability.COASTAL_ONLY)
+                && !colony.getTile().isCoastland()) {
+                lockReason.add(Messages.message(StringTemplate.template("colonyPanel.coastalOnly")));
+            }
+                                                
             if (buildingType.getRequiredPopulation() > unitCount) {
                 lockReason.add(Messages.message(StringTemplate.template("colonyPanel.populationTooSmall")
                                                 .addAmount("%number%", buildingType.getRequiredPopulation())));
