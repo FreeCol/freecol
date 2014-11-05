@@ -592,6 +592,9 @@ public class Player extends FreeColGameObject implements Nameable {
     protected java.util.Map<Player, Tension> tension
         = new HashMap<Player, Tension>();
 
+    /** A list of players who can not establish missions to this player. */
+    protected Set<Player> bannedMissions = null;
+
     /**
      * Stores the stance towards the other players. One of: WAR, CEASE_FIRE,
      * PEACE and ALLIANCE.
@@ -3039,6 +3042,26 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Does this player ban missions from another player?
+     *
+     * @param player The other <code>Player</code> to test.
+     * @return True if the given player is banned.
+     */
+    public boolean missionsBanned(Player player) {
+        return bannedMissions != null && bannedMissions.contains(player);
+    }
+
+    /**
+     * Ban a player from establishing missions to this player.
+     *
+     * @param player The <code>Player</code> to ban.
+     */
+    public void addMissionBan(Player player) {
+        if (bannedMissions == null) bannedMissions = new HashSet<Player>();
+        bannedMissions.add(player);
+    }
+
+    /**
      * Gets the stance towards a given player.
      *
      * @param player The other <code>Player</code> to check.
@@ -3931,6 +3954,7 @@ public class Player extends FreeColGameObject implements Nameable {
     private static final String AI_TAG = "ai";
     private static final String ATTACKED_BY_PRIVATEERS_TAG = "attackedByPrivateers";
     private static final String BANKRUPT_TAG = "bankrupt";
+    private static final String BAN_MISSIONS_TAG = "banMissions";
     private static final String CURRENT_FATHER_TAG = "currentFather";
     private static final String DEAD_TAG = "dead";
     private static final String ENTRY_LOCATION_TAG = "entryLocation";
@@ -4062,6 +4086,16 @@ public class Player extends FreeColGameObject implements Nameable {
 
                 xw.writeEndElement();
             }
+            
+            if (bannedMissions != null) {
+                for (Player p : getSortedCopy(bannedMissions)) {
+                    xw.writeStartElement(BAN_MISSIONS_TAG);
+
+                    xw.writeAttribute(PLAYER_TAG, p.getId());
+
+                    xw.writeEndElement();
+                }
+            }
 
             List<String> playerIds = new ArrayList<String>(stance.keySet());
             Collections.sort(playerIds);
@@ -4113,6 +4147,14 @@ public class Player extends FreeColGameObject implements Nameable {
                 xw.writeAttribute(PLAYER_TAG, player);
 
                 xw.writeAttribute(VALUE_TAG, t.getValue());
+
+                xw.writeEndElement();
+            }
+
+            if (missionsBanned(player)) {
+                xw.writeStartElement(BAN_MISSIONS_TAG);
+
+                xw.writeAttribute(PLAYER_TAG, player.getId());
 
                 xw.writeEndElement();
             }
@@ -4212,6 +4254,7 @@ public class Player extends FreeColGameObject implements Nameable {
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         tension.clear();
+        if (bannedMissions != null) bannedMissions.clear();
         stance.clear();
         foundingFathers.clear();
         offeredFathers.clear();
@@ -4251,7 +4294,13 @@ public class Player extends FreeColGameObject implements Nameable {
         final Game game = getGame();
         final String tag = xr.getLocalName();
 
-        if (FOUNDING_FATHERS_TAG.equals(tag)) {
+        if (BAN_MISSIONS_TAG.equals(tag)) {
+            Player player = xr.makeFreeColGameObject(game, PLAYER_TAG,
+                                                     Player.class, true);
+            if (player != null && player.isEuropean()) addMissionBan(player);
+            xr.closeTag(BAN_MISSIONS_TAG);
+
+        } else if (FOUNDING_FATHERS_TAG.equals(tag)) {
             List<FoundingFather> ffs = xr.readList(spec, FOUNDING_FATHERS_TAG,
                                                    FoundingFather.class);
             if (ffs != null) {

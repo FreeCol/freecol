@@ -3176,9 +3176,12 @@ public final class InGameController extends Controller {
                 tile.changeOwnership(serverPlayer, null);//-til
                 cs.add(See.perhaps(), tile);
             }
-        } else { // Consider not accepting the treaty to be an insult.
+        } else {
+            // Consider not accepting the treaty to be an insult and
+            // ban missions.
             other.csModifyTension(serverPlayer,
                 Tension.TENSION_ADD_MAJOR, cs);//+til
+            other.addMissionBan(serverPlayer);
         }
 
         sendToOthers(serverPlayer, cs);

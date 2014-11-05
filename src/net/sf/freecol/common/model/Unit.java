@@ -1768,6 +1768,7 @@ public class Unit extends GoodsLocation
         MOVE_NO_ACCESS_FULL("Attempt to embark onto full carrier"),
         MOVE_NO_ACCESS_GOODS("Attempt to trade without goods"),
         MOVE_NO_ACCESS_CONTACT("Attempt to interact with natives before contact"),
+        MOVE_NO_ACCESS_MISSION_BAN("Attempt to use missionary at banned settlement"),
         MOVE_NO_ACCESS_SETTLEMENT("Attempt to move into foreign settlement"),
         MOVE_NO_ACCESS_SKILL("Attempt to learn skill with incapable unit"),
         MOVE_NO_ACCESS_TRADE("Attempt to trade without authority"),
@@ -2161,6 +2162,8 @@ public class Unit extends GoodsLocation
                 ? MoveType.MOVE_NO_ACCESS_CONTACT
                 : (!allowMoveFrom(from))
                 ? MoveType.MOVE_NO_ACCESS_WATER
+                : (settlement.getOwner().missionsBanned(getOwner()))
+                ? MoveType.MOVE_NO_ACCESS_MISSION_BAN
                 : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY;
         } else {
             return MoveType.MOVE_ILLEGAL; // should not happen

@@ -2777,6 +2777,16 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             break;
+        case MOVE_NO_ACCESS_MISSION_BAN:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessMissionBan")
+                    .addStringTemplate("%unit%", unit.getFullLabel(false))
+                    .addStringTemplate("%nation%", nation));
+            }
+            break;
         case MOVE_NO_ACCESS_SETTLEMENT:
             if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
