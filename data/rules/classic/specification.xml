@@ -3564,6 +3564,9 @@
         <!-- Overflow hammer and cross production is preserved? -->
         <booleanOption id="model.option.saveProductionOverflow"
                        defaultValue="true"/>
+        <!-- Clear the hammers count if production is changed. -->
+        <booleanOption id="model.option.clearHammersOnConstructionSwitch"
+                       defaultValue="false" />
         <!-- Whether to educate the least skilled unit first -->
         <booleanOption id="model.option.allowStudentSelection"
                        defaultValue="false"/>

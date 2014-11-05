@@ -144,6 +144,10 @@ public class GameOptions {
     public static final String SAVE_PRODUCTION_OVERFLOW
         = "model.option.saveProductionOverflow";
 
+    /** Clear the hammers when changing production. */
+    public static final String CLEAR_HAMMERS_ON_CONSTRUCTION_SWITCH
+        = "model.option.clearHammersOnConstructionSwitch";
+
     /**
      * Whether to educate the least skilled unit first. This is the
      * behaviour of the original game and disallows manually assigning

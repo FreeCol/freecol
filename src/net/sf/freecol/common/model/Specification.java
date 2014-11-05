@@ -2468,6 +2468,8 @@ public final class Specification {
                                   GameOptions.GAMEOPTIONS_COLONY, false);
         ret |= checkBooleanOption(GameOptions.PAY_FOR_BUILDING,
                                   GameOptions.GAMEOPTIONS_COLONY, true);
+        ret |= checkBooleanOption(GameOptions.CLEAR_HAMMERS_ON_CONSTRUCTION_SWITCH,
+                                  GameOptions.GAMEOPTIONS_COLONY, false);
         // end @compat 0.11.0
 
         return ret;

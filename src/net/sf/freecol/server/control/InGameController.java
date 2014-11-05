@@ -3791,7 +3791,17 @@ public final class InGameController extends Controller {
      */
     public Element setBuildQueue(ServerPlayer serverPlayer, Colony colony,
                                  List<BuildableType> queue) {
+        BuildableType current = colony.getCurrentlyBuilding();
         colony.setBuildQueue(queue);
+        if (getGame().getSpecification()
+            .getBoolean(GameOptions.CLEAR_HAMMERS_ON_CONSTRUCTION_SWITCH)
+            && current != colony.getCurrentlyBuilding()) {
+            for (AbstractGoods ag : current.getRequiredGoods()) {
+                if (!ag.getType().isStorable()) {
+                    colony.removeGoods(ag.getType());
+                }
+            }
+        }
         colony.invalidateCache();
 
         // Only visible to player.
