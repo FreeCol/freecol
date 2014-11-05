@@ -2468,6 +2468,7 @@
                         aggression="low">
       <skill id="model.unit.masterSugarPlanter" probability="20"/>
       <skill id="model.unit.expertFisherman" probability="10"/>
+      <skill id="model.unit.masterFurTrader" probability="3"/>
       <region id="model.region.east" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.cherokee" extends="village" number-of-settlements="average"
@@ -2490,6 +2491,7 @@
       <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
       <skill id="model.unit.expertFisherman" probability="3"/>
       <skill id="model.unit.expertOreMiner" probability="3"/>
+      <skill id="model.unit.masterFurTrader" probability="3"/>
       <region id="model.region.north" />
     </indian-nation-type>
     <indian-nation-type id="city" abstract="true" extends="default" number-of-settlements="high">
