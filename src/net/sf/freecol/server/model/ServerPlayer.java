@@ -308,6 +308,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Flush the extra trades.
+     *
+     * @param random A pseudo-random number source.
+     */
+    public void flushExtraTrades(Random random) {
+        while (!extraTrades.isEmpty()) {
+            AbstractGoods ag = extraTrades.remove(0);
+            propagateToEuropeanMarkets(ag.getType(), ag.getAmount(), random);
+        }
+    }
+
+    /**
      * Performs initial randomizations for this player.
      *
      * @param random A pseudo-random number source.
@@ -1722,10 +1734,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
 
-        while (!extraTrades.isEmpty()) {
-            AbstractGoods ag = extraTrades.remove(0);
-            propagateToEuropeanMarkets(ag.getType(), ag.getAmount(), random);
-        }
+        flushExtraTrades(random);
         csFlushMarket(cs);
     }
 

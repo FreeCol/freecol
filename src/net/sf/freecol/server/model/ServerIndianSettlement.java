@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -547,6 +548,27 @@ public class ServerIndianSettlement extends IndianSettlement
                         getLocationNameFor(missionaryOwner)));
         }
     }
+
+    /**
+     * Equip a unit for a specific role.
+     *
+     * @param unit The <code>Unit</code> to equip.
+     * @param role The <code>Role</code> to equip for.
+     * @param roleCount The role count.
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return True if the equipping succeeds.
+     */
+    public boolean csEquipForRole(Unit unit, Role role, int roleCount,
+                                  Random random, ChangeSet cs) {
+        boolean ret = equipForRole(unit, role, roleCount);
+
+        if (ret) {
+            cs.add(See.only((ServerPlayer)getOwner()), getTile());
+        }
+        return ret;
+    }
+
 
     /**
      * Gets the tag name of the root element representing this object.

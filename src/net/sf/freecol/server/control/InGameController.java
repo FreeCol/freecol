@@ -3587,26 +3587,25 @@ public final class InGameController extends Controller {
      */
     public Element equipForRole(ServerPlayer serverPlayer, Unit unit,
                                 Role role, int roleCount) {
-        UnitLocation loc = (unit.isInEurope()) ? serverPlayer.getEurope()
-            : unit.getSettlement();
-        if (loc == null) {
+        ChangeSet cs = new ChangeSet();
+        boolean ret = false;
+        if (unit.isInEurope()) {
+            ServerEurope serverEurope = (ServerEurope)serverPlayer.getEurope();
+            ret = serverEurope.csEquipForRole(unit, role, roleCount,
+                                              random, cs);
+        } else if (unit.getColony() != null) {
+            ServerColony serverColony = (ServerColony)unit.getColony();
+            ret = serverColony.csEquipForRole(unit, role, roleCount,
+                                              random, cs);
+        } else if (unit.getIndianSettlement() != null) {
+            ServerIndianSettlement sis = (ServerIndianSettlement)unit.getIndianSettlement();
+            ret = sis.csEquipForRole(unit, role, roleCount, random, cs);
+        } else {
             return DOMMessage.clientError("Unsuitable equip location for: "
                 + unit.getId());
-        } else if (!loc.equipForRole(unit, role, roleCount)) {
-            return DOMMessage.clientError("Can not build " + role.getId()
-                + "." + roleCount + " at " + loc + " for: " + unit.getId());
         }
+        if (!ret) return null;
 
-        ChangeSet cs = new ChangeSet();
-        if (loc instanceof Europe) {
-            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        } else if (unit.isInColony()) {
-            loc.getTile().cacheUnseen();//+til
-            unit.setLocation(loc.getTile());//-vis: safe/colony,-til
-            cs.add(See.perhaps(), loc.getTile());
-        } else { // Settlement tile
-            cs.add(See.only(serverPlayer), unit.getTile());
-        }
         if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
             unit.setMovesLeft(0);
         }

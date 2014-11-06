@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -820,6 +821,29 @@ public class ServerColony extends Colony implements ServerModelObject {
                 firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
             }
         }
+    }
+
+    /**
+     * Equip a unit for a specific role.
+     *
+     * @param unit The <code>Unit</code> to equip.
+     * @param role The <code>Role</code> to equip for.
+     * @param roleCount The role count.
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return True if the equipping succeeds.
+     */
+    public boolean csEquipForRole(Unit unit, Role role, int roleCount,
+                                  Random random, ChangeSet cs) {
+        boolean ret = equipForRole(unit, role, roleCount);
+
+        if (ret) {
+            Tile tile = getTile();
+            tile.cacheUnseen();//+til
+            unit.setLocation(tile);
+            cs.add(See.perhaps(), tile);
+        }
+        return ret;
     }
 
 

@@ -40,6 +40,7 @@ import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.ChangeSet.See;
 
 
 /**
@@ -186,6 +187,30 @@ public class ServerEurope extends Europe implements ServerModelObject {
                 ((ServerUnit)unit).csRepairUnit(cs);
             }
         }
+    }
+
+    /**
+     * Equip a unit for a specific role.
+     *
+     * @param unit The <code>Unit</code> to equip.
+     * @param role The <code>Role</code> to equip for.
+     * @param roleCount The role count.
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     * @return True if the equipping succeeds.
+     */
+    public boolean csEquipForRole(Unit unit, Role role, int roleCount,
+                                  Random random, ChangeSet cs) {
+        boolean ret = equipForRole(unit, role, roleCount);
+
+        if (ret) {
+            ServerPlayer serverPlayer = (ServerPlayer)getOwner();
+            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+            cs.add(See.only(serverPlayer), unit);
+            serverPlayer.flushExtraTrades(random);
+            serverPlayer.csFlushMarket(cs);
+        }
+        return ret;
     }
 
 

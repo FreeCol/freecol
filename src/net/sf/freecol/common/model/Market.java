@@ -446,6 +446,7 @@ public final class Market extends FreeColGameObject implements Ownable {
         return transactionListeners.toArray(new TransactionListener[0]);
     }
 
+
     // Interface Ownable
 
     /**

@@ -2193,6 +2193,8 @@ public final class InGameController implements NetworkConstants {
 
         final Player player = freeColClient.getMyPlayer();
         final Colony colony = unit.getColony();
+        ColonyWas colonyWas = null;
+        EuropeWas europeWas = null;
 
         List<AbstractGoods> req = unit.getGoodsDifference(role, roleCount);
         if (unit.isInEurope()) {
@@ -2204,6 +2206,7 @@ public final class InGameController implements NetworkConstants {
             }
             int price = player.getEurope().priceGoods(req);
             if (price < 0 || !player.checkGold(price)) return false;
+            europeWas = new EuropeWas(player.getEurope());
         } else if (colony != null) {
             for (AbstractGoods ag : req) {
                 if (colony.getGoodsCount(ag.getType()) < ag.getAmount()) {
@@ -2217,14 +2220,15 @@ public final class InGameController implements NetworkConstants {
                     return false;
                 }
             }
+            colonyWas = new ColonyWas(colony);
         } else {
             throw new IllegalStateException("Unit not in settlement/Europe");
         }
 
-        ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
         UnitWas unitWas = new UnitWas(unit);
         if (askServer().equipUnitForRole(unit, role, roleCount)) {
             if (colonyWas != null) colonyWas.fireChanges();
+            if (europeWas != null) europeWas.fireChanges();
             unitWas.fireChanges();
             gui.updateMenuBar();
             return true;
