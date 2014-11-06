@@ -836,7 +836,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The ruler name key.
      */
     public final String getRulerNameKey() {
-        return nationId + ".ruler";
+        return Messages.rulerKey(nationId);
     }
 
     /**

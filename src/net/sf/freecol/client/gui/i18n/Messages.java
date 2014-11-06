@@ -105,6 +105,7 @@ public class Messages {
     public static final String DESCRIPTION_SUFFIX = ".description";
     public static final String SHORT_DESCRIPTION_SUFFIX = ".shortDescription";
     public static final String NAME_SUFFIX = ".name";
+    public static final String RULER_SUFFIX = ".ruler";
 
     private static final String[] DESCRIPTION_KEYS = new String[] {
         DESCRIPTION_SUFFIX, SHORT_DESCRIPTION_SUFFIX, NAME_SUFFIX
@@ -629,6 +630,14 @@ public class Messages {
             }
         }
         return id;
+    }
+
+    public static String rulerKey(String id) {
+        return id + RULER_SUFFIX;
+    }
+
+    public static String getRulerName(String id) {
+        return message(rulerKey(id));
     }
 
     /**

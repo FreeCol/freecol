@@ -28,6 +28,7 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -204,7 +205,7 @@ public class Nation extends FreeColGameObjectType {
      * @return a <code>String</code> value
      */
     public final String getRulerNameKey() {
-        return getId() + ".ruler";
+        return Messages.rulerKey(getId());
     }
 
     /**

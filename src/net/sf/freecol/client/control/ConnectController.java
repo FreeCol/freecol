@@ -47,6 +47,7 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -401,13 +402,13 @@ public final class ConnectController {
 
         if (freeColClient.isLoggedIn()) logout(true);
 
+        final Game game = freeColClient.getGame();
         GameState state = getGameState(host, port);
         if (state == null) return false;
         switch (state) {
         case STARTING_GAME:
             if (!login(FreeCol.getName(), host, port)) return false;
-            gui.showStartGamePanel(freeColClient.getGame(),
-                                   freeColClient.getMyPlayer(), false);
+            gui.showStartGamePanel(game, freeColClient.getMyPlayer(), false);
             freeColClient.setSinglePlayer(false);
             break;
 
@@ -429,12 +430,12 @@ public final class ConnectController {
             for (String n : names) {
                 choices.add(new ChoiceItem<String>(Messages.getName(n), n));
             }
-            String id = gui.showChoiceDialog(true, null,
+            String choice = gui.showChoiceDialog(true, null,
                 Messages.message("connectController.choicePlayer"), null,
                 "cancel", choices);
-            if (id == null) return false; // User cancelled
+            if (choice == null) return false; // User cancelled
 
-            if (!login(id + ".ruler", host, port)) {
+            if (!login(Messages.getRulerName(choice), host, port)) {
                 // login() shows error messages
                 return false;
             }
