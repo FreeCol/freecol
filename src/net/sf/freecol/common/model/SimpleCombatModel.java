@@ -47,9 +47,14 @@ public class SimpleCombatModel extends CombatModel {
 
     private static final Logger logger = Logger.getLogger(SimpleCombatModel.class.getName());
 
-    // The maximum attack power of a Colony's fortifications against a
-    // naval unit.
+    /**
+     * The maximum attack power of a Colony's fortifications against a
+     * naval unit.
+     */
     public static final int MAXIMUM_BOMBARD_POWER = 48;
+
+    /** A defence percentage bonus that disables the fortification bonus. */
+    public static final int STRONG_DEFENCE_THRESHOLD = 150; // percent
 
     public static final Modifier UNKNOWN_DEFENCE_MODIFIER
         = new Modifier("bogus", Modifier.UNKNOWN, ModifierType.ADDITIVE);
@@ -386,8 +391,7 @@ public class SimpleCombatModel extends CombatModel {
                     // Ambush bonus in the open = defender's defence
                     // bonus, if defender is REF, or attacker is indian.
                     if (isAmbush(attacker, defender)) {
-                        for (Modifier m : tile.getType()
-                                 .getModifiers(Modifier.DEFENCE)) {
+                        for (Modifier m : tile.getDefenceModifiers()) {
                             Modifier mod = new Modifier(Modifier.OFFENCE, m);
                             mod.setSource(Specification.AMBUSH_BONUS_SOURCE);
                             result.add(mod);
@@ -401,6 +405,7 @@ public class SimpleCombatModel extends CombatModel {
             if (attacker.hasAbility(Ability.BOMBARD)
                 && attacker.getLocation() instanceof Tile
                 && attacker.getSettlement() == null
+                && attacker.getState() != Unit.UnitState.FORTIFIED
                 && defenderUnit.getSettlement() == null) {
                 result.addAll(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN));
             }
@@ -453,7 +458,7 @@ public class SimpleCombatModel extends CombatModel {
             result.addAll(tile.getType().getDefenceModifiers());
 
             // Settlement defence bonus
-            result.addAll(settlement.getModifiers(Modifier.DEFENCE));
+            result.addAll(settlement.getDefenceModifiers());
 
             // Not allowed to see inside the settlement.  This only applies 
             // to the pre-combat dialog--- the actual attack is on the
@@ -495,6 +500,22 @@ public class SimpleCombatModel extends CombatModel {
     }
 
     /**
+     * Does a given object provide a strong defence bonus?
+     *
+     * @param fco The <code>FreeColObject</code> to check.
+     * @return True if a strong defence bonus is present.
+     */
+    private boolean hasStrongDefenceModifier(FreeColObject fco) {
+        for (Modifier m : fco.getDefenceModifiers()) {
+            if (m.getType() == ModifierType.PERCENTAGE
+                && m.getValue() >= STRONG_DEFENCE_THRESHOLD) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Add all the defensive modifiers that apply to a land attack.
      *
      * @param attacker The attacker.
@@ -509,13 +530,11 @@ public class SimpleCombatModel extends CombatModel {
         final Settlement settlement = (tile == null) ? null
             : tile.getSettlement();
 
-        // Fortify bonus
-        if (defender.getState() == Unit.UnitState.FORTIFIED) {
-            result.addAll(spec.getModifiers(Modifier.FORTIFIED));
-        }
-
         if (tile != null) {
+            boolean disableFortified = false;
+
             // Tile defence bonus
+            disableFortified |= hasStrongDefenceModifier(tile.getType());
             result.addAll(tile.getType().getDefenceModifiers());
 
             if (settlement == null) {
@@ -527,7 +546,7 @@ public class SimpleCombatModel extends CombatModel {
 
             } else { // In settlement
                 // Settlement defence bonus
-                result.addAll(settlement.getModifiers(Modifier.DEFENCE));
+                result.addAll(settlement.getDefenceModifiers());
 
                 // Artillery defence bonus against an Indian raid
                 if (defender.hasAbility(Ability.BOMBARD)
@@ -539,8 +558,21 @@ public class SimpleCombatModel extends CombatModel {
                 // Automatic defensive role (e.g. Revere)
                 Role autoRole = defender.getAutomaticRole();
                 if (autoRole != null) {
-                    result.addAll(autoRole.getModifiers(Modifier.DEFENCE));
+                    result.addAll(autoRole.getDefenceModifiers());
                 }
+
+                if (settlement instanceof Colony) {
+                    Building stockade = ((Colony)settlement).getStockade();
+                    if (stockade != null) {
+                        disableFortified |= hasStrongDefenceModifier(stockade.getType());
+                    }
+                }
+            }
+
+            // Fortify bonus
+            if (defender.getState() == Unit.UnitState.FORTIFIED
+                && !disableFortified) {
+                result.addAll(spec.getModifiers(Modifier.FORTIFIED));
             }
         }
     }
@@ -859,6 +891,7 @@ public class SimpleCombatModel extends CombatModel {
             return attackerUnit.getSettlement() == null
                 && attackerUnit.hasTile()
                 && defenderUnit.getSettlement() == null
+                && defenderUnit.getState() != Unit.UnitState.FORTIFIED
                 && defenderUnit.hasTile()
                 && (attackerUnit.hasAbility(Ability.AMBUSH_BONUS)
                     || defenderUnit.hasAbility(Ability.AMBUSH_PENALTY))

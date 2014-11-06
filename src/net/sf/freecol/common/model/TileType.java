@@ -329,15 +329,6 @@ public final class TileType extends FreeColGameObjectType {
     // Utilities
 
     /**
-     * Get the defence modifiers applicable to this tile type.
-     *
-     * @return A set of defence <code>Modifier</code>s.
-     */
-    public Set<Modifier> getDefenceModifiers() {
-        return getModifiers(Modifier.DEFENCE);
-    }
-
-    /**
      * Can a tile of this type produce a given goods type?
      *
      * @param goodsType The <code>GoodsType</code> to produce.

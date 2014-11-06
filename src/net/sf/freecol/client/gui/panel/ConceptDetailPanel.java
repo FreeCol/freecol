@@ -51,6 +51,7 @@ public class ConceptDetailPanel extends FreeColPanel
         "taxes",
         "efficiency",
         "education",
+        "fortification",
         "independence",
         "ref",
         "interventionForce"

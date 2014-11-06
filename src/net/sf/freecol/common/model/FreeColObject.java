@@ -676,6 +676,15 @@ public abstract class FreeColObject
         if (fc != null) fc.removeFeatures(fco);
     }
 
+    /**
+     * Get the defence modifiers applicable to this object.
+     *
+     * @return A set of defence <code>Modifier</code>s.
+     */
+    public Set<Modifier> getDefenceModifiers() {
+        return getModifiers(Modifier.DEFENCE);
+    }
+
 
     // DOM handling.  Beware, this needs to go away.
 
