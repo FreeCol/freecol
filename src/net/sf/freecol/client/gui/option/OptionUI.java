@@ -131,7 +131,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
      *
      * @return a <code>JLabel</code> value
      */
-    public JLabel getLabel() {
+    public JLabel getJLabel() {
         return label;
     }
 

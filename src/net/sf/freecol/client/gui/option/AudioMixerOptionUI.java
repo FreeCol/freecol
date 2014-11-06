@@ -96,7 +96,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
         panel.add(button2);
         button2.addActionListener(aHandler);
 
-        cbox.add(super.getLabel());
+        cbox.add(super.getJLabel());
         cbox.setModel(new DefaultComboBoxModel(getOption().getChoices().toArray(new MixerWrapper[0])));
         reset();
 
@@ -125,7 +125,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
      * @return null
      */
     @Override
-    public final JLabel getLabel() {
+    public final JLabel getJLabel() {
         return null;
     }
 

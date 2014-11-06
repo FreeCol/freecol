@@ -52,7 +52,7 @@ public class EditOptionDialog extends FreeColConfirmDialog {
         ui = OptionUI.getOptionUI(getGUI(), option, true);
 
         MigPanel panel = new MigPanel(new MigLayout());
-        if (ui.getLabel() == null) panel.add(ui.getLabel(), "split 2");
+        if (ui.getJLabel() == null) panel.add(ui.getJLabel(), "split 2");
         panel.add(ui.getComponent());
 
         initializeConfirmDialog(true, panel, null, "ok", "cancel");

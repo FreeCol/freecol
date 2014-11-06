@@ -50,7 +50,7 @@ public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
         super(gui, option, editable);
 
         slider.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
-                                                          super.getLabel().getText()));
+                                                          super.getJLabel().getText()));
         slider.setOrientation(JSlider.HORIZONTAL);
         slider.setPreferredSize(new Dimension(500, 50));
         slider.setPaintLabels(true);
@@ -67,7 +67,7 @@ public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
      * @return null
      */
     @Override
-    public final JLabel getLabel() {
+    public final JLabel getJLabel() {
         return null;
     }
 

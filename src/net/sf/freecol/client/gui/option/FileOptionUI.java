@@ -54,7 +54,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
     public FileOptionUI(final GUI gui, final FileOption option, boolean editable) {
         super(gui, option, editable);
 
-        panel.add(getLabel());
+        panel.add(getJLabel());
 
         File file = option.getValue();
         fileField = new JTextField((file == null) ? null : file.getAbsolutePath(), 20);
@@ -92,7 +92,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         browse.setEnabled(editable);
         remove.setEnabled(editable);
         fileField.setEnabled(false);
-        getLabel().setLabelFor(fileField);
+        getJLabel().setLabelFor(fileField);
         /*
         fileField.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent arg0) {

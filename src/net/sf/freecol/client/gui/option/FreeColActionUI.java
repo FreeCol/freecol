@@ -71,7 +71,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
         this.optionGroupUI = optionGroupUI;
         keyStroke = option.getAccelerator();
 
-        panel.add(getLabel());
+        panel.add(getJLabel());
 
         bl = new BlinkingLabel();
         panel.add(bl);

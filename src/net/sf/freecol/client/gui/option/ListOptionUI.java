@@ -82,7 +82,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         super(gui, option, editable);
 
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
-                                                         super.getLabel().getText()));
+                                                         super.getJLabel().getText()));
         panel.setLayout(new MigLayout("wrap 2, fill", "[fill, grow]20[fill]"));
 
         model = new DefaultListModel();
@@ -182,7 +182,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
      * @return Null.
      */
     @Override
-    public final JLabel getLabel() {
+    public final JLabel getJLabel() {
         return null;
     }
 

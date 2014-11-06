@@ -190,7 +190,7 @@ public final class OptionGroupUI extends MigPanel
                 optionUIs.put(option.getId(), ui);
             }
         }
-        JLabel label = ui.getLabel();
+        JLabel label = ui.getJLabel();
         if (label == null) {
             detailPanel.add(ui.getComponent(), "newline, span");
         } else {
