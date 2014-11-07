@@ -290,6 +290,7 @@ public abstract class WorkLocation extends UnitLocation
     public int getUnitProduction(Unit unit, GoodsType goodsType) {
         if (unit == null) return 0;
         final UnitType unitType = unit.getType();
+        if (unit.getWorkType() != goodsType) return 0;
         final Turn turn = getGame().getTurn();
         int bestAmount = 0;
         for (AbstractGoods output : getOutputs()) {
