@@ -2157,9 +2157,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Create the recruit, move it to the docks.
         ServerEurope europe = (ServerEurope)getEurope();
         UnitType recruitType = europe.getRecruitable(index);
-        Game game = getGame();
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
+        Role role = (spec.getBoolean(GameOptions.EQUIP_EUROPEAN_RECRUITS))
+            ? recruitType.getDefaultRole()
+            : spec.getDefaultRole();
         Unit unit = new ServerUnit(game, europe, this,
-                                   recruitType);//-vis: safe/Europe
+                                   recruitType, role);//-vis: safe/Europe
 
         // Handle migration type specific changes.
         switch (type) {

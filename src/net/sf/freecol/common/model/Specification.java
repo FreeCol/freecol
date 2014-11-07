@@ -2485,6 +2485,8 @@ public final class Specification {
                                   GameOptions.GAMEOPTIONS_COLONY, false);
         ret |= checkBooleanOption(GameOptions.CUSTOMS_ON_COAST,
                                   GameOptions.GAMEOPTIONS_COLONY, false);
+        ret |= checkBooleanOption(GameOptions.EQUIP_EUROPEAN_RECRUITS,
+                                  GameOptions.GAMEOPTIONS_COLONY, true);
         // end @compat 0.11.0
 
         return ret;

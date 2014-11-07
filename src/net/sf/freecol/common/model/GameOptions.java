@@ -102,6 +102,10 @@ public class GameOptions {
     public static final String PLAYER_IMMIGRATION_BONUS
         = "model.option.playerImmigrationBonus";
 
+    /** Equip European recruits. */
+    public static final String EQUIP_EUROPEAN_RECRUITS
+        = "model.option.equipEuropeanRecruits";
+
 
     /** Colony game option group. */
     public static final String GAMEOPTIONS_COLONY

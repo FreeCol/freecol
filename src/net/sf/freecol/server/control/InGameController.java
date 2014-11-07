@@ -3748,6 +3748,7 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element trainUnitInEurope(ServerPlayer serverPlayer, UnitType type) {
+
         Europe europe = serverPlayer.getEurope();
         if (europe == null) {
             return DOMMessage.clientError("No Europe to train in.");
@@ -3761,8 +3762,13 @@ public final class InGameController extends Controller {
                 + ") to train " + type);
         }
 
-        Unit unit = new ServerUnit(getGame(), europe, serverPlayer,
-                                   type);//-vis: safe, Europe
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
+        Role role = (spec.getBoolean(GameOptions.EQUIP_EUROPEAN_RECRUITS))
+            ? type.getDefaultRole()
+            : spec.getDefaultRole();
+        Unit unit = new ServerUnit(game, europe, serverPlayer, type,
+                                   role);//-vis: safe, Europe
         unit.setName(serverPlayer.getNameForUnit(type, random));
         serverPlayer.modifyGold(-price);
         ((ServerEurope)europe).increasePrice(type, price);

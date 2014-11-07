@@ -3540,6 +3540,9 @@
         <!-- Per turn player immigration bonus. -->
         <integerOption id="model.option.playerImmigrationBonus"
                        defaultValue="2" minimumValue="0" />
+        <!-- New recruits in Europe are equipped. -->
+        <booleanOption id="model.option.equipEuropeanRecruits"
+                       defaultValue="true"/>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Is colony bell accumulation capped when 100% rebels achieved? -->
