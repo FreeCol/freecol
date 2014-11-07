@@ -138,9 +138,11 @@ public class InformationPanel extends FreeColPanel {
             ? Messages.message(((IndianSettlement)fco).getLocationName())
 
             : (fco instanceof Tile)
-            ? Messages.message(StringTemplate.template("tile")
-                .addAmount("%x%", ((Tile)fco).getX())
-                .addAmount("%y%", ((Tile)fco).getY()))
+            ? ((((Tile)fco).hasSettlement())
+                ? displayLabel(((Tile)fco).getSettlement())
+                : Messages.message(StringTemplate.template("tile")
+                    .addAmount("%x%", ((Tile)fco).getX())
+                    .addAmount("%y%", ((Tile)fco).getY())))
 
             : (fco instanceof Unit)
             ? displayLabel((FreeColObject)((Unit)fco).getLocation())
