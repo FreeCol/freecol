@@ -81,7 +81,7 @@ public class StanceTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getDescription() {
+    public StringTemplate getLabel() {
         return stance.getLabel();
     }
 

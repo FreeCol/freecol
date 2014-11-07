@@ -81,7 +81,7 @@ public class InciteTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getDescription() {
+    public StringTemplate getLabel() {
         return StringTemplate.template("inciteTradeItem.description")
             .addStringTemplate("%nation%", victim.getNationName());
     }

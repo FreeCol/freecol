@@ -2683,7 +2683,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             if (value == Integer.MIN_VALUE) unacceptable++;
             scores.put(item, Integer.valueOf(value));
-            lb.add(" ", Messages.message(item.getDescription()), " = ", value);
+            lb.add(" ", Messages.message(item.getLabel()), " = ", value);
         }
 
         // If too many items are unacceptable, reject

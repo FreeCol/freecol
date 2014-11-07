@@ -83,7 +83,7 @@ public class GoodsTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getDescription() {
+    public StringTemplate getLabel() {
         return goods.getLabel(true);
     }
 

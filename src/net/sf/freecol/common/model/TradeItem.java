@@ -134,11 +134,11 @@ public abstract class TradeItem extends FreeColObject {
     public abstract boolean isUnique();
 
     /**
-     * Get a description of this item.
+     * Get a label for this item.
      *
      * @return A <code>StringTemplate</code> describing this item.
      */
-    public abstract StringTemplate getDescription();
+    public abstract StringTemplate getLabel();
 
     /**
      * Get the colony to trade.

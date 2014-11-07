@@ -1028,7 +1028,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
      * @return A new <code>JButton</code> for the item.
      */
     private JButton getTradeItemButton(TradeItem item) {
-        String description = Messages.message(item.getDescription());
+        String description = Messages.message(item.getLabel());
         JButton button = new JButton(new RemoveAction(item));
         button.setText(description);
         button.setMargin(GUI.EMPTY_MARGIN);

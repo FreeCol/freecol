@@ -79,7 +79,7 @@ public class GoldTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getDescription() {
+    public StringTemplate getLabel() {
         return StringTemplate.template("tradeItem.gold.long")
             .addAmount("%amount%", gold);
     }

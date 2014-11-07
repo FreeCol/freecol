@@ -93,7 +93,7 @@ public class ColonyTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getDescription() {
+    public StringTemplate getLabel() {
         return StringTemplate.template("tradeItem.colony.long")
             .addName("%colony%", colonyName);
     }
