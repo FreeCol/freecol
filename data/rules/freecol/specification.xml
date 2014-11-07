@@ -58,6 +58,12 @@
   </building-types>
 
   <european-nation-types>
+    <european-nation-type id="model.nationType.ref" preserve="true">
+      <!-- Shorten REF sail time. -->
+      <modifier id="model.modifier.sailHighSeas"
+                type="additive" value="-1"/>
+    </european-nation-type>
+
     <european-nation-type id="model.nationType.naval"
                           extends="model.nationType.default">
       <modifier id="model.modifier.movementBonus"
