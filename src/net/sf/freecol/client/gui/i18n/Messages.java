@@ -678,22 +678,43 @@ public class Messages {
      */
     public static StringTemplate getTemplate(String name, String typeId,
                                              String roleId, int number) {
-        StringTemplate ret = StringTemplate.label("");
-        if (name != null) ret.addName(name + " (");
         // Check for special role-specific key, which will not have a
         // %role% argument.  These exist so we can avoid mentioning
         // the role twice, e.g. "Seasoned Scout Scout".
+        StringTemplate type;
+        String roleKey;
         String baseKey = typeId + "." + Role.getRoleSuffix(roleId);
         if (containsKey(baseKey)) {
-            ret.addStringTemplate(StringTemplate.template(baseKey)
-                .addAmount("%number%", number));
+            type = StringTemplate.template(baseKey)
+                .addAmount("%number%", number);
+            roleKey = null;
         } else {
-            ret.addStringTemplate(StringTemplate.template(typeId + NAME_SUFFIX)
-                .addAmount("%number%", number));
-            String roleKey = Role.getRoleKey(roleId);
-            if (roleKey != null) ret.addName(" ").add(roleKey);
+            type = StringTemplate.template(nameKey(typeId))
+                .addAmount("%number%", number);
+            roleKey = Role.getRoleKey(roleId);
         }
-        if (name != null) ret.addName(")");
+        StringTemplate ret;
+        if (name == null) {
+            if (roleKey == null) {
+                ret = StringTemplate.template("unitFormat.null.null")
+                    .addStringTemplate("%type%", type);
+            } else {
+                ret = StringTemplate.template("unitFormat.null.role")
+                    .addStringTemplate("%type%", type)
+                    .add("%role%", roleKey);
+            }
+        } else {
+            if (roleKey == null) {
+                ret = StringTemplate.template("unitFormat.name.null")
+                    .addName("%name%", name)
+                    .addStringTemplate("%type%", type);
+            } else {
+                ret = StringTemplate.template("unitFormat.name.role")
+                    .addName("%name%", name)
+                    .addStringTemplate("%type%", type)
+                    .add("%role%", roleKey);
+            }
+        }
         return ret;
     }
 

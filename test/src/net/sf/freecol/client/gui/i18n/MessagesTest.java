@@ -636,7 +636,7 @@ public class MessagesTest extends FreeColTestCase {
             .equals(unit.getFullDescription(true)));
 
         unit.setRole(soldierRole);
-        assertTrue("Free Colonist Soldier" // FIXME: "Solider (Free Colonist)"
+        assertTrue("Soldier (Free Colonist)"
             .equals(unit.getDescription()));
         assertTrue("Dutch Soldier (Free Colonist)"
             .equals(unit.getFullDescription(false)));
@@ -644,7 +644,7 @@ public class MessagesTest extends FreeColTestCase {
             .equals(unit.getFullDescription(true)));
 
         unit.setName("John Doe");
-        assertTrue("John Doe (Free Colonist Soldier)" // FIXME "John Doe (Solider/Free Colonist)"
+        assertTrue("John Doe (Soldier/Free Colonist)"
             .equals(unit.getDescription()));
         assertTrue("John Doe (Dutch Soldier/Free Colonist)"
             .equals(unit.getFullDescription(false)));
@@ -662,7 +662,7 @@ public class MessagesTest extends FreeColTestCase {
             .equals(unit.getFullDescription(true)));
 
         unit.setRole(missionaryRole);
-        assertTrue("Master Carpenter Missionary" // FIXME "Missionary (Master Carpenter)"
+        assertTrue("Missionary (Master Carpenter)"
             .equals(unit.getDescription()));
         assertTrue("Dutch Missionary (Master Carpenter)"
             .equals(unit.getFullDescription(false)));
