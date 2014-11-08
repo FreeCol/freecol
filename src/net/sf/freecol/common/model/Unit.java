@@ -279,8 +279,8 @@ public class Unit extends GoodsLocation
      * @return The <code>StringTemplate</code> to describe the given unit.
      */
     public StringTemplate getLabel() {
-        return Messages.getTemplate(getName(), getType().getId(),
-                                    getRole().getId(), 1);
+        return Messages.getUnitLabel(getName(), getType().getId(), 1, null,
+                                     getRole().getId(), null);
     }
 
     /**
@@ -307,7 +307,7 @@ public class Unit extends GoodsLocation
      *      given unit.
      */
     public StringTemplate getFullLabel(boolean equipment) {
-        return Messages.getFullTemplate(this, equipment);
+        return Messages.getUnitLabel(this, equipment);
     }
 
     /**
@@ -317,7 +317,7 @@ public class Unit extends GoodsLocation
      * @return The full <code>String</code> describing this unit.
      */
     public String getFullDescription(boolean equipment) {
-        return Messages.message(Messages.getFullTemplate(this, equipment));
+        return Messages.message(Messages.getUnitLabel(this, equipment));
     }
 
     /**

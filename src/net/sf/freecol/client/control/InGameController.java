@@ -3975,6 +3975,7 @@ public final class InGameController implements NetworkConstants {
         // Look for active units.
         Player player = freeColClient.getMyPlayer();
         Unit unit = gui.getActiveUnit();
+System.err.println("NAU " + unit + ((unit != null && !unit.isDisposed() && unit.couldMove())));
         if (unit != null && !unit.isDisposed()
             && unit.couldMove()) return; // Current active unit has more to do.
         if (player.hasNextActiveUnit()) {
@@ -4177,24 +4178,25 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit for which to select a destination.
      */
     public void selectDestination(Unit unit) {
+        if (!requireOurTurn()) return;
+
         Location destination = gui.showSelectDestinationDialog(unit);
         if (destination == null) return; // user aborted
+        if (!setDestination(unit, destination)) return; // Server fail
 
-        if (setDestination(unit, destination)
-            && freeColClient.currentPlayerIsMyPlayer()) {
-            if (destination instanceof Europe) {
-                if (unit.hasTile()
-                    && unit.getTile().isDirectlyHighSeasConnected()) {
-                    moveTo(unit, destination);
-                } else {
-                    moveToDestination(unit, null);
-                }
+System.err.println(unit + " to " + destination);
+        if (destination instanceof Europe) {
+            if (unit.hasTile()
+                && unit.getTile().isDirectlyHighSeasConnected()) {
+                moveTo(unit, destination);
             } else {
-                if (unit.isInEurope()) {
-                    moveTo(unit, destination);
-                } else {
-                    moveToDestination(unit, null);
-                }
+                moveToDestination(unit, null);
+            }
+        } else {
+            if (unit.isInEurope()) {
+                moveTo(unit, destination);
+            } else {
+                moveToDestination(unit, null);
             }
         }
         nextActiveUnit(); // Unit may have become unmovable.

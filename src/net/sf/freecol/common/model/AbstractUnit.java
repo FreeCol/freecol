@@ -125,8 +125,8 @@ public class AbstractUnit extends FreeColObject {
      * @return A <code>StringTemplate</code> describing the abstract unit.
      */
     public StringTemplate getLabel() {
-        StringTemplate tmpl = Messages.getTemplate(null, getId(), getRoleId(),
-                                                   getNumber());
+        StringTemplate tmpl = Messages.getUnitLabel(null, getId(), getNumber(),
+                                                    null, getRoleId(), null);
         return StringTemplate.template("abstractUnit")
                              .addAmount("%number%", getNumber())
                              .addStringTemplate("%unit%", tmpl);

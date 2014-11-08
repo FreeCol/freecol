@@ -454,7 +454,6 @@ public class MessagesTest extends FreeColTestCase {
 
         // King's regulars
         unit = new ServerUnit(game, null, dutchREF, kingsRegular, defaultRole);
-
         assertTrue("King's Regular"
             .equals(unit.getDescription()));
         assertTrue("Dutch Royal Expeditionary Force King's Regular"
@@ -480,7 +479,6 @@ public class MessagesTest extends FreeColTestCase {
 
         // Colonial regulars
         unit = new ServerUnit(game, null, dutch, colonialRegular, defaultRole);
-
         assertTrue("Colonial Regular"
             .equals(unit.getDescription()));
         assertTrue("Dutch Colonial Regular"
@@ -506,7 +504,6 @@ public class MessagesTest extends FreeColTestCase {
 
         // Veteran Soldiers
         unit = new ServerUnit(game, null, dutch, veteranSoldier, soldierRole);
-
         assertTrue("Veteran Soldier"
             .equals(unit.getDescription()));
         assertTrue("Dutch Veteran Soldier"
@@ -517,7 +514,7 @@ public class MessagesTest extends FreeColTestCase {
         unit.changeRole(defaultRole, 0);
         assertTrue("Veteran Soldier"
             .equals(unit.getDescription()));
-        assertTrue("Dutch Veteran Soldier (no muskets)"
+        assertTrue("Dutch Veteran Soldier"
             .equals(unit.getFullDescription(false)));
         assertTrue("Dutch Veteran Soldier (no muskets)"
             .equals(unit.getFullDescription(true)));
@@ -540,7 +537,6 @@ public class MessagesTest extends FreeColTestCase {
 
         // Indian Braves
         unit = new ServerUnit(game, null, sioux, brave, defaultRole);
-
         assertTrue("Brave"
             .equals(unit.getDescription()));
         assertTrue("Sioux Brave"
@@ -582,7 +578,6 @@ public class MessagesTest extends FreeColTestCase {
 
         // Hardy Pioneers
         unit = new ServerUnit(game, null, dutch, hardyPioneer, pioneerRole);
-
         assertTrue("Hardy Pioneer"
             .equals(unit.getDescription()));
         assertTrue("Dutch Hardy Pioneer (100 Tools)"
@@ -593,7 +588,7 @@ public class MessagesTest extends FreeColTestCase {
         unit.changeRole(defaultRole, 0);
         assertTrue("Hardy Pioneer"
             .equals(unit.getDescription()));
-        assertTrue("Dutch Hardy Pioneer (no tools)"
+        assertTrue("Dutch Hardy Pioneer"
             .equals(unit.getFullDescription(false)));
         assertTrue("Dutch Hardy Pioneer (no tools)"
             .equals(unit.getFullDescription(true)));
@@ -601,7 +596,7 @@ public class MessagesTest extends FreeColTestCase {
         unit.setName("Daniel Boone");
         assertTrue("Daniel Boone (Hardy Pioneer)"
             .equals(unit.getDescription()));
-        assertTrue("Daniel Boone (Dutch Hardy Pioneer/no tools)"
+        assertTrue("Daniel Boone (Dutch Hardy Pioneer)"
             .equals(unit.getFullDescription(false)));
         assertTrue("Daniel Boone (Dutch Hardy Pioneer/no tools)"
             .equals(unit.getFullDescription(true)));
@@ -609,7 +604,6 @@ public class MessagesTest extends FreeColTestCase {
         // Jesuit Missionaries
         unit = new ServerUnit(game, null, dutch, jesuitMissionary, 
                               missionaryRole);
-
         assertTrue("Jesuit Missionary"
             .equals(unit.getDescription()));
         assertTrue("Dutch Jesuit Missionary"
@@ -620,14 +614,13 @@ public class MessagesTest extends FreeColTestCase {
         unit.changeRole(defaultRole, 0);
         assertTrue("Jesuit Missionary"
             .equals(unit.getDescription()));
-        assertTrue("Dutch Jesuit Missionary (not commissioned)"
+        assertTrue("Dutch Jesuit Missionary"
             .equals(unit.getFullDescription(false)));
         assertTrue("Dutch Jesuit Missionary (not commissioned)"
             .equals(unit.getFullDescription(true)));
 
         // Free Colonists
         unit = new ServerUnit(game, null, dutch, freeColonist, defaultRole);
-
         assertTrue("Free Colonist"
             .equals(unit.getDescription()));
         assertTrue("Dutch Free Colonist"
@@ -640,7 +633,7 @@ public class MessagesTest extends FreeColTestCase {
             .equals(unit.getDescription()));
         assertTrue("Dutch Soldier (Free Colonist)"
             .equals(unit.getFullDescription(false)));
-        assertTrue("Dutch Free Colonist (50 Muskets)"
+        assertTrue("Dutch Soldier (Free Colonist/50 Muskets)"
             .equals(unit.getFullDescription(true)));
 
         unit.setName("John Doe");
@@ -648,12 +641,11 @@ public class MessagesTest extends FreeColTestCase {
             .equals(unit.getDescription()));
         assertTrue("John Doe (Dutch Soldier/Free Colonist)"
             .equals(unit.getFullDescription(false)));
-        assertTrue("John Doe (Dutch Free Colonist/50 Muskets)" // FIXME: John Doe (Dutch Soldier/Free Colonist/50 Muskets)"
+        assertTrue("John Doe (Dutch Soldier/Free Colonist/50 Muskets)"
             .equals(unit.getFullDescription(true)));
 
         // Expert
         unit = new ServerUnit(game, null, dutch, masterCarpenter, defaultRole);
-
         assertTrue("Master Carpenter"
             .equals(unit.getDescription()));
         assertTrue("Dutch Master Carpenter"
@@ -666,16 +658,15 @@ public class MessagesTest extends FreeColTestCase {
             .equals(unit.getDescription()));
         assertTrue("Dutch Missionary (Master Carpenter)"
             .equals(unit.getFullDescription(false)));
-        assertTrue("Dutch Master Carpenter (1 Bible)" // FIXME: "Dutch Missionary (Master Carpenter/1 Bible)"
+        assertTrue("Dutch Missionary (Master Carpenter/1 Bible)"
             .equals(unit.getFullDescription(true)));
 
         // Treasure Train
         unit = new ServerUnit(game, null, dutch, treasureTrain, defaultRole);
         unit.setTreasureAmount(4567);
-
         assertTrue("Treasure Train"
             .equals(unit.getDescription()));
-        assertTrue("Dutch Treasure Train (4567 gold)"
+        assertTrue("Dutch Treasure Train"
             .equals(unit.getFullDescription(false)));
         assertTrue("Dutch Treasure Train (4567 gold)"
             .equals(unit.getFullDescription(true)));
@@ -683,14 +674,13 @@ public class MessagesTest extends FreeColTestCase {
         unit.setName("The Gold of El Dorado");
         assertTrue("The Gold of El Dorado (Treasure Train)"
             .equals(unit.getDescription()));
-        assertTrue("The Gold of El Dorado (Dutch Treasure Train/4567 gold)"
+        assertTrue("The Gold of El Dorado (Dutch Treasure Train)"
             .equals(unit.getFullDescription(false)));
         assertTrue("The Gold of El Dorado (Dutch Treasure Train/4567 gold)"
             .equals(unit.getFullDescription(true)));
 
         // Caravel
         unit = new ServerUnit(game, null, dutch, caravel, defaultRole);
-
         assertTrue("Caravel"
             .equals(unit.getDescription()));
         assertTrue("Dutch Caravel"

@@ -320,6 +320,10 @@ public class Messages {
         return id + NAME_SUFFIX;
     }
 
+    public static String nameKey(ObjectWithId object) {
+        return nameKey(object.getId());
+    }
+
     public static String getName(String id) {
         return message(nameKey(id));
     }
@@ -430,17 +434,21 @@ public class Messages {
     // Special purpose unit labelling
 
     /**
-     * Get a template for a collection of units given a name, type,
-     * role identifier and number.
+     * Get a label for a collection of units given a name, type,
+     * number, nation, role and extra equipment.
      *
      * @param name An optional unit name.
      * @param typeId The unit type identifier.
-     * @param roleId The unit role identifier.
      * @param number The number of units.
+     * @param nationId An optional nation identifier.
+     * @param roleId The unit role identifier.
+     * @param equipment An optional equipment annotation.
      * @return A <code>StringTemplate</code> to describe the given unit.
      */
-    public static StringTemplate getTemplate(String name, String typeId,
-                                             String roleId, int number) {
+    public static StringTemplate getUnitLabel(String name, String typeId,
+                                              int number, String nationId,
+                                              String roleId,
+                                              String equipment) {
         // Check for special role-specific key, which will not have a
         // %role% argument.  These exist so we can avoid mentioning
         // the role twice, e.g. "Seasoned Scout Scout".
@@ -456,42 +464,129 @@ public class Messages {
                 .addAmount("%number%", number);
             roleKey = Role.getRoleKey(roleId);
         }
+
+        // This is extra brutal, but crash proof.
         StringTemplate ret;
         if (name == null) {
-            if (roleKey == null) {
-                ret = StringTemplate.template("unitFormat.null.null")
-                    .addStringTemplate("%type%", type);
+            if (nationId == null) {
+                if (roleKey == null) {
+                    if (equipment == null) {
+                        ret = StringTemplate.template("unitFormat.null.null.null.null")
+                            .addStringTemplate("%type%", type);
+                    } else {
+                        ret = StringTemplate.template("unitFormat.null.null.null.equip")
+                            .addStringTemplate("%type%", type)
+                            .addName("%equipment%", equipment);
+                    }
+                } else {
+                    if (equipment == null) {
+                        ret = StringTemplate.template("unitFormat.null.null.role.null")
+                            .addStringTemplate("%type%", type)
+                            .add("%role%", roleKey);
+                    } else {
+                        ret = StringTemplate.template("unitFormat.null.null.role.equip")
+                            .addStringTemplate("%type%", type)
+                            .add("%role%", roleKey)
+                            .addName("%equipment%", equipment);
+                    }
+                }
             } else {
-                ret = StringTemplate.template("unitFormat.null.role")
-                    .addStringTemplate("%type%", type)
-                    .add("%role%", roleKey);
+                if (roleKey == null) {
+                    if (equipment == null) {
+                        ret = StringTemplate.template("unitFormat.null.nation.null.null")
+                            .addStringTemplate("%type%", type)
+                            .add("%nation%", nationId);
+                    } else {
+                        ret = StringTemplate.template("unitFormat.null.nation.null.equip")
+                            .addStringTemplate("%type%", type)
+                            .add("%nation%", nationId)
+                            .addName("%equipment%", equipment);
+                    }
+                } else {
+                    if (equipment == null) {
+                        ret = StringTemplate.template("unitFormat.null.nation.role.null")
+                            .addStringTemplate("%type%", type)
+                            .add("%nation%", nationId)
+                            .add("%role%", roleKey);
+                    } else {
+                        ret = StringTemplate.template("unitFormat.null.nation.role.equip")
+                            .addStringTemplate("%type%", type)
+                            .add("%nation%", nationId)
+                            .add("%role%", roleKey)
+                            .addName("%equipment%", equipment);
+                    }
+                }
             }
         } else {
-            if (roleKey == null) {
-                ret = StringTemplate.template("unitFormat.name.null")
-                    .addName("%name%", name)
-                    .addStringTemplate("%type%", type);
+            if (nationId == null) {
+                if (roleKey == null) {
+                    if (equipment == null) {
+                        ret = StringTemplate.template("unitFormat.name.null.null.null")
+                            .addName("%name%", name)
+                            .addStringTemplate("%type%", type);
+                    } else {
+                        ret = StringTemplate.template("unitFormat.name.null.null.equip")
+                            .addName("%name%", name)
+                            .addStringTemplate("%type%", type)
+                            .addName("%equipment%", equipment);
+                    }
+                } else {
+                    if (equipment == null) {
+                        ret = StringTemplate.template("unitFormat.name.null.role.null")
+                            .addName("%name%", name)
+                            .addStringTemplate("%type%", type)
+                            .add("%role%", roleKey);
+                    } else {
+                        ret = StringTemplate.template("unitFormat.name.null.role.equip")
+                            .addName("%name%", name)
+                            .addStringTemplate("%type%", type)
+                            .add("%role%", roleKey)
+                            .addName("%equipment%", equipment);
+                    }
+                }
             } else {
-                ret = StringTemplate.template("unitFormat.name.role")
-                    .addName("%name%", name)
-                    .addStringTemplate("%type%", type)
-                    .add("%role%", roleKey);
+                if (roleKey == null) {
+                    if (equipment == null) {
+                        ret = StringTemplate.template("unitFormat.name.nation.null.null")
+                            .addName("%name%", name)
+                            .addStringTemplate("%type%", type)
+                            .add("%nation%", nationId);
+                    } else {
+                        ret = StringTemplate.template("unitFormat.name.nation.null.equip")
+                            .addName("%name%", name)
+                            .addStringTemplate("%type%", type)
+                            .add("%nation%", nationId)
+                            .addName("%equipment%", equipment);
+                    }
+                } else {
+                    if (equipment == null) {
+                        ret = StringTemplate.template("unitFormat.name.nation.role.null")
+                            .addName("%name%", name)
+                            .addStringTemplate("%type%", type)
+                            .add("%nation%", nationId)
+                            .add("%role%", roleKey);
+                    } else {
+                        ret = StringTemplate.template("unitFormat.name.nation.role.equip")
+                            .addName("%name%", name)
+                            .addStringTemplate("%type%", type)
+                            .add("%nation%", nationId)
+                            .add("%role%", roleKey)
+                            .addName("%equipment%", equipment);
+                    }
+                }
             }
         }
         return ret;
     }
 
     /**
-     * Get a detailed template for a unit.
-     *
-     * TODO: The two getTemplate routines are largely independent ATM.
-     * They should share code.
+     * Get a detailed label for a unit.
      *
      * @param unit The <code>Unit</code> to query.
      * @param equipment Always show all equipment.
      * @return A <code>StringTemplate</code> to describe the unit.
      */
-    public static StringTemplate getFullTemplate(Unit unit, boolean equipment) {
+    public static StringTemplate getUnitLabel(Unit unit, boolean equipment) {
         final UnitType type = unit.getType();
         final Role role = unit.getRole();
         final Player owner = unit.getOwner();
@@ -499,112 +594,59 @@ public class Messages {
             return null; // Probably disposed
         }
 
-        final Role defaultRole = unit.getSpecification().getDefaultRole();
-        String nationName = getName(owner.getNation());
-        String typeName = getName(type);
-        String roleName = getName(role);
-        String extra = typeName;
-        boolean showRole = true, addEquipment = false;
-
-        // First, check for special type-role combinations, such as
-        // model.unit.seasonedScout.scout.  We must handle cases where the
-        // role is implicit in the unit type to avoid calling things
-        // "Seasoned Scout Scout".
-        String roleKey = type.getId() + "." + role.getSuffix();
-        if (role.getMaximumCount() == 1 && containsKey(roleKey)) {
-            typeName = message(StringTemplate.template(roleKey)
-                                             .addAmount("%number%", 1));
-            if (equipment) {
-                addEquipment = true;
-            } else {
-                showRole = false;
-            }
-
-        } else if (defaultRole == role) {
-            if (unit.canCarryTreasure()) {
-                // treasure trains display amount of gold
-                roleName = typeName;
-                extra = message(StringTemplate.template("goldAmount")
-                                .addAmount("%amount%", unit.getTreasureAmount()));
-            } else {
-                boolean noEquipment = false;
-                // unequipped expert has no-equipment label
-                List<Role> expertRoles = type.getExpertRoles();
-                for (Role someRole : expertRoles) {
-                    String key = someRole.getId() + ".noequipment";
-                    if (containsKey(key)) {
-                        roleName = typeName;
-                        extra = message(key);
-                        noEquipment = true;
-                        break;
-                    }
-                }
-                if (!noEquipment) showRole = false; // no extra label
-            }
-        } else if (role.getExpertUnit() == type) {
+        if (role.getExpertUnit() == type && role.getMaximumCount() > 1) {
             // expert equipped as such has no additional label if the
             // amount of equipment must be 1, but if the amount can
             // vary a label is required.
-            if (role.getMaximumCount() > 1 || equipment) {
-                addEquipment = true;
-            } else {
-                showRole = false;
-            }
-        } else if (equipment) {
-            addEquipment = true;
+            equipment = true;
         }
 
-        if (addEquipment) {
-            StringTemplate g = StringTemplate.label("");
-            String equipmentKey = role.getId() + ".equipment";
-            if (Messages.containsKey(equipmentKey)) {
-                // Currently only used for missionary which does not
-                // have equipment that directly corresponds to goods.
-                g.addStringTemplate(StringTemplate
-                    .template("model.goods.goodsAmount")
-                    .add("%goods%", equipmentKey)
-                    .addAmount("%amount%", 1));
+        String extra = null;
+        if (equipment) {
+            if (role.isDefaultRole()) {
+                if (unit.canCarryTreasure()) {
+                    extra = message(StringTemplate.template("goldAmount")
+                        .addAmount("%amount%", unit.getTreasureAmount()));
+                } else {
+                    boolean noEquipment = false;
+                    // unequipped expert has no-equipment label
+                    List<Role> expertRoles = type.getExpertRoles();
+                    for (Role someRole : expertRoles) {
+                        String key = someRole.getId() + ".noequipment";
+                        if (containsKey(key)) {
+                            extra = message(key);
+                            break;
+                        }
+                    }
+                }
             } else {
-                // Other roles can be characterized by their goods.
-                List<AbstractGoods> requiredGoods
-                    = role.getRequiredGoods(unit.getRoleCount());
-                boolean first = true;
-                for (AbstractGoods ag : requiredGoods) {
-                    if (first) first = false; else g.addName(" ");
-                    g.addStringTemplate(StringTemplate
+                String equipmentKey = role.getId() + ".equipment";
+                if (Messages.containsKey(equipmentKey)) {
+                    // Currently only used for missionary which does not
+                    // have equipment that directly corresponds to goods.
+                    extra = message(StringTemplate
                         .template("model.goods.goodsAmount")
-                        .addName("%goods%", ag.getType())
-                        .addAmount("%amount%", ag.getAmount()));
+                        .add("%goods%", equipmentKey)
+                        .addAmount("%amount%", 1));
+                } else {
+                    // Other roles can be characterized by their goods.
+                    List<AbstractGoods> requiredGoods
+                        = role.getRequiredGoods(unit.getRoleCount());
+                    boolean first = true;
+                    StringTemplate g = StringTemplate.label("");
+                    for (AbstractGoods ag : requiredGoods) {
+                        if (first) first = false; else g.addName(" ");
+                        g.addStringTemplate(StringTemplate
+                            .template("model.goods.goodsAmount")
+                            .addName("%goods%", ag.getType())
+                            .addAmount("%amount%", ag.getAmount()));
+                    }
+                    extra = message(g);
                 }
             }
-            extra = message(g);
-            roleName = typeName;
         }
-
-        // model.unit.nationUnit=%nation% %unit%
-        // model.unit.nationUnitRole=%nation% %role% (%extra%)
-        // model.unit.namedNationUnit=%name% (%nation% %unit%)
-        // model.unit.namedNationUnitRole=%name% (%nation% %role%/%extra%)
-        StringTemplate result = null;
-        if (unit.getName() == null) {
-            if (showRole) {
-                result = StringTemplate.template("model.unit.nationUnitRole");
-            } else {
-                result = StringTemplate.template("model.unit.nationUnit");
-            }
-        } else {
-            if (showRole) {
-                result = StringTemplate.template("model.unit.namedNationUnitRole");
-            } else {
-                result = StringTemplate.template("model.unit.namedNationUnit");
-            }
-            result.addName("%name%", unit.getName());
-        }
-        result.addName("%nation%", nationName)
-            .addName("%unit%", typeName)
-            .addName("%role%", roleName)
-            .addName("%extra%", extra);
-        return result;
+        return getUnitLabel(unit.getName(), type.getId(), 1,
+                            nameKey(owner.getNation()), role.getId(), extra);
     }
 
 
