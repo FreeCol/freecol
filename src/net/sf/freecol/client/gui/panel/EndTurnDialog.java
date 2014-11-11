@@ -114,7 +114,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
 
         public UnitWrapper(Unit unit) {
             this.unit = unit;
-            this.name = unit.getFullDescription(false);
+            this.name = unit.getDescription(Unit.UnitLabelType.NATIONAL);
             this.location = Messages.message(unit.getLocation()
                 .getLocationNameFor(unit.getOwner()));
         }

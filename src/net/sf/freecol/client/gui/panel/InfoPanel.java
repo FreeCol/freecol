@@ -370,7 +370,7 @@ public final class InfoPanel extends FreeColPanel {
             if (unit != null) {
                 add(new JLabel(lib.getUnitImageIcon(unit)),
                     "spany, gapafter 5px");
-                String name = unit.getFullDescription(false);
+                String name = unit.getDescription(Unit.UnitLabelType.NATIONAL);
 
                 // TODO: this is too brittle!
                 int index = name.indexOf(" (");
@@ -399,7 +399,7 @@ public final class InfoPanel extends FreeColPanel {
                     for (Unit carriedUnit : unit.getUnitList()) {
                         icon = lib.getUnitImageIcon(carriedUnit, 0.5);
                         label = new JLabel(icon);
-                        text = carriedUnit.getFullDescription(false);
+                        text = carriedUnit.getDescription(Unit.UnitLabelType.NATIONAL);
                         label.setToolTipText(text);
                         add(label);
                     }

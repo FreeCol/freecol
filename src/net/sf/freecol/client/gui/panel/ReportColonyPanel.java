@@ -687,7 +687,8 @@ public final class ReportColonyPanel extends ReportPanel
                     cAlarm,
                     stpl("report.colony.making.noteach.description")
                         .addName("%colony%", colony.getName())
-                        .addStringTemplate("%teacher%", u.getFullLabel(false)));
+                        .addStringTemplate("%teacher%",
+                            u.getLabel(Unit.UnitLabelType.NATIONAL)));
             } else {
                 b = colourButton(cac, Integer.toString(left),
                     lib.getUnitImageIcon(u.getType(),
@@ -695,7 +696,8 @@ public final class ReportColonyPanel extends ReportPanel
                     Color.BLACK,
                     stpl("report.colony.making.educating.description")
                         .addName("%colony%", colony.getName())
-                        .addStringTemplate("%teacher%", u.getFullLabel(false))
+                        .addStringTemplate("%teacher%",
+                            u.getLabel(Unit.UnitLabelType.NATIONAL))
                         .addAmount("%turns%", left));
             }
             reportPanel.add(b);

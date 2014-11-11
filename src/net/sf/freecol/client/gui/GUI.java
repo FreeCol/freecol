@@ -1091,7 +1091,8 @@ public class GUI {
         if (tr == null) return true;
         StringTemplate template
             = StringTemplate.template("traderoute.reassignRoute")
-                .addStringTemplate("%unit%", unit.getFullLabel(false))
+                .addStringTemplate("%unit%",
+                    unit.getLabel(Unit.UnitLabelType.NATIONAL))
                 .addName("%route%", tr.getName());
         return showConfirmDialog(true, unit.getTile(), template,
                                  unit, "yes", "no");

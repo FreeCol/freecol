@@ -321,7 +321,7 @@ public final class UnitLabel extends JLabel
         ImageLibrary lib = gui.getImageLibrary();
         setIcon(lib.getUnitImageIcon(unit));
         setDisabledIcon(lib.getUnitImageIcon(unit, true));
-        setDescriptionLabel(unit.getFullDescription(true));
+        setDescriptionLabel(unit.getDescription(Unit.UnitLabelType.FULL));
         setSmall(isSmall);
         // repaint(0, 0, getWidth(), getHeight());
         // uc.refresh();

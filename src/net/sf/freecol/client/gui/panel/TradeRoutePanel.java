@@ -206,7 +206,8 @@ public final class TradeRoutePanel extends FreeColPanel {
         add(GUI.getDefaultHeader(Messages.message("tradeRoutePanel.name")),
             "span, align center");
         if (this.unit != null && this.unit.getLocation() != null) {
-            JLabel unitLabel = new JLabel(unit.getFullDescription(false));
+            JLabel unitLabel
+                = new JLabel(unit.getDescription(Unit.UnitLabelType.NATIONAL));
             unitLabel.setIcon(getLibrary().getUnitImageIcon(this.unit, 0.5));
             add(unitLabel);
             Location loc = this.unit.getLocation();

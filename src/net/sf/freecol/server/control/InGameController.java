@@ -993,7 +993,7 @@ public final class InGameController extends Controller {
     private StringTemplate unitTemplate(String base, List<Unit> units) {
         StringTemplate template = StringTemplate.label(base);
         for (Unit u : units) {
-            template.addStringTemplate(u.getLabel());
+            template.addStringTemplate(u.getLabel(Unit.UnitLabelType.PLAIN));
         }
         return template;
     }

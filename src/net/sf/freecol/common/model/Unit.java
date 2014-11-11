@@ -268,19 +268,111 @@ public class Unit extends GoodsLocation
         return own.getNationName();
     }
 
+    /** What type of unit label do we want? */
+    public static enum UnitLabelType {
+        PLAIN,      // Just the basics
+        NATIONAL,   // Add the nation
+        FULL        // Add the equipment and extras
+    }
+
     /**
-     * Get a string template for a unit.
-     *
-     * The template contains:
-     * - The type of the unit
-     * - A role if not the default
-     * - The specific name of the unit if it has one
+     * Get a plain string template for a unit.
      *
      * @return The <code>StringTemplate</code> to describe the given unit.
      */
     public StringTemplate getLabel() {
-        return Messages.getUnitLabel(getName(), getType().getId(), 1, null,
-                                     getRole().getId(), null);
+        return getLabel(UnitLabelType.PLAIN);
+    }
+
+    /**
+     * Get a string template for a unit.
+     *
+     * The PLAIN template contains:
+     * - The type of the unit
+     * - A role if not the default
+     * - The specific name of the unit if it has one
+     * The NATIONAL template adds the nation
+     * The FULL template adds equipment annotations
+     *
+     * @param ult The type of label to get.
+     * @return The <code>StringTemplate</code> to describe the given unit.
+     */
+    public StringTemplate getLabel(UnitLabelType ult) {
+        final UnitType type = getType();
+        final Role role = getRole();
+        final Player owner = getOwner();
+        if (type == null || role == null || owner == null) {
+            return null; // Probably disposed
+        }
+
+        switch (ult) {
+        case PLAIN:
+            return Messages.getUnitLabel(getName(), type.getId(), 1, null,
+                                         role.getId(), null);
+
+        case NATIONAL:
+            if (role.getExpertUnit() == type && role.getMaximumCount() > 1) {
+                // Expert equipped as such has no additional label if
+                // the amount of equipment must be 1, but if the
+                // amount can vary a label is required, so fall through
+                // into the FULL case.
+            } else {
+                return Messages.getUnitLabel(getName(), type.getId(), 1,
+                                             Messages.nameKey(owner.getNation()), 
+                                             role.getId(), null);
+            }
+            // Fall through
+
+        case FULL:
+            String extra = null;
+            if (role.isDefaultRole()) {
+                if (canCarryTreasure()) {
+                    extra = Messages.message(StringTemplate.template("goldAmount")
+                        .addAmount("%amount%", getTreasureAmount()));
+                } else {
+                    boolean noEquipment = false;
+                    // unequipped expert has no-equipment label
+                    List<Role> expertRoles = type.getExpertRoles();
+                    for (Role someRole : expertRoles) {
+                        String key = someRole.getId() + ".noequipment";
+                        if (Messages.containsKey(key)) {
+                            extra = Messages.message(key);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                String equipmentKey = role.getId() + ".equipment";
+                if (Messages.containsKey(equipmentKey)) {
+                    // Currently only used for missionary which does not
+                    // have equipment that directly corresponds to goods.
+                    extra = Messages.message(StringTemplate
+                        .template("model.goods.goodsAmount")
+                        .add("%goods%", equipmentKey)
+                        .addAmount("%amount%", 1));
+                } else {
+                    // Other roles can be characterized by their goods.
+                    List<AbstractGoods> requiredGoods
+                        = role.getRequiredGoods(getRoleCount());
+                    boolean first = true;
+                    StringTemplate g = StringTemplate.label("");
+                    for (AbstractGoods ag : requiredGoods) {
+                        if (first) first = false; else g.addName(" ");
+                        g.addStringTemplate(StringTemplate
+                            .template("model.goods.goodsAmount")
+                            .addName("%goods%", ag.getType())
+                            .addAmount("%amount%", ag.getAmount()));
+                    }
+                    extra = Messages.message(g);
+                }
+            }
+            return Messages.getUnitLabel(getName(), type.getId(), 1,
+                                         Messages.nameKey(owner.getNation()), 
+                                         role.getId(), extra);
+        default: // Can not happen
+            break;
+        }
+        return null;
     }
 
     /**
@@ -293,31 +385,13 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Get a detailed string template for a unit.
+     * Get the basic i18n description for this unit.
      *
-     * This routine extends getLabel() with:
-     * - The nation
-     * - information about treasure if the unit is a treasure train
-     * - missing expected equipment given the unit role
-     * - equipment if the amount can vary (pioneers), or the equipment
-     *   flag is true (only user is the UnitLabel descriptionLabel)
-     *
-     * @param equipment If true always list all equipment.
-     * @return The <code>StringTemplate</code> to fully describe the
-     *      given unit.
+     * @param ult The label type required.
+     * @return A <code>String</code> describing this unit.
      */
-    public StringTemplate getFullLabel(boolean equipment) {
-        return Messages.getUnitLabel(this, equipment);
-    }
-
-    /**
-     * Get the full i18n description for this unit.
-     *
-     * @param equipment If true always list all equipment.
-     * @return The full <code>String</code> describing this unit.
-     */
-    public String getFullDescription(boolean equipment) {
-        return Messages.message(Messages.getUnitLabel(this, equipment));
+    public String getDescription(UnitLabelType ult) {
+        return Messages.message(getLabel(ult));
     }
 
     /**
@@ -3157,7 +3231,8 @@ public class Unit extends GoodsLocation
 
         return (leavingColony)
             ? StringTemplate.template("abandonEducation.text")
-                            .addStringTemplate("%unit%", getFullLabel(false))
+                            .addStringTemplate("%unit%",
+                                getLabel(UnitLabelType.NATIONAL))
                             .addName("%colony%", getColony().getName())
                             .add("%building%", school.getNameKey())
                             .addName("%action%", (teacher)
@@ -3165,7 +3240,7 @@ public class Unit extends GoodsLocation
                                 : Messages.message("abandonEducation.action.studying"))
             : (teacher)
             ? StringTemplate.template("abandonTeaching.text")
-                            .addStringTemplate("%unit%", getFullLabel(false))
+                            .addStringTemplate("%unit%", getLabel(UnitLabelType.NATIONAL))
                             .add("%building%", school.getNameKey())
             : null;
     }

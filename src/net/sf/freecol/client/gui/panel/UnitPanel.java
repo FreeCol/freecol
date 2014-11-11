@@ -107,7 +107,8 @@ public abstract class UnitPanel extends MigPanel
                     = new UnitLabel(portPanel.getFreeColClient(), unit);
                 TradeRoute tradeRoute = unit.getTradeRoute();
                 if (tradeRoute != null) {
-                    unitLabel.setDescriptionLabel(unit.getFullDescription(false)
+                    unitLabel.setDescriptionLabel(unit
+                        .getDescription(Unit.UnitLabelType.NATIONAL)
                         + " (" + tradeRoute.getName() + ")");
                 }
                 if (editable) {

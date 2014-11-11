@@ -231,7 +231,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
                                                        unit.getRole().getId());
         JButton button = GUI.getLinkButton("", icon, unit.getLocation().getId());
         button.addActionListener(this);
-        String toolTip = unit.getFullDescription(false);
+        String toolTip = unit.getDescription(Unit.UnitLabelType.NATIONAL);
         if (unit.getDestination() != null) {
             String type = unit.isPerson()
                 ? "person"
