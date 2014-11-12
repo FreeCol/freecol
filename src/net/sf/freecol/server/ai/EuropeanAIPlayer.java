@@ -2579,23 +2579,31 @@ public class EuropeanAIPlayer extends AIPlayer {
                 cash = item;
                 int gold = ((GoldTradeItem)item).getGold();
                 if (item.getSource() == player) {
-                    value = -gold;
+                    value = (player.checkGold(gold)) ? -gold
+                        : Integer.MIN_VALUE;
                 } else {
                     value = gold;
                 }
 
             } else if (item instanceof ColonyTradeItem) {
+                Colony colony = item.getColony(getGame());
                 if (item.getSource() == player) {
-                    if (player.getNumberOfSettlements() < 5) {
+                    if (!player.owns(colony)
+                        || player.getNumberOfSettlements() < 5) {
                         value = Integer.MIN_VALUE;
                     } else {
-                        value = -evaluateColony(item.getColony(getGame()));
+                        value = -evaluateColony(colony);
                     }
                 } else {
-                    value = evaluateColony(item.getColony(getGame()));
+                    if (player.owns(colony)) {
+                        value = Integer.MIN_VALUE;
+                    } else {
+                        value = evaluateColony(colony);
+                    }
                 }
 
             } else if (item instanceof GoodsTradeItem) {
+                // TODO: Unchecked!
                 Goods goods = ((GoodsTradeItem)item).getGoods();
                 if (item.getSource() == player) {
                     value = -market.getBidPrice(goods.getType(),
@@ -2605,12 +2613,11 @@ public class EuropeanAIPlayer extends AIPlayer {
                                                 goods.getAmount());
                 }
 
-            } else if (item instanceof InciteTradeItem) {
-                // TODO, rebalance this
+            } else if (item instanceof InciteTradeItem) { // TODO, rebalance
                 Player victim = item.getVictim();
                 switch (player.getStance(victim)) {
                 case ALLIANCE:
-                    value = -1;
+                    value = Integer.MIN_VALUE;
                     break;
                 case WAR: // Not invalid, other player may not know our stance
                     value = 0;
@@ -2640,7 +2647,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                     }
                     break;
                 case PEACE:
-                    if (agreement.getContext() == DiplomaticTrade.TradeContext.CONTACT) {
+                    if (agreement.getContext()
+                        == DiplomaticTrade.TradeContext.CONTACT) {
                         peace = item;
                         value = 0;
                         break;
@@ -2660,21 +2668,25 @@ public class EuropeanAIPlayer extends AIPlayer {
                         value = 1000;
                     }                       
                     break;
-                case UNCONTACTED:
-                default:
+                case UNCONTACTED: default:
                     value = Integer.MIN_VALUE;
                     break;
                 }
 
             } else if (item instanceof UnitTradeItem) {
+                Unit unit = item.getUnit();
                 if (item.getSource() == player) {
-                    if (player.getUnits().size() < 10) {
+                    if (!player.owns(unit) || player.getUnits().size() < 10) {
                         value = Integer.MIN_VALUE;
                     } else {
-                        value = -evaluateUnit(item.getUnit());
+                        value = -evaluateUnit(unit);
                     }
                 } else {
-                    value = evaluateUnit(item.getUnit());
+                    if (player.owns(unit)) {
+                        value = Integer.MIN_VALUE; // Invalid
+                    } else {
+                        value = evaluateUnit(unit);
+                    }
                 }
 
             } else {
@@ -2707,7 +2719,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             // If the result is non-negative,
             // accept/propose-without-unacceptable
             if (value >= 0) {
-                result = (agreement.getContext() == DiplomaticTrade.TradeContext.CONTACT
+                result = (agreement.getContext()
+                    == DiplomaticTrade.TradeContext.CONTACT
                     && agreement.getVersion() == 0) ? TradeStatus.PROPOSE_TRADE
                     : (unacceptable == 0) ? TradeStatus.ACCEPT_TRADE
                     : (agreement.isEmpty()) ? TradeStatus.REJECT_TRADE

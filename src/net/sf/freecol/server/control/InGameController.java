@@ -62,6 +62,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.HighSeas;
@@ -78,6 +79,7 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationSummary;
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
@@ -3041,34 +3043,90 @@ public final class InGameController extends Controller {
      * @param agreement The <code>DiplomacyTrade</code> agreement.
      * @param session The <code>DiplomacySession</code> in scope.
      * @param cs A <code>ChangeSet</code> to update.
+     * @return True if the trade was valid.
      */
-    private void csAcceptTrade(DiplomaticTrade agreement,
-                               DiplomacySession session, ChangeSet cs) {
+    private boolean csAcceptTrade(DiplomaticTrade agreement,
+                                  DiplomacySession session, ChangeSet cs) {
         final ServerPlayer srcPlayer = (ServerPlayer)agreement.getSender();
         final ServerPlayer dstPlayer = (ServerPlayer)agreement.getRecipient();
         final Unit unit = session.getUnit();
         final Settlement settlement = session.getSettlement();
         boolean visibilityChange = false;
 
+        // Check trade carefully before committing.
+        boolean fail = false;
         for (TradeItem tradeItem : agreement.getTradeItems()) {
-            // Check trade carefully before committing.
+            final ServerPlayer source = (ServerPlayer)tradeItem.getSource();
+            final ServerPlayer dest = (ServerPlayer)tradeItem.getDestination();
             if (!tradeItem.isValid()) {
                 logger.warning("Trade with invalid tradeItem: " + tradeItem);
+                fail = true;
                 continue;
             }
-            ServerPlayer source = (ServerPlayer)tradeItem.getSource();
             if (source != srcPlayer && source != dstPlayer) {
                 logger.warning("Trade with invalid source: "
                                + ((source == null) ? "null" : source.getId()));
+                fail = true;
                 continue;
             }
-            ServerPlayer dest = (ServerPlayer)tradeItem.getDestination();
             if (dest != srcPlayer && dest != dstPlayer) {
                 logger.warning("Trade with invalid destination: "
                                + ((dest == null) ? "null" : dest.getId()));
+                fail = true;
                 continue;
             }
 
+            Colony colony = tradeItem.getColony(getGame());
+            if (colony != null && !source.owns(colony)) {
+                logger.warning("Trade with invalid source owner: " + colony);
+                fail = true;
+                continue;
+            }
+            int gold = tradeItem.getGold();
+            if (gold > 0 && !source.checkGold(gold)) {
+                logger.warning("Trade with invalid gold: " + gold);
+                fail = true;
+                continue;
+            }
+
+            Goods goods = tradeItem.getGoods();
+            if (goods != null) {
+                Location loc = goods.getLocation();
+                if (loc instanceof Ownable
+                    && !source.owns((Ownable)loc)) {
+                    logger.warning("Trade with invalid source owner: " + loc);
+                    fail = true;
+                } else if (!(loc instanceof GoodsLocation
+                        && ((GoodsLocation)loc).contains(goods))) {
+                    logger.warning("Trade of unavailable goods " + goods
+                        + " at " + loc);
+                    fail = true;
+                } else if (dest.owns(unit) && !unit.couldCarry(goods)) {
+                    logger.warning("Trade unit can not carry traded goods: "
+                        + goods);
+                    fail = true;
+                }
+            }
+
+            // Stance trade fail is harmless
+            Unit u = tradeItem.getUnit();
+            if (u != null) {
+                if (!source.owns(u)) {
+                    logger.warning("Trade with invalid source owner: " + u);
+                    fail = true;
+                    continue;
+                } else if (dest.owns(unit) && !unit.couldCarry(u)) {
+                    logger.warning("Trade unit can not carry traded unit: "
+                        + u);
+                    fail = true;
+                }
+            }
+        }
+        if (fail) return false;
+
+        for (TradeItem tradeItem : agreement.getTradeItems()) {
+            final ServerPlayer source = (ServerPlayer)tradeItem.getSource();
+            final ServerPlayer dest = (ServerPlayer)tradeItem.getDestination();
             // Collect changes for updating.  Not very OO but
             // TradeItem should not know about server internals.
             // Take care to show items that change hands to the *old*
@@ -3098,11 +3156,13 @@ public final class InGameController extends Controller {
             }
             Goods goods = tradeItem.getGoods();
             if (goods != null && settlement != null) {
-                if (settlement.getOwner() == dest) {
+                if (dest.owns(settlement)) {
+                    goods.setLocation(unit);
                     moveGoods(goods, settlement);
                     cs.add(See.only(source), unit);
                     cs.add(See.only(dest), settlement.getGoodsContainer());
                 } else {
+                    goods.setLocation(settlement);
                     moveGoods(goods, unit);
                     cs.add(See.only(dest), unit);
                     cs.add(See.only(source), settlement.getGoodsContainer());
@@ -3143,6 +3203,7 @@ public final class InGameController extends Controller {
             srcPlayer.invalidateCanSeeTiles();//+vis(srcPlayer)
             dstPlayer.invalidateCanSeeTiles();//+vis(dstPlayer)
         }
+        return true;
     }
 
     /**
@@ -3217,14 +3278,16 @@ public final class InGameController extends Controller {
         case ACCEPT_TRADE:
             // Process the agreement that was sent!
             agreement = session.getAgreement();
-            agreement.setStatus(status);
-            csAcceptTrade(agreement, session, cs);
-            session.complete(cs);
-            sendToOthers(serverPlayer, cs);
-            return false;
+            agreement.setStatus(TradeStatus.ACCEPT_TRADE);
+            if (csAcceptTrade(agreement, session, cs)) {
+                session.complete(cs);
+                sendToOthers(serverPlayer, cs);
+                return false;
+            }
+            // Trade was invalid, fall through into rejection.
         case REJECT_TRADE: default:
             agreement = session.getAgreement();
-            agreement.setStatus(status);
+            agreement.setStatus(TradeStatus.REJECT_TRADE);
             session.complete(cs);
             sendToOthers(serverPlayer, cs);
             return false;
@@ -3250,12 +3313,15 @@ public final class InGameController extends Controller {
             break;
         case ACCEPT_TRADE:
             agreement = session.getAgreement(); // Accept offered agreement
-            agreement.setStatus(status);
-            csAcceptTrade(agreement, session, cs);
-            session.complete(cs);
-            sendToOthers(serverPlayer, cs);
-            break;
+            agreement.setStatus(TradeStatus.ACCEPT_TRADE);
+            if (csAcceptTrade(agreement, session, cs)) {
+                session.complete(cs);
+                sendToOthers(serverPlayer, cs);
+                return false;
+            }
+            // Trade was invalid, fall through into rejection.
         case REJECT_TRADE: default:
+            agreement.setStatus(TradeStatus.REJECT_TRADE);
             session.setAgreement(agreement);
             session.complete(cs);
             sendToOthers(serverPlayer, cs);

@@ -68,7 +68,8 @@ public class InciteTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     public boolean isValid() {
-        return victim != null;
+        return victim != null && victim != getSource()
+            && victim != getDestination();
     }
 
     /**

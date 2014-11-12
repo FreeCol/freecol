@@ -3986,7 +3986,6 @@ public final class InGameController implements NetworkConstants {
         // Look for active units.
         Player player = freeColClient.getMyPlayer();
         Unit unit = gui.getActiveUnit();
-System.err.println("NAU " + unit + ((unit != null && !unit.isDisposed() && unit.couldMove())));
         if (unit != null && !unit.isDisposed()
             && unit.couldMove()) return; // Current active unit has more to do.
         if (player.hasNextActiveUnit()) {

@@ -34,7 +34,7 @@ public class GoodsTradeItem extends TradeItem {
     
     /** The goods to change hands. */
     private Goods goods;
-        
+
 
     /**
      * Creates a new <code>GoodsTradeItem</code> instance.
@@ -68,9 +68,10 @@ public class GoodsTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     public boolean isValid() {
-        Location loc = goods.getLocation();
-        return (loc instanceof Ownable)
-            && ((Ownable)loc).getOwner() == getSource();
+        return goods != null && goods.getType() != null
+            && goods.getAmount() > 0
+            && (goods.getLocation() instanceof Ownable)
+            && getSource().owns((Ownable)goods.getLocation());
     }
     
     /**

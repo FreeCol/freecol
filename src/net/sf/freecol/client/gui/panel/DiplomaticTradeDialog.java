@@ -60,6 +60,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.InciteTradeItem;
@@ -297,7 +298,6 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         private JButton clearButton, addButton;
         private JLabel label;
         private final List<Goods> allGoods;
-
 
         /**
          * Creates a new <code>GoodsTradeItemPanel</code> instance.
@@ -833,14 +833,17 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         case TRADE:
             this.stancePanel = null;
             this.colonyDemandPanel = this.colonyOfferPanel = null;
-            this.goodsDemandPanel = new GoodsTradeItemPanel(otherPlayer,
-                                                            getAnyGoods());
-            List<Goods> goods = (ourUnit != null) ? ourUnit.getGoodsList()
+            GoodsLocation gl = (otherUnit != null) ? otherUnit : otherColony;
+            List<Goods> goods = getAnyGoods(gl);
+            this.goodsDemandPanel = new GoodsTradeItemPanel(otherPlayer, goods);
+            gl = (ourUnit != null) ? ourUnit : ourColony;
+            goods = (ourUnit != null) ? ourUnit.getGoodsList()
                 : ourColony.getCompactGoods();
             for (Goods g : goods) {
                 if (g.getAmount() > GoodsContainer.CARGO_SIZE) {
                     g.setAmount(GoodsContainer.CARGO_SIZE);
                 }
+                g.setLocation(gl);
             }
             this.goodsOfferPanel = new GoodsTradeItemPanel(player, goods);
             this.inciteOfferPanel = this.inciteDemandPanel = null;
@@ -946,18 +949,19 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
      * Gets a list of all possible storable goods (one cargo load).
      * Note that these goods are fictional.  They are the goods that
      * *might* be in the other player's store.  Therefore they have a
-     * null location (using the other player unit or settlement is not
-     * valid on the client side, as there may not even be a
-     * GoodsContainer present).
+     * bogus location (i.e. not the actual goods container).
      *
+     * @param gl The <code>GoodsLocation</code> for the goods.
      * @return A list of storable <code>Goods</code>.
      */
-    private List<Goods> getAnyGoods() {
+    private List<Goods> getAnyGoods(GoodsLocation gl) {
         List<Goods> goodsList = new ArrayList<Goods>();
         for (GoodsType type : getSpecification().getGoodsTypeList()) {
             if (type.isStorable()) {
-                goodsList.add(new Goods(getGame(), null, type,
-                                        GoodsContainer.CARGO_SIZE));
+                Goods g = new Goods(getGame(), null, type,
+                                    GoodsContainer.CARGO_SIZE);
+                g.setLocation(gl);
+                goodsList.add(g);
             }
         }
         return goodsList;
@@ -1122,8 +1126,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         final Player player = getMyPlayer();
 
         Player destination = (source == otherPlayer) ? player : otherPlayer;
-        agreement.add(new GoodsTradeItem(getGame(), source, destination,
-                                         goods));
+        agreement.add(new GoodsTradeItem(getGame(), source, destination, goods));
         updateDialog();
     }
 

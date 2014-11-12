@@ -118,7 +118,7 @@ public abstract class TradeItem extends FreeColObject {
     // The following routines must be supplied/overridden by the subclasses.
 
     /**
-     * Is this trade item valid?
+     * Is this trade item valid?  That is, is the request well formed.
      *
      * @return True if the item is valid.
      */
