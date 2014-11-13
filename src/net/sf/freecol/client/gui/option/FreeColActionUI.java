@@ -162,29 +162,6 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
-    public JPanel getComponent() {
-        return panel;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void updateOption() {
-        getOption().setAccelerator(keyStroke);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void reset() {
-        keyStroke = getOption().getAccelerator();
-        bl.setText(getHumanKeyStrokeText(keyStroke));
-    }
-
-
     // Interface ActionListener
 
     /**
@@ -289,5 +266,30 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
                 repaint();
             }
         }
+    }
+
+
+    // Implement OptionUI
+
+    /**
+     * {@inheritDoc}
+     */
+    public JPanel getComponent() {
+        return panel;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void updateOption() {
+        getOption().setAccelerator(keyStroke);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void reset() {
+        keyStroke = getOption().getAccelerator();
+        bl.setText(getHumanKeyStrokeText(keyStroke));
     }
 }

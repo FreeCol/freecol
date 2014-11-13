@@ -38,6 +38,30 @@ import net.sf.freecol.common.option.ModOption;
  */
 public final class ModOptionUI extends OptionUI<ModOption>  {
 
+
+    private static class ChoiceRenderer extends FreeColComboBoxRenderer {
+
+        @Override
+        public void setLabelValues(JLabel label, Object value) {
+            FreeColModFile modFile = null;
+            if (value instanceof FreeColModFile) {
+                modFile = (FreeColModFile) value;
+            } else if (value instanceof ModOption) {
+                modFile = (FreeColModFile) ((ModOption) value).getValue();
+            }
+            if (modFile == null) {
+                label.setText(value.toString());
+            } else {
+                String key = "mod." + modFile.getId();
+                label.setText(Messages.getName(key));
+                if (Messages.containsKey(key + Messages.SHORT_DESCRIPTION_SUFFIX)) {
+                    label.setToolTipText(Messages.getShortDescription(key));
+                }
+            }
+        }
+    }
+
+
     private JComboBox box = new JComboBox();
 
     /**
@@ -62,6 +86,16 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
         initialize();
     }
 
+
+    // Implement OptionUI
+
+    /**
+     * {@inheritDoc}
+     */
+    public ListCellRenderer getListCellRenderer() {
+        return new ChoiceRenderer();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -72,40 +106,14 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
     /**
      * {@inheritDoc}
      */
-    public void reset() {
-        box.setSelectedItem(getOption().getValue());
+    public JComboBox getComponent() {
+        return box;
     }
 
     /**
      * {@inheritDoc}
      */
-    public JComboBox getComponent() {
-        return box;
-    }
-
-    private static class ChoiceRenderer extends FreeColComboBoxRenderer {
-
-        @Override
-        public void setLabelValues(JLabel label, Object value) {
-            FreeColModFile modFile = null;
-            if (value instanceof FreeColModFile) {
-                modFile = (FreeColModFile) value;
-            } else if (value instanceof ModOption) {
-                modFile = (FreeColModFile) ((ModOption) value).getValue();
-            }
-            if (modFile == null) {
-                label.setText(value.toString());
-            } else {
-                String key = "mod." + modFile.getId();
-                label.setText(Messages.getName(key));
-                if (Messages.containsKey(key + Messages.SHORT_DESCRIPTION_SUFFIX)) {
-                    label.setToolTipText(Messages.getShortDescription(key));
-                }
-            }
-        }
-    }
-
-    public ListCellRenderer getListCellRenderer() {
-        return new ChoiceRenderer();
+    public void reset() {
+        box.setSelectedItem(getOption().getValue());
     }
 }

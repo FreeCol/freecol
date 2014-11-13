@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.option;
 
+import javax.swing.JComponent;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
@@ -61,10 +62,13 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
         initialize();
     }
 
+
+    // Implement OptionUI
+
     /**
      * {@inheritDoc}
      */
-    public JSpinner getComponent() {
+    public JComponent getComponent() {
         return spinner;
     }
 
@@ -81,6 +85,4 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
     public void reset() {
         spinner.setValue(getOption().getValue());
     }
-
-
 }

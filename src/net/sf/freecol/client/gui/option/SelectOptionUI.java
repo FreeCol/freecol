@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.option;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -35,6 +36,7 @@ import net.sf.freecol.common.option.SelectOption;
 public final class SelectOptionUI extends OptionUI<SelectOption> {
 
     private JComboBox box = new JComboBox();
+
 
     /**
      * Creates a new <code>SelectOptionUI</code> for the given
@@ -61,6 +63,16 @@ public final class SelectOptionUI extends OptionUI<SelectOption> {
         initialize();
     }
 
+
+    // Implement OptionUI
+
+    /**
+     * {@inheritDoc}
+     */
+    public JComponent getComponent() {
+        return box;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -74,12 +86,4 @@ public final class SelectOptionUI extends OptionUI<SelectOption> {
     public void reset() {
         box.setSelectedIndex(getOption().getValue());
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public JComboBox getComponent() {
-        return box;
-    }
-
 }

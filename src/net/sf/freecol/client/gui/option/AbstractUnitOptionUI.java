@@ -55,6 +55,35 @@ import net.sf.freecol.common.option.UnitTypeOption;
 public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     implements ItemListener {
 
+    private class AbstractUnitRenderer extends FreeColComboBoxRenderer {
+
+        @Override
+        public void setLabelValues(JLabel label, Object value) {
+            final Specification spec = getOption().getSpecification();
+            AbstractUnit au = (AbstractUnit)((AbstractUnitOption)value)
+                .getValue();
+            String key = au.getId();
+            if (au.getType(spec).hasAbility(Ability.CAN_BE_EQUIPPED)
+                && !Specification.DEFAULT_ROLE_ID.equals(au.getRoleId())) {
+                key = au.getRoleId();
+            }
+            StringTemplate template = StringTemplate.template(Messages.nameKey(key))
+                .addAmount("%number%", au.getNumber())
+                .add("%unit%", Messages.nameKey(au.getId()));
+            label.setText(Integer.toString(au.getNumber()) + " "
+                          + Messages.message(template));
+        }
+    }
+
+    private static class RoleRenderer extends FreeColComboBoxRenderer {
+
+        @Override
+        public void setLabelValues(JLabel label, Object value) {
+            label.setText(Messages.getName((String)value));
+        }
+    }
+
+
     private JPanel panel;
     private IntegerOptionUI numberUI;
     private UnitTypeOptionUI typeUI;
@@ -107,6 +136,31 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
 
     }
 
+
+    @SuppressWarnings("unchecked") // FIXME in Java7
+    public void itemStateChanged(ItemEvent e) {
+        JComboBox box = roleUI.getComponent();
+        UnitType type = (UnitType) typeUI.getComponent().getSelectedItem();
+        if (type.hasAbility(Ability.CAN_BE_EQUIPPED)) {
+            box.setModel(new DefaultComboBoxModel(roleUI.getOption().getChoices().toArray(new String[0])));
+            box.setEnabled(roleEditable);
+        } else {
+            box.setModel(new DefaultComboBoxModel(new String[] {
+                        Specification.DEFAULT_ROLE_ID }));
+            box.setEnabled(false);
+        }
+    }
+
+
+    // Implement OptionUI
+
+    /**
+     * {@inheritDoc}
+     */
+    public ListCellRenderer getListCellRenderer() {
+        return new AbstractUnitRenderer();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -129,58 +183,11 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     }
 
     /**
-     * Reset with the value from the option.
+     * {@inheritDoc}
      */
     public void reset() {
         typeUI.reset();
         roleUI.reset();
         numberUI.reset();
-    }
-
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    public void itemStateChanged(ItemEvent e) {
-        JComboBox box = roleUI.getComponent();
-        UnitType type = (UnitType) typeUI.getComponent().getSelectedItem();
-        if (type.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-            box.setModel(new DefaultComboBoxModel(roleUI.getOption().getChoices().toArray(new String[0])));
-            box.setEnabled(roleEditable);
-        } else {
-            box.setModel(new DefaultComboBoxModel(new String[] {
-                        Specification.DEFAULT_ROLE_ID }));
-            box.setEnabled(false);
-        }
-    }
-
-
-    private static class RoleRenderer extends FreeColComboBoxRenderer {
-
-        @Override
-        public void setLabelValues(JLabel label, Object value) {
-            label.setText(Messages.getName((String)value));
-        }
-    }
-
-    public ListCellRenderer getListCellRenderer() {
-        return new AbstractUnitRenderer();
-    }
-
-    private class AbstractUnitRenderer extends FreeColComboBoxRenderer {
-
-        @Override
-        public void setLabelValues(JLabel label, Object value) {
-            final Specification spec = getOption().getSpecification();
-            AbstractUnit au = (AbstractUnit)((AbstractUnitOption)value)
-                .getValue();
-            String key = au.getId();
-            if (au.getType(spec).hasAbility(Ability.CAN_BE_EQUIPPED)
-                && !Specification.DEFAULT_ROLE_ID.equals(au.getRoleId())) {
-                key = au.getRoleId();
-            }
-            StringTemplate template = StringTemplate.template(Messages.nameKey(key))
-                .addAmount("%number%", au.getNumber())
-                .add("%unit%", Messages.nameKey(au.getId()));
-            label.setText(Integer.toString(au.getNumber()) + " "
-                          + Messages.message(template));
-        }
     }
 }

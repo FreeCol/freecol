@@ -47,12 +47,16 @@ public final class BooleanOptionUI extends OptionUI<BooleanOption>  {
         initialize();
     }
 
+
     /**
      * Sets the value of this UI's component.
      */
     public void setValue(boolean b) {
         box.setSelected(b);
     }
+
+
+    // Implement OptionUI
 
     /**
      * {@inheritDoc}

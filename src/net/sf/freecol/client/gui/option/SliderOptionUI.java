@@ -43,14 +43,16 @@ public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
      * Creates a new <code>SliderOptionUI</code> for the given
      * <code>IntegerOption</code>.
      *
-     * @param option The <code>IntegerOption</code> to make a user interface for
+     * @param option The <code>IntegerOption</code> to make a user
+     *     interface for.
      * @param editable boolean whether user can modify the setting
      */
     public SliderOptionUI(GUI gui, final T option, boolean editable) {
         super(gui, option, editable);
 
-        slider.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
-                                                          super.getJLabel().getText()));
+        slider.setBorder(BorderFactory
+            .createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
+                                super.getJLabel().getText()));
         slider.setOrientation(JSlider.HORIZONTAL);
         slider.setPreferredSize(new Dimension(500, 50));
         slider.setPaintLabels(true);
@@ -60,11 +62,11 @@ public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
         initialize();
     }
 
+
+    // Implement OptionUI
+
     /**
-     * Returns <code>null</code>, since this OptionUI does not require
-     * an external label.
-     *
-     * @return null
+     * {@inheritDoc}
      */
     @Override
     public final JLabel getJLabel() {
@@ -91,5 +93,4 @@ public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
     public void reset() {
         slider.setValue(getOption().getValue());
     }
-
 }

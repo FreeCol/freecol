@@ -50,9 +50,11 @@ public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {
 
         JSlider slider = getComponent();
 
-        slider.setModel(new DefaultBoundedRangeModel(option.getValueRank(), 0, 0, option.getItemValues().size() - 1));
+        slider.setModel(new DefaultBoundedRangeModel(option.getValueRank(), 0,
+                0, option.getItemValues().size() - 1));
 
-        Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
+        Hashtable<Integer, JComponent> labels
+            = new Hashtable<Integer, JComponent>();
         int index = 0;
         for (String string : option.getItemValues().values()) {
             if (option.localizeLabels()) {
@@ -69,6 +71,9 @@ public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {
         slider.setSnapToTicks(true);
     }
 
+
+    // Implement OptionUpdater
+
     /**
      * {@inheritDoc}
      */
@@ -84,6 +89,4 @@ public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {
     public void reset() {
         getComponent().setValue(getOption().getValueRank());
     }
-
-
 }

@@ -39,27 +39,45 @@ import net.sf.freecol.common.option.UnitTypeOption;
  */
 public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
 
+    private static class ChoiceRenderer extends FreeColComboBoxRenderer {
+
+        @Override
+        public void setLabelValues(JLabel label, Object value) {
+            if (value == null) {
+                label.setText(Messages.message("none"));
+            } else {
+                label.setText(Messages.getName((UnitType) value));
+            }
+        }
+    }
+
     private JComboBox box = new JComboBox();
 
+
     /**
-     * Creates a new <code>UnitTypeOptionUI</code> for the given <code>UnitTypeOption</code>.
+     * Creates a new <code>UnitTypeOptionUI</code> for the given
+     * <code>UnitTypeOption</code>.
      *
-     * @param option The <code>UnitTypeOption</code> to make a user interface for
+     * @param option The <code>UnitTypeOption</code> to make a user
+     *     interface for.
      * @param editable boolean whether user can modify the setting
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public UnitTypeOptionUI(GUI gui, final UnitTypeOption option, boolean editable) {
+    public UnitTypeOptionUI(GUI gui, final UnitTypeOption option,
+                            boolean editable) {
         super(gui, option, editable);
 
-
         List<UnitType> choices = option.getChoices();
-
-        box.setModel(new DefaultComboBoxModel(choices.toArray(new UnitType[choices.size()])));
+        box.setModel(new DefaultComboBoxModel(choices
+                .toArray(new UnitType[choices.size()])));
         box.setSelectedItem(option.getValue());
         box.setRenderer(new ChoiceRenderer());
 
         initialize();
     }
+
+
+    // Implement OptionUI
 
     /**
      * {@inheritDoc}
@@ -80,17 +98,5 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
      */
     public void reset() {
         box.setSelectedItem(getOption().getValue());
-    }
-
-    private static class ChoiceRenderer extends FreeColComboBoxRenderer {
-
-        @Override
-        public void setLabelValues(JLabel label, Object value) {
-            if (value == null) {
-                label.setText(Messages.message("none"));
-            } else {
-                label.setText(Messages.getName((UnitType) value));
-            }
-        }
     }
 }

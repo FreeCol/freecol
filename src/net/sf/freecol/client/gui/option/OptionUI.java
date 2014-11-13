@@ -79,6 +79,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
         label.setToolTipText(text);
     }
 
+
     /**
      * Set up component.
      */
@@ -88,7 +89,6 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
         component.setEnabled(editable);
         component.setOpaque(false);
     }
-
 
     /**
      * Get the <code>Option</code> value.
@@ -127,6 +127,54 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
     }
 
     /**
+     * Get an option UI for a given option.
+     *
+     * @param gui The <code>GUI</code> to use.
+     * @param option The <code>Option</code> to check.
+     * @param editable Should the result be editable.
+     * @return A suitable <code>OptionUI</code>, or null if none found.
+     */
+    @SuppressWarnings("unchecked")
+    public static OptionUI getOptionUI(GUI gui, Option option, boolean editable) {
+        if (option instanceof BooleanOption) {
+            return new BooleanOptionUI(gui, (BooleanOption)option, editable);
+        } else if (option instanceof FileOption) {
+            return new FileOptionUI(gui, (FileOption)option, editable);
+        } else if (option instanceof PercentageOption) {
+            return new PercentageOptionUI(gui, (PercentageOption)option, editable);
+        } else if (option instanceof RangeOption) {
+            return new RangeOptionUI(gui, (RangeOption)option, editable);
+        } else if (option instanceof SelectOption) {
+            return new SelectOptionUI(gui, (SelectOption)option, editable);
+        } else if (option instanceof IntegerOption) {
+            return new IntegerOptionUI(gui, (IntegerOption)option, editable);
+        } else if (option instanceof StringOption) {
+            return new StringOptionUI(gui, (StringOption)option, editable);
+        } else if (option instanceof LanguageOption) {
+            return new LanguageOptionUI(gui, (LanguageOption)option, editable);
+        } else if (option instanceof AudioMixerOption) {
+            return new AudioMixerOptionUI(gui, (AudioMixerOption)option, editable);
+        } else if (option instanceof FreeColAction) {
+            return new FreeColActionUI(gui, (FreeColAction)option, editable);
+        } else if (option instanceof AbstractUnitOption) {
+            return new AbstractUnitOptionUI(gui, (AbstractUnitOption)option, editable);
+        } else if (option instanceof ModOption) {
+            return new ModOptionUI(gui, (ModOption)option, editable);
+        } else if (option instanceof UnitListOption) {
+            return new ListOptionUI(gui, (UnitListOption)option, editable);
+        } else if (option instanceof ModListOption) {
+            return new ListOptionUI(gui, (ModListOption)option, editable);
+        } else if (option instanceof TextOption) {
+            return new TextOptionUI(gui, (TextOption)option, editable);
+        } else {
+            return null;
+        }
+    }
+
+
+    // Routines to be implemented/overridden
+
+    /**
      * Get the <code>Label</code> value.
      *
      * @return a <code>JLabel</code> value
@@ -142,6 +190,15 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
      */
     protected void setLabel(JLabel label) {
         this.label = label;
+    }
+
+    /**
+     * Get a ListCellRenderer suitable for the wrapped Option.
+     *
+     * @return A suitable ListCellRenderer.
+     */
+    public ListCellRenderer getListCellRenderer() {
+        return null;
     }
 
     /**
@@ -161,52 +218,4 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
      * Reset the value of the UI's component from the Option.
      */
     public abstract void reset();
-
-    /**
-     * Returns a ListCellRenderer suitable for the Option wrapped.
-     *
-     * @return a ListCellRenderer
-     */
-    public ListCellRenderer getListCellRenderer() {
-        return null;
-    }
-
-
-    @SuppressWarnings("unchecked")
-    public static OptionUI getOptionUI(GUI gui, Option option, boolean editable) {
-        if (option instanceof BooleanOption) {
-            return new BooleanOptionUI(gui, (BooleanOption) option, editable);
-        } else if (option instanceof FileOption) {
-            return new FileOptionUI(gui, (FileOption) option, editable);
-        } else if (option instanceof PercentageOption) {
-            return new PercentageOptionUI(gui, (PercentageOption) option, editable);
-        } else if (option instanceof RangeOption) {
-            return new RangeOptionUI(gui, (RangeOption) option, editable);
-        } else if (option instanceof SelectOption) {
-            return new SelectOptionUI(gui, (SelectOption) option, editable);
-        } else if (option instanceof IntegerOption) {
-            return new IntegerOptionUI(gui, (IntegerOption) option, editable);
-        } else if (option instanceof StringOption) {
-            return new StringOptionUI(gui, (StringOption) option, editable);
-        } else if (option instanceof LanguageOption) {
-            return new LanguageOptionUI(gui, (LanguageOption) option, editable);
-        } else if (option instanceof AudioMixerOption) {
-            return new AudioMixerOptionUI(gui, (AudioMixerOption) option, editable);
-        } else if (option instanceof FreeColAction) {
-            return new FreeColActionUI(gui, (FreeColAction) option, editable);
-        } else if (option instanceof AbstractUnitOption) {
-            return new AbstractUnitOptionUI(gui, (AbstractUnitOption) option, editable);
-        } else if (option instanceof ModOption) {
-            return new ModOptionUI(gui, (ModOption) option, editable);
-        } else if (option instanceof UnitListOption) {
-            return new ListOptionUI(gui, (UnitListOption) option, editable);
-        } else if (option instanceof ModListOption) {
-            return new ListOptionUI(gui, (ModListOption) option, editable);
-        } else if (option instanceof TextOption) {
-            return new TextOptionUI(gui, (TextOption) option, editable);
-        } else {
-            return null;
-        }
-    }
-
 }

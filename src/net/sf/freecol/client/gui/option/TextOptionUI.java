@@ -34,18 +34,24 @@ public final class TextOptionUI extends OptionUI<TextOption>  {
 
     private JTextField box = new JTextField(16);
 
+
     /**
-     * Creates a new <code>TextOptionUI</code> for the given <code>TextOption</code>.
+     * Creates a new <code>TextOptionUI</code> for the given
+     * <code>TextOption</code>.
      *
-     * @param option The <code>TextOption</code> to make a user interface for
-     * @param editable boolean whether user can modify the setting
+     * @param option The <code>TextOption</code> to make a user interface for.
+     * @param editable boolean whether user can modify the setting.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public TextOptionUI(GUI gui, final TextOption option, boolean editable) {
         super(gui, option, editable);
+
         box.setText(option.getValue());
         initialize();
     }
+
+
+    // Implement OptionUI
 
     /**
      * {@inheritDoc}
@@ -67,5 +73,4 @@ public final class TextOptionUI extends OptionUI<TextOption>  {
     public void reset() {
         box.setText(getOption().getValue());
     }
-
 }

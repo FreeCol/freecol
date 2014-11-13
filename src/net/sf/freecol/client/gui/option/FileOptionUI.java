@@ -119,6 +119,9 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         reset();
     }
 
+
+    // Implement OptionUI
+
     /**
      * {@inheritDoc}
      */

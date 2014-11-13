@@ -81,8 +81,9 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                         boolean editable) {
         super(gui, option, editable);
 
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
-                                                         super.getJLabel().getText()));
+        panel.setBorder(BorderFactory
+            .createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
+                                super.getJLabel().getText()));
         panel.setLayout(new MigLayout("wrap 2, fill", "[fill, grow]20[fill]"));
 
         model = new DefaultListModel();
@@ -91,7 +92,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 AbstractOption<T> c = o.clone();
                 model.addElement(c);
             } catch (CloneNotSupportedException e) {
-                logger.log(Level.WARNING, "Can not clone" + o.getId(), e);
+                logger.log(Level.WARNING, "Can not clone " + o.getId(), e);
             }
         }
         list = new JList(model);
@@ -110,76 +111,96 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         panel.add(pane, "grow, spany 5");
 
         for (JButton button : new JButton[] {
-                editButton, addButton, removeButton, upButton, downButton}) {
+                editButton, addButton, removeButton, upButton, downButton }) {
             button.setEnabled(editable);
             panel.add(button);
         }
 
         addButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                AbstractOption<T> oldValue
-                    = (AbstractOption<T>)list.getSelectedValue();
-                if (oldValue == null) oldValue = option.getTemplate();
-                try {
-                    AbstractOption<T> newValue = oldValue.clone();
-                    if (gui.showEditOptionDialog(newValue)) {
-                        if (option.canAdd(newValue)) {
-                            model.addElement(newValue);
-                            list.setSelectedValue(newValue, true);
+                public void actionPerformed(ActionEvent event) {
+                    AbstractOption<T> oldValue
+                        = (AbstractOption<T>)list.getSelectedValue();
+                    if (oldValue == null) oldValue = option.getTemplate();
+                    try {
+                        AbstractOption<T> newValue = (oldValue == null) ? null
+                            : oldValue.clone();
+                        if (gui.showEditOptionDialog(newValue)) {
+                            if (option.canAdd(newValue)) {
+                                model.addElement(newValue);
+                                list.setSelectedValue(newValue, true);
+                                list.repaint();
+                            }
+                        }
+                    } catch (CloneNotSupportedException e) {
+                        logger.log(Level.WARNING, "Can not clone: " + oldValue,
+                                   e);
+                    }
+                }
+            });
+        editButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    Object object = list.getSelectedValue();
+                    if (object != null) {
+                        if (gui.showEditOptionDialog((Option)object)) {
                             list.repaint();
                         }
                     }
-                } catch (CloneNotSupportedException e) {
-                    logger.log(Level.WARNING, "Can not clone: " + oldValue, e);
                 }
-            }
-        });
-        editButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Object object = list.getSelectedValue();
-                if (object != null) {
-                    if (gui.showEditOptionDialog((Option) object)) {
-                        list.repaint();
-                    }
-                }
-            }
-        });
+            });
         removeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                model.removeElementAt(list.getSelectedIndex());
-            }
-        });
+                public void actionPerformed(ActionEvent e) {
+                    model.removeElementAt(list.getSelectedIndex());
+                }
+            });
         upButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (list.getSelectedIndex() == 0) return;
-                final int index = list.getSelectedIndex();
-                final Object temp = model.getElementAt(index);
-                model.setElementAt(model.getElementAt(index-1), index);
-                model.setElementAt(temp, index-1);
-                list.setSelectedIndex(index-1);
-            }
-        });
+                public void actionPerformed(ActionEvent e) {
+                    if (list.getSelectedIndex() == 0) return;
+                    final int index = list.getSelectedIndex();
+                    final Object temp = model.getElementAt(index);
+                    model.setElementAt(model.getElementAt(index-1), index);
+                    model.setElementAt(temp, index-1);
+                    list.setSelectedIndex(index-1);
+                }
+            });
         downButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (list.getSelectedIndex() == model.getSize() - 1) return;
-                final int index = list.getSelectedIndex();
-                final Object temp = model.getElementAt(index);
-                model.setElementAt(model.getElementAt(index+1), index);
-                model.setElementAt(temp, index+1);
-                list.setSelectedIndex(index+1);
-            }
-        });
+                public void actionPerformed(ActionEvent e) {
+                    if (list.getSelectedIndex() == model.getSize() - 1) return;
+                    final int index = list.getSelectedIndex();
+                    final Object temp = model.getElementAt(index);
+                    model.setElementAt(model.getElementAt(index+1), index);
+                    model.setElementAt(temp, index+1);
+                    list.setSelectedIndex(index+1);
+                }
+            });
 
         list.addListSelectionListener(this);
         initialize();
     }
 
+    public void valueChanged(ListSelectionEvent e) {
+        if (e.getValueIsAdjusting() == false) {
+            boolean enabled = (isEditable() && list.getSelectedValue() != null);
+            editButton.setEnabled(enabled);
+            removeButton.setEnabled(enabled);
+            upButton.setEnabled(enabled);
+            downButton.setEnabled(enabled);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<AbstractOption<T>> getValue() {
+        List<AbstractOption<T>> result = new ArrayList<AbstractOption<T>>();
+        for (Enumeration e = model.elements(); e.hasMoreElements();) {
+            result.add((AbstractOption<T>) e.nextElement());
+        }
+        return result;
+    }
+
+
+    // Implement OptionUI
 
     /**
-     * Returns <code>null</code>, since this OptionUI does not require
-     * an external label.
-     *
-     * @return Null.
+     * {@inheritDoc}
      */
     @Override
     public final JLabel getJLabel() {
@@ -194,24 +215,14 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     }
 
     /**
-     * Updates the value of the
-     * {@link net.sf.freecol.common.option.Option} this object keeps.
+     * {@inheritDoc}
      */
     public void updateOption() {
         getOption().setValue(getValue());
     }
 
-    @SuppressWarnings("unchecked")
-    private List<AbstractOption<T>> getValue() {
-        List<AbstractOption<T>> result = new ArrayList<AbstractOption<T>>();
-        for (Enumeration e = model.elements(); e.hasMoreElements();) {
-            result.add((AbstractOption<T>) e.nextElement());
-        }
-        return result;
-    }
-
     /**
-     * Reset with the value from the Option.
+     * {@inheritDoc}
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public void reset() {
@@ -221,13 +232,4 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         }
     }
 
-    public void valueChanged(ListSelectionEvent e) {
-        if (e.getValueIsAdjusting() == false) {
-            boolean enabled = (isEditable() && list.getSelectedValue() != null);
-            editButton.setEnabled(enabled);
-            removeButton.setEnabled(enabled);
-            upButton.setEnabled(enabled);
-            downButton.setEnabled(enabled);
-        }
-    }
 }

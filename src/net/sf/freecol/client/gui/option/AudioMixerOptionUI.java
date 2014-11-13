@@ -118,11 +118,10 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
     }
 
 
+    // Implement OptionUI
+
     /**
-     * Returns <code>null</code>, since this OptionUI does not require
-     * an external label.
-     *
-     * @return null
+     * {@inheritDoc}
      */
     @Override
     public final JLabel getJLabel() {
@@ -141,7 +140,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
      * {@link net.sf.freecol.common.option.Option} this object keeps.
      */
     public void updateOption() {
-        getOption().setValue((MixerWrapper) cbox.getSelectedItem());
+        getOption().setValue((MixerWrapper)cbox.getSelectedItem());
     }
 
     /**

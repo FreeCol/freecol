@@ -41,16 +41,19 @@ public final class PercentageOptionUI extends SliderOptionUI<PercentageOption>  
      * Creates a new <code>PercentageOptionUI</code> for the given
      * <code>PercentageOption</code>.
      *
-     * @param option The <code>PercentageOption</code> to make a user interface for
+     * @param option The <code>PercentageOption</code> to make a user
+     *     interface for.
      * @param editable boolean whether user can modify the setting
      */
-    public PercentageOptionUI(GUI gui, final PercentageOption option, boolean editable) {
+    public PercentageOptionUI(GUI gui, final PercentageOption option,
+                              boolean editable) {
         super(gui, option, editable);
 
         JSlider slider = getComponent();
 
         slider.setModel(new DefaultBoundedRangeModel(option.getValue(), 0, 0, 100));
-        Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
+        Hashtable<Integer, JComponent> labels
+            = new Hashtable<Integer, JComponent>();
         labels.put(Integer.valueOf(0),   new JLabel("0 %"));
         labels.put(Integer.valueOf(25),  new JLabel("25 %"));
         labels.put(Integer.valueOf(50),  new JLabel("50 %"));
@@ -61,5 +64,4 @@ public final class PercentageOptionUI extends SliderOptionUI<PercentageOption>  
         slider.setMajorTickSpacing(5);
         slider.setSnapToTicks(false);
     }
-
 }

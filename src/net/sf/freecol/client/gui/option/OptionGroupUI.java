@@ -164,12 +164,16 @@ public final class OptionGroupUI extends MigPanel
     }
 
     /**
-     * Updates the value of the
-     * {@link net.sf.freecol.common.option.Option} this object keeps.
+     * Removes the given <code>KeyStroke</code> from all of this
+     * <code>OptionGroupUI</code>'s children.
+     *
+     * @param keyStroke The <code>KeyStroke</code> to be removed.
      */
-    public void updateOption() {
+    public void removeKeyStroke(KeyStroke keyStroke) {
         for (OptionUpdater optionUpdater : optionUpdaters) {
-            optionUpdater.updateOption();
+            if (optionUpdater instanceof FreeColActionUI) {
+                ((FreeColActionUI) optionUpdater).removeKeyStroke(keyStroke);
+            }
         }
     }
 
@@ -202,22 +206,20 @@ public final class OptionGroupUI extends MigPanel
         }
     }
 
+
+    // Implement OptionUpdater
+
     /**
-     * Removes the given <code>KeyStroke</code> from all of this
-     * <code>OptionGroupUI</code>'s children.
-     *
-     * @param keyStroke The <code>KeyStroke</code> to be removed.
+     * {@inheritDoc}
      */
-    public void removeKeyStroke(KeyStroke keyStroke) {
+    public void updateOption() {
         for (OptionUpdater optionUpdater : optionUpdaters) {
-            if (optionUpdater instanceof FreeColActionUI) {
-                ((FreeColActionUI) optionUpdater).removeKeyStroke(keyStroke);
-            }
+            optionUpdater.updateOption();
         }
     }
 
     /**
-     * Reset with the value from the option.
+     * {@inheritDoc}
      */
     public void reset() {
         for (OptionUpdater optionUpdater : optionUpdaters) {
