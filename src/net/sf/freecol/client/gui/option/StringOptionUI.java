@@ -38,7 +38,8 @@ import net.sf.freecol.common.option.StringOption;
  */
 public final class StringOptionUI extends OptionUI<StringOption>  {
 
-    private JComboBox box = new JComboBox();
+    private JComboBox<String> box = new JComboBox<String>();
+
 
     /**
      * Creates a new <code>StringOptionUI</code> for the given
@@ -46,19 +47,17 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
      *
      * @param option The <code>StringOption</code> to make a user
      *     interface for.
-     * @param editable boolean whether user can modify the setting
+     * @param editable Whether user can modify the setting.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public StringOptionUI(GUI gui, final StringOption option,
                           boolean editable) {
         super(gui, option, editable);
 
         List<String> choices = option.getChoices();
-
-        box.setModel(new DefaultComboBoxModel(choices
+        box.setModel(new DefaultComboBoxModel<String>(choices
                 .toArray(new String[choices.size()])));
         box.setSelectedItem(option.getValue());
-        box.setRenderer(new FreeColComboBoxRenderer("", true));
+        box.setRenderer(new FreeColComboBoxRenderer<String>("", true));
 
         initialize();
     }
@@ -69,7 +68,7 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
     /**
      * {@inheritDoc}
      */
-    public JComboBox getComponent() {
+    public JComboBox<String> getComponent() {
         return box;
     }
 
@@ -77,7 +76,7 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
      * {@inheritDoc}
      */
     public void updateOption() {
-        getOption().setValue((String) box.getSelectedItem());
+        getOption().setValue((String)box.getSelectedItem());
     }
 
     /**

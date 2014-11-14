@@ -36,12 +36,15 @@ public final class BooleanOptionUI extends OptionUI<BooleanOption>  {
 
 
     /**
-     * Creates a new <code>BooleanOptionUI</code> for the given <code>BooleanOption</code>.
+     * Creates a new <code>BooleanOptionUI</code> for the given
+     * <code>BooleanOption</code>.
      *
-     * @param option The <code>BooleanOption</code> to make a user interface for.
-     * @param editable boolean whether user can modify the setting
+     * @param option The <code>BooleanOption</code> to make a user
+     *     interface for.
+     * @param editable Whether user can modify the setting.
      */
-    public BooleanOptionUI(GUI gui, final BooleanOption option, boolean editable) {
+    public BooleanOptionUI(GUI gui, final BooleanOption option,
+                           boolean editable) {
         super(gui, option, editable);
         setValue(option.getValue());
         initialize();
