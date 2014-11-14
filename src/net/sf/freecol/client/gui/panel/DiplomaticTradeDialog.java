@@ -113,7 +113,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         implements ActionListener {
 
         private final Player source;
-        private JComboBox colonyBox;
+        private JComboBox<Colony> colonyBox;
         private JButton clearButton, addButton;
         private JLabel label;
         private final List<Colony> allColonies;
@@ -126,7 +126,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          */
         public ColonyTradeItemPanel(Player source) {
             this.source = source;
-            this.colonyBox = new JComboBox();
+            this.colonyBox = new JComboBox<Colony>();
             this.clearButton
                 = new JButton(Messages.message("negotiationDialog.clear"));
             this.clearButton.addActionListener(this);
@@ -152,7 +152,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         }
 
 
-        @SuppressWarnings("unchecked") // FIXME in Java7
+        /**
+         * Update this panel.
+         *
+         * @param dt The <code>DiplomaticTrade</code> to update with.
+         */
         private void update(DiplomaticTrade dt) {
             if (!source.isEuropean()) return;
 
@@ -249,6 +253,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         }
 
 
+        /**
+         * Update this panel.
+         *
+         * @param dt The <code>DiplomaticTrade</code> to update with.
+         */
         public void update(DiplomaticTrade dt) {
             int gold = dt.getGoldGivenBy(source);
             if (gold >= 0) {
@@ -281,23 +290,27 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         implements ActionListener {
 
         private class GoodsBoxRenderer extends JLabel
-            implements ListCellRenderer {
+            implements ListCellRenderer<Goods> {
 
-            public Component getListCellRendererComponent(JList list,
-                Object value, int index, boolean isSelected,
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Component getListCellRendererComponent(JList<? extends Goods> list,
+                Goods value, int index, boolean isSelected,
                 boolean cellHasFocus) {
-                Goods goods = (Goods)value;
-                setText((goods == null) ? ""
-                    : Messages.message(goods.getLabel(true)));
+                setText((value == null) ? ""
+                    : Messages.message(value.getLabel(true)));
                 return this;
             }
         }
 
         private final Player source;
-        private JComboBox goodsBox;
+        private JComboBox<Goods> goodsBox;
         private JButton clearButton, addButton;
         private JLabel label;
         private final List<Goods> allGoods;
+
 
         /**
          * Creates a new <code>GoodsTradeItemPanel</code> instance.
@@ -306,10 +319,9 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          *     goods (this may be totally fictional).
          * @param allGoods The <code>Goods</code> to trade.
          */
-        @SuppressWarnings("unchecked") // FIXME in Java7
         public GoodsTradeItemPanel(Player source, List<Goods> allGoods) {
             this.source = source;
-            this.goodsBox = new JComboBox(new DefaultComboBoxModel());
+            this.goodsBox = new JComboBox<Goods>(new DefaultComboBoxModel<Goods>());
             this.goodsBox.setRenderer(new GoodsBoxRenderer());
             this.clearButton
                 = new JButton(Messages.message("negotiationDialog.clear"));
@@ -336,7 +348,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         }
 
 
-        @SuppressWarnings("unchecked") // FIXME in Java7
+        /**
+         * Update this panel.
+         *
+         * @param dt The <code>DiplomaticTrade</code> to update with.
+         */
         public void update(DiplomaticTrade dt) {
             // Remove all action listeners, so the update has no
             // effect (except updating the list).
@@ -398,21 +414,24 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         implements ActionListener {
 
         private class InciteBoxRenderer extends JLabel
-            implements ListCellRenderer {
+            implements ListCellRenderer<Player> {
 
-            public Component getListCellRendererComponent(JList list,
-                Object value, int index, boolean isSelected,
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Component getListCellRendererComponent(JList<? extends Player> list,
+                Player value, int index, boolean isSelected,
                 boolean cellHasFocus) {
-                Player victim = (Player)value;
-                setText((victim == null) ? ""
-                    : Messages.message(victim.getNationName()));
+                setText((value == null) ? ""
+                    : Messages.message(value.getNationName()));
                 return this;
             }
         }
 
         private final Player source;
         private final Player other;
-        private JComboBox victimBox;
+        private JComboBox<Player> victimBox;
         private JLabel label;
         private JButton clearButton, addButton;
         private final List<Player> available = new ArrayList<Player>();
@@ -424,11 +443,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          * @param source The <code>Player</code> that is trading.
          * @param other The <code>Player</code> negotiated with.
          */
-        @SuppressWarnings("unchecked") // FIXME in Java7
         public InciteTradeItemPanel(Player source, Player other) {
             this.source = source;
             this.other = other;
-            this.victimBox = new JComboBox(new DefaultComboBoxModel());
+            this.victimBox = new JComboBox<Player>(new DefaultComboBoxModel<Player>());
             this.victimBox.setRenderer(new InciteBoxRenderer());
             this.clearButton
                 = new JButton(Messages.message("negotiationDialog.clear"));
@@ -462,7 +480,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         }
 
 
-        @SuppressWarnings("unchecked") // FIXME in Java7
+        /**
+         * Update this panel.
+         *
+         * @param dt The <code>DiplomaticTrade</code> to update with.
+         */
         public void update(DiplomaticTrade dt) {
             // Remove all action listeners, so the update has no
             // effect (except updating the list).
@@ -515,21 +537,24 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         implements ActionListener {
 
         private class StanceBoxRenderer extends JLabel
-            implements ListCellRenderer {
+            implements ListCellRenderer<Stance> {
 
-            public Component getListCellRendererComponent(JList list,
-                Object value, int index, boolean isSelected,
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Component getListCellRendererComponent(JList<? extends Stance> list,
+                Stance value, int index, boolean isSelected,
                 boolean cellHasFocus) {
-                Stance stance = (Stance)value;
-                setText((stance == null) ? ""
-                    : Messages.message(stance.getLabel()));
+                setText((value == null) ? ""
+                    : Messages.message(value.getLabel()));
                 return this;
             }
         }
 
         private Player source;
         private Player target;
-        private JComboBox stanceBox;
+        private JComboBox<Stance> stanceBox;
         private JButton clearButton, addButton;
 
 
@@ -539,11 +564,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          * @param source The <code>Player</code> offering the stance change.
          * @param target The <code>Player</code> to consider the stance change.
          */
-        @SuppressWarnings("unchecked") // FIXME in Java7
         public StanceTradeItemPanel(Player source, Player target) {
             this.source = source;
             this.target = target;
-            this.stanceBox = new JComboBox(new DefaultComboBoxModel());
+            this.stanceBox = new JComboBox<Stance>(new DefaultComboBoxModel<Stance>());
             this.stanceBox.setRenderer(new StanceBoxRenderer());
             this.clearButton
                 = new JButton(Messages.message("negotiationDialog.clear"));
@@ -566,15 +590,24 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         }
 
 
+        /**
+         * Select the item with a given stance.
+         *
+         * @param stance The <code>Stance</code> to select.
+         */
         private void setSelectedValue(Stance stance) {
             for (int i = 0; i < stanceBox.getItemCount(); i++) {
-                if (((Stance)stanceBox.getItemAt(i)) == stance) {
+                if (stanceBox.getItemAt(i) == stance) {
                     stanceBox.setSelectedItem(i);
                 }
             }
         }
 
-        @SuppressWarnings("unchecked") // FIXME in Java7
+        /**
+         * Update this panel with a given trade.
+         *
+         * @param dt The <code>DiplomaticTrade</code> to update with.
+         */
         public void update(DiplomaticTrade dt) {
             stanceBox.removeAllItems();
 
@@ -618,19 +651,22 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         implements ActionListener {
 
         private class UnitBoxRenderer extends JLabel
-            implements ListCellRenderer {
+            implements ListCellRenderer<Unit> {
 
-            public Component getListCellRendererComponent(JList list,
-                Object value, int index, boolean isSelected,
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Component getListCellRendererComponent(JList<? extends Unit> list,
+                Unit value, int index, boolean isSelected,
                 boolean cellHasFocus) {
-                Unit unit = (Unit)value;
-                setText((unit == null) ? "" : unit.getDescription());
+                setText((value == null) ? "" : value.getDescription());
                 return this;
             }
         }
 
         private final Player source;
-        private JComboBox unitBox;
+        private JComboBox<Unit> unitBox;
         private JButton clearButton, addButton;
         private JLabel label;
         private final List<Unit> allUnits;
@@ -643,10 +679,9 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          *     unit (this may be totally fictional).
          * @param allUnits The <code>Unit</code>s to trade.
          */
-        @SuppressWarnings("unchecked") // FIXME in Java7
         public UnitTradeItemPanel(Player source, List<Unit> allUnits) {
             this.source = source;
-            this.unitBox = new JComboBox(new DefaultComboBoxModel());
+            this.unitBox = new JComboBox<Unit>(new DefaultComboBoxModel<Unit>());
             this.unitBox.setRenderer(new UnitBoxRenderer());
             this.clearButton
                 = new JButton(Messages.message("negotiationDialog.clear"));
@@ -673,7 +708,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         }
 
 
-        @SuppressWarnings("unchecked") // FIXME in Java7
+        /**
+         * Update this panel with a given trade.
+         *
+         * @param dt The <code>DiplomaticTrade</code> to update with.
+         */
         private void update(DiplomaticTrade dt) {
             // Remove all action listeners, so the update has no
             // effect (except updating the list).
