@@ -75,10 +75,11 @@ public final class TradeRoutePanel extends FreeColPanel {
     private final Unit unit;
 
     /** The list model describing the players trade routes. */
-    private final DefaultListModel listModel = new DefaultListModel();
+    private final DefaultListModel<TradeRoute> listModel
+        = new DefaultListModel<TradeRoute>();
 
     /** The list of trade routes to display. */
-    private JList tradeRoutes;
+    private JList<TradeRoute> tradeRoutes;
 
     /** A map of trade route to the number of units using it. */
     private final Map<TradeRoute, Integer> counts
@@ -100,14 +101,13 @@ public final class TradeRoutePanel extends FreeColPanel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The optional <code>Unit</code> to operate on.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public TradeRoutePanel(FreeColClient freeColClient, Unit unit) {
         super(freeColClient, new MigLayout("wrap 2", "[fill][fill]"));
 
         final Player player = getMyPlayer();
 
         this.unit = unit;
-        this.tradeRoutes = new JList(listModel);
+        this.tradeRoutes = new JList<TradeRoute>(listModel);
         this.tradeRoutes.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     updateButtons();
