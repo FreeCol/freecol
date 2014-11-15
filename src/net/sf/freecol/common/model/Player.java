@@ -2266,17 +2266,14 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Checks if this player has at least one Man-of-War.
+     * Checks if this player has at least one of a given unit type.
      *
-     * @return True if this player owns at least one Man-of-War.
+     * @param typeId The identifier for the unit type to check.
+     * @return True if this player owns at least one of the specified unit type.
      */
-    public boolean hasManOfWar() {
-        Iterator<Unit> it = getUnitIterator();
-        while (it.hasNext()) {
-            Unit unit = it.next();
-            if ("model.unit.manOWar".equals(unit.getType().getId())) {
-                return true;
-            }
+    public boolean hasUnitType(String typeId) {
+        for (Unit u : getUnits()) {
+            if (typeId.equals(u.getType().getId())) return true;
         }
         return false;
     }

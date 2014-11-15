@@ -359,7 +359,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals("Cash in increases gold by the treasure amount",
                      100, dutch.getGold() - oldGold);
 
-        // Succeed from a port
+        // Fail from a port while galleon exists, then succeed
         treasure = new ServerUnit(game, tile, dutch, treasureTrainType);
         treasure.setTreasureAmount(100);
         Colony port = getStandardColony(1, 9, 4);
@@ -368,7 +368,10 @@ public class InGameControllerTest extends FreeColTestCase {
         assertTrue("Standard colony is connected to Europe",
                    port.isConnectedPort());
         treasure.setLocation(port.getTile());
-        assertTrue("Can cash in treasure from a port",
+        assertFalse("Can not cash in treasure from a port (galleon exists)",
+                   treasure.canCashInTreasureTrain());
+        dutch.removeUnit(ship);
+        assertTrue("Can cash in treasure from a port (galleon gone)",
                    treasure.canCashInTreasureTrain());
 
         // Fail from a landlocked colony
