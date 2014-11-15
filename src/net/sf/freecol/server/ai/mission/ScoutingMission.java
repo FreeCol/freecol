@@ -61,9 +61,11 @@ public class ScoutingMission extends Mission {
     private static final String tag = "AI scout";
 
     /**
-     * The target for this mission.  Either a tile with an LCR, a
-     * native settlement to talk to the chief of, or a player colony
-     * to retarget from.
+     * The target for this mission.
+     * - A tile with an LCR
+     * - A native settlement to talk to the chief of
+     * - A player colony to retarget from
+     * - An unexplored tile
      */
     private Location target;
 
@@ -141,7 +143,9 @@ public class ScoutingMission extends Mission {
             : (loc instanceof IndianSettlement)
             ? 2000 / (path.getTotalTurns() + 1)
             : (loc instanceof Tile)
-            ? 1000 / (path.getTotalTurns() + 1)
+            ? ((((Tile)loc).hasLostCityRumour())
+                ? 1000 / (path.getTotalTurns() + 1)
+                : 50 / (path.getTotalTurns() + 1))
             : Integer.MIN_VALUE;
     }
 
@@ -308,11 +312,11 @@ public class ScoutingMission extends Mission {
      * @param tile The <code>Tile</code> to test.
      * @return A reason why the mission would be invalid, or null if none found.
      */
-    private static String invalidTileReason(@SuppressWarnings("unused") AIUnit aiUnit,
-                                            Tile tile) {
+    private static String invalidTileReason(AIUnit aiUnit, Tile tile) {
         return (tile == null) ? "tile-null"
-            : (!tile.hasLostCityRumour()) ? "tile-lacks-rumour"
-            : null;
+            : (tile.hasLostCityRumour()) ? null
+            : (!tile.isExploredBy(aiUnit.getUnit().getOwner())) ? null
+            : "explored-tile-lacks-rumour";
     }
 
     /**

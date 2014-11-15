@@ -440,15 +440,15 @@ public class FreeColTestCase extends TestCase {
                 }
             }
 
+            map.resetContiguity();
+            map.resetHighSeasCount();
             if (exploredByAll) {
-                for (Player player : game.getPlayers()) {
-                    for (Tile tile : map.getAllTiles()) {
+                for (Tile tile : map.getAllTiles()) {
+                    for (Player player : game.getLiveEuropeanPlayers(null)) {
                         tile.setExplored(player, true);
                     }
                 }
             }
-            map.resetContiguity();
-            map.resetHighSeasCount();
             return map;
         }
 

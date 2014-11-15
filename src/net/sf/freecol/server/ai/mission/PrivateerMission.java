@@ -57,8 +57,10 @@ public class PrivateerMission extends Mission {
     private static String tag = "AI privateer";
 
     /**
-     * The target for this mission.  Either a port location to drop off
-     * plunder, or a unit to attack.
+     * The target for this mission.
+     * - A port location to drop off plunder
+     * - A unit to attack
+     * - An unexplored tile
      */
     private Location target;
 
@@ -164,6 +166,8 @@ public class PrivateerMission extends Mission {
             return 1000 / (path.getTotalTurns() + 1);
         } else if (loc instanceof Unit) {
             return scoreUnit(aiUnit, (Unit)loc) / (path.getTotalTurns() + 1);
+        } else if (loc instanceof Tile) {
+            return 50 / (path.getTotalTurns() + 1);
         } else {
             return Integer.MIN_VALUE;
         }
@@ -307,6 +311,7 @@ public class PrivateerMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
+        final Player owner = aiUnit.getUnit().getOwner();
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
             ? reason
@@ -315,11 +320,14 @@ public class PrivateerMission extends Mission {
             : (loc == null)
             ? null
             : (loc instanceof Europe)
-            ? invalidTargetReason(loc, aiUnit.getUnit().getOwner())
+            ? invalidTargetReason(loc, owner)
             : (loc instanceof Settlement)
             ? invalidSettlementReason(aiUnit, (Settlement)loc)
             : (loc instanceof Unit)
             ? invalidUnitReason(aiUnit, (Unit)loc)
+            : (loc instanceof Tile)
+            ? ((((Tile)loc).isExploredBy(owner)) ? "tile-is-explored"
+                : null)
             : Mission.TARGETINVALID;
     }
 
