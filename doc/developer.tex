@@ -370,12 +370,13 @@ using tabs.
 \item Call \verb+ant dist+ in order to build all packages. You will be
   prompted for the version of this release. Alternatively, you can
   specify the version on the command line, by saying something like
-  \verb+ant -Dfreecol.version=0.9.0-alpha2 dist+ instead (replace
-  0.9.0-alpha2 with the correct version, of course). It might be
-  necessary to increase the memory available for ant, for example by
-  setting the environment variable
-  \verb+ANT_OPTS="-Xms256m -Xmx256m"+.  Errors in language packs only
-  apply to the installer and need not delay the overall release.
+\begin{verbatim}ant -Dfreecol.version=0.9.0-alpha2 dist
+\end{verbatim}
+  instead (replace 0.9.0-alpha2 with the correct version, of
+  course). It might be necessary to increase the memory available for
+  ant, for example by setting the environment variable
+  \verb|ANT_OPTS="-Xms256m -Xmx256m"|.  Errors in language packs
+  only apply to the installer and need not delay the overall release.
 
 \item Install one of the generated packages and verify that you can play
   normally for at least five turns. Other good tests include loading a
@@ -412,7 +413,7 @@ FILE
   and/or run the previous version for comparison).
 
 \item Update the release number in the "Version"-mambot at
-  http://www.freecol.org/administrator > Mambots > Site Mambots > Version.
+  \texttt{http://www.freecol.org/administrator} > Mambots > Site Mambots > Version.
 
 \item Publish/unpublish "Download Unstable Version" in the main menu
   (Front Page Manager).  This page should only be displayed if the
@@ -425,8 +426,7 @@ FILE
 
 \item Post release messages on our mailing lists: developers,
   translators and users.  The addresses are:
-
-\verb+freecol-{developers,translators,users}@lists.sourceforge.net+
+  \texttt{freecol-{developers,translators,users}@lists.sourceforge.net}.
 
 Include information on savegame compatibility with previous versions
 on all messages.  Beware that you may have to be subscribed to some
