@@ -872,7 +872,7 @@ public final class FreeColServer {
      * game will be used.
      *
      * @param file The <code>File</code> to read from.
-     * @param specification An optional <code>Specification</code> to use.
+     * @param spec An optional <code>Specification</code> to use.
      * @param server Use this (optional) server to load into.
      * @return The game found in the stream.
      */

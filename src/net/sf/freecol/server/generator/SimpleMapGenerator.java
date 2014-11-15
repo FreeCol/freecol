@@ -156,7 +156,6 @@ public class SimpleMapGenerator implements MapGenerator {
      * Creates a <code>MapGenerator</code>
      *
      * @param game The <code>Game</code> to generate for.
-     * @param importGame A <code>Game</code> to selectively import from.
      * @param random The <code>Random</code> number source to use.
      * @see #createMap
      */

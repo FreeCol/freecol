@@ -188,7 +188,7 @@ public class Role extends BuildableType {
     /**
      * Fix a role id.
      *
-     * @param The role id to fix.
+     * @param roleId The role id to fix.
      * @return The fixed role id.
      */
     public static String fixRoleId(String roleId) {
