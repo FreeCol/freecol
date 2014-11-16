@@ -560,7 +560,7 @@ public final class InGameController implements NetworkConstants {
         LogBuilder lb = new LogBuilder((detailed && !tr.isSilent()) ? 256 : -1);
         lb.mark();
 
-        for (;;) {
+        outer: for (;;) {
             stop = unit.getStop();
             // Complain and return if the stop is no longer valid.
             if (!TradeRoute.isStopValid(unit, stop)) {
@@ -571,15 +571,8 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Is the unit at the stop already?
-            boolean atStop;
-            if (stop.getLocation() instanceof Europe) {
-                atStop = unit.isInEurope();
-            } else if (stop.getLocation() instanceof Colony) {
-                atStop = unit.getTile() == stop.getLocation().getTile();
-            } else {
-                throw new IllegalStateException("Bogus stop location: "
-                    + (FreeColGameObject)stop.getLocation());
-            }
+            boolean atStop = Map.isSameLocation(stop.getLocation(),
+                                                unit.getLocation());
             if (atStop) {
                 lb.mark();
 
@@ -599,22 +592,37 @@ public final class InGameController implements NetworkConstants {
                 // the moves.
                 if (unit.getMovesLeft() <= 0) break;
 
-                // Update the stop.
+                // Try to find the next stop with work to do.
                 int index = unit.validateCurrentStop();
-                askServer().updateCurrentStop(unit);
-                
-                // If the stop was changed.  If not there is no work
-                // to do anywhere in the whole trade route, and we
-                // should skip the unit.  Otherwise optionally add
-                // messages notifying that a stop has been skipped.
-                int next = unit.validateCurrentStop();
-                if (next == index) {
-                    lb.add(" ", Messages.message("tradeRoute.wait"));
-
-                    // Prevent reselection
-                    askServer().changeState(unit, UnitState.SKIPPED);
-                    break;
+                int next = index;
+                for (;;) {
+                    if (++next >= stops.size()) next = 0;
+                    if (next == index) {
+                        // No work was found anywhere on the trade
+                        // route, so we should skip this unit.
+                        lb.add(" ", Messages.message("tradeRoute.wait"));
+                        askServer().changeState(unit, UnitState.SKIPPED);
+                        break outer;
+                    }
+                    stop = stops.get(next);
+                    if (!TradeRoute.isStopValid(unit, stop)) {
+                        // Invalid stop found, throw the unit off the route.
+                        lb.add(" ", stopMessage("tradeRoute.invalidStop",
+                                                stop, player));
+                        clearOrders(unit);
+                        result = true;
+                        break outer;
+                    }
+                    if (unit.hasWorkAtStop(stop)) break;
                 }
+                // A new stop was found, inform the server.
+                if (!askServer().setCurrentStop(unit, next)) {
+                    askServer().changeState(unit, UnitState.SKIPPED);
+                    break outer;
+                }
+
+                // Add messages for any skipped stops now that we know
+                // a valid one has been found.
                 for (;;) {
                     if (++index >= stops.size()) index = 0;
                     if (index == next) break;

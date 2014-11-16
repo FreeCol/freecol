@@ -20,6 +20,7 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -31,44 +32,49 @@ import org.w3c.dom.Element;
 /**
  * The message sent updating a unit's current stop.
  */
-public class UpdateCurrentStopMessage extends DOMMessage {
+public class SetCurrentStopMessage extends DOMMessage {
 
-    /** The identifier of the unit whose stop is to be updated. */
+    /** The identifier of the unit whose stop is to be set. */
     private String unitId;
+
+    /** The index of the new stop. */
+    private String index;
 
 
     /**
-     * Create a new <code>UpdateCurrentStopMessage</code> for the
+     * Create a new <code>SetCurrentStopMessage</code> for the
      * supplied unit.
      *
-     * @param unit A <code>Unit</code> whose stop is to be updated.
+     * @param unit A <code>Unit</code> whose stop is to be setd.
      */
-    public UpdateCurrentStopMessage(Unit unit) {
+    public SetCurrentStopMessage(Unit unit, int index) {
         super(getXMLElementTagName());
 
         this.unitId = unit.getId();
+        this.index = String.valueOf(index);
     }
 
     /**
-     * Create a new <code>UpdateCurrentStopMessage</code> from a
+     * Create a new <code>SetCurrentStopMessage</code> from a
      * supplied element.
      *
      * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
      */
-    public UpdateCurrentStopMessage(Game game, Element element) {
+    public SetCurrentStopMessage(Game game, Element element) {
         super(getXMLElementTagName());
 
         this.unitId = element.getAttribute("unit");
+        this.index = element.getAttribute("index");
     }
 
 
     /**
-     * Handle a "updateCurrentStop"-message.
+     * Handle a "setCurrentStop"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param connection The <code>Connection</code> the message is from.
-     * @return An update containing the unit after updating its
+     * @return An set containing the unit after updating its
      *     current stop, or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
@@ -81,28 +87,45 @@ public class UpdateCurrentStopMessage extends DOMMessage {
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
+        TradeRoute tr = serverUnit.getTradeRoute();
+        if (tr == null) {
+            return DOMMessage.clientError("Unit has no trade route: "
+                + unitId);
+        }
 
-        // Valid, update.
+        int count;
+        try {
+            count = Integer.parseInt(this.index);
+        } catch (NumberFormatException nfe) {
+            return DOMMessage.clientError("Stop index is not an integer: " +
+                this.index);
+        }
+        if (count < 0 || count > tr.getStops().size()) {
+            return DOMMessage.clientError("Invalid stop index: " + this.index);
+        }
+
+        // Valid, set.
         return server.getInGameController()
-            .updateCurrentStop(serverPlayer, serverUnit);
+            .setCurrentStop(serverPlayer, serverUnit, count);
     }
 
     /**
-     * Convert this UpdateCurrentStopMessage to XML.
+     * Convert this SetCurrentStopMessage to XML.
      *
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
         return createMessage(getXMLElementTagName(),
-            "unit", unitId);
+            "unit", unitId,
+            "index", index);
     }
 
     /**
      * The tag name of the root element representing this object.
      *
-     * @return "updateCurrentStop".
+     * @return "setCurrentStop".
      */
     public static String getXMLElementTagName() {
-        return "updateCurrentStop";
+        return "setCurrentStop";
     }
 }

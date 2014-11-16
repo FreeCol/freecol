@@ -85,13 +85,13 @@ import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.SellMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
+import net.sf.freecol.common.networking.SetCurrentStopMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SetGoodsLevelsMessage;
 import net.sf.freecol.common.networking.SetTradeRoutesMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
 import net.sf.freecol.common.networking.UnloadCargoMessage;
-import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
 import net.sf.freecol.common.networking.UpdateTradeRouteMessage;
 import net.sf.freecol.common.networking.WorkMessage;
 import net.sf.freecol.server.FreeColServer;
@@ -663,6 +663,13 @@ public final class InGameInputHandler extends InputHandler
                     .retire(freeColServer.getPlayer(connection));
             }
         });
+        register(SetCurrentStopMessage.getXMLElementTagName(),
+                 new NetworkRequestHandler() {
+            @Override
+            public Element handle(Connection connection, Element element) {
+                return new SetCurrentStopMessage(getGame(), element)
+                    .handle(freeColServer, connection);
+            }});
         register(SetDestinationMessage.getXMLElementTagName(),
                  new NetworkRequestHandler() {
             @Override
@@ -690,13 +697,6 @@ public final class InGameInputHandler extends InputHandler
             public Element handle(Connection connection, Element element) {
                 return freeColServer.getInGameController()
                     .getStatistics(freeColServer.getPlayer(connection));
-            }});
-        register(UpdateCurrentStopMessage.getXMLElementTagName(),
-                 new NetworkRequestHandler() {
-            @Override
-            public Element handle(Connection connection, Element element) {
-                return new UpdateCurrentStopMessage(getGame(), element)
-                    .handle(freeColServer, connection);
             }});
         register(UpdateTradeRouteMessage.getXMLElementTagName(),
                  new NetworkRequestHandler() {

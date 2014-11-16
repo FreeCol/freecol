@@ -64,7 +64,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -1120,44 +1119,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
             // asynchronously answer the new region name message.
             region.setName(defaultName);
         }
-    }
-
-    /**
-     * Is there work for a unit to do at a stop?
-     *
-     * @param stop The <code>TradeRouteStop</code> to test.
-     * @return True if the unit should load or unload cargo at the stop.
-     */
-    public boolean hasWorkAtStop(TradeRouteStop stop) {
-        Location loc = stop.getLocation();
-
-        // Look for goods to load.
-        List<GoodsType> stopGoods = stop.getCargo();
-        for (GoodsType type : stopGoods) {
-            if (getLoadableAmount(type) <= 0) continue;
-            // There is space on the unit to load some more
-            // of this goods type, so return true if there is
-            // some available at the stop.
-            if (loc instanceof Colony) {
-                if (((Colony)loc).getExportAmount(type) > 0) return true;
-            } else if (loc instanceof Europe) {
-                return true;
-            }
-        }
-
-        // Look for goods to unload.
-        for (Goods goods : getCompactGoodsList()) {
-            GoodsType type = goods.getType();
-            if (stopGoods.contains(type)) continue;
-            // There are goods on board this unit that need to be unloaded.
-            if (loc instanceof Colony) {
-                if (((Colony)loc).getImportAmount(type) > 0) return true;
-            } else if (loc instanceof Europe) {
-                return true;
-            }
-        }
-            
-        return false;
     }
 
 

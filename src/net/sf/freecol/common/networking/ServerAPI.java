@@ -1344,6 +1344,18 @@ public abstract class ServerAPI {
     }
 
     /**
+     * Server query-response to set the current stop.
+     *
+     * @param unit The <code>Unit</code> whose stop is to be updated.
+     * @param index The stop index.
+     * @return True if the query-response succeeds.
+     */
+    public boolean setCurrentStop(Unit unit, int index) {
+        return askHandling(new SetCurrentStopMessage(unit, index),
+            null, null);
+    }
+
+    /**
      * Server query-response to set the destination of the given unit.
      *
      * @param unit The <code>Unit</code> to direct.
@@ -1457,17 +1469,6 @@ public abstract class ServerAPI {
      */
     public boolean unloadCargo(Goods goods) {
         return askHandling(new UnloadCargoMessage(goods),
-            null, null);
-    }
-
-    /**
-     * Server query-response for updating the current stop.
-     *
-     * @param unit The <code>Unit</code> whose stop is to be updated.
-     * @return True if the query-response succeeds.
-     */
-    public boolean updateCurrentStop(Unit unit) {
-        return askHandling(new UpdateCurrentStopMessage(unit),
             null, null);
     }
 

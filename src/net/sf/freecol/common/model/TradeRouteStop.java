@@ -105,8 +105,8 @@ public class TradeRouteStop extends FreeColObject {
     public boolean isValid(Player player) {
         return location != null
             && !((FreeColGameObject)location).isDisposed()
-            && !((location instanceof Ownable)
-                && !player.owns((Ownable)location));
+            && ((location instanceof Ownable)
+                && player.owns((Ownable)location));
     }
 
     /**

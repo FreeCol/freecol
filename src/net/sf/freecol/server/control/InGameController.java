@@ -2469,43 +2469,27 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Set current stop of a unit to the next valid stop if any.
+     * Set a unit stop.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> the unit belongs to.
-     * @param serverUnit The <code>ServerUnit</code> to update.
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @param unit The <code>Unit</code> to set the destination for.
+     * @param destination The <code>Location</code> to set as destination.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element updateCurrentStop(ServerPlayer serverPlayer,
-                                     ServerUnit serverUnit) {
-        // Check if there is a valid current stop?
-        int current = serverUnit.validateCurrentStop();
-        if (current < 0) { // No valid stop
-            serverUnit.setTradeRoute(null);
-            return new ChangeSet().add(See.only(serverPlayer), serverUnit)
-                .build(serverPlayer);
+    public Element setCurrentStop(ServerPlayer serverPlayer, Unit unit,
+                                  int index) {
+        TradeRoute tr = unit.getTradeRoute();
+        if (tr == null) {
+            return DOMMessage.clientError("Unit has no trade route to set stop for.");
+        } else if (index < 0 || index >= tr.getStops().size()) {
+            return DOMMessage.clientError("Stop index out of range [0.."
+                + tr.getStops().size() + "]: " + index);
         }
 
-        List<TradeRouteStop> stops = serverUnit.getTradeRoute().getStops();
-        int next = current;
-        for (;;) {
-            if (++next >= stops.size()) next = 0;
-            if (next == current) return null; // No work at any stop, stay put.
-            TradeRouteStop nextStop = stops.get(next);
-            boolean work = serverUnit.hasWorkAtStop(nextStop);
-            logger.finest("Unit " + serverUnit
-                + " in trade route " + serverUnit.getTradeRoute().getName()
-                + " found" + ((work) ? "" : " no")
-                + " work at: " + (FreeColGameObject)nextStop.getLocation());
-            if (work) break;
-        }
-
-        // Next is the updated stop.
-        // Could do just a partial update of currentStop if we did not
-        // also need to set the unit destination.
-        serverUnit.setCurrentStop(next);
+        unit.setCurrentStop(index);
 
         // Others can not see a stop change.
-        return new ChangeSet().add(See.only(serverPlayer), serverUnit)
+        return new ChangeSet().add(See.only(serverPlayer), unit)
             .build(serverPlayer);
     }
 

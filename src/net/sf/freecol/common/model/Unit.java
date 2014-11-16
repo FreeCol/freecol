@@ -3182,6 +3182,44 @@ public class Unit extends GoodsLocation
         return result;
     }
 
+    /**
+     * Is there work for this unit to do at a stop?
+     *
+     * @param stop The <code>TradeRouteStop</code> to test.
+     * @return True if this unit should load or unload cargo at the stop.
+     */
+    public boolean hasWorkAtStop(TradeRouteStop stop) {
+        Location loc = stop.getLocation();
+
+        // Look for goods to load.
+        List<GoodsType> stopGoods = stop.getCargo();
+        for (GoodsType type : stopGoods) {
+            if (getLoadableAmount(type) <= 0) continue;
+            // There is space on the unit to load some more
+            // of this goods type, so return true if there is
+            // some available at the stop.
+            if (loc instanceof Colony) {
+                if (((Colony)loc).getExportAmount(type) > 0) return true;
+            } else if (loc instanceof Europe) {
+                return true;
+            }
+        }
+
+        // Look for goods to unload.
+        for (Goods goods : getCompactGoodsList()) {
+            GoodsType type = goods.getType();
+            if (stopGoods.contains(type)) continue;
+            // There are goods on board this unit that need to be unloaded.
+            if (loc instanceof Colony) {
+                if (((Colony)loc).getImportAmount(type) > 0) return true;
+            } else if (loc instanceof Europe) {
+                return true;
+            }
+        }
+            
+        return false;
+    }
+
 
     // Miscellaneous more complex functionality
 
