@@ -430,7 +430,7 @@ public class ClientOptions extends OptionGroup {
     // clientOptions.warehouse
 
     /**
-     * The Stock the custom house should keep when selling goods.
+     * The amount of stock the custom house should keep when selling goods.
      */
     public static final String CUSTOM_STOCK
         = "model.option.customStock";
@@ -446,6 +446,13 @@ public class ClientOptions extends OptionGroup {
      */
     public static final String HIGH_LEVEL
         = "model.option.highLevel";
+
+    /**
+     * Should trade routes check production to determine whether to visit
+     * a stop?
+     */
+    public static final String STOCK_ACCOUNTS_FOR_PRODUCTION
+        = "model.option.stockAccountsForProduction";
 
 
     // clientOptions.audio
@@ -901,6 +908,11 @@ public class ClientOptions extends OptionGroup {
         addTextOption(BEFORE_LAST_TURN_NAME,
             "clientOptions.savegames", "before-last-turn");
         // end @compact 0.11.0
+
+        // @compat 0.11.1
+        addBooleanOption(STOCK_ACCOUNTS_FOR_PRODUCTION,
+            "clientOptions.warehouse", false);
+        // end @compat 0.11.1
     }
 
     private void addBooleanOption(String id, String gr, boolean val) {

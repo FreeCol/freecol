@@ -2054,7 +2054,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * Returns the net production of the given GoodsType.
+     * Get the net production of the given goods type.
+     *
+     * (Also part of interface TradeLocation)
      *
      * @param goodsType a <code>GoodsType</code> value
      * @return an <code>int</code> value
@@ -2597,7 +2599,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public int getExportAmount(GoodsType goodsType) {
         int present = getGoodsCount(goodsType);
         int exportable = getExportData(goodsType).getExportLevel();
-        return (present < exportable) ? 0 : present - exportable;
+        return present - exportable;
     }
 
     /**
@@ -2610,7 +2612,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         int present = getGoodsCount(goodsType);
         if (goodsType.limitIgnored()) return Integer.MAX_VALUE;
         int capacity = getWarehouseCapacity();
-        return (present > capacity) ? 0 : capacity - present;
+        return capacity - present;
     }
 
 

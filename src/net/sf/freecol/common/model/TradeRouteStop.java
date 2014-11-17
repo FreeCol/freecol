@@ -231,6 +231,15 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
             : 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int getNetProductionOf(GoodsType goodsType) {
+        return (location instanceof TradeLocation)
+            ? ((TradeLocation)location).getNetProductionOf(goodsType)
+            : 0;
+    }
+
 
     // Serialization
 

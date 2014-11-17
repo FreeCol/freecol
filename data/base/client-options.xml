@@ -266,6 +266,10 @@
       <!-- Generate warning of stock exceeds this percentage of capacity. -->
       <integerOption id="model.option.highLevel"
                      defaultValue="90" minimumValue="0" maximumValue="100"/>
+      <!-- Should trade routes check production to determine whether
+           to visit a stop? -->
+      <booleanOption id="model.option.stockAccountsForProduction"
+                     defaultValue="false"/>
     </optionGroup>
 
     <optionGroup id="clientOptions.audio">

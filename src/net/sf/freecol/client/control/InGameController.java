@@ -547,10 +547,12 @@ public final class InGameController implements NetworkConstants {
      *     unit is thrown off it.
      */
     private boolean followTradeRoute(Unit unit, List<ModelMessage> messages) {
-        Player player = unit.getOwner();
-        TradeRoute tr = unit.getTradeRoute();
-        boolean detailed = freeColClient.getClientOptions()
+        final Player player = unit.getOwner();
+        final TradeRoute tr = unit.getTradeRoute();
+        final boolean detailed = freeColClient.getClientOptions()
             .getBoolean(ClientOptions.SHOW_GOODS_MOVEMENT);
+        final boolean checkProduction = freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.STOCK_ACCOUNTS_FOR_PRODUCTION);
         final List<TradeRouteStop> stops = tr.getStops();
         TradeRouteStop stop;
         boolean result = false, more = true;
@@ -613,7 +615,7 @@ public final class InGameController implements NetworkConstants {
                         result = true;
                         break outer;
                     }
-                    if (unit.hasWorkAtStop(stop)) break;
+                    if (unit.hasWorkAtStop(stop, checkProduction)) break;
                 }
                 // A new stop was found, inform the server.
                 if (!askServer().setCurrentStop(unit, next)) {

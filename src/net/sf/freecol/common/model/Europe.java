@@ -381,6 +381,13 @@ public class Europe extends UnitLocation
         return (getOwner().canTrade(goodsType)) ? Integer.MAX_VALUE : 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int getNetProductionOf(GoodsType goodsType) {
+        return 0;
+    }
+
 
     // Override FreeColObject
 

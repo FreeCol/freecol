@@ -47,4 +47,13 @@ public interface TradeLocation {
      * @return The amount of goods to import.
      */
     public int getImportAmount(GoodsType goodsType);
+
+    /**
+     * Gets the new amount of a given goods type that is being produced
+     * at this trade location.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return The amount of goods to being produced.
+     */
+    public int getNetProductionOf(GoodsType goodsType);
 }
