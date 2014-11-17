@@ -4202,7 +4202,6 @@ public final class InGameController implements NetworkConstants {
         if (destination == null) return; // user aborted
         if (!setDestination(unit, destination)) return; // Server fail
 
-System.err.println(unit + " to " + destination);
         if (destination instanceof Europe) {
             if (unit.hasTile()
                 && unit.getTile().isDirectlyHighSeasConnected()) {

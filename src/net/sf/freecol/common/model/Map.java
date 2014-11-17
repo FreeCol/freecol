@@ -1038,7 +1038,9 @@ public class Map extends FreeColGameObject implements Location {
      */
     private PathNode findMapPath(Unit unit, Tile start, Tile end, Unit carrier,
                                  CostDecider costDecider, LogBuilder lb) {
-        final Unit offMapUnit = (carrier != null) ? carrier : unit;
+        final Unit offMapUnit = (carrier != null) ? carrier
+            : (unit != null && unit.isNaval()) ? unit
+            : null;
         final GoalDecider gd = GoalDeciders.getLocationGoalDecider(end);
         final SearchHeuristic sh = getManhattenHeuristic(end);
 
@@ -1060,13 +1062,25 @@ public class Map extends FreeColGameObject implements Location {
                         > carrierPath.getLastNode().getCost()))) {
                 path = carrierPath;
             }
+
         } else if (offMapUnit != null) {
-            // If there is a water unit then complex paths which use
-            // settlements and inland lakes are possible, but hard to
-            // capture with the contiguity test, so just allow the
+            // If there is an off-map unit then complex paths which
+            // use settlements and inland lakes are possible, but hard
+            // to capture with the contiguity test, so just allow the
             // search to proceed.
             path = searchMap(unit, start, gd, costDecider,
                              INFINITY, carrier, sh, lb);
+
+        } else if (start.isCoastland() && !end.isLand()
+            && end.isAdjacent(start) && end.getFirstUnit() != null
+            && unit != null && unit.getOwner().owns(end.getFirstUnit())) {
+            // Special case where a land unit on the coast is trying to
+            // move to an adjacent ship.
+            Unit ship = end.getFirstUnit();
+            path = new PathNode(start, 0, 0, false, null, null);
+            path.next = new PathNode(end, unit.getMoveCost(start, end, 0), 1,
+                                     true, path, null);
+
         } else { // Otherwise, there is a connectivity failure.
             path = null;
         }
