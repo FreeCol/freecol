@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 
 
@@ -37,28 +38,67 @@ public abstract class FreeColFrame extends JFrame {
 
     private static final Logger logger = Logger.getLogger(FreeColFrame.class.getName());
 
-    private FreeColClient freeColClient;
-    
-    
-    public static FreeColFrame createFreeColFrame(FreeColClient freeColClient, Canvas canvas, 
-            GraphicsDevice gd, boolean windowed) {
-        if (windowed) 
-            return new WindowedFrame(freeColClient, gd, canvas);
-        return new FullScreenFrame(freeColClient, gd);
-    }
-    
-    public FreeColFrame(FreeColClient freeColClient, String title) {
-        super(title);
+    /** The FreeCol client controlling the frame. */
+    protected FreeColClient freeColClient;
+
+
+    /**
+     * Create a new main frame.
+     *
+     * @param freeColClient The enclosing <code>FreeColClient</code>.
+     */
+    public FreeColFrame(FreeColClient freeColClient) {
+        super(getFrameName());
+
         this.freeColClient = freeColClient;
     }
 
-    public FreeColFrame(FreeColClient freeColClient, String title, GraphicsDevice gd) {
-        super(title, gd.getDefaultConfiguration());
+    /**
+     * Create a new main frame.
+     *
+     * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param gd The <code>GraphicsDevice</code> to use.
+     */
+    public FreeColFrame(FreeColClient freeColClient, GraphicsDevice gd) {
+        super(getFrameName(), gd.getDefaultConfiguration());
+
         this.freeColClient = freeColClient;
     }
 
+
+    /**
+     * Get the standard name for the main frame.
+     *
+     * @return The standard frame name.
+     */
+    private static String getFrameName() {
+        return "FreeCol " + FreeCol.getVersion();
+    } 
+
+    /**
+     * Create a new main frame for FreeCol.
+     *
+     * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param gd The <code>GraphicsDevice</code> to use.
+     * @param canvas The <code>Canvas</code> to use.
+     * @param windowed Use windowed mode.
+     * @return A suitable <code>FreeColFrame</code>.
+     */
+    public static FreeColFrame createFreeColFrame(FreeColClient freeColClient,
+                                                  Canvas canvas,
+                                                  GraphicsDevice gd,
+                                                  boolean windowed) {
+        return (windowed)
+            ? new WindowedFrame(freeColClient, gd, canvas)
+            : new FullScreenFrame(freeColClient, gd);
+    }
+
+    /**
+     * Set the canvas for this frame.
+     *
+     * @param canvas The <code>Canvas</code> to use.
+     */
     public void setCanvas(Canvas canvas) {
-        addWindowListener(new WindowedFrameListener(freeColClient));
         // This crashes deep in the Java libraries when changing full screen
         // mode during the opening video
         //   Java version: 1.7.0_45
@@ -71,6 +111,11 @@ public abstract class FreeColFrame extends JFrame {
             logger.log(Level.WARNING, "Java crash", e);
         }        
     }
-   
+
+    /**
+     * Update the bounds of the main FreeCol frame.
+     *
+     * @param rectangle A <code>Rectangle</code> to specify the bounds.
+     */
     public abstract void updateBounds(Rectangle rectangle);
 }

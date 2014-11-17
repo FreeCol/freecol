@@ -27,8 +27,8 @@ import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.WindowedFrameListener;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -40,6 +40,7 @@ public final class WindowedFrame extends FreeColFrame  {
 
     private static final Logger logger = Logger.getLogger(WindowedFrame.class.getName());
 
+
     /**
      * Create a windowed frame.
      *
@@ -49,7 +50,7 @@ public final class WindowedFrame extends FreeColFrame  {
      */
     public WindowedFrame(final FreeColClient freeColClient,
                          GraphicsDevice gd, final Canvas canvas) {
-        super(freeColClient, "FreeCol " + FreeCol.getVersion(), gd);
+        super(freeColClient, gd);
 
         // Disabled as this prevents the --windowed WIDTHxHEIGHT
         // command line parameter from working.
@@ -58,16 +59,24 @@ public final class WindowedFrame extends FreeColFrame  {
         setResizable(true);
         
         addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                ResourceManager.preload(canvas.getSize());
-            }
-        });
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    ResourceManager.preload(canvas.getSize());
+                }
+            });
 
-        logger.info("WindowedFrame created with size: "
-            + canvas.getSize());
+        logger.info("Switched to windowed mode with size: " + canvas.getSize());
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setCanvas(Canvas canvas) {
+        addWindowListener(new WindowedFrameListener(freeColClient));
+        super.setCanvas(canvas);
+    }
 
     /**
      * {@inheritDoc}

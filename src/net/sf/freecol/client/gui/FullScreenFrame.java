@@ -35,8 +35,7 @@ import net.sf.freecol.client.FreeColClient;
  */
 public final class FullScreenFrame extends FreeColFrame {
 
-    private static final Logger logger = Logger.getLogger(FullScreenFrame.class
-                                                          .getName());
+    private static final Logger logger = Logger.getLogger(FullScreenFrame.class.getName());
 
 
     /**
@@ -46,27 +45,20 @@ public final class FullScreenFrame extends FreeColFrame {
      * @param gd The context of this <code>FullScreenFrame</code>.
      */
     public FullScreenFrame(FreeColClient freeColClient, GraphicsDevice gd) {
-        super(freeColClient, "Freecol " + FreeCol.getVersion(), gd);
+        super(freeColClient, gd);
 		
-        logger.info("FullScreenFrame's JFrame created.");
-
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setUndecorated(true);
 
         gd.setFullScreenWindow(this);
-
         logger.info("Switched to full screen mode.");
-
         //getContentPane().setLayout(null);
-
-        logger.info("FullScreenFrame created.");
     }
 
 
-    @Override
-    public void updateBounds(Rectangle rectangle) {
-    }
-
-
+    /**
+     * {@inheritDoc}
+     */
+    public void updateBounds(Rectangle rectangle) {}
 }
 
