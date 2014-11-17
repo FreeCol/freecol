@@ -125,6 +125,7 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -796,17 +797,33 @@ public class GUI {
         DisplayMode dm = gd.getDisplayMode();
         int width = dm.getWidth();
         int height = dm.getHeight();
+        LogBuilder lb = new LogBuilder(256);
+        lb.add("determineWindowSize\n",
+            "  Display mode size: ", width, "x", height, "\n");
+
+        // Reduce by any screen insets (windowing system menu bar etc)
+        try {
+            Insets in = Toolkit.getDefaultToolkit()
+                .getScreenInsets(gd.getDefaultConfiguration());
+            height -= in.bottom + in.top;
+            width -= in.left + in.right;
+            lb.add("  less insets: ", (in.left + in.right),
+                "x", (in.bottom + in.top), "\n");
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Unable to get screen insets", e);
+        }
 
         // TODO: find better way to get size of window title and
         // border.  The information is only available from getInsets
         // when a window is already displayable.
-        Dimension size
-            = new Dimension(width - DEFAULT_WINDOW_INSET_WIDTH,
-                height - DEFAULT_WINDOW_INSET_HEIGHT);
-        logger.info("Screen = " + Toolkit.getDefaultToolkit().getScreenSize()
-            + "\nwidth = " + width
-            + "\nheight = " + height
-            + "\n => " + size);
+        height -= DEFAULT_WINDOW_INSET_HEIGHT;
+        width -= DEFAULT_WINDOW_INSET_WIDTH;
+        lb.add("  less faked window decoration adjust: ",
+            DEFAULT_WINDOW_INSET_WIDTH, "x", DEFAULT_WINDOW_INSET_HEIGHT, "\n");
+
+        Dimension size = new Dimension(width, height);
+        lb.add("  = ", size);
+        lb.log(logger, Level.INFO);
         return size;
     }
 
