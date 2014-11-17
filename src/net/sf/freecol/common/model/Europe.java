@@ -42,7 +42,8 @@ import net.sf.freecol.common.model.Unit.UnitState;
  * In Europe, you can recruit, train and purchase new units.  You can
  * also equip units, as well as sell and buy goods.
  */
-public class Europe extends UnitLocation implements Ownable, Named {
+public class Europe extends UnitLocation
+    implements Ownable, Named, TradeLocation {
 
     private static final Logger logger = Logger.getLogger(Europe.class.getName());
 
@@ -361,6 +362,23 @@ public class Europe extends UnitLocation implements Ownable, Named {
      */
     public void setOwner(Player p) {
         throw new UnsupportedOperationException();
+    }
+
+
+    // Interface TradeLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getExportAmount(GoodsType goodsType) {
+        return (getOwner().canTrade(goodsType)) ? Integer.MAX_VALUE : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getImportAmount(GoodsType goodsType) {
+        return (getOwner().canTrade(goodsType)) ? Integer.MAX_VALUE : 0;
     }
 
 

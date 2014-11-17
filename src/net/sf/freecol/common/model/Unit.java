@@ -2404,7 +2404,8 @@ public class Unit extends GoodsLocation
     public Location resolveDestination() {
         if (!isAtSea()) throw new IllegalArgumentException("Not at sea.");
         TradeRouteStop stop = getStop();
-        Location dst = (TradeRoute.isStopValid(this, stop)) ? stop.getLocation()
+        Location dst = (TradeRoute.isStopValid(this, stop))
+            ? stop.getLocation()
             : getDestination();
         Tile best;
         return (dst == null) ? getFullEntryLocation()
@@ -3189,8 +3190,6 @@ public class Unit extends GoodsLocation
      * @return True if this unit should load or unload cargo at the stop.
      */
     public boolean hasWorkAtStop(TradeRouteStop stop) {
-        Location loc = stop.getLocation();
-
         // Look for goods to load.
         List<GoodsType> stopGoods = stop.getCargo();
         for (GoodsType type : stopGoods) {
@@ -3198,11 +3197,7 @@ public class Unit extends GoodsLocation
             // There is space on the unit to load some more
             // of this goods type, so return true if there is
             // some available at the stop.
-            if (loc instanceof Colony) {
-                if (((Colony)loc).getExportAmount(type) > 0) return true;
-            } else if (loc instanceof Europe) {
-                return true;
-            }
+            if (stop.getExportAmount(type) > 0) return true;
         }
 
         // Look for goods to unload.
@@ -3210,11 +3205,7 @@ public class Unit extends GoodsLocation
             GoodsType type = goods.getType();
             if (stopGoods.contains(type)) continue;
             // There are goods on board this unit that need to be unloaded.
-            if (loc instanceof Colony) {
-                if (((Colony)loc).getImportAmount(type) > 0) return true;
-            } else if (loc instanceof Europe) {
-                return true;
-            }
+            if (stop.getImportAmount(type) > 0) return true;
         }
             
         return false;

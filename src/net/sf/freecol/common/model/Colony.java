@@ -51,7 +51,7 @@ import net.sf.freecol.common.util.RandomChoice;
  * {@link ColonyTile}s. The latter represents the tiles around the
  * <code>Colony</code> where working is possible.
  */
-public class Colony extends Settlement implements Nameable {
+public class Colony extends Settlement implements Nameable, TradeLocation {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
@@ -1986,34 +1986,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
 
-    // Import/export
-
-    /**
-     * How much of a goods type can be exported from this colony?
-     *
-     * @param goodsType The <code>GoodsType</code> to export.
-     * @return The amount of this type of goods available for export.
-     */
-    public int getExportAmount(GoodsType goodsType) {
-        int present = getGoodsCount(goodsType);
-        int exportable = getExportData(goodsType).getExportLevel();
-        return (present < exportable) ? 0 : present - exportable;
-    }
-
-    /**
-     * How much of a goods type can be imported into this colony?
-     *
-     * @param goodsType The <code>GoodsType</code> to import.
-     * @return The amount of this type of goods that can be imported.
-     */
-    public int getImportAmount(GoodsType goodsType) {
-        int present = getGoodsCount(goodsType);
-        if (goodsType.isFoodType()) return Integer.MAX_VALUE;
-        int capacity = getWarehouseCapacity();
-        return (present > capacity) ? 0 : capacity - present;
-    }
-
-
     // Production and consumption
 
     /**
@@ -2611,6 +2583,34 @@ public class Colony extends Settlement implements Nameable {
      */
     public String toShortString() {
         return getName();
+    }
+
+
+    // Interface TradeLocation
+
+    /**
+     * How much of a goods type can be exported from this colony?
+     *
+     * @param goodsType The <code>GoodsType</code> to export.
+     * @return The amount of this type of goods available for export.
+     */
+    public int getExportAmount(GoodsType goodsType) {
+        int present = getGoodsCount(goodsType);
+        int exportable = getExportData(goodsType).getExportLevel();
+        return (present < exportable) ? 0 : present - exportable;
+    }
+
+    /**
+     * How much of a goods type can be imported into this colony?
+     *
+     * @param goodsType The <code>GoodsType</code> to import.
+     * @return The amount of this type of goods that can be imported.
+     */
+    public int getImportAmount(GoodsType goodsType) {
+        int present = getGoodsCount(goodsType);
+        if (goodsType.limitIgnored()) return Integer.MAX_VALUE;
+        int capacity = getWarehouseCapacity();
+        return (present > capacity) ? 0 : capacity - present;
     }
 
 

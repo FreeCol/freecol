@@ -31,19 +31,20 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.TradeLocation;
 
 
 /**
  * A stop along a trade route.
  */
-public class TradeRouteStop extends FreeColObject {
+public class TradeRouteStop extends FreeColObject implements TradeLocation {
 
     private static final Logger logger = Logger.getLogger(TradeRouteStop.class.getName());
 
     /** The game in play. */
     private final Game game;
 
-    /** The location of the stop. */
+    /** The trade location of the stop. */
     private Location location;
 
     /** The cargo expected to be on board on leaving the stop. */
@@ -53,14 +54,14 @@ public class TradeRouteStop extends FreeColObject {
     /**
      * Create a stop for the given location from a stream.
      *
-     * @param loc The <code>Location</code> of this stop.
+     * @param location The <code>Location</code> of this stop.
      */
-    public TradeRouteStop(Game game, Location loc) {
+    public TradeRouteStop(Game game, Location location) {
         setId("");
         setSpecification(game.getSpecification());
 
         this.game = game;
-        this.location = loc;
+        this.location = location;
         this.cargo.clear();
     }
 
@@ -91,7 +92,7 @@ public class TradeRouteStop extends FreeColObject {
     /**
      * Get the location of this stop.
      *
-     * @return The stop location.
+     * @return The <code>Location</code> of this stop.
      */
     public final Location getLocation() {
         return location;
@@ -103,7 +104,7 @@ public class TradeRouteStop extends FreeColObject {
      * @return True if the stop is valid.
      */
     public boolean isValid(Player player) {
-        return location != null
+        return (location instanceof TradeLocation)
             && !((FreeColGameObject)location).isDisposed()
             && ((location instanceof Ownable)
                 && player.owns((Ownable)location));
@@ -209,6 +210,26 @@ public class TradeRouteStop extends FreeColObject {
     //public final void setModified(final boolean newModified) {
     //    this.modified = newModified;
     //}
+
+    // Interface TradeLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getExportAmount(GoodsType goodsType) {
+        return (location instanceof TradeLocation)
+            ? ((TradeLocation)location).getExportAmount(goodsType)
+            : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getImportAmount(GoodsType goodsType) {
+        return (location instanceof TradeLocation)
+            ? ((TradeLocation)location).getImportAmount(goodsType)
+            : 0;
+    }
 
 
     // Serialization
