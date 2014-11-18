@@ -355,7 +355,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
         }
     }
 
-    private class StopRenderer implements ListCellRenderer {
+    private class StopRenderer implements ListCellRenderer<TradeRouteStop> {
 
         private final JPanel SELECTED_COMPONENT = new JPanel();
         private final JPanel NORMAL_COMPONENT = new JPanel();
@@ -370,30 +370,19 @@ public final class TradeRouteInputPanel extends FreeColPanel {
         }
 
         /**
-         * Returns a <code>ListCellRenderer</code> for the given
-         * <code>JList</code>.
-         *
-         * @param list The <code>JList</code>.
-         * @param value The list cell.
-         * @param index The index in the list.
-         * @param isSelected <code>true</code> if the given list cell
-         *     is selected.
-         * @param hasFocus <code>false</code> if the given list cell
-         *     has the focus.
-         * @return The <code>ListCellRenderer</code>
+         * {@inheritDoc}
          */
-        public Component getListCellRendererComponent(JList list, Object value,
+        public Component getListCellRendererComponent(JList<? extends TradeRouteStop> list,
+                                                      TradeRouteStop value,
                                                       int index,
                                                       boolean isSelected,
                                                       boolean hasFocus) {
             JPanel panel = (isSelected) ? SELECTED_COMPONENT
                 : NORMAL_COMPONENT;
-
             panel.removeAll();
             panel.setForeground(list.getForeground());
             panel.setFont(list.getFont());
-            TradeRouteStop stop = (TradeRouteStop)value;
-            Location location = stop.getLocation();
+            Location location = value.getLocation();
             JLabel icon, name;
             if (location instanceof Europe) {
                 Europe europe = (Europe) location;
@@ -411,7 +400,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
             }
             panel.add(icon, "spany");
             panel.add(name, "span, wrap");
-            for (GoodsType cargo : stop.getCargo()) {
+            for (GoodsType cargo : value.getCargo()) {
                 panel.add(new JLabel(new ImageIcon(getLibrary()
                             .getGoodsImage(cargo, 0.5))));
             }
