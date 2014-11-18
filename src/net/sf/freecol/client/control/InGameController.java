@@ -897,36 +897,28 @@ public final class InGameController implements NetworkConstants {
      * @param tile The <code>Tile</code> to claim.
      * @param claimant The <code>Unit</code> or <code>Colony</code> claiming.
      * @param price The price required.
-     * @param offer An offer to pay.
      * @return True if the claim succeeded.
      */
     private boolean claimTile(Player player, Tile tile,
-                              FreeColGameObject claimant,
-                              int price, int offer) {
-        Player owner = tile.getOwner();
-        if (price < 0) return false; // not for sale
-        if (price > 0) { // for sale by natives
-            if (offer >= price) { // offered more than enough
-                price = offer;
-            } else if (offer < 0) { // plan to steal
+                              FreeColGameObject claimant, int price) {
+        final Player owner = tile.getOwner();
+        if (price < 0) { // not for sale
+            return false;
+        } else if (price > 0) { // for sale
+            GUI.ClaimAction act = gui.showClaimDialog(tile, player, price,
+                                                      owner);
+            if (act == null) return false; // Cancelled
+            switch (act) {
+            case ACCEPT: // accepted price
+                break;
+            case STEAL:
                 price = NetworkConstants.STEAL_LAND;
-            } else {
-                GUI.ClaimAction act
-                    = gui.showClaimDialog(tile, player, price, owner,
-                                          player.checkGold(price));
-                if (act == null) return false; // Cancelled
-                switch (act) {
-                case ACCEPT: // accepted price
-                    break;
-                case STEAL:
-                    price = NetworkConstants.STEAL_LAND;
-                    break;
-                default:
-                    logger.warning("showClaimDialog fail: " + act);
-                    return false;
-                }
+                break;
+            default:
+                logger.warning("showClaimDialog fail: " + act);
+                return false;
             }
-        } // else price == 0 and we can just proceed
+        } // else price == 0 and we can just proceed to claim
 
         // Ask the server
         if (askServer().claimLand(tile, claimant, price)
@@ -1576,7 +1568,7 @@ public final class InGameController implements NetworkConstants {
             // Claim tile from other owners before founding a settlement.
             // Only native owners that we can steal, buy from, or use a
             // bonus center tile exception should be possible by this point.
-            if (!claimTile(player, tile, unit, player.getLandPrice(tile), 0))
+            if (!claimTile(player, tile, unit, player.getLandPrice(tile)))
                 return;
             // One more check that founding can now proceed.
             if (!player.canClaimToFoundSettlement(tile)) return;
@@ -1841,7 +1833,7 @@ public final class InGameController implements NetworkConstants {
         Player player = freeColClient.getMyPlayer();
         Tile tile = unit.getTile();
         if (!player.owns(tile)) {
-            if (!claimTile(player, tile, unit, player.getLandPrice(tile), 0)
+            if (!claimTile(player, tile, unit, player.getLandPrice(tile))
                 || !player.owns(tile)) return;
         }
 
@@ -1930,18 +1922,18 @@ public final class InGameController implements NetworkConstants {
      *
      * @param tile The <code>Tile</code> to claim.
      * @param claimant The <code>Unit</code> or <code>Colony</code> claiming.
-     * @param offer An offer to pay.
      * @return True if the claim succeeded.
      */
-    public boolean claimLand(Tile tile, FreeColGameObject claimant, int offer) {
+    public boolean claimLand(Tile tile, FreeColGameObject claimant) {
         if (!requireOurTurn()) return false;
 
         Player player = freeColClient.getMyPlayer();
         int price = ((claimant instanceof Settlement)
-            ? player.canClaimForSettlement(tile)
-            : player.canClaimForImprovement(tile)) ? 0
+                ? player.canClaimForSettlement(tile)
+                : player.canClaimForImprovement(tile))
+            ? 0
             : player.getLandPrice(tile);
-        return claimTile(player, tile, claimant, price, offer);
+        return claimTile(player, tile, claimant, price);
     }
 
     /**
@@ -4646,8 +4638,8 @@ public final class InGameController implements NetworkConstants {
                 return;
             }
             if (tile.getOwner() != unit.getOwner()) {
-                if (!claimLand(tile, ((colony != null) ? colony : unit),
-                               0)) return;
+                if (!claimLand(tile, ((colony != null) ? colony : unit)))
+                    return;
             }
         }
 

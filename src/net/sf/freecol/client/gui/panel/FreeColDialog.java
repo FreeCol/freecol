@@ -154,6 +154,20 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     }
 
     /**
+     * Collect the enabled options and return as an array so as to be able
+     * to pass to the JOptionPane constructor.
+     *
+     * @return An array of enabled options.
+     */
+    private Object[] selectOptions() {
+        List<ChoiceItem<T>> actual = new ArrayList<ChoiceItem<T>>();
+        for (ChoiceItem<T> c : this.options) {
+            if (c.isEnabled()) actual.add(c);
+        }
+        return actual.toArray();
+    }
+
+    /**
      * Complete the initialization.  Useful for subclasses that need
      * to construct a non-trivial object to display in the JOptionPane.
      *
@@ -177,7 +191,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         int def = selectDefault(options);
         ChoiceItem<T> ci = (def >= 0) ? options.get(def) : null;
         this.pane = new JOptionPane(obj, paneType, JOptionPane.YES_NO_OPTION,
-                                    icon, options.toArray(), ci);
+                                    icon, selectOptions(), ci);
         this.pane.setBorder(dialogBorder);
         this.pane.setName("FreeColDialog");
         this.pane.setValue(JOptionPane.UNINITIALIZED_VALUE);

@@ -1308,9 +1308,9 @@ public class GUI {
     }
 
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,
-                                       Player owner, boolean canAccept) {
+                                       Player owner) {
         if (canvas == null) return null;
-        return canvas.showClaimDialog(tile, player, price, owner, canAccept);
+        return canvas.showClaimDialog(tile, player, price, owner);
     }
 
     public OptionGroup showClientOptionsDialog() {

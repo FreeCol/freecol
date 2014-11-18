@@ -155,11 +155,17 @@ public class ClaimLandMessage extends DOMMessage {
             case NONE:
                 break; // Succeed.
             case NATIVES:
-                if (price >= 0 && price < value) {
-                    return DOMMessage.clientError("Can not claim tile "
-                        + tile.getId() + ": insufficient offer.");
-                }
-                // Succeed: either sufficient offer, or stealing.
+                if (price >= 0) {
+                    if (price < value) {
+                        return DOMMessage.clientError("Can not claim tile "
+                            + tile.getId() + ": insufficient offer.");
+                    }
+                    if (!player.checkGold(price)) {
+                        return DOMMessage.clientError("Can not pay for tile: "
+                            + tile.getId() + ": insufficient funds.");
+                    }
+                    // Succeed, sufficient offer
+                } // else succeed, stealing
                 break;
             default: // Fail
                 return DOMMessage.clientError("Can not claim tile "

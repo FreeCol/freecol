@@ -384,8 +384,8 @@ public final class UnitLabel extends JLabel
                 = game.getFreeColGameObject(args[1], ColonyTile.class);
             if (args.length >= 4 && "!".equals(args[3])) {
                 // Claim tile if needed
-                if (!igc.claimLand(colonyTile.getWorkTile(), unit.getColony(),
-                                   0)) break;
+                if (!igc.claimLand(colonyTile.getWorkTile(),
+                                   unit.getColony())) break;
             }
             if (colonyTile != unit.getLocation()) igc.work(unit, colonyTile);
             if ((gt = spec.getGoodsType(args[2])) != null

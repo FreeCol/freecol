@@ -1506,32 +1506,30 @@ public final class Canvas extends JDesktopPane {
      * @param player The <code>Player</code> that is claiming.
      * @param price An asking price, if any.
      * @param owner The <code>Player</code> that owns the land.
-     * @param canAccept True if accept is a valid option.
      * @return The chosen action, accept, steal or cancel.
      */
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,
-                                       Player owner, boolean canAccept) {
+                                       Player owner) {
         List<ChoiceItem<ClaimAction>> choices
             = new ArrayList<ChoiceItem<ClaimAction>>();
         
         StringTemplate template;
-        
         if (owner.hasContacted(player)) {
             template = StringTemplate.template("indianLand.text")
                 .addStringTemplate("%player%", owner.getNationName());
-            
             StringTemplate pay = StringTemplate.template("indianLand.pay")
                 .addAmount("%amount%", price);
             choices.add(new ChoiceItem<ClaimAction>(Messages.message(pay),
-                    ClaimAction.ACCEPT, canAccept));
+                                                    ClaimAction.ACCEPT,
+                                                    player.checkGold(price)));
         } else {
             template = StringTemplate.template("indianLand.unknown");
         }
         
-        JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
         choices.add(new ChoiceItem<ClaimAction>(Messages.message("indianLand.take"),
-                ClaimAction.STEAL));
+                                                ClaimAction.STEAL));
 
+        JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
         return showChoiceDialog(true, tile, text,
                                 gui.getImageIcon(owner, false),
                                 "indianLand.cancel", choices);
