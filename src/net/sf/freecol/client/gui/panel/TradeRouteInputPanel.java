@@ -61,6 +61,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
@@ -258,6 +259,35 @@ public final class TradeRouteInputPanel extends FreeColPanel {
         }
     }
 
+    private class DestinationCellRenderer extends JLabel
+        implements ListCellRenderer<String> {
+
+        public DestinationCellRenderer() {
+            setOpaque(true);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Component getListCellRendererComponent(JList<? extends String> list,
+                                                      String value,
+                                                      int index,
+                                                      boolean isSelected,
+                                                      boolean cellHasFocus) {
+            FreeColGameObject fcgo = getGame().getFreeColGameObject(value);
+            if (fcgo instanceof Location) {
+                setText(Messages.message(((Location)fcgo).getLocationName()));
+            } else {
+                setText(value);
+            }
+            setForeground((isSelected) ? list.getSelectionForeground()
+                : list.getForeground());
+            setBackground((isSelected) ? list.getSelectionBackground()
+                : list.getBackground());
+            return this;
+        }
+    }
+
     public static class StopTransferable implements Transferable {
 
         private List<TradeRouteStop> stops;
@@ -408,27 +438,6 @@ public final class TradeRouteInputPanel extends FreeColPanel {
         }
     }
 
-    private static class DestinationCellRenderer extends JLabel
-        implements ListCellRenderer {
-
-        public DestinationCellRenderer() {
-            setOpaque(true);
-        }
-
-        public Component getListCellRendererComponent(JList list, Object value,
-                                                      int index,
-                                                      boolean isSelected,
-                                                      boolean cellHasFocus) {
-            setText((value instanceof Location)
-                ? Messages.message(((Location)value).getLocationName())
-                : value.toString());
-            setForeground((isSelected) ? list.getSelectionForeground()
-                : list.getForeground());
-            setBackground((isSelected) ? list.getSelectionBackground()
-                : list.getBackground());
-            return this;
-        }
-    }
 
     /**
      * The original route passed to this panel.  We are careful not to
@@ -452,7 +461,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
     private JTextField tradeRouteName;
 
     /** A box to select stops to add. */
-    private JComboBox destinationSelector;
+    private JComboBox<String> destinationSelector;
 
     /** Toggle message display. */
     private JCheckBox messagesBox;
@@ -537,16 +546,15 @@ public final class TradeRouteInputPanel extends FreeColPanel {
 
         JLabel destinationLabel
             = localizedLabel("tradeRouteInputPanel.destinationLabel");
-        this.destinationSelector = new JComboBox();
+        this.destinationSelector = new JComboBox<String>();
         this.destinationSelector.setRenderer(new DestinationCellRenderer());
-        StringTemplate template = StringTemplate.template("report.allColonies")
-            .addName("%number%", "");
+        StringTemplate template = StringTemplate.template("report.allColonies");
         this.destinationSelector.addItem(Messages.message(template));
         if (player.getEurope() != null) {
-            this.destinationSelector.addItem(player.getEurope());
+            this.destinationSelector.addItem(player.getEurope().getId());
         }
         for (Colony colony : freeColClient.getMySortedColonies()) {
-            this.destinationSelector.addItem((Settlement)colony);
+            this.destinationSelector.addItem(colony.getId());
         }
 
         this.messagesBox
@@ -616,18 +624,16 @@ public final class TradeRouteInputPanel extends FreeColPanel {
     /**
      * Add any stops selected in the destination selector.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     private void addSelectedStops() {
         int startIndex = -1;
         int endIndex = -1;
         int sel = this.destinationSelector.getSelectedIndex();
         if (sel == 0) { // All colonies + Europe
             startIndex = 1;
-            endIndex = destinationSelector.getItemCount() - 1;
-        } else {
-            // just 1 colony
+            endIndex = this.destinationSelector.getItemCount();
+        } else { // just one place
             startIndex = sel;
-            endIndex = startIndex;
+            endIndex = startIndex+1;
         }
         List<GoodsType> cargo = new ArrayList<GoodsType>();
         for (Component comp : cargoPanel.getComponents()) {
@@ -635,15 +641,19 @@ public final class TradeRouteInputPanel extends FreeColPanel {
             cargo.add(label.getType());
         }
         int maxIndex = this.stopList.getMaxSelectionIndex();
-        for (int i = startIndex; i <= endIndex; i++) {
-            Location loc = (Location)this.destinationSelector.getItemAt(i);
-            TradeRouteStop stop = new TradeRouteStop(getGame(), loc);
-            stop.setCargo(cargo);
-            if (maxIndex < 0) {
-                this.stopListModel.addElement(stop);
-            } else {
-                maxIndex++;
-                this.stopListModel.add(maxIndex, stop);
+        for (int i = startIndex; i < endIndex; i++) {
+            String id = this.destinationSelector.getItemAt(i);
+            FreeColGameObject fcgo = getGame().getFreeColGameObject(id);
+            if (fcgo instanceof Location) {
+                TradeRouteStop stop
+                    = new TradeRouteStop(getGame(), (Location)fcgo);
+                stop.setCargo(cargo);
+                if (maxIndex < 0) {
+                    this.stopListModel.addElement(stop);
+                } else {
+                    maxIndex++;
+                    this.stopListModel.add(maxIndex, stop);
+                }
             }
         }
     }
