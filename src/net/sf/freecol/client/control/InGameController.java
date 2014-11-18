@@ -3593,8 +3593,8 @@ public final class InGameController implements NetworkConstants {
      * @param goods The <code>Goods</code> that failed to trade.
      * @return A <code>StringTemplate</code> describing the failure.
      */
-    private StringTemplate tradeFailMessage(int fail,
-        Settlement settlement, Goods goods) {
+    private StringTemplate tradeFailMessage(int fail, Settlement settlement,
+                                            Goods goods) {
         switch (fail) {
         case NO_TRADE_GOODS:
             return StringTemplate.template("trade.noTradeGoods")
@@ -3607,7 +3607,9 @@ public final class InGameController implements NetworkConstants {
         default:
             break;
         }
-        return StringTemplate.template("trade.noTrade");
+        return StringTemplate.template("trade.noTrade")
+            .addName("%settlement%",
+                settlement.getLocationNameFor(freeColClient.getMyPlayer()));
     }
 
     /**
