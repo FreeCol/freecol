@@ -1159,15 +1159,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Get the adjacent settlements.
+     * Get the adjacent colonies.
      *
-     * @return A list of adjacent <code>Settlement</code>.
+     * @return A list of adjacent <code>Colony</code>s.
      */
-    public List<Settlement> getAdjacentSettlements() {
-        List<Settlement> result = new ArrayList<Settlement>();
+    public List<Colony> getAdjacentColonies() {
+        List<Colony> result = new ArrayList<Colony>();
         for (Tile t : getSurroundingTiles(1)) {
-            Settlement s = t.getSettlement();
-            if (s != null) result.add(s);
+            Colony c = t.getColony();
+            if (c != null) result.add(c);
         }
         return result;
     }
