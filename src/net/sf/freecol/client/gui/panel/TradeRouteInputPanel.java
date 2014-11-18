@@ -200,8 +200,8 @@ public final class TradeRouteInputPanel extends FreeColPanel {
                     TradeRouteInputPanel.this.cargoPanel.revalidate();
                     int[] indices = stopList.getSelectedIndices();
                     for (int index : indices) {
-                        TradeRouteStop stop
-                            = (TradeRouteStop)stopListModel.get(index);
+                        TradeRouteStop stop = TradeRouteInputPanel.this
+                            .stopListModel.get(index);
                         stop.addCargo(label.getType());
                     }
                     stopList.revalidate();
@@ -224,8 +224,8 @@ public final class TradeRouteInputPanel extends FreeColPanel {
                     TradeRouteInputPanel.this.cargoPanel.remove(label);
                     int[] indices = stopList.getSelectedIndices();
                     for (int stopIndex : indices) {
-                        TradeRouteStop stop
-                            = (TradeRouteStop)stopListModel.get(stopIndex);
+                        TradeRouteStop stop = TradeRouteInputPanel.this
+                            .stopListModel.get(stopIndex);
                         List<GoodsType> cargo
                             = new ArrayList<GoodsType>(stop.getCargo());
                         for (int index = 0; index < cargo.size(); index++) {
@@ -443,7 +443,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
     private MouseListener dragListener, dropListener;
 
     /** Model to contain the current stops. */
-    private DefaultListModel stopListModel;
+    private DefaultListModel<TradeRouteStop> stopListModel;
 
     /** The list of stops to show. */
     private JList stopList;
@@ -490,7 +490,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
         this.dragListener = new DragListener(getFreeColClient(), this);
         this.dropListener = new DropListener();
 
-        this.stopListModel = new DefaultListModel();
+        this.stopListModel = new DefaultListModel<TradeRouteStop>();
         for (TradeRouteStop stop : tradeRoute.getStops()) {
             this.stopListModel.addElement(stop);
         }
@@ -520,8 +520,8 @@ public final class TradeRouteInputPanel extends FreeColPanel {
                     if (e.getValueIsAdjusting()) return;
                     int[] idx = stopList.getSelectedIndices();
                     if (idx.length > 0) {
-                        TradeRouteStop stop = (TradeRouteStop)
-                            TradeRouteInputPanel.this.stopListModel.get(idx[0]);
+                        TradeRouteStop stop = TradeRouteInputPanel.this
+                            .stopListModel.get(idx[0]);
                         TradeRouteInputPanel.this.cargoPanel.initialize(stop);
                         TradeRouteInputPanel.this.goodsPanel.setEnabled(true);
                     } else {
@@ -603,8 +603,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
         // update cargo panel if stop is selected
         if (this.stopListModel.getSize() > 0) {
             this.stopList.setSelectedIndex(0);
-            TradeRouteStop selectedStop
-                = (TradeRouteStop)this.stopListModel.firstElement();
+            TradeRouteStop selectedStop = this.stopListModel.firstElement();
             this.cargoPanel.initialize(selectedStop);
         }
 
@@ -724,8 +723,8 @@ public final class TradeRouteInputPanel extends FreeColPanel {
         }
 
         // Check that all stops are valid
-        for (int index = 0; index < stopListModel.getSize(); index++) {
-            TradeRouteStop stop = (TradeRouteStop)stopListModel.get(index);
+        for (int index = 0; index < this.stopListModel.getSize(); index++) {
+            TradeRouteStop stop = this.stopListModel.get(index);
             if (!TradeRoute.isStopValid(player, stop)) {
                 String badStop = Messages.message(stop.getLocation()
                     .getLocationNameFor(player));
@@ -753,8 +752,7 @@ public final class TradeRouteInputPanel extends FreeColPanel {
             this.newRoute.setName(tradeRouteName.getText());
             this.newRoute.clearStops();
             for (int index = 0; index < this.stopListModel.getSize(); index++) {
-                this.newRoute.addStop((TradeRouteStop)this.stopListModel
-                    .get(index));
+                this.newRoute.addStop(this.stopListModel.get(index));
             }
             this.newRoute.setSilent(this.messagesBox.isSelected());
             // Return to TradeRoutePanel, which will add the route
