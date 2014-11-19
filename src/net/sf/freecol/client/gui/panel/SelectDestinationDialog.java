@@ -45,6 +45,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -84,9 +86,10 @@ import net.miginfocom.swing.MigLayout;
 
 
 /**
- * Centers the map on a known settlement or colony.
+ * Select a location as the destination for a given unit.
  */
-public final class SelectDestinationDialog extends FreeColDialog<Location> {
+public final class SelectDestinationDialog extends FreeColDialog<Location>
+    implements ListSelectionListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SelectDestinationDialog.class.getName());
@@ -315,13 +318,16 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
         }
     }
 
-    private static class LocationRenderer extends FreeColComboBoxRenderer {
+    private static class LocationRenderer
+        extends FreeColComboBoxRenderer<Destination> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public void setLabelValues(JLabel label, Object value) {
-            Destination d = (Destination)value;
-            if (d.icon != null) label.setIcon(d.icon);
-            label.setText(d.text);
+        public void setLabelValues(JLabel label, Destination value) {
+            if (value.icon != null) label.setIcon(value.icon);
+            label.setText(value.text);
         }
     }
 
@@ -339,13 +345,13 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
         = new ArrayList<Destination>();
 
     /** The list of destinations. */
-    private final JList destinationList;
+    private final JList<Destination> destinationList;
 
     /** Restrict to only the player colonies? */
-    private final JCheckBox onlyMyColoniesBox;
+    private JCheckBox onlyMyColoniesBox;
 
     /** Choice of the comparator. */
-    private final JComboBox comparatorBox;
+    private JComboBox<String> comparatorBox;
 
 
     /**
@@ -353,7 +359,6 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public SelectDestinationDialog(FreeColClient freeColClient, Unit unit) {
         super(freeColClient);
 
@@ -368,26 +373,21 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
         JLabel header = GUI.getDefaultHeader(sel);
         header.setFont(GUI.SMALL_HEADER_FONT);
 
-        DefaultListModel model = new DefaultListModel();
-        this.destinationList = new JList(model);
+        DefaultListModel<Destination> model
+            = new DefaultListModel<Destination>();
+        this.destinationList = new JList<Destination>(model);
         this.destinationList.setCellRenderer(new LocationRenderer());
         this.destinationList.setFixedCellHeight(CELL_HEIGHT);
-        this.destinationList
-            .addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    if (e.getValueIsAdjusting()) return;
-                    recenter((Destination)destinationList.getSelectedValue());
-                }
-            });
+        this.destinationList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.destinationList.addListSelectionListener(this);
         this.destinationList.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() != 2) return;
-                    Destination d
-                        = (Destination)destinationList.getSelectedValue();
+                    Destination d = destinationList.getSelectedValue();
                     if (d != null) setValue(options.get(0));
                 }
             });
-        update();
+        updateDestinationList();
 
         JScrollPane listScroller = new JScrollPane(destinationList);
         listScroller.setPreferredSize(new Dimension(300, 300));
@@ -397,11 +397,11 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
         this.onlyMyColoniesBox.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent event) {
                     showOnlyMyColonies = onlyMyColoniesBox.isSelected();
-                    update();
+                    updateDestinationList();
                 }
             });
 
-        this.comparatorBox = new JComboBox(new String[] {
+        this.comparatorBox = new JComboBox<String>(new String[] {
                 Messages.message("selectDestination.sortByOwner"),
                 Messages.message("selectDestination.sortByName"),
                 Messages.message("selectDestination.sortByDistance")
@@ -409,8 +409,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
         this.comparatorBox.addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent event) {
                     updateDestinationComparator();
-                    Collections.sort(destinations, destinationComparator);
-                    update();
+                    Collections.sort(SelectDestinationDialog.this.destinations,
+                        SelectDestinationDialog.this.destinationComparator);
+                    updateDestinationList();
                 }
             });
         this.comparatorBox.setSelectedIndex(
@@ -422,8 +423,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                                                     "[align center]", ""));
         panel.add(header);
         panel.add(listScroller, "newline 30, growx, growy");
-        panel.add(onlyMyColoniesBox, "left");
-        panel.add(comparatorBox, "left");
+        panel.add(this.onlyMyColoniesBox, "left");
+        panel.add(this.comparatorBox, "left");
         panel.setSize(panel.getPreferredSize());
 
         List<ChoiceItem<Location>> c = choices();
@@ -489,7 +490,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                     if (!s.isConnectedPort()) continue;
                 } else {
                     if (!Map.isSameContiguity(unit.getLocation(),
-                            s.getTile())) continue;
+                                              s.getTile())) continue;
                 }
                 if (s instanceof IndianSettlement
                     && !((IndianSettlement)s).hasContacted(player)) continue;
@@ -518,13 +519,12 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
     /**
      * Reset the destinations in the model.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private void update() {
+    private void updateDestinationList() {
         final Player player = getMyPlayer();
-        DefaultListModel model = (DefaultListModel)destinationList.getModel();
-        Object selected = destinationList.getSelectedValue();
-        model.clear();
-        for (Destination d : destinations) {
+        Destination selected = this.destinationList.getSelectedValue();
+        DefaultListModel<Destination> model
+            = new DefaultListModel<Destination>();
+        for (Destination d : this.destinations) {
             if (showOnlyMyColonies) {
                 if (d.location instanceof Europe
                     || d.location instanceof Map
@@ -536,11 +536,12 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
                 model.addElement(d);
             }
         }
-        destinationList.setSelectedValue(selected, true);
-        if (destinationList.getSelectedIndex() < 0) {
-            destinationList.setSelectedIndex(0);
+        this.destinationList.setModel(model);
+        this.destinationList.setSelectedValue(selected, true);
+        if (this.destinationList.getSelectedIndex() < 0) {
+            this.destinationList.setSelectedIndex(0);
         }
-        recenter((Destination)destinationList.getSelectedValue());
+        recenter(this.destinationList.getSelectedValue());
     }
 
     /**
@@ -549,9 +550,10 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
      * @param destination The <code>Destination</code> to display.
      */
     private void recenter(Destination destination) {
-        if (destination == null
-            || destination.location.getTile() == null) return;
-        getGUI().setFocus(destination.location.getTile());
+        if (destination != null
+            && destination.location.getTile() != null) {
+            getGUI().setFocus(destination.location.getTile());
+        }
     }
 
     /**
@@ -572,13 +574,27 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
         }
     }
 
+
+    // Interface ListSelectionListener
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void valueChanged(ListSelectionEvent e) {
+        if (e.getValueIsAdjusting()) return;
+        recenter(this.destinationList.getSelectedValue());
+    }
+
+
+    // Implement FreeColDialog
+
     /**
      * {@inheritDoc}
      */
     public Location getResponse() {
         Object value = getValue();
         if (options.get(0).equals(value)) {
-            Destination d = (Destination)destinationList.getSelectedValue();
+            Destination d = this.destinationList.getSelectedValue();
             if (d != null) return d.location;
         }
         return null;
@@ -591,7 +607,20 @@ public final class SelectDestinationDialog extends FreeColDialog<Location> {
      * {@inheritDoc}
      */
     @Override
+    public void removeNotify() {
+        super.removeNotify();
+
+        removeAll();
+        this.destinations.clear();
+        this.onlyMyColoniesBox = null;
+        this.comparatorBox = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void requestFocus() {
-        destinationList.requestFocus();
+        this.destinationList.requestFocus();
     }
 }
