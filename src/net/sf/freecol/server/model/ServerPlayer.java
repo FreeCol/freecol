@@ -2016,7 +2016,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         for (Event event : father.getEvents()) {
             String eventId = event.getId();
-            if ("model.event.resetNativeAlarm".equals(eventId)) {
+            if ("model.event.resetBannedMissions".equals(eventId)) {
+                for (Player p : game.getLiveNativePlayers(null)) {
+                    if (p.missionsBanned(this)) {
+                        p.removeMissionBan(this);
+                        cs.add(See.only(this), p);
+                    }
+                }
+            } else if ("model.event.resetNativeAlarm".equals(eventId)) {
                 for (Player p : game.getLiveNativePlayers(null)) {
                     if (!p.hasContacted(this)) continue;
                     p.setTension(this, new Tension(Tension.TENSION_MIN));

@@ -57,6 +57,18 @@
     </building-type>
   </building-types>
 
+  <founding-fathers>
+    <founding-father id="model.foundingFather.pocahontas" type="political"
+                     weight1="7" weight2="5" weight3="3">
+      <modifier id="model.modifier.nativeAlarmModifier"
+                type="percentage" value="-50"/>
+      <event id="model.event.resetNativeAlarm"/>
+      <!-- In Col1 bans on missionaries persist forever.  Allow
+           Pocahontas to clear them as a FreeCol extension. -->
+      <event id="model.event.resetBannedMissions"/>
+    </founding-father>
+  </founding-fathers>
+
   <european-nation-types>
     <european-nation-type id="model.nationType.ref" preserve="true">
       <!-- Shorten REF sail time. -->

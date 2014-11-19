@@ -3059,6 +3059,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Remove a mission ban from a player.
+     *
+     * @param player The <code>Player</code> to clear the ban for.
+     */
+    public void removeMissionBan(Player player) {
+        if (bannedMissions != null) bannedMissions.remove(player);
+    }
+
+    /**
      * Gets the stance towards a given player.
      *
      * @param player The other <code>Player</code> to check.
