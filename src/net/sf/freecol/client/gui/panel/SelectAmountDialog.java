@@ -49,7 +49,7 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
     private static final int[] amounts = { 20, 40, 50, 60, 80, 100 };
 
     /** The combo box to input the amount through. */
-    private final JComboBox comboBox;
+    private final JComboBox<Integer> comboBox;
 
 
     /**
@@ -61,7 +61,6 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
      * @param defaultAmount The amount to select to start with.
      * @param pay If true, check the player has sufficient funds.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public SelectAmountDialog(FreeColClient freeColClient, GoodsType goodsType,
                               int available, int defaultAmount, boolean pay) {
         super(freeColClient);
@@ -97,7 +96,7 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
                 }
             }
         }
-        this.comboBox = new JComboBox(values.toArray());
+        this.comboBox = new JComboBox<Integer>(values.toArray(new Integer[0]));
         this.comboBox.setEditable(true);
         if (defaultIndex >= 0) this.comboBox.setSelectedIndex(defaultIndex);
 
@@ -114,14 +113,7 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
      */
     protected Integer getInputValue() {
         Object value = this.comboBox.getSelectedItem();
-        if (value instanceof Integer) {
-            return (Integer)value;
-        } else if (value instanceof String) {
-            try {
-                return Integer.valueOf((String)value);
-            } catch (NumberFormatException e) {}
-        }
-        return -1;
+        return (value instanceof Integer) ? (Integer)value : -1;
     }
 
 
