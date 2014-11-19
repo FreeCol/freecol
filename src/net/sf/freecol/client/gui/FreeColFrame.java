@@ -29,6 +29,8 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.WindowedFrameListener;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -39,7 +41,7 @@ public abstract class FreeColFrame extends JFrame {
     private static final Logger logger = Logger.getLogger(FreeColFrame.class.getName());
 
     /** The FreeCol client controlling the frame. */
-    protected FreeColClient freeColClient;
+    protected final FreeColClient freeColClient;
 
 
     /**
@@ -75,23 +77,6 @@ public abstract class FreeColFrame extends JFrame {
         return "FreeCol " + FreeCol.getVersion();
     } 
 
-    /**
-     * Create a new main frame for FreeCol.
-     *
-     * @param freeColClient The enclosing <code>FreeColClient</code>.
-     * @param gd The <code>GraphicsDevice</code> to use.
-     * @param canvas The <code>Canvas</code> to use.
-     * @param windowed Use windowed mode.
-     * @return A suitable <code>FreeColFrame</code>.
-     */
-    public static FreeColFrame createFreeColFrame(FreeColClient freeColClient,
-                                                  Canvas canvas,
-                                                  GraphicsDevice gd,
-                                                  boolean windowed) {
-        return (windowed)
-            ? new WindowedFrame(freeColClient, gd, canvas)
-            : new FullScreenFrame(freeColClient, gd);
-    }
 
     /**
      * Set the canvas for this frame.

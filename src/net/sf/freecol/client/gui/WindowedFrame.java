@@ -19,17 +19,12 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.Rectangle;
 import java.awt.GraphicsDevice;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.util.logging.Logger;
+import java.awt.Rectangle;
 
 import javax.swing.JFrame;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.WindowedFrameListener;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -38,34 +33,19 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class WindowedFrame extends FreeColFrame  {
 
-    private static final Logger logger = Logger.getLogger(WindowedFrame.class.getName());
-
 
     /**
      * Create a windowed frame.
      *
-     * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param gd The <code>GraphicsDevice</code> to display on.
-     * @param canvas The <code>Canvas</code> to extract the size from.
      */
     public WindowedFrame(final FreeColClient freeColClient,
-                         GraphicsDevice gd, final Canvas canvas) {
+                         GraphicsDevice gd) {
         super(freeColClient, gd);
 
-        // Disabled as this prevents the --windowed WIDTHxHEIGHT
-        // command line parameter from working.
-        //this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setResizable(true);
-        
-        addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    ResourceManager.preload(canvas.getSize());
-                }
-            });
-
-        logger.info("Switched to windowed mode with size: " + canvas.getSize());
     }
 
 

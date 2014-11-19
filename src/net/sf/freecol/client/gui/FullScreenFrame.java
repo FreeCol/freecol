@@ -21,11 +21,9 @@ package net.sf.freecol.client.gui;
 
 import java.awt.GraphicsDevice;
 import java.awt.Rectangle;
-import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 
 
@@ -35,26 +33,24 @@ import net.sf.freecol.client.FreeColClient;
  */
 public final class FullScreenFrame extends FreeColFrame {
 
-    private static final Logger logger = Logger.getLogger(FullScreenFrame.class.getName());
-
 
     /**
-     * The constructor to use.
+     * Create a full screen frame.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gd The context of this <code>FullScreenFrame</code>.
+     * @param gd The <code>GraphicsDevice</code> to display on.
      */
-    public FullScreenFrame(FreeColClient freeColClient, GraphicsDevice gd) {
+    public FullScreenFrame(final FreeColClient freeColClient,
+                           GraphicsDevice gd) {
         super(freeColClient, gd);
 		
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setUndecorated(true);
-
         gd.setFullScreenWindow(this);
-        logger.info("Switched to full screen mode.");
-        //getContentPane().setLayout(null);
     }
 
+
+    // Inherit FreeColFrame.setCanvas
 
     /**
      * {@inheritDoc}

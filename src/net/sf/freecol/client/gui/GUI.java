@@ -38,6 +38,8 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -395,36 +397,47 @@ public class GUI {
      *     and <code>false</code> for fullscreen mode.
      */
     public void changeWindowedMode(boolean windowed) {
-        JMenuBar menuBar = null;
-        if (frame != null) {
-            menuBar = frame.getJMenuBar();
-            if (frame instanceof WindowedFrame) {
-                this.windowBounds = frame.getBounds();
-            }
-            frame.setVisible(false);
-            frame.dispose();
-        }
-        setWindowed(windowed);
-
-        /* User might have moved window to new screen in a
-         * multi-screen setup, so make this.gd point to the current
-         * screen. */
+        // Get the graphics device
         GraphicsDevice gd;
         if (this.frame != null) {
-            GraphicsConfiguration GraphicsConf = this.frame.getGraphicsConfiguration();
+            GraphicsConfiguration GraphicsConf
+                = this.frame.getGraphicsConfiguration();
             gd = GraphicsConf.getDevice();
         } else {
             gd = getGoodGraphicsDevice();
         }
-        this.frame = FreeColFrame.createFreeColFrame(freeColClient, canvas, gd,
-                                                     windowed);
-        frame.setJMenuBar(menuBar);
-        frame.setCanvas(canvas);
-        frame.updateBounds(getWindowBounds());
+
+        // Clean up the old frame
+        JMenuBar menuBar = null;
+        if (this.frame != null) {
+            menuBar = this.frame.getJMenuBar();
+            if (this.frame instanceof WindowedFrame) {
+                this.windowBounds = this.frame.getBounds();
+            }
+            this.frame.setVisible(false);
+            this.frame.dispose();
+        }
+        setWindowed(windowed);
+
+        // User might have moved window to new screen in a
+        // multi-screen setup, so make this.gd point to the current screen.
+        this.frame = (windowed) ? new WindowedFrame(freeColClient, gd)
+            : new FullScreenFrame(freeColClient, gd);
+        this.frame.setJMenuBar(menuBar);
+        this.frame.setCanvas(canvas);
+        this.frame.updateBounds(getWindowBounds());
+        if (windowed) {
+            this.frame.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        ResourceManager.preload(canvas.getSize());
+                    }
+                });
+        }
 
         mapViewer.forceReposition();
         canvas.updateSizes();
-        frame.setVisible(true);
+        this.frame.setVisible(true);
     }
 
     /**
@@ -792,6 +805,10 @@ public class GUI {
      */
     public static Dimension determineWindowSize(GraphicsDevice gd) {
         if (gd == null) return null;
+
+        // This is supposed to maximize a window
+        //   setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        // but there have been problems.
 
         // Get max size of window including border.
         DisplayMode dm = gd.getDisplayMode();
