@@ -62,7 +62,36 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EndTurnDialog.class.getName());
 
-    private class UnitCellRenderer implements ListCellRenderer {
+    /**
+     * We need to wrap the Unit class in order to make the JList
+     * support keystroke navigation.  JList.getNextMatch uses the
+     * toString() method, but the toString() method of FreeCol objects
+     * provides debugging information rather than a searchable name.
+     */
+    private static class UnitWrapper {
+
+        public Unit unit;
+        public String name;
+        public String location;
+
+
+        public UnitWrapper(Unit unit) {
+            this.unit = unit;
+            this.name = unit.getDescription(Unit.UnitLabelType.NATIONAL);
+            this.location = Messages.message(unit.getLocation()
+                .getLocationNameFor(unit.getOwner()));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private class UnitCellRenderer implements ListCellRenderer<UnitWrapper> {
 
         private JPanel itemPanel = new MigPanel();
         private JPanel selectedPanel = new MigPanel();
@@ -76,23 +105,27 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
             itemPanel.setLayout(new MigLayout("", "[60]"));
             selectedPanel.setOpaque(false);
             selectedPanel.setLayout(new MigLayout("", "[60]"));
-            selectedPanel.setUI((PanelUI) FreeColSelectedPanelUI.createUI(selectedPanel));
-            locationLabel.setFont(locationLabel.getFont().deriveFont(Font.ITALIC));
+            selectedPanel.setUI((PanelUI)FreeColSelectedPanelUI.createUI(selectedPanel));
+            locationLabel.setFont(locationLabel.getFont()
+                .deriveFont(Font.ITALIC));
         }
 
-        public Component getListCellRendererComponent(JList list,
-                                                      Object value,
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Component getListCellRendererComponent(JList<? extends UnitWrapper> list,
+                                                      UnitWrapper value,
                                                       int index,
                                                       boolean isSelected,
                                                       boolean cellHasFocus) {
-            UnitWrapper unit = (UnitWrapper) value;
+            imageLabel.setIcon(getImageLibrary().getUnitImageIcon(value.unit, 0.5));
+            nameLabel.setText(value.name);
+            locationLabel.setText(value.location);
+
             JPanel panel = (isSelected) ? selectedPanel : itemPanel;
             panel.removeAll();
-
-            imageLabel.setIcon(getImageLibrary().getUnitImageIcon(unit.unit, 0.5));
-            nameLabel.setText(unit.name);
-            locationLabel.setText(unit.location);
-
             panel.add(imageLabel, "center");
             panel.add(nameLabel, "split 2, flowy");
             panel.add(locationLabel);
@@ -100,46 +133,14 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
         }
     }
 
-    /**
-     * We need to wrap the Unit class in order to make the JList
-     * support keystroke navigation.  JList.getNextMatch uses the
-     * toString() method, but the toString() method of FreeCol objects
-     * provides debugging information rather than a searchable name.
-     */
-    public static class UnitWrapper {
-
-        public Unit unit;
-        public String name;
-        public String location;
-
-        public UnitWrapper(Unit unit) {
-            this.unit = unit;
-            this.name = unit.getDescription(Unit.UnitLabelType.NATIONAL);
-            this.location = Messages.message(unit.getLocation()
-                .getLocationNameFor(unit.getOwner()));
-        }
-
-        public Unit getUnit() {
-            return unit;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
 
     /** The list of units to display. */
-    private JList unitList;
+    private JList<UnitWrapper> unitList;
 
 
     /**
      * The constructor to use.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public EndTurnDialog(FreeColClient freeColClient, List<Unit> units) {
         super(freeColClient);
 
@@ -154,11 +155,12 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
                 .addAmount("%number%", units.size());
         JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
 
-        DefaultListModel model = new DefaultListModel();
+        DefaultListModel<UnitWrapper> model = new DefaultListModel<UnitWrapper>();
         for (Unit unit : units) {
             model.addElement(new UnitWrapper(unit));
         }
-        this.unitList = new JList(model);
+
+        this.unitList = new JList<UnitWrapper>(model);
         this.unitList.setCellRenderer(new UnitCellRenderer());
         this.unitList.setFixedCellHeight(48);
         this.unitList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"),
@@ -181,8 +183,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
                     selectUnit();
                 }
             });
-
-        JScrollPane listScroller = new JScrollPane(unitList);
+        JScrollPane listScroller = new JScrollPane(this.unitList);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
                                                     "[400, align center]"));
@@ -199,20 +200,19 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
      * Select the current unit in the list.
      */
     private void selectUnit() {
-        UnitWrapper wrapper = (UnitWrapper)unitList.getSelectedValue();
-        if (wrapper != null && wrapper.getUnit() != null) {
-            Unit unit = wrapper.getUnit();
-            if (unit.isInEurope()) {
+        UnitWrapper wrapper = this.unitList.getSelectedValue();
+        if (wrapper != null && wrapper.unit != null) {
+            if (wrapper.unit.isInEurope()) {
                 getGUI().showEuropePanel();
             } else {
-                getGUI().setActiveUnit(unit);
-                if (unit.getColony() != null) {
-                    getGUI().showColonyPanel(unit.getColony(), unit);
-                } else if (unit.hasTile()) {
-                    getGUI().setFocus(unit.getTile());
+                getGUI().setActiveUnit(wrapper.unit);
+                if (wrapper.unit.getColony() != null) {
+                    getGUI().showColonyPanel(wrapper.unit.getColony(),
+                                             wrapper.unit);
+                } else if (wrapper.unit.hasTile()) {
+                    getGUI().setFocus(wrapper.unit.getTile());
                 }
             }
         }
     }
 }
-
