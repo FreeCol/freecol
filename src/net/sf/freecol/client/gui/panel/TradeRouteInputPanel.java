@@ -117,7 +117,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
      * TODO: create a single cargo panel for this purpose and the use in the
      * ColonyPanel, the EuropePanel and the CaptureGoodsDialog.
      */
-    public class CargoPanel extends JPanel {
+    private class CargoPanel extends JPanel {
 
         public CargoPanel() {
             super();
@@ -347,7 +347,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
     /**
      * TransferHandler for Stops.
      */
-    public static class StopListHandler extends TransferHandler {
+    private class StopListHandler extends TransferHandler {
 
         /**
          * {@inheritDoc}
@@ -387,16 +387,17 @@ public final class TradeRouteInputPanel extends FreeColPanel
         /**
          * {@inheritDoc}
          */
-        @Override @SuppressWarnings("unchecked") // FIXME in Java7
+        @Override
         public boolean importData(JComponent target, Transferable data) {
+            JList<TradeRouteStop> stl = TradeRouteInputPanel.this.stopList;
             if (canImport(target, data.getTransferDataFlavors())
-                && target instanceof JList
+                && target == stl
                 && data instanceof StopListTransferable) {
                 List<TradeRouteStop> stops
                     = ((StopListTransferable)data).getStops();
                 DefaultListModel<TradeRouteStop> model
                     = new DefaultListModel<TradeRouteStop>();
-                int index = ((JList)target).getMaxSelectionIndex();
+                int index = stl.getMaxSelectionIndex();
                 for (TradeRouteStop stop : stops) {
                     if (index < 0) {
                         model.addElement(stop);
@@ -405,7 +406,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
                         model.add(index, stop);
                     }
                 }
-                ((JList<TradeRouteStop>)target).setModel(model);
+                stl.setModel(model);
                 return true;
             }
             return false;
