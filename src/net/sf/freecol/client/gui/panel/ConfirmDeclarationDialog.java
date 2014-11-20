@@ -25,7 +25,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -36,7 +38,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -49,6 +50,8 @@ import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * A dialog used to confirm the declaration of independence.
@@ -59,8 +62,11 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ConfirmDeclarationDialog.class.getName());
 
+    /** A button for a colour.  Public for FlagTest. */
     public static class ColorButton extends JButton {
+
         private Color color = null;
+
 
         public ColorButton(Color color) {
             setColor(color);
@@ -76,6 +82,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
             setText(color == null ? "X" : null);
         }
 
+
         /**
          * {@inheritDoc}
          */
@@ -83,29 +90,33 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         public String getUIClassID() {
             return "ColorButtonUI";
         }
-
-
     }
 
-    private static class EnumRenderer extends FreeColComboBoxRenderer {
+    /** Simple renderer for Messages with a prefix. */
+    private static class EnumRenderer<T> extends FreeColComboBoxRenderer<T> {
 
         private final String prefix;
+
 
         public EnumRenderer(String prefix) {
             this.prefix = prefix;
         }
 
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public void setLabelValues(JLabel c, Object value) {
-            c.setText(Messages.message(prefix + value));
+        public void setLabelValues(JLabel c, T value) {
+            c.setText(Messages.message(prefix + value.toString()));
         }
     }
 
 
     // based on the flag of Venezuela (Colombia and Ecuador are
     // similar)
-    public static final Flag SPANISH_FLAG =
-        new Flag(Background.FESSES, Decoration.NONE, UnionPosition.MIDDLE)
+    public static final Flag SPANISH_FLAG
+        = new Flag(Background.FESSES, Decoration.NONE, UnionPosition.MIDDLE)
         .setStripes(3)
         .setUnionColor(null)
         .setBackgroundColors(new Color(0xcf, 0x14, 0x2b),
@@ -115,24 +126,24 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
     // based on the flag of Brazil, particularly the Provisional
     // Flag of Republic of the United States of Brazil (November
     // 15–19, 1889)
-    public static final Flag PORTUGUESE_FLAG =
-        new Flag(Background.FESSES, Decoration.NONE, UnionPosition.CANTON)
+    public static final Flag PORTUGUESE_FLAG
+        = new Flag(Background.FESSES, Decoration.NONE, UnionPosition.CANTON)
         .setUnionColor(new Color(62, 64, 149))
         .setBackgroundColors(new Color(0, 168, 89),
                              new Color(255, 204, 41));
 
     // based on the current flag of the United States and its
     // various predecessors
-    public static final Flag ENGLISH_FLAG =
-        new Flag(Background.FESSES, Decoration.NONE, UnionPosition.CANTON)
+    public static final Flag ENGLISH_FLAG
+        = new Flag(Background.FESSES, Decoration.NONE, UnionPosition.CANTON)
         .setUnionColor(new Color(.234f, .233f, .430f))
         .setBackgroundColors(new Color(.698f, .132f, .203f),
                              Color.WHITE);
 
     // based on the flag of Louisiana in 1861 and other similar
     // French colonial flags
-    public static final Flag FRENCH_FLAG =
-        new Flag(Background.PALES, Decoration.NONE, UnionPosition.LEFT)
+    public static final Flag FRENCH_FLAG
+        = new Flag(Background.PALES, Decoration.NONE, UnionPosition.LEFT)
         .setStripes(3)
         .setUnionColor(null)
         .setBackgroundColors(new Color(0, 0x23, 0x95),
@@ -140,8 +151,8 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
                              new Color(0xed, 0x29, 0x39));
 
     // Dutch flag
-    public static final Flag DUTCH_FLAG =
-        new Flag(Background.FESSES, Decoration.NONE, UnionPosition.TOP)
+    public static final Flag DUTCH_FLAG
+        = new Flag(Background.FESSES, Decoration.NONE, UnionPosition.TOP)
         .setStripes(3)
         .setUnionColor(null)
         .setBackgroundColors(new Color(0xae, 0x1c, 0x28),
@@ -149,52 +160,88 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
                              new Color(0x21, 0x46, 0x6b));
 
     // Swedish flag
-    public static final Flag SWEDISH_FLAG =
-        new Flag(Background.QUARTERLY, Decoration.SCANDINAVIAN_CROSS, UnionPosition.CANTON)
+    public static final Flag SWEDISH_FLAG
+        = new Flag(Background.QUARTERLY, Decoration.SCANDINAVIAN_CROSS, UnionPosition.CANTON)
         .setUnionColor(null)
         .setDecorationColor(new Color(0xFE, 0xCB, 0))
         .setBackgroundColors(new Color(0, 0x52, 0x93));
 
     // Danish flag
-    public static final Flag DANISH_FLAG =
-        new Flag(Background.QUARTERLY, Decoration.SCANDINAVIAN_CROSS, UnionPosition.CANTON)
+    public static final Flag DANISH_FLAG
+        = new Flag(Background.QUARTERLY, Decoration.SCANDINAVIAN_CROSS, UnionPosition.CANTON)
         .setUnionColor(null)
         .setDecorationColor(Color.WHITE)
         .setBackgroundColors(new Color(0xC6, 0x0C, 0x30));
 
     // Russian flag
-    public static final Flag RUSSIAN_FLAG =
-        new Flag(Background.FESSES, Decoration.NONE, UnionPosition.MIDDLE)
+    public static final Flag RUSSIAN_FLAG
+        = new Flag(Background.FESSES, Decoration.NONE, UnionPosition.MIDDLE)
         .setStripes(3)
         .setUnionColor(null)
         .setBackgroundColors(Color.WHITE,
                              new Color(0, 0x39, 0xa6),
                              new Color(0xd5, 0x2b, 0x1e));
 
-    private final JTextField nationField;
+    /** A map of default nation flags. */
+    private static final Map<String, Flag> defaultFlags
+        = new HashMap<String, Flag>();
+    static {
+        defaultFlags.put("model.nation.dutch",      DUTCH_FLAG);
+        defaultFlags.put("model.nation.english",    ENGLISH_FLAG);
+        defaultFlags.put("model.nation.french",     FRENCH_FLAG);
+        defaultFlags.put("model.nation.spanish",    SPANISH_FLAG);
+        defaultFlags.put("model.nation.danish",     DANISH_FLAG);
+        defaultFlags.put("model.nation.portuguese", PORTUGUESE_FLAG);
+        defaultFlags.put("model.nation.russian",    RUSSIAN_FLAG);
+        defaultFlags.put("model.nation.swedish",    SWEDISH_FLAG);
+    }
 
+    /** Independent country name. */
     private final JTextField countryField;
 
-    private final JLabel label = new JLabel();
+    /** Independent nation name. */
+    private final JTextField nationField;
 
+    /** Label with the icon of the flag. */
+    private final JLabel label;
+
+    /** The flag to use for the new nation. */
     private Flag flag;
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private final JComboBox decoration = new JComboBox(Flag.Decoration.values());
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private JComboBox background = new JComboBox(Flag.Background.values());
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private JComboBox unionPosition = new JComboBox(Flag.UnionPosition.values());
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private JComboBox unionShape = new JComboBox(Flag.UnionShape.values());
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private JComboBox stars = new JComboBox(getNumbers(50));
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private JComboBox stripes = new JComboBox(getNumbers(13));
+    /** A box to select the flag background from. */
+    private final JComboBox<Background> background
+        = new JComboBox<Background>(Background.values());
 
-    private ColorButton unionColor = new ColorButton(Color.BLUE);
-    private ColorButton starColor = new ColorButton(Color.WHITE);
+    /** A box to select the flag decoration from. */
+    private final JComboBox<Decoration> decoration
+        = new JComboBox<Decoration>(Decoration.values());
+
+    /** A box to select the union position with. */
+    private final JComboBox<UnionPosition> unionPosition
+        = new JComboBox<UnionPosition>(UnionPosition.values());
+
+    /** A box to select the union shap with. */
+    private final JComboBox<UnionShape> unionShape
+        = new JComboBox<UnionShape>(UnionShape.values());
+
+    /** A box to select the number of stars with. */
+    private final JComboBox<String> stars
+        = new JComboBox<String>(getNumbers(50));
+
+    /** A box to select the number of stripes with. */
+    private final JComboBox<String> stripes
+        = new JComboBox<String>(getNumbers(13));
+
+    /** The selected decoration colour. */
     private ColorButton decorationColor = new ColorButton(Color.WHITE);
+
+    /** The selected union colour. */
+    private ColorButton unionColor = new ColorButton(Color.BLUE);
+
+    /** The selected star colour. */
+    private ColorButton starColor = new ColorButton(Color.WHITE);
+
+    /** The selected background colours. */
     private ColorButton[] backgroundColors = new ColorButton[] {
         new ColorButton(null), new ColorButton(null), new ColorButton(null),
         new ColorButton(null), new ColorButton(null), new ColorButton(null)
@@ -210,92 +257,83 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         super(freeColClient);
 
         final Player player = freeColClient.getMyPlayer();
-        // TODO: put flag data in specification or resources
-        String nationId = player.getNationId();
-        if ("model.nation.dutch".equals(nationId)) {
-            flag = DUTCH_FLAG;
-        } else if ("model.nation.spanish".equals(nationId)) {
-            flag = SPANISH_FLAG;
-        } else if ("model.nation.french".equals(nationId)) {
-            flag = FRENCH_FLAG;
-        } else if ("model.nation.portuguese".equals(nationId)) {
-            flag = PORTUGUESE_FLAG;
-        } else if ("model.nation.russian".equals(nationId)) {
-            flag = RUSSIAN_FLAG;
-        } else if ("model.nation.danish".equals(nationId)) {
-            flag = DANISH_FLAG;
-        } else if ("model.nation.swedish".equals(nationId)) {
-            flag = SWEDISH_FLAG;
-        } else {
-            // English is default
-            flag = ENGLISH_FLAG;
-        }
+        this.flag = defaultFlags.get(player.getNationId());
+        if (this.flag == null) this.flag = ENGLISH_FLAG; // default to USA-style
 
-        // Create the main panel
-        MigPanel panel = new MigPanel(new MigLayout("wrap 2", "[][fill]", "[fill]"));
+        StringTemplate sure = StringTemplate
+            .template("declareIndependence.areYouSure.text")
+            .add("%monarch%", player.getMonarch().getNameKey());
 
-        StringTemplate sure
-            = StringTemplate.template("declareIndependence.areYouSure.text")
-                .add("%monarch%", player.getMonarch().getNameKey());
+        StringTemplate country = StringTemplate
+            .template("declareIndependence.defaultCountry")
+            .add("%nation%", player.getNewLandName());
+        this.countryField = new JTextField(Messages.message(country), 20);
 
-        StringTemplate country
-            = StringTemplate.template("declareIndependence.defaultCountry")
-                .add("%nation%", player.getNewLandName());
-        countryField = new JTextField(Messages.message(country), 20);
         String cPrompt = Messages.message("declareIndependence.enterCountry");
 
-        StringTemplate nation
-            = StringTemplate.template("declareIndependence.defaultNation")
-                .addStringTemplate("%nation%", player.getNationName());
-        nationField = new JTextField(Messages.message(nation), 20);
+        StringTemplate nation = StringTemplate
+            .template("declareIndependence.defaultNation")
+            .addStringTemplate("%nation%", player.getNationName());
+        this.nationField = new JTextField(Messages.message(nation), 20);
+
         String nPrompt = Messages.message("declareIndependence.enterNation");
+
         String flagPrompt = Messages.message("declareIndependence.createFlag");
 
+        this.label = new JLabel();
+        this.label.setIcon(new ImageIcon(this.flag.getImage()));
+
+        // Create the main panel
+        MigPanel panel = new MigPanel(new MigLayout("wrap 2", "[][fill]",
+                                                    "[fill]"));
         panel.add(GUI.getDefaultTextArea(Messages.message(sure)), "span");
         panel.add(GUI.getDefaultTextArea(cPrompt), "span");
-        panel.add(countryField, "span");
+        panel.add(this.countryField, "span");
         panel.add(GUI.getDefaultTextArea(nPrompt), "span");
-        panel.add(nationField, "span");
+        panel.add(this.nationField, "span");
         panel.add(GUI.getDefaultTextArea(flagPrompt), "span");
 
-        label.setIcon(new ImageIcon(flag.getImage()));
-        panel.add(label, "skip, width 200, height 100");
+        panel.add(this.label, "skip, width 200, height 100");
 
-        addComboBox(panel, background, "flag.background.", flag.getBackground());
-        addComboBox(panel, decoration, "flag.decoration.", flag.getDecoration());
-        addComboBox(panel, unionPosition, "flag.unionPosition.", flag.getUnionPosition());
-        addComboBox(panel, unionShape, "flag.unionShape.", flag.getUnionShape());
+        addComboBox(panel, this.background, "flag.background.",
+                    this.flag.getBackground());
+        addComboBox(panel, this.decoration, "flag.decoration.",
+                    this.flag.getDecoration());
+        addComboBox(panel, this.unionPosition, "flag.unionPosition.",
+                    this.flag.getUnionPosition());
+        addComboBox(panel, this.unionShape, "flag.unionShape.",
+                    this.flag.getUnionShape());
 
-        stars.setSelectedIndex(flag.getStars() - 1);
-        stars.addItemListener(this);
+        this.stars.setSelectedIndex(this.flag.getStars() - 1);
+        this.stars.addItemListener(this);
         panel.add(new JLabel(Messages.message("flag.stars.label")));
-        panel.add(stars);
+        panel.add(this.stars);
 
-        stripes.setSelectedIndex(flag.getStripes() - 1);
-        stripes.addItemListener(this);
+        this.stripes.setSelectedIndex(this.flag.getStripes() - 1);
+        this.stripes.addItemListener(this);
         panel.add(new JLabel(Messages.message("flag.stripes.label")));
-        panel.add(stripes);
+        panel.add(this.stripes);
 
-        unionColor.setColor(flag.getUnionColor());
-        unionColor.addActionListener(this);
+        this.unionColor.setColor(this.flag.getUnionColor());
+        this.unionColor.addActionListener(this);
         panel.add(new JLabel(Messages.message("flag.unionColor.label")));
-        panel.add(unionColor, "sg colorButton");
+        panel.add(this.unionColor, "sg colorButton");
 
-        decorationColor.setColor(flag.getDecorationColor());
-        decorationColor.addActionListener(this);
+        this.decorationColor.setColor(this.flag.getDecorationColor());
+        this.decorationColor.addActionListener(this);
         panel.add(new JLabel(Messages.message("flag.decorationColor.label")));
-        panel.add(decorationColor);
+        panel.add(this.decorationColor);
 
-        starColor.setColor(flag.getStarColor());
-        starColor.addActionListener(this);
+        this.starColor.setColor(this.flag.getStarColor());
+        this.starColor.addActionListener(this);
         panel.add(new JLabel(Messages.message("flag.starColor.label")));
-        panel.add(starColor);
+        panel.add(this.starColor);
 
-        List<Color> flagColors = flag.getBackgroundColors();
+        List<Color> flagColors = this.flag.getBackgroundColors();
         int colors = flagColors.size();
         panel.add(new JLabel(Messages.message("flag.backgroundColors.label")));
-        for (int index = 0; index < backgroundColors.length; index++) {
-            ColorButton button = backgroundColors[index];
+        for (int index = 0; index < this.backgroundColors.length; index++) {
+            ColorButton button = this.backgroundColors[index];
             if (index < colors) button.setColor(flagColors.get(index));
             button.addActionListener(this);
             if (index == 0) {
@@ -310,7 +348,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         panel.setPreferredSize(panel.getPreferredSize()); // Prevent NPE
 
         // Use the coat of arms image icon.  Is there something better?
-        ImageIcon icon = getGUI().getImageLibrary().getImageIcon(player, true);
+        ImageIcon icon = getImageLibrary().getImageIcon(player, true);
 
         final List<String> fake = null;
         List<ChoiceItem<List<String>>> c = choices();
@@ -321,56 +359,31 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         initializeDialog(DialogType.QUESTION, true, panel, icon, c);
     }
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private void addComboBox(JPanel panel, JComboBox box, String prefix, Object value) {
-        box.setRenderer(new EnumRenderer(prefix));
+
+    private <T> void addComboBox(JPanel panel, JComboBox<T> box,
+                                 String prefix, T value) {
+        box.setRenderer(new EnumRenderer<T>(prefix));
         box.setSelectedItem(value);
         box.addItemListener(this);
         panel.add(new JLabel(Messages.message(prefix + "label")));
         panel.add(box);
     }
 
-
-    //@SuppressWarnings("unchecked") // FIXME in Java7
-    public void itemStateChanged(ItemEvent e) {
-        Flag.Background newBackground = (Flag.Background) background.getSelectedItem();
-        Flag.Decoration newDecoration = (Flag.Decoration) decoration.getSelectedItem();
-        Flag.UnionPosition newPosition = (Flag.UnionPosition) unionPosition.getSelectedItem();
-        Flag.UnionShape newShape = (Flag.UnionShape) unionShape.getSelectedItem();
-        flag = new Flag(newBackground, newDecoration, newPosition, newShape);
-        flag.setStripes(stripes.getSelectedIndex() + 1);
-        flag.setStars(stars.getSelectedIndex() + 1);
-        setColors();
-
-        label.setIcon(new ImageIcon(flag.getImage()));
-    }
-
-    public void actionPerformed(ActionEvent e) {
-        ColorButton button = (ColorButton) e.getSource();
-        Color color = JColorChooser
-            .showDialog(this,
-                        label.getText(),
-                        button.getBackground());
-        button.setColor(color);
-        setColors();
-        label.setIcon(new ImageIcon(flag.getImage()));
-    }
-
     private void setColors() {
-        flag.setUnionColor(unionColor.getColor());
-        flag.setStarColor(starColor.getColor());
-        flag.setDecorationColor(decorationColor.getColor());
+        this.flag.setUnionColor(this.unionColor.getColor());
+        this.flag.setStarColor(this.starColor.getColor());
+        this.flag.setDecorationColor(this.decorationColor.getColor());
         List<Color> colors = new ArrayList<Color>();
-        for (ColorButton button : backgroundColors) {
+        for (ColorButton button : this.backgroundColors) {
             Color color = button.getColor();
             if (color != null) {
                 colors.add(color);
             }
-            flag.setBackgroundColors(colors);
+            this.flag.setBackgroundColors(colors);
         }
     }
 
-    public final String[] getNumbers(int count) {
+    private final String[] getNumbers(int count) {
         String[] result = new String[count];
         for (int index = 0; index < count; index++) {
             result[index] = Integer.toString(index + 1);
@@ -378,16 +391,58 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         return result;
     }
 
+
+    // Interface ActionListener
+
     /**
      * {@inheritDoc}
      */
+    public void actionPerformed(ActionEvent e) {
+        ColorButton button = (ColorButton)e.getSource();
+        Color color = JColorChooser.showDialog(this, this.label.getText(),
+                                               button.getBackground());
+        button.setColor(color);
+        setColors();
+        this.label.setIcon(new ImageIcon(this.flag.getImage()));
+    }
+
+
+    // Interface ItemListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void itemStateChanged(ItemEvent e) {
+        Background newBackground
+            = (Background)this.background.getSelectedItem();
+        Decoration newDecoration
+            = (Decoration)this.decoration.getSelectedItem();
+        UnionPosition newPosition
+            = (UnionPosition)this.unionPosition.getSelectedItem();
+        UnionShape newShape
+            = (UnionShape)this.unionShape.getSelectedItem();
+        this.flag = new Flag(newBackground, newDecoration,
+                             newPosition, newShape);
+        this.flag.setStars(this.stars.getSelectedIndex() + 1);
+        this.flag.setStripes(this.stripes.getSelectedIndex() + 1);
+        setColors();
+        this.label.setIcon(new ImageIcon(this.flag.getImage()));
+    }
+
+
+    // Override FreeColDialog
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<String> getResponse() {
         Object value = getValue();
         if (options.get(0).equals(value)) {
             List<String> result = new ArrayList<String>();
             // Sanitize user input, used in save file name
-            result.add(nationField.getText().replaceAll("[^\\s\\w]", ""));
-            result.add(countryField.getText());
+            result.add(this.nationField.getText().replaceAll("[^\\s\\w]", ""));
+            result.add(this.countryField.getText());
             return result;
         }
         return null;
