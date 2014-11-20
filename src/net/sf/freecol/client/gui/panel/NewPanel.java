@@ -95,14 +95,17 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         Advantages.NONE
     };
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private final JComboBox nationalAdvantages = new JComboBox(advChoices);
+    /** A box to choose the national advantages setting. */
+    private final JComboBox<Advantages> nationalAdvantages
+        = new JComboBox<Advantages>(advChoices);
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private final JComboBox specificationBox = new JComboBox();
+    /** A box to choose a TC from. */
+    private final JComboBox<FreeColTcFile> specificationBox
+        = new JComboBox<FreeColTcFile>();
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private final JComboBox difficultyBox = new JComboBox();
+    /** A box to choose the difficulty from. */
+    private final JComboBox<OptionGroup> difficultyBox
+        = new JComboBox<OptionGroup>();
 
     private final Component[] joinComponents = new Component[] {
         ipLabel, server, port1Label, port1
@@ -184,7 +187,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
                                     false),
             start = new JRadioButton(Messages.message("startMultiplayerGame"),
                                      false),
-            meta = new JRadioButton( Messages.message("getServerList")
+            meta = new JRadioButton(Messages.message("getServerList")
                 + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
 
         group.add(single);
@@ -305,8 +308,7 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
      * @return The TC.
      */
     private FreeColTcFile getTC() {
-        Object o = specificationBox.getSelectedItem();
-        return (o == null) ? null : (FreeColTcFile)o;
+        return (FreeColTcFile)specificationBox.getSelectedItem();
     }
 
     /**
@@ -400,9 +402,9 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     private void setRenderers() {
-        specificationBox.setRenderer(new FreeColComboBoxRenderer("mod."));
-        nationalAdvantages.setRenderer(new FreeColComboBoxRenderer());
-        difficultyBox.setRenderer(new FreeColComboBoxRenderer());
+        specificationBox.setRenderer(new FreeColComboBoxRenderer<FreeColTcFile>("mod."));
+        nationalAdvantages.setRenderer(new FreeColComboBoxRenderer<Advantages>());
+        difficultyBox.setRenderer(new FreeColComboBoxRenderer<OptionGroup>());
     }
 
     @Override
