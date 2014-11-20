@@ -235,6 +235,8 @@ public final class Specification {
         = new ArrayList<EuropeanNationType>();
 
     // Derived from readerMap container: unitTypeList
+    private final ArrayList<UnitType> buildableUnitTypes
+        = new ArrayList<UnitType>();
     private final Map<GoodsType, UnitType> experts
         = new HashMap<GoodsType, UnitType>();
     private final List<UnitType> unitTypesTrainedInEurope
@@ -597,6 +599,10 @@ public final class Specification {
         unitTypesPurchasedInEurope.clear();
         int bestLandValue = -1, bestNavalValue = -1;
         for (UnitType unitType : unitTypeList) {
+            if (unitType.needsGoodsToBuild()
+                && !unitType.hasAbility(Ability.BORN_IN_COLONY)) {
+                buildableUnitTypes.add(unitType);
+            }
             if (unitType.getExpertProduction() != null) {
                 experts.put(unitType.getExpertProduction(), unitType);
             }
@@ -1247,6 +1253,15 @@ public final class Specification {
      */
     public UnitType getDefaultUnitType() {
         return getUnitType("model.unit.freeColonist");
+    }
+
+    /**
+     * Get the list of buildable unit types.
+     *
+     * @return The list of buildable unit types.
+     */
+    public List<UnitType> getBuildableUnitTypes() {
+        return buildableUnitTypes;
     }
 
     /**

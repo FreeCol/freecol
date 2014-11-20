@@ -90,6 +90,116 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     private static Logger logger = Logger.getLogger(BuildQueuePanel.class.getName());
 
+    private class DefaultBuildQueueCellRenderer
+        implements ListCellRenderer<BuildableType> {
+
+        private JPanel itemPanel = new JPanel();
+        private JPanel selectedPanel = new JPanel();
+        private JLabel imageLabel = new JLabel(new ImageIcon());
+        private JLabel nameLabel = new JLabel();
+
+        private JLabel lockLabel
+            = new JLabel(new ImageIcon(ResourceManager.getImage("lock.image", 0.5)));
+
+        private Dimension buildingDimension = new Dimension(-1, 48);
+
+
+        public DefaultBuildQueueCellRenderer() {
+            itemPanel.setOpaque(false);
+            itemPanel.setLayout(new MigLayout());
+            selectedPanel.setOpaque(false);
+            selectedPanel.setLayout(new MigLayout());
+            selectedPanel.setUI((PanelUI) FreeColSelectedPanelUI.createUI(selectedPanel));
+        }
+
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Component getListCellRendererComponent(JList<? extends BuildableType> list,
+                                                      BuildableType value,
+                                                      int index,
+                                                      boolean isSelected,
+                                                      boolean cellHasFocus) {
+            JPanel panel = (isSelected) ? selectedPanel : itemPanel;
+            panel.removeAll();
+
+            ((ImageIcon)imageLabel.getIcon()).setImage(ResourceManager
+                .getImage(value.getId() + ".image", buildingDimension));
+
+            nameLabel.setText(Messages.message(value.getNameKey()));
+            panel.setToolTipText(lockReasons.get(value));
+            panel.add(imageLabel, "span 1 2");
+            if (lockReasons.get(value) == null) {
+                panel.add(nameLabel, "wrap");
+            } else {
+                panel.add(nameLabel, "split 2");
+                panel.add(lockLabel, "wrap");
+            }
+
+            List<AbstractGoods> required = value.getRequiredGoods();
+            int size = required.size();
+            for (int i = 0; i < size; i++) {
+                AbstractGoods goods = required.get(i);
+                ImageIcon icon = new ImageIcon(ResourceManager.getImage(goods.getType().getId() + ".image", 0.66));
+                JLabel goodsLabel = new JLabel(Integer.toString(goods.getAmount()),
+                    icon, SwingConstants.CENTER);
+                if (i == 0 && size > 1) {
+                    panel.add(goodsLabel, "split " + size);
+                } else {
+                    panel.add(goodsLabel);
+                }
+            }
+            return panel;
+        }
+    }
+
+    class BuildQueueMouseAdapter extends MouseAdapter {
+
+        private boolean add = true;
+        
+        private boolean enabled = false;
+
+        public BuildQueueMouseAdapter(boolean add) {
+            this.add = add;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked") // FIXME in Java7
+        public void mousePressed(MouseEvent e) {
+            if (!enabled && e.getClickCount() == 1 && !e.isConsumed()) {
+                enabled = true;
+            }
+
+            if (enabled) {
+                JList<BuildableType> source
+                    = (JList<BuildableType>)e.getSource();
+                if (e.getButton() == MouseEvent.BUTTON3
+                    || e.isPopupTrigger()) {
+                    int index = source.locationToIndex(e.getPoint());
+                    BuildableType type = source.getModel().getElementAt(index);
+                    getGUI().showColopediaPanel(type.getId());
+                } else if (e.getClickCount() > 1 && !e.isConsumed()) {
+                    JList<BuildableType> bql = BuildQueuePanel.this.buildQueueList;
+                    DefaultListModel<BuildableType> model
+                        = (DefaultListModel<BuildableType>)bql.getModel();
+                    if (source.getSelectedIndex() < 0) {
+                        source.setSelectedIndex(source.locationToIndex(e.getPoint()));
+                    }
+                    for (BuildableType bt : source.getSelectedValuesList()) {
+                        if (add) {
+                            model.addElement(bt);
+                        } else {
+                            model.removeElement(bt);
+                        }
+                    }
+                    updateAllLists();
+                }
+            }
+        }
+    }
+
     private static final String BUY = "buy";
 
     private static final int UNABLE_TO_BUILD = -1;
@@ -99,6 +209,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     /** The enclosing colony. */
     private final Colony colony;
+
+    /** A feature container for potential features from queued buildables. */
+    private FeatureContainer featureContainer;
 
     private final BuildQueueTransferHandler buildQueueHandler
         = new BuildQueueTransferHandler();
@@ -112,18 +225,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     private ConstructionPanel constructionPanel;
     private JButton buyBuilding;
 
-    private FeatureContainer featureContainer;
-
     private Map<BuildableType, String> lockReasons
         = new HashMap<BuildableType, String>();
     private Set<BuildableType> unbuildableTypes
         = new HashSet<BuildableType>();
-
-    /**
-     * A list of unit types that can be build.  Most unit types are
-     * human and can never be built.
-     */
-    private List<UnitType> buildableUnits = new ArrayList<UnitType>();
 
 
     @SuppressWarnings("unchecked") // FIXME in Java7
@@ -134,13 +239,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         this.colony = colony;
         this.featureContainer = new FeatureContainer();
 
-        for (UnitType unitType : getSpecification().getUnitTypeList()) {
-            if (unitType.needsGoodsToBuild()
-                && !unitType.hasAbility(Ability.BORN_IN_COLONY)) {
-                buildableUnits.add(unitType); // can be built
-            }
-        }
-
         DefaultListModel<BuildableType> current
             = new DefaultListModel<BuildableType>();
         for (BuildableType type : this.colony.getBuildQueue()) {
@@ -148,7 +246,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             this.featureContainer.addFeatures(type);
         }
 
-        cellRenderer = getCellRenderer();
+        this.cellRenderer = getCellRenderer();
 
         // remove previous listeners
         for (ItemListener listener : compactBox.getItemListeners()) {
@@ -168,7 +266,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         this.buildQueueList.setTransferHandler(buildQueueHandler);
         this.buildQueueList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.buildQueueList.setDragEnabled(true);
-        this.buildQueueList.setCellRenderer(cellRenderer);
+        this.buildQueueList.setCellRenderer(this.cellRenderer);
         this.buildQueueList.addMouseListener(new BuildQueueMouseAdapter(false));
         Action deleteAction = new AbstractAction() {
                 @SuppressWarnings("deprecation") // FIXME in Java7
@@ -204,7 +302,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         unitList.setTransferHandler(buildQueueHandler);
         unitList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         unitList.setDragEnabled(true);
-        unitList.setCellRenderer(cellRenderer);
+        unitList.setCellRenderer(this.cellRenderer);
         unitList.addMouseListener(adapter);
 
         unitList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "add");
@@ -215,7 +313,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         buildingList.setTransferHandler(buildQueueHandler);
         buildingList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         buildingList.setDragEnabled(true);
-        buildingList.setCellRenderer(cellRenderer);
+        buildingList.setCellRenderer(this.cellRenderer);
         buildingList.addMouseListener(adapter);
 
         buildingList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "add");
@@ -265,7 +363,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         final Specification spec = getSpecification();
         DefaultListModel units = (DefaultListModel) unitList.getModel();
         units.clear();
-        loop: for (UnitType unitType : buildableUnits) {
+        loop: for (UnitType unitType : spec.getBuildableUnitTypes()) {
             // compare colony.getNoBuildReason()
             List<String> lockReason = new ArrayList<String>();
             if (unbuildableTypes.contains(unitType)) {
@@ -607,23 +705,24 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     @SuppressWarnings("unchecked") // FIXME in Java7
     private void updateDetailView() {
-        cellRenderer = getCellRenderer();
-        this.buildQueueList.setCellRenderer(cellRenderer);
-        buildingList.setCellRenderer(cellRenderer);
-        unitList.setCellRenderer(cellRenderer);
+        this.cellRenderer = getCellRenderer();
+        this.buildQueueList.setCellRenderer(this.cellRenderer);
+        buildingList.setCellRenderer(this.cellRenderer);
+        unitList.setCellRenderer(this.cellRenderer);
     }
 
     private ListCellRenderer getCellRenderer() {
         if (compactBox.isSelected()) {
-            if (cellRenderer == null || cellRenderer instanceof DefaultBuildQueueCellRenderer) {
-                return new FreeColComboBoxRenderer();
+            if (this.cellRenderer == null
+                || this.cellRenderer instanceof DefaultBuildQueueCellRenderer) {
+                return new FreeColComboBoxRenderer<BuildableType>();
             }
-        } else if (cellRenderer == null || cellRenderer instanceof FreeColComboBoxRenderer) {
+        } else if (this.cellRenderer == null
+            || this.cellRenderer instanceof FreeColComboBoxRenderer) {
             return new DefaultBuildQueueCellRenderer();
         }
 
-        // return current one
-        return cellRenderer;
+        return this.cellRenderer; // return current one
     }
 
     /**
@@ -926,110 +1025,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                     }
                 }
                 return false;
-            }
-        }
-    }
-
-    class DefaultBuildQueueCellRenderer implements ListCellRenderer {
-
-        JPanel itemPanel = new JPanel();
-        JPanel selectedPanel = new JPanel();
-        JLabel imageLabel = new JLabel(new ImageIcon());
-        JLabel nameLabel = new JLabel();
-
-        private JLabel lockLabel =
-            new JLabel(new ImageIcon(ResourceManager.getImage("lock.image", 0.5)));
-
-        private Dimension buildingDimension = new Dimension(-1, 48);
-
-        public DefaultBuildQueueCellRenderer() {
-            itemPanel.setOpaque(false);
-            itemPanel.setLayout(new MigLayout());
-            selectedPanel.setOpaque(false);
-            selectedPanel.setLayout(new MigLayout());
-            selectedPanel.setUI((PanelUI) FreeColSelectedPanelUI.createUI(selectedPanel));
-        }
-
-        public Component getListCellRendererComponent(JList list,
-                                                      Object value,
-                                                      int index,
-                                                      boolean isSelected,
-                                                      boolean cellHasFocus) {
-            BuildableType item = (BuildableType) value;
-            JPanel panel = isSelected ? selectedPanel : itemPanel;
-            panel.removeAll();
-
-            ((ImageIcon) imageLabel.getIcon()).setImage(ResourceManager.getImage(item.getId() + ".image",
-                                                                                 buildingDimension));
-
-            nameLabel.setText(Messages.message(item.getNameKey()));
-            panel.setToolTipText(lockReasons.get(item));
-            panel.add(imageLabel, "span 1 2");
-            if (lockReasons.get(item) == null) {
-                panel.add(nameLabel, "wrap");
-            } else {
-                panel.add(nameLabel, "split 2");
-                panel.add(lockLabel, "wrap");
-            }
-
-            List<AbstractGoods> required = item.getRequiredGoods();
-            int size = required.size();
-            for (int i = 0; i < size; i++) {
-                AbstractGoods goods = required.get(i);
-                ImageIcon icon = new ImageIcon(ResourceManager.getImage(goods.getType().getId() + ".image", 0.66));
-                JLabel goodsLabel = new JLabel(Integer.toString(goods.getAmount()),
-                    icon, SwingConstants.CENTER);
-                if (i == 0 && size > 1) {
-                    panel.add(goodsLabel, "split " + size);
-                } else {
-                    panel.add(goodsLabel);
-                }
-            }
-            return panel;
-        }
-    }
-
-    class BuildQueueMouseAdapter extends MouseAdapter {
-
-        private boolean add = true;
-        
-        private boolean enabled = false;
-
-        public BuildQueueMouseAdapter(boolean add) {
-            this.add = add;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked") // FIXME in Java7
-        public void mousePressed(MouseEvent e) {
-            if (!enabled && e.getClickCount() == 1 && !e.isConsumed()) {
-                enabled = true;
-            }
-
-            if (enabled) {
-                JList<BuildableType> source
-                    = (JList<BuildableType>)e.getSource();
-                if (e.getButton() == MouseEvent.BUTTON3
-                    || e.isPopupTrigger()) {
-                    int index = source.locationToIndex(e.getPoint());
-                    BuildableType type = source.getModel().getElementAt(index);
-                    getGUI().showColopediaPanel(type.getId());
-                } else if (e.getClickCount() > 1 && !e.isConsumed()) {
-                    JList<BuildableType> bql = BuildQueuePanel.this.buildQueueList;
-                    DefaultListModel<BuildableType> model
-                        = (DefaultListModel<BuildableType>)bql.getModel();
-                    if (source.getSelectedIndex() < 0) {
-                        source.setSelectedIndex(source.locationToIndex(e.getPoint()));
-                    }
-                    for (BuildableType bt : source.getSelectedValuesList()) {
-                        if (add) {
-                            model.addElement(bt);
-                        } else {
-                            model.removeElement(bt);
-                        }
-                    }
-                    updateAllLists();
-                }
             }
         }
     }
