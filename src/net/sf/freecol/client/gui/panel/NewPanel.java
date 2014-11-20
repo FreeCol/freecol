@@ -67,6 +67,7 @@ public final class NewPanel extends FreeColPanel
 
     private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
 
+    /** The actions for this panel. */
     private static enum NewPanelAction {
         OK,
         CANCEL,
@@ -85,59 +86,62 @@ public final class NewPanel extends FreeColPanel
      */
     private final Specification fixedSpecification;
 
-    /** A box to choose a TC from. */
-    private final JComboBox<FreeColTcFile> specificationBox
-        = new JComboBox<FreeColTcFile>();
-
-    private final JLabel port1Label = localizedLabel("port");
-    private final JLabel port2Label = localizedLabel("startServerOnPort");
-    private final JLabel ipLabel = localizedLabel("host");
-    private final JLabel advantageLabel = localizedLabel("playerOptions.nationalAdvantages");
-    private final JLabel rulesLabel = localizedLabel("rules");
-    private final JLabel difficultyLabel = localizedLabel("difficulty");
-
-    private final JCheckBox publicServer = new JCheckBox(Messages.message("publicServer"));
-    private final JTextField name = new JTextField(getPlayerName(), 20);
-    private final JTextField server = new JTextField("127.0.0.1");
-    private final JTextField port1 = new JTextField(Integer.toString(FreeCol.getServerPort()));
-    private final JTextField port2 = new JTextField(Integer.toString(FreeCol.getServerPort()));
-    private final JButton showDifficulty = new JButton(Messages.message("showDifficulty"));
-    private final Advantages[] advChoices = new Advantages[] {
-        Advantages.SELECTABLE,
-        Advantages.FIXED,
-        Advantages.NONE
-    };
-
-    /** A box to choose the national advantages setting. */
-    private final JComboBox<Advantages> nationalAdvantages
-        = new JComboBox<Advantages>(advChoices);
-
-    /** A box to choose the difficulty from. */
-    private final JComboBox<OptionGroup> difficultyBox
-        = new JComboBox<OptionGroup>();
-
-    /** Handy container for the components to enable when Join is selected. */
-    private final Component[] joinComponents = new Component[] {
-        ipLabel, server, port1Label, port1
-    };
-
-    /** Container for components to enable if server parameters can be set. */
-    private final Component[] serverComponents = new Component[] {
-        publicServer, port2Label, port2
-    };
-
-    /** Container for components to enable when choosing game parameters. */
-    private final Component[] gameComponents = new Component[] {
-        advantageLabel, nationalAdvantages,
-        rulesLabel, specificationBox,
-        difficultyLabel, difficultyBox, showDifficulty
-    };
+    /** Field to input the player name. */
+    private final JTextField nameBox;
 
     /** A button group for the main choices. */
-    private final ButtonGroup group;
+    private final ButtonGroup buttonGroup;
 
-    /** The difficulty level to use for the new game. */
-    private OptionGroup difficulty;
+    /** The label for the national advantages. */
+    private final JLabel advantagesLabel;
+
+    /** A box to choose the national advantages setting. */
+    private final JComboBox<Advantages> advantagesBox;
+
+    /** Start server name label. */
+    private final JLabel serverPortLabel;
+
+    /** Start server port number label and field to input through. */
+    private final JTextField serverPortField;
+
+    /** The label for the rules selection. */
+    private final JLabel rulesLabel;
+
+    /** A box to choose the rules from. */
+    private final JComboBox<FreeColTcFile> rulesBox;
+
+    /** The check box to select a public server with. */
+    private final JCheckBox publicServer;
+
+    /** A label for the difficulty level selection. */
+    private final JLabel difficultyLabel;
+
+    /** A box to choose the difficulty from. */
+    private final JComboBox<OptionGroup> difficultyBox;
+
+    /** A button to show/edit difficulty level. */
+    private final JButton difficultyButton;
+
+    /** Join multiplayer server name label. */
+    private final JLabel joinNameLabel;
+
+    /** Join multiplayer server name selection. */
+    private final JTextField joinNameField;
+
+    /** Join multiplayer server port label. */
+    private final JLabel joinPortLabel;
+
+    /** Join multiplayer server port selection. */
+    private final JTextField joinPortField;
+
+    /** Container for the components to enable when Join is selected. */
+    private final Component[] joinComponents;
+
+    /** Container for components to enable if server parameters can be set. */
+    private final Component[] serverComponents;
+
+    /** Container for components to enable when choosing game parameters. */
+    private final Component[] gameComponents;
 
 
     /**
@@ -156,37 +160,13 @@ public final class NewPanel extends FreeColPanel
      * @param specification An optional <code>Specification</code> value for
      *     the new game.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public NewPanel(FreeColClient freeColClient, Specification specification) {
         super(freeColClient, new MigLayout("wrap 6", "[15]", ""));
 
         this.fixedSpecification = specification;
-        if (this.fixedSpecification == null) { // Allow TC selection
-            String selectTC = FreeCol.getTC();
-            for (FreeColTcFile tc : Mods.getRuleSets()) {
-                this.specificationBox.addItem(tc);
-                if (selectTC.equals(tc.getId())) {
-                    this.specificationBox.setSelectedItem(tc);
-                }
-            }
-        } else { // Force the use of the TC that contains the given spec
-            String selectTC = this.fixedSpecification.getId();
-            for (FreeColTcFile tc : Mods.getRuleSets()) {
-                if (selectTC.equals(tc.getId())) {
-                    this.specificationBox.addItem(tc);
-                    this.specificationBox.setSelectedItem(tc);
-                }
-            }
-        }
 
-        specificationBox.setRenderer(new FreeColComboBoxRenderer<FreeColTcFile>("mod."));
-        nationalAdvantages.setRenderer(new FreeColComboBoxRenderer<Advantages>());
-        difficultyBox.setRenderer(new FreeColComboBoxRenderer<OptionGroup>());
-
-        JButton cancel = new JButton(Messages.message("cancel"));
-        setCancelComponent(cancel);
-
-        this.group = new ButtonGroup();
+        // Create the components
+        this.buttonGroup = new ButtonGroup();
         JRadioButton
             single = new JRadioButton(Messages.message("singlePlayerGame"),
                                       true),
@@ -196,134 +176,164 @@ public final class NewPanel extends FreeColPanel
                                      false),
             meta = new JRadioButton(Messages.message("getServerList")
                 + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
-        this.group.add(single);
-        this.group.add(join);
-        this.group.add(start);
-        this.group.add(meta);
+        this.buttonGroup.add(single);
+        single.setActionCommand(String.valueOf(NewPanelAction.SINGLE));
+        single.addActionListener(this);
+        this.buttonGroup.add(join);
+        join.setActionCommand(String.valueOf(NewPanelAction.JOIN));
+        join.addActionListener(this);
+        this.buttonGroup.add(start);
+        start.setActionCommand(String.valueOf(NewPanelAction.START));
+        start.addActionListener(this);
+        this.buttonGroup.add(meta);
+        meta.setActionCommand(String.valueOf(NewPanelAction.META_SERVER));
+        meta.addActionListener(this);
+        single.setSelected(true);
 
+        this.nameBox = new JTextField(getPlayerName(), 20);
+
+        this.advantagesLabel
+            = localizedLabel("playerOptions.nationalAdvantages");
+        this.advantagesBox = new JComboBox<Advantages>(new Advantages[] {
+                Advantages.SELECTABLE,
+                Advantages.FIXED,
+                Advantages.NONE
+            });
+        this.advantagesBox
+            .setRenderer(new FreeColComboBoxRenderer<Advantages>());
+
+        this.serverPortLabel = localizedLabel("startServerOnPort");
+        this.serverPortField
+            = new JTextField(Integer.toString(FreeCol.getServerPort()));
+
+        this.rulesLabel = localizedLabel("rules");
+        this.rulesBox = new JComboBox<FreeColTcFile>();
+        if (this.fixedSpecification == null) { // Allow TC selection
+            String selectTC = FreeCol.getTC();
+            for (FreeColTcFile tc : Mods.getRuleSets()) {
+                this.rulesBox.addItem(tc);
+                if (selectTC.equals(tc.getId())) {
+                    this.rulesBox.setSelectedItem(tc);
+                }
+            }
+        } else { // Force the use of the TC that contains the given spec
+            String selectTC = this.fixedSpecification.getId();
+            for (FreeColTcFile tc : Mods.getRuleSets()) {
+                if (selectTC.equals(tc.getId())) {
+                    this.rulesBox.addItem(tc);
+                    this.rulesBox.setSelectedItem(tc);
+                }
+            }
+        }
+        this.rulesBox
+            .setRenderer(new FreeColComboBoxRenderer<FreeColTcFile>("mod."));
+        this.rulesBox.addItemListener(this);
+
+        this.publicServer = new JCheckBox(Messages.message("publicServer"));
+
+        this.difficultyLabel = localizedLabel("difficulty");
+        this.difficultyBox = new JComboBox<OptionGroup>();
+        this.difficultyBox
+            .setRenderer(new FreeColComboBoxRenderer<OptionGroup>());
+        this.difficultyBox.addItemListener(this);
+        this.difficultyButton = new JButton(Messages.message("showDifficulty"));
+        this.difficultyButton
+            .setActionCommand(String.valueOf(NewPanelAction.SHOW_DIFFICULTY));
+        this.difficultyButton.addActionListener(this);
+
+        this.joinNameLabel = localizedLabel("host");
+        this.joinNameField = new JTextField("127.0.0.1");
+        this.joinPortLabel = localizedLabel("port");
+        this.joinPortField
+            = new JTextField(Integer.toString(FreeCol.getServerPort()));
+
+        okButton.setActionCommand(String.valueOf(NewPanelAction.OK));
+
+        JButton cancel = new JButton(Messages.message("cancel"));
+        cancel.setActionCommand(String.valueOf(NewPanelAction.CANCEL));
+        cancel.addActionListener(this);
+        setCancelComponent(cancel);
+
+        // Add all the components
         add(GUI.getDefaultHeader(Messages.message("newGamePanel")),
             "span 6, center");
         add(single, "newline, span 3");
         add(new JSeparator(JSeparator.VERTICAL), "spany 7, grow");
-        JLabel nameLabel = localizedLabel("name");
-        add(nameLabel, "span, split 2");
-        add(name, "growx");
-
+        add(localizedLabel("name"), "span, split 2");
+        add(this.nameBox, "growx");
         add(start, "newline, span 3");
-        add(advantageLabel);
-        add(nationalAdvantages, "growx");
-        Advantages selectAdvantage = FreeCol.getAdvantages();
-        for (Advantages a : advChoices) {
-            if (selectAdvantage == a) {
-                nationalAdvantages.setSelectedItem(a);
-            }
-        }
-
-        add(port2Label, "newline, skip");
-        add(port2, "width 60:");
-        add(rulesLabel);
-        add(specificationBox, "growx");
-        specificationBox.addItemListener(this);
-
-        add(publicServer, "newline, skip, span 2");
-        add(difficultyLabel);
-        add(difficultyBox, "growx");
-        difficultyBox.addItemListener(this);
-        updateDifficulty();
-
+        add(this.advantagesLabel);
+        add(this.advantagesBox, "growx");
+        add(this.serverPortLabel, "newline, skip");
+        add(this.serverPortField, "width 60:");
+        add(this.rulesLabel);
+        add(this.rulesBox, "growx");
+        add(this.publicServer, "newline, skip, span 2");
+        add(this.difficultyLabel);
+        add(this.difficultyBox, "growx");
         add(meta, "newline, span 3");
-        add(showDifficulty, "skip 2, growx");
-
+        add(this.difficultyButton, "skip 2, growx");
         add(join, "newline, span 3");
-
-        add(ipLabel, "newline, skip, split 2");
-        add(server, "width 80:");
-        add(port1Label, "split 2");
-        add(port1, "width 60:");
-
+        add(this.joinNameLabel, "newline, skip, split 2");
+        add(this.joinNameField, "width 80:");
+        add(this.joinPortLabel, "split 2");
+        add(this.joinPortField, "width 60:");
         add(okButton, "newline, span, split 2, tag ok");
         add(cancel, "tag cancel");
+        joinComponents = new Component[] {
+            this.joinNameLabel, this.joinNameField,
+            this.joinPortLabel, this.joinPortField
+        };
+        serverComponents = new Component[] {
+            this.serverPortLabel, this.serverPortField, this.publicServer
+        };
+        gameComponents = new Component[] {
+            this.advantagesLabel, this.advantagesBox,
+            this.rulesLabel, this.rulesBox,
+            this.difficultyLabel, this.difficultyBox, this.difficultyButton
+        };
 
-        okButton.setActionCommand(String.valueOf(NewPanelAction.OK));
-        cancel.setActionCommand(String.valueOf(NewPanelAction.CANCEL));
-        single.setActionCommand(String.valueOf(NewPanelAction.SINGLE));
-        join.setActionCommand(String.valueOf(NewPanelAction.JOIN));
-        start.setActionCommand(String.valueOf(NewPanelAction.START));
-        meta.setActionCommand(String.valueOf(NewPanelAction.META_SERVER));
-        showDifficulty.setActionCommand(String.valueOf(NewPanelAction.SHOW_DIFFICULTY));
-
-        cancel.addActionListener(this);
-        single.addActionListener(this);
-        join.addActionListener(this);
-        start.addActionListener(this);
-        meta.addActionListener(this);
-        showDifficulty.addActionListener(this);
-
-        single.setSelected(true);
+        updateDifficulty();
         enableComponents();
-
         setSize(getPreferredSize());
-
     }
+
 
     /**
      * Update the contents of the difficulty level box depending on
      * the specification currently selected.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     private void updateDifficulty() {
-        difficultyBox.removeAllItems();
+        final Specification spec = getSpecification();
 
-        Specification spec = getSpecification();
-        OptionGroup selected = null;
-        for (OptionGroup group : spec.getDifficultyLevels()) {
-            difficultyBox.addItem(group);
-            // Check the equality of the group ids rather than the
-            // option groups themselves
-            if (difficulty != null
-                && group.getId().equals(difficulty.getId())) {
-                selected = group;
-            }
+        OptionGroup selected = getDifficulty();
+        this.difficultyBox.removeAllItems();
+        for (OptionGroup og : spec.getDifficultyLevels()) {
+            this.difficultyBox.addItem(og);
         }
         if (selected == null) {
             selected = spec.getDifficultyOptionGroup("model.difficulty.medium");
+            if (selected == null) {
+                int index = this.difficultyBox.getItemCount() / 2;
+                selected = this.difficultyBox.getItemAt(index);
+            }
         }
-        if (selected == null) {
-            int index = difficultyBox.getItemCount() / 2;
-            selected = (OptionGroup)difficultyBox.getItemAt(index);
-        }
-        difficulty = selected;
-        difficultyBox.setSelectedItem(selected);
+        this.difficultyBox.setSelectedItem(selected);
         updateShowButton();
     }
 
+    /**
+     * Update the show button.
+     */
     private void updateShowButton() {
-        OptionGroup selected = (OptionGroup)difficultyBox.getSelectedItem();
+        OptionGroup selected = getDifficulty();
         if (selected == null) {
-            showDifficulty.setEnabled(false);
+            difficultyButton.setEnabled(false);
         } else {
-            showDifficulty.setEnabled(true);
-            showDifficulty.setText(Messages.message((selected.isEditable())
+            difficultyButton.setEnabled(true);
+            difficultyButton.setText(Messages.message((selected.isEditable())
                     ? "editDifficulty" : "showDifficulty"));
         }
-    }
-
-    /**
-     * Gets the currently selected total-conversion from the specificationBox.
-     *
-     * @return The selected TC.
-     */
-    private FreeColTcFile getTC() {
-        return (FreeColTcFile)this.specificationBox.getSelectedItem();
-    }
-
-    /**
-     * Gets the currently selected difficulty from the difficultyBox.
-     *
-     * @return The difficulty <code>OptionGroup</code>.
-     */
-    private OptionGroup getDifficulty() {
-        return (OptionGroup)difficultyBox.getSelectedItem();
     }
 
     /**
@@ -333,7 +343,25 @@ public final class NewPanel extends FreeColPanel
      * @return The selected advantages type.
      */
     private Advantages getAdvantages() {
-        return (Advantages)this.nationalAdvantages.getSelectedItem();
+        return (Advantages)this.advantagesBox.getSelectedItem();
+    }
+
+    /**
+     * Gets the currently selected total-conversion from the rulesBox.
+     *
+     * @return The selected TC.
+     */
+    private FreeColTcFile getTC() {
+        return (FreeColTcFile)this.rulesBox.getSelectedItem();
+    }
+
+    /**
+     * Gets the currently selected difficulty from the difficultyBox.
+     *
+     * @return The difficulty <code>OptionGroup</code>.
+     */
+    private OptionGroup getDifficulty() {
+        return (OptionGroup)this.difficultyBox.getSelectedItem();
     }
 
     /**
@@ -356,31 +384,31 @@ public final class NewPanel extends FreeColPanel
      */
     private void enableComponents() {
         NewPanelAction action = Enum.valueOf(NewPanelAction.class,
-            this.group.getSelection().getActionCommand());
+            this.buttonGroup.getSelection().getActionCommand());
         switch (action) {
         case SINGLE:
-            enableComponents(joinComponents, false);
-            enableComponents(serverComponents, false);
-            enableComponents(gameComponents, true);
-            specificationBox.setEnabled(true);
+            enableComponents(this.joinComponents, false);
+            enableComponents(this.serverComponents, false);
+            enableComponents(this.gameComponents, true);
+            this.rulesBox.setEnabled(true);
             break;
         case JOIN:
-            enableComponents(joinComponents, true);
-            enableComponents(serverComponents, false);
-            enableComponents(gameComponents, false);
-            specificationBox.setEnabled(false);
+            enableComponents(this.joinComponents, true);
+            enableComponents(this.serverComponents, false);
+            enableComponents(this.gameComponents, false);
+            this.rulesBox.setEnabled(false);
             break;
         case START:
-            enableComponents(joinComponents, false);
-            enableComponents(serverComponents, true);
-            enableComponents(gameComponents, true);
-            specificationBox.setEnabled(true);
+            enableComponents(this.joinComponents, false);
+            enableComponents(this.serverComponents, true);
+            enableComponents(this.gameComponents, true);
+            this.rulesBox.setEnabled(true);
             break;
         case META_SERVER:
-            enableComponents(joinComponents, false);
-            enableComponents(serverComponents, false);
-            enableComponents(gameComponents, false);
-            specificationBox.setEnabled(false);
+            enableComponents(this.joinComponents, false);
+            enableComponents(this.serverComponents, false);
+            enableComponents(this.gameComponents, false);
+            this.rulesBox.setEnabled(false);
             break;
         default:
             break;
@@ -400,7 +428,6 @@ public final class NewPanel extends FreeColPanel
     }
 
 
-
     // Override FreeColPanel
 
     /**
@@ -411,7 +438,7 @@ public final class NewPanel extends FreeColPanel
      */
     @Override
     public Specification getSpecification() {
-        if (fixedSpecification != null) return fixedSpecification;
+        if (this.fixedSpecification != null) return this.fixedSpecification;
         FreeColTcFile tcFile = getTC();
         if (tcFile != null) {
             try {
@@ -431,57 +458,50 @@ public final class NewPanel extends FreeColPanel
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
-        final ConnectController connectController
-            = getFreeColClient().getConnectController();
-        String command = event.getActionCommand();
-        OptionGroup level = (OptionGroup)difficultyBox.getSelectedItem();
+        final Specification spec = getSpecification();
+        final ConnectController cc = getFreeColClient().getConnectController();
+        final String command = event.getActionCommand();
+
         int port;
         switch (Enum.valueOf(NewPanelAction.class, command)) {
         case OK:
-            FreeCol.setName(name.getText());
+            FreeCol.setName(this.nameBox.getText());
             FreeCol.setTC(getTC().getId());
             FreeCol.setAdvantages(getAdvantages());
-            Specification spec = getSpecification();
             if (getAdvantages() == Advantages.NONE) {
                 spec.clearEuropeanNationalAdvantages();
             }
             NewPanelAction action = Enum.valueOf(NewPanelAction.class,
-                group.getSelection().getActionCommand());
+                buttonGroup.getSelection().getActionCommand());
             switch (action) {
             case SINGLE:
-                spec.applyDifficultyLevel(level);
-                // Launch!
-                if (connectController.startSinglePlayerGame(spec, false))
-                    return;
+                spec.applyDifficultyLevel(getDifficulty());
+                if (cc.startSinglePlayerGame(spec, false)) return;
                 break;
             case JOIN:
                 try {
-                    port = Integer.parseInt(port1.getText());
+                    port = Integer.parseInt(this.joinPortField.getText());
                 } catch (NumberFormatException e) {
-                    port1Label.setForeground(Color.red);
+                    this.joinPortLabel.setForeground(Color.red);
                     break;
                 }
-                // Launch!
-                if (connectController.joinMultiplayerGame(server.getText(),
-                        port)) return;
+                if (cc.joinMultiplayerGame(this.joinNameField.getText(),
+                                           port)) return;
                 break;
             case START:
                 try {
-                    port = Integer.parseInt(port2.getText());
+                    port = Integer.parseInt(this.serverPortField.getText());
                 } catch (NumberFormatException e) {
-                    port2Label.setForeground(Color.red);
+                    this.serverPortLabel.setForeground(Color.red);
                     break;
                 }
-                spec.applyDifficultyLevel(level);
-                // Launch!
-                if (connectController.startMultiplayerGame(spec,
-                        publicServer.isSelected(), port)) return;
+                spec.applyDifficultyLevel(getDifficulty());
+                if (cc.startMultiplayerGame(spec,
+                        this.publicServer.isSelected(), port)) return;
                 break;
             case META_SERVER:
-                List<ServerInfo> servers = connectController.getServerList();
-                if (servers != null) {
-                    getGUI().showServerListPanel(servers);
-                }
+                List<ServerInfo> servers = cc.getServerList();
+                if (servers != null) getGUI().showServerListPanel(servers);
                 break;
             default:
                 break;
@@ -492,7 +512,7 @@ public final class NewPanel extends FreeColPanel
             getGUI().showMainPanel(null);
             break;
         case SHOW_DIFFICULTY:
-            getGUI().showDifficultyDialog(getSpecification(), level);
+            getGUI().showDifficultyDialog(spec, getDifficulty());
             break;
         case SINGLE: case JOIN: case START: case META_SERVER:
             enableComponents();
@@ -510,8 +530,7 @@ public final class NewPanel extends FreeColPanel
      * {@inheritDoc}
      */
     public void itemStateChanged(ItemEvent e) {
-        if (e.getSource() == this.specificationBox) {
-            difficulty = getDifficulty();
+        if (e.getSource() == this.rulesBox) {
             updateDifficulty();
         } else if (e.getSource() == this.difficultyBox) {
             updateShowButton();
