@@ -159,7 +159,7 @@ public final class ColonyPanel extends PortPanel
     private MouseListener releaseListener = null;
 
     // Subparts
-    private final JComboBox nameBox = new JComboBox();
+    private final JComboBox<Colony> nameBox = new JComboBox<Colony>();
 
     private JPanel netProductionPanel = null;
 
@@ -192,7 +192,6 @@ public final class ColonyPanel extends PortPanel
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param colony The <code>Colony</code> to display in this panel.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public ColonyPanel(FreeColClient freeColClient, Colony colony) {
         super(freeColClient,
             new MigLayout("fill, wrap 2, insets 2",
@@ -277,19 +276,19 @@ public final class ColonyPanel extends PortPanel
         selectedUnitLabel = null;
 
         // Make the colony label
-        nameBox.setFont(GUI.SMALL_HEADER_FONT);
+        this.nameBox.setFont(GUI.SMALL_HEADER_FONT);
         if (editable) {
-            for (Colony aColony : freeColClient.getMySortedColonies()) {
-                nameBox.addItem(aColony);
+            for (Colony c : freeColClient.getMySortedColonies()) {
+                this.nameBox.addItem(c);
             }
         } else { // When spying, only add the given colony.
-            nameBox.addItem(colony);
+            this.nameBox.addItem(colony);
         }
-        nameBox.setSelectedItem(colony);
-        nameBox.getInputMap().put(KeyStroke.getKeyStroke("LEFT"),
-                                  "selectPrevious2");
-        nameBox.getInputMap().put(KeyStroke.getKeyStroke("RIGHT"),
-                                  "selectNext2");
+        this.nameBox.setSelectedItem(colony);
+        this.nameBox.getInputMap().put(KeyStroke.getKeyStroke("LEFT"),
+                                       "selectPrevious2");
+        this.nameBox.getInputMap().put(KeyStroke.getKeyStroke("RIGHT"),
+                                       "selectNext2");
 
         netProductionPanel = new JPanel();
         netProductionPanel.setOpaque(false);
@@ -338,10 +337,10 @@ public final class ColonyPanel extends PortPanel
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         warehouseScroll.setBorder(BorderFactory.createEtchedBorder());
 
-        InputMap nameIM = new ComponentInputMap(nameBox);
+        InputMap nameIM = new ComponentInputMap(this.nameBox);
         nameIM.put(KeyStroke.getKeyStroke("LEFT"), "selectPrevious2");
         nameIM.put(KeyStroke.getKeyStroke("RIGHT"), "selectNext2");
-        SwingUtilities.replaceUIInputMap(nameBox,
+        SwingUtilities.replaceUIInputMap(this.nameBox,
             JComponent.WHEN_IN_FOCUSED_WINDOW, nameIM);
 
         // See the message of Ulf Onnen for more information about the
@@ -401,8 +400,8 @@ public final class ColonyPanel extends PortPanel
         }
 
         final GUI gui = getGUI();
-        nameBox.setEnabled(isEditable());
-        nameBox.addActionListener(new ActionListener() {
+        this.nameBox.setEnabled(isEditable());
+        this.nameBox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     final Colony newColony = (Colony)nameBox.getSelectedItem();
                     closeColonyPanel();
@@ -420,7 +419,7 @@ public final class ColonyPanel extends PortPanel
         tilesPanel.initialize();
         warehousePanel.initialize();
 
-        add(nameBox, "height 48:, grow");
+        add(this.nameBox, "height 48:, grow");
         add(netProductionPanel, "growx");
         add(tilesScroll, "width 390!, height 200!, top");
         add(buildingsScroll, "span 1 3, grow");
