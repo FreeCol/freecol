@@ -62,7 +62,8 @@ import net.sf.freecol.common.option.OptionGroup;
  * game, to join a running game, and to fetch a list of games from the
  * meta-server.
  */
-public final class NewPanel extends FreeColPanel implements ItemListener {
+public final class NewPanel extends FreeColPanel
+    implements ActionListener, ItemListener {
 
     private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
 
@@ -75,6 +76,18 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         META_SERVER,
         SHOW_DIFFICULTY
     };
+
+    /**
+     * A particular specification to use for the new game.  If not
+     * null, the specification box just contains this spec, but if
+     * nullthe user chooses from available specs using the
+     * specification box.
+     */
+    private final Specification fixedSpecification;
+
+    /** A box to choose a TC from. */
+    private final JComboBox<FreeColTcFile> specificationBox
+        = new JComboBox<FreeColTcFile>();
 
     private final JLabel port1Label = localizedLabel("port");
     private final JLabel port2Label = localizedLabel("startServerOnPort");
@@ -99,35 +112,29 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     private final JComboBox<Advantages> nationalAdvantages
         = new JComboBox<Advantages>(advChoices);
 
-    /** A box to choose a TC from. */
-    private final JComboBox<FreeColTcFile> specificationBox
-        = new JComboBox<FreeColTcFile>();
-
     /** A box to choose the difficulty from. */
     private final JComboBox<OptionGroup> difficultyBox
         = new JComboBox<OptionGroup>();
 
+    /** Handy container for the components to enable when Join is selected. */
     private final Component[] joinComponents = new Component[] {
         ipLabel, server, port1Label, port1
     };
 
+    /** Container for components to enable if server parameters can be set. */
     private final Component[] serverComponents = new Component[] {
         publicServer, port2Label, port2
     };
 
+    /** Container for components to enable when choosing game parameters. */
     private final Component[] gameComponents = new Component[] {
         advantageLabel, nationalAdvantages,
         rulesLabel, specificationBox,
         difficultyLabel, difficultyBox, showDifficulty
     };
 
-    private final ButtonGroup group = new ButtonGroup();
-
-    /**
-     * A particular specification to use for the new game.  If null, the user
-     * chooses using the specificationBox.
-     */
-    private final Specification fixedSpecification;
+    /** A button group for the main choices. */
+    private final ButtonGroup group;
 
     /** The difficulty level to use for the new game. */
     private OptionGroup difficulty;
@@ -154,32 +161,32 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         super(freeColClient, new MigLayout("wrap 6", "[15]", ""));
 
         this.fixedSpecification = specification;
-
-        if (fixedSpecification == null) { // Allow TC selection
+        if (this.fixedSpecification == null) { // Allow TC selection
             String selectTC = FreeCol.getTC();
             for (FreeColTcFile tc : Mods.getRuleSets()) {
-                specificationBox.addItem(tc);
+                this.specificationBox.addItem(tc);
                 if (selectTC.equals(tc.getId())) {
-                    specificationBox.setSelectedItem(tc);
+                    this.specificationBox.setSelectedItem(tc);
                 }
             }
         } else { // Force the use of the TC that contains the given spec
-            String selectTC = fixedSpecification.getId();
+            String selectTC = this.fixedSpecification.getId();
             for (FreeColTcFile tc : Mods.getRuleSets()) {
                 if (selectTC.equals(tc.getId())) {
-                    specificationBox.addItem(tc);
-                    specificationBox.setSelectedItem(tc);
+                    this.specificationBox.addItem(tc);
+                    this.specificationBox.setSelectedItem(tc);
                 }
             }
         }
 
-        setRenderers();
+        specificationBox.setRenderer(new FreeColComboBoxRenderer<FreeColTcFile>("mod."));
+        nationalAdvantages.setRenderer(new FreeColComboBoxRenderer<Advantages>());
+        difficultyBox.setRenderer(new FreeColComboBoxRenderer<OptionGroup>());
 
         JButton cancel = new JButton(Messages.message("cancel"));
-        JLabel nameLabel = localizedLabel("name");
-
         setCancelComponent(cancel);
 
+        this.group = new ButtonGroup();
         JRadioButton
             single = new JRadioButton(Messages.message("singlePlayerGame"),
                                       true),
@@ -189,17 +196,16 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
                                      false),
             meta = new JRadioButton(Messages.message("getServerList")
                 + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
-
-        group.add(single);
-        group.add(join);
-        group.add(start);
-        group.add(meta);
+        this.group.add(single);
+        this.group.add(join);
+        this.group.add(start);
+        this.group.add(meta);
 
         add(GUI.getDefaultHeader(Messages.message("newGamePanel")),
             "span 6, center");
-
         add(single, "newline, span 3");
         add(new JSeparator(JSeparator.VERTICAL), "spany 7, grow");
+        JLabel nameLabel = localizedLabel("name");
         add(nameLabel, "span, split 2");
         add(name, "growx");
 
@@ -303,12 +309,21 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
     }
 
     /**
-     * Gets the currently selected TC from the specificationBox.
+     * Gets the currently selected total-conversion from the specificationBox.
      *
-     * @return The TC.
+     * @return The selected TC.
      */
     private FreeColTcFile getTC() {
-        return (FreeColTcFile)specificationBox.getSelectedItem();
+        return (FreeColTcFile)this.specificationBox.getSelectedItem();
+    }
+
+    /**
+     * Gets the currently selected difficulty from the difficultyBox.
+     *
+     * @return The difficulty <code>OptionGroup</code>.
+     */
+    private OptionGroup getDifficulty() {
+        return (OptionGroup)difficultyBox.getSelectedItem();
     }
 
     /**
@@ -318,24 +333,75 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
      * @return The selected advantages type.
      */
     private Advantages getAdvantages() {
-        return (Advantages)nationalAdvantages.getSelectedItem();
+        return (Advantages)this.nationalAdvantages.getSelectedItem();
     }
 
     /**
-     * Return the preferred player name.  This is either the value of
-     * the client option "model.option.playerName", or the value of
-     * the system property "user.name", or the localized value of
-     * "defaultPlayerName".
+     * Get the preferred player name.
+     *
+     * This is either the value of the client option
+     * "model.option.playerName", or the value of the system property
+     * "user.name", or the localized value of "defaultPlayerName".
      *
      * @return A name for the player.
      */
     private String getPlayerName() {
         String name = getClientOptions().getText(ClientOptions.NAME);
-        if (name == null || name.isEmpty()) {
-            name = FreeCol.getName();
-        }
+        if (name == null || name.isEmpty()) name = FreeCol.getName();
         return name;
     }
+
+    /**
+     * Enable components according to the selected button.
+     */
+    private void enableComponents() {
+        NewPanelAction action = Enum.valueOf(NewPanelAction.class,
+            this.group.getSelection().getActionCommand());
+        switch (action) {
+        case SINGLE:
+            enableComponents(joinComponents, false);
+            enableComponents(serverComponents, false);
+            enableComponents(gameComponents, true);
+            specificationBox.setEnabled(true);
+            break;
+        case JOIN:
+            enableComponents(joinComponents, true);
+            enableComponents(serverComponents, false);
+            enableComponents(gameComponents, false);
+            specificationBox.setEnabled(false);
+            break;
+        case START:
+            enableComponents(joinComponents, false);
+            enableComponents(serverComponents, true);
+            enableComponents(gameComponents, true);
+            specificationBox.setEnabled(true);
+            break;
+        case META_SERVER:
+            enableComponents(joinComponents, false);
+            enableComponents(serverComponents, false);
+            enableComponents(gameComponents, false);
+            specificationBox.setEnabled(false);
+            break;
+        default:
+            break;
+        }
+    }
+
+    /**
+     * Dis/Enable a group of components.
+     *
+     * @param components The <code>Component</code>s to set.
+     * @param enable Enable if true.
+     */
+    private void enableComponents(Component[] components, boolean enable) {
+        for (Component c : components) {
+            c.setEnabled(enable);
+        }
+    }
+
+
+
+    // Override FreeColPanel
 
     /**
      * Get the specification.  Either the one set for this panel, or the
@@ -356,65 +422,6 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
             }
         }
         return null;
-    }
-
-    private void enableComponents(Component[] components, boolean enable) {
-        for (Component c : components) {
-            c.setEnabled(enable);
-        }
-    }
-
-    private void enableComponents() {
-        NewPanelAction action = Enum.valueOf(NewPanelAction.class,
-                                             group.getSelection().getActionCommand());
-        switch (action) {
-        case SINGLE:
-            enableComponents(joinComponents, false);
-            enableComponents(serverComponents, false);
-            enableComponents(gameComponents, true);
-            specificationBox.setEnabled(true);
-            break;
-        case JOIN:
-            enableComponents(joinComponents, true);
-            enableComponents(serverComponents, false);
-            enableComponents(gameComponents, false);
-            break;
-        case START:
-            enableComponents(joinComponents, false);
-            enableComponents(serverComponents, true);
-            enableComponents(gameComponents, true);
-            specificationBox.setEnabled(true);
-            break;
-        case META_SERVER:
-            enableComponents(joinComponents, false);
-            enableComponents(serverComponents, false);
-            enableComponents(gameComponents, false);
-            break;
-        default:
-            break;
-        }
-    }
-
-
-    /**
-     * Moved these here out of the constructor to allow
-     * warning suppression to work.
-     */
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private void setRenderers() {
-        specificationBox.setRenderer(new FreeColComboBoxRenderer<FreeColTcFile>("mod."));
-        nationalAdvantages.setRenderer(new FreeColComboBoxRenderer<Advantages>());
-        difficultyBox.setRenderer(new FreeColComboBoxRenderer<OptionGroup>());
-    }
-
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-        if (e.getSource() == specificationBox) {
-            difficulty = (OptionGroup)difficultyBox.getSelectedItem();
-            updateDifficulty();
-        } else if (e.getSource() == difficultyBox) {
-            updateShowButton();
-        }
     }
 
 
@@ -493,6 +500,21 @@ public final class NewPanel extends FreeColPanel implements ItemListener {
         default:
             super.actionPerformed(event);
             break;
+        }
+    }
+
+
+    // Interface ItemListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() == this.specificationBox) {
+            difficulty = getDifficulty();
+            updateDifficulty();
+        } else if (e.getSource() == this.difficultyBox) {
+            updateShowButton();
         }
     }
 }
