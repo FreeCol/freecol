@@ -71,12 +71,22 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EditSettlementDialog.class.getName());
 
+    /** The settlement to edit. */
     private final IndianSettlement settlement;
 
+    /** The settlement name. */
     private final JTextField name;
+
+    /** The selected settlement owner. */
     private final JComboBox owner;
+
+    /** Is this settlement the capital? */
     private final JCheckBox capital;
-    private final JComboBox skill;
+
+    /** The skill to learn at the settlement. */
+    private final JComboBox<UnitType> skill;
+
+    /** The number of units. */
     private final JSpinner units;
 
 
@@ -92,52 +102,43 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         super(freeColClient);
 
         this.settlement = settlement;
-        
-        MigPanel panel = new MigPanel(new MigLayout("wrap 2, gapx 20"));
 
-        name = new JTextField(settlement.getName(), 30);
+        this.name = new JTextField(settlement.getName(), 30);
 
-        DefaultComboBoxModel nationModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<Nation> nationModel
+            = new DefaultComboBoxModel<Nation>();
         for (Nation n : getSpecification().getIndianNations()) {
-            nationModel.addElement(n.getId());
+            nationModel.addElement(n);
         }
-        owner = new JComboBox(nationModel);
-        owner.setSelectedItem(settlement.getOwner().getNation().getId());
-        owner.addItemListener(this);
-        owner.setRenderer(new DefaultListCellRenderer() {
-                public Component getListCellRendererComponent(JList list,
-                    Object value, int index, boolean selected, boolean focus) {
-                    Component ret = super.getListCellRendererComponent(list,
-                        value, index, selected, focus);
-                    String name = Messages.getName((String)value);
-                    setText(name);
-                    return ret;
-                }
-            });
+        this.owner = new JComboBox<Nation>(nationModel);
+        this.owner.setSelectedItem(settlement.getOwner().getNation());
+        this.owner.addItemListener(this);
+        this.owner.setRenderer(new FreeColComboBoxRenderer<Nation>());
 
-        capital = new JCheckBox();
-        capital.setSelected(settlement.isCapital());
+        this.capital = new JCheckBox();
+        this.capital.setSelected(settlement.isCapital());
 
-        skill = new JComboBox(getSkillModel());
-        skill.setSelectedItem(settlement.getLearnableSkill());
-        skill.setRenderer(new FreeColComboBoxRenderer());
+        this.skill = new JComboBox<UnitType>(getSkillModel());
+        this.skill.setSelectedItem(settlement.getLearnableSkill());
+        this.skill.setRenderer(new FreeColComboBoxRenderer<UnitType>());
 
         int unitCount = settlement.getUnitCount();
         SpinnerNumberModel spinnerModel
             = new SpinnerNumberModel(unitCount, 1, 20, 1);
-        units = new JSpinner(spinnerModel);
+        this.units = new JSpinner(spinnerModel);
         spinnerModel.setValue(unitCount);
 
+        MigPanel panel = new MigPanel(new MigLayout("wrap 2, gapx 20"));
         panel.add(new JLabel(Messages.message("name")));
-        panel.add(name);
+        panel.add(this.name);
         panel.add(new JLabel(Messages.message("nation")));
-        panel.add(owner);
+        panel.add(this.owner);
         panel.add(new JLabel(Messages.message("capital")));
-        panel.add(capital);
+        panel.add(this.capital);
         panel.add(new JLabel(Messages.message("report.indian.skillTaught")));
-        panel.add(skill);
+        panel.add(this.skill);
         panel.add(new JLabel(Messages.message("report.units")));
-        panel.add(units);
+        panel.add(this.units);
 
         final IndianSettlement fake = null;
         List<ChoiceItem<IndianSettlement>> c = choices();
@@ -152,8 +153,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     }
 
     private Nation getOwnerNation() {
-        String id = (String)owner.getSelectedItem();
-        return getSpecification().getNation(id);
+        return (Nation)this.owner.getSelectedItem();
     }
 
     private IndianNationType getOwnerNationType() {
@@ -170,7 +170,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     }
 
     private SettlementType getSettlementType() {
-        return getOwnerNationType().getSettlementType(capital.isSelected());
+        return getOwnerNationType().getSettlementType(this.capital.isSelected());
     }
         
     private int getAverageSize() {
@@ -188,22 +188,32 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         return skillModel;
     }
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    public void itemStateChanged(ItemEvent e) {
-        Player player = getOwnerPlayer();
-        if (player != null) {
-            name.setText((capital.isSelected()) ? player.getCapitalName(null)
-                : player.getSettlementName(null));
-        }
-        skill.setModel(getSkillModel());
-        skill.setSelectedItem(settlement.getLearnableSkill());
-        units.getModel().setValue(settlement.getUnitList().size());
-    }
 
+    // Interface ItemListener
 
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
+    public void itemStateChanged(ItemEvent e) {
+        Player player = getOwnerPlayer();
+        if (player != null) {
+            this.name.setText((this.capital.isSelected())
+                ? player.getCapitalName(null)
+                : player.getSettlementName(null));
+        }
+        this.skill.setModel(getSkillModel());
+        this.skill.setSelectedItem(settlement.getLearnableSkill());
+        this.units.getModel().setValue(settlement.getUnitList().size());
+    }
+
+
+    // Override FreeColDialog
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public IndianSettlement getResponse() {
         final Specification spec = freeColClient.getGame().getSpecification();
         final GUI gui = freeColClient.getGUI();
@@ -211,7 +221,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         Set<Tile> tiles = settlement.getOwnedTiles();
         Object value = getValue();
         if (options.get(0).equals(value)) { // OK
-            settlement.setName(name.getText());
+            settlement.setName(this.name.getText());
             Nation newNation = getOwnerNation();
             if (newNation != settlement.getOwner().getNation()) {
                 Player newPlayer = getOwnerPlayer();
@@ -230,18 +240,18 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
                 }
                 MapEditorTransformPanel.setNativeNation(newNation);
             }
-            if (capital.isSelected() && !settlement.isCapital()) {
+            if (this.capital.isSelected() && !settlement.isCapital()) {
                 // make sure we downgrade the old capital
                 for (IndianSettlement indianSettlement
                          : settlement.getOwner().getIndianSettlements()) {
                     indianSettlement.setCapital(false);
                 }
                 settlement.setCapital(true);
-            } else if (!capital.isSelected() && settlement.isCapital()) {
+            } else if (!this.capital.isSelected() && settlement.isCapital()) {
                 settlement.setCapital(false);
             }
-            settlement.setLearnableSkill((UnitType)skill.getSelectedItem());
-            int numberOfUnits = (Integer)units.getValue()
+            settlement.setLearnableSkill((UnitType)this.skill.getSelectedItem());
+            int numberOfUnits = (Integer)this.units.getValue()
                 - settlement.getUnitCount();
             if (numberOfUnits > 0) {
                 UnitType brave = spec.getUnitType("model.unit.brave");
