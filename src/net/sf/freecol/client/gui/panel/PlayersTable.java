@@ -33,6 +33,7 @@ import java.util.Map;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -54,6 +55,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColorCellEditor;
+import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
@@ -68,6 +70,45 @@ import net.sf.freecol.common.resources.ResourceManager;
  * The table of players.
  */
 public final class PlayersTable extends JTable {
+
+    /**
+     * A table cell editor that can be used to select a nation.
+     */
+    private class AdvantageCellEditor extends DefaultCellEditor {
+
+        private final JComboBox<EuropeanNationType> box;
+
+        /**
+         * Internal constructor.
+         *
+         * @param box The <code>JComboBox</code> to edit.
+         */
+        private AdvantageCellEditor(JComboBox<EuropeanNationType> box) {
+            super(box);
+
+            this.box = box;
+        }
+
+        /**
+         * A standard constructor.
+         *
+         * @param nationTypes List of <code>EuropeanNationType></code>
+         */
+        public AdvantageCellEditor(List<EuropeanNationType> nationTypes) {
+            this(new JComboBox<EuropeanNationType>(nationTypes
+                    .toArray(new EuropeanNationType[0])));
+
+            this.box.setRenderer(new FreeColComboBoxRenderer<EuropeanNationType>());
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Object getCellEditorValue() {
+            return ((JComboBox) getComponent()).getSelectedItem();
+        }
+    }
 
     private static class AvailableCellRenderer implements TableCellRenderer {
 
