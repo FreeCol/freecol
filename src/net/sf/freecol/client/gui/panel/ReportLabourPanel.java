@@ -65,10 +65,71 @@ import net.sf.freecol.common.model.UnitType;
  */
 public final class ReportLabourPanel extends ReportPanel {
 
-    private Map<UnitType, Map<Location, Integer>> data;
-    private TypeCountMap<UnitType> unitCount;
-    private List<Colony> colonies;
-    private JList list;
+    /** An individual unit type panel. */
+    private class LabourUnitPanel extends JPanel {
+
+        public boolean selected;
+        public UnitType unitType;
+
+
+        public LabourUnitPanel(UnitType unitType, String roleId, int count) {
+            this.unitType = unitType;
+            setOpaque(false);
+            setLayout(new MigLayout("wrap 2", "[60, right][left]"));
+            add(new JLabel(getLibrary().getUnitImageIcon(unitType, roleId,
+                                                         (count == 0), 0.8)),
+                "spany 2");
+            add(new JLabel(Messages.getName(unitType)));
+            add(new JLabel(Integer.toString(count)));
+        }
+
+
+        public void paint(Graphics g) {
+            if (selected) {
+                Graphics2D g2d = (Graphics2D) g;
+                Composite oldComposite = g2d.getComposite();
+                Color oldColor = g2d.getColor();
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1f));
+                g2d.setColor(Color.BLACK);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+                g2d.setComposite(oldComposite);
+                g2d.setColor(oldColor);
+            }
+            super.paint(g);
+        }
+    }
+
+    /** A renderer for the labour unit panels. */
+    private static class LabourUnitPanelRenderer
+        implements ListCellRenderer<LabourUnitPanel> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Component getListCellRendererComponent(JList<? extends LabourUnitPanel> list,
+                                                      LabourUnitPanel value,
+                                                      int index,
+                                                      boolean isSelected,
+                                                      boolean cellHasFocus) {
+            value.selected = isSelected;
+            return value;
+        }
+    }
+
+
+    /** The map of unit type to location and count. */
+    private final Map<UnitType, Map<Location, Integer>> data;
+
+    /** A map of count by unit type. */
+    private final TypeCountMap<UnitType> unitCount;
+
+    /** The player colonies. */
+    private final List<Colony> colonies;
+
+    /** A list of panels for the unit types. */
+    private JList<LabourUnitPanel> panelList = null;
+
 
     /**
      * The constructor that will add the items to this panel.
@@ -76,22 +137,15 @@ public final class ReportLabourPanel extends ReportPanel {
     public ReportLabourPanel(FreeColClient freeColClient) {
         super(freeColClient, Messages.message("reportLabourAction.name"));
 
-        colonies = freeColClient.getMySortedColonies();
-        gatherData();
-        displayData();
-    }
-
-    public void gatherData() {
-        data = new HashMap<UnitType, Map<Location, Integer>>();
-        unitCount = new TypeCountMap<UnitType>();
-
+        this.data = new HashMap<UnitType, Map<Location, Integer>>();
+        this.unitCount = new TypeCountMap<UnitType>();
         for (Unit unit : getMyPlayer().getUnits()) {
             UnitType type = unit.getType();
-            unitCount.incrementCount(type, 1);
-            Map<Location, Integer> unitMap = data.get(type);
+            this.unitCount.incrementCount(type, 1);
+            Map<Location, Integer> unitMap = this.data.get(type);
             if (unitMap == null) {
                 unitMap = new HashMap<Location, Integer>();
-                data.put(type, unitMap);
+                this.data.put(type, unitMap);
             }
 
             Location location = unit.getLocation();
@@ -111,103 +165,60 @@ public final class ReportLabourPanel extends ReportPanel {
                 unitMap.put(location, count + 1);
             }
         }
-    }
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    public void displayData() {
+        this.colonies = freeColClient.getMySortedColonies();
 
-        DefaultListModel model = new DefaultListModel();
-
+        DefaultListModel<LabourUnitPanel> model
+            = new DefaultListModel<LabourUnitPanel>();
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isPerson() && unitType.isAvailableTo(getMyPlayer())) {
-                int count = unitCount.getCount(unitType);
+                int count = this.unitCount.getCount(unitType);
                 model.addElement(new LabourUnitPanel(unitType,
                         unitType.getDisplayRoleId(), count));
             }
         }
-        list = new JList(model);
-
         Action selectAction = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     showDetails();
                 }
             };
-
         Action quitAction = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     getGUI().removeFromCanvas(ReportLabourPanel.this);
                 }
             };
 
-        list.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "select");
-        list.getActionMap().put("select", selectAction);
-        list.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), "quit");
-        list.getActionMap().put("quit", quitAction);
-
-        MouseListener mouseListener = new MouseAdapter() {
+        // Add all the components
+        this.panelList = new JList<LabourUnitPanel>(model);
+        this.panelList.getInputMap()
+            .put(KeyStroke.getKeyStroke("ENTER"), "select");
+        this.panelList.getActionMap().put("select", selectAction);
+        this.panelList.getInputMap()
+            .put(KeyStroke.getKeyStroke("ESCAPE"), "quit");
+        this.panelList.getActionMap().put("quit", quitAction);
+        this.panelList.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() == 2) {
                         showDetails();
                     }
                 }
-            };
-        list.addMouseListener(mouseListener);
-        list.setOpaque(false);
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        list.setVisibleRowCount(-1);
-        list.setCellRenderer(new UnitRenderer());
-        scrollPane.setViewportView(list);
+            });
+        this.panelList.setOpaque(false);
+        this.panelList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.panelList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        this.panelList.setVisibleRowCount(-1);
+        this.panelList.setCellRenderer(new LabourUnitPanelRenderer());
+
+        this.scrollPane.setViewportView(this.panelList);
     }
 
-    public void showDetails() {
-        UnitType unitType = ((LabourUnitPanel) list.getSelectedValue()).unitType;
-        getGUI().showReportLabourDetailPanel(unitType, data, unitCount, colonies);
+    private void showDetails() {
+        UnitType unitType = ((LabourUnitPanel)panelList.getSelectedValue())
+            .unitType;
+        getGUI().showReportLabourDetailPanel(unitType, this.data,
+                                             this.unitCount, this.colonies);
     }
 
-    private static class UnitRenderer implements ListCellRenderer {
-
-        public Component getListCellRendererComponent(JList list,
-            Object value, int index,
-            boolean isSelected, boolean cellHasFocus) {
-            LabourUnitPanel panel = (LabourUnitPanel) value;
-            panel.selected = isSelected;
-            return panel;
-        }
-    }
-
-    private class LabourUnitPanel extends JPanel {
-
-        boolean selected;
-        UnitType unitType;
-
-        public LabourUnitPanel(UnitType unitType, String roleId, int count) {
-            this.unitType = unitType;
-            setOpaque(false);
-            setLayout(new MigLayout("wrap 2", "[60, right][left]"));
-            add(new JLabel(getLibrary().getUnitImageIcon(unitType, roleId,
-                                                         (count == 0), 0.8)),
-                "spany 2");
-            add(new JLabel(Messages.getName(unitType)));
-            add(new JLabel(Integer.toString(count)));
-        }
-
-        public void paint(Graphics g) {
-            if (selected) {
-                Graphics2D g2d = (Graphics2D) g;
-                Composite oldComposite = g2d.getComposite();
-                Color oldColor = g2d.getColor();
-                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1f));
-                g2d.setColor(Color.BLACK);
-                g2d.fillRect(0, 0, getWidth(), getHeight());
-                g2d.setComposite(oldComposite);
-                g2d.setColor(oldColor);
-            }
-            super.paint(g);
-        }
-
-
-    }
 
     // Interface ActionListener
 
@@ -220,8 +231,8 @@ public final class ReportLabourPanel extends ReportPanel {
             super.actionPerformed(event);
         } else {
             UnitType unitType = getSpecification().getUnitType(command);
-            getGUI().showReportLabourDetailPanel(unitType, data, unitCount, colonies);
-
+            getGUI().showReportLabourDetailPanel(unitType, this.data,
+                this.unitCount, this.colonies);
         }
     }
 }
