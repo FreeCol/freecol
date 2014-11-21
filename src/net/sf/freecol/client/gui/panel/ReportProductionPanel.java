@@ -45,75 +45,83 @@ import net.sf.freecol.common.model.TypeCountMap;
  */
 public final class ReportProductionPanel extends ReportPanel {
 
+    /** The number of selection boxes. */
     private static final int NUMBER_OF_GOODS = 4;
-    private final JComboBox[] boxes = new JComboBox[NUMBER_OF_GOODS];
-    private final JButton selectButton;
-    private final JLabel selectLabel;
+
+    /** The goods types available for selection. */
     private final List<GoodsType> goodsTypes;
+
+    /** The boxes with which to select goods types for display. */
+    private final List<JComboBox<String>> boxes
+        = new ArrayList<JComboBox<String>>();
 
 
     /**
      * The constructor that will add the items to this panel.
      *
+     * TODO: can we extend this to cover farmed goods?
+     *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public ReportProductionPanel(FreeColClient freeColClient) {
         super(freeColClient, Messages.message("reportProductionAction.name"));
 
-        // TODO: can we extend this to cover farmed goods?
-        goodsTypes = new ArrayList<GoodsType>();
+        this.goodsTypes = new ArrayList<GoodsType>();
+
         List<String> goodsNames = new ArrayList<String>();
         goodsNames.add(Messages.message("nothing"));
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             if (!goodsType.isFarmed()) {
-                goodsTypes.add(goodsType);
+                this.goodsTypes.add(goodsType);
                 goodsNames.add(Messages.message(goodsType.getNameKey()));
             }
         }
-
-        String[] model = goodsNames.toArray(new String[goodsTypes.size() + 1]);
+        String[] model = goodsNames.toArray(new String[0]);
         for (int index = 0; index < NUMBER_OF_GOODS; index++) {
-            boxes[index] = new JComboBox(model);
+            JComboBox<String> newBox = new JComboBox<String>(model);
+            newBox.setSelectedIndex(0);
+            this.boxes.add(newBox);
         }
-
-        selectLabel = new JLabel(Messages.message("report.production.selectGoods"));
-        selectButton = new JButton(Messages.message("report.production.update"));
-        selectButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    update();
-                }
-            });
 
         reportPanel.setLayout(new MigLayout("gap 0 0", "[fill]", "[fill]"));
         update();
     }
 
+
     private void update() {
-
-        List<GoodsType> selectedTypes = new ArrayList<GoodsType>();
-
         reportPanel.removeAll();
-
+        JLabel selectLabel
+            = new JLabel(Messages.message("report.production.selectGoods"));
         reportPanel.add(selectLabel, "span, split " + (NUMBER_OF_GOODS + 2));
 
-        for (int index = 0; index < NUMBER_OF_GOODS; index++) {
-            reportPanel.add(boxes[index]);
-            int selectedIndex = boxes[index].getSelectedIndex();
-            if (selectedIndex > 0) {
-                selectedTypes.add(goodsTypes.get(selectedIndex - 1));
-            }
-        }
-
+        JButton selectButton
+            = new JButton(Messages.message("report.production.update"));
+        selectButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    update();
+                }
+            });
         reportPanel.add(selectButton, "wrap 20");
 
+        List<GoodsType> selectedTypes = new ArrayList<GoodsType>();
+        for (int index = 0; index < NUMBER_OF_GOODS; index++) {
+            JComboBox<String> box = this.boxes.get(index);
+            reportPanel.add(box);
+            int selectedIndex = box.getSelectedIndex();
+            if (selectedIndex > 0) {
+                selectedTypes.add(this.goodsTypes.get(selectedIndex - 1));
+            }
+        }
         if (!selectedTypes.isEmpty()) {
-
-            TypeCountMap<BuildingType> buildingCount = new TypeCountMap<BuildingType>();
-            List<List<BuildingType>> basicBuildingTypes = new ArrayList<List<BuildingType>>();
+            TypeCountMap<BuildingType> buildingCount
+                = new TypeCountMap<BuildingType>();
+            List<List<BuildingType>> basicBuildingTypes
+                = new ArrayList<List<BuildingType>>();
             for (GoodsType goodsType : selectedTypes) {
-                List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
-                for (BuildingType buildingType : getSpecification().getBuildingTypeList()) {
+                List<BuildingType> buildingTypes
+                    = new ArrayList<BuildingType>();
+                for (BuildingType buildingType
+                         : getSpecification().getBuildingTypeList()) {
                     if (goodsType.equals(buildingType.getProducedGoodsType())
                         || buildingType.hasModifier(goodsType.getId())) {
                         BuildingType firstLevel = buildingType.getFirstLevel();
@@ -125,9 +133,8 @@ public final class ReportProductionPanel extends ReportPanel {
                 basicBuildingTypes.add(buildingTypes);
             }
 
-            JLabel newLabel;
-
             // labels
+            JLabel newLabel;
             newLabel = new JLabel(Messages.message("Colony"));
             newLabel.setBorder(FreeColPanel.TOPLEFTCELLBORDER);
             reportPanel.add(newLabel, "newline 20");
@@ -143,7 +150,6 @@ public final class ReportProductionPanel extends ReportPanel {
                     reportPanel.add(newLabel);
                 }
             }
-
 
             int[] totalProduction = new int[selectedTypes.size()];
             for (Colony colony : getFreeColClient().getMySortedColonies()) {
