@@ -57,10 +57,14 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
 
 
     private final Flag[] FLAGS = new Flag[] {
-        ConfirmDeclarationDialog.ENGLISH_FLAG, ConfirmDeclarationDialog.SPANISH_FLAG,
-        ConfirmDeclarationDialog.FRENCH_FLAG, ConfirmDeclarationDialog.DUTCH_FLAG,
-        ConfirmDeclarationDialog.PORTUGUESE_FLAG, ConfirmDeclarationDialog.SWEDISH_FLAG,
-        ConfirmDeclarationDialog.DANISH_FLAG, ConfirmDeclarationDialog.RUSSIAN_FLAG,
+        ConfirmDeclarationDialog.ENGLISH_FLAG,
+        ConfirmDeclarationDialog.SPANISH_FLAG,
+        ConfirmDeclarationDialog.FRENCH_FLAG,
+        ConfirmDeclarationDialog.DUTCH_FLAG,
+        ConfirmDeclarationDialog.PORTUGUESE_FLAG,
+        ConfirmDeclarationDialog.SWEDISH_FLAG,
+        ConfirmDeclarationDialog.DANISH_FLAG,
+        ConfirmDeclarationDialog.RUSSIAN_FLAG,
         null // custom
     };
 
@@ -71,20 +75,20 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
 
     private Flag flag;
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private JComboBox flags = new JComboBox(FLAG_NAMES);
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private JComboBox decoration = new JComboBox(Flag.Decoration.values());
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private JComboBox background = new JComboBox(Flag.Background.values());
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private JComboBox union = new JComboBox(Flag.UnionPosition.values());
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private JComboBox unionShape = new JComboBox(Flag.UnionShape.values());
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private JComboBox stars = new JComboBox(getNumbers(50));
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private JComboBox stripes = new JComboBox(getNumbers(13));
+    private JComboBox<String> flags
+        = new JComboBox<String>(FLAG_NAMES);
+    private JComboBox<Decoration> decoration
+        = new JComboBox<Decoration>(Decoration.values());
+    private JComboBox<Background> background
+        = new JComboBox<Background>(Background.values());
+    private JComboBox<UnionPosition> union
+        = new JComboBox<UnionPosition>(UnionPosition.values());
+    private JComboBox<UnionShape> unionShape
+        = new JComboBox<UnionShape>(UnionShape.values());
+    private JComboBox<String> stars
+        = new JComboBox<String>(getNumbers(50));
+    private JComboBox<String> stripes
+        = new JComboBox<String>(getNumbers(13));
 
     private ColorButton unionColor = new ColorButton(Color.BLUE);
     private ColorButton starColor = new ColorButton(Color.WHITE);
@@ -105,10 +109,9 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
     final JLabel label = new JLabel();
 
 
-    @SuppressWarnings("unchecked")
     public FlagTest() {
-
         super("FlagTest");
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new MigLayout("wrap 2", "[][fill]"));
         flags.addItemListener(this);
@@ -171,12 +174,11 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         itemStateChanged(null);
     }
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public void itemStateChanged(ItemEvent e) {
-        Flag.Background newBackground = (Flag.Background) background.getSelectedItem();
-        Flag.Decoration newDecoration = (Flag.Decoration) decoration.getSelectedItem();
-        Flag.UnionPosition newPosition = (Flag.UnionPosition) union.getSelectedItem();
-        Flag.UnionShape newShape = (Flag.UnionShape) unionShape.getSelectedItem();
+        Background newBackground = (Background) background.getSelectedItem();
+        Decoration newDecoration = (Decoration) decoration.getSelectedItem();
+        UnionPosition newPosition = (UnionPosition) union.getSelectedItem();
+        UnionShape newShape = (UnionShape) unionShape.getSelectedItem();
         Flag newFlag = FLAGS[flags.getSelectedIndex()];
         if (e == null || e.getSource() == flags) {
             if (newFlag == null) {
@@ -258,14 +260,10 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
 
 
     public static void main(String[] args) {
-
         FlagTest frame = new FlagTest();
 
         // display the window
         frame.pack();
         frame.setVisible(true);
-
-
     }
-
 }
