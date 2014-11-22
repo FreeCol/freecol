@@ -660,7 +660,6 @@ public class ClientOptions extends OptionGroup {
      *
      * @return A list of active mods.
      */
-    @SuppressWarnings("unchecked")
     public List<FreeColModFile> getActiveMods() {
         List<FreeColModFile> active = new ArrayList<FreeColModFile>();
         ModListOption option = (ModListOption)getOption(ClientOptions.USER_MODS);
