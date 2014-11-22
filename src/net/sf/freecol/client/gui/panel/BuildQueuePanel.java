@@ -90,12 +90,14 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     private static Logger logger = Logger.getLogger(BuildQueuePanel.class.getName());
 
+    private static final DataFlavor BUILD_LIST_FLAVOR
+        = new DataFlavor(List.class, "BuildListFlavor");
+
     /**
      * This class implements a transfer handler able to transfer
      * <code>BuildQueueItem</code>s between the build queue list, the
      * unit list and the building list.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     private class BuildQueueTransferHandler extends TransferHandler {
 
         /**
@@ -106,7 +108,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             private List<? extends BuildableType> buildables;
 
             private final DataFlavor[] supportedFlavors = new DataFlavor[] {
-                buildQueueFlavor
+                BUILD_LIST_FLAVOR
             };
 
 
@@ -159,12 +161,28 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             }
         }
 
-        private final DataFlavor buildQueueFlavor
-            = new DataFlavor(List.class, "BuildingQueueFlavor");
-
         private JList<? extends BuildableType> source = null;
-        private int[] indices = null;
+        //private int[] indices = null;
         private int numberOfItems = 0; // number of items to be added
+
+        
+        /**
+         * Convert a component to an actual part of this panel,
+         * recovering its list type.
+         *
+         * @param comp The <code>JComponent</code> to convert.
+         * @return The actual panel component <code>JList</code>, or
+         *     null on error.
+         */
+        private JList<? extends BuildableType> convertJComp(JComponent comp) {
+            return (comp == BuildQueuePanel.this.unitList)
+                ? BuildQueuePanel.this.unitList
+                : (comp == BuildQueuePanel.this.buildQueueList)
+                ? BuildQueuePanel.this.buildQueueList
+                : (comp == BuildQueuePanel.this.buildingList)
+                ? BuildQueuePanel.this.buildingList
+                : null;
+        }
 
 
         // Override TransferHandler
@@ -176,112 +194,111 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         public boolean importData(JComponent comp, Transferable data) {
             if (!canImport(comp, data.getTransferDataFlavors())) return false;
 
-            List<BuildableType> buildQueue = new ArrayList<BuildableType>();
-            JList target = null;
-            DefaultListModel targetModel;
-
-            try {
-                target = (JList) comp;
-                targetModel = (DefaultListModel)target.getModel();
-                Object transferData = data.getTransferData(buildQueueFlavor);
-
-                if (!(transferData instanceof List<?>)) {
-                    return false;
-                }
-
-                for (Object object : (List<?>)transferData) {
-                    // first we need to make sure all items are compatible
-                    //with the drop zone
-                    if (!(object instanceof BuildableType)) {
-                        return false;
-                    }
-
-                    // check if trying to drop units in the Building list
-                    //or buildings in the Unit List
-                    if ((object instanceof BuildingType
-                            && target == BuildQueuePanel.this.unitList)
-                        || (object instanceof UnitType
-                            && target == BuildQueuePanel.this.buildingList)) {
-                        return false;
-                    }
-
-                    // Object check complete
-                    // Add object to the to-add list
-                    buildQueue.add((BuildableType) object);
-                }
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Build queue import fail", e);
+            // What actual panel component was chosen?
+            JList<? extends BuildableType> target = convertJComp(comp);
+            if (target == null) {
+                logger.warning("Build queue import failed to: " + comp);
                 return false;
             }
 
-            // check if every Buildable can be added to the queue
-            for (BuildableType type : buildQueue) {
-                if (getMinimumIndex(type) < 0) return false;
+            // Grab the transfer object and insist it is a list of something.
+            Object transferData;
+            try {
+                transferData = data.getTransferData(BUILD_LIST_FLAVOR);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "BuildQueue import", e);
+                return false;
             }
+            if (!(transferData instanceof List<?>)) return false;
+
+            // Collect the transferred buildables.
+            final JList<BuildableType> bql
+                = BuildQueuePanel.this.buildQueueList;
+            List<BuildableType> queue = new ArrayList<BuildableType>();
+            for (Object object : (List<?>)transferData) {
+                // Fail if:
+                // - dropping a non-Buildable
+                // - dropping a unit in the Building list
+                // - dropping a building in the Unit list
+                // - no minimum index for the buildable is found
+                if (!(object instanceof BuildableType)
+                    || (object instanceof UnitType
+                        && target == BuildQueuePanel.this.buildingList)
+                    || (object instanceof BuildingType
+                        && target == BuildQueuePanel.this.unitList)
+                    || getMinimumIndex((BuildableType)object) < 0)
+                    return false;
+                queue.add((BuildableType)object);
+            }
+
+            // Handle the cases where the BQL is not the target.
+            boolean isOrderingQueue = false;
+            if (this.source == bql) {
+                if (target != bql) {
+                    // Dragging out of build queue => just remove the element.
+                    // updateAllLists takes care of the rest.
+                    DefaultListModel sourceModel
+                        = (DefaultListModel)source.getModel();
+                    for (Object obj : queue) {
+                        sourceModel.removeElement(obj);
+                    }
+                    return true;
+                }
+                // OK, we are reordering the build queue.
+                isOrderingQueue = true;
+            } else {
+                // Can only drag from the Building and Unit lists to
+                // the build queue, so require that to be the target.
+                if (target != bql && target.getParent() != bql) return false;
+            }
+
+            // Now that the BQL is the target, grab its model (fully
+            // type qualified now).
+            DefaultListModel<BuildableType> targetModel
+                = (DefaultListModel<BuildableType>)bql.getModel();
 
             // This is where the dragged target was dropped.
             int preferredIndex = target.getSelectedIndex();
-
-            boolean isOrderingQueue = false;
+            int maxIndex = targetModel.size();
             int prevPos = -1;
-            if (source.equals(target)) {
-                // only the build queue allows ordering
-                if (target != BuildQueuePanel.this.buildQueueList
-                    && target.getParent() != BuildQueuePanel.this.buildQueueList) {
-                    return false;
-                }
-
-                // find previous position
+            if (isOrderingQueue) {
+                // Find previous position
                 for (int i = 0; i < targetModel.getSize(); i++) {
-                    if (targetModel.getElementAt(i) == buildQueue.get(0)) {
+                    if (targetModel.getElementAt(i) == queue.get(0)) {
                         prevPos = i;
                         break;
                     }
                 }
 
-                // don't drop selection on itself
+                // Suppress dropping the selection onto itself.
                 if (preferredIndex != -1 && prevPos == preferredIndex) {
-                    indices = null;
+                    //indices = null;
                     return false;
                 }
 
-                int maximumIndex = getMaximumIndex(buildQueue.get(0));
+                // Insist drop is within bounds.
+                int maximumIndex = getMaximumIndex(queue.get(0));
                 if (preferredIndex > maximumIndex) {
-                    indices = null;
+                    //indices = null;
                     return false;
                 }
 
-                isOrderingQueue = true;
-                numberOfItems = buildQueue.size();
-            }
-            else if (source == BuildQueuePanel.this.buildQueueList) {
-                // Dragging out of build queue - just remove the element.
-                // updateAllLists takes care of the rest.
-                DefaultListModel sourceModel = (DefaultListModel)source.getModel();
+                this.numberOfItems = queue.size();
 
-                for (Object obj : buildQueue) {
-                    sourceModel.removeElement(obj);
+                // Remove all transferring elements from the build queue.
+                for (BuildableType bt : queue) {
+                    targetModel.removeElement(bt);
                 }
-                return true;
             }
 
-            int maxIndex = targetModel.size();
             // Set index to add to the last position, if not set or
             // out-of-bounds
             if (preferredIndex < 0 || preferredIndex > maxIndex) {
                 preferredIndex = maxIndex;
             }
 
-            if (isOrderingQueue) {
-                // Remove all elements in the build queue from the target.
-                for (Object obj : buildQueue) {
-                    targetModel.removeElement(obj);
-                }
-            }
-
-            for (int index = 0; index < buildQueue.size(); index++) {
-                BuildableType toBuild = (BuildableType)buildQueue.get(index);
-
+            for (int index = 0; index < queue.size(); index++) {
+                BuildableType toBuild = queue.get(index);
                 int minimumIndex = getMinimumIndex(toBuild);
 
                 // minimumIndex == targetModel.size() means it has to
@@ -303,7 +320,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                         }
                     }
                 }
-                targetModel.add(minimumIndex, buildQueue.get(index));
+                targetModel.add(minimumIndex, toBuild);
             }
 
             // update selected index to new position
@@ -320,7 +337,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         @Override
         protected void exportDone(JComponent source, Transferable data, 
                                   int action) {
-            this.indices = null;
+            //this.indices = null;
             this.numberOfItems = 0;
             updateAllLists();
         }
@@ -332,7 +349,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         public boolean canImport(JComponent comp, DataFlavor[] flavors) {
             if (flavors == null) return false;
             for (DataFlavor flavor : flavors) {
-                if (flavor.equals(buildQueueFlavor)) return true;
+                if (flavor.equals(BUILD_LIST_FLAVOR)) return true;
             }
             return false;
         }
@@ -342,15 +359,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
          */
         @Override
         protected Transferable createTransferable(JComponent comp) {
-            this.source = (comp == BuildQueuePanel.this.unitList)
-                ? BuildQueuePanel.this.unitList
-                : (comp == BuildQueuePanel.this.buildQueueList)
-                ? BuildQueuePanel.this.buildQueueList
-                : (comp == BuildQueuePanel.this.buildingList)
-                ? BuildQueuePanel.this.buildingList
-                : null;
+            
+            this.source = convertJComp(comp);
             if (this.source == null) return null;
-            this.indices = this.source.getSelectedIndices();
+            //this.indices = this.source.getSelectedIndices();
             return new BuildablesTransferable(this.source.getSelectedValuesList());
         }
 
