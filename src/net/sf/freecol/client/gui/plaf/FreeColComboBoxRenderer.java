@@ -92,7 +92,8 @@ public class FreeColComboBoxRenderer<T>
 
 
     /**
-     * Returns a <code>ListCellRenderer</code> for the given <code>JList</code>.
+     * Returns a <code>ListCellRenderer</code> for the given
+     * <code>JList</code>.
      *
      * @param list The <code>JList</code>.
      * @param value The list cell.

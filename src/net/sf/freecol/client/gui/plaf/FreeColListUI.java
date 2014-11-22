@@ -41,19 +41,13 @@ public class FreeColListUI extends BasicListUI {
     }
 
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public void installUI(JComponent c) {
         super.installUI(c);
-        ((JList) c).setCellRenderer(createRenderer());
     }
 
     public void paint(Graphics g, JComponent c) {
         ImageLibrary.drawTiledImage("background.FreeColList", g, c, null);
         LAFUtilities.setProperties(g, c);
         super.paint(g, c);
-    }
-
-    protected ListCellRenderer createRenderer() {
-        return new FreeColComboBoxRenderer();
     }
 }
