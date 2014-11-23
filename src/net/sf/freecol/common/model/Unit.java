@@ -311,11 +311,9 @@ public class Unit extends GoodsLocation
                                          role.getId(), null);
 
         case NATIONAL:
-            if (role.getExpertUnit() == type && role.getMaximumCount() > 1) {
-                // Expert equipped as such has no additional label if
-                // the amount of equipment must be 1, but if the
-                // amount can vary a label is required, so fall through
-                // into the FULL case.
+            if (role.getMaximumCount() > 1) {
+                // If the amount of equipment can vary an equipment
+                // label is required, so fall through into the FULL case.
             } else {
                 return Messages.getUnitLabel(getName(), type.getId(), 1,
                                              Messages.nameKey(owner.getNation()), 
