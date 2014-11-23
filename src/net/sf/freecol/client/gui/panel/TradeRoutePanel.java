@@ -159,11 +159,14 @@ public final class TradeRoutePanel extends FreeColPanel {
                     getGUI().showTradeRouteInputPanel(selected,
                         new Runnable() {
                             public void run() {
+                                StringTemplate template = null;
                                 if (selected.getName() == null) { // Cancelled
                                     selected.setName(name);
-                                } else if (selected.verify() == null) {
+                                } else if ((template = selected.verify()) == null) {
                                     getController().updateTradeRoute(selected);
                                     updateList(selected);
+                                } else {
+                                    getGUI().showInformationMessage(template);
                                 }
                             }
                         });
@@ -245,17 +248,21 @@ public final class TradeRoutePanel extends FreeColPanel {
         getGUI().showTradeRouteInputPanel(newRoute,
             new Runnable() {
                 public void run() {
+                    StringTemplate template = null;
                     if (newRoute.getName() == null) { // Cancelled
                         deleteTradeRoute(newRoute);
                         updateList(null);
-                    } else if (newRoute.verify() == null) {
-                        getController().updateTradeRoute(newRoute);
-                        if (u != null) {
-                            getController().assignTradeRoute(u, newRoute);
-                        }
-                        updateList(newRoute);
                     } else {
-                        updateList(null);
+                        if ((template = newRoute.verify()) == null) {
+                            getController().updateTradeRoute(newRoute);
+                            if (u != null) {
+                                getController().assignTradeRoute(u, newRoute);
+                            }
+                            updateList(newRoute);
+                        } else {
+                            updateList(null);
+                            getGUI().showInformationMessage(template);
+                        }
                     }
                 }
             });
@@ -283,7 +290,6 @@ public final class TradeRoutePanel extends FreeColPanel {
      *
      * @param selectRoute An optional <code>TradeRoute</code> to select.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     private void updateList(TradeRoute selectRoute) {
         final Player player = getMyPlayer();
 

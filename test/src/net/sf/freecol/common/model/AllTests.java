@@ -62,6 +62,7 @@ public class AllTests {
         suite.addTestSuite(TileImprovementTest.class);
         suite.addTestSuite(TileItemContainerTest.class);
         suite.addTestSuite(TileTest.class);
+        suite.addTestSuite(TradeRouteTest.class);
         suite.addTestSuite(UnitTest.class);
         suite.addTestSuite(UnitTypeChangeTest.class);
         //$JUnit-END$

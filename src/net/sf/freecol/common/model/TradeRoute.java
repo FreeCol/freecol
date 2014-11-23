@@ -20,7 +20,9 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -233,7 +235,12 @@ public class TradeRoute extends FreeColGameObject
             return StringTemplate.template("tradeRoute.notEnoughStops");
         }
 
-        // Check that all stops are valid
+        // Check:
+        // - all stops are valid
+        // - there is at least one non-empty stop
+        // - there is no goods that is present at all stops
+        Set<GoodsType> always = new HashSet<GoodsType>(stops.get(0).getCargo());
+        boolean empty = true;
         for (TradeRouteStop stop : stops) {
             if (!TradeRoute.isStopValid(owner, stop)) {
                 String badStop = Messages.message(stop.getLocation()
@@ -241,8 +248,15 @@ public class TradeRoute extends FreeColGameObject
                 return StringTemplate.template("tradeRoute.invalidStop")
                     .addName("%name%", badStop);
             }
+            if (!stop.getCargo().isEmpty()) empty = false;
+            always.retainAll(stop.getCargo());
         }
-
+        if (empty) return StringTemplate.template("tradeRoute.allEmpty");
+        if (!always.isEmpty()) {
+            return StringTemplate.template("tradeRoute.alwaysPresent")
+                .add("%goodsType%", always.iterator().next().getNameKey());
+        }
+        
         return null;
     }
 
