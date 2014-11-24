@@ -57,7 +57,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
         private Mixer.Info mixerInfo;
 
 
-        MixerWrapper(String name, Mixer.Info mixerInfo) {
+        public MixerWrapper(String name, Mixer.Info mixerInfo) {
             this.name = name;
             this.mixerInfo = mixerInfo;
         }

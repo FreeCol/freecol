@@ -45,25 +45,26 @@ import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
 public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
 
     private JPanel panel = new JPanel();
-    private JComboBox cbox;
+    private JComboBox<MixerWrapper> cbox;
     private JButton button1, button2;
     private JLabel currentMixerLabel;
 
     private ActionListener aHandler = new ActionListener () {
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == button1) {
-                gui.playSound("sound.event.buildingComplete");
-            } else if (e.getSource() == button2) {
-                gui.playSound("sound.intro.general");
-            } else if (e.getSource() == cbox) {
-                MixerWrapper value = (MixerWrapper) cbox.getSelectedItem();
-                if (getOption().getValue() != value) {
-                    getOption().setValue(value);
-                    updateMixerLabel();
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource() == button1) {
+                    gui.playSound("sound.event.buildingComplete");
+                } else if (e.getSource() == button2) {
+                    gui.playSound("sound.intro.general");
+                } else if (e.getSource() == cbox) {
+                    MixerWrapper value = (MixerWrapper) cbox.getSelectedItem();
+                    if (getOption().getValue() != value) {
+                        getOption().setValue(value);
+                        updateMixerLabel();
+                    }
                 }
             }
-        }
-    };
+        };
+
 
     /**
      * Creates a new <code>AudioMixerOptionUI</code> for the given
@@ -73,15 +74,15 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
      *      interface for.
      * @param editable boolean whether user can modify the setting
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    public AudioMixerOptionUI(GUI gui, final AudioMixerOption option, boolean editable) {
+    public AudioMixerOptionUI(GUI gui, final AudioMixerOption option,
+                              boolean editable) {
         super(gui, option, editable);
 
         BorderLayout layout = new BorderLayout();
         layout.setHgap(15);
         panel.setLayout(layout);
 
-        cbox = new JComboBox();
+        cbox = new JComboBox<MixerWrapper>();
         panel.add(cbox, BorderLayout.WEST);
 
         currentMixerLabel = new JLabel();
@@ -97,7 +98,8 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
         button2.addActionListener(aHandler);
 
         cbox.add(super.getJLabel());
-        cbox.setModel(new DefaultComboBoxModel(getOption().getChoices().toArray(new MixerWrapper[0])));
+        cbox.setModel(new DefaultComboBoxModel<MixerWrapper>(getOption()
+                .getChoices().toArray(new MixerWrapper[0])));
         reset();
 
         cbox.setEnabled(editable);
