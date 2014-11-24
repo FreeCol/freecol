@@ -42,7 +42,6 @@ public final class TextOptionUI extends OptionUI<TextOption>  {
      * @param option The <code>TextOption</code> to make a user interface for.
      * @param editable boolean whether user can modify the setting.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public TextOptionUI(GUI gui, final TextOption option, boolean editable) {
         super(gui, option, editable);
 
