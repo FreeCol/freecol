@@ -21,11 +21,15 @@ package net.sf.freecol.common;
 
 
 /**
- * Any object that provides a string ID that can be used to identify
- * it, and to provide a localized name for it.
+ * Any object that provides a string identifier that can be used to
+ * identify it, and to provide a localized name for it.
  */
 public interface ObjectWithId {
 
+    /**
+     * Get the identifier of the object.
+     *
+     * @return The object identifier.
+     */
     public String getId();
-
 }

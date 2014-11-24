@@ -66,6 +66,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
+import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -166,25 +167,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         private int numberOfItems = 0; // number of items to be added
 
         
-        /**
-         * Convert a component to an actual part of this panel,
-         * recovering its list type.
-         *
-         * @param comp The <code>JComponent</code> to convert.
-         * @return The actual panel component <code>JList</code>, or
-         *     null on error.
-         */
-        private JList<? extends BuildableType> convertJComp(JComponent comp) {
-            return (comp == BuildQueuePanel.this.unitList)
-                ? BuildQueuePanel.this.unitList
-                : (comp == BuildQueuePanel.this.buildQueueList)
-                ? BuildQueuePanel.this.buildQueueList
-                : (comp == BuildQueuePanel.this.buildingList)
-                ? BuildQueuePanel.this.buildingList
-                : null;
-        }
-
-
         // Override TransferHandler
 
         /**
@@ -195,7 +177,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             if (!canImport(comp, data.getTransferDataFlavors())) return false;
 
             // What actual panel component was chosen?
-            JList<? extends BuildableType> target = convertJComp(comp);
+            JList<? extends BuildableType> target = BuildQueuePanel.this
+                .convertJComp(comp);
             if (target == null) {
                 logger.warning("Build queue import failed to: " + comp);
                 return false;
@@ -360,7 +343,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         @Override
         protected Transferable createTransferable(JComponent comp) {
             
-            this.source = convertJComp(comp);
+            this.source = BuildQueuePanel.this.convertJComp(comp);
             if (this.source == null) return null;
             //this.indices = this.source.getSelectedIndices();
             return new BuildablesTransferable(this.source.getSelectedValuesList());
@@ -386,37 +369,43 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             this.add = add;
         }
 
-        @Override
-        @SuppressWarnings("unchecked") // FIXME in Java7
-        public void mousePressed(MouseEvent e) {
-            if (!enabled && e.getClickCount() == 1 && !e.isConsumed()) {
-                enabled = true;
-            }
 
-            if (enabled) {
-                JList<BuildableType> source
-                    = (JList<BuildableType>)e.getSource();
-                if (e.getButton() == MouseEvent.BUTTON3
-                    || e.isPopupTrigger()) {
-                    int index = source.locationToIndex(e.getPoint());
-                    BuildableType type = source.getModel().getElementAt(index);
-                    getGUI().showColopediaPanel(type.getId());
-                } else if (e.getClickCount() > 1 && !e.isConsumed()) {
-                    JList<BuildableType> bql = BuildQueuePanel.this.buildQueueList;
-                    DefaultListModel<BuildableType> model
-                        = (DefaultListModel<BuildableType>)bql.getModel();
-                    if (source.getSelectedIndex() < 0) {
-                        source.setSelectedIndex(source.locationToIndex(e.getPoint()));
-                    }
-                    for (BuildableType bt : source.getSelectedValuesList()) {
-                        if (add) {
-                            model.addElement(bt);
-                        } else {
-                            model.removeElement(bt);
-                        }
-                    }
-                    updateAllLists();
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if (!this.enabled && e.getClickCount() == 1 && !e.isConsumed()) {
+                this.enabled = true;
+            }
+            if (!this.enabled) return;
+
+            Object source = e.getSource();
+            JList<? extends BuildableType> jlist
+                = (source instanceof JComponent)
+                ? BuildQueuePanel.this.convertJComp((JComponent)source)
+                : null;
+            if (jlist == null) return;
+
+            if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
+                int index = jlist.locationToIndex(e.getPoint());
+                BuildableType bt = jlist.getModel().getElementAt(index);
+                getGUI().showColopediaPanel(bt.getId());
+            } else if (e.getClickCount() > 1 && !e.isConsumed()) {
+                JList<BuildableType> bql = BuildQueuePanel.this.buildQueueList;
+                DefaultListModel<BuildableType> model
+                    = (DefaultListModel<BuildableType>)bql.getModel();
+                if (jlist.getSelectedIndex() < 0) {
+                    jlist.setSelectedIndex(jlist.locationToIndex(e.getPoint()));
                 }
+                for (BuildableType bt : jlist.getSelectedValuesList()) {
+                    if (this.add) {
+                        model.addElement(bt);
+                    } else {
+                        model.removeElement(bt);
+                    }
+                }
+                updateAllLists();
             }
         }
     }
@@ -672,6 +661,21 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      */
     public Colony getColony() {
         return this.colony;
+    }
+
+    /**
+     * Convert a component to an actual part of this panel,
+     * recovering its list type.
+     *
+     * @param comp The <code>JComponent</code> to convert.
+     * @return The actual panel component <code>JList</code>, or
+     *     null on error.
+     */
+    private JList<? extends BuildableType> convertJComp(JComponent comp) {
+        return (comp == this.unitList) ? this.unitList
+            : (comp == this.buildQueueList) ? this.buildQueueList
+            : (comp == this.buildingList) ? this.buildingList
+            : null;
     }
 
     private void removeBuildable(Object type) {
