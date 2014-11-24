@@ -58,8 +58,8 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     private static Logger logger = Logger.getLogger(ListOptionUI.class.getName());
 
     private JPanel panel = new MigPanel();
-    private JList list;
-    private DefaultListModel model;
+    private JList<AbstractOption<T>> list;
+    private DefaultListModel<AbstractOption<T>> model;
 
     private JButton editButton = new JButton(Messages.message("list.edit"));
     private JButton addButton = new JButton(Messages.message("list.add"));
@@ -76,17 +76,16 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
      * @param option The <code>ListOption</code> to display.
      * @param editable boolean whether user can modify the setting
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public ListOptionUI(final GUI gui, final ListOption<T> option,
                         boolean editable) {
         super(gui, option, editable);
 
         panel.setBorder(BorderFactory
             .createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
-                                super.getJLabel().getText()));
+                super.getJLabel().getText()));
         panel.setLayout(new MigLayout("wrap 2, fill", "[fill, grow]20[fill]"));
 
-        model = new DefaultListModel();
+        model = new DefaultListModel<AbstractOption<T>>();
         for (AbstractOption<T> o : option.getValue()) {
             try {
                 AbstractOption<T> c = o.clone();
@@ -95,15 +94,12 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 logger.log(Level.WARNING, "Can not clone " + o.getId(), e);
             }
         }
-        list = new JList(model);
+        list = new JList<AbstractOption<T>>(model);
         AbstractOption<T> o = option.getValue().isEmpty()
             ? option.getTemplate()
             : option.getValue().get(0);
         if (o != null) {
-            OptionUI ui = OptionUI.getOptionUI(gui, o, editable);
-            if (ui != null && ui.getListCellRenderer() != null) {
-                list.setCellRenderer(ui.getListCellRenderer());
-            }
+            setCellRenderer(gui, o, editable);
             list.setSelectedIndex(0);
         }
         list.setVisibleRowCount(4);
@@ -133,7 +129,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                         }
                     } catch (CloneNotSupportedException e) {
                         logger.log(Level.WARNING, "Can not clone: " + oldValue,
-                                   e);
+                            e);
                     }
                 }
             });
@@ -156,7 +152,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 public void actionPerformed(ActionEvent e) {
                     if (list.getSelectedIndex() == 0) return;
                     final int index = list.getSelectedIndex();
-                    final Object temp = model.getElementAt(index);
+                    final AbstractOption<T> temp = model.getElementAt(index);
                     model.setElementAt(model.getElementAt(index-1), index);
                     model.setElementAt(temp, index-1);
                     list.setSelectedIndex(index-1);
@@ -166,7 +162,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 public void actionPerformed(ActionEvent e) {
                     if (list.getSelectedIndex() == model.getSize() - 1) return;
                     final int index = list.getSelectedIndex();
-                    final Object temp = model.getElementAt(index);
+                    final AbstractOption<T> temp = model.getElementAt(index);
                     model.setElementAt(model.getElementAt(index+1), index);
                     model.setElementAt(temp, index+1);
                     list.setSelectedIndex(index+1);
@@ -177,21 +173,20 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         initialize();
     }
 
-    public void valueChanged(ListSelectionEvent e) {
-        if (e.getValueIsAdjusting() == false) {
-            boolean enabled = (isEditable() && list.getSelectedValue() != null);
-            editButton.setEnabled(enabled);
-            removeButton.setEnabled(enabled);
-            upButton.setEnabled(enabled);
-            downButton.setEnabled(enabled);
+    @SuppressWarnings("unchecked") // Fix in Java7
+    private void setCellRenderer(GUI gui, AbstractOption<T> o,
+                                 boolean editable) {
+        OptionUI ui = OptionUI.getOptionUI(gui, o, editable);
+        if (ui != null && ui.getListCellRenderer() != null) {
+            list.setCellRenderer(ui.getListCellRenderer());
         }
     }
 
-    @SuppressWarnings("unchecked")
     private List<AbstractOption<T>> getValue() {
         List<AbstractOption<T>> result = new ArrayList<AbstractOption<T>>();
-        for (Enumeration e = model.elements(); e.hasMoreElements();) {
-            result.add((AbstractOption<T>) e.nextElement());
+        for (Enumeration<AbstractOption<T>> e = model.elements();
+             e.hasMoreElements();) {
+            result.add(e.nextElement());
         }
         return result;
     }
@@ -224,7 +219,6 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public void reset() {
         model.clear();
         for (AbstractOption<T> o : getOption().getValue()) {
@@ -232,4 +226,18 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         }
     }
 
+    // Interface ListSelectionListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void valueChanged(ListSelectionEvent e) {
+        if (e.getValueIsAdjusting() == false) {
+            boolean enabled = (isEditable() && list.getSelectedValue() != null);
+            editButton.setEnabled(enabled);
+            removeButton.setEnabled(enabled);
+            upButton.setEnabled(enabled);
+            downButton.setEnabled(enabled);
+        }
+    }
 }
