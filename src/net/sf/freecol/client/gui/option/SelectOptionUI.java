@@ -35,7 +35,7 @@ import net.sf.freecol.common.option.SelectOption;
  */
 public final class SelectOptionUI extends OptionUI<SelectOption> {
 
-    private JComboBox box = new JComboBox();
+    private JComboBox<String> box = new JComboBox<String>();
 
 
     /**
@@ -46,12 +46,11 @@ public final class SelectOptionUI extends OptionUI<SelectOption> {
      *     interface for.
      * @param editable Whether user can modify the setting.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public SelectOptionUI(GUI gui, final SelectOption option,
                           boolean editable) {
         super(gui, option, editable);
-        DefaultComboBoxModel model = new DefaultComboBoxModel();
 
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
         for (String string : option.getItemValues().values()) {
             model.addElement(option.localizeLabels() ? Messages.message(string)
                 : string);
