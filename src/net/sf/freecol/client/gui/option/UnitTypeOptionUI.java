@@ -39,19 +39,20 @@ import net.sf.freecol.common.option.UnitTypeOption;
  */
 public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
 
-    private static class ChoiceRenderer extends FreeColComboBoxRenderer {
+    private static class ChoiceRenderer
+        extends FreeColComboBoxRenderer<UnitType> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public void setLabelValues(JLabel label, Object value) {
-            if (value == null) {
-                label.setText(Messages.message("none"));
-            } else {
-                label.setText(Messages.getName((UnitType) value));
-            }
+        public void setLabelValues(JLabel label, UnitType value) {
+            label.setText((value == null) ? Messages.message("none")
+                : Messages.getName(value));
         }
     }
 
-    private JComboBox box = new JComboBox();
+    private JComboBox<UnitType> box = new JComboBox<UnitType>();
 
 
     /**
@@ -68,7 +69,7 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
         super(gui, option, editable);
 
         List<UnitType> choices = option.getChoices();
-        box.setModel(new DefaultComboBoxModel(choices
+        box.setModel(new DefaultComboBoxModel<UnitType>(choices
                 .toArray(new UnitType[choices.size()])));
         box.setSelectedItem(option.getValue());
         box.setRenderer(new ChoiceRenderer());
