@@ -35,7 +35,7 @@ import net.sf.freecol.common.option.LanguageOption.Language;
  */
 public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
 
-    private JComboBox box = new JComboBox();
+    private JComboBox<Language> box = new JComboBox<Language>();
 
 
     /**
@@ -46,15 +46,14 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
      *     interface for.
      * @param editable boolean whether user can modify the setting
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public LanguageOptionUI(GUI gui, final LanguageOption option,
                             boolean editable) {
         super(gui, option, editable);
 
         Language[] languages = option.getChoices().toArray(new Language[0]);
-        box.setModel(new DefaultComboBoxModel(languages));
+        box.setModel(new DefaultComboBoxModel<Language>(languages));
         box.setSelectedItem(option.getValue());
-        box.setRenderer(new FreeColComboBoxRenderer("", false));
+        box.setRenderer(new FreeColComboBoxRenderer<Language>("", false));
 
         initialize();
     }
@@ -73,7 +72,7 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
      * {@inheritDoc}
      */
     public void updateOption() {
-        getOption().setValue((Language) box.getSelectedItem());
+        getOption().setValue((Language)box.getSelectedItem());
     }
 
     /**
