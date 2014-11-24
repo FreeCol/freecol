@@ -39,22 +39,18 @@ import net.sf.freecol.common.option.ModOption;
 public final class ModOptionUI extends OptionUI<ModOption>  {
 
 
-    private static class ChoiceRenderer extends FreeColComboBoxRenderer {
+    private static class ChoiceRenderer
+        extends FreeColComboBoxRenderer<FreeColModFile> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
-        public void setLabelValues(JLabel label, Object value) {
-            FreeColModFile modFile = null;
-            if (value instanceof FreeColModFile) {
-                modFile = (FreeColModFile) value;
-            } else if (value instanceof ModOption) {
-                modFile = (FreeColModFile) ((ModOption) value).getValue();
-            }
-            if (modFile == null) {
-                label.setText(value.toString());
-            } else {
-                String key = "mod." + modFile.getId();
+        public void setLabelValues(JLabel label, FreeColModFile value) {
+            if (value != null) {
+                String key = "mod." + value.getId();
                 label.setText(Messages.getName(key));
-                if (Messages.containsKey(key + Messages.SHORT_DESCRIPTION_SUFFIX)) {
+                if (Messages.containsKey(Messages.shortDescriptionKey(key))) {
                     label.setToolTipText(Messages.getShortDescription(key));
                 }
             }
@@ -62,19 +58,21 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
     }
 
 
-    private JComboBox box = new JComboBox();
+    private JComboBox<FreeColModFile> box = new JComboBox<FreeColModFile>();
+
 
     /**
-    * Creates a new <code>ModOptionUI</code> for the given <code>ModOption</code>.
-    *
-    * @param option The <code>ModOption</code> to make a user interface for
-    * @param editable boolean whether user can modify the setting
-    */
-    @SuppressWarnings("unchecked") // FIXME in Java7
+     * Creates a new <code>ModOptionUI</code> for the given
+     * <code>ModOption</code>.
+     *
+     * @param option The <code>ModOption</code> to make a user interface for
+     * @param editable boolean whether user can modify the setting
+     */
     public ModOptionUI(GUI gui, final ModOption option, boolean editable) {
         super(gui, option, editable);
 
-        DefaultComboBoxModel model = new DefaultComboBoxModel();
+        DefaultComboBoxModel<FreeColModFile> model
+            = new DefaultComboBoxModel<FreeColModFile>();
         for (FreeColModFile choice : option.getChoices()) {
             model.addElement(choice);
         }
@@ -100,7 +98,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
      * {@inheritDoc}
      */
     public void updateOption() {
-        getOption().setValue((FreeColModFile) box.getSelectedItem());
+        getOption().setValue((FreeColModFile)box.getSelectedItem());
     }
 
     /**
