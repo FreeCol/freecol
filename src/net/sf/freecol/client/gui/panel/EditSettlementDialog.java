@@ -78,7 +78,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     private final JTextField name;
 
     /** The selected settlement owner. */
-    private final JComboBox owner;
+    private final JComboBox<Nation> owner;
 
     /** Is this settlement the capital? */
     private final JCheckBox capital;
@@ -96,7 +96,6 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param settlement The <code>IndianSettlement</code> to edit.
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public EditSettlementDialog(FreeColClient freeColClient,
                                 final IndianSettlement settlement) {
         super(freeColClient);
@@ -178,10 +177,10 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         return (t.getMinimumSize() + t.getMaximumSize()) / 2;
     }
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private DefaultComboBoxModel getSkillModel() {
+    private DefaultComboBoxModel<UnitType> getSkillModel() {
         IndianNationType ownerType = getOwnerNationType();
-        DefaultComboBoxModel skillModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<UnitType> skillModel
+            = new DefaultComboBoxModel<UnitType>();
         for (RandomChoice<UnitType> skill : ownerType.getSkills()) {
             skillModel.addElement(skill.getObject());
         }
@@ -194,7 +193,6 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked") // FIXME in Java7
     public void itemStateChanged(ItemEvent e) {
         Player player = getOwnerPlayer();
         if (player != null) {
