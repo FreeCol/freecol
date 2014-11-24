@@ -251,7 +251,10 @@ public class PathNode {
      * @return The number of turns, using zero for the first move.
      */
     public int getTotalTurns() {
-        return getLastNode().getTurns();
+        PathNode path = getLastNode();
+        int n = path.getTurns();
+        if (path.getMovesLeft() == 0) n++;
+        return n;
     }
 
     /**
