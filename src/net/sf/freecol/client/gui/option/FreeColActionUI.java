@@ -68,7 +68,8 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
     public FreeColActionUI(GUI gui, FreeColAction option, boolean editable) {
         super(gui, option, editable);
 
-        this.optionGroupUI = optionGroupUI;
+        this.optionGroupUI = null;
+
         keyStroke = option.getAccelerator();
 
         panel.add(getJLabel());
@@ -238,7 +239,9 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
 
         public void keyReleased(KeyEvent e) {
             KeyStroke ks = KeyStroke.getKeyStroke(e.getKeyCode(), e.getModifiers());
-            optionGroupUI.removeKeyStroke(ks);
+            if (FreeColActionUI.this.optionGroupUI != null) {
+                FreeColActionUI.this.optionGroupUI.removeKeyStroke(ks);
+            }
             keyStroke = ks;
             //keyStroke = KeyStroke.getKeyStroke(new Character(e.getKeyChar()), e.getModifiers());
             stopBlinking();
