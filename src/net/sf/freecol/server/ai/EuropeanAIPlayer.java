@@ -737,6 +737,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         AIUnit result = trainAIUnitInEurope(unitType);
         lb.add(" to build ", what, " ", unitType.getSuffix(),
             ((result != null) ? "" : "(failed)"), ", ");
+        if (result == null) return null;
         player.logCheat("Build " + result.getUnit());
         return result;
     }
