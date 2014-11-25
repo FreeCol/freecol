@@ -48,11 +48,12 @@ public class FontResource extends Resource {
 
     /**
      * Do not use directly.
+     *
      * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
      * @see ResourceFactory#createResource(URI)
      */
-    FontResource(URI resourceLocator) throws Exception {
+    public FontResource(URI resourceLocator) throws Exception {
         super(resourceLocator);
         font = null;
         if (resourceLocator.getPath() != null
@@ -103,5 +104,4 @@ public class FontResource extends Resource {
     public static Font getEmergencyFont() {
         return Font.decode(null);
     }
-
 }

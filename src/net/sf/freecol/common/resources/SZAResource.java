@@ -41,17 +41,20 @@ public class SZAResource extends Resource {
     private Map<Double, SimpleZippedAnimation> scaledSzAnimations = new HashMap<Double, SimpleZippedAnimation>();
     private SimpleZippedAnimation szAnimation = null;
     private volatile Object loadingLock = new Object();
-    
+
+
     /**
      * Do not use directly.
+     *
      * @param resourceLocator The <code>URI</code> used when loading this
-     *      resource.
+     *     resource.
      * @see ResourceFactory#createResource(URI)
      */
-    SZAResource(URI resourceLocator) {
+    public SZAResource(URI resourceLocator) {
         super(resourceLocator);
     }
-    
+
+
     /**
      * Preloading the animation.
      */
@@ -69,7 +72,9 @@ public class SZAResource extends Resource {
     }
     
     /**
-     * Gets the <code>SimpleZippedAnimation</code> represented by this resource.
+     * Gets the <code>SimpleZippedAnimation</code> represented by this
+     * resource.
+     *
      * @return The <code>SimpleZippedAnimation</code> in it's original size.
      */
     public SimpleZippedAnimation getSimpleZippedAnimation() {
@@ -78,7 +83,8 @@ public class SZAResource extends Resource {
     }
     
     /**
-     * Returns the <code>SimpleZippedAnimation</code> using the specified scale.
+     * Get the <code>SimpleZippedAnimation</code> using the specified
+     * scale.
      * 
      * @param scale The size of the requested animation (with 1 being normal
      *      size, 2 twice the size, 0.5 half the size etc). Rescaling

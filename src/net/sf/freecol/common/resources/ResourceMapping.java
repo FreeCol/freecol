@@ -93,6 +93,12 @@ public class ResourceMapping {
         return resources.get(id);
     }
 
+    /**
+     * Get the keys in this mapping with a given prefix.
+     *
+     * @param prefix The prefix to check.
+     * @return A list of keys.
+     */
     public List<String> getKeys(String prefix) {
         List<String> result = new ArrayList<String>();
         for (String key : resources.keySet()) {
@@ -102,6 +108,4 @@ public class ResourceMapping {
         }
         return result;
     }
-
-
 }

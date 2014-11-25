@@ -37,10 +37,12 @@ public abstract class Resource {
      */
     private final URI resourceLocator;
 
+
     protected Resource() {
         // empty constructor
         resourceLocator = null;
     }
+
 
     /**
      * Do not use directly.
@@ -48,9 +50,10 @@ public abstract class Resource {
      *      resource.
      * @see ResourceFactory#createResource(URI)
      */
-    Resource(URI resourceLocator) {
+    public Resource(URI resourceLocator) {
         this.resourceLocator = resourceLocator;
     }
+
 
     /**
      * Preload the resource.  Often implemented as a noop.

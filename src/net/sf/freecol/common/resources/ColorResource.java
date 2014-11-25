@@ -49,13 +49,26 @@ public class ColorResource extends Resource {
      * Do not use directly.
      *
      * @param resourceLocator The <code>URI</code> used when loading this
-     *      resource.
+     *     resource.
      * @see ResourceFactory#createResource(URI)
      */
     public ColorResource(URI resourceLocator) throws Exception {
         super(resourceLocator);
-        String colorName = resourceLocator.getSchemeSpecificPart().substring(SCHEME.length());
-        color = getColor(colorName);
+
+        String colorName = resourceLocator.getSchemeSpecificPart()
+            .substring(SCHEME.length());
+        this.color = getColor(colorName);
+    }
+
+
+    
+    /**
+     * Gets the <code>Color</code> represented by this resource.
+     *
+     * @return The <code>Color</code> in it's original size.
+     */
+    public Color getColor() {
+        return this.color;
     }
 
     /**
@@ -104,13 +117,5 @@ public class ColorResource extends Resource {
         // Fall back to black.  There are places where a null colour
         // can cause crashes.
         return Color.BLACK;
-    }
-    
-    /**
-     * Gets the <code>Color</code> represented by this resource.
-     * @return The <code>Color</code> in it's original size.
-     */
-    public Color getColor() {
-        return color;
     }
 }

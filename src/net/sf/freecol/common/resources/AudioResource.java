@@ -24,8 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -39,8 +37,6 @@ import net.sf.freecol.client.gui.sound.SoundPlayer;
  * @see Resource
  */
 public class AudioResource extends Resource {
-
-    private static final Logger logger = Logger.getLogger(AudioResource.class.getName());
 
     private File file;
 
