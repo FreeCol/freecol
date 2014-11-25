@@ -106,13 +106,12 @@ public final class FreeCol {
     private static String       FREECOL_REVISION;
 
     // Cli defaults.
-
     private static final Advantages ADVANTAGES_DEFAULT = Advantages.SELECTABLE;
     private static final String DIFFICULTY_DEFAULT = "model.difficulty.medium";
     private static final int    EUROPEANS_DEFAULT = 4;
     private static final int    EUROPEANS_MIN = 1;
     private static final Level  LOGLEVEL_DEFAULT = Level.INFO;
-    private static final String JAVA_VERSION_MIN = "1.6";
+    private static final String JAVA_VERSION_MIN = "1.7";
     private static final int    MEMORY_MIN = 128; // Mbytes
     private static final int    PORT_DEFAULT = 3541;
     private static final String SPLASH_FILE_DEFAULT = "splash.jpg";
@@ -123,7 +122,6 @@ public final class FreeCol {
 
     // Cli values.  Often set to null so the default can be applied in
     // the accessor function.
-
     private static boolean checkIntegrity = false,
                            consoleLogging = false,
                            debugStart = false,

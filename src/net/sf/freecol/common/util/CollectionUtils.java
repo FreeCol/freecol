@@ -38,7 +38,8 @@ public class CollectionUtils {
      *
      * @param members The set members.
      * @return An unmodifiable set containing the members.
-     */     
+     */
+    @SafeVarargs
     public static <T> Set<T> makeUnmodifiableSet(T... members) {
         Set<T> tmp = new HashSet<T>();
         for (T t : members) tmp.add(t);
@@ -50,7 +51,8 @@ public class CollectionUtils {
      *
      * @param members The list members.
      * @return An unmodifiable list containing the members.
-     */     
+     */
+    @SafeVarargs
     public static <T> List<T> makeUnmodifiableList(T... members) {
         List<T> tmp = new ArrayList<T>();
         for (T t : members) tmp.add(t);

@@ -173,7 +173,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         initialize();
     }
 
-    @SuppressWarnings("unchecked") // Fix in Java7
+    @SuppressWarnings("unchecked")
     private void setCellRenderer(GUI gui, AbstractOption<T> o,
                                  boolean editable) {
         OptionUI ui = OptionUI.getOptionUI(gui, o, editable);

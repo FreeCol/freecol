@@ -9,7 +9,7 @@
         the metaserver, distribution packages, running tests
         and creating documentation.
     </description>
-    <property name="java.target.version" value="1.6"/>
+    <property name="java.target.version" value="1.7"/>
     <property name="freecol.name" value="freecol"/>
     <property environment="env"/>
     <property name="freecol.data.dir" value="${basedir}/data"/>
@@ -331,7 +331,7 @@
                         <authors>
                             <author name="The FreeCol Team" email="developers@freecol.org" />
                         </authors>
-                        <javaversion>1.6</javaversion>
+                        <javaversion>1.7</javaversion>
                     </info>
                     <guiprefs width="640" height="480" resizable="no">
                         <laf name="looks">
@@ -468,7 +468,7 @@
                     mainclass="net.sf.freecol.FreeCol"
                     version="${freecol.version}"
                     vmoptions="-Xmx256M -Dapple.awt.fakefullscreen=true"
-                    jvmversion="1.6+"
+                    jvmversion="1.7+"
                     arguments="--windowed --freecol-data FreeCol.app/Contents/Resources/"
                     stubfile="${freecol.build.dir}/skeletons/FreeCol"
                     icon="${freecol.packaging.dir}/icons/FreeCol.icns">
@@ -608,8 +608,6 @@
         <delete dir="${freecol.build.dir}/report" />
         <mkdir dir="${freecol.build.dir}/report"/>
         <mkdir dir="${freecol.build.dir}/report/xml"/>
-
-        <echo message="if the next task fails then please read the build script" />
         <!-- if the next fails then here is the long answer:
              http://ant.apache.org/faq.html#delegating-classloader
              the short answer depends.
@@ -842,7 +840,6 @@
         <mkdir dir="${freecol.build.dir}/report"/>
         <mkdir dir="${freecol.build.dir}/report/xml"/>
 
-        <echo message="if the next task fails then please read the build script" />
         <junit printsummary="on" errorproperty="error.junit"
                fork="yes" maxmemory="48m">
             <classpath location="build/instrumented-classes"/>

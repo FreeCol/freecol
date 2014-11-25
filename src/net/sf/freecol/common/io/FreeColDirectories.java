@@ -430,7 +430,7 @@ public class FreeColDirectories {
     /**
      * Copy files/directories from one path to another.
      *
-     * Yes this is easier in Java7, but we are not there yet.
+     * FIXME: Use Java7 copyFile and copyDirectory routines
      *
      * @param src The source directory.
      * @param dst The destination directory.
