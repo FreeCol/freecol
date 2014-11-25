@@ -3190,8 +3190,9 @@ public class Unit extends GoodsLocation
      */
     public boolean hasWorkAtStop(TradeRouteStop stop,
                                  boolean checkProduction) {
-        int multiplier = (checkProduction) ? 0
-            : getTurnsToReach(stop.getLocation());
+        final int multiplier = (checkProduction)
+            ? getTurnsToReach(stop.getLocation())
+            : 0;
         // Look for goods to load.
         List<GoodsType> stopGoods = stop.getCargo();
         for (GoodsType type : stopGoods) {
@@ -3213,7 +3214,7 @@ public class Unit extends GoodsLocation
             // There are goods on board this unit that need to be unloaded.
             int amount = stop.getImportAmount(type);
             if (multiplier > 0) {
-                amount += multiplier * stop.getNetProductionOf(type);
+                amount -= multiplier * stop.getNetProductionOf(type);
             }
             if (amount > 0) return true;
         }
