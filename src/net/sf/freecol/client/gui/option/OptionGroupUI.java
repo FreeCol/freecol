@@ -187,7 +187,9 @@ public final class OptionGroupUI extends MigPanel
             ui = OptionUI.getOptionUI(gui, option, editable);
             if (ui == null) {
                 logger.warning("Unknown option type: " + option.toString());
-            } else if (ui instanceof FreeColActionUI) {
+                return;
+            }
+            if (ui instanceof FreeColActionUI) {
                 ((FreeColActionUI)ui).setOptionGroupUI(this);
             }
             if (option.getId() != null) {
