@@ -32,6 +32,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -79,6 +80,7 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -684,9 +686,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         model.removeElement(type);
     }
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
     private void updateUnitList() {
         final Specification spec = getSpecification();
+        final Turn turn = getGame().getTurn();
+        StringTemplate tmpl;
         DefaultListModel<UnitType> units
             = (DefaultListModel<UnitType>)this.unitList.getModel();
         units.clear();
@@ -698,20 +701,22 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             }
 
             if (unitType.getRequiredPopulation() > this.colony.getUnitCount()) {
-                lockReason.add(Messages.message(StringTemplate.template("colonyPanel.populationTooSmall")
-                                                .addAmount("%number%", unitType.getRequiredPopulation())));
+                tmpl = StringTemplate.template("colonyPanel.populationTooSmall")
+                    .addAmount("%number%", unitType.getRequiredPopulation());
+                lockReason.add(Messages.message(tmpl));
             }
 
             if (unitType.getLimits() != null) {
                 for (Limit limit : unitType.getLimits()) {
                     if (!limit.evaluate(this.colony)) {
-                        lockReason.add(Messages.message(limit.getDescriptionKey()));
+                        lockReason.add(Messages.getDescription(limit));
                     }
                 }
             }
 
-            if (!(this.colony.hasAbility(Ability.BUILD, unitType, getGame().getTurn())
-                    || this.featureContainer.hasAbility(Ability.BUILD, unitType, null))) {
+            if (!(this.colony.hasAbility(Ability.BUILD, unitType, turn)
+                    || this.featureContainer.hasAbility(Ability.BUILD,
+                        unitType, null))) {
                 boolean builderFound = false;
                 for (Ability ability : spec.getAbilities(Ability.BUILD)) {
                     if (ability.appliesTo(unitType)
@@ -742,15 +747,16 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                         unbuildableTypes.add(unitType);
                         continue loop;
                     } else {
-                        lockReason.add(Messages.message(sources.get(0).getNameKey()));
+                        lockReason.add(Messages.getName(sources.get(0)));
                     }
                 }
             }
             if (lockReason.isEmpty()) {
                 lockReasons.put(unitType, null);
             } else {
-                lockReasons.put(unitType, Messages.message(StringTemplate.template("colonyPanel.requires")
-                                                           .addName("%string%", join("/", lockReason))));
+                tmpl = StringTemplate.template("colonyPanel.requires")
+                    .addName("%string%", join("/", lockReason));
+                lockReasons.put(unitType, Messages.message(tmpl));
             }
             if (lockReason.isEmpty() || showAllBox.isSelected()) {
                 units.addElement(unitType);
@@ -758,16 +764,21 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         }
     }
 
-    @SuppressWarnings("unchecked") // FIXME in Java7
     private void updateBuildingList() {
-        DefaultListModel buildings = (DefaultListModel)this.buildingList.getModel();
-        DefaultListModel current = (DefaultListModel)this.buildQueueList.getModel();
+        final Specification spec = getSpecification();
+        final DefaultListModel<BuildingType> buildings
+            = (DefaultListModel<BuildingType>)this.buildingList.getModel();
+        final DefaultListModel<BuildableType> current
+            = (DefaultListModel<BuildableType>)this.buildQueueList.getModel();
+        StringTemplate tmpl;
+
         buildings.clear();
-        loop: for (BuildingType buildingType : getSpecification().getBuildingTypeList()) {
+        loop: for (BuildingType buildingType : spec.getBuildingTypeList()) {
             // compare colony.getNoBuildReason()
             List<String> lockReason = new ArrayList<String>();
             Building colonyBuilding = this.colony.getBuilding(buildingType);
-            if (current.contains(buildingType) || hasBuildingType(buildingType)) {
+            if (current.contains(buildingType)
+                || hasBuildingType(buildingType)) {
                 // only one building of any kind
                 continue;
             } else if (unbuildableTypes.contains(buildingType)) {
@@ -776,19 +787,20 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 // pre-built
                 continue;
             } else if (unbuildableTypes.contains(buildingType.getUpgradesFrom())) {
-                // impossible upgrade path
-                unbuildableTypes.add(buildingType);
+                unbuildableTypes.add(buildingType); // impossible upgrade path
                 continue;
             }
 
             if (buildingType.hasAbility(Ability.COASTAL_ONLY)
                 && !this.colony.getTile().isCoastland()) {
-                lockReason.add(Messages.message(StringTemplate.template("colonyPanel.coastalOnly")));
+                tmpl = StringTemplate.template("colonyPanel.coastalOnly");
+                lockReason.add(Messages.message(tmpl));
             }
                                                 
             if (buildingType.getRequiredPopulation() > this.colony.getUnitCount()) {
-                lockReason.add(Messages.message(StringTemplate.template("colonyPanel.populationTooSmall")
-                                                .addAmount("%number%", buildingType.getRequiredPopulation())));
+                tmpl = StringTemplate.template("colonyPanel.populationTooSmall")
+                    .addAmount("%number%", buildingType.getRequiredPopulation());
+                lockReason.add(Messages.message(tmpl));
             }
 
             for (Entry<String, Boolean> entry
@@ -803,7 +815,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                         unbuildableTypes.add(buildingType);
                         continue loop;
                     } else {
-                        lockReason.add(Messages.message(sources.get(0).getNameKey()));
+                        lockReason.add(Messages.getName(sources.get(0)));
                     }
                 }
             }
@@ -811,7 +823,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             if (buildingType.getLimits() != null) {
                 for (Limit limit : buildingType.getLimits()) {
                     if (!limit.evaluate(this.colony)) {
-                        lockReason.add(Messages.message(limit.getDescriptionKey()));
+                        lockReason.add(Messages.getDescription(limit));
                     }
                 }
             }
@@ -820,14 +832,15 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 && !current.contains(buildingType.getUpgradesFrom())) {
                 if (colonyBuilding == null
                     || colonyBuilding.getType() != buildingType.getUpgradesFrom()) {
-                    lockReason.add(Messages.message(buildingType.getUpgradesFrom().getNameKey()));
+                    lockReason.add(Messages.getName(buildingType.getUpgradesFrom()));
                 }
             }
             if (lockReason.isEmpty()) {
                 lockReasons.put(buildingType, null);
             } else {
-                lockReasons.put(buildingType, Messages.message(StringTemplate.template("colonyPanel.requires")
-                                                               .addName("%string%", join("/", lockReason))));
+                tmpl = StringTemplate.template("colonyPanel.requires")
+                    .addName("%string%", join("/", lockReason));
+                lockReasons.put(buildingType, Messages.message(tmpl));
             }
             if (lockReason.isEmpty() || showAllBox.isSelected()) {
                 buildings.addElement(buildingType);
@@ -836,13 +849,15 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     }
 
     private void updateAllLists() {
-        DefaultListModel<BuildableType> current
+        final DefaultListModel<BuildableType> current
             = (DefaultListModel<BuildableType>)this.buildQueueList.getModel();
 
-        this.featureContainer = new FeatureContainer();
-        for (Object type : current.toArray()) {
-            if (getMinimumIndex((BuildableType) type) >= 0) {
-                featureContainer.addFeatures((BuildableType)type);
+        this.featureContainer.clear();
+        for (Enumeration<BuildableType> e = current.elements();
+             e.hasMoreElements();) {
+            BuildableType type = e.nextElement();
+            if (getMinimumIndex(type) >= 0) {
+                featureContainer.addFeatures(type);
             } else {
                 current.removeElement(type);
             }
@@ -909,31 +924,21 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     private int getMinimumIndex(BuildableType buildableType) {
         ListModel<BuildableType> buildQueue = this.buildQueueList.getModel();
         if (buildableType instanceof UnitType) {
-            if (this.colony.canBuild(buildableType)) {
-                return 0;
-            } else {
-                for (int index = 0; index < buildQueue.getSize(); index++) {
-                    if (((BuildableType) buildQueue.getElementAt(index))
-                        .hasAbility(Ability.BUILD, buildableType)) {
-                        return index + 1;
-                    }
-                }
+            if (this.colony.canBuild(buildableType)) return 0;
+            for (int index = 0; index < buildQueue.getSize(); index++) {
+                if (buildQueue.getElementAt(index).hasAbility(Ability.BUILD,
+                        buildableType)) return index + 1;
             }
         } else if (buildableType instanceof BuildingType) {
-            BuildingType upgradesFrom = ((BuildingType) buildableType).getUpgradesFrom();
-            if (upgradesFrom == null) {
-                return 0;
-            } else {
-                Building building = this.colony.getBuilding((BuildingType) buildableType);
-                BuildingType buildingType = (building == null) ? null : building.getType();
-                if (buildingType == upgradesFrom) {
-                    return 0;
-                } else {
-                    for (int index = 0; index < buildQueue.getSize(); index++) {
-                        if (upgradesFrom.equals(buildQueue.getElementAt(index))) {
-                            return index + 1;
-                        }
-                    }
+            BuildingType upgradesFrom = ((BuildingType)buildableType).getUpgradesFrom();
+            if (upgradesFrom == null) return 0;
+            Building building = this.colony.getBuilding((BuildingType)buildableType);
+            BuildingType buildingType = (building == null) ? null
+                : building.getType();
+            if (buildingType == upgradesFrom) return 0;
+            for (int index = 0; index < buildQueue.getSize(); index++) {
+                if (upgradesFrom.equals(buildQueue.getElementAt(index))) {
+                    return index + 1;
                 }
             }
         }
@@ -955,65 +960,55 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             if (canBuild) return buildQueueLastPos;
             // check for building in queue that allows builting this unit
             for (int index = 0; index < buildQueue.getSize(); index++) {
-                BuildableType toBuild = (BuildableType) buildQueue.getElementAt(index);
-
-                if(toBuild == buildableType){
-                    continue;
-                }
-
+                BuildableType toBuild = buildQueue.getElementAt(index);
+                if (toBuild == buildableType) continue;
                 if (toBuild.hasAbility(Ability.BUILD, buildableType)) {
                     return buildQueueLastPos;
                 }
             }
-
             return UNABLE_TO_BUILD;
         }
 
         if (buildableType instanceof BuildingType) {
-            BuildingType upgradesFrom = ((BuildingType) buildableType).getUpgradesFrom();
-            BuildingType upgradesTo = ((BuildingType) buildableType).getUpgradesTo();
-
+            BuildingType upgradesFrom = ((BuildingType)buildableType).getUpgradesFrom();
+            BuildingType upgradesTo = ((BuildingType)buildableType).getUpgradesTo();
             // does not depend on nothing, but still cannot be built
             if (!canBuild && upgradesFrom == null) {
                 return UNABLE_TO_BUILD;
             }
 
             // if can be built and does not have any upgrade,
-            //then it can be built at any time
-            if(canBuild && upgradesTo == null){
+            // then it can be built at any time
+            if (canBuild && upgradesTo == null) {
                 return buildQueueLastPos;
             }
 
-            // if can be built, does not depend on anything, mark upgradesfrom as found
-            boolean foundUpgradesFrom = canBuild? true:false;
+            // if can be built, does not depend on anything, mark
+            // upgrades from as found
+            boolean foundUpgradesFrom = canBuild;
             for (int index = 0; index < buildQueue.getSize(); index++) {
-                BuildableType toBuild = (BuildableType) buildQueue.getElementAt(index);
+                BuildableType toBuild = buildQueue.getElementAt(index);
+                
+                if (toBuild == buildableType) continue;
 
-                if(toBuild == buildableType){
-                    continue;
-                }
-
-                if (!canBuild && !foundUpgradesFrom && upgradesFrom.equals(toBuild)) {
+                if (!canBuild && !foundUpgradesFrom
+                    && upgradesFrom.equals(toBuild)) {
                     foundUpgradesFrom = true;
                     // nothing else to upgrade this building to
-                    if(upgradesTo == null){
-                        return buildQueueLastPos;
-                    }
+                    if (upgradesTo == null) return buildQueueLastPos;
                 }
-                // found a building it upgrades to, cannot go to or beyond this position
-                if (foundUpgradesFrom && upgradesTo != null && upgradesTo.equals(toBuild)) {
-                    return index;
-                }
+                // found a building it upgrades to, cannot go to or
+                // beyond this position
+                if (foundUpgradesFrom && upgradesTo != null
+                    && upgradesTo.equals(toBuild)) return index;
 
                 // Don't go past a unit this building can build.
                 if (buildableType.hasAbility(Ability.BUILD, toBuild)) {
                     return index;
                 }
             }
-
             return buildQueueLastPos;
         }
-
         return UNABLE_TO_BUILD;
     }
 
