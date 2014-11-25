@@ -879,7 +879,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         }
 
         // Update the construction panel
-        this.constructionPanel.update(current.getElementAt(0));
+        if (current.getSize() > 0) {
+            this.constructionPanel.update(current.getElementAt(0));
+        }
     }
 
     private boolean hasBuildingType(BuildingType buildingType) {
