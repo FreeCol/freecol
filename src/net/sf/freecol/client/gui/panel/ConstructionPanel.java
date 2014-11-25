@@ -126,9 +126,11 @@ public class ConstructionPanel extends MigPanel
     }
 
     public void update() {
-        BuildableType buildable = (colony == null) ? null
-            : colony.getCurrentlyBuilding();
-        GUI gui = freeColClient.getGUI();
+        update((colony == null) ? null : colony.getCurrentlyBuilding());
+    }
+
+    public void update(BuildableType buildable) {
+        final GUI gui = freeColClient.getGUI();
 
         removeAll();
 

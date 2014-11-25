@@ -878,13 +878,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 .canPayToFinishBuilding(current.getElementAt(0)));
         }
 
-        // TODO: THIS IS BORKEN
-        // Reset the construction panel
-        PropertyChangeEvent event
-            = new PropertyChangeEvent(this.colony, ConstructionPanel.EVENT,
-                                      null,
-                                      getBuildableTypes(this.buildQueueList));
-        this.constructionPanel.propertyChange(event);
+        // Update the construction panel
+        this.constructionPanel.update(current.getElementAt(0));
     }
 
     private boolean hasBuildingType(BuildingType buildingType) {
