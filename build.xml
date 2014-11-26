@@ -123,6 +123,9 @@
                source="${java.target.version}"
                target="${java.target.version}"
                includeantruntime="false">
+            <compilerarg value="-Xlint:unchecked"/>
+            <compilerarg value="-Xlint:deprecation"/>
+            <compilerarg value="-g"/>
         </javac>
     </target>
 
@@ -144,7 +147,6 @@
             <arg value="rev-parse"/>
             <arg value="HEAD"/>
         </exec>
-        <echo message="${gitRawRevision}" />
     </target>
 
     <target name="git-revision" unless="have-revision"
@@ -653,10 +655,18 @@
     <target name="build-unit-tests" depends="build">
         <depend srcDir="test/src" destDir="${freecol.build.dir}"
                 cache="${freecol.build.dir}" />
-        <javac srcdir="test/src" destdir="${freecol.build.dir}"
-               classpathref="test.build.classpath" debug="on" deprecation="off"
-               source="${java.target.version}" target="${java.target.version}"
-               includeantruntime="false"/>
+        <javac srcdir="test/src"
+               destdir="${freecol.build.dir}"
+               classpathref="test.build.classpath"
+               debug="on"
+               optimize="on"
+               deprecation="off"
+               source="${java.target.version}"
+               target="${java.target.version}"
+               includeantruntime="false">
+            <compilerarg value="-Xlint:unchecked"/>
+            <compilerarg value="-Xlint:deprecation"/>
+        </javac>
     </target>
 
     <target name="validate" description="Validates the specification.">

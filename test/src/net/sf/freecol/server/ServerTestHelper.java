@@ -18,10 +18,8 @@
  */
 package net.sf.freecol.server;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import junit.framework.*;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;

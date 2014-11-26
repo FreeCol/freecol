@@ -19,7 +19,9 @@
 
 package net.sf.freecol.client;
 
-import static junit.framework.Assert.assertTrue;
+import junit.framework.*;
+import static org.junit.Assert.*;
+
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.server.FreeColServer;
 
@@ -34,13 +36,13 @@ public class ClientTestHelper {
         // tests where the resource manager is exercised.
         System.setProperty("java.awt.headless", "true"); 
 
-        FreeColClient client = new FreeColClient(null, null, false, null, false, null, null, null);
+        FreeColClient client = new FreeColClient(null, null, false, null,
+                                                 false, null, null, null);
         ConnectController connectController = client.getConnectController();
         client.setFreeColServer(freeColServer);
         client.setSinglePlayer(true);
-        boolean connected
-            = connectController.login("test", FreeColServer.LOCALHOST,
-                                      freeColServer.getPort());
+        boolean connected = connectController.login("test",
+            FreeColServer.LOCALHOST, freeColServer.getPort());
         assertTrue(connected);
         client.getPreGameController().setReady(true);
         return client;
