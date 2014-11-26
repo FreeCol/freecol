@@ -340,7 +340,7 @@ public class ColonyPlan {
         // colony is building a warehouse, unless we find a plan to
         // make muskets and the tool stock is low.
         //
-        // TODO: generalize this further to make tools for pioneers.
+        // FIXME: generalize this further to make tools for pioneers.
         //
         List<WorkLocationPlan> plans
             = new ArrayList<WorkLocationPlan>(workPlans);
@@ -504,7 +504,9 @@ public class ColonyPlan {
 
     /**
      * Chooses the two best raw materials, updating the production
-     * map and lists.  TODO: scale with colony size.
+     * map and lists.
+     *
+     * FIXME: scale with colony size.
      *
      * @param production The production map.
      */
@@ -582,7 +584,7 @@ public class ColonyPlan {
 
 
     // Relative weights of the various building categories.
-    // TODO: split out/parameterize into a `building strategy'
+    // FIXME: split out/parameterize into a "building strategy"
     //
     // BuildableTypes that improve breeding.
     private static final double BREEDING_WEIGHT    = 0.1;
@@ -827,7 +829,7 @@ public class ColonyPlan {
         for (UnitType unitType : spec().getUnitTypeList()) {
             if (!colony.canBuild(unitType)) continue;
             if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                ; // TODO: decide to build a ship
+                ; // FIXME: decide to build a ship
             } else if (unitType.isDefensive()) {
                 if (colony.isBadlyDefended()) {
                     prioritize(unitType, DEFENCE_WEIGHT,
@@ -1276,7 +1278,7 @@ public class ColonyPlan {
         }
 
         // Consider the defence situation.
-        // TODO: scan for neighbouring hostiles
+        // FIXME: scan for neighbouring hostiles
         // Favour low-skill/experience units for defenders, order experts
         // in reverse order of their production on the produce-list.
         Comparator<Unit> soldierComparator = new Comparator<Unit>() {

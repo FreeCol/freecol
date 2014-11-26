@@ -534,7 +534,8 @@ public final class ReportColonyPanel extends ReportPanel
         // are not just temporarily there because they are being
         // taught), the types for sites that really need a new
         // unit, the teachers, and the units that are not working.
-        // TODO: this needs to be merged with the requirements
+        //
+        // FIXME: this needs to be merged with the requirements
         // checking code, but that in turn should be opened up
         // so the AI can use it...
         HashMap<UnitType, Suggestion> improve
@@ -713,7 +714,7 @@ public final class ReportColonyPanel extends ReportPanel
 
         // Field: The units the colony could make good use of.
         if (!want.isEmpty()) {
-            // TODO: explain food limitations better
+            // FIXME: explain food limitations better
             grow = Math.min(grow, colony.getNetProductionOf(foodType)
                 / Settlement.FOOD_PER_COLONIST);
             addUnits(want, couldWork, colony);

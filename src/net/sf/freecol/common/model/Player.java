@@ -581,7 +581,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * The tension levels, 0-1000, with 1000 being maximum hostility.
-     * Only used by AI.  TODO: move this to AIPlayer
+     * Only used by AI.  FIXME: move this to AIPlayer
      */
     protected java.util.Map<Player, Tension> tension
         = new HashMap<Player, Tension>();
@@ -727,7 +727,7 @@ public class Player extends FreeColGameObject implements Nameable {
         this.name = newName;
     }
 
-    // TODO: remove this again
+    // FIXME: remove this again
     public String getNameKey() {
         return getName();
     }
@@ -969,7 +969,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Gets a new name for a unit.
      *
      * Currently only names naval units, not specific to type.
-     * TODO: specific names for types.
+     * FIXME: specific names for types.
      *
      * @param type The <code>UnitType</code> to choose a name for.
      * @param random A pseudo-random number source.
@@ -1366,7 +1366,6 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A strength score.
      */
     public int getSpanishSuccessionScore() {
-        // TODO: try getColoniesPopulation.
         return getScore();
     }
 
@@ -2913,7 +2912,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * Note the use of copies of the unit and settlement lists to
      * avoid nasty surprises due to asynchronous disappearance of
-     * members of either.  TODO: see if this can be relaxed.
+     * members of either.  FIXME: see if this can be relaxed.
      *
      * @param map The <code>Map</code> to use.
      * @return A canSeeTiles array.
@@ -3525,7 +3524,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Gets a list of values for building a <code>Colony</code> on the
      * given tile for each <code>ColonyValueCategory</code>.
      *
-     * TODO: tune magic numbers.  Expose more to the spec?
+     * FIXME: tune magic numbers and expose more to the spec.
      *
      * @param tile The <code>Tile</code>
      * @return A list of values.
@@ -3813,7 +3812,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Gets the value for building a <code>Colony</code> on
      * the given tile.
      *
-     * TODO: tune magic numbers.  Expose more to the spec?
+     * FIXME: tune magic numbers and expose more to the spec.
      *
      * @param tile The <code>Tile</code>
      * @return A score for the tile.

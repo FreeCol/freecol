@@ -702,7 +702,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         final Specification spec = getSpecification();
         // Preserve some extra naval capacity so that not all the REF
         // navy is completely loaded
-        // TODO: magic number 2.5 * Manowar-capacity = 15
+        // FIXME: magic number 2.5 * Manowar-capacity = 15
         boolean needNaval = expeditionaryForce.getCapacity()
             < expeditionaryForce.getSpaceRequired() + 15;
         List<UnitType> types = (needNaval) ? navalREFUnitTypes
@@ -781,7 +781,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
 
         /**
-         * TODO: we should use a total strength value, and randomly
+         * FIXME: we should use a total strength value, and randomly
          * add individual units until that limit has been
          * reached. E.g. given a value of 10, we might select two
          * units with strength 5, or three units with strength 3 (plus

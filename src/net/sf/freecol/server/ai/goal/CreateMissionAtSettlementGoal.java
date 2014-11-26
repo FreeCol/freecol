@@ -98,8 +98,8 @@ public class CreateMissionAtSettlementGoal extends Goal {
     protected void plan() {
         isFinished = false;
 
-        //TODO: Check whether our target settlement is still valid.
-        //If not, skip the rest and set isFinished = true.
+        // FIXME: Check whether our target settlement is still valid.
+        // If not, skip the rest and set isFinished = true.
 
         if (gotoSubGoal != null) {
             //We do have a gotoSubGoal, so probably a missionary there.
@@ -133,7 +133,7 @@ public class CreateMissionAtSettlementGoal extends Goal {
                 AIUnit u = uit.next();
                 uit.remove();
                 if (!"model.role.missionary".equals(u.getUnit().getRole().getId())) {
-                    //TODO: Uncomment after this method has been added to AIPlayer
+                    //FIXME: Uncomment after this method has been added to AIPlayer
                     //player.addUnit(u);
                 } else {
                     if (!hasFoundMissionary) {
@@ -183,11 +183,11 @@ public class CreateMissionAtSettlementGoal extends Goal {
 
 
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        //TODO
+        //FIXME
     }
 
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
-        //TODO
+        //FIXME
     }
 
     /**

@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  * A map that incorporates a count.
  *
- * TODO: implement entire Map interface
+ * FIXME: implement entire Map interface
  */
 public class TypeCountMap<T extends FreeColGameObjectType> {
 

@@ -54,7 +54,7 @@ import net.sf.freecol.server.model.ServerRegion;
 /**
  * Class for making a <code>Map</code> based upon a land map.
  *
- * TODO dynamic lakes, mountains and hills
+ * FIXME: dynamic lakes, mountains and hills
  */
 public class TerrainGenerator {
 
@@ -113,7 +113,7 @@ public class TerrainGenerator {
 
     // Utilities
 
-    // TODO: this might be useful elsewhere, too
+    // FIXME: this might be useful elsewhere, too
     private int limitToRange(int value, int lower, int upper) {
         return Math.max(lower, Math.min(value, upper));
     }
@@ -210,7 +210,7 @@ public class TerrainGenerator {
     /**
      * Gets a tile type fitted to the regional requirements.
      *
-     * TODO: Can be used for mountains and rivers too.
+     * FIXME: Can be used for mountains and rivers too.
      *
      * @param candidates A list of <code>TileType</code>s to use for
      *     calculations.
@@ -1139,7 +1139,7 @@ public class TerrainGenerator {
 
             // In Col1, the ocean tile in front of a river mouth would
             // get an additional +1 bonus
-            // TODO: This probably has some false positives, means
+            // FIXME: This probably has some false positives, means
             // river tiles that are NOT a river mouth next to this tile!
             if (!t.hasRiver() && adjacentRiver) {
                 t.add(new TileImprovement(game, t, fishBonusRiverType));

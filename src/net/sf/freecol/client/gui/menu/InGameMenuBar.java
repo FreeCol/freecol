@@ -63,26 +63,25 @@ public class InGameMenuBar extends FreeColMenuBar {
      * @param f The main controller.
      */
     public InGameMenuBar(FreeColClient f) {
-        // TODO: FreeColClient should not have to be passed in to this class.
-        // This is only a menu bar, it doesn't need
-        // a reference to the main controller. The only reason it has one now is
-        // because DebugMenu needs it. And DebugMenu
-        // needs it because it is using inner classes for ActionListeners and
-        // those inner classes use the reference.
-        // If those inner classes were in seperate classes, when they were
-        // created, they could use the FreeColClient
-        // reference of the ActionManger. So DebugMenu needs to be refactored to
-        // remove inner classes so that this
-        // MenuBar can lose its unnecessary reference to the main controller.
-        // See FreeColMenuTest.
+        // FIXME: FreeColClient should not have to be passed in to
+        // this class.  This is only a menu bar, it doesn't need a
+        // reference to the main controller.  The only reason it has
+        // one now is because DebugMenu needs it.  And DebugMenu needs
+        // it because it is using inner classes for ActionListeners
+        // and those inner classes use the reference.  If those inner
+        // classes were in seperate classes, when they were created,
+        // they could use the FreeColClient reference of the
+        // ActionManger.  So DebugMenu needs to be refactored to remove
+        // inner classes so that this MenuBar can lose its unnecessary
+        // reference to the main controller.  See FreeColMenuTest.
         //
-        // Okay, I lied.. the update() and paintComponent() methods in this
-        // MenuBar use freeColClient, too. But so what.
-        // Move those to another class too. :)
-
+        // Okay, I lied.. the update() and paintComponent() methods in
+        // this MenuBar use freeColClient, too. But so what.  Move
+        // those to another class too. :)
         super(f);
 
-        //add a mouse listener so that autoscrolling can happen in this menubar
+        // Add a mouse listener so that autoscrolling can happen in
+        // this menubar
         this.addMouseMotionListener(new MenuMouseMotionListener(f));
         
         reset();

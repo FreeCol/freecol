@@ -195,7 +195,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
         // Increase score for drydock/s, musket and tools suppliers,
         // but decrease for fortifications.
-        // TODO: use Modifiers?
+        // FIXME: use Modifiers?
         final int percentTwiddle = 20; // Perturb score by +/-20%
         int[] twiddle = randomInts(logger, "REF target twiddle",
                                    getAIRandom(), 2*percentTwiddle+1,

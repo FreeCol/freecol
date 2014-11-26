@@ -174,7 +174,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * A comparator to sort units by suitability for a PioneeringMission.
      *
      * We do not check if a unit is near to a colony that can provide tools,
-     * as that is likely to be too expensive.  TODO: revise
+     * as that is likely to be too expensive.  FIXME: perhaps we should.
      */
     public static final Comparator<AIUnit> pioneerComparator
         = new Comparator<AIUnit>() {
@@ -193,7 +193,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * A comparator to sort units by suitability for a ScoutingMission.
      *
      * We do not check if a unit is near to a colony that can provide horses,
-     * as that is likely to be too expensive.  TODO: revise
+     * as that is likely to be too expensive.  FIXME: perhaps we should.
      */
     public static final Comparator<AIUnit> scoutComparator
         = new Comparator<AIUnit>() {
@@ -458,7 +458,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Cheats for the AI.  Please try to centralize cheats here.
      *
-     * TODO: Remove when the AI is good enough.
+     * FIXME: Remove when the AI is good enough.
      *
      * @param lb A <code>LogBuilder</code> to log to.
      */
@@ -820,9 +820,9 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Brings gifts to nice players with nearby colonies.
      *
-     * TODO: European players can also bring gifts! However,
-     * this might be folded into a trade mission, since
-     * European gifts are just a special case of trading.
+     * FIXME: European players can also bring gifts!  However, this
+     * might be folded into a trade mission, since European gifts are
+     * just a special case of trading.
      *
      * @param lb A <code>LogBuilder</code> to log to.
      */
@@ -833,7 +833,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Demands goods from players with nearby colonies.
      *
-     * TODO: European players can also demand tribute!
+     * FIXME: European players can also demand tribute!
      *
      * @param lb A <code>LogBuilder</code> to log to.
      */
@@ -1466,8 +1466,8 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Asks the server to recruit a unit in Europe on behalf of the AIPlayer.
      *
-     * TODO: Move this to a specialized Handler class (AIEurope?)
-     * TODO: Give protected access?
+     * FIXME: Move this to a specialized Handler class (AIEurope?)
+     * FIXME: Give protected access?
      *
      * @param index The index of the unit to recruit in the recruitables list,
      *     (if not a valid index, recruit a random unit).
@@ -1493,8 +1493,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Helper function for server communication - Ask the server
      * to train a unit in Europe on behalf of the AIGetPlayer().
      *
-     * TODO: Move this to a specialized Handler class (AIEurope?)
-     * TODO: Give protected access?
+     * FIXME: Move this to a specialized Handler class (AIEurope?)
+     * FIXME: Give protected access?
      *
      * @return the new AIUnit created by this action. May be null.
      */
@@ -2205,7 +2205,8 @@ public class EuropeanAIPlayer extends AIPlayer {
 
     /**
      * Gets a new PioneeringMission for a unit.
-     * TODO: pioneers to make roads between colonies
+     *
+     * FIXME: pioneers to make roads between colonies
      *
      * @param aiUnit The <code>AIUnit</code> to check.
      * @param target An optional target <code>Location</code>.
@@ -2409,7 +2410,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         determineStances(lb);
 
         if (colonyCount > 0) {
-            lb.add("\n  Badly defended:"); // TODO: prioritize defence
+            lb.add("\n  Badly defended:"); // FIXME: prioritize defence
             for (AIColony aic : getAIColonies()) {
                 if (aic.isBadlyDefended()) {
                     badlyDefended.add(aic);
@@ -2551,7 +2552,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     @Override
     public boolean indianDemand(Unit unit, Colony colony,
                                 GoodsType goods, int gold) {
-        // TODO: make a better choice, check whether the colony is
+        // FIXME: make a better choice, check whether the colony is
         // well defended
         return !"conquest".equals(getAIAdvantage());
     }
@@ -2604,7 +2605,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
 
             } else if (item instanceof GoodsTradeItem) {
-                // TODO: Unchecked!
+                // FIXME: Unchecked!
                 Goods goods = ((GoodsTradeItem)item).getGoods();
                 if (item.getSource() == player) {
                     value = -market.getBidPrice(goods.getType(),
@@ -2614,7 +2615,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                                                 goods.getAmount());
                 }
 
-            } else if (item instanceof InciteTradeItem) { // TODO, rebalance
+            } else if (item instanceof InciteTradeItem) { // FIXME: rebalance
                 Player victim = item.getVictim();
                 switch (player.getStance(victim)) {
                 case ALLIANCE:
@@ -2635,7 +2636,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             } else if (item instanceof StanceTradeItem) {
                 double ratio = getStrengthRatio(other);
-                // TODO: evaluate whether we want this stance change
+                // FIXME: evaluate whether we want this stance change
                 Stance stance = ((StanceTradeItem)item).getStance();
                 switch (stance) {
                 case WAR:
@@ -2889,7 +2890,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             || goodsType.isTradeGoods()
             || goodsType.isBuildingMaterial()) {
             // By age 3 we should be able to produce enough ourselves.
-            // TODO: check whether we have an armory, at least
+            // FIXME: check whether we have an armory, at least
             int age = getGame().getTurn().getAge();
             ret = age < 3;
             lb.add(((ret) ? "accepted" : "rejected"),
@@ -2897,7 +2898,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         } else {
             int averageIncome = 0;
             int numberOfGoods = 0;
-            // TODO: consider the amount of goods produced. If we
+            // FIXME: consider the amount of goods produced. If we
             // depend on shipping huge amounts of cheap goods, we
             // don't want these goods to be boycotted.
             List<GoodsType> goodsTypes = getSpecification().getGoodsTypeList();

@@ -414,7 +414,7 @@ public class ProductionType extends FreeColObject {
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // ProductionType does not need an id.
         // No need for: super.readAttributes(in);
-        // TODO: as soon as we allow the user to select a production type,
+        // FIXME: as soon as we allow the user to select a production type,
         // we will need an id
 
         unattended = xr.getAttribute(UNATTENDED_TAG, false);

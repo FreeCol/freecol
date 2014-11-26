@@ -296,7 +296,7 @@ public class Modifier extends Feature {
         float inc = template.getIncrement();
         int duration = template.getDuration();
         modifier.setTemporary(template.isTemporary());
-        // TODO: remove this, it only works for additive modifiers anyway
+        // FIXME: this only works for additive modifiers
         if (duration == 0) {
             duration = (int)(template.getValue()/-inc);
         }

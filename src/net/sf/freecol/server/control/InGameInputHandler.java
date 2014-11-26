@@ -118,8 +118,8 @@ public final class InGameInputHandler extends InputHandler
      */
     public InGameInputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
-        // TODO: move and simplify methods later, for now just delegate
-        // TODO: check that NRHs and CPNRHs are sensibly chosen
+        // FIXME: move and simplify methods later, for now just delegate
+        // FIXME: check that NRHs and CPNRHs are sensibly chosen
 
         // Messages that are not specialized are trivial elements identified
         // by tag name only.
@@ -723,7 +723,7 @@ public final class InGameInputHandler extends InputHandler
         if (player == null) {
             return null;
         }
-        // TODO
+        // FIXME:
         // Remove the player's units/colonies from the map and send map updates
         // to the
         // players that can see such units or colonies.
@@ -736,7 +736,7 @@ public final class InGameInputHandler extends InputHandler
          */
 
         /*
-         * TODO: Setting the player dead directly should be a server
+         * FIXME: Setting the player dead directly should be a server
          * option, but for now - allow the player to reconnect:
          */
         Element reply = null;

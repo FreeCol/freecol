@@ -124,7 +124,7 @@ public final class CornerMapControls extends MapControls {
             miniMapPanel.setSize(miniMapSkin.getWidth(null),
                                  miniMapSkin.getHeight(null));
             miniMapPanel.setOpaque(false);
-            // TODO-LATER: The values below should be specified by a
+            // FIXME: LATER: The values below should be specified by a
             // skin-configuration-file.
             miniMap.setLocation(38, 75);
             miniMapToggleBorders.setLocation(4,114);

@@ -61,7 +61,7 @@ public final class PreGameInputHandler extends InputHandler {
      */
     public PreGameInputHandler(FreeColServer freeColServer) {
         super(freeColServer);
-        // TODO: move and simplify methods later, for now just delegate
+        // FIXME: move and simplify methods later, for now just delegate
         register("ready", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return ready(connection, element);

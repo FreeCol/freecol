@@ -83,7 +83,7 @@
     </tile-type>
   </tile-types>
 
-  <!-- TODO: add specialists for hemp and coffee.
+  <!-- FIXME: add specialists for hemp and coffee?
   <unit-types>
   </unit-types>
   -->

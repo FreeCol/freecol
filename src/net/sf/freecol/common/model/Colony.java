@@ -900,7 +900,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The warehouse <code>Building</code>.
      */
     public Building getWarehouse() {
-        // TODO: it should search for more than one building?
+        // FIXME: should search for more than one building?
         for (Building building : buildingMap.values()) {
             if (building.getType().hasModifier(Modifier.WAREHOUSE_STORAGE)) {
                 return building;
@@ -924,7 +924,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The stockade <code>Building</code>.
      */
     public Building getStockade() {
-        // TODO: it should search for more than one building?
+        // FIXME: should search for more than one building?
         for (Building building : buildingMap.values()) {
             if (building.getType().hasModifier(Modifier.DEFENCE)) {
                 return building;
@@ -1215,7 +1215,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             GoodsType goodsType = ag.getType();
             int amount = ag.getAmount();
             if (goodsType.isStorable()) {
-                // TODO: magic number!
+                // FIXME: magic number!
                 price += (market.getBidPrice(goodsType, amount) * 110) / 100;
             } else {
                 price += goodsType.getPrice() * amount;
@@ -1852,7 +1852,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * own units are considered friendly, but that could be extended
      * to include the units of allied players.
      *
-     * TODO: if a colony is under siege, it should not be possible to
+     * FIXME: if a colony is under siege, it should not be possible to
      * put units outside the colony, unless those units are armed.
      *
      * @return a <code>boolean</code> value

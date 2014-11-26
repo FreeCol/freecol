@@ -301,7 +301,7 @@ public final class DefaultTransferHandler extends TransferHandler {
 
             logger.warning("The dragged component is of an invalid type.");
 
-        } catch (Exception e) { // TODO: Suggest a reconnect.
+        } catch (Exception e) { // FIXME: Suggest a reconnect?
             logger.log(Level.WARNING, "Import data fail", e);
         }
         return false;

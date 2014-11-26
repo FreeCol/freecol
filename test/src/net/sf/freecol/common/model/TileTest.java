@@ -184,7 +184,7 @@ public class TileTest extends FreeColTestCase {
             new Work(savannah, 5, 3),
             new Work(marsh, 7, 5),
             new Work(swamp, 9, 7),
-            // TODO: fix test
+            // FIXME: fix test
             //new Work(arctic, 6, 4)
         };
 

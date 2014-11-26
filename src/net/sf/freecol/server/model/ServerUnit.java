@@ -571,7 +571,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         if (!isNaval() || getMovesLeft() <= 0) return null;
         for (Tile tile : newTile.getSurroundingTiles(1)) {
             // Ships in settlements do not slow enemy ships, but:
-            // TODO should a fortress slow a ship?
+            // FIXME: should a fortress slow a ship?
             Player enemy;
             if (tile.isLand()
                 || tile.getColony() != null
@@ -808,7 +808,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         case RUINS:
             int ruinsAmount = randomInt(logger, "Base ruins amount", random,
                                         dx * 2) * 300 + 50;
-            if (ruinsAmount < 500) { // TODO remove magic number
+            if (ruinsAmount < 500) { // FIXME: remove magic number
                 serverPlayer.modifyGold(ruinsAmount);
                 cs.addPartial(See.only(serverPlayer), serverPlayer,
                               "gold", "score");
@@ -837,7 +837,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                          "lostCityRumour.fountainOfYouthWithoutEurope",
                          serverPlayer, this));
             } else {
-                if (!serverPlayer.isAI()) { // TODO: let the AI select
+                if (!serverPlayer.isAI()) { // FIXME: let the AI select
                     // Remember, and ask player to select
                     serverPlayer.setRemainingEmigrants(dx);
                     cs.addTrivial(See.only(serverPlayer), "fountainOfYouth",

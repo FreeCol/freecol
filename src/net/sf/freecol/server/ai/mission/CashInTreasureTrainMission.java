@@ -45,8 +45,8 @@ import net.sf.freecol.server.ai.AIUnit;
 
 /**
  * Mission for cashing in a treasure train.
- * TODO: Require protection
- * TODO: Better avoidance of enemy units
+ * FIXME: acquire protection
+ * FIXME: Better avoidance of enemy units
  */
 public class CashInTreasureTrainMission extends Mission {
 
@@ -127,7 +127,7 @@ public class CashInTreasureTrainMission extends Mission {
             && (tm = aiCarrier.getMission(TransportMission.class)) != null) {
             setTarget(europe);
             aiUnit.changeTransport(aiCarrier);
-            // TODO: violently reorder the queue to deliver only, then
+            // FIXME: violently reorder the queue to deliver only, then
             // collect the treasure
             if (tm.queueTransportable(aiUnit, false, lb)) {
                 lb.add(" to ", aiCarrier.getUnit());

@@ -45,9 +45,10 @@ public class FreeColToolTipUI extends BasicToolTipUI {
 
     private static FreeColToolTipUI sharedInstance = new FreeColToolTipUI();
 
-    // TODO: find out why we can't use the FontRenderContext of the
-    // component. And should we use fractional metrics?
-    private static FontRenderContext frc = new FontRenderContext(null, true, false);
+    // FIXME: find out why we can't use the FontRenderContext of the
+    // component.  And should we use fractional metrics?
+    private static FontRenderContext frc
+        = new FontRenderContext(null, true, false);
 
     private static int margin = 5;
     private static int maximumWidth = 300;
@@ -78,10 +79,9 @@ public class FreeColToolTipUI extends BasicToolTipUI {
             ImageLibrary.drawTiledImage("background.FreeColToolTip", g, c, null);
         }
 
-        // TODO: find out why this is necessary
-        g.setColor(Color.BLACK);
-        Graphics2D graphics = (Graphics2D) g;
+        g.setColor(Color.BLACK); // FIXME: find out why this is necessary
 
+        Graphics2D graphics = (Graphics2D)g;
         float x = margin;
         float y = margin;
         for (String line : lineBreak.split(((JToolTip) c).getTipText())) {

@@ -37,7 +37,7 @@ public class DisplayTileTextAction extends SelectableAction {
 
     public static final String id = "displayTileTextAction.";
 
-    // TODO: make ClientOptions use enum
+    // FIXME: make ClientOptions use enum
     public static enum DisplayText {
         EMPTY, NAMES, OWNERS, REGIONS
     };

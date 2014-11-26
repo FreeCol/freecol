@@ -53,7 +53,7 @@ import net.sf.freecol.server.ai.goal.GoalConstants;
  * </p><p>
  * Units (each one wrapped in an {@link AIUnit} object) will be moved between
  * existing Goal objects.
- * TODO: Turn {@link AIUnit} into a simple wrapper for individual units.
+ * FIXME: Turn {@link AIUnit} into a simple wrapper for individual units.
  * </p><p>
  * Specific AI goals are created by extending this class; some of
  * these could also be used to assist the human player (i.e. GoTo,
@@ -296,9 +296,9 @@ public abstract class Goal extends AIObject implements GoalConstants {
 //      * of this goal, and the number of turns since a unit request has last been granted.
 //      * The latter should be taken into account as a "bonus weight" by the AIPlayer.
 //      * </p><p>
-//      * TODO:Should that be role, instead or alternatively?
+//      * FIXME:Should that be role, instead or alternatively?
 //      * </p><p>
-//      * TODO: {@link AIPlayer#addUnitWish(Goal,UnitType,float,int)}; should add
+//      * FIXME: {@link AIPlayer#addUnitWish(Goal,UnitType,float,int)}; should add
 //      * requests to a set-like structure, so that there's only one active request
 //      * per Goal at any time. Since fulfilling a request using {@link #addUnit(AIUnit)}
 //      * means that {@link #plan()} will be called again during the turn,
@@ -309,7 +309,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
 //     protected void requestUnit(UnitType ut) {
 //         int turnsWithoutUnit = getGame().getTurn().getNumber() - turnLastUnitAdded;
 //
-//         //TODO: Uncomment after AIPlayer.addUnitWish() has been written.
+//         //FIXME: Uncomment after AIPlayer.addUnitWish() has been written.
 //         //player.addUnitWish(this, ut, getAbsoluteWeight(), turnsWithoutUnit);
 //     }
 
@@ -322,7 +322,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * of this goal, and the number of turns since a unit request has last been granted.
      * The latter should be taken into account as a "bonus weight" by the AIPlayer.
      * </p><p>
-     * TODO: AIPlayer#addUnitWish(Goal,GoodsType,int,float,int); should add
+     * FIXME: AIPlayer#addUnitWish(Goal,GoodsType,int,float,int); should add
      * requests to a set-like structure, so that there's only one active request
      * per Goal at any time. Since fulfilling a request using {@link #addUnit(AIUnit)}
      * means that {@link #plan()} will be called again during the turn,
@@ -333,7 +333,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
      */
     protected void requestWorker(GoodsType gt, int minProduction) {
 
-        //TODO: Uncomment after AIPlayer.addWorkerWish() has been written.
+        //FIXME: Uncomment after AIPlayer.addWorkerWish() has been written.
         //int turnsWithoutUnit = getGame().getTurn().getNumber() - turnLastUnitAdded;
         //player.addWorkerWish(this, gt, minProduction, getAbsoluteWeight(), turnsWithoutUnit);
     }
@@ -343,7 +343,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * This may be from {@link AIPlayer} fulfilling a unit request,
      * by the parent goal, or by a subgoal that no longer needs the unit.
      * </p><p>
-     * Possible TODO: If the unit we're requesting is a high-interest one,
+     * Possible FIXME: If the unit we're requesting is a high-interest one,
      * such as a Galleon, AIUnit#setLoaningGoal() may be used to
      * signal that this unit may _only_ be moved to subgoals, or back to
      * {@link AIPlayer}, but not further up the hierarchy or to any other requesting Goal.
@@ -372,7 +372,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
             parentGoal.addUnit(u);
         } else {
             //Setting goal=null will make the unit appear in the unit iterator next turn.
-            //TODO: What about this turn?
+            //FIXME: What about this turn?
             u.setGoal(null);
         }
     }
@@ -383,7 +383,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * </p><p>
      * This recursively checks its subgoals, if there's no match among the own units.
      * </p><p>
-     * Possible TODO: Check whether AIUnit#isOnLoan() - in which case, we mustn't
+     * Possible FIXME: Check whether AIUnit#isOnLoan() - in which case, we mustn't
      * yield a unit unless it's the {@link AIPlayer} that requests.
      *
      * @param ut The {@link UnitType} wanted by the parent
@@ -512,7 +512,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
                                + u.getGoal().getGoalDescription());
                 removeUnit(u);
             }
-            //TODO: Uncomment after AIUnit.isValid() has been written.
+            //FIXME: Uncomment after AIUnit.isValid() has been written.
             //if (!u.isValid()) {
             //    removeUnit(u);
             //}

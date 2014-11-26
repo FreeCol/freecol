@@ -364,14 +364,14 @@ public abstract class AIPlayer extends AIObject {
 
     /**
      * Find out if a tile contains a suitable target for seek-and-destroy.
-     * TODO: Package for access by a test only - necessary?
+     *
+     * FIXME: Package for access by a test only - necessary?
      *
      * @param attacker The attacking <code>Unit</code>.
      * @param tile The <code>Tile</code> to attack into.
      * @return True if an attack can be launched.
      */
     public boolean isTargetValidForSeekAndDestroy(Unit attacker, Tile tile) {
-
         // Insist the attacker exists.
         if (attacker == null) return false;
 

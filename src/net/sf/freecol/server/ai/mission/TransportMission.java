@@ -169,7 +169,8 @@ public class TransportMission extends Mission {
     /**
      * Decide if this unit has a good chance of defeating another.
      * If there is cargo aboard, be more conservative.
-     * TODO: magic numbers.
+     *
+     * FIXME: magic numbers to the spec.
      *
      * @param other The other <code>Unit</code> to attack.
      * @return True if the attack should proceed.
@@ -1089,7 +1090,7 @@ public class TransportMission extends Mission {
         }
 
         // Replenish cargoes up to available destination capacity
-        // and 50% above maximum cargoes (TODO: longer?)
+        // and 50% above maximum cargoes (FIXME: longer?)
         final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
         while (destinationCapacity() > 0
             && tSize() < unit.getCargoCapacity() * 3 / 2) {
@@ -1447,7 +1448,7 @@ public class TransportMission extends Mission {
                 }
                 // Fall through
             case MOVE_NO_ATTACK_CIVILIAN:
-                // TODO: See if the transportable can get around the
+                // FIXME: See if the transportable can get around the
                 // blockage using its own path finding.
                 if (unit.getTile().isAdjacent(target.getTile())
                     || costDecider == fallBackDecider) {

@@ -153,7 +153,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
     /**
      * Handles a "login"-request.
      *
-     * TODO: Do not allow more than one (human) player to connect
+     * FIXME: Do not allow more than one (human) player to connect
      * to a single player game. This would be easy if we used a
      * dummy connection for single player games.
      *
@@ -187,7 +187,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
             == FreeColServer.GameState.STARTING_GAME;
         if (starting) {
             // Wait until the game has been created.
-            // TODO: is this still needed?
+            // FIXME: is this still needed?
             int timeOut = 20000;
             while (freeColServer.getGame() == null) {
                 try {
@@ -214,7 +214,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
             game.addPlayer(player);
 
             // Send message to all players except to the new player.
-            // TODO: check visibility.
+            // FIXME: check visibility.
             Element add = DOMMessage.createMessage("addPlayer");
             add.appendChild(player.toXMLElement(add.getOwnerDocument()));
             server.sendToAll(add, connection);

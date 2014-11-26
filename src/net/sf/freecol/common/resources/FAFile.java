@@ -37,10 +37,10 @@ import java.util.StringTokenizer;
  */
 public class FAFile {
 
-
-    // TODO: Use two hashes, to be safer.
+    // FIXME: Use two hashes, to be safer?
     private HashMap<Object, Object> letters = new HashMap<Object, Object>();
     private int maxHeight = 0;
+
 
     /**
      * Reads data from the given <code>InputStream</code> and
@@ -52,6 +52,7 @@ public class FAFile {
     public FAFile(InputStream is) throws IOException {
         load(new CREatingInputStream(is));
     }
+
     
     /**
      * Gets the <code>Dimension</code> of the given

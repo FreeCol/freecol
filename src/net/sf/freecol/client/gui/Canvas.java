@@ -974,7 +974,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Gets the last <code>LoadingSavegameDialog</code>.
      *
-     * TODO: clean this up
+     * FIXME: clean this up
      *
      * @return The <code>LoadingSavegameDialog</code>.
      */
@@ -1117,7 +1117,7 @@ public final class Canvas extends JDesktopPane {
      * Closes all panels, changes the background and shows the main menu.
      */
     public void returnToTitle() {
-        // TODO: check if the GUI object knows that we're not
+        // FIXME: check if the GUI object knows that we're not
         // inGame. (Retrieve value of GUI::inGame.)  If GUI thinks
         // we're still in the game then log an error because at this
         // point the GUI should have been informed.
@@ -1478,10 +1478,8 @@ public final class Canvas extends JDesktopPane {
      * @see ChatPanel
      */
     public void showChatPanel() {
-        // TODO: does it have state, or can we create a new one?
-        if (freeColClient.isSinglePlayer()) {
-            return; // In single player, no chat available
-        }
+        // FIXME: does it have state, or can we create a new one?
+        if (freeColClient.isSinglePlayer()) return; // chat with who?
         showSubPanel(chatPanel, true);
     }
 

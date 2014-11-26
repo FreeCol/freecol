@@ -303,7 +303,7 @@ public class Building extends WorkLocation
                 int minimumGoodsInput = 0;
                 for (Unit unit: getUnitList()) {
                     if (unit.getType() == getExpertUnitType()) {
-                        // TODO: put magic number in specification
+                        // FIXME: put magic number in specification
                         minimumGoodsInput += 4;
                     }
                 }

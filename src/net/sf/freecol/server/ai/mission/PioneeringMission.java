@@ -160,7 +160,7 @@ public class PioneeringMission extends Mission {
             if (tileImprovementPlan != null) {
                 tileImprovementPlan.setPioneer(aiUnit);
             }
-            // TODO getEuropeanAIPlayer().claimTileImprovementPlan(tip);
+            // FIXME getEuropeanAIPlayer().claimTileImprovementPlan(tip);
         }
     }
 
@@ -641,7 +641,7 @@ public class PioneeringMission extends Mission {
         // The code below is very conservative.  When enabled it
         // reduces the number of completed improvements by a factor of
         // 4 -- 5, which is unacceptable.  Therefore, disabled for
-        // now.  TODO: something better.
+        // now.  FIXME: do something better.
         /*
         int turnsNeeded = DEFAULT_THREAT_TURNS;
         if (unit.getWorkImprovement() != null) {
@@ -692,7 +692,7 @@ public class PioneeringMission extends Mission {
         // Take control of the land before proceeding to improve.
         lbAt(lb);
         if (!player.owns(tile)) {
-            // TODO: Better choice whether to pay or steal.
+            // FIXME: Better choice whether to pay or steal.
             // Currently always pay if we can, steal if we can not.
             boolean fail = false;
             int price = player.getLandPrice(tile);

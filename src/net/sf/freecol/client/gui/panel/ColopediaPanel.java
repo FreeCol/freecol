@@ -108,8 +108,9 @@ public final class ColopediaPanel extends FreeColPanel
 
     /**
      * Creates a new <code>ColopediaPanel</code> instance suitable
-     * only for the construction of ColopediaDetailPanels. TODO: find
-     * a more elegant solution.
+     * only for the construction of ColopediaDetailPanels.
+     *
+     * FIXME: find a more elegant solution.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */

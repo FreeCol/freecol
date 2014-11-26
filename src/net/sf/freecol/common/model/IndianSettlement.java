@@ -627,8 +627,7 @@ public class IndianSettlement extends Settlement {
      * Note that it takes no account of whether the native player
      * actually has the gold.
      *
-     * TODO: this is rancid with magic numbers.
-     * TODO: the hardwired goods/equipment types are a wart.
+     * FIXME: this is rancid with magic numbers.
      *
      * @param type The type of <code>Goods</code> to price.
      * @param amount The amount of <code>Goods</code> to price.
@@ -873,6 +872,8 @@ public class IndianSettlement extends Settlement {
     /**
      * Allows spread of horses and arms between settlements
      *
+     * FIXME: the hardwired goods/equipment types are a wart.
+     *
      * @param settlement The other <code>IndianSettlement</code> to trade with.
      */
     public void tradeGoodsWithSettlement(IndianSettlement settlement) {
@@ -895,6 +896,7 @@ public class IndianSettlement extends Settlement {
 
     /**
      * Gets the maximum possible production of the given type of goods.
+     *
      * @param goodsType The type of goods to check.
      * @return The maximum amount, of the given type of goods, that can
      *         be produced in one turn.
@@ -903,7 +905,7 @@ public class IndianSettlement extends Settlement {
         int amount = 0;
         for (Tile workTile: getTile().getSurroundingTiles(getRadius())) {
             if (workTile.getOwningSettlement() == null || workTile.getOwningSettlement() == this) {
-                // TODO: make unitType brave
+                // FIXME: make unitType brave
                 amount += workTile.getPotentialProduction(goodsType, null);
             }
         }
@@ -1206,7 +1208,7 @@ public class IndianSettlement extends Settlement {
 
         for (Tile workTile : getOwnedTiles()) {
             if (workTile != getTile() && !workTile.isOccupied()) {
-                // TODO: make unitType brave
+                // FIXME: make unitType brave
                 potential += workTile.getPotentialProduction(type, null);
                 tiles++;
             }

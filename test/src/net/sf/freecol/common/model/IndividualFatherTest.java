@@ -33,8 +33,9 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 
 /**
- * Test cases for individual Founding Fathers. TODO: add a test case
- * for each Founding Father.
+ * Test cases for individual Founding Fathers.
+ *
+ * FIXME: there should be a test case for each Founding Father.
  */
 public class IndividualFatherTest extends FreeColTestCase {
 

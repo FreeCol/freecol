@@ -148,7 +148,7 @@ public class ConstructionPanel extends MigPanel
         } else {
             int turnsToComplete = colony.getTurnsToComplete(buildable);
             String turnsStr = Messages.getTurnsText(turnsToComplete);
-            // TODO: distinguish national unit types
+            // FIXME: distinguish national unit types
             Image image = (buildable instanceof BuildingType)
                 ? gui.getImageLibrary()
                     .getBuildingImage((BuildingType) buildable, colony.getOwner(), 0.75)

@@ -597,7 +597,7 @@ public class Unit extends GoodsLocation
      * @param s The new <code>UnitState</code>.
      */
     protected void setStateUnchecked(UnitState s) {
-        // TODO: move to the server.
+        // FIXME: move to the server.
         // Cleanup the old UnitState, for example destroy the
         // TileImprovment being built by a pioneer.
         switch (state) {
@@ -883,8 +883,11 @@ public class Unit extends GoodsLocation
     public boolean isInMission() {
         return hasAbility(Ability.ESTABLISH_MISSION)
             && (getLocation() instanceof IndianSettlement
-                // TODO: remove this when PET missionary serialization is fixed
-                || getLocation() == null);
+                // @compat 0.10.x
+                // Remove this when PET missionary serialization is retired
+                || getLocation() == null
+                // end @compat 0.10.x
+                );
     }
 
     /**
@@ -1922,9 +1925,6 @@ public class Unit extends GoodsLocation
         // Remember to also change map.findPath(...) if you change anything
         // here.
 
-        // TODO: also pass direction, so that we can check for rivers
-        // more easily
-
         int cost = target.getType().getBasicMoveCost();
         if (target.isLand() && !isNaval()) {
             TileItemContainer container = target.getTileItemContainer();
@@ -2808,7 +2808,7 @@ public class Unit extends GoodsLocation
 
         if (isNaval()) {
             if (!srcTile.isHighSeasConnected()) {
-                // On a lake!  TODO: better
+                // On a lake!  FIXME: do better
                 type = 0;
             } else if (dstTile == null) {
                 // Carrier must be blocked from high seas
@@ -3302,7 +3302,7 @@ public class Unit extends GoodsLocation
      * Gets the probability that an attack by this unit will provoke natives
      * to burn our missions.
      *
-     * TODO: enhance burn probability proportionally with tension
+     * FIXME: enhance burn probability proportionally with tension
      *
      * @return A probability of burning missions.
      */
@@ -3440,7 +3440,8 @@ public class Unit extends GoodsLocation
 
     /**
      * Gets the <code>ProductionInfo</code> for this unit.
-     * TODO: the input parameter is ignored! Fix?
+     *
+     * FIXME: the input parameter is ignored! Fix?
      *
      * @param input A list of input <code>AbstractGoods</code>.
      * @return The <code>ProductionInfo</code> for this unit.
@@ -3800,7 +3801,7 @@ public class Unit extends GoodsLocation
         } else if (locatable instanceof Unit) {
             Unit unit = (Unit)locatable;
             if (super.add(locatable)) {
-                // TODO: there seems to be an inconsistency between
+                // FIXME: there seems to be an inconsistency between
                 // units moving from an adjacent tile onto a ship and
                 // units boarding a ship in-colony.  The former does not
                 // appear to come through here (which it probably should)
@@ -4005,7 +4006,7 @@ public class Unit extends GoodsLocation
         result.addAll(owner.getAbilities(id, fcgot, turn));
 
         // Location abilities may apply.
-        // TODO: extend this to all locations?  May simplify
+        // FIXME: extend this to all locations?  May simplify
         // code.  Units are also Locations however, which complicates
         // the issue as we do not want Units aboard other Units to share
         // the abilities of the carriers.

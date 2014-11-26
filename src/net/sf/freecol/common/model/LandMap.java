@@ -246,7 +246,8 @@ public class LandMap {
     /**
      * Add land to the polar map rows at the top and bottom of the map,
      * with height determined by Map.POLAR_HEIGHT.
-     * TODO: Make POLAR_HEIGHT an option.
+     *
+     * FIXME: Make POLAR_HEIGHT an option.
      */
     private void addPolarRegions() {
         for (int x = 0; x < width; x++) {

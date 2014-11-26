@@ -635,7 +635,7 @@ public class AIUnit extends TransportableAIObject {
             aiOwner.removeAIUnit(this);
         } else {
             // This happens with missionaries, and legitimately when a unit
-            // changes owner.  TODO: cleanup.
+            // changes owner.  FIXME: cleanup.
             logger.warning("Disposing of " + getId() + " but owner is null!");
         }
         if (mission != null) {

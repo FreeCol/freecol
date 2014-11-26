@@ -105,7 +105,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     private static final Logger logger = Logger.getLogger(ServerPlayer.class.getName());
 
-    // TODO: move to options or spec?
+    // FIXME: move to options or spec?
     public static final int ALARM_RADIUS = 2;
     public static final int ALARM_TILE_IN_USE = 2;
     public static final int ALARM_MISSIONARY_PRESENT = -10;
@@ -536,7 +536,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (!getSettlements().isEmpty()) return false;
 
         // Not defeated if there is a non-zero navy and enough land units.
-        final int landREFUnitsRequired = 7; // TODO: magic number
+        final int landREFUnitsRequired = 7; // FIXME: magic number
         final CombatModel cm = getGame().getCombatModel();
         boolean naval = false;
         int land = 0;
@@ -633,7 +633,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         currentFather = null;
         if (foundingFathers != null) foundingFathers.clear();
         if (offeredFathers != null) offeredFathers.clear();
-        // TODO: stance and tension?
+        // FIXME: stance and tension?
         if (tradeRoutes != null) tradeRoutes.clear();
         // Retaining model messages for now
         // Retaining history for now
@@ -1679,8 +1679,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (!type.isStorable()) return;
 
         // Propagate 5-30% of the original change.
-        final int lowerBound = 5; // TODO: make into game option?
-        final int upperBound = 30;// TODO: make into game option?
+        final int lowerBound = 5; // FIXME: to spec
+        final int upperBound = 30;// FIXME: to spec
         amount *= randomInt(logger, "Propagate goods", random,
                             upperBound - lowerBound + 1) + lowerBound;
         amount /= 100;
@@ -1948,7 +1948,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Europe europe = getEurope();
         boolean europeDirty = false, visibilityChange = false;
 
-        // TODO: We do not want to have to update the whole player
+        // FIXME: We do not want to have to update the whole player
         // just to get the FF into the client.  Use this hack until
         // the client gets proper containers.
         cs.addFather(this, father);
@@ -2309,7 +2309,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Extract main result, insisting it is one of the fundamental cases,
         // and add the animation.
         // Set vis so that loser always sees things.
-        // TODO: Bombard animations
+        // FIXME: Bombard animations
         See vis; // Visibility that insists on the loser seeing the result.
         CombatResult result = crs.remove(0);
         switch (result) {
@@ -2641,7 +2641,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             ; // do nothing
         } else if (burnedNativeCapital) {
             defenderPlayer.getTension(this).setValue(Tension.SURRENDERED);
-            // TODO: just the tension
+            // FIXME: just the tension
             cs.add(See.perhaps().always(this), defenderPlayer);
             csChangeStance(Stance.PEACE, defenderPlayer, true, cs);
             for (IndianSettlement is : defenderPlayer.getIndianSettlements()) {
@@ -2966,8 +2966,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         Role newRole = winner.canCaptureEquipment(role);
         if (newRole != null) {
-            List<AbstractGoods> newGoods = winner.getGoodsDifference(newRole, 1);
-            GoodsType goodsType = newGoods.get(0).getType(); // TODO: generalize
+            List<AbstractGoods> newGoods
+                = winner.getGoodsDifference(newRole, 1);
+            GoodsType goodsType = newGoods.get(0).getType(); // FIXME: generalize
             winner.changeRole(newRole, 1);
 
             // Currently can not capture equipment back so this only
@@ -4004,7 +4005,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         } else if (colony.getGoodsCount(goodsType) < amount) {
             // Player has removed the goods from the colony,
             // so raise the tax anyway.
-            final int extraTax = 3; // TODO, magic number
+            final int extraTax = 3; // FIXME, magic number
             csSetTax(tax + extraTax, cs);
             cs.add(See.only(this), ChangePriority.CHANGE_NORMAL,
                 new MonarchActionMessage(Monarch.MonarchAction.FORCE_TAX,

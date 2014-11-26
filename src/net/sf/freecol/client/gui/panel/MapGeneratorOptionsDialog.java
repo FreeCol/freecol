@@ -82,7 +82,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
 
         if (isEditable()) {
             loadDefaultOptions();
-            // TODO: The update should be solved by PropertyEvent.
+            // FIXME: The update should be solved by PropertyEvent.
             File mapDirectory = FreeColDirectories.getMapsDirectory();
             if (mapDirectory.isDirectory()) {
                 File[] files = mapDirectory.listFiles(FreeCol.freeColSaveFileFilter);
@@ -108,7 +108,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                 scrollPane.getVerticalScrollBar().setUnitIncrement(16);
                 scrollPane.getViewport().setOpaque(false);
-                // TODO: find out how to do this properly
+                // FIXME: find out how to do this properly
                 scrollPane.setMinimumSize(new Dimension(400, 110));
 
                 panel.add(scrollPane);

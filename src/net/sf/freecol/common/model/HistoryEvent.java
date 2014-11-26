@@ -45,7 +45,7 @@ public class HistoryEvent extends StringTemplate {
         COLONY_DESTROYED,
         COLONY_CONQUERED,
         DESTROY_SETTLEMENT,
-        // TODO: when exactly is a European nation destroyed?
+        // FIXME: when exactly is a European nation destroyed?
         DESTROY_NATION,
         NATION_DESTROYED,
         FOUNDING_FATHER,

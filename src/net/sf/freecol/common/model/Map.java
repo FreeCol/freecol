@@ -1288,7 +1288,7 @@ public class Map extends FreeColGameObject implements Location {
 
             // ...then if we find a path, try to optimize it.  This
             // will lose if the initial search fails due to a turn limit.
-            // TODO: something better.
+            // FIXME: do something better.
             } else {
                 path = findPath(unit, realStart, p.getLastNode().getTile(),
                                 carrier, costDecider, lb);
@@ -1633,7 +1633,7 @@ public class Map extends FreeColGameObject implements Location {
 
             final Tile currentTile = currentNode.getTile();
             if (currentTile == null) { // Must be in Europe.
-                // TODO: Do not consider tiles `adjacent' to Europe, yet.
+                // FIXME: Do not consider tiles "adjacent" to Europe, yet.
                 // There may indeed be cases where going to Europe and
                 // coming back on the other side of the map is faster.
                 if (lb != null) lb.add("...skip Europe");

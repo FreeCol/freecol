@@ -615,6 +615,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 public void actionPerformed(ActionEvent e) {
                     igc.equipUnitForRole(unitLabel.getUnit(), to, toCount);
                     unitLabel.updateIcon();
+                    // FIXME: fix the PCL handling so this can go away
                     if (parentPanel instanceof ColonyPanel) {
                         ((ColonyPanel)parentPanel).update();
                     }
@@ -628,8 +629,6 @@ public final class QuickActionMenu extends JPopupMenu {
      *
      * Note "clear speciality" is here too to keep it well separated from
      * other items.
-     *
-     * TODO: fix the PCL handling so the hacks with parentPanel can go away
      *
      * @param unitLabel The <code>UnitLabel</code> specifying the unit.
      * @return True if menu items were added and a separator is now needed.
@@ -744,7 +743,7 @@ public final class QuickActionMenu extends JPopupMenu {
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     igc.payArrears(goodsType);
-                    // TODO fix pcls so this hackery can go away
+                    // FIXME: fix pcls so this hackery can go away
                     if (parentPanel instanceof CargoPanel) {
                         CargoPanel cargoPanel = (CargoPanel) parentPanel;
                         cargoPanel.initialize();
@@ -826,7 +825,7 @@ public final class QuickActionMenu extends JPopupMenu {
                                 promptForGoods(goods);
                             }
                             igc.unloadCargo(goods, true);
-                            // TODO fix pcls so this hackery can go away
+                            // FIXME: fix pcls so this hackery can go away
                             if (parentPanel instanceof CargoPanel) {
                                 ((CargoPanel) parentPanel).initialize();
                             }

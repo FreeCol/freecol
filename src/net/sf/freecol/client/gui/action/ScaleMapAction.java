@@ -71,10 +71,10 @@ public class ScaleMapAction extends FreeColAction {
          * This implementation uses a simple linear scaling, and
          * the isometric shape is not taken into account.
          *
-         * TODO: Find a better method for choosing a group of
-         *       adjacent tiles. This group can then be merged into
-         *       a common tile by using the average value (for
-         *       example: are there a majority of ocean tiles?).
+         * FIXME: Find a better method for choosing a group of
+         * adjacent tiles.  This group can then be merged into a
+         * common tile by using the average value (for example: are
+         * there a majority of ocean tiles?).
          */
 
         final Game game = getGame();
@@ -88,10 +88,8 @@ public class ScaleMapAction extends FreeColAction {
             for (int y = 0; y < height; y++) {
                 final int oldX = (x * oldWidth) / width;
                 final int oldY = (y * oldHeight) / height;
-                /*
-                 * TODO: This tile should be based on the average as
-                 *       mentioned at the top of this method.
-                 */
+                // FIXME: This tile should be based on the average as
+                // mentioned at the top of this method.
                 Tile importTile = oldMap.getTile(oldX, oldY);
                 Tile t = new Tile(game, importTile.getType(), x, y);
                 if (importTile.getMoveToEurope() != null) {

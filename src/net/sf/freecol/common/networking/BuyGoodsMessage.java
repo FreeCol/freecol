@@ -145,5 +145,5 @@ public class BuyGoodsMessage extends DOMMessage {
         return "buyGoods";
     }
 }
-// TODO: this and SellGoodsMessage are almost identical, collapse into
+// FIXME: this and SellGoodsMessage are almost identical, collapse into
 // a single TradeGoods?

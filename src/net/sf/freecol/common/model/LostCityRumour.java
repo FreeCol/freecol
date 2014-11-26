@@ -152,7 +152,7 @@ public class LostCityRumour extends TileItem {
      * @param random A random number source.
      * @return The type of rumour.
      *
-     * TODO: Make RumourType a FreeColGameObjectType and move all the
+     * FIXME: Make RumourType a FreeColGameObjectType and move all the
      * magic numbers in here to the specification.
      */
     public RumourType chooseType(Unit unit, Random random) {
@@ -256,7 +256,7 @@ public class LostCityRumour extends TileItem {
      */
     public int applyBonus(GoodsType goodsType, UnitType unitType, int potential) {
         // Just return the given potential, since lost cities do not
-        // provide any production bonuses.  TODO: maybe we should
+        // provide any production bonuses.  FIXME: maybe we should
         // return zero, since lost cities actually prevent production?
         return potential;
     }

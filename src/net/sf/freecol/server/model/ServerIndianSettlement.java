@@ -115,8 +115,7 @@ public class ServerIndianSettlement extends IndianSettlement
 
         setLearnableSkill(template.getLearnableSkill());
         setCapital(template.isCapital());
-        // TODO: the template settlement might have additional owned
-        // units
+        // FIXME: the template settlement might have additional owned units
         for (Unit unit: template.getUnitList()) {
             Unit newUnit = new ServerUnit(game, this,
                                           unit);//-vis: safe, not on map yet
@@ -174,7 +173,7 @@ public class ServerIndianSettlement extends IndianSettlement
             setConvertProgress((int)Math.floor(convert));
         } else {
             setConvertProgress(0);
-            // TODO: fix native AI to put the units just hanging
+            // FIXME: fix native AI to put the units just hanging
             // around (as distinct to those with DefendSettlement
             // missions) into the settlement so we can ignore the
             // tile-residents.
@@ -307,9 +306,9 @@ public class ServerIndianSettlement extends IndianSettlement
         }
 
         // Try to breed horses
-        // TODO: Make this generic.
+        // FIXME: Make this generic.
         GoodsType horsesType = spec.getGoodsType("model.goods.horses");
-        // TODO: remove this
+        // FIXME: remove this
         GoodsType grainType = spec.getGoodsType("model.goods.grain");
         int foodProdAvail = getTotalProductionOf(grainType) - getFoodConsumption();
         if (getGoodsCount(horsesType) >= horsesType.getBreedingNumber()

@@ -402,7 +402,7 @@ public final class InGameController extends Controller {
      * a given player that is about to rebel.
      * Public for the test suite.
      *
-     * TODO: this should eventually generate changes for the REF player.
+     * FIXME: this should eventually generate changes for the REF player.
      *
      * @param serverPlayer The <code>ServerPlayer</code> about to rebel.
      * @return The REF player.
@@ -768,7 +768,7 @@ public final class InGameController extends Controller {
                 break;
             }
             // Are there humans left?
-            // TODO: see if this can be relaxed so we can run large
+            // FIXME: see if this can be relaxed so we can run large
             // AI-only simulations.
             boolean human = false;
             for (Player p : game.getLivePlayers(null)) {
@@ -2074,11 +2074,12 @@ public final class InGameController extends Controller {
     /**
      * Demand a tribute from a native settlement.
      *
+     * FIXME: Move TURNS_PER_TRIBUTE magic number to the spec.
+     *
      * @param serverPlayer The <code>ServerPlayer</code> demanding the tribute.
      * @param unit The <code>Unit</code> that is demanding the tribute.
      * @param settlement The <code>ServerIndianSettlement</code> demanded of.
      * @return An <code>Element</code> encapsulating this action.
-     * TODO: Move TURNS_PER_TRIBUTE magic number to the spec.
      */
     public Element demandTribute(ServerPlayer serverPlayer, Unit unit,
                                  ServerIndianSettlement settlement) {
@@ -2217,7 +2218,7 @@ public final class InGameController extends Controller {
                     result = "tales";
                 } else {
                     if (unit.hasAbility(Ability.EXPERT_SCOUT)) {
-                        gold = (gold * 11) / 10; // TODO: magic number
+                        gold = (gold * 11) / 10; // FIXME: magic number
                     }
                     serverPlayer.modifyGold(gold);
                     settlement.getOwner().modifyGold(-gold);
@@ -2770,7 +2771,7 @@ public final class InGameController extends Controller {
     /**
      * Clear the specialty of a unit.
      *
-     * TODO: why not clear speciality in the open?  You can disband!
+     * FIXME: why not clear speciality in the open?  You can disband!
      * If we implement this remember to fix the visibility.
      *
      * @param serverPlayer The owner of the unit.
@@ -2978,7 +2979,7 @@ public final class InGameController extends Controller {
         // Comprehensive dispose.
         serverPlayer.csDisposeSettlement(settlement, cs);//+vis
 
-        // TODO: Player.settlements is still being fixed on the client side.
+        // FIXME: Player.settlements is still being fixed on the client side.
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
@@ -3706,7 +3707,7 @@ public final class InGameController extends Controller {
             GoodsType type = ag.getType();
             int amount = ag.getAmount();
             if (type.isStorable()) {
-                // TODO: should also check canTrade(type, Access.?)
+                // FIXME: should also check canTrade(type, Access.?)
                 if ((amount = serverPlayer.buy(container, type, amount)) < 0) {
                     return DOMMessage.clientError("Can not buy " + amount
                         + " " + type + " for " + build);
@@ -4139,7 +4140,7 @@ public final class InGameController extends Controller {
         cs.addTrivial(See.only(serverPlayer), "getREFUnits",
                       ChangePriority.CHANGE_NORMAL);
         Element reply = cs.build(serverPlayer);
-        // TODO: eliminate explicit Element hackery
+        // FIXME: eliminate explicit Element hackery
         for (AbstractUnit unit : units) {
             reply.appendChild(unit.toXMLElement(reply.getOwnerDocument()));
         }

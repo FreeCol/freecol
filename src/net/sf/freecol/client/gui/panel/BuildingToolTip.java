@@ -69,7 +69,7 @@ public class BuildingToolTip extends JToolTip {
         final Game game = building.getGame();
         final int workplaces = building.getUnitCapacity();
         List<AbstractGoods> outputs = building.getOutputs();
-        // TODO: consider several outputs
+        // FIXME: consider several outputs
         final GoodsType output = (outputs.isEmpty()) ? null
             : outputs.get(0).getType();
 

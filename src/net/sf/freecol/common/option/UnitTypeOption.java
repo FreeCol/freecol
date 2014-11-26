@@ -41,7 +41,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     private static Logger logger = Logger.getLogger(UnitTypeOption.class.getName());
 
     /**
-     * TODO: replace with Predicates.
+     * FIXME: replace with Predicates.
      */
     public static enum TypeSelector {
         UNITS, IMMIGRANTS, LAND_UNITS, NAVAL_UNITS

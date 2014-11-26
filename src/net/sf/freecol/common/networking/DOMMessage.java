@@ -152,7 +152,8 @@ public class DOMMessage {
 
     /**
      * Create a DOMMessage from an element.
-     * TODO: make this into a constructor?
+     *
+     * FIXME: make this into a constructor?
      *
      * @param game The <code>Game</code> to create the message in.
      * @param element The <code>Element</code> to create the message from.

@@ -69,7 +69,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
         header.setFont(GUI.SMALL_HEADER_FONT);
 
         for (Goods goods : goodsList) {
-            // TODO: find out why check box is not displayed when icon
+            // FIXME: find out why check box is not displayed when icon
             // is present
             JCheckBox checkBox
                 = new JCheckBox(Messages.message(goods.getLabel(true)),

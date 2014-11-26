@@ -132,7 +132,9 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
     /**
      * Creates a new <code>UnitLocation</code> instance.
-     * Only Unit needs this.  TODO: make it go away, its a noop.
+     * Only Unit needs this.
+     *
+     * FIXME: make it go away, its a noop.
      *
      * @param game The enclosing <code>Game</code>.
      * @param e The <code>Element</code> to read from.
@@ -445,7 +447,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * (e.g. if the unit changes type --- does it still have a
      * required skill?)
      *
-     * TODO: consider moving this up to Location?
+     * FIXME: consider moving this up to Location?
      *
      * @param locatable The <code>Locatable</code> to test.
      * @return The reason why adding would fail.

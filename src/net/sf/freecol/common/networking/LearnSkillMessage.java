@@ -106,9 +106,10 @@ public class LearnSkillMessage extends DOMMessage {
                 + tile.getId());
         }
 
-        // Do not use getMoveType (checking moves left) as the preceding
-        // AskLearnSkill transaction will have already zeroed the moves.
-        // TODO: use a transaction, so that declining restores the moves?
+        // Do not use getMoveType (checking moves left) as the
+        // preceding AskLearnSkill transaction will have already
+        // zeroed the moves.
+        // Consider using a transaction, so that declining restores the moves?
         MoveType type = unit.getSimpleMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST) {
             return DOMMessage.clientError("Unable to enter "

@@ -362,8 +362,8 @@ public abstract class Feature extends FreeColObject implements Named {
         hash += 31 * ((temporary) ? 1 : 0);
         if (scopes != null) {
             for (Scope scope : scopes) {
-                // TODO: is this safe? It is an easy way to ignore the order
-                // of scope elements.
+                // FIXME: is this safe?  It is an easy way to ignore
+                // the order of scope elements.
                 hash += Utils.hashCode(scope);
             }
         }

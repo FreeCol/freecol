@@ -106,7 +106,7 @@ public abstract class ServerAPI {
     /**
      * Sends an Element to the server.
      *
-     * TODO: remove all uses of this.
+     * FIXME: remove all uses of this.
      *
      * @param element The <code>Element</code> to send.
      * @return True if the send succeeded.

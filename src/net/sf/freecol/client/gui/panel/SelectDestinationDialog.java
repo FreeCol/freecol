@@ -334,7 +334,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     /** The size of each destination cell. */
     private static final int CELL_HEIGHT = 48;
 
-    /** Show only the player colonies.  TODO: make a client option. */
+    /** Show only the player colonies.  FIXME: make a client option. */
     private static boolean showOnlyMyColonies = true;
 
     /** How to order the destinations. */

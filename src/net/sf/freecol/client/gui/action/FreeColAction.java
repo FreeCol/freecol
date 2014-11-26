@@ -299,18 +299,22 @@ public abstract class FreeColAction extends AbstractAction
     }
 
     /**
-     * Returns the action itself. TODO: at the moment, this is only
-     * necessary in order to implement Option.
+     * Returns the action itself.
      *
-     * @return an <code>FreeColAction</code> value
+     * FIXME: at the moment, this is only necessary in order to
+     * implement Option.
+     *
+     * @return This <code>FreeColAction</code>.
      */
     public FreeColAction getValue() {
         return this;
     }
 
     /**
-     * Does nothing except log a warning. TODO: at the moment, this is
-     * only necessary in order to implement Option.
+     * Does nothing except log a warning.
+     *
+     * FIXME: at the moment, this is only necessary in order to
+     * implement Option.
      *
      * @param value a <code>FreeColAction</code> value
      */

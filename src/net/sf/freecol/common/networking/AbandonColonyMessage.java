@@ -89,7 +89,7 @@ public class AbandonColonyMessage extends DOMMessage {
         }
 
         // Proceed to abandon
-        // TODO: Player.settlements is still being fixed on the client side.
+        // FIXME: Player.settlements is still being fixed on the client side.
         return server.getInGameController()
             .abandonSettlement(serverPlayer, colony);
     }

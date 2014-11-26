@@ -129,7 +129,7 @@ public class Game extends FreeColGameObject {
     /**
      * A FreeColGameObjectListener to watch the objects in the game.
      * Usually this is the AIMain instance.
-     * TODO: is this better done with a property change listener?
+     * FIXME: is this better done with a property change listener?
      */
     protected FreeColGameObjectListener freeColGameObjectListener = null;
 

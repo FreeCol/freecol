@@ -820,7 +820,7 @@ public final class ColonyPanel extends PortPanel
     public void updateNetProductionPanel() {
         final Colony colony = getColony();
         final Specification spec = colony.getSpecification();
-        // TODO: find out why the cache needs to be explicitly invalidated
+        // FIXME: find out why the cache needs to be explicitly invalidated
         colony.invalidateCache();
         netProductionPanel.removeAll();
 

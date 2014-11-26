@@ -84,7 +84,7 @@ public class ProductionCache {
      * but from Buildings with getAdjustedProductionInfo() which takes
      * account of the input and output goods levels.
      *
-     * TODO: Ideally these should be unified into a
+     * FIXME: Ideally these should be unified into a
      * WorkLocation.getProductionInfo with the Building-form
      * arguments.
      */

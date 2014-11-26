@@ -424,8 +424,8 @@ public final class GoodsType extends FreeColGameObjectType {
      * element of the production chain is the goods type itself.
      *
      * Note that this does not really handle goods that are stored as
-     * something else as is the case for grain etc.  TODO: fix or
-     * retire this routine?
+     * something else as is the case for grain etc.
+     * FIXME: fix or retire this routine?
      *
      * @return The production chain of this <code>GoodsType</code> as
      *     a list.

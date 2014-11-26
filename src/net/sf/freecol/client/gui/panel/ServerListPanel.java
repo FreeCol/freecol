@@ -132,7 +132,7 @@ public final class ServerListPanel extends FreeColPanel {
      *            displayed.
      */
     public void initialize(List<ServerInfo> servers) {
-        // TODO: This should be added as a filtering rule:
+        // FIXME: This should be added as a filtering rule:
         // Remove servers with an incorrect version from the list:
         Iterator<ServerInfo> it = servers.iterator();
         while (it.hasNext()) {

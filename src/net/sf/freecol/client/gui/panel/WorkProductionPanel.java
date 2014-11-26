@@ -71,7 +71,7 @@ public class WorkProductionPanel extends FreeColPanel {
     /**
      * Create a new production display.
      *
-     * TODO: expand display to handle several outputs
+     * FIXME: expand display to handle several outputs
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The <code>Unit</code> that is producing.
@@ -96,7 +96,7 @@ public class WorkProductionPanel extends FreeColPanel {
         float result = wl.getBaseProduction(wl.getProductionType(), 
                                             workType, unitType);
 
-        // TODO: Fix OO.
+        // FIXME: Fix OO.
         if (wl instanceof ColonyTile) {
             final ColonyTile colonyTile = (ColonyTile)wl;
             final Tile tile = colonyTile.getWorkTile();

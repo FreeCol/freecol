@@ -179,8 +179,10 @@ public final class InGameController implements NetworkConstants {
     public InGameController(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
-        // TODO: fetch value of lastSaveGameFile from a persistent client value
-        // lastSaveGameFile = new File(freeColClient.getClientOptions().getString(null));
+
+        // FIXME: fetch value of lastSaveGameFile from a persistent
+        // client value
+        //   lastSaveGameFile = new File(freeColClient.getClientOptions().getString(null));
     }
 
 
@@ -412,7 +414,7 @@ public final class InGameController implements NetworkConstants {
     /**
      * Updates the GUI after a unit moves.
      *
-     * TODO: check if this is necessary for all actions?
+     * FIXME: check if this is necessary for all actions?
      */
     private void updateAfterMove() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -3189,7 +3191,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean moveHighSeas(Unit unit, Direction direction) {
         // Confirm moving to Europe if told to move to a null tile
-        // (TODO: can this still happen?), or if crossing the boundary
+        // (FIXME: can this still happen?), or if crossing the boundary
         // between coastal and high sea.  Otherwise just move.
         Tile oldTile = unit.getTile();
         Tile newTile = oldTile.getNeighbourOrNull(direction);
@@ -3339,7 +3341,8 @@ public final class InGameController implements NetworkConstants {
      * Move to a foreign colony and either attack, negotiate with the
      * foreign power or spy on them.  Follows a move of
      * MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT.
-     * TODO: Unify trade and negotiation.
+     *
+     * FIXME: Unify trade and negotiation.
      *
      * @param unit The unit that will spy, negotiate or attack.
      * @param direction The direction in which the foreign colony lies.
@@ -4583,7 +4586,7 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        // Try to unload.  TODO: should there be a sound for this?
+        // Try to unload.  FIXME: should there be a sound for this?
         unloadGoods(goods, carrier, colony);
     }
 

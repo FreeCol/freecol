@@ -303,7 +303,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     return;
                 case 1:
                     ResourceType resourceType = resList.get(0);
-                    // TODO: create GUI for setting the quantity
+                    // FIXME: create GUI for setting the quantity
                     t.addResource(new Resource(t.getGame(), t, resourceType,
                                   resourceType.getMaxValue()));
                     return;

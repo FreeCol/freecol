@@ -129,7 +129,7 @@ public class GoToMission extends AbstractMission {
      * {@inheritDoc}
      */
     public MissionState doMission() {
-        // TODO: do we need acess to the InGameController?
+        // FIXME: do we need access to the InGameController?
         return MissionState.OK;
     }
 
@@ -142,7 +142,7 @@ public class GoToMission extends AbstractMission {
     public boolean isValid() {
         return super.isValid()
             && destination != null
-            // TODO: check for disposed destinations
+            // FIXME: check for disposed destinations
             && destination.canAdd(getUnit());
     }
 

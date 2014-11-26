@@ -272,7 +272,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     /**
      * Rearranges the workers within this colony using the {@link ColonyPlan}.
-     * TODO: Detect military threats and boost defence.
+     *
+     * FIXME: Detect military threats and boost defence.
      *
      * @param lb A <code>LogBuilder</code> to log to.
      * @return A collection of worker <code>AIUnit</code>s that now need
@@ -363,7 +364,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 || (m instanceof BuildColonyMission
                     && (Map.isSameLocation(m.getTarget(), tile)
                         || colony.getUnitCount() <= 1))
-                // TODO: drop this when the AI stops building excessive armies
+                // FIXME: drop this when the AI stops building excessive armies
                 || m instanceof DefendSettlementMission
                 || m instanceof IdleAtSettlementMission
                 || m instanceof WorkInsideColonyMission
@@ -523,7 +524,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Reset the export settings.
      * This is always needed even when there is no customs house, because
      * updateAIGoods needs to know what to export by transport.
-     * TODO: consider market prices?
+     *
+     * FIXME: consider market prices?
      */
     private void resetExports() {
         final Specification spec = getSpecification();
@@ -629,7 +631,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         for (Unit u : tile.getUnitList()) {
             if (u.isDefensiveUnit()
                 && getAIUnit(u).getMission(DefendSettlementMission.class) != null) {
-                // TODO: be smarter
+                // FIXME: be smarter
                 hasDefender = true;
                 break;
             }
@@ -1186,8 +1188,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             requireWorkerWish(expert, false, 50, lb);
         }
 
-        // TODO: check for students
-        // TODO: add missionaries
+        // FIXME: check for students
+        // FIXME: add missionaries
 
         // Improve defence.
         if (isBadlyDefended()) {
@@ -1208,7 +1210,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         int goodsWishValue = 50;
 
         // Request goods.
-        // TODO: improve heuristics
+        // FIXME: improve heuristics
         TypeCountMap<GoodsType> required = new TypeCountMap<GoodsType>();
 
         // Add building materials.
@@ -1239,7 +1241,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     ProductionInfo info = colony.getProductionInfo(building);
                     if (!info.hasMaximumProduction()) {
                         for (AbstractGoods goods : inputs) {
-                            // TODO: find better heuristics
+                            // FIXME: find better heuristics
                             required.incrementCount(goods.getType(), 100);
                         }
                     }

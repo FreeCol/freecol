@@ -372,7 +372,7 @@ public final class InfoPanel extends FreeColPanel {
                     "spany, gapafter 5px");
                 String name = unit.getDescription(Unit.UnitLabelType.NATIONAL);
 
-                // TODO: this is too brittle!
+                // FIXME: this is too brittle!
                 int index = name.indexOf(" (");
                 if (index < 0) {
                     add(new JLabel(name), "span");

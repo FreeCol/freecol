@@ -228,11 +228,10 @@ public class SimpleMapGenerator implements MapGenerator {
         int number = getApproximateLandCount() / rumourNumber;
         int counter = 0;
 
-        // TODO: Remove temporary fix:
+        // FIXME: Remove temporary fix:
         if (importGame != null) {
             number = map.getWidth() * map.getHeight() * 25 / (100 * 35);
         }
-        // END TODO
 
         for (int i = 0; i < number; i++) {
             for (int tries = 0; tries < 100; tries++) {
@@ -447,7 +446,7 @@ public class SimpleMapGenerator implements MapGenerator {
         int settlementsToPlace = settlementTiles.size();
         float share = settlementsToPlace / shares;
         if (settlementTiles.size() < indians.size()) {
-            // TODO: something drastic to boost the settlement number
+            // FIXME: something drastic to boost the settlement number
             logger.warning("There are only " + settlementTiles.size()
                            + " settlement sites."
                            + " This is smaller than " + indians.size()
@@ -521,7 +520,7 @@ public class SimpleMapGenerator implements MapGenerator {
         }
 
         // Grow some more tiles.
-        // TODO: move the magic numbers below to the spec RSN
+        // FIXME: move the magic numbers below to the spec
         // Also collect the skills provided
         HashMap<UnitType, List<IndianSettlement>> skills
             = new HashMap<UnitType, List<IndianSettlement>>();
@@ -641,8 +640,10 @@ public class SimpleMapGenerator implements MapGenerator {
     /**
      * Is a tile suitable for a native settlement?
      * Require the tile be settleable, and at least half its neighbours
-     * also be settleable.  TODO: degrade the second test to usability,
-     * but fix this when the natives-use-water situation is sorted.
+     * also be settleable.
+     *
+     * FIXME: degrade the second test to usability, but wait until the
+     * natives-use-water situation is sorted.
      *
      * @param tile The <code>Tile</code> to examine.
      * @return True if this tile is suitable.

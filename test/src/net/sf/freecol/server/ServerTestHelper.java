@@ -90,9 +90,9 @@ public final class ServerTestHelper {
                                             int port, String name) {
         stopServer();
         try {
-            // TODO: fixme! Pass tc
+            // FIXME: Pass tc
             server = new FreeColServer(publicServer, singlePlayer,
-                                       spec,  port, name);
+                                       spec, port, name);
         } catch (NoRouteToServerException e) {
             fail(e.getMessage());
         } catch (IOException e) {

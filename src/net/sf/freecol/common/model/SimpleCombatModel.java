@@ -301,8 +301,8 @@ public class SimpleCombatModel extends CombatModel {
         // Goods penalty always applies
         int count = attacker.getGoodsSpaceTaken();
         if (count > 0) {
-            // TODO: shouldn't this be -cargo/capacity?
-            // TODO: magic number to spec
+            // FIXME: shouldn't this be -cargo/capacity?
+            // FIXME: magic number to spec
             result.add(new Modifier(Modifier.OFFENCE, -12.5f * count,
                                     ModifierType.PERCENTAGE,
                                     Specification.CARGO_PENALTY_SOURCE));
@@ -492,7 +492,7 @@ public class SimpleCombatModel extends CombatModel {
         // Cargo penalty always applies
         int goodsCount = defender.getVisibleGoodsCount();
         if (goodsCount > 0) {
-            // TODO: should this be -cargo/capacity?
+            // FIXME: should this be -cargo/capacity?
             result.add(new Modifier(Modifier.DEFENCE, -12.5f * goodsCount,
                                     ModifierType.PERCENTAGE,
                                     Specification.CARGO_PENALTY_SOURCE));

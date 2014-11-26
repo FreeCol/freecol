@@ -524,7 +524,7 @@ public class TileImprovement extends TileItem implements Named {
         // neighbour that *is* connected to this one, and connect this
         // one.
         //
-        // TODO: drop this one day when we never have style
+        // FIXME: drop this one day when we never have style
         // discontinuities.  This alas is not the case in 0.10.x.
         String curr = (style == null) ? null : style.getString();
         String found = (isRiver()) ? updateRiverConnections(curr)

@@ -132,7 +132,7 @@ public class Cargo {
             final Location src = t.getLocation();
             final boolean carrying = src == carrier;
             if (!carrying && src instanceof Unit) {
-                // TODO: drop this and allow multi-stage plans?
+                // FIXME: drop this and allow multi-stage plans?
                 return "invalid-collected-elsewhere";
             }
 
@@ -545,7 +545,8 @@ public class Cargo {
     /**
      * Should this <code>Cargo</code> be retried after encountering
      * a blockage?  For now, just tries three times.
-     * TODO: be smarter.
+     *
+     * FIXME: be smarter.
      *
      * @return True if the <code>Cargo</code> should be retried.
      */

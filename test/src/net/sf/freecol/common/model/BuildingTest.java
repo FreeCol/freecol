@@ -404,7 +404,7 @@ public class BuildingTest extends FreeColTestCase {
      * schoolhouse that could be invalidated by the
      * specification.
      *
-     * TODO: make this more generic.
+     * FIXME: make this more generic.
      */
     public void testCanAddToSchool() {
         Game game = getGame();

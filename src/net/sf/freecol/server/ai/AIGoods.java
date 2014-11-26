@@ -197,7 +197,7 @@ public class AIGoods extends TransportableAIObject {
                 logger.warning(carrier + " at " + carrier.getLocation()
                     + " only unloaded " + (oldAmount - newAmount)
                     + " " + type + " (" + amount + " expected)");
-                // TODO: sort this out.
+                // FIXME: sort this out.
                 // For now, do not tolerate partial unloads.
                 result = false;
             }
@@ -310,7 +310,7 @@ public class AIGoods extends TransportableAIObject {
                     + " " + goodsType
                     + " (" + goodsAmount + " expected)");
                 goodsAmount = newAmount - oldAmount;
-                // TODO: sort this out.  For now, tolerate partial loads.
+                // FIXME: sort this out.  For now, tolerate partial loads.
                 result = goodsAmount > 0;
             }
         }

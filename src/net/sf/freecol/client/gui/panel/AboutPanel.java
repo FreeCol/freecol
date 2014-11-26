@@ -105,6 +105,7 @@ public final class AboutPanel extends FreeColPanel {
         String url = event.getActionCommand();
         if (SITE_URL.equals(url) || PROJECT_URL.equals(url)) {
             String os = System.getProperty("os.name");
+            // FIXME: move this to OS utilities
             String[] cmd = null;
             if (os == null) {
                 // error, the operating system could not be determined
@@ -118,16 +119,13 @@ public final class AboutPanel extends FreeColPanel {
             } else if (os.toLowerCase().contains("linux")) {
                 // GNU Linux, use xdg-utils to launch the default
                 // browser (portland.freedesktop.org)
-                cmd = new String[] {"xdg-open", url};
+                cmd = new String[] { "xdg-open", url};
             } else {
-                // Unix, ...
-                // TODO: should we just call an arbitrary browser like this?
-                //cmd = new String[] { "netscape",  "-remote", "openURL(" + url + ")"};
                 cmd = new String[] { "firefox", url};
             }
             try {
                 Runtime.getRuntime().exec(cmd);
-            } catch(IOException x) {
+            } catch (IOException x) {
                 // couldn't start browser
             }
         } else {

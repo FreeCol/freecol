@@ -1993,7 +1993,7 @@
                 type="percentage" value="100" index="50"/>
       <modifier id="model.modifier.minimumColonySize"
                 type="additive" value="3"/>
-      <!-- TODO: abilties to prevent the effects of Indian raids. -->
+      <!-- FIXME: abilties to prevent the effects of Indian raids. -->
     </building-type>
     <building-type id="model.building.fort"
                    extends="model.building.stockade"

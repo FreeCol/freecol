@@ -200,10 +200,10 @@ public class TileImprovementPlan extends ValuedAIObject {
                  : tile.getSpecification().getTileImprovementTypeList()) {
             if (!impType.isNatural()
                 && impType.isTileTypeAllowed(tile.getType())
-                // TODO: For now, disable any exotic non-Col1
+                // FIXME: For now, disable any exotic non-Col1
                 // improvement types that expend more than one parcel
-                // of tools (e.g. plantForest), because PioneeringMission
-                // assumes this does not happen.
+                // of tools (e.g. plantForest), because
+                // PioneeringMission assumes this does not happen.
                 && impType.getExpendedAmount() <= 1
                 && tile.getTileImprovement(impType) == null) {
                 int value = impType.getImprovementValue(tile, goodsType);

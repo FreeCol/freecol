@@ -107,7 +107,7 @@ public class FreeColDirectories {
      *
      * Can be overridden at the command line.
      *
-     * TODO: defaults lamely to ./data.  Do something better in the
+     * FIXME: defaults lamely to ./data.  Do something better in the
      * installer.
      */
     private static File dataDirectory = new File(DATA_DIRECTORY);
@@ -570,7 +570,7 @@ public class FreeColDirectories {
      * Note: the freecol data directory is set independently and earlier
      * in initialization than this routine.
      *
-     * TODO: Should the default location of the main user and data
+     * FIXME: Should the default location of the main user and data
      * directories be determined by the installer?
      *
      * @return A message key to use to create a message to the user

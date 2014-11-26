@@ -212,7 +212,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
      * Change the allocated transport for this transportable to a different
      * carrier unit.
      *
-     * TODO: partial attempt to maintain consistency of any carrier
+     * FIXME: partial attempt to maintain consistency of any carrier
      * TransportMission lists, and disembark from the old carrier if
      * possible.
      *

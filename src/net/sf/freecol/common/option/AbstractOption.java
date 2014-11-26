@@ -218,7 +218,7 @@ public abstract class AbstractOption<T> extends FreeColObject
         AbstractOption option = null;
 
         if (ACTION_TAG.equals(tag)) {
-            // TODO: load FreeColActions from client options?
+            // FIXME: load FreeColActions from client options?
             logger.finest("Skipping action " + xr.readId());
             xr.nextTag();
 

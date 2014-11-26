@@ -210,7 +210,7 @@ public class NativeAIPlayer extends AIPlayer {
             = getPlayer().getIndianSettlements();
         for (IndianSettlement is : settlements) {
             // Spread arms and horses between camps
-            // TODO: maybe make this dependent on difficulty level?
+            // FIXME: maybe make this dependent on difficulty level?
             int n = randoms[randomIdx++];
             IndianSettlement settlement = settlements.get(n);
             if (settlement != is) {

@@ -666,7 +666,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The priority of this unit type.
      */
     public int getPriority() {
-        // TODO: make this configurable
+        // FIXME: make this configurable
         return UNIT_PRIORITY;
     }
 

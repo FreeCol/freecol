@@ -62,11 +62,11 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
         super(freeColClient);
 
         /*
-         * TODO: Extend this dialog. It should be possible to specify the sizes
-         * using percentages.
+         * FIXME: Extend this dialog. It should be possible to specify
+         * the sizes using percentages.
          *
-         * Add a panel containing information about the scaling (old size, new
-         * size etc).
+         * Add a panel containing information about the scaling (old
+         * size, new size etc).
          */
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1, center"));

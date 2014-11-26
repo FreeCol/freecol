@@ -127,6 +127,7 @@ public class ProductionCache {
     }
 
     private List<Entry> createEntries(GoodsType goodsType) {
+        // FIXME: OO/generic
         List<Entry> result = new ArrayList<Entry>();
         if (goodsType.isFarmed()) {
             for (ColonyTile colonyTile : colonyTiles) {
@@ -142,7 +143,7 @@ public class ProductionCache {
             }
         } else {
             for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
-                if (!(wl instanceof Building)) continue; // TODO: fix
+                if (!(wl instanceof Building)) continue;
                 Building building = (Building)wl;
                 if (building.getType().getWorkPlaces() > 0) {
                     for (Unit unit : units) {

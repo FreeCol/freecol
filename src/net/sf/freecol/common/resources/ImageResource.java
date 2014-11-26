@@ -150,7 +150,7 @@ public class ImageResource extends Resource {
             try {
                 // Use SCALE_REPLICATE instead of SCALE_SMOOTH to avoid
                 // ClassCastException.
-                // TODO (perhaps): find a better solution.
+                // FIXME (perhaps): find a better solution.
                 Image scaled = im.getScaledInstance(d.width, d.height,
                                                     Image.SCALE_REPLICATE);
                 mt.addImage(scaled, 0, d.width, d.height);

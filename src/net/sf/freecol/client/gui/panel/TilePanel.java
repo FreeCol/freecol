@@ -119,7 +119,7 @@ public final class TilePanel extends FreeColPanel {
         }
 
         if (tileType != null) {
-            // TODO: make this more generic
+            // FIXME: make this more generic
             UnitType colonist = getSpecification().getDefaultUnitType();
 
             JLabel label = null;

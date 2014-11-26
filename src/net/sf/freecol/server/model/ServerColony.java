@@ -100,7 +100,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             colonyTiles.add(new ServerColonyTile(game, this, t));
         }
         // Set up default production queues.
-        // TODO: express this in the spec somehow.
+        // FIXME: express this in the spec somehow.
         if (isLandLocked()) {
             buildQueue.add(spec.getBuildingType("model.building.warehouse"));
         } else {
@@ -128,7 +128,6 @@ public class ServerColony extends Colony implements ServerModelObject {
      * New turn for this colony.
      * Try to find out if the colony is going to survive (last colonist does
      * not starve) before generating lots of production-related messages.
-     * TODO: use the warehouse to store things?
      *
      * @param random A <code>Random</code> number source.
      * @param lb A <code>LogBuilder</code> to log to.
@@ -175,7 +174,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 }
             }
             if (workLocation instanceof Building) {
-                // TODO: generalize to other WorkLocations?
+                // FIXME: generalize to other WorkLocations?
                 csCheckMissingInput((Building)workLocation, productionInfo, cs);
             }
         }
@@ -210,7 +209,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     }
                 }
             } else {
-                // Ready to build something.  TODO: OO!
+                // Ready to build something.  FIXME: OO!
                 BuildableType buildable = csNextBuildable(queue, cs);
                 if (buildable == null) {
                     ; // It was invalid, ignore.

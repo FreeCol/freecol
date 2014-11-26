@@ -360,7 +360,7 @@ public final class ConnectController {
     // The server then tells the clients that the game is starting
     // with a "startGame" message.  Except for saved games where it
     // cheats and sets a "startGame" flag in the login response that
-    // short circuits this.  TODO: which is awkward, tidy?
+    // short circuits this.  FIXME: which is awkward, tidy?
     //
     // "startGame" ends up in PreGameController.startGame, where the
     // inGame state is finally set to true, and the game begins.
@@ -414,7 +414,7 @@ public final class ConnectController {
 
         case IN_GAME:
             // Disable this check if you need to debug a multiplayer client.
-            // TODO: allow if the server is in debug mode.
+            // FIXME: allow if the server is in debug mode.
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
                 gui.showErrorMessage("connectController.debugConnect");
                 return false;
@@ -451,7 +451,8 @@ public final class ConnectController {
 
     /**
      * Starts a new single player game by connecting to the server.
-     * TODO: connect client/server directly (not using network-classes)
+     *
+     * FIXME: connect client/server directly (not using network-classes)
      *
      * @param spec The <code>Specification</code> for the game.
      * @param skip Skip the start game panel.
@@ -468,7 +469,7 @@ public final class ConnectController {
         // used to initialize the server.
         //
         // ATM we only allow mods in single player games.
-        // TODO: allow in stand alone server starts?
+        // FIXME: allow in stand alone server starts?
         spec.loadMods(freeColClient.getClientOptions().getActiveMods());
 
         FreeColServer freeColServer = startServer(false, true, spec, -1);

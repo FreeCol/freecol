@@ -198,7 +198,7 @@ public final class StatisticsPanel extends FreeColPanel {
                        stats.remove(k));
         }
         for (String k : new ArrayList<String>(stats.keySet())) {
-            if (k.startsWith("AI")) { // TODO: AIMain.aiStatisticsPrefix
+            if (k.startsWith("AI")) { // FIXME: AIMain.aiStatisticsPrefix
                 ai.put(k, stats.remove(k));
             }
         }

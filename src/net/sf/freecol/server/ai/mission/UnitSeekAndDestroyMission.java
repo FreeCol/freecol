@@ -124,7 +124,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * Do not cheat and look inside the settlement.
      * Just use visible facts about it.
      *
-     * TODO: if we are the REF and there is a significant Tory
+     * FIXME: if we are the REF and there is a significant Tory
      * population inside, assume traitors have briefed us.
      *
      * @param aiUnit The <code>AIUnit</code> to do the mission.

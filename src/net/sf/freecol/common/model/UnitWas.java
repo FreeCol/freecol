@@ -142,7 +142,7 @@ public class UnitWas implements Comparable<UnitWas> {
         }
     }
 
-    // TODO: fix this non-OO nastiness
+    // FIXME: fix this non-OO nastiness
     private String change(FreeColGameObject fcgo) {
         return (fcgo instanceof Tile) ? Tile.UNIT_CHANGE
             : (fcgo instanceof Europe) ? Europe.UNIT_CHANGE
@@ -152,7 +152,7 @@ public class UnitWas implements Comparable<UnitWas> {
             : null;
     }
 
-    // TODO: fix this non-OO nastiness
+    // FIXME: fix this non-OO nastiness
     private int getAmount(Location location, GoodsType goodsType) {
         if (goodsType == null) return 0;
         if (location instanceof WorkLocation) {

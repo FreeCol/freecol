@@ -221,9 +221,9 @@ public final class BuildingType extends BuildableType {
      * Gets the production types available at the current difficulty
      * level.
      *
-     * TODO: TileType.getAvailableProductionTypes(boolean) uses the
-     * GameOptions.TILE_PRODUCTION option.  We should implement a
-     * corresponding one for BuildingTypes.
+     * FIXME: TileType.getAvailableProductionTypes(boolean) uses the
+     * GameOptions.TILE_PRODUCTION option.  Should we implement a
+     * corresponding one for BuildingTypes?
      *
      * @param unattended Whether the production is unattended.
      * @param level The production level (NYI).

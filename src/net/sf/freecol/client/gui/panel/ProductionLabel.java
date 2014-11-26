@@ -383,9 +383,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         }
         int maxSpacing = iconWidth;
 
-        /* TODO Tune this: all icons are the same width, but many
-         * do not take up the whole width, eg. bells
-         */
+        // FIXME: Tune this: all icons are the same width, but many do
+        // not take up the whole width, eg. bells
         boolean iconsTooFarApart = pixelsPerIcon > maxSpacing;
         if (iconsTooFarApart) {
             pixelsPerIcon = maxSpacing;
@@ -426,9 +425,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         }
         int maxSpacing = iconWidth;
 
-        /* TODO Tune this: all icons are the same width, but many
-         * do not take up the whole width, eg. bells
-         */
+        // FIXME: Tune this: all icons are the same width, but many do
+        // not take up the whole width, eg. bells
         boolean iconsTooFarApart = pixelsPerIcon > maxSpacing;
         if (iconsTooFarApart) {
             pixelsPerIcon = maxSpacing;

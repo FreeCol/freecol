@@ -66,7 +66,7 @@ public final class ReportReligiousPanel extends ReportPanel {
         for (Colony colony : colonies) {
             WorkLocation wl = colony.getWorkLocationForProducing(crosses);
             if (wl == null
-                || !(wl instanceof Building)) // TODO: fix!
+                || !(wl instanceof Building)) // FIXME: non-OO
                 continue;
             Building building = (Building)wl;
             reportPanel.add(createColonyButton(colony),

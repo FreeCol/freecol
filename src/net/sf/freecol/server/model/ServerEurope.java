@@ -173,7 +173,8 @@ public class ServerEurope extends Europe implements ServerModelObject {
 
     /**
      * New turn for this colony tile.
-     * TODO: give Europe a shipyard and remove this
+     *
+     * FIXME: give Europe a shipyard and remove this?
      *
      * @param random A <code>Random</code> number source.
      * @param lb A <code>LogBuilder</code> to log to.

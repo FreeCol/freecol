@@ -127,7 +127,7 @@ public class ManageMissionariesGoal extends Goal {
                 }
             } else {
                 //Setting goal=null will make the unit appear in the unit iterator next turn.
-                //TODO: What about this turn?
+                //FIXME: What about this turn?
                 u.setGoal(null);
             }
         }
@@ -157,32 +157,32 @@ public class ManageMissionariesGoal extends Goal {
 
     private IndianSettlement findSettlement(Tile tile) {
         if (tile == null) {
-            //TODO: We're in europe - let's deal with it.
+            //FIXME: We're in europe - let's deal with it.
             return null;
         } else {
-            //Possible TODO: Slightly randomize findings?
+            //Possible FIXME: Slightly randomize findings?
             //Otherwise, missionaries starting from the same position will find
             //the same settlement.
 
             for (Tile t : tile.getSurroundingTiles(MAX_SEARCH_RADIUS)) {
                 IndianSettlement is = t.getIndianSettlement();
                 if (is != null && !is.hasMissionary(player.getPlayer())) {
-                    //TODO: Check if this settlement is reachable
+                    //FIXME: Check if this settlement is reachable
                     return is;
                 }
             }
         }
-        //TODO: We didn't find a settlement in range - what now?
+        //FIXME: We didn't find a settlement in range - what now?
         return null;
     }
 
 
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        //TODO
+        //FIXME
     }
 
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
-        //TODO
+        //FIXME
     }
 
     /**

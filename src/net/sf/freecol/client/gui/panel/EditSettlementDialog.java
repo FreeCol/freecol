@@ -223,7 +223,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             Nation newNation = getOwnerNation();
             if (newNation != settlement.getOwner().getNation()) {
                 Player newPlayer = getOwnerPlayer();
-                // TODO: recalculate tile ownership properly, taking
+                // FIXME: recalculate tile ownership properly, taking
                 // settlement radius into account
                 settlement.setOwner(newPlayer);
                 List<Unit> ul = settlement.getUnitList();

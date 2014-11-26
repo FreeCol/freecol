@@ -2495,13 +2495,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             super.readChild(xr);
         }
 
+        // @compat 0.10.x
         // Fix bug where missionary locations get cleared.
-        // TODO: Remove this when PETs have been revised to not store
+        // FIXME: Remove this when PETs have been revised to not store
         // the actual unit.
         if (settlement instanceof IndianSettlement) {
             Unit missionary = ((IndianSettlement)settlement).getMissionary();
             if (missionary != null) missionary.setLocationNoUpdate(settlement);
         }
+        // end @compat 0.10.x
     }
 
     /**

@@ -59,7 +59,7 @@ public final class ReportProductionPanel extends ReportPanel {
     /**
      * The constructor that will add the items to this panel.
      *
-     * TODO: can we extend this to cover farmed goods?
+     * FIXME: can we extend this to cover farmed goods?
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */

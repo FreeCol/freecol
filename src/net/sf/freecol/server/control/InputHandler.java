@@ -118,7 +118,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
                 logger.log(Level.FINEST, "Handling " + tagName);
                 return handler.handle(connection, element);
             } catch (Exception e) {
-                // TODO: should we really catch Exception? The old code did.
+                // FIXME: should we really catch Exception? The old code did.
                 logger.log(Level.WARNING, "Handler failed", e);
                 sendReconnectSafely(connection);
             }
@@ -144,7 +144,8 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
 
     /**
      * Create a reply message with an error.
-     * TODO: should this be localized (return message name)?
+     *
+     * FIXME: should this be localized (return message name)?
      * 
      * @param message The error message.
      * @return An error message.

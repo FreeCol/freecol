@@ -1174,7 +1174,7 @@ public final class FreeCol {
         } else {
             Specification spec = FreeCol.getTCSpecification();
             try {
-                // TODO: command line advantages setting?
+                // FIXME: command line advantages setting?
                 freeColServer = new FreeColServer(publicServer, false, spec,
                                                   serverPort, serverName);
             } catch (NoRouteToServerException nrtse) {

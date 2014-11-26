@@ -84,12 +84,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         = new DataFlavor(TradeRouteStop.class, "Stop");
 
     /**
-     * Special label for goods type.
-     *
-     * TODO: clean this up for 0.7.0 -- The GoodsLabel needs to be
-     * modified so that it can act as a GoodsTypeLabel (like this
-     * label), an AbstractGoodsLabel and a CargoLabel (its current
-     * function).
+     * Special label for cargo-to-carry type.
      */
     private class CargoLabel extends JLabel {
 
@@ -114,8 +109,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
      * Panel for the cargo the carrier is supposed to take on board at
      * a certain stop.
      *
-     * TODO: create a single cargo panel for this purpose and the use in the
-     * ColonyPanel, the EuropePanel and the CaptureGoodsDialog.
+     * FIXME: create a single cargo panel for this purpose and the use
+     * in the ColonyPanel, the EuropePanel and the CaptureGoodsDialog?
      */
     private class CargoPanel extends JPanel {
 
@@ -144,7 +139,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
     /**
      * TransferHandler for CargoLabels.
      *
-     * TODO: check whether this could/should be folded into the
+     * FIXME: check whether this could/should be folded into the
      * DefaultTransferHandler.
      */
     private class CargoHandler extends TransferHandler {

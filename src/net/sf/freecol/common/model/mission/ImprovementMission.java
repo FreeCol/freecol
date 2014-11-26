@@ -108,7 +108,7 @@ public class ImprovementMission extends AbstractMission {
      * {@inheritDoc}
      */
     public MissionState doMission() {
-        // TODO: get rid of magic numbers: either add a pioneerWork
+        // FIXME: get rid of magic numbers: either add a pioneerWork
         // attribute to UnitType, or introduce an expertRole ability
         // and add the work to the Role definition
         int work = getUnit().hasAbility(Ability.EXPERT_PIONEER) ? 2 : 1;

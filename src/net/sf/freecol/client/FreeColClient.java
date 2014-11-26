@@ -223,7 +223,8 @@ public final class FreeColClient {
         //   - base resources
         //   - resources in the default "classic" ruleset,
         //   - resources in the default actions
-        // TODO: probably should not need to load "classic", but there
+        //
+        // FIXME: probably should not need to load "classic", but there
         // are a bunch of things in there (e.g. orderButton) that first
         // need to move to base because the action manager requires them.
         //

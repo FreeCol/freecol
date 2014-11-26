@@ -455,9 +455,8 @@ public class GUI {
         Graphics2D g2d = image.createGraphics();
         miniMap.paintMap(g2d);
 
-        // TODO: this can probably done more efficiently
-        // by applying a suitable AffineTransform to the
-        // Graphics2D
+        // FIXME: this can probably done more efficiently by applying
+        // a suitable AffineTransform to the Graphics2D
         double scaledWidth = Math.min((64 * width) / height, 128);
         BufferedImage scaledImage = new BufferedImage((int) scaledWidth, 64,
             BufferedImage.TYPE_INT_ARGB);
@@ -830,7 +829,7 @@ public class GUI {
             logger.log(Level.WARNING, "Unable to get screen insets", e);
         }
 
-        // TODO: find better way to get size of window title and
+        // FIXME: find better way to get size of window title and
         // border.  The information is only available from getInsets
         // when a window is already displayable.
         height -= DEFAULT_WINDOW_INSET_HEIGHT;

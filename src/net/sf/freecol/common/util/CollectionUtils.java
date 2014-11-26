@@ -121,7 +121,7 @@ public class CollectionUtils {
                         return index < np;
                     }
 
-                    // TODO: see if we can do it with one array:-)
+                    // FIXME: see if we can do it with one array:-)
                     public List<T> next() {
                         List<T> pick = new ArrayList<T>(original);
                         List<T> result = new ArrayList<T>();

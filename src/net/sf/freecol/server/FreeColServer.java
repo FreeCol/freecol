@@ -151,8 +151,8 @@ public final class FreeColServer {
      * The oldest save game format that can still be loaded.
      * The promise is that FreeCol 0.n.* can load 0.(n-1).* games.
      *
-     * TODO: revisit the numbering scheme and save compatibility promise
-     * when 1.0 is released.
+     * Revisit the numbering scheme and save compatibility promise
+     * when 1.0 is released?
      */
     public static final int MINIMUM_SAVEGAME_VERSION = 11;
 
@@ -1241,7 +1241,7 @@ public final class FreeColServer {
         getAIMain().setFreeColGameObject(aiPlayer.getId(), aiPlayer);
 
         // Send message to all players except to the new player:
-        // TODO: null-destination-player is unnecessarily generous visibility
+        // FIXME: null-destination-player is unnecessarily generous visibility
         Element player = DOMMessage.createMessage("addPlayer");
         player.appendChild(aiPlayer.toXMLElement(player.getOwnerDocument()));
         getServer().sendToAll(player, theConnection);
