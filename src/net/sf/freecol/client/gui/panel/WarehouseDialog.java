@@ -169,7 +169,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
 
             // export checkbox
             export = new JCheckBox(Messages.message("warehouseDialog.export"),
-                                   exportData.isExported());
+                                   exportData.getExported());
             str = Messages.message("warehouseDialog.export.shortDescription");
             export.setToolTipText(str);
             if (!colony.hasAbility(Ability.EXPORT)) {
@@ -197,7 +197,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
             int exportLevelValue = ((SpinnerNumberModel)exportLevel.getModel())
                 .getNumber().intValue();
             ExportData exportData = colony.getExportData(goodsType);
-            boolean changed = (export.isSelected() != exportData.isExported())
+            boolean changed = (export.isSelected() != exportData.getExported())
                 || (lowLevelValue != exportData.getLowLevel())
                 || (highLevelValue != exportData.getHighLevel())
                 || (exportLevelValue != exportData.getExportLevel());

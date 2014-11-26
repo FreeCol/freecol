@@ -138,7 +138,7 @@ public class ExportData extends FreeColObject {
      *
      * @return True if this goods type is to be exported.
      */
-    public final boolean isExported() {
+    public final boolean getExported() {
         return exported;
     }
 

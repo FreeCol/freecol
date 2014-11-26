@@ -491,7 +491,7 @@ public final class ReportColonyPanel extends ReportPanel
                         .add("%goods%", g.getNameKey())
                         .addAmount("%amount%", p);
                 }
-            } else if (exportData.isExported()) {
+            } else if (exportData.getExported()) {
                 c = cExport;
                 tip = stpl("report.colony.production.export.description")
                     .addName("%colony%", colony.getName())

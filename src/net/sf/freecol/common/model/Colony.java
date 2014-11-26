@@ -2323,7 +2323,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         } else {
             //food is never wasted -> new settler is produced
             int waste = (amount + production - getWarehouseCapacity());
-            if (waste > 0 && !getExportData(goodsType).isExported() && !goodsType.limitIgnored()) {
+            if (waste > 0 && !getExportData(goodsType).getExported()
+                && !goodsType.limitIgnored()) {
                 result.add(StringTemplate.template("model.building.warehouseSoonFull")
                            .add("%goods%", goodsType.getNameKey())
                            .addName("%colony%", getName())
