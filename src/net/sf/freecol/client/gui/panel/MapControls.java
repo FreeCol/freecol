@@ -165,12 +165,7 @@ public abstract class MapControls {
             infoPanel.update(gui.getActiveUnit());
             break;
         case GUI.VIEW_TERRAIN_MODE:
-            if (gui.getSelectedTile() != null) {
-                Tile selectedTile = gui.getSelectedTile();
-                if (infoPanel.getTile() != selectedTile) {
-                    infoPanel.update(selectedTile);
-                }
-            }
+            infoPanel.update(gui.getSelectedTile());
             break;
         default:
             break;

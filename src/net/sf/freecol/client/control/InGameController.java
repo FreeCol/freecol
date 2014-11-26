@@ -3999,6 +3999,7 @@ public final class InGameController implements NetworkConstants {
             gui.setActiveUnit(player.getNextActiveUnit());
             return; // Successfully found a unit to display
         }
+        gui.setActiveUnit(null);
 
         // No active units left.  Do the goto orders.
         if (!doExecuteGotoOrders()) return;
@@ -4006,7 +4007,6 @@ public final class InGameController implements NetworkConstants {
         // If not already ending the turn, use the fallback tile if
         // supplied, then check for automatic end of turn, otherwise
         // just select nothing and wait.
-        gui.setActiveUnit(null);
         ClientOptions options = freeColClient.getClientOptions();
         if (tile != null) {
             gui.setSelectedTile(tile, false);
