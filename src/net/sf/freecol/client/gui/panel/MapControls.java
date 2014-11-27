@@ -155,6 +155,18 @@ public abstract class MapControls {
 
     public abstract void repaint();
     
+    public void toggleView() {
+        miniMap.setToggleBordersOption(!freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS));
+        repaint();
+    }
+    
+    public void toggleFogOfWar() {
+        miniMap.setToggleFogOfWarOption(!freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR));
+        repaint();
+    }
+
     /**
      * Updates this <code>MapControls</code>.
      */
@@ -195,26 +207,6 @@ public abstract class MapControls {
 
     public void zoomOut() {
         miniMap.zoomOut();
-        repaint();
-    }
-    
-    public void toggleView() {
-        if (freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS)) {
-            miniMap.setToogleBordersOption(false);
-        } else {
-            miniMap.setToogleBordersOption(true);
-        }
-        repaint();
-    }
-    
-    public void toogleFogOfWar() {
-        if (freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR)) {
-            miniMap.setToogleFogOfWarOption(false);
-        } else {
-            miniMap.setToogleFogOfWarOption(true);
-        }
         repaint();
     }
 }

@@ -1114,7 +1114,7 @@ public class GUI {
     
     public void miniMapToggleFogOfWarControls() {
         if (mapControls == null) return;
-        mapControls.toogleFogOfWar();
+        mapControls.toggleFogOfWar();
     }
 
 

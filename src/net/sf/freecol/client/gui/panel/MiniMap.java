@@ -161,12 +161,12 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             .setInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM, zoom);
     }
 
-    public void setToogleBordersOption(boolean toggle) {
+    public void setToggleBordersOption(boolean toggle) {
         freeColClient.getClientOptions()
             .setBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS, toggle);
     }
     
-    public void setToogleFogOfWarOption(boolean toggle) {
+    public void setToggleFogOfWarOption(boolean toggle) {
         freeColClient.getClientOptions()
             .setBoolean(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR, toggle);
     }
