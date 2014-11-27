@@ -165,13 +165,10 @@ public final class PreGameController {
             .registerMessageHandler(freeColClient.getInGameInputHandler());
 
         freeColClient.setInGame(true);
-        gui.setupInGameMenuBar();
+        gui.initializeInGame((Tile)myPlayer.getEntryLocation());
 
         InGameController igc = freeColClient.getInGameController();
-        gui.setSelectedTile((Tile) myPlayer.getEntryLocation(), false);
-        if (freeColClient.currentPlayerIsMyPlayer()) {
-            igc.nextActiveUnit();
-        }
+        if (freeColClient.currentPlayerIsMyPlayer()) igc.nextActiveUnit();
 
         gui.setupMouseListeners();
 

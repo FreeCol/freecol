@@ -542,9 +542,25 @@ public class GUI {
     }
 
     /**
-     * Plays some sound. Parameter == null stops playing a sound.
+     * In game initializations.
+     * Called from PreGameController.startGame().
      *
-     * @param sound The sound resource to play or <b>null</b>
+     * @param tile An initial <code>Tile</code> to select.
+     */
+    public void initializeInGame(Tile tile) {
+        if (frame == null || canvas == null) return;
+
+        frame.setJMenuBar(new InGameMenuBar(freeColClient));
+        frame.paintAll(canvas.getGraphics());
+        enableMapControls(freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
+        setSelectedTile(tile, false);
+    }
+
+    /**
+     * Play a sound.
+     *
+     * @param sound The sound resource to play, or if null stop playing.
      */
     public void playSound(String sound) {
         if (!canPlaySound()) return;
@@ -622,21 +638,11 @@ public class GUI {
     public void setActiveUnit(Unit unit) {
         if (mapViewer == null || canvas == null) return;
         mapViewer.setActiveUnit(unit);
-        unit = mapViewer.getActiveUnit();
-        showMapControls(unit != null);
+        updateMapControls();
         if (unit != null && !freeColClient.getMyPlayer().owns(unit)) {
             canvas.refresh();
         }
         updateMenuBar();
-    }
-
-    /**
-     * Set up the menu bar once in game.
-     */
-    public void setupInGameMenuBar() {
-        if (frame == null || canvas == null) return;
-        frame.setJMenuBar(new InGameMenuBar(freeColClient));
-        frame.paintAll(canvas.getGraphics());
     }
 
     /**
@@ -1035,10 +1041,16 @@ public class GUI {
 
     // MapControls handling
 
-    public void showMapControls(boolean value) {
-        if (canvas == null) return;
-
-        if (value && freeColClient.isInGame() && mapControls == null) {
+    /**
+     * Enable the map controls.
+     *
+     * Called from the MapControlsAction.
+     *
+     * @param enable If true then enable.
+     */
+    public void enableMapControls(boolean enable) {
+        // Always instantiate in game.
+        if (enable && mapControls == null) {
             String className = freeColClient.getClientOptions()
                 .getString(ClientOptions.MAP_CONTROLS);
             try {
@@ -1054,23 +1066,19 @@ public class GUI {
                     + className, e);
                 mapControls = new CornerMapControls(freeColClient);
             }
-        }
-
-        if (mapControls != null) {
-            if (value) {
-                if (!mapControls.isShowing()) {
-                    mapControls.addToComponent(canvas);
-                }
+            if (mapControls != null) {
+                mapControls.addToComponent(canvas);
                 mapControls.update();
-            } else {
-                if (mapControls.isShowing()) {
-                    mapControls.removeFromComponent(canvas);
-                }
             }
+        } else if (!enable && mapControls != null) {
+            mapControls.removeFromComponent(canvas);
+            mapControls = null;
         }
     }
 
     public void updateMapControls() {
+        if (canvas == null) return;
+
         if (mapControls != null) mapControls.update();
     }
 

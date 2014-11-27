@@ -54,7 +54,7 @@ public class MapControlsAction extends SelectableAction {
     public void update() {
         super.update();
 
-        getGUI().showMapControls(enabled && isSelected());
+        getGUI().enableMapControls(enabled && isSelected());
     }
 
 
@@ -66,6 +66,6 @@ public class MapControlsAction extends SelectableAction {
     public void actionPerformed(ActionEvent e) {
         selected = ((AbstractButton) e.getSource()).isSelected();
         updateOption(selected);
-        getGUI().showMapControls(enabled && selected);
+        getGUI().enableMapControls(enabled && selected);
     }
 }

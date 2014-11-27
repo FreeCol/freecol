@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -159,16 +160,20 @@ public abstract class MapControls {
      */
     public void update() {
         final GUI gui = freeColClient.getGUI();
+        Unit unit = gui.getActiveUnit();
 
         switch (gui.getViewMode()) {
         case GUI.MOVE_UNITS_MODE:
-            infoPanel.update(gui.getActiveUnit());
+            infoPanel.update(unit);
             break;
         case GUI.VIEW_TERRAIN_MODE:
             infoPanel.update(gui.getSelectedTile());
             break;
         default:
             break;
+        }
+        for (UnitButton ub : unitButtons) {
+            ub.setVisible(unit != null);
         }
     }
 
@@ -194,7 +199,8 @@ public abstract class MapControls {
     }
     
     public void toggleView() {
-        if (freeColClient.getClientOptions().getBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS)) {
+        if (freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS)) {
             miniMap.setToogleBordersOption(false);
         } else {
             miniMap.setToogleBordersOption(true);
@@ -203,12 +209,12 @@ public abstract class MapControls {
     }
     
     public void toogleFogOfWar() {
-        if (freeColClient.getClientOptions().getBoolean(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR)) {
+        if (freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR)) {
             miniMap.setToogleFogOfWarOption(false);
         } else {
             miniMap.setToogleFogOfWarOption(true);
         }
         repaint();
     }
-
 }
