@@ -611,12 +611,12 @@ public class TileTest extends FreeColTestCase {
         int i = 0;
         for (Tile t : tiles) {
             if (firstTile == null) firstTile = t;
-            if ((i & 0x1) == 0x1) t.addRiver(1, "1111");// must be first!
-            if ((i & 0x2) == 0x2) {
+            if ((i & 0b0001) == 0b0001) t.addRiver(1, "1111");// must be first!
+            if ((i & 0b0010) == 0b0010) {
                 TileImprovement road = t.addRoad();
                 road.setTurnsToComplete(0);
             }
-            if ((i & 0x4) == 0x4) t.addResource(new Resource(game, t, lumberResource, 99));
+            if ((i & 0b0100) == 0b0100) t.addResource(new Resource(game, t, lumberResource, 99));
             i++;
         }
         ColonyTile firstColonyTile = colony.getColonyTile(firstTile);

@@ -132,7 +132,7 @@ public class ColonizationMapLoader implements MapLoader {
             for (int y = 0; y < header[HEIGHT]; y++) {
                 for (int x = 0; x < header[WIDTH]; x++) {
                     int decimal = layer1[index] & 0xff;
-                    int terrain = decimal & 31;
+                    int terrain = decimal & 0b11111;
                     tileType = (terrain == OCEAN || terrain == HIGH_SEAS) ?
                         TileType.WATER : TileType.LAND;
                     index++;
@@ -143,7 +143,7 @@ public class ColonizationMapLoader implements MapLoader {
             for (int y = 0; y < header[HEIGHT]; y++) {
                 for (int x = 0; x < header[WIDTH]; x++) {
                     int decimal = layer1[index] & 0xff;
-                    int terrain = decimal & 31;
+                    int terrain = decimal & 0b11111;
                     int overlay = decimal >> 5;
 
                     if (terrain < tiletypes.length) {
