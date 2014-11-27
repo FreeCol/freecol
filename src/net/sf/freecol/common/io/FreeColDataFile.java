@@ -147,7 +147,7 @@ public class FreeColDataFile {
         String country = locale.getCountry();
         String variant = locale.getVariant();
 
-        List<String> result = new ArrayList<String>(4);
+        List<String> result = new ArrayList<>(4);
 
         if (!"".equals(language)) {
             language = "_" + language;
@@ -256,7 +256,7 @@ public class FreeColDataFile {
         }
 
         ResourceMapping rc = new ResourceMapping();
-        List<String> todo = new ArrayList<String>();
+        List<String> todo = new ArrayList<>();
         Enumeration<?> pn = properties.propertyNames();
         while (pn.hasMoreElements()) {
             final String key = (String) pn.nextElement();
@@ -271,7 +271,7 @@ public class FreeColDataFile {
             }
         }
         boolean progress = true;
-        List<String> miss = new ArrayList<String>();
+        List<String> miss = new ArrayList<>();
         while (progress && !todo.isEmpty()) {
             miss.clear();
             progress = false;

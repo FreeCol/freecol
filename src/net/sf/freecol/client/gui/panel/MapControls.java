@@ -86,7 +86,7 @@ public abstract class MapControls {
         infoPanel = new InfoPanel(freeColClient, useSkin);
         miniMap = new MiniMap(freeColClient);
         final ActionManager am = freeColClient.getActionManager();
-        unitButtons = new ArrayList<UnitButton>();
+        unitButtons = new ArrayList<>();
 
         final Game game = freeColClient.getGame();
         if (game != null) {

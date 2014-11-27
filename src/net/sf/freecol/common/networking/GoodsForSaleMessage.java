@@ -80,7 +80,7 @@ public class GoodsForSaleMessage extends DOMMessage {
 
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
-        this.sellGoods = new ArrayList<Goods>();
+        this.sellGoods = new ArrayList<>();
         NodeList children = element.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             this.sellGoods.add(new Goods(game, (Element) children.item(i)));

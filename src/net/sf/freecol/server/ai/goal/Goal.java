@@ -86,7 +86,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
         getGame().getTurn().getNumber();
         needsPlanning = true; //a newly created Goal always needs planning
         isFinished = false; //only plan() should set this to true!
-        availableUnitsList = new ArrayList<AIUnit>();
+        availableUnitsList = new ArrayList<>();
     }
 
     /**
@@ -126,7 +126,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
      */
     public List<AIUnit> cancelGoal() {
         logger.finest("Entering method cancelGoal() for "+getDebugDescription());
-        List<AIUnit> cancelledUnitsList = new ArrayList<AIUnit>();
+        List<AIUnit> cancelledUnitsList = new ArrayList<>();
 
         //get units from subgoals
         Iterator<Goal> git = getSubGoalIterator();

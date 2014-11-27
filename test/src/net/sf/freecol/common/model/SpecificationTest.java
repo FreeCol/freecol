@@ -206,67 +206,66 @@ public final class SpecificationTest extends FreeColTestCase {
     public void testRequiredAbilitiesForRoles() {
         final Specification spec = spec();
         Map<String, Boolean> abilitiesReq, expectAbilities;
-        Map<String, Map<String, Boolean>> roleAbilities
-            = new HashMap<String,Map<String,Boolean>>();
+        Map<String, Map<String, Boolean>> roleAbilities = new HashMap<>();
 
-        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities = new HashMap<>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, false);
         expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.scout", expectAbilities);
 
-        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities = new HashMap<>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, false);
         expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.soldier", expectAbilities);
 
-        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities = new HashMap<>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, false);
         expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.dragoon", expectAbilities);
 
-        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities = new HashMap<>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, false);
         expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.pioneer", expectAbilities);
 
-        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities = new HashMap<>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.DRESS_MISSIONARY, true);
         expectAbilities.put(Ability.NATIVE, false);
         expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.missionary", expectAbilities);
 
-        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities = new HashMap<>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, false);
         expectAbilities.put(Ability.REF_UNIT, true);
         expectAbilities.put(Ability.ROYAL_EXPEDITIONARY_FORCE, true);
         roleAbilities.put("model.role.infantry", expectAbilities);
 
-        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities = new HashMap<>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, false);
         expectAbilities.put(Ability.REF_UNIT, true);
         expectAbilities.put(Ability.ROYAL_EXPEDITIONARY_FORCE, true);
         roleAbilities.put("model.role.cavalry", expectAbilities);
 
-        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities = new HashMap<>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, true);
         expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.mountedBrave", expectAbilities);
 
-        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities = new HashMap<>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, true);
         expectAbilities.put(Ability.REF_UNIT, false);
         roleAbilities.put("model.role.armedBrave", expectAbilities);
 
-        expectAbilities = new HashMap<String, Boolean>();
+        expectAbilities = new HashMap<>();
         expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.NATIVE, true);
         expectAbilities.put(Ability.REF_UNIT, false);
@@ -414,7 +413,7 @@ public final class SpecificationTest extends FreeColTestCase {
         try {
             Specification specification = new Specification(new FreeColTcFile("freecol").getSpecificationInputStream());
             int numberOfUnitTypes = specification.getUnitTypeList().size();
-            List<FreeColModFile> mods = new ArrayList<FreeColModFile>();
+            List<FreeColModFile> mods = new ArrayList<>();
             mods.add(new FreeColModFile(new File("data/mods/example")));
             specification.loadMods(mods);
             UnitType milkmaid = specification.getUnitType("model.unit.milkmaid");

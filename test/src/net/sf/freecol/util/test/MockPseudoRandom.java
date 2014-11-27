@@ -31,8 +31,8 @@ public class MockPseudoRandom extends Random {
     private Random random;
     private final float scale = 1.0f / (float) Integer.MAX_VALUE;
 
-    public MockPseudoRandom(){
-        this(new ArrayList<Integer>(),false);
+    public MockPseudoRandom() {
+        this(new ArrayList<Integer>(), false);
     }
     
     public MockPseudoRandom(List<Integer> setNumbers,boolean toCycle){

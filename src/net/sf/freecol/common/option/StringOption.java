@@ -45,7 +45,7 @@ public class StringOption extends AbstractOption<String> {
     private String value;
 
     /** A list of choices to provide to the UI. */
-    private final List<String> choices = new ArrayList<String>();
+    private final List<String> choices = new ArrayList<>();
 
 
     /**

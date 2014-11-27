@@ -286,7 +286,7 @@ public class Role extends BuildableType {
      * @param capture The identifier for the role to capture.
      */
     public void addRoleChange(String from, String capture) {
-        if (roleChanges == null) roleChanges = new ArrayList<RoleChange>();
+        if (roleChanges == null) roleChanges = new ArrayList<>();
         roleChanges.add(new RoleChange(from, capture));
     }
 
@@ -371,7 +371,7 @@ public class Role extends BuildableType {
      */
     public static List<AbstractGoods> getGoodsDifference(Role from,
         int fromCount, Role to, int toCount) {
-        List<AbstractGoods> result = new ArrayList<AbstractGoods>();
+        List<AbstractGoods> result = new ArrayList<>();
         if (from != to && !(from == null && to.isDefaultRole())) {
             List<AbstractGoods> fromGoods = (from == null)
                 ? new ArrayList<AbstractGoods>()
@@ -413,7 +413,7 @@ public class Role extends BuildableType {
      */
     public static List<Role> getAvailableRoles(Player player, UnitType type,
                                                List<Role> roles) {
-        List<Role> result = new ArrayList<Role>();
+        List<Role> result = new ArrayList<>();
         for (Role r : roles) {
             if (r.isAvailableTo(player, type)) result.add(r);
         }

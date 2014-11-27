@@ -121,7 +121,7 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
         reportPanel.add(localizedLabel(t), "newline, span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
-        List<AbstractUnit> units = new ArrayList<AbstractUnit>();
+        List<AbstractUnit> units = new ArrayList<>();
         for (Role r : militaryRoles) {
             for (UnitType unitType : spec.getUnitTypeList()) {
                 if (unitType.isAvailableTo(player)

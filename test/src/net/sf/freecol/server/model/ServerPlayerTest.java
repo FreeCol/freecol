@@ -119,7 +119,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         // Pretend time is passing.
         // Have to advance time as yearly goods removal is initially low.
         game.setTurn(new Turn(200));
-        List<Integer> setValues = new ArrayList<Integer>();
+        List<Integer> setValues = new ArrayList<>();
         setValues.add(20);
         MockPseudoRandom mockRandom = new MockPseudoRandom(setValues, true);
         ServerTestHelper.setRandom(mockRandom);

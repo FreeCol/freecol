@@ -227,7 +227,7 @@ public final class ConnectController {
         Connection mc = getConnection(host, port);
         if (mc == null) return null;
 
-        List<String> items = new ArrayList<String>();
+        List<String> items = new ArrayList<>();
         Element element = DOMMessage.createMessage("getVacantPlayers");
         try {
             Element reply = mc.askDumping(element);
@@ -425,8 +425,7 @@ public final class ConnectController {
                 return false;
             }
 
-            List<ChoiceItem<String>> choices
-                = new ArrayList<ChoiceItem<String>>();
+            List<ChoiceItem<String>> choices = new ArrayList<>();
             for (String n : names) {
                 choices.add(new ChoiceItem<String>(Messages.getName(n), n));
             }
@@ -744,7 +743,7 @@ public final class ConnectController {
                 logger.warning("The meta-server did not return a list.");
                 return null;
             } else {
-                List<ServerInfo> items = new ArrayList<ServerInfo>();
+                List<ServerInfo> items = new ArrayList<>();
                 NodeList nl = reply.getChildNodes();
                 for (int i = 0; i < nl.getLength(); i++) {
                     items.add(new ServerInfo((Element)nl.item(i)));

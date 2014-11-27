@@ -160,7 +160,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @return An array of enabled options.
      */
     private Object[] selectOptions() {
-        List<ChoiceItem<T>> actual = new ArrayList<ChoiceItem<T>>();
+        List<ChoiceItem<T>> actual = new ArrayList<>();
         for (ChoiceItem<T> c : this.options) {
             if (c.isEnabled()) actual.add(c);
         }
@@ -400,7 +400,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @return An empty list of choices.
      */
     public static <T> List<ChoiceItem<T>> choices() {
-        return new ArrayList<ChoiceItem<T>>();
+        return new ArrayList<>();
     }
 
 

@@ -81,8 +81,8 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
      * @param root a <code>DefaultMutableTreeNode</code>
      */
     public void addSubTrees(DefaultMutableTreeNode root) {
-        List<UnitType> units = new ArrayList<UnitType>();
-        List<UnitType> skills = new ArrayList<UnitType>();
+        List<UnitType> units = new ArrayList<>();
+        List<UnitType> skills = new ArrayList<>();
         for (UnitType u : getSpecification().getUnitTypeList()) {
             if (u.getSkill() <= 0 || u.hasAbility(Ability.EXPERT_SOLDIER)) {
                 units.add(u);
@@ -146,7 +146,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             panel.add(localizedLabel("colopedia.unit.skill"));
             panel.add(new JLabel(Integer.toString(type.getSkill())), "right");
 
-            List<BuildingType> schools = new ArrayList<BuildingType>();
+            List<BuildingType> schools = new ArrayList<>();
             for (final BuildingType buildingType : getSpecification().getBuildingTypeList()) {
                 if (buildingType.hasAbility(Ability.TEACH) && buildingType.canAdd(type)) {
                     schools.add(buildingType);
@@ -167,7 +167,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
                 }
             }
 
-            List<IndianNationType> nations = new ArrayList<IndianNationType>();
+            List<IndianNationType> nations = new ArrayList<>();
             for (IndianNationType nation : getSpecification().getIndianNationTypes()) {
                 for (RandomChoice<UnitType> choice : nation.getSkills()) {
                     if (choice.getObject() == type) {
@@ -206,7 +206,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             }
         }
 
-        List<Modifier> bonusList = new ArrayList<Modifier>();
+        List<Modifier> bonusList = new ArrayList<>();
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             bonusList.addAll(type.getModifiers(goodsType.getId()));
         }

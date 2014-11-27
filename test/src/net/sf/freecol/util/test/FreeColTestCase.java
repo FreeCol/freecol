@@ -63,8 +63,8 @@ import net.sf.freecol.server.model.ServerUnit;
  */
 public class FreeColTestCase extends TestCase {
 
-    private static java.util.Map<String, Specification> specifications =
-        new HashMap<String, Specification>();
+    private static java.util.Map<String, Specification> specifications
+        = new HashMap<>();
 
     /**
      * use getGame to access this.
@@ -641,7 +641,7 @@ public class FreeColTestCase extends TestCase {
         CombatOdds combatOdds = combatModel.calculateCombatOdds(attacker, defender);
         float f = combatOdds.win;
         MockPseudoRandom mr = new MockPseudoRandom();
-        List<Integer> number = new ArrayList<Integer>();
+        List<Integer> number = new ArrayList<>();
         number.add(-1);
         do {
             f += (result == CombatResult.WIN) ? -delta : delta;
@@ -695,7 +695,7 @@ public class FreeColTestCase extends TestCase {
      */
     public void checkGoods(String err, List<AbstractGoods> goods,
                            AbstractGoods... results) {
-        List<AbstractGoods> check = new ArrayList<AbstractGoods>(goods);
+        List<AbstractGoods> check = new ArrayList<>(goods);
         for (AbstractGoods ag : results) {
             assertTrue(err + " requires " + ag, check.contains(ag));
             check.remove(ag);

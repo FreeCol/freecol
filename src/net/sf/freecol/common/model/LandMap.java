@@ -402,7 +402,7 @@ public class LandMap {
         size++;
 
         // Add all valid neighbour positions to list
-        List<Position> l = new ArrayList<Position>();
+        List<Position> l = new ArrayList<>();
         Position p = new Position(x, y);
         for (Direction direction : Direction.longSides) {
             Position n = new Position(p, direction);

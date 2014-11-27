@@ -113,7 +113,7 @@ public class Event extends FreeColGameObjectType {
      * @param limit The <code>Limit</code> to add.
      */
     private void addLimit(Limit limit) {
-        if (limits == null) limits = new HashMap<String, Limit>();
+        if (limits == null) limits = new HashMap<>();
         limits.put(limit.getId(), limit);
     }
 

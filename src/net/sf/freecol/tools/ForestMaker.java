@@ -157,7 +157,7 @@ public class ForestMaker {
                 System.out.println(imageFiles.length + " images found in source directory "
                                    + arg + ".");
             }
-            List<BufferedImage> images = new ArrayList<BufferedImage>(imageFiles.length);
+            List<BufferedImage> images = new ArrayList<>(imageFiles.length);
             int maximumHeight = 0;
             for (File imageFile : imageFiles) {
                 if (imageFile.isFile() && imageFile.canRead()) {
@@ -234,7 +234,7 @@ public class ForestMaker {
                 }
 
                 if (drawTrees) {
-                    List<ImageLocation> trees = new ArrayList<ImageLocation>(TREES);
+                    List<ImageLocation> trees = new ArrayList<>(TREES);
                     // reduce number of trees if river branches are present
                     int numberOfTrees = (6 - treeCount) * TREES / 6;
 

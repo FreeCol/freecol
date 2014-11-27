@@ -948,7 +948,7 @@ public final class FreeColServer {
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 final String tag = xr.getLocalName();
                 if (SERVER_OBJECTS_TAG.equals(tag)) {
-                    serverStrings = new ArrayList<String>();
+                    serverStrings = new ArrayList<>();
                     while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         serverStrings.add(xr.getLocalName());
                         serverStrings.add(xr.readId());

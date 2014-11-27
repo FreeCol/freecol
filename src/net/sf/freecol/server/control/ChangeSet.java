@@ -659,9 +659,9 @@ public class ChangeSet {
         public List<Change> consequences(ServerPlayer serverPlayer) {
             if (seeOld(serverPlayer) && !seeNew(serverPlayer)
                 && !unit.isDisposed()) {
-                List<Unit> units = new ArrayList<Unit>();
+                List<Unit> units = new ArrayList<>();
                 units.add(unit);
-                List<Change> changes = new ArrayList<Change>();
+                List<Change> changes = new ArrayList<>();
                 changes.add(new RemoveChange(See.only(serverPlayer),
                                              unit.getLocation(), units));
                 return changes;
@@ -1316,7 +1316,7 @@ public class ChangeSet {
      * Simple constructor.
      */
     public ChangeSet() {
-        changes = new ArrayList<Change>();
+        changes = new ArrayList<>();
     }
 
     /**
@@ -1325,7 +1325,7 @@ public class ChangeSet {
      * @param other The other <code>ChangeSet</code> to copy.
      */
     public ChangeSet(ChangeSet other) {
-        changes = new ArrayList<Change>(other.changes);
+        changes = new ArrayList<>(other.changes);
     }
 
 
@@ -1458,7 +1458,7 @@ public class ChangeSet {
      */
     public ChangeSet addDisappear(ServerPlayer owner, Tile tile,
                                   FreeColGameObject fcgo) {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        List<FreeColGameObject> objects = new ArrayList<>();
         objects.add(fcgo);
         changes.add(new RemoveChange(See.perhaps().except(owner), tile, objects));
         changes.add(new ObjectChange(See.perhaps().except(owner), tile));
@@ -1638,7 +1638,7 @@ public class ChangeSet {
      */
     public ChangeSet addRemoves(See see, Location loc,
                                 List<? extends FreeColGameObject> objects) {
-        List<FreeColGameObject> fcgos = new ArrayList<FreeColGameObject>();
+        List<FreeColGameObject> fcgos = new ArrayList<>();
         for (FreeColGameObject fcgo : objects) {
             fcgos.clear(); fcgos.add(fcgo);
             changes.add(new RemoveChange(see, loc, fcgos));
@@ -1767,7 +1767,7 @@ public class ChangeSet {
      * @return A collapsed list of elements.
      */
     private static List<Element> collapseElementList(List<Element> elements) {
-        List<Element> results = new ArrayList<Element>();
+        List<Element> results = new ArrayList<>();
         if (!elements.isEmpty()) {
             Element head = elements.remove(0);
             while (!elements.isEmpty()) {
@@ -1796,9 +1796,9 @@ public class ChangeSet {
      *         consider, or null if there is nothing to report.
      */
     public Element build(ServerPlayer serverPlayer) {
-        List<Change> c = new ArrayList<Change>(changes);
-        List<Element> elements = new ArrayList<Element>();
-        List<Change> diverted = new ArrayList<Change>();
+        List<Change> c = new ArrayList<>(changes);
+        List<Element> elements = new ArrayList<>();
+        List<Change> diverted = new ArrayList<>();
         Document doc = DOMMessage.createNewDocument();
 
         // For all sorted changes, if it is notifiable to the target

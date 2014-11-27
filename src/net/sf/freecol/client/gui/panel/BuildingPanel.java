@@ -65,7 +65,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     private ProductionLabel productionOutput = null;
 
     /** Labels for any units present. */
-    private List<UnitLabel> unitLabels = new ArrayList<UnitLabel>();
+    private List<UnitLabel> unitLabels = new ArrayList<>();
 
 
     /**

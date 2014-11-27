@@ -73,7 +73,7 @@ public class CreateMissionAtSettlementGoal extends Goal {
     protected Iterator<Goal> getSubGoalIterator() {
         //For the moment, we only have one goal.
         //Let's create an iterator of it. :)
-        List<Goal> subGoalList = new ArrayList<Goal>();
+        List<Goal> subGoalList = new ArrayList<>();
         if (gotoSubGoal != null) {
             subGoalList.add(gotoSubGoal);
         }

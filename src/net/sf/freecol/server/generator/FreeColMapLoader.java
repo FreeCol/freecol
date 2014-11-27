@@ -59,8 +59,7 @@ public class FreeColMapLoader implements MapLoader {
         int width = importMap.getWidth();
         int height = importMap.getHeight();
 
-        java.util.Map<String, ServerRegion> regions
-            = new HashMap<String, ServerRegion>();
+        java.util.Map<String, ServerRegion> regions = new HashMap<>();
 
         Map map = new Map(game, width, height);
         if (highestLayer == Layer.LAND) {

@@ -117,7 +117,7 @@ public class SetBuildQueueMessage extends DOMMessage {
         if (queue == null) {
             return DOMMessage.clientError("Empty queue");
         }
-        List<BuildableType> buildQueue = new ArrayList<BuildableType>();
+        List<BuildableType> buildQueue = new ArrayList<>();
         for (int i = 0; i < queue.length; i++) {
             try {
                 buildQueue.add(i, spec.getType(queue[i], BuildableType.class));

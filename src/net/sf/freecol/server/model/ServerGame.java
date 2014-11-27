@@ -117,7 +117,7 @@ public class ServerGame extends Game implements ServerModelObject {
         // because the server objects are just placeholders with no
         // real references to them, the WeakReferences in the Game are
         // insufficient to preserve them across garbage collections.
-        List<Object> serverObjects = new ArrayList<Object>();
+        List<Object> serverObjects = new ArrayList<>();
 
         // Create trivial instantiations of all the server objects.
         while (!serverStrings.isEmpty()) {
@@ -280,7 +280,7 @@ public class ServerGame extends Game implements ServerModelObject {
             = event.getLimit("model.limit.spanishSuccession.weakestPlayer");
         Limit strongLimit
             = event.getLimit("model.limit.spanishSuccession.strongestPlayer");
-        Map<Player, Integer> scores = new HashMap<Player, Integer>();
+        Map<Player, Integer> scores = new HashMap<>();
         boolean ready = false;
         for (Player player : getLiveEuropeanPlayers(null)) {
             if (player.isREF()) continue;
@@ -320,7 +320,7 @@ public class ServerGame extends Game implements ServerModelObject {
         }
         lb.add(" ]=> ", weakestAIPlayer.getName(),
                " cedes to ", strongestAIPlayer.getName(), ":");
-        List<Tile> tiles = new ArrayList<Tile>();
+        List<Tile> tiles = new ArrayList<>();
         ServerPlayer strongest = (ServerPlayer)strongestAIPlayer;
         ServerPlayer weakest = (ServerPlayer)weakestAIPlayer;
         for (Player player : getLiveNativePlayers(null)) {
@@ -406,7 +406,7 @@ public class ServerGame extends Game implements ServerModelObject {
      * @return A list of all the ServerModelObjects in this game.
      */
     public List<ServerModelObject> getServerModelObjects() {
-        List<ServerModelObject> objs = new ArrayList<ServerModelObject>();
+        List<ServerModelObject> objs = new ArrayList<>();
         for (WeakReference<FreeColGameObject> wr :freeColGameObjects.values()) {
             if (wr.get() instanceof ServerModelObject) {
                 objs.add((ServerModelObject) wr.get());

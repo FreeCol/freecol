@@ -117,7 +117,7 @@ public class InstallerTranslations {
         }
 
         //Map<String, String> languageMappings = readLanguageMappings(LANGUAGE_CODES);
-        Map<String, String> languageMappings = new HashMap<String, String>();
+        Map<String, String> languageMappings = new HashMap<>();
         for (String[] mapping : IZPACK_CODES) {
             languageMappings.put(mapping[0], mapping[1]);
         }
@@ -187,7 +187,7 @@ public class InstallerTranslations {
     }
 
     private static Map<String, String> readFile(File file) {
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
         BufferedReader bufferedReader = null;
         try {
             FileReader fileReader = new FileReader(file);
@@ -209,7 +209,7 @@ public class InstallerTranslations {
     }
     /*
     private static Map<String, String> readLanguageMappings(File file) {
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);

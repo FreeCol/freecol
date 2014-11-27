@@ -61,8 +61,7 @@ public final class BuildingType extends BuildableType {
     private BuildingType upgradesTo = null;
 
     /** The possible production types of this building type. */
-    private final List<ProductionType> productionTypes
-        = new ArrayList<ProductionType>();
+    private final List<ProductionType> productionTypes = new ArrayList<>();
 
 
     /**
@@ -231,7 +230,7 @@ public final class BuildingType extends BuildableType {
      */
     public List<ProductionType> getAvailableProductionTypes(boolean unattended,
                                                             String level) {
-        List<ProductionType> result = new ArrayList<ProductionType>();
+        List<ProductionType> result = new ArrayList<>();
         for (ProductionType productionType : productionTypes) {
             if (productionType.isUnattended() == unattended
                 && productionType.appliesTo(level)) {

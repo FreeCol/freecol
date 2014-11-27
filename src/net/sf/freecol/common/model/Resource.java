@@ -229,7 +229,7 @@ public class Resource extends TileItem {
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
         return (goodsType == null) ? Collections.<Modifier>emptyList()
-            : new ArrayList<Modifier>(getType()
+            : new ArrayList<>(getType()
                 .getModifiers(goodsType.getId(), unitType));
     }
 

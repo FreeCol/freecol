@@ -129,7 +129,7 @@ public final class ImageLibrary {
      */
     private final float scalingFactor;
 
-    private Map<String, Integer> imageCounts = new HashMap<String, Integer>();
+    private Map<String, Integer> imageCounts = new HashMap<>();
 
 
     /**

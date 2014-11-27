@@ -419,8 +419,7 @@ public final class GoalDeciders {
 
         private final GoalDecider gd;
 
-        private final HashMap<Location, PathNode> results
-            = new HashMap<Location, PathNode>();
+        private final HashMap<Location, PathNode> results = new HashMap<>();
 
 
         /**

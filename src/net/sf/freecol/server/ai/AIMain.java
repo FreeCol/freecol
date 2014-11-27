@@ -68,8 +68,7 @@ public class AIMain extends FreeColObject
      * Contains mappings between <code>FreeColGameObject</code>s
      * and <code>AIObject</code>s.
      */
-    private final Map<String, AIObject> aiObjects
-        = new HashMap<String, AIObject>();
+    private final Map<String, AIObject> aiObjects = new HashMap<>();
 
 
     /**
@@ -249,7 +248,7 @@ public class AIMain extends FreeColObject
      */
     private List<AIObject> getAIObjects() {
         synchronized (aiObjects) {
-            return new ArrayList<AIObject>(aiObjects.values());
+            return new ArrayList<>(aiObjects.values());
         }
     }
 
@@ -305,8 +304,8 @@ public class AIMain extends FreeColObject
      * track memory leaks over time
      */
     public Map<String, String> getAIStatistics() {
-        Map<String, String> stats = new HashMap<String, String>();
-        Map<String, Long> objStats = new HashMap<String, Long>();
+        Map<String, String> stats = new HashMap<>();
+        Map<String, Long> objStats = new HashMap<>();
         for (AIObject aio : getAIObjects()) {
             String className = aio.getClass().getSimpleName();
             if (objStats.containsKey(className)) {

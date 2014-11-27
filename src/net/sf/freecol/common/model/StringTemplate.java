@@ -159,7 +159,7 @@ public class StringTemplate extends FreeColObject {
      * @param key The key to add.
      */
     private void addKey(String key) {
-        if (keys == null) keys = new ArrayList<String>();
+        if (keys == null) keys = new ArrayList<>();
         keys.add(key);
     }
 
@@ -180,7 +180,7 @@ public class StringTemplate extends FreeColObject {
      */
     private void addReplacement(StringTemplate replacement) {
         if (replacements == null) {
-            replacements = new ArrayList<StringTemplate>();
+            replacements = new ArrayList<>();
         }
         replacements.add(replacement);
     }

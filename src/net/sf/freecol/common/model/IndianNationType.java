@@ -110,7 +110,7 @@ public class IndianNationType extends NationType {
      * @param id The object identifier.
      */
     private void addRegion(String id) {
-        if (regions == null) regions = new ArrayList<String>();
+        if (regions == null) regions = new ArrayList<>();
         regions.add(id);
     }
 
@@ -167,9 +167,7 @@ public class IndianNationType extends NationType {
      * @param probability The probability of the skill.
      */
     private void addSkill(UnitType unitType, int probability) {
-        if (skills == null) {
-            skills = new ArrayList<RandomChoice<UnitType>>();
-        }
+        if (skills == null) skills = new ArrayList<>();
         skills.add(new RandomChoice<UnitType>(unitType, probability));
     }
 
@@ -182,7 +180,7 @@ public class IndianNationType extends NationType {
      */
     public List<RandomChoice<UnitType>> generateSkillsForTile(Tile tile) {
         List<RandomChoice<UnitType>> skills = getSkills();
-        Map<GoodsType, Integer> scale = new HashMap<GoodsType, Integer>();
+        Map<GoodsType, Integer> scale = new HashMap<>();
 
         for (RandomChoice<UnitType> skill : skills) {
             scale.put(skill.getObject().getExpertProduction(), 1);
@@ -196,8 +194,7 @@ public class IndianNationType extends NationType {
             }
         }
 
-        List<RandomChoice<UnitType>> scaledSkills
-            = new ArrayList<RandomChoice<UnitType>>();
+        List<RandomChoice<UnitType>> scaledSkills = new ArrayList<>();
         for (RandomChoice<UnitType> skill : skills) {
             UnitType unitType = skill.getObject();
             int scaleValue = scale.get(unitType.getExpertProduction()).intValue();
@@ -257,16 +254,12 @@ public class IndianNationType extends NationType {
                                              IndianNationType.class, this);
         if (parent != this) {
             if (parent.skills != null && !parent.skills.isEmpty()) {
-                if (skills == null) {
-                    skills = new ArrayList<RandomChoice<UnitType>>();
-                }
+                if (skills == null) skills = new ArrayList<>();
                 skills.addAll(parent.skills);
             }
 
             if (parent.regions != null && !parent.regions.isEmpty()) {
-                if (regions == null) {
-                    regions = new ArrayList<String>();
-                }
+                if (regions == null) regions = new ArrayList<>();
                 regions.addAll(parent.regions);
             }
         }

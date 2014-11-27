@@ -495,7 +495,7 @@ public class TileImprovement extends TileItem implements Named {
         if (goodsType != null) {
             Modifier modifier = getProductionModifier(goodsType);
             if (modifier != null && isComplete()) {
-                List<Modifier> result = new ArrayList<Modifier>();
+                List<Modifier> result = new ArrayList<>();
                 result.add(modifier);
                 return result;
             }

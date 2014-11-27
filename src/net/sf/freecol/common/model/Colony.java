@@ -135,16 +135,13 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /** A map of Buildings, indexed by the id of their basic type. */
-    protected final java.util.Map<String, Building> buildingMap
-        = new HashMap<String, Building>();
+    protected final java.util.Map<String, Building> buildingMap = new HashMap<>();
 
     /** A list of the ColonyTiles. */
-    protected final List<ColonyTile> colonyTiles
-        = new ArrayList<ColonyTile>();
+    protected final List<ColonyTile> colonyTiles = new ArrayList<>();
 
     /** A map of ExportData, indexed by the ids of GoodsTypes. */
-    protected final java.util.Map<String, ExportData> exportData
-        = new HashMap<String, ExportData>();
+    protected final java.util.Map<String, ExportData> exportData = new HashMap<>();
 
     /**
      * The number of liberty points.  Liberty points are an
@@ -238,7 +235,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @see Building
      */
     public List<Building> getBuildings() {
-        return new ArrayList<Building>(buildingMap.values());
+        return new ArrayList<>(buildingMap.values());
     }
 
     /**
@@ -455,8 +452,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public List<Collection<GoodsType>> getWorkTypeChoices(Unit unit,
                                                           boolean userMode) {
         final Specification spec = getSpecification();
-        List<Collection<GoodsType>> result
-            = new ArrayList<Collection<GoodsType>>();
+        List<Collection<GoodsType>> result = new ArrayList<>();
         Set<GoodsType> tried = new HashSet<GoodsType>();
 
         // Find the food and non-food goods types required by the unit.
@@ -526,7 +522,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         lb.add(" alone=", alone);
 
         // Try the available production types for the best production.
-        List<ProductionType> productionTypes = new ArrayList<ProductionType>();
+        List<ProductionType> productionTypes = new ArrayList<>();
         if (alone) {
             productionTypes.addAll(wl.getAvailableProductionTypes(false));
         } else {
@@ -804,7 +800,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForConsuming(GoodsType goodsType) {
-        List<WorkLocation> result = new ArrayList<WorkLocation>();
+        List<WorkLocation> result = new ArrayList<>();
         for (WorkLocation wl : getCurrentWorkLocations()) {
             for (AbstractGoods input : wl.getInputs()) {
                 if (input.getType() == goodsType) result.add(wl);
@@ -821,7 +817,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForProducing(GoodsType goodsType) {
-        List<WorkLocation> result = new ArrayList<WorkLocation>();
+        List<WorkLocation> result = new ArrayList<>();
         for (WorkLocation wl : getCurrentWorkLocations()) {
             for (AbstractGoods ag : wl.getOutputs()) {
                 if (ag.getType() == goodsType) result.add(wl);
@@ -952,8 +948,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A weighted list of <code>Disaster</code>s.
      */
     public List<RandomChoice<Disaster>> getDisasters() {
-        List<RandomChoice<Disaster>> disasters
-            = new ArrayList<RandomChoice<Disaster>>();
+        List<RandomChoice<Disaster>> disasters = new ArrayList<>();
         for (ColonyTile tile : colonyTiles) {
             disasters.addAll(tile.getWorkTile().getDisasters());
         }
@@ -982,7 +977,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of buildable <code>UnitType</code>s.
      */
     public List<UnitType> getBuildableUnits() {
-        ArrayList<UnitType> buildableUnits = new ArrayList<UnitType>();
+        ArrayList<UnitType> buildableUnits = new ArrayList<>();
         List<UnitType> unitTypes = getSpecification().getUnitTypeList();
         for (UnitType unitType : unitTypes) {
             if (unitType.needsGoodsToBuild() && canBuild(unitType)) {
@@ -1232,7 +1227,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The map to completion.
      */
     public List<AbstractGoods> getRequiredGoods(BuildableType type) {
-        List<AbstractGoods> result = new ArrayList<AbstractGoods>();
+        List<AbstractGoods> result = new ArrayList<>();
         for (AbstractGoods goods : type.getRequiredGoods()) {
             GoodsType goodsType = goods.getType();
             int remaining = goods.getAmount() - getGoodsCount(goodsType);
@@ -1257,7 +1252,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of required abstract goods.
      */
     public List<AbstractGoods> getFullRequiredGoods(BuildableType buildable) {
-        List<AbstractGoods> required = new ArrayList<AbstractGoods>();
+        List<AbstractGoods> required = new ArrayList<>();
         if (buildable == null) return required;
         for (AbstractGoods ag : buildable.getRequiredGoods()) {
             int amount = ag.getAmount();
@@ -1824,7 +1819,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of burnable buildings.
      */
     public List<Building> getBurnableBuildings() {
-        List<Building> buildingList = new ArrayList<Building>();
+        List<Building> buildingList = new ArrayList<>();
         for (Building building : getBuildings()) {
             if (building.canBeDamaged()) buildingList.add(building);
         }
@@ -1838,7 +1833,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of lootable goods in this colony.
      */
     public List<Goods> getLootableGoodsList() {
-        List<Goods> goodsList = new ArrayList<Goods>();
+        List<Goods> goodsList = new ArrayList<>();
         for (Goods goods : getGoodsContainer().getGoods()) {
             if (goods.getType().isStorable()) goodsList.add(goods);
         }
@@ -1921,7 +1916,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of teacher <code>Unit</code>s.
      */
     public List<Unit> getTeachers() {
-        List<Unit> teachers = new ArrayList<Unit>();
+        List<Unit> teachers = new ArrayList<>();
         for (Building building : buildingMap.values()) {
             if (building.canTeach()) {
                 teachers.addAll(building.getUnitList());
@@ -1996,7 +1991,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return a list of consumers
      */
     public List<Consumer> getConsumers() {
-        List<Consumer> result = new ArrayList<Consumer>();
+        List<Consumer> result = new ArrayList<>();
         result.addAll(getUnitList());
         result.addAll(buildingMap.values());
         result.add(buildQueue);
@@ -2048,7 +2043,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                                     Modifier.ModifierType.ADDITIVE,
                                     Specification.SOL_MODIFIER_SOURCE);
         mod.setModifierIndex(Modifier.COLONY_PRODUCTION_INDEX);
-        List<Modifier> result = new ArrayList<Modifier>();
+        List<Modifier> result = new ArrayList<>();
         result.add(mod);
         return result;
     }
@@ -2485,7 +2480,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        List<FreeColGameObject> objects = new ArrayList<>();
         for (WorkLocation workLocation : getAllWorkLocations()) {
             objects.addAll(workLocation.disposeList());
         }
@@ -2574,7 +2569,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public List<Unit> getUnitList() {
-        ArrayList<Unit> units = new ArrayList<Unit>();
+        ArrayList<Unit> units = new ArrayList<>();
         for (WorkLocation wl : getCurrentWorkLocations()) {
             units.addAll(wl.getUnitList());
         }
@@ -2838,7 +2833,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     private int checkBuildQueueIntegrity(boolean fix) {
         int result = 1;
         List<BuildableType> buildables = buildQueue.getValues();
-        List<BuildableType> assumeBuilt = new ArrayList<BuildableType>();
+        List<BuildableType> assumeBuilt = new ArrayList<>();
         for (int i = 0; i < buildables.size(); i++) {
             BuildableType bt = buildables.get(i);
             NoBuildReason reason = getNoBuildReason(bt, assumeBuilt);
@@ -2962,7 +2957,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
         if (xw.validFor(getOwner())) {
 
-            List<String> keys = new ArrayList<String>(exportData.keySet());
+            List<String> keys = new ArrayList<>(exportData.keySet());
             Collections.sort(keys);
             for (String key : keys) {
                 exportData.get(key).toXML(xw);

@@ -578,7 +578,7 @@ public final class InGameInputHandler extends InputHandler
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 final NodeList nodes = element.getChildNodes();
-                List<Element> results = new ArrayList<Element>();
+                List<Element> results = new ArrayList<>();
 
                 for (int i = 0; i < nodes.getLength(); i++) {
                     final Element node = (Element)nodes.item(i);

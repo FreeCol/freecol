@@ -98,7 +98,7 @@ public class TransportMission extends Mission {
     private static final int MINIMUM_GOLD_TO_STAY_IN_EUROPE = 600;
 
     /** A list of <code>Cargo</code>s to work on. */
-    private final List<Cargo> cargoes = new ArrayList<Cargo>();
+    private final List<Cargo> cargoes = new ArrayList<>();
 
     /** The current target location to travel to. */
     private Location target;
@@ -199,7 +199,7 @@ public class TransportMission extends Mission {
     private List<Cargo> tCopy() {
         List<Cargo> nxt;
         synchronized (cargoes) {
-            nxt = new ArrayList<Cargo>(cargoes);
+            nxt = new ArrayList<>(cargoes);
         }
         return nxt;
     }
@@ -210,7 +210,7 @@ public class TransportMission extends Mission {
      * @return The old cargoes list.
      */
     private List<Cargo> tClear() {
-        List<Cargo> old = new ArrayList<Cargo>();
+        List<Cargo> old = new ArrayList<>();
         synchronized (cargoes) {
             old.addAll(cargoes);
             cargoes.clear();
@@ -739,10 +739,8 @@ public class TransportMission extends Mission {
 
         List<Unit> unitsPresent = carrier.getUnitList();
         List<Goods> goodsPresent = carrier.getCompactGoods();
-        List<TransportableAIObject> todo
-            = new ArrayList<TransportableAIObject>();
-        List<TransportableAIObject> drop
-            = new ArrayList<TransportableAIObject>();
+        List<TransportableAIObject> todo = new ArrayList<>();
+        List<TransportableAIObject> drop = new ArrayList<>();
 
         String reason;
         PathNode path;
@@ -1002,8 +1000,8 @@ public class TransportMission extends Mission {
             // a good time to decide to fail to deliver something.
             lbAt(lb);
             lb.add(", delivering");
-            List<Cargo> cont = new ArrayList<Cargo>();
-            List<Cargo> next = new ArrayList<Cargo>();
+            List<Cargo> cont = new ArrayList<>();
+            List<Cargo> next = new ArrayList<>();
             List<Cargo> curr = tClear();
             for (Cargo cargo : curr) {
                 CargoResult result = (cargo.getMode().isCollection())

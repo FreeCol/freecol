@@ -213,7 +213,7 @@ public abstract class FreeColObject
      * @return A sorted copy of the collection.
      */
     public static <T extends FreeColObject> List<T> getSortedCopy(Collection<T> c) {
-        List<T> newC = new ArrayList<T>(c);
+        List<T> newC = new ArrayList<>(c);
         Collections.sort(newC); // Use natural order if implemented.
         return newC;
     }
@@ -378,7 +378,7 @@ public abstract class FreeColObject
      * @return A list of abilities.
      */
     public final List<Ability> getSortedAbilities() {
-        List<Ability> abilities = new ArrayList<Ability>();
+        List<Ability> abilities = new ArrayList<>();
         abilities.addAll(getAbilities());
         Collections.sort(abilities);
         return abilities;
@@ -521,7 +521,7 @@ public abstract class FreeColObject
      * @return A list of modifiers.
      */
     public final List<Modifier> getSortedModifiers() {
-        List<Modifier> modifiers = new ArrayList<Modifier>();
+        List<Modifier> modifiers = new ArrayList<>();
         modifiers.addAll(getModifiers());
         Collections.sort(modifiers);
         return modifiers;

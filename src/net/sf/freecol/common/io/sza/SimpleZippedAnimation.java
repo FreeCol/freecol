@@ -82,14 +82,14 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
     }
     
     private SimpleZippedAnimation(final ZipInputStream zipStream) throws IOException {
-        this.events = new ArrayList<AnimationEvent>();
+        this.events = new ArrayList<>();
 
         /*
          * Preload all files from the archive since we cannot
          * use a ZipFile for reading (as we should support an
          * arbitrary stream).
          */
-        final Map<String, BufferedImage> loadingImages = new HashMap<String, BufferedImage>();
+        final Map<String, BufferedImage> loadingImages = new HashMap<>();
         final List<String> loadingDescriptor = new LinkedList<String>();
         try {
             ZipEntry entry;
@@ -177,7 +177,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
      * @return The scaled animation.
      */
     public SimpleZippedAnimation createScaledVersion(double scale) {
-        final List<AnimationEvent> newEvents = new ArrayList<AnimationEvent>();
+        final List<AnimationEvent> newEvents = new ArrayList<>();
         for (AnimationEvent event : events) {
             if (event instanceof ImageAnimationEvent) {
                 newEvents.add(((ImageAnimationEventImpl) event).createScaledVersion(scale));

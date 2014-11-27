@@ -92,9 +92,8 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
         ImageIcon buildingIcon = (buildingImage == null) ? null
             : new ImageIcon(buildingImage);
 
-        List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
-        Map<BuildingType, DefaultMutableTreeNode> buildingHash =
-            new HashMap<BuildingType, DefaultMutableTreeNode>();
+        List<BuildingType> buildingTypes = new ArrayList<>();
+        Map<BuildingType, DefaultMutableTreeNode> buildingHash = new HashMap<>();
         for (BuildingType buildingType : getSpecification().getBuildingTypeList()) {
             if (buildingType.getUpgradesFrom() == null) {
                 String name = Messages.message(buildingType.getNameKey());
@@ -241,7 +240,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
             }
         }
 
-        List<JComponent> labels = new ArrayList<JComponent>();
+        List<JComponent> labels = new ArrayList<>();
         for (Modifier productionBonus : buildingType.getModifiers()) {
             JComponent component = getModifierComponent(productionBonus);
             if (component instanceof JButton) {

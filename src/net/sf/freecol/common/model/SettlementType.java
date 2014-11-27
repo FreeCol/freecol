@@ -259,7 +259,7 @@ public class SettlementType extends FreeColGameObjectType {
      * @param gift The gift to add.
      */
     private void addGift(RandomRange gift) {
-        if (gifts == null) gifts = new ArrayList<RandomRange>();
+        if (gifts == null) gifts = new ArrayList<>();
         gifts.add(gift);
     }
 
@@ -269,7 +269,7 @@ public class SettlementType extends FreeColGameObjectType {
      * @param range The plunder to add.
      */
     private void addPlunder(RandomRange range) {
-        if (plunder == null) plunder = new ArrayList<RandomRange>();
+        if (plunder == null) plunder = new ArrayList<>();
         plunder.add(range);
     }
 

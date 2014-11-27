@@ -77,7 +77,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
         DefaultMutableTreeNode parent =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
 
-        List<NationType> nations = new ArrayList<NationType>();
+        List<NationType> nations = new ArrayList<>();
         nations.addAll(getSpecification().getEuropeanNationTypes());
         nations.addAll(getSpecification().getREFNationTypes());
         nations.addAll(getSpecification().getIndianNationTypes());
@@ -196,7 +196,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
                              new ImageIcon(getLibrary().getSettlementImage(nationType.getCapitalType())),
                              SwingConstants.CENTER));
 
-        List<String> regionNames = new ArrayList<String>();
+        List<String> regionNames = new ArrayList<>();
         for (String regionName : nationType.getRegionNames()) {
             regionNames.add(Messages.getName(regionName));
         }

@@ -155,7 +155,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
      */
     public List<AbstractGoods> getRequiredGoods() {
         if (requiredGoods == null) return Collections.<AbstractGoods>emptyList();
-        List<AbstractGoods> result = new ArrayList<AbstractGoods>();
+        List<AbstractGoods> result = new ArrayList<>();
         for (AbstractGoods ag : requiredGoods) {
             result.add(new AbstractGoods(ag.getType(), ag.getAmount()));
         }
@@ -180,7 +180,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
      */
     private void addRequiredGoods(AbstractGoods ag) {
         if (requiredGoods == null) {
-            requiredGoods = new ArrayList<AbstractGoods>();
+            requiredGoods = new ArrayList<>();
         }
         requiredGoods.add(ag);
     }
@@ -219,7 +219,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * @param limit The <code>Limit</code> to add.
      */
     private void addLimit(Limit limit) {
-        if (limits == null) limits = new ArrayList<Limit>();
+        if (limits == null) limits = new ArrayList<>();
         limits.add(limit);
     }
 

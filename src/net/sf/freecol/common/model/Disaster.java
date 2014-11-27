@@ -101,9 +101,7 @@ public class Disaster extends FreeColGameObjectType {
      * @param effect The <code>Effect</code> to add.
      */
     private void addEffect(Effect effect) {
-        if (effects == null) {
-            effects = new ArrayList<RandomChoice<Effect>>();
-        }
+        if (effects == null) effects = new ArrayList<>();
         effects.add(new RandomChoice<Effect>(effect,
                                              effect.getProbability()));
     }
@@ -172,9 +170,7 @@ public class Disaster extends FreeColGameObjectType {
         Disaster parent = xr.getType(spec, EXTENDS_TAG, Disaster.class, this);
 
         if (parent != this && !parent.getEffects().isEmpty()) {
-            if (effects == null) {
-                effects = new ArrayList<RandomChoice<Effect>>();
-            }
+            if (effects == null) effects = new ArrayList<>();
             for (RandomChoice<Effect> choice : parent.getEffects()) {
                 Effect effect = new Effect(choice.getObject());
                 effect.getFeatureContainer().replaceSource(parent, this);

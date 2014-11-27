@@ -50,7 +50,7 @@ public class GameTest extends FreeColTestCase {
         NationOptions defaultOptions = new NationOptions(spec());
         game.setNationOptions(defaultOptions);
 
-        List<Player> players = new ArrayList<Player>();
+        List<Player> players = new ArrayList<>();
 
         int counter = 0;
         for (Nation n : spec().getNations()) {

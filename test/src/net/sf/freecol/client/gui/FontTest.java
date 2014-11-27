@@ -36,9 +36,7 @@ public class FontTest extends FreeColTestCase {
             }
         };
 
-    private static final Map<Character, String> specialCharacters =
-        new HashMap<Character, String>();
-
+    private static final Map<Character, String> specialCharacters = new HashMap<>();
     static {
         specialCharacters.put('\u00D7', "MULTIPLICATION SIGN");
         specialCharacters.put('\u2192', "RIGHTWARDS ARROW");

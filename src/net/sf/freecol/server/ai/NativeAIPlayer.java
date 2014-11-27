@@ -103,15 +103,13 @@ public class NativeAIPlayer extends AIPlayer {
      * Stores temporary information for sessions (trading with another
      * player etc).
      */
-    private HashMap<String, Integer> sessionRegister
-        = new HashMap<String, Integer>();
+    private HashMap<String, Integer> sessionRegister = new HashMap<>();
 
     /**
      * Debug helper to keep track of why/what the units are doing.
      * Do not serialize.
      */
-    private final java.util.Map<Unit, String> reasons
-        = new HashMap<Unit, String>();
+    private final java.util.Map<Unit, String> reasons = new HashMap<>();
 
 
     /**
@@ -155,7 +153,7 @@ public class NativeAIPlayer extends AIPlayer {
 
         // Give defensive missions up to the minimum expected defence,
         // leave the rest with the default wander-hostile mission.
-        List<Unit> units = new ArrayList<Unit>();
+        List<Unit> units = new ArrayList<>();
         for (IndianSettlement is : player.getIndianSettlements()) {
             units.clear();
             units.addAll(is.getTile().getUnitList());
@@ -271,8 +269,8 @@ public class NativeAIPlayer extends AIPlayer {
         DefendSettlementMission dm;
 
         // Collect native units and defenders
-        List<Unit> units = new ArrayList<Unit>();
-        List<Unit> defenders = new ArrayList<Unit>();
+        List<Unit> units = new ArrayList<>();
+        List<Unit> defenders = new ArrayList<>();
         units.addAll(is.getUnitList());
         units.addAll(is.getTile().getUnitList());
         for (Unit u : is.getOwnedUnits()) {
@@ -280,7 +278,7 @@ public class NativeAIPlayer extends AIPlayer {
         }
 
         // Collect the current defenders
-        for (Unit u : new ArrayList<Unit>(units)) {
+        for (Unit u : new ArrayList<>(units)) {
             AIUnit aiu = aiMain.getAIUnit(u);
             if (aiu == null) {
                 units.remove(u);
@@ -294,7 +292,7 @@ public class NativeAIPlayer extends AIPlayer {
         }
 
         // Collect threats and other potential defenders
-        final HashMap<Tile, Float> threats = new HashMap<Tile, Float>();
+        final HashMap<Tile, Float> threats = new HashMap<>();
         Player enemy;
         Tension tension;
         for (Tile t : is.getTile().getSurroundingTiles(is.getRadius() + 1)) {
@@ -377,7 +375,7 @@ public class NativeAIPlayer extends AIPlayer {
         }
 
         // Sort threat tiles by threat value.
-        List<Tile> threatTiles = new ArrayList<Tile>(threats.keySet());
+        List<Tile> threatTiles = new ArrayList<>(threats.keySet());
         Collections.sort(threatTiles, new Comparator<Tile>() {
                 public int compare(Tile t1, Tile t2) {
                     return Float.compare(threats.get(t2).floatValue(),
@@ -429,7 +427,7 @@ public class NativeAIPlayer extends AIPlayer {
         List<AIUnit> aiUnits = getAIUnits();
 
         lb.mark();
-        List<AIUnit> done = new ArrayList<AIUnit>();
+        List<AIUnit> done = new ArrayList<>();
         reasons.clear();
         for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();
@@ -527,7 +525,7 @@ public class NativeAIPlayer extends AIPlayer {
 
             // Check if there are available units, and if there are already
             // enough missions in operation.
-            List<Unit> availableUnits = new ArrayList<Unit>();
+            List<Unit> availableUnits = new ArrayList<>();
             int alreadyAssignedUnits = 0;
             for (Unit ou : is.getOwnedUnits()) {
                 AIUnit aiu = getAIUnit(ou);
@@ -569,8 +567,7 @@ public class NativeAIPlayer extends AIPlayer {
             // Collect nearby colonies.  Filter out ones which are uncontacted,
             // unreachable or otherwise unsuitable.  Score the rest on alarm
             // and distance.
-            List<RandomChoice<Colony>> nearbyColonies
-                = new ArrayList<RandomChoice<Colony>>();
+            List<RandomChoice<Colony>> nearbyColonies = new ArrayList<>();
             for (Tile t : home.getSurroundingTiles(MAX_DISTANCE_TO_BRING_GIFTS)) {
                 Colony c = t.getColony();
                 PathNode path;
@@ -624,7 +621,7 @@ public class NativeAIPlayer extends AIPlayer {
 
             // Check if there are available units, and if there are already
             // enough missions in operation.
-            List<Unit> availableUnits = new ArrayList<Unit>();
+            List<Unit> availableUnits = new ArrayList<>();
             int alreadyAssignedUnits = 0;
             for (Unit ou : is.getOwnedUnits()) {
                 AIUnit aiu = getAIUnit(ou);
@@ -665,8 +662,7 @@ public class NativeAIPlayer extends AIPlayer {
 
             // Collect nearby colonies.  Filter out ones which are unreachable
             // or with which the settlement is on adequate terms.
-            List<RandomChoice<Colony>> nearbyColonies
-                = new ArrayList<RandomChoice<Colony>>();
+            List<RandomChoice<Colony>> nearbyColonies = new ArrayList<>();
             for (Tile t : home.getSurroundingTiles(MAX_DISTANCE_TO_MAKE_DEMANDS)) {
                 Colony c = t.getColony();
                 PathNode path;

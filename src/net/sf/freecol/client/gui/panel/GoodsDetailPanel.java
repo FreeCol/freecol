@@ -94,8 +94,8 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
         panel.add(name, "span, align center, wrap 40");
 
         if (type.isFarmed()) {
-            List<TileImprovementType> improvements = new ArrayList<TileImprovementType>();
-            List<Modifier> modifiers = new ArrayList<Modifier>();
+            List<TileImprovementType> improvements = new ArrayList<>();
+            List<Modifier> modifiers = new ArrayList<>();
             for (TileImprovementType improvementType :
                      getSpecification().getTileImprovementTypeList()) {
                 Modifier productionModifier = improvementType.getProductionModifier(type);
@@ -136,7 +136,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
         }
 
         if (type.isBuildingMaterial()) {
-            List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
+            List<BuildingType> buildingTypes = new ArrayList<>();
             boolean allTypes = filterBuildables(getSpecification().getBuildingTypeList(), buildingTypes, type);
             if (!buildingTypes.isEmpty()) {
                 panel.add(localizedLabel("colopedia.goods.buildings"), "newline 20");
@@ -158,7 +158,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
                     }
                 }
             }
-            List<Role> roles = new ArrayList<Role>();
+            List<Role> roles = new ArrayList<>();
             allTypes = filterBuildables(getSpecification().getRoles(), roles, type);
             if (!roles.isEmpty()) {
                 panel.add(localizedLabel("colopedia.goods.equipment"), "newline 20");
@@ -173,7 +173,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
                     count++;
                 }
             }
-            List<UnitType> unitTypes = new ArrayList<UnitType>();
+            List<UnitType> unitTypes = new ArrayList<>();
             allTypes = filterBuildables(getSpecification().getUnitTypeList(), unitTypes, type);
             if (!unitTypes.isEmpty()) {
                 panel.add(localizedLabel("colopedia.goods.units"), "newline 20");

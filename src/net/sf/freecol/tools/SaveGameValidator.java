@@ -46,7 +46,7 @@ public class SaveGameValidator {
         Schema schema = factory.newSchema(schemaLocation);
         Validator saveGameValidator = schema.newValidator();
 
-        List<File> allFiles = new ArrayList<File>();
+        List<File> allFiles = new ArrayList<>();
         FileFilter ff = FreeCol.freeColSaveFileFilter;
         for (String name : args) {
             File file = new File(name);

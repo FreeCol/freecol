@@ -32,7 +32,7 @@ import java.util.StringTokenizer;
  */
 public class Rule {
 
-    private List<List<Relation>> conditions = new ArrayList<List<Relation>>();
+    private List<List<Relation>> conditions = new ArrayList<>();
 
 
     public Rule(String input) {
@@ -74,7 +74,7 @@ public class Rule {
      */
     public final void parse(String input) {
         StringTokenizer st = new StringTokenizer(input.toLowerCase(Locale.US), " .");
-        List<String> tokens = new ArrayList<String>();
+        List<String> tokens = new ArrayList<>();
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             if ("or".equals(token)) {
@@ -88,8 +88,8 @@ public class Rule {
     }
 
     private List<Relation> parseCondition(List<String> input) {
-        List<String> tokens = new ArrayList<String>();
-        List<Relation> result = new ArrayList<Relation>();
+        List<String> tokens = new ArrayList<>();
+        List<Relation> result = new ArrayList<>();
         for (String token : input) {
             if ("and".equals(token)) {
                 result.add(new Relation(tokens));

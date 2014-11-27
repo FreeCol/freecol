@@ -280,8 +280,8 @@ public final class MapViewer {
 
         setImageLibrary(lib);
 
-        unitsOutForAnimation = new HashMap<Unit, Integer>();
-        unitsOutForAnimationLabels = new HashMap<Unit, JLabel>();
+        unitsOutForAnimation = new HashMap<>();
+        unitsOutForAnimationLabels = new HashMap<>();
 
         logger.info("GUI created.");
         messages = new Vector<GUIMessage>(MESSAGE_COUNT);
@@ -1786,7 +1786,7 @@ public final class MapViewer {
                     }
                 }
 
-                List<SortableImage> imageBorders = new ArrayList<SortableImage>(8);
+                List<SortableImage> imageBorders = new ArrayList<>(8);
                 SortableImage si;
                 for (Direction direction : Direction.values()) {
                     Tile borderingTile = tile.getNeighbourOrNull(direction);
@@ -2020,11 +2020,10 @@ public final class MapViewer {
         Display the Tile overlays and Units
         */
 
-        List<Unit> units = new ArrayList<Unit>();
-        List<AffineTransform> unitTransforms = new ArrayList<AffineTransform>();
-        List<Settlement> settlements = new ArrayList<Settlement>();
-        List<AffineTransform> settlementTransforms
-            = new ArrayList<AffineTransform>();
+        List<Unit> units = new ArrayList<>();
+        List<AffineTransform> unitTransforms = new ArrayList<>();
+        List<Settlement> settlements = new ArrayList<>();
+        List<AffineTransform> settlementTransforms = new ArrayList<>();
 
         int colonyLabels = options.getInteger(ClientOptions.COLONY_LABELS);
         boolean withNumbers = colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC;
@@ -2461,7 +2460,7 @@ public final class MapViewer {
             g.drawImage(lib.getTerrainImage(null, tile.getX(), tile.getY()), 0, 0, null);
         } else {
             // layer additions and improvements according to zIndex
-            List<TileItem> tileItems = new ArrayList<TileItem>();
+            List<TileItem> tileItems = new ArrayList<>();
             if (tile.getTileItemContainer() != null) {
                 tileItems = tile.getTileItemContainer().getTileItems();
             }
@@ -2679,8 +2678,8 @@ public final class MapViewer {
         g.setStroke(roadStroke);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         GeneralPath path = new GeneralPath();
-        List<Point2D.Float> points = new ArrayList<Point2D.Float>(8);
-        List<Direction> directions = new ArrayList<Direction>(8);
+        List<Point2D.Float> points = new ArrayList<>(8);
+        List<Direction> directions = new ArrayList<>(8);
         for (Direction direction : Direction.values()) {
             Tile borderingTile = tile.getNeighbourOrNull(direction);
             TileImprovement r;

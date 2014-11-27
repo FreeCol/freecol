@@ -256,7 +256,7 @@ public abstract class ServerAPI {
 
         // Process multiple returns, pick out expected element
         if ("multiple".equals(reply.getTagName())) {
-            List<Element> replies = new ArrayList<Element>();
+            List<Element> replies = new ArrayList<>();
             NodeList nodes = reply.getChildNodes();
             Element result = null;
 
@@ -306,7 +306,7 @@ public abstract class ServerAPI {
      * @return A map with null mappings for the query strings.
      */
     private HashMap<String, String> loadMap(String... queries) {
-        HashMap<String, String> result = new HashMap<String, String>();
+        HashMap<String, String> result = new HashMap<>();
         for (String q : queries) result.put(q, null);
         return result;
     }
@@ -907,7 +907,7 @@ public abstract class ServerAPI {
             null, null);
         if (reply == null) return Collections.<HighScore>emptyList();
 
-        List<HighScore> result = new ArrayList<HighScore>();
+        List<HighScore> result = new ArrayList<>();
         NodeList childElements = reply.getChildNodes();
         for (int i = 0; i < childElements.getLength(); i++) {
             result.add(new HighScore((Element)childElements.item(i)));
@@ -950,7 +950,7 @@ public abstract class ServerAPI {
             null, null);
         if (reply == null) return Collections.<AbstractUnit>emptyList();
 
-        List<AbstractUnit> result = new ArrayList<AbstractUnit>();
+        List<AbstractUnit> result = new ArrayList<>();
         NodeList childElements = reply.getChildNodes();
         for (int index = 0; index < childElements.getLength(); index++) {
             AbstractUnit unit = new AbstractUnit();

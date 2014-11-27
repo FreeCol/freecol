@@ -53,7 +53,7 @@ public final class MetaServer extends Thread {
     private ServerSocket serverSocket;
 
     /** A hash of Connection objects, keyed by the Socket they relate to. */
-    private HashMap<Socket, Connection> connections = new HashMap<Socket, Connection>();
+    private HashMap<Socket, Connection> connections = new HashMap<>();
 
     /**
      * Whether to keep running the main loop that is awaiting new client

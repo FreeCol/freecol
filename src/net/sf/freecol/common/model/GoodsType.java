@@ -431,7 +431,7 @@ public final class GoodsType extends FreeColGameObjectType {
      *     a list.
      */
     public List<GoodsType> getProductionChain() {
-        List<GoodsType> result = new ArrayList<GoodsType>();
+        List<GoodsType> result = new ArrayList<>();
         GoodsType currentGoods = this;
         while (currentGoods != null) {
             result.add(0, currentGoods);
@@ -500,7 +500,7 @@ public final class GoodsType extends FreeColGameObjectType {
         }
 
         // Set buildingMaterial attribute
-        List<BuildableType> buildableTypes = new ArrayList<BuildableType>();
+        List<BuildableType> buildableTypes = new ArrayList<>();
         buildableTypes.addAll(spec.getBuildingTypeList());
         buildableTypes.addAll(spec.getUnitTypeList());
         buildableTypes.addAll(spec.getRoles());

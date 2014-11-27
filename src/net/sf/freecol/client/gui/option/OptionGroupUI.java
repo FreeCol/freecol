@@ -53,9 +53,9 @@ public final class OptionGroupUI extends MigPanel
 
     private static final Logger logger = Logger.getLogger(OptionGroupUI.class.getName());
 
-    private final List<OptionUpdater> optionUpdaters = new ArrayList<OptionUpdater>();
+    private final List<OptionUpdater> optionUpdaters = new ArrayList<>();
 
-    private final HashMap<String, OptionUI> optionUIs = new HashMap<String, OptionUI>();
+    private final HashMap<String, OptionUI> optionUIs = new HashMap<>();
 
 
     private JPanel detailPanel;

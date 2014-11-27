@@ -52,8 +52,7 @@ public final class ReportProductionPanel extends ReportPanel {
     private final List<GoodsType> goodsTypes;
 
     /** The boxes with which to select goods types for display. */
-    private final List<JComboBox<String>> boxes
-        = new ArrayList<JComboBox<String>>();
+    private final List<JComboBox<String>> boxes = new ArrayList<>();
 
 
     /**
@@ -66,9 +65,9 @@ public final class ReportProductionPanel extends ReportPanel {
     public ReportProductionPanel(FreeColClient freeColClient) {
         super(freeColClient, Messages.message("reportProductionAction.name"));
 
-        this.goodsTypes = new ArrayList<GoodsType>();
+        this.goodsTypes = new ArrayList<>();
 
-        List<String> goodsNames = new ArrayList<String>();
+        List<String> goodsNames = new ArrayList<>();
         goodsNames.add(Messages.message("nothing"));
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             if (!goodsType.isFarmed()) {
@@ -103,7 +102,7 @@ public final class ReportProductionPanel extends ReportPanel {
             });
         reportPanel.add(selectButton, "wrap 20");
 
-        List<GoodsType> selectedTypes = new ArrayList<GoodsType>();
+        List<GoodsType> selectedTypes = new ArrayList<>();
         for (int index = 0; index < NUMBER_OF_GOODS; index++) {
             JComboBox<String> box = this.boxes.get(index);
             reportPanel.add(box);
@@ -115,11 +114,9 @@ public final class ReportProductionPanel extends ReportPanel {
         if (!selectedTypes.isEmpty()) {
             TypeCountMap<BuildingType> buildingCount
                 = new TypeCountMap<BuildingType>();
-            List<List<BuildingType>> basicBuildingTypes
-                = new ArrayList<List<BuildingType>>();
+            List<List<BuildingType>> basicBuildingTypes = new ArrayList<>();
             for (GoodsType goodsType : selectedTypes) {
-                List<BuildingType> buildingTypes
-                    = new ArrayList<BuildingType>();
+                List<BuildingType> buildingTypes = new ArrayList<>();
                 for (BuildingType buildingType
                          : getSpecification().getBuildingTypeList()) {
                     if (goodsType.equals(buildingType.getProducedGoodsType())

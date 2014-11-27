@@ -113,14 +113,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     private ColonyPlan colonyPlan = null;
 
     /** Goods to export from the colony. */
-    private final List<AIGoods> exportGoods = new ArrayList<AIGoods>();
+    private final List<AIGoods> exportGoods = new ArrayList<>();
 
     /** Useful things for the colony. */
-    private final List<Wish> wishes = new ArrayList<Wish>();
+    private final List<Wish> wishes = new ArrayList<>();
 
     /** Plans to improve neighbouring tiles. */
-    private final List<TileImprovementPlan> tileImprovementPlans
-        = new ArrayList<TileImprovementPlan>();
+    private final List<TileImprovementPlan> tileImprovementPlans = new ArrayList<>();
 
     /** When should the workers in this Colony be rearranged? */
     private Turn rearrangeTurn = new Turn(0);
@@ -338,7 +337,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         BuildableType oldBuild = colony.getCurrentlyBuilding();
         BuildableType build = colonyPlan.getBestBuildableType();
         if (build != oldBuild) {
-            List<BuildableType> queue = new ArrayList<BuildableType>();
+            List<BuildableType> queue = new ArrayList<>();
             if (build != null) queue.add(build);
             AIMessage.askSetBuildQueue(this, queue);
             build = colony.getCurrentlyBuilding();
@@ -351,7 +350,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // tile, which happens regularly with the initial AI colony.
         // Remember where the units came from.
         List<Unit> workers = colony.getUnitList();
-        List<UnitWas> was = new ArrayList<UnitWas>();
+        List<UnitWas> was = new ArrayList<>();
         for (Unit u : workers) {
             Location loc = u.getLocation();
             was.add(new UnitWas(u));
@@ -379,7 +378,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer)getAIOwner();
         LogBuilder aw = new LogBuilder(256);
         boolean preferScouts = aiPlayer.scoutsNeeded() > 0;
-        Colony scratch = colonyPlan.assignWorkers(new ArrayList<Unit>(workers),
+        Colony scratch = colonyPlan.assignWorkers(new ArrayList<>(workers),
                                                   preferScouts, aw);
         if (scratch == null) {
             lb.add(", failed to assign workers.");
@@ -412,7 +411,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             BuildableType newBuild = colonyPlan.getBestBuildableType();
             lb.add(", reneged building ", build.getSuffix(),
                    " (", colony.getNoBuildReason(build, null), ")");
-            List<BuildableType> queue = new ArrayList<BuildableType>();
+            List<BuildableType> queue = new ArrayList<>();
             if (newBuild != null) queue.add(newBuild);
             AIMessage.askSetBuildQueue(this, queue);
             nextRearrange = 1;
@@ -455,7 +454,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Allocate pioneers if possible.
         int tipSize = tileImprovementPlans.size();
         if (tipSize > 0) {
-            List<Unit> pioneers = new ArrayList<Unit>();
+            List<Unit> pioneers = new ArrayList<>();
             for (Unit u : tile.getUnitList()) {
                 if (u.getPioneerScore() >= 0) pioneers.add(u);
             }
@@ -589,7 +588,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     private void exploreLCRs() {
         final Tile tile = colony.getTile();
-        List<Unit> explorers = new ArrayList<Unit>();
+        List<Unit> explorers = new ArrayList<>();
         for (Unit u : tile.getUnitList()) {
             if (u.isPerson()
                 && (u.getType().getSkill() <= 0
@@ -639,7 +638,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (!hasDefender) return;
 
         // What goods are really needed?
-        List<GoodsType> needed = new ArrayList<GoodsType>();
+        List<GoodsType> needed = new ArrayList<>();
         for (GoodsType g : spec.getRawBuildingGoodsTypeList()) {
             if (colony.getTotalProductionOf(g) <= 0) needed.add(g);
         }
@@ -745,7 +744,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @return A copy of the exportGoods list.
      */
     public List<AIGoods> getAIGoods() {
-        return new ArrayList<AIGoods>(exportGoods);
+        return new ArrayList<>(exportGoods);
     }
 
     /**
@@ -833,7 +832,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
             final Europe europe = colony.getOwner().getEurope();
             final int capacity = colony.getWarehouseCapacity();
-            List<AIGoods> newAIGoods = new ArrayList<AIGoods>();
+            List<AIGoods> newAIGoods = new ArrayList<>();
             for (GoodsType g : getSpecification().getGoodsTypeList()) {
                 if (colony.getAdjustedNetProductionOf(g) < 0) continue;
                 int count = colony.getGoodsCount(g);
@@ -1007,7 +1006,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @return A copy of the wishes list.
      */
     public List<Wish> getWishes() {
-        return new ArrayList<Wish>(wishes);
+        return new ArrayList<>(wishes);
     }
 
     /**
@@ -1016,7 +1015,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @return A copy of the wishes list with non-goods wishes removed.
      */
     public List<GoodsWish> getGoodsWishes() {
-        List<GoodsWish> result = new ArrayList<GoodsWish>();
+        List<GoodsWish> result = new ArrayList<>();
         for (Wish wish : wishes) {
             if (wish instanceof GoodsWish) {
                 result.add((GoodsWish) wish);
@@ -1031,7 +1030,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @return A copy of the wishes list with non-worker wishes removed.
      */
     public List<WorkerWish> getWorkerWishes() {
-        List<WorkerWish> result = new ArrayList<WorkerWish>();
+        List<WorkerWish> result = new ArrayList<>();
         for (Wish wish : wishes) {
             if (wish instanceof WorkerWish) {
                 result.add((WorkerWish) wish);
@@ -1132,7 +1131,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // production because it could be in balance).
         // Add some weight when multiple cases of the same expert are
         // needed, rather than generating heaps of wishes.
-        List<GoodsType> producing = new ArrayList<GoodsType>();
+        List<GoodsType> producing = new ArrayList<>();
         for (WorkLocation wl : colony.getAvailableWorkLocations()) {
             for (Unit u : wl.getUnitList()) {
                 GoodsType work = u.getWorkType();
@@ -1314,7 +1313,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @return A copy of the tile improvement plan list.
      */
     public List<TileImprovementPlan> getTileImprovementPlans() {
-        return new ArrayList<TileImprovementPlan>(tileImprovementPlans);
+        return new ArrayList<>(tileImprovementPlans);
     }
 
     /**
@@ -1350,8 +1349,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     public void updateTileImprovementPlans(LogBuilder lb) {
-        List<TileImprovementPlan> newPlans
-            = new ArrayList<TileImprovementPlan>();
+        List<TileImprovementPlan> newPlans = new ArrayList<>();
         for (WorkLocation wl : colony.getAvailableWorkLocations()) {
             if (!(wl instanceof ColonyTile)) continue;
             ColonyTile colonyTile = (ColonyTile) wl;
@@ -1500,7 +1498,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     @Override
     public void dispose() {
-        List<AIObject> disposeList = new ArrayList<AIObject>();
+        List<AIObject> disposeList = new ArrayList<>();
         for (AIGoods ag : exportGoods) {
             if (ag.isDisposed() || ag.getGoods() == null) continue;
             if (ag.getGoods().getLocation() == colony) disposeList.add(ag);

@@ -46,7 +46,7 @@ public class ProductionMap {
 
         public ProductionTree(AbstractGoods root, AbstractGoods... leafs) {
             if (leafs.length > 0) {
-                this.leafs = new ArrayList<AbstractGoods>();
+                this.leafs = new ArrayList<>();
                 int amount = root.getAmount();
                 for (AbstractGoods leaf : leafs) {
                     this.leafs.add(new AbstractGoods(leaf));
@@ -144,7 +144,7 @@ public class ProductionMap {
     }
 
 
-    private Map<GoodsType, Object> cache = new HashMap<GoodsType, Object>();
+    private Map<GoodsType, Object> cache = new HashMap<>();
 
 
     public AbstractGoods get(GoodsType type) {

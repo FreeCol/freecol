@@ -39,7 +39,7 @@ public final class MetaRegister {
 
     private static Logger logger = Logger.getLogger(MetaRegister.class.getName());
 
-    private ArrayList<MetaItem> items = new ArrayList<MetaItem>();
+    private ArrayList<MetaItem> items = new ArrayList<>();
     
     
     /**

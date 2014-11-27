@@ -158,7 +158,7 @@ public class RearrangeColonyMessage extends DOMMessage {
         super(getXMLElementTagName());
 
         this.colonyId = colony.getId();
-        this.unitChanges = new ArrayList<UnitChange>();
+        this.unitChanges = new ArrayList<>();
     }
 
     /**
@@ -178,7 +178,7 @@ public class RearrangeColonyMessage extends DOMMessage {
         } catch (NumberFormatException nfe) {
             n = 0;
         }
-        this.unitChanges = new ArrayList<UnitChange>();
+        this.unitChanges = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             unitChanges.add(new UnitChange().readFromElement(game, element, i));
         }

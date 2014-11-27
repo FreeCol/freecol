@@ -71,12 +71,12 @@ public class ProductionCache {
     /**
      * The assigned entries.
      */
-    private final List<Entry> assigned = new ArrayList<Entry>();
+    private final List<Entry> assigned = new ArrayList<>();
 
     /**
      * The reserved entries.
      */
-    private final List<Entry> reserved = new ArrayList<Entry>();
+    private final List<Entry> reserved = new ArrayList<>();
 
     /**
      * Compares entries by production.
@@ -123,12 +123,12 @@ public class ProductionCache {
                 colonyTiles.add(colonyTile);
             }
         }
-        this.entries = new HashMap<GoodsType, List<Entry>>();
+        this.entries = new HashMap<>();
     }
 
     private List<Entry> createEntries(GoodsType goodsType) {
         // FIXME: OO/generic
-        List<Entry> result = new ArrayList<Entry>();
+        List<Entry> result = new ArrayList<>();
         if (goodsType.isFarmed()) {
             for (ColonyTile colonyTile : colonyTiles) {
                 Tile tile = colonyTile.getWorkTile();
@@ -196,7 +196,7 @@ public class ProductionCache {
     }
 
     public List<Entry> getEntries(List<GoodsType> goodsTypes, boolean useMarketValues) {
-        List<Entry> result = new ArrayList<Entry>();
+        List<Entry> result = new ArrayList<>();
         for (GoodsType goodsType : goodsTypes) {
             result.addAll(getEntries(goodsType));
         }
@@ -275,7 +275,7 @@ public class ProductionCache {
      */
     public static List<Entry> removeEntries(Unit unit, WorkLocation workLocation, List<Entry> entryList) {
         Iterator<Entry> entryIterator = entryList.iterator();
-        List<Entry> removedEntries = new ArrayList<Entry>();
+        List<Entry> removedEntries = new ArrayList<>();
         while (entryIterator.hasNext()) {
             Entry entry = entryIterator.next();
             if (entry.getUnit() == unit

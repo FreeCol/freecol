@@ -76,7 +76,7 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
             = GUI.getDefaultTextArea(Messages.message("goodsTransfer.text"));
 
         int defaultIndex = -1;
-        List<Integer> values = new ArrayList<Integer>();
+        List<Integer> values = new ArrayList<>();
         for (int index = 0; index < amounts.length; index++) {
             if (amounts[index] < available) {
                 if (amounts[index] == defaultAmount) defaultIndex = index;

@@ -661,7 +661,7 @@ public class ClientOptions extends OptionGroup {
      * @return A list of active mods.
      */
     public List<FreeColModFile> getActiveMods() {
-        List<FreeColModFile> active = new ArrayList<FreeColModFile>();
+        List<FreeColModFile> active = new ArrayList<>();
         ModListOption option = (ModListOption)getOption(ClientOptions.USER_MODS);
         if (option != null) {
             for (FreeColModFile modInfo : option.getOptionValues()) {

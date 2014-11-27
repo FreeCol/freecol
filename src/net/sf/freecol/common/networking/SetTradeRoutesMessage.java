@@ -67,7 +67,7 @@ public class SetTradeRoutesMessage extends DOMMessage {
     public SetTradeRoutesMessage(Game game, Element element) {
         super(getXMLElementTagName());
 
-        List<TradeRoute> newRoutes = new ArrayList<TradeRoute>();
+        List<TradeRoute> newRoutes = new ArrayList<>();
         NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             TradeRoute route
@@ -145,7 +145,7 @@ public class SetTradeRoutesMessage extends DOMMessage {
         }
         if (!"".equals(errors)) return DOMMessage.clientError(errors);
         
-        List<TradeRoute> newRoutes = new ArrayList<TradeRoute>();
+        List<TradeRoute> newRoutes = new ArrayList<>();
         for (TradeRoute tradeRoute : tradeRoutes) {
             TradeRoute realRoute
                 = game.getFreeColGameObject(removePrefix(tradeRoute),

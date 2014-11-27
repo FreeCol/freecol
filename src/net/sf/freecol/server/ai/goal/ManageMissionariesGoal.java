@@ -60,7 +60,7 @@ public class ManageMissionariesGoal extends Goal {
 
     public ManageMissionariesGoal(AIPlayer p, Goal g, float w) {
         super(p,g,w);
-        subGoalList = new ArrayList<Goal>();
+        subGoalList = new ArrayList<>();
     }
 
     protected Iterator<AIUnit> getOwnedAIUnitsIterator() {

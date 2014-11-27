@@ -56,25 +56,22 @@ public abstract class ReportUnitPanel extends ReportPanel {
     /**
      * Units in Europe.
      */
-    private List<Unit> inEurope = new ArrayList<Unit>();
+    private List<Unit> inEurope = new ArrayList<>();
 
     /**
      * Units in colonies.
      */
-    private Map<Colony, List<Unit>> inColonies
-        = new HashMap<Colony, List<Unit>>();
+    private Map<Colony, List<Unit>> inColonies = new HashMap<>();
 
     /**
      * Units in other locations.
      */
-    private Map<String, List<Unit>> inLocations
-        = new HashMap<String, List<Unit>>();
+    private Map<String, List<Unit>> inLocations = new HashMap<>();
 
     /**
      * Records the number of units of each type.
      */
-    private Map<String, TypeCountMap<UnitType>> units
-        = new HashMap<String, TypeCountMap<UnitType>>();
+    private Map<String, TypeCountMap<UnitType>> units = new HashMap<>();
 
     /**
      * Whether to show colonies even if no selected units are present.
@@ -114,7 +111,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         }
 
         // finally all other locations, sorted alphabetically
-        List<String> otherNames = new ArrayList<String>(inLocations.keySet());
+        List<String> otherNames = new ArrayList<>(inLocations.keySet());
         Collections.sort(otherNames);
         for (String locationName : otherNames) {
             handleLocation(null, locationName, inLocations.get(locationName));
@@ -164,14 +161,14 @@ public abstract class ReportUnitPanel extends ReportPanel {
                 String locationName = getLocationNameFor(unit);
                 List<Unit> unitList = inLocations.get(locationName);
                 if (unitList == null) {
-                    unitList = new ArrayList<Unit>();
+                    unitList = new ArrayList<>();
                     inLocations.put(locationName, unitList);
                 }
                 unitList.add(unit);
             } else {
                 List<Unit> unitList = inColonies.get(colony);
                 if (unitList == null) {
-                    unitList = new ArrayList<Unit>();
+                    unitList = new ArrayList<>();
                     inColonies.put(colony, unitList);
                 }
                 unitList.add(unit);

@@ -146,8 +146,7 @@ public final class DeclarationPanel extends FreeColPanel {
 
         private FAFile faFile;
 
-        private ArrayList<ActionListener> actionListeners
-            = new ArrayList<ActionListener>();
+        private ArrayList<ActionListener> actionListeners = new ArrayList<>();
 
         private Point[] points = null;
 

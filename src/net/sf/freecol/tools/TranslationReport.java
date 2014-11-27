@@ -48,7 +48,7 @@ public class TranslationReport {
     private static final boolean printSummary = true;
 
     public static void main(String[] args) throws Exception {
-        ArrayList<LanguageStatsRecord> statistics = new ArrayList<LanguageStatsRecord>();
+        ArrayList<LanguageStatsRecord> statistics = new ArrayList<>();
 
         //String dirName = "src/net/sf/freecol/client/gui/i18n/";
         String dirName = args[0];
@@ -78,9 +78,9 @@ public class TranslationReport {
             System.out.println("*** " + name + " ***");
             System.out.println(name.length()+8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);
 
-            ArrayList<String> missingKeys      = new ArrayList<String>();
-            ArrayList<String> missingVariables = new ArrayList<String>();
-            ArrayList<String> copiedFromMaster = new ArrayList<String>();
+            ArrayList<String> missingKeys      = new ArrayList<>();
+            ArrayList<String> missingVariables = new ArrayList<>();
+            ArrayList<String> copiedFromMaster = new ArrayList<>();
             
             for (Enumeration<Object> keys = master.keys() ; keys.hasMoreElements()  ;)  {
                 String key = (String) keys.nextElement();
@@ -156,8 +156,8 @@ public class TranslationReport {
             }
 
 
-            ArrayList<String> superfluousKeys = new ArrayList<String>();
-            ArrayList<String> superfluousVariables = new ArrayList<String>();
+            ArrayList<String> superfluousKeys = new ArrayList<>();
+            ArrayList<String> superfluousVariables = new ArrayList<>();
             for (Enumeration<Object> keys = properties.keys() ; keys.hasMoreElements()  ;)  {
                 String key = (String) keys.nextElement();
                 String value = master.getProperty(key, null);

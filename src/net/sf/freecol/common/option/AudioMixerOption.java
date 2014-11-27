@@ -116,8 +116,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
             : AUTODETECTED_MIXER.getMixerInfo());
 
     /** The available audio mixers. */
-    private static final List<MixerWrapper> audioMixers
-        = new ArrayList<MixerWrapper>();
+    private static final List<MixerWrapper> audioMixers = new ArrayList<>();
     static {
         for (Mixer.Info mi : AudioSystem.getMixerInfo()) {
             audioMixers.add(new MixerWrapper(mi.getName(), mi));
@@ -160,7 +159,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
      * @return The available mixers.
      */
     public List<MixerWrapper> getChoices() {
-        return new ArrayList<MixerWrapper>(audioMixers);
+        return new ArrayList<>(audioMixers);
     }
 
 

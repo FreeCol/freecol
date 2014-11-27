@@ -363,8 +363,8 @@ public final class PlayersTable extends JTable {
             this.preGameController = preGameController;
             this.nationOptions = nationOptions;
             this.thisPlayer = thisPlayer;
-            nations = new ArrayList<Nation>();
-            players = new HashMap<Nation, Player>();
+            nations = new ArrayList<>();
+            players = new HashMap<>();
             for (Nation nation : thisPlayer.getSpecification().getNations()) {
                 if (nation.isUnknownEnemy()) continue;
                 NationState state = nationOptions.getNations().get(nation);

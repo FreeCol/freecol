@@ -380,7 +380,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return a list of expert roles
      */
     public List<Role> getExpertRoles() {
-        List<Role> result = new ArrayList<Role>();
+        List<Role> result = new ArrayList<>();
         for (Role role : getSpecification().getRoles()) {
             if (role.getExpertUnit() == this) {
                 result.add(role);
@@ -426,7 +426,7 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     private void addTypeChange(UnitTypeChange change) {
         if (typeChanges == null) {
-            typeChanges = new ArrayList<UnitTypeChange>();
+            typeChanges = new ArrayList<>();
         }
         typeChanges.add(change);
     }
@@ -504,7 +504,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return A list of unit types.
      */
     public List<UnitType> getUnitTypesLearntInLostCity() {
-        List<UnitType> unitTypes = new ArrayList<UnitType>();
+        List<UnitType> unitTypes = new ArrayList<>();
         for (UnitTypeChange change : getTypeChanges()) {
             if (change.asResultOf(ChangeType.LOST_CITY)) {
                 unitTypes.add(change.getNewUnitType());
@@ -648,7 +648,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The goods consumed by this unit type.
      */
     public List<AbstractGoods> getConsumedGoods() {
-        List<AbstractGoods> result = new ArrayList<AbstractGoods>();
+        List<AbstractGoods> result = new ArrayList<>();
         if (consumption != null) {
             for (GoodsType goodsType : consumption.keySet()) {
                 result.add(new AbstractGoods(goodsType,
@@ -860,7 +860,7 @@ public final class UnitType extends BuildableType implements Consumer {
 
             if (parent.typeChanges != null) {
                 if (typeChanges == null) {
-                    typeChanges = new ArrayList<UnitTypeChange>();
+                    typeChanges = new ArrayList<>();
                 }
                 typeChanges.addAll(parent.typeChanges);
             }

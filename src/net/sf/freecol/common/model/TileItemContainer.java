@@ -62,7 +62,7 @@ public class TileItemContainer extends FreeColGameObject {
     private Tile tile;
 
     /** All tile items, sorted by zIndex. */
-    private final List<TileItem> tileItems = new ArrayList<TileItem>();
+    private final List<TileItem> tileItems = new ArrayList<>();
 
 
     /**
@@ -290,7 +290,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @return A list of <code>TileImprovement</code>s.
      */
     private List<TileImprovement> getImprovements(boolean completedOnly) {
-        List<TileImprovement> improvements = new ArrayList<TileImprovement>();
+        List<TileImprovement> improvements = new ArrayList<>();
         for (TileItem item : tileItems) {
             if (item instanceof TileImprovement
                 && (!completedOnly || ((TileImprovement)item).isComplete())) {
@@ -422,7 +422,7 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
-        List<Modifier> result = new ArrayList<Modifier>();
+        List<Modifier> result = new ArrayList<>();
         for (TileItem item : tileItems) {
             result.addAll(item.getProductionModifiers(goodsType, unitType));
         }
@@ -552,7 +552,7 @@ public class TileItemContainer extends FreeColGameObject {
     @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
-        for (TileItem ti : new ArrayList<TileItem>(tileItems)) {
+        for (TileItem ti : new ArrayList<>(tileItems)) {
             int integ = ti.checkIntegrity(fix);
             if (fix) {
                 // @compat 0.10.5

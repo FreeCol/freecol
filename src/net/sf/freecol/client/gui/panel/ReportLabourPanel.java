@@ -137,14 +137,14 @@ public final class ReportLabourPanel extends ReportPanel {
     public ReportLabourPanel(FreeColClient freeColClient) {
         super(freeColClient, Messages.message("reportLabourAction.name"));
 
-        this.data = new HashMap<UnitType, Map<Location, Integer>>();
+        this.data = new HashMap<>();
         this.unitCount = new TypeCountMap<UnitType>();
         for (Unit unit : getMyPlayer().getUnits()) {
             UnitType type = unit.getType();
             this.unitCount.incrementCount(type, 1);
             Map<Location, Integer> unitMap = this.data.get(type);
             if (unitMap == null) {
-                unitMap = new HashMap<Location, Integer>();
+                unitMap = new HashMap<>();
                 this.data.put(type, unitMap);
             }
 

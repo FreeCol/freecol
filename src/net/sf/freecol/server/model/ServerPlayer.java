@@ -145,11 +145,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
     private int remainingEmigrants = 0;
 
     /** Players with respect to which stance has changed. */
-    private List<ServerPlayer> stanceDirty = new ArrayList<ServerPlayer>();
+    private List<ServerPlayer> stanceDirty = new ArrayList<>();
 
     /** Accumulate extra trades here.  Do not serialize. */
-    private final List<AbstractGoods> extraTrades
-        = new ArrayList<AbstractGoods>();
+    private final List<AbstractGoods> extraTrades = new ArrayList<>();
 
 
     /**
@@ -732,9 +731,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (!hasFather(father) && father.isAvailableTo(this)) {
                 FoundingFatherType type = father.getType();
                 List<RandomChoice<FoundingFather>> rc = choices.get(type);
-                if (rc == null) {
-                    rc = new ArrayList<RandomChoice<FoundingFather>>();
-                }
+                if (rc == null) rc = new ArrayList<>();
                 int weight = father.getWeight(age);
                 rc.add(new RandomChoice<FoundingFather>(father, weight));
                 choices.put(father.getType(), rc);
@@ -742,7 +739,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Select one from each father type
-        List<FoundingFather> randomFathers = new ArrayList<FoundingFather>();
+        List<FoundingFather> randomFathers = new ArrayList<>();
         String logMessage = "Random fathers";
         for (FoundingFatherType type : FoundingFatherType.values()) {
             List<RandomChoice<FoundingFather>> rc = choices.get(type);
@@ -765,8 +762,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return A weighted list of recruitable unit types.
      */
     public List<RandomChoice<UnitType>> generateRecruitablesList() {
-        ArrayList<RandomChoice<UnitType>> recruitables
-            = new ArrayList<RandomChoice<UnitType>>();
+        ArrayList<RandomChoice<UnitType>> recruitables = new ArrayList<>();
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isRecruitable()
                 && hasAbility(Ability.CAN_RECRUIT_UNIT, unitType)) {
@@ -881,8 +877,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @see #hasExplored
      */
     public List<Tile> exploreTiles(List<Tile> tiles) {
-        List<Tile> result = new ArrayList<Tile>();
-        List<Tile> done = new ArrayList<Tile>();
+        List<Tile> result = new ArrayList<>();
+        List<Tile> done = new ArrayList<>();
         for (Tile t : tiles) {
             if (done.contains(t)) continue; // Ignore duplicates
             if (exploreTile(t)) result.add(t);
@@ -900,7 +896,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return A list of newly explored <code>Tile</code>s.
      */
     public List<Tile> exploreForSettlement(Settlement settlement) {
-        List<Tile> tiles = new ArrayList<Tile>(settlement.getOwnedTiles());
+        List<Tile> tiles = new ArrayList<>(settlement.getOwnedTiles());
         tiles.addAll(settlement.getTile().getSurroundingTiles(1,
                      settlement.getLineOfSight()));
         return exploreTiles(tiles);
@@ -929,7 +925,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return A list of tiles whose visibility changed.
      */
     public List<Tile> exploreMap(boolean reveal) {
-        List<Tile> result = new ArrayList<Tile>();
+        List<Tile> result = new ArrayList<>();
         for (Tile tile : getGame().getMap().getAllTiles()) {
             if (hasExplored(tile) != reveal) {
                 tile.setExplored(this, reveal);//-vis(this)
@@ -955,7 +951,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public List<Unit> createUnits(List<AbstractUnit> abstractUnits,
                                   Location location) {
-        List<Unit> units = new ArrayList<Unit>();
+        List<Unit> units = new ArrayList<>();
         if (location == null) return units;
 
         final Game game = getGame();
@@ -1024,7 +1020,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public List<Unit> loadShips(List<Unit> landUnits,
                                 List<Unit> navalUnits,
                                 Random random) {
-        List<Unit> leftOver = new ArrayList<Unit>();
+        List<Unit> leftOver = new ArrayList<>();
         randomShuffle(logger, "Naval load", navalUnits, random);
         randomShuffle(logger, "Land load", landUnits, random);
         LogBuilder lb = new LogBuilder(256);
@@ -1287,8 +1283,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         lb.add("PLAYER ", getName(), ": ");
 
         // Settlements
-        List<Settlement> settlements
-            = new ArrayList<Settlement>(getSettlements());
+        List<Settlement> settlements = new ArrayList<>(getSettlements());
         int newSoL = 0, newImmigration = getImmigration();
         for (Settlement settlement : settlements) {
             ((ServerModelObject)settlement).csNewTurn(random, lb, cs);
@@ -1317,7 +1312,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             modifyImmigration(europe.getImmigration(newImmigration));
         }
         // Units.
-        for (Unit unit : new ArrayList<Unit>(getUnits())) {
+        for (Unit unit : new ArrayList<>(getUnits())) {
             try {
                 ((ServerModelObject) unit).csNewTurn(random, lb, cs);
             } catch (ClassCastException e) {
@@ -1349,7 +1344,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 interventionBells = Integer.MIN_VALUE;
                 
                 // Enter near a port.
-                List<Colony> ports = new ArrayList<Colony>();
+                List<Colony> ports = new ArrayList<>();
                 for (Colony c : getColonies()) {
                     if (c.isConnectedPort()) ports.add(c);
                 }
@@ -1517,7 +1512,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .append(Messages.getName(disaster));
         if (colony != null) sb.append(" to ").append(colony.getName());
         sb.append(":");
-        List<Effect> effects = new ArrayList<Effect>();
+        List<Effect> effects = new ArrayList<>();
         switch (disaster.getNumberOfEffects()) {
         case ONE:
             effects.add(RandomChoice.getWeightedRandom(logger,
@@ -1543,7 +1538,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         logger.fine(sb.toString());
 
         boolean colonyDirty = false;
-        List<ModelMessage> messages = new ArrayList<ModelMessage>();
+        List<ModelMessage> messages = new ArrayList<>();
         for (Effect effect : effects) {
             if (colony == null) {
                 // currently, the only effects that can apply to the
@@ -1652,7 +1647,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     public Unit getUnitForEffect(Colony colony, Effect effect, Random random) {
-        List<Unit> units = new ArrayList<Unit>();
+        List<Unit> units = new ArrayList<>();
         for (Unit unit : colony.getUnitList()) {
             if (effect.appliesTo(unit.getType())) {
                 units.add(unit);
@@ -1783,12 +1778,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             // all the changes.
             List<IndianSettlement> allSettlements = getIndianSettlements();
             java.util.Map<IndianSettlement,
-                java.util.Map<Player, Tension.Level>> oldLevels
-                = new HashMap<IndianSettlement,
-                    java.util.Map<Player, Tension.Level>>();
+                java.util.Map<Player, Tension.Level>> oldLevels = new HashMap<>();
             for (IndianSettlement settlement : allSettlements) {
-                java.util.Map<Player, Tension.Level> oldLevel
-                    = new HashMap<Player, Tension.Level>();
+                java.util.Map<Player, Tension.Level> oldLevel = new HashMap<>();
                 oldLevels.put(settlement, oldLevel);
                 for (Player enemy : game.getLiveEuropeanPlayers(this)) {
                     Tension alarm = settlement.getAlarm(enemy);
@@ -1799,8 +1791,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
             // Do the settlement alarms first.
             for (IndianSettlement settlement : allSettlements) {
-                java.util.Map<Player, Integer> extra
-                    = new HashMap<Player, Integer>();
+                java.util.Map<Player, Integer> extra = new HashMap<>();
                 for (Player enemy : game.getLiveEuropeanPlayers(this)) {
                     extra.put(enemy, Integer.valueOf(0));
                 }
@@ -1986,7 +1977,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.add(See.only(this), this);
             // Some modifiers are special
             if (father.hasModifier(Modifier.LINE_OF_SIGHT_BONUS)) {
-                List<Tile> tiles = new ArrayList<Tile>();
+                List<Tile> tiles = new ArrayList<>();
                 for (Colony c : getColonies()) {
                     tiles.addAll(exploreForSettlement(c));
                 }
@@ -2101,7 +2092,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public List<BuildingType> getFreeBuildingTypes() {
         final Specification spec = getGame().getSpecification();
-        List<BuildingType> result = new ArrayList<BuildingType>();
+        List<BuildingType> result = new ArrayList<>();
         for (FoundingFather ff : getFathers()) {
             for (Event event : ff.getEvents()) {
                 String eventId = event.getId();
@@ -2831,7 +2822,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer colonyPlayer = (ServerPlayer) colony.getOwner();
         StringTemplate colonyNation = colonyPlayer.getNationName();
         Tile tile = colony.getTile();
-        List<Unit> units = new ArrayList<Unit>();
+        List<Unit> units = new ArrayList<>();
         units.addAll(colony.getUnitList());
         units.addAll(tile.getUnitList());
         int plunder = colony.getPlunder(attacker, random);
@@ -3382,8 +3373,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Try to reassign the tiles.  Do it in two passes so the first
         // successful claim does not give a large advantage.
         Settlement centerClaimant = null;
-        HashMap<Settlement, Integer> votes = new HashMap<Settlement,Integer>();
-        HashMap<Tile, Settlement> claims = new HashMap<Tile, Settlement>();
+        HashMap<Settlement, Integer> votes = new HashMap<>();
+        HashMap<Tile, Settlement> claims = new HashMap<>();
         Settlement claimant;
         for (Tile tile : owned) {
             votes.clear();
@@ -3444,7 +3435,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Former missionary owner knows that the settlement fell.
         if (missionaryOwner != null) {
-            List<Tile> surrounding = new ArrayList<Tile>();
+            List<Tile> surrounding = new ArrayList<>();
             for (Tile t : centerTile.getSurroundingTiles(1, radius)) {
                 if (!owned.contains(t)) surrounding.add(t);
             }

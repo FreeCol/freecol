@@ -78,7 +78,7 @@ public abstract class NationType extends FreeColGameObjectType {
      */
     private void addSettlementType(SettlementType settlementType) {
         if (settlementTypes == null) {
-            settlementTypes = new ArrayList<SettlementType>();
+            settlementTypes = new ArrayList<>();
         }
         settlementTypes.add(settlementType);
     }
@@ -90,7 +90,7 @@ public abstract class NationType extends FreeColGameObjectType {
      */
     private void addSettlementTypes(List<SettlementType> types) {
         if (settlementTypes == null) {
-            settlementTypes = new ArrayList<SettlementType>();
+            settlementTypes = new ArrayList<>();
         }
         settlementTypes.addAll(types);
     }

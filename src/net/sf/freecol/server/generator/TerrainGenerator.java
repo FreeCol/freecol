@@ -174,7 +174,7 @@ public class TerrainGenerator {
      */
     private TileType getRandomLandTileType(int latitude) {
         if (landTileTypes == null) {
-            landTileTypes = new ArrayList<TileType>();
+            landTileTypes = new ArrayList<>();
             for (TileType type : spec.getTileTypeList()) {
                 if (type.isElevation() || type.isWater()) {
                     // do not generate elevated and water tiles at this time
@@ -195,7 +195,7 @@ public class TerrainGenerator {
      */
     private TileType getRandomOceanTileType(int latitude) {
         if (oceanTileTypes == null) {
-            oceanTileTypes = new ArrayList<TileType>();
+            oceanTileTypes = new ArrayList<>();
             for (TileType type : spec.getTileTypeList()) {
                 if (type.isWater()
                     && type.isHighSeasConnected()
@@ -272,8 +272,7 @@ public class TerrainGenerator {
             - humidityDeviation;
         localeHumidity = limitToRange(localeHumidity, 0, 100);
 
-        List<TileType> candidateTileTypes
-            = new ArrayList<TileType>(candidates);
+        List<TileType> candidateTileTypes = new ArrayList<>(candidates);
 
         // Filter the candidates by temperature.
         int i = 0;
@@ -959,8 +958,8 @@ public class TerrainGenerator {
         final int number = getApproximateLandCount()
             / mapOptions.getInteger(MapGeneratorOptions.RIVER_NUMBER);
         int counter = 0;
-        HashMap<Tile, River> riverMap = new HashMap<Tile, River>();
-        List<River> rivers = new ArrayList<River>();
+        HashMap<Tile, River> riverMap = new HashMap<>();
+        List<River> rivers = new ArrayList<>();
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
@@ -1022,7 +1021,7 @@ public class TerrainGenerator {
         // Create the water map, and find any tiles that are water but
         // not part of any region (such as the oceans).  These are
         // lake tiles.
-        List<Tile> lakes = new ArrayList<Tile>();
+        List<Tile> lakes = new ArrayList<>();
         StringBuilder sb = new StringBuilder("Lakes at:");
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {
@@ -1058,8 +1057,8 @@ public class TerrainGenerator {
         Game game = map.getGame();
         final TileType lakeType = map.getSpecification()
             .getTileType("model.tile.lake");
-        List<Tile> todo = new ArrayList<Tile>();
-        List<ServerRegion> result = new ArrayList<ServerRegion>();
+        List<Tile> todo = new ArrayList<>();
+        List<ServerRegion> result = new ArrayList<>();
         int lakeCount = 0;
         while (!lakes.isEmpty()) {
             Tile tile = lakes.get(0);
@@ -1252,8 +1251,7 @@ public class TerrainGenerator {
         map.setMinimumLatitude(Math.min(minimumLatitude, maximumLatitude));
         map.setMaximumLatitude(Math.max(minimumLatitude, maximumLatitude));
 
-        java.util.Map<String, ServerRegion> regionMap
-            = new HashMap<String, ServerRegion>();
+        java.util.Map<String, ServerRegion> regionMap = new HashMap<>();
         if (importTerrain) { // Import the regions
             String ids = "";
             for (Region r : importGame.getMap().getRegions()) {
@@ -1275,7 +1273,7 @@ public class TerrainGenerator {
             logger.info("Imported regions: " + ids);
         }
 
-        List<Tile> fixRegions = new ArrayList<Tile>();
+        List<Tile> fixRegions = new ArrayList<>();
         for (int y = 0; y < height; y++) {
             int latitude = map.getLatitude(y);
             for (int x = 0; x < width; x++) {

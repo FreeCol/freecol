@@ -268,7 +268,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @param child The child <code>Region</code> to add.
      */
     public void addChild(Region child) {
-        if (children == null) children = new ArrayList<Region>();
+        if (children == null) children = new ArrayList<>();
         children.add(child);
     }
 

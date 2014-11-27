@@ -270,7 +270,7 @@ public final class QuickActionMenu extends JPopupMenu {
     }
 
     private List<JMenuItem> descendingList(final Map<JMenuItem, Integer> map) {
-        List<JMenuItem> ret = new ArrayList<JMenuItem>(map.keySet());
+        List<JMenuItem> ret = new ArrayList<>(map.keySet());
         Collections.sort(ret, new Comparator<JMenuItem>() {
                 public int compare(JMenuItem m1, JMenuItem m2) {
                     Integer i1 = map.get(m1);
@@ -319,8 +319,8 @@ public final class QuickActionMenu extends JPopupMenu {
             : colony.governmentChange(colony.getUnitCount() + 1);
         final int bonus = colony.getProductionBonus();
 
-        Map<JMenuItem, Integer> items = new HashMap<JMenuItem, Integer>();
-        Map<JMenuItem, Integer> extras = new HashMap<JMenuItem, Integer>();
+        Map<JMenuItem, Integer> items = new HashMap<>();
+        Map<JMenuItem, Integer> extras = new HashMap<>();
         JMenuItem expertOwned = null;
         JMenuItem expertUnowned = null;
         for (GoodsType type : spec.getGoodsTypeList()) {

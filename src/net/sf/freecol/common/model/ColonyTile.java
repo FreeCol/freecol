@@ -336,7 +336,7 @@ public class ColonyTile extends WorkLocation {
         final Player owner = colony.getOwner();
         final Turn turn = getGame().getTurn();
 
-        List<Modifier> mods = new ArrayList<Modifier>();
+        List<Modifier> mods = new ArrayList<>();
         if (unitType == null) {
             if (isColonyCenterTile()) { // Unattended only possible in center
                 mods.addAll(workTile.getProductionModifiers(goodsType, null));

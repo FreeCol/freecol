@@ -50,12 +50,10 @@ public final class Monarch extends FreeColGameObject implements Named {
     public class Force {
 
         /** The number of land units in the REF. */
-        private final List<AbstractUnit> landUnits
-            = new ArrayList<AbstractUnit>();
+        private final List<AbstractUnit> landUnits = new ArrayList<>();
 
         /** The number of naval units in the REF. */
-        private final List<AbstractUnit> navalUnits
-            = new ArrayList<AbstractUnit>();
+        private final List<AbstractUnit> navalUnits = new ArrayList<>();
 
         // Internal variables that do not need serialization.
         /** The space required to transport all land units. */
@@ -128,7 +126,7 @@ public final class Monarch extends FreeColGameObject implements Named {
          * @return A list of all units.
          */
         public final List<AbstractUnit> getUnits() {
-            List<AbstractUnit> result = new ArrayList<AbstractUnit>(landUnits);
+            List<AbstractUnit> result = new ArrayList<>(landUnits);
             result.addAll(navalUnits);
             return result;
         }
@@ -469,10 +467,10 @@ public final class Monarch extends FreeColGameObject implements Named {
     private void initializeCaches() {
         if (navalTypes != null) return;
         final Specification spec = getSpecification();
-        navalTypes = new ArrayList<UnitType>();
-        bombardTypes = new ArrayList<UnitType>();
-        landTypes = new ArrayList<UnitType>();
-        mercenaryTypes = new ArrayList<UnitType>();
+        navalTypes = new ArrayList<>();
+        bombardTypes = new ArrayList<>();
+        landTypes = new ArrayList<>();
+        mercenaryTypes = new ArrayList<>();
         navalREFUnitTypes = spec.getREFUnitTypes(true);
         landREFUnitTypes = spec.getREFUnitTypes(false);
 
@@ -509,7 +507,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return A list of potential enemy <code>Player</code>s.
      */
     public List<Player> collectPotentialEnemies() {
-        List<Player> enemies = new ArrayList<Player>();
+        List<Player> enemies = new ArrayList<>();
         // Benjamin Franklin puts an end to the monarch's interference
         if (!player.hasAbility(Ability.IGNORE_EUROPEAN_WARS)) {
             for (Player enemy : getGame().getLiveEuropeanPlayers(player)) {
@@ -535,7 +533,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return A list of potential friendly <code>Player</code>s.
      */
     public List<Player> collectPotentialFriends() {
-        List<Player> friends = new ArrayList<Player>();
+        List<Player> friends = new ArrayList<>();
         for (Player enemy : getGame().getLiveEuropeanPlayers(player)) {
             if (enemy.isREF()) continue;
             switch (player.getStance(enemy)) {
@@ -597,8 +595,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public List<RandomChoice<MonarchAction>> getActionChoices() {
         final Specification spec = getSpecification();
-        List<RandomChoice<MonarchAction>> choices
-            = new ArrayList<RandomChoice<MonarchAction>>();
+        List<RandomChoice<MonarchAction>> choices = new ArrayList<>();
         int dx = 1 + spec.getInteger(GameOptions.MONARCH_MEDDLING);
         int turn = getGame().getTurn().getNumber();
         int grace = (6 - dx) * 10; // 10-50
@@ -770,7 +767,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         initializeCaches();
 
         final Specification spec = getSpecification();
-        List<AbstractUnit> support = new ArrayList<AbstractUnit>();
+        List<AbstractUnit> support = new ArrayList<>();
         
         if (naval) {
             support.add(new AbstractUnit(getRandomMember(logger,
@@ -841,16 +838,16 @@ public final class Monarch extends FreeColGameObject implements Named {
         final Specification spec = getSpecification();
         final Role defaultRole = spec.getDefaultRole();
         final int mercPrice = spec.getInteger(GameOptions.MERCENARY_PRICE);
-        List<Role> landRoles = new ArrayList<Role>();
+        List<Role> landRoles = new ArrayList<>();
         landRoles.add(armedRole);
         landRoles.add(mountedRole);
 
         // FIXME: magic numbers for 2-4 mercs
-        List<AbstractUnit> mercs = new ArrayList<AbstractUnit>();
+        List<AbstractUnit> mercs = new ArrayList<>();
         int count = randomInt(logger, "Mercenary count", random, 2) + 2;
         int price = 0;
         UnitType unitType = null;
-        List<UnitType> unitTypes = new ArrayList<UnitType>(mercenaryTypes);
+        List<UnitType> unitTypes = new ArrayList<>(mercenaryTypes);
         while (!unitTypes.isEmpty() && count > 0) {
             unitType = getRandomMember(logger, "Merc unit",
                                        unitTypes, random);

@@ -185,8 +185,7 @@ final class ReceivingThread extends Thread {
 
     /** A map of network ids to the corresponding waiting thread. */
     private final Map<Integer, NetworkReplyObject> waitingThreads
-        = Collections.synchronizedMap(new HashMap<Integer,
-                                                  NetworkReplyObject>());
+        = Collections.synchronizedMap(new HashMap<Integer, NetworkReplyObject>());
 
     /** The wrapped version of the input stream. */
     private final FreeColNetworkInputStream in;

@@ -41,7 +41,7 @@ public class ResourceMapping {
      * Creates a new empty <code>ResourceMapping</code>.
      */
     public ResourceMapping() {
-        resources = new HashMap<String, Resource>();
+        resources = new HashMap<>();
     }
 
 
@@ -100,7 +100,7 @@ public class ResourceMapping {
      * @return A list of keys.
      */
     public List<String> getKeys(String prefix) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (String key : resources.keySet()) {
             if (key.startsWith(prefix)) {
                 result.add(key);

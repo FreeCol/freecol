@@ -207,8 +207,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
                     for (int stopIndex : indices) {
                         TradeRouteStop stop = TradeRouteInputPanel.this
                             .stopListModel.get(stopIndex);
-                        List<GoodsType> cargo
-                            = new ArrayList<GoodsType>(stop.getCargo());
+                        List<GoodsType> cargo = new ArrayList<>(stop.getCargo());
                         for (int index = 0; index < cargo.size(); index++) {
                             if (cargo.get(index) == label.getType()) {
                                 cargo.remove(index);
@@ -364,7 +363,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         protected Transferable createTransferable(JComponent c) {
             JList list = (JList)c;
             DefaultListModel model = (DefaultListModel)list.getModel();
-            List<TradeRouteStop> stops = new ArrayList<TradeRouteStop>();
+            List<TradeRouteStop> stops = new ArrayList<>();
             for (int index : list.getSelectedIndices()) {
                 stops.add((TradeRouteStop)model.get(index));
             }
@@ -664,7 +663,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             startIndex = sel;
             endIndex = startIndex+1;
         }
-        List<GoodsType> cargo = new ArrayList<GoodsType>();
+        List<GoodsType> cargo = new ArrayList<>();
         for (Component comp : cargoPanel.getComponents()) {
             CargoLabel label = (CargoLabel)comp;
             cargo.add(label.getType());

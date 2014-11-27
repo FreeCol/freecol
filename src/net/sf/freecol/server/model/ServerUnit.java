@@ -414,7 +414,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
                 settlement.addGoods(deliver.getType(), amount);
             } else {
-                List<Settlement> adjacent = new ArrayList<Settlement>();
+                List<Settlement> adjacent = new ArrayList<>();
                 int newAmount = amount;
                 for (Tile t : tile.getSurroundingTiles(2)) {
                     Settlement ts = t.getSettlement();
@@ -895,7 +895,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @return A list of new tiles to see.
      */
     public List<Tile> collectNewTiles(Tile tile) {
-        List<Tile> newTiles = new ArrayList<Tile>();
+        List<Tile> newTiles = new ArrayList<>();
         int los = getLineOfSight();
         for (Tile t : tile.getSurroundingTiles(0, los)) {
             if (!getOwner().canSee(t)) newTiles.add(t);
@@ -1007,7 +1007,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
 
             // Check for new contacts.
-            List<ServerPlayer> pending = new ArrayList<ServerPlayer>();
+            List<ServerPlayer> pending = new ArrayList<>();
             for (Tile t : newTile.getSurroundingTiles(1, 1)) {
                 if (t == null || !t.isLand()) {
                     continue; // Invalid tile for contact

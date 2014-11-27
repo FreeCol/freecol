@@ -89,8 +89,7 @@ public final class TileType extends FreeColGameObjectType {
      * the production types available if a tile of this type is a
      * colony center tile.
      */
-    private final List<ProductionType> productionTypes
-        = new ArrayList<ProductionType>();
+    private final List<ProductionType> productionTypes = new ArrayList<>();
 
 
     /**
@@ -232,7 +231,7 @@ public final class TileType extends FreeColGameObjectType {
      * @return A list of <code>ResourceType</code>s.
      */
     public List<ResourceType> getResourceTypes() {
-        List<ResourceType> result = new ArrayList<ResourceType>();
+        List<ResourceType> result = new ArrayList<>();
         if (resourceTypes != null) {
             for (RandomChoice<ResourceType> resource : resourceTypes) {
                 result.add(resource.getObject());
@@ -249,9 +248,7 @@ public final class TileType extends FreeColGameObjectType {
      *     present.
      */
     private void addResourceType(ResourceType type, int prob) {
-        if (resourceTypes == null) {
-            resourceTypes = new ArrayList<RandomChoice<ResourceType>>();
-        }
+        if (resourceTypes == null) resourceTypes = new ArrayList<>();
         resourceTypes.add(new RandomChoice<ResourceType>(type, prob));
     }
 
@@ -283,9 +280,7 @@ public final class TileType extends FreeColGameObjectType {
      * @param probability The probability of the disaster.
      */
     private void addDisaster(Disaster disaster, int probability) {
-        if (disasters == null) {
-            disasters = new ArrayList<RandomChoice<Disaster>>();
-        }
+        if (disasters == null) disasters = new ArrayList<>();
         disasters.add(new RandomChoice<Disaster>(disaster, probability));
     }
 
@@ -312,8 +307,8 @@ public final class TileType extends FreeColGameObjectType {
      */
     public List<ProductionType> getAvailableProductionTypes(boolean unattended,
                                                             String level) {
-        List<ProductionType> good = new ArrayList<ProductionType>(),
-            better = new ArrayList<ProductionType>();
+        List<ProductionType> good = new ArrayList<>(),
+            better = new ArrayList<>();
         for (ProductionType productionType : productionTypes) {
             if (productionType.isUnattended() != unattended) continue;
             if (productionType.appliesExactly(level)) {
@@ -394,7 +389,7 @@ public final class TileType extends FreeColGameObjectType {
      * @return A list of produced <code>AbstractGoods</code>.
      */
     public List<AbstractGoods> getPossibleProduction(boolean unattended) {
-        List<AbstractGoods> production = new ArrayList<AbstractGoods>();
+        List<AbstractGoods> production = new ArrayList<>();
         for (ProductionType pt : getAvailableProductionTypes(unattended)) {
             List<AbstractGoods> outputs = pt.getOutputs();
             if (!outputs.isEmpty()) production.addAll(outputs);

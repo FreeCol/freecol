@@ -68,14 +68,12 @@ public final class ReportRequirementsPanel extends ReportPanel {
     /**
      * Records the number of units indexed by colony and unit type.
      */
-    private Map<Colony, TypeCountMap<UnitType>> unitCount
-        = new HashMap<Colony, TypeCountMap<UnitType>>();
+    private Map<Colony, TypeCountMap<UnitType>> unitCount = new HashMap<>();
 
     /**
      * Records whether a colony can train a type of unit.
      */
-    private Map<Colony, Set<UnitType>> canTrain
-        = new HashMap<Colony, Set<UnitType>>();
+    private Map<Colony, Set<UnitType>> canTrain = new HashMap<>();
 
 
     /**
@@ -187,10 +185,10 @@ public final class ReportRequirementsPanel extends ReportPanel {
             }
         }
 
-        List<Tile> exploreTiles = new ArrayList<Tile>();
-        List<Tile> clearTiles = new ArrayList<Tile>();
-        List<Tile> plowTiles = new ArrayList<Tile>();
-        List<Tile> roadTiles = new ArrayList<Tile>();
+        List<Tile> exploreTiles = new ArrayList<>();
+        List<Tile> clearTiles = new ArrayList<>();
+        List<Tile> plowTiles = new ArrayList<>();
+        List<Tile> roadTiles = new ArrayList<>();
         colony.getColonyTileTodo(exploreTiles, clearTiles, plowTiles,
             roadTiles);
         for (Tile t : exploreTiles) {
@@ -284,9 +282,9 @@ public final class ReportRequirementsPanel extends ReportPanel {
         try {
             doc.insertString(doc.getLength(), "\n\n" + newMessage, doc.getStyle("regular"));
 
-            ArrayList<Colony> misusedExperts = new ArrayList<Colony>();
-            ArrayList<Colony> severalExperts = new ArrayList<Colony>();
-            ArrayList<Colony> canTrainExperts = new ArrayList<Colony>();
+            ArrayList<Colony> misusedExperts = new ArrayList<>();
+            ArrayList<Colony> severalExperts = new ArrayList<>();
+            ArrayList<Colony> canTrainExperts = new ArrayList<>();
             for (Colony colony : colonies) {
                 for (Unit unit : colony.getUnitList()) {
                     GoodsType expertise = unit.getType().getExpertProduction();
@@ -358,8 +356,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
         try {
             doc.insertString(doc.getLength(), "\n\n" + newMessage, doc.getStyle("regular"));
 
-            ArrayList<Colony> withSurplus = new ArrayList<Colony>();
-            ArrayList<Integer> theSurplus = new ArrayList<Integer>();
+            ArrayList<Colony> withSurplus = new ArrayList<>();
+            ArrayList<Integer> theSurplus = new ArrayList<>();
             for (Colony col : colonies) {
                 int amount = colony.getAdjustedNetProductionOf(input);
                 if (amount > 0) {

@@ -453,7 +453,7 @@ public class LabourData {
 
     public static List<UnitType> getLabourTypes(Player player) {
         List<UnitType> unitTypes = player.getSpecification().getUnitTypeList();
-        ArrayList<UnitType> labourTypes = new ArrayList<UnitType>();
+        ArrayList<UnitType> labourTypes = new ArrayList<>();
         for (UnitType unitType : unitTypes) {
             if (unitType.hasSkill() && unitType.isAvailableTo(player)) {
                 labourTypes.add(unitType);

@@ -261,7 +261,7 @@ public final class ReportColonyPanel extends ReportPanel
 
     private void initializeCompactColonyPanel() {
         Specification spec = getSpecification();
-        goodsTypes = new ArrayList<GoodsType>(spec.getGoodsTypeList());
+        goodsTypes = new ArrayList<>(spec.getGoodsTypeList());
         Collections.sort(goodsTypes, goodsComparator);
         while (!goodsTypes.get(0).isStorable()
             || goodsTypes.get(0).isTradeGoods()) {
@@ -341,10 +341,10 @@ public final class ReportColonyPanel extends ReportPanel
 
         // Assemble the fundamental facts about this colony
         final String cac = colony.getId();
-        List<Tile> exploreTiles = new ArrayList<Tile>();
-        List<Tile> clearTiles = new ArrayList<Tile>();
-        List<Tile> plowTiles = new ArrayList<Tile>();
-        List<Tile> roadTiles = new ArrayList<Tile>();
+        List<Tile> exploreTiles = new ArrayList<>();
+        List<Tile> clearTiles = new ArrayList<>();
+        List<Tile> plowTiles = new ArrayList<>();
+        List<Tile> roadTiles = new ArrayList<>();
         colony.getColonyTileTodo(exploreTiles, clearTiles, plowTiles,
             roadTiles);
         boolean plowMe = plowTiles.size() > 0
@@ -538,12 +538,10 @@ public final class ReportColonyPanel extends ReportPanel
         // FIXME: this needs to be merged with the requirements
         // checking code, but that in turn should be opened up
         // so the AI can use it...
-        HashMap<UnitType, Suggestion> improve
-            = new HashMap<UnitType, Suggestion>();
-        HashMap<UnitType, Suggestion> want
-            = new HashMap<UnitType, Suggestion>();
-        List<Unit> teachers = new ArrayList<Unit>();
-        List<Unit> notWorking = new ArrayList<Unit>();
+        HashMap<UnitType, Suggestion> improve = new HashMap<>();
+        HashMap<UnitType, Suggestion> want = new HashMap<>();
+        List<Unit> teachers = new ArrayList<>();
+        List<Unit> notWorking = new ArrayList<>();
         for (Unit u : colony.getTile().getUnitList()) {
             if (u.getState() != Unit.UnitState.FORTIFIED
                 && u.getState() != Unit.UnitState.SENTRY) {
@@ -598,7 +596,7 @@ public final class ReportColonyPanel extends ReportPanel
         }
         // Make a list of unit types that are not working at their
         // speciality, including the units just standing around.
-        List<UnitType> couldWork = new ArrayList<UnitType>();
+        List<UnitType> couldWork = new ArrayList<>();
         for (Unit u : notWorking) {
             GoodsType t = u.getWorkType();
             WorkLocation wl = u.getWorkLocation();
@@ -850,7 +848,7 @@ public final class ReportColonyPanel extends ReportPanel
 
         String layout = (suggestions.size() <= 1) ? null
             : "split " + Integer.toString(suggestions.size());
-        List<UnitType> types = new ArrayList<UnitType>();
+        List<UnitType> types = new ArrayList<>();
         types.addAll(suggestions.keySet());
         Collections.sort(types, new Comparator<UnitType>() {
                 public int compare(UnitType t1, UnitType t2) {
@@ -897,7 +895,7 @@ public final class ReportColonyPanel extends ReportPanel
             return (outputs.isEmpty()) ? null : outputs.get(0).getType();
         } else {
             final Specification spec = getSpecification();
-            List<AbstractGoods> prod = new ArrayList<AbstractGoods>();
+            List<AbstractGoods> prod = new ArrayList<>();
             for (GoodsType g : spec.getGoodsTypeList()) {
                 int amount = wl.getPotentialProduction(g, type);
                 if (amount > 0) prod.add(new AbstractGoods(g, amount));

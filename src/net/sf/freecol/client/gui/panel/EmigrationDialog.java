@@ -55,8 +55,7 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
         super(freeColClient);
 
         final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
-        final List<UnitType> recruitables
-            = new ArrayList<UnitType>(europe.getRecruitables());
+        final List<UnitType> recruitables = new ArrayList<>(europe.getRecruitables());
 
         String hdr = Messages.message("chooseImmigrant");
         JTextArea header = GUI.getDefaultTextArea(hdr);

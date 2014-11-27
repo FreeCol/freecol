@@ -802,7 +802,7 @@ public class Unit extends GoodsLocation
      */
     public List<Role> getAvailableRoles(List<Role> roles) {
         if (roles == null) roles = getSpecification().getRoles();
-        List<Role> result = new ArrayList<Role>();
+        List<Role> result = new ArrayList<>();
         for (Role role : roles) {
             if (roleIsAvailable(role)) result.add(role);
         }
@@ -3938,7 +3938,7 @@ public class Unit extends GoodsLocation
      */
     @Override
     public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        List<FreeColGameObject> objects = new ArrayList<>();
 
         if (location != null) {
             location.remove(this);

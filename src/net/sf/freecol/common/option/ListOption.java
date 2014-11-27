@@ -48,8 +48,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     private int maximumNumber = Integer.MAX_VALUE;
 
     /** The list of options. */
-    private final List<AbstractOption<T>> value
-        = new ArrayList<AbstractOption<T>>();
+    private final List<AbstractOption<T>> value = new ArrayList<>();
 
     /**
      * Whether the list can include duplicates.  This was always true before
@@ -102,7 +101,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      * @return A list of option values.
      */
     public List<T> getOptionValues() {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         for (AbstractOption<T> option : value) {
             if (option != null) result.add(option.getValue());
         }
@@ -172,8 +171,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
         // Fail fast: the list value may be empty, but it must not be null.
         if (value==null) throw new IllegalArgumentException("Null ListOption");
 
-        List<AbstractOption<T>> oldValue
-            = new ArrayList<AbstractOption<T>>(this.value);
+        List<AbstractOption<T>> oldValue = new ArrayList<>(this.value);
         this.value.clear();
         for (AbstractOption<T> op : value) addMember(op);
 

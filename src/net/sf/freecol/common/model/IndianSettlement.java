@@ -141,11 +141,10 @@ public class IndianSettlement extends Settlement {
      * At the client side, only the information regarding the player
      * on that client should be included.
      */
-    protected final java.util.Map<Player, ContactLevel> contactLevels
-        = new HashMap<Player, ContactLevel>();
+    protected final java.util.Map<Player, ContactLevel> contactLevels = new HashMap<>();
 
     /** Units that belong to this settlement. */
-    protected List<Unit> ownedUnits = new ArrayList<Unit>();
+    protected List<Unit> ownedUnits = new ArrayList<>();
 
     /** The missionary at this settlement. */
     protected Unit missionary = null;
@@ -167,8 +166,7 @@ public class IndianSettlement extends Settlement {
      * has never been contacted by a player, alarm.get(player) will be null.
      * Acts causing contact initialize this variable.
      */
-    protected final java.util.Map<Player, Tension> alarm
-        = new HashMap<Player, Tension>();
+    protected final java.util.Map<Player, Tension> alarm = new HashMap<>();
 
 
     /**
@@ -219,7 +217,7 @@ public class IndianSettlement extends Settlement {
      * @return The list of units native to this settlement.
      */
     public List<Unit> getOwnedUnits() {
-        return new ArrayList<Unit>(ownedUnits);
+        return new ArrayList<>(ownedUnits);
     }
 
     /**
@@ -841,7 +839,7 @@ public class IndianSettlement extends Settlement {
      * @return A list of goods to sell.
      */
     public List<Goods> getSellGoods(int limit, Unit unit) {
-        List<Goods> result = new ArrayList<Goods>();
+        List<Goods> result = new ArrayList<>();
         List<Goods> settlementGoods = getCompactGoods();
         Collections.sort(settlementGoods, exportGoodsComparator);
 
@@ -879,7 +877,7 @@ public class IndianSettlement extends Settlement {
     public void tradeGoodsWithSettlement(IndianSettlement settlement) {
         GoodsType armsType = getSpecification().getGoodsType("model.goods.muskets");
         GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
-        List<GoodsType> goodsToTrade = new ArrayList<GoodsType>();
+        List<GoodsType> goodsToTrade = new ArrayList<>();
         goodsToTrade.add(armsType);
         goodsToTrade.add(horsesType);
 
@@ -923,10 +921,8 @@ public class IndianSettlement extends Settlement {
      */
     public void updateWantedGoods() {
         final Specification spec = getSpecification();
-        List<GoodsType> goodsTypes
-            = new ArrayList<GoodsType>(spec.getGoodsTypeList());
-        final java.util.Map<GoodsType, Integer> prices
-            = new HashMap<GoodsType, Integer>();
+        List<GoodsType> goodsTypes = new ArrayList<>(spec.getGoodsTypeList());
+        final java.util.Map<GoodsType, Integer> prices = new HashMap<>();
         for (GoodsType gt : goodsTypes) {
             prices.put(gt, getNormalGoodsPriceToBuy(gt, GoodsContainer.CARGO_SIZE));
         }
@@ -987,7 +983,7 @@ public class IndianSettlement extends Settlement {
      * @return A random goods gift, or null if none found.
      */
     public Goods getRandomGift(Random random) {
-        List<Goods> goodsList = new ArrayList<Goods>();
+        List<Goods> goodsList = new ArrayList<>();
         for (GoodsType type : getSpecification().getNewWorldGoodsTypeList()) {
             int n = getGoodsCount(type) - KEEP_RAW_MATERIAL;
             if (n >= GIFT_THRESHOLD) {
@@ -1011,8 +1007,7 @@ public class IndianSettlement extends Settlement {
      * @param random A pseudo-random number source.
      */
     public void addRandomGoods(Random random) {
-        HashMap<GoodsType, Integer> goodsMap
-            = new HashMap<GoodsType, Integer>();
+        HashMap<GoodsType, Integer> goodsMap = new HashMap<>();
         for (Tile t : getOwnedTiles()) {
             for (AbstractGoods ag : t.getSortedPotential()) {
                 GoodsType type = ag.getType().getStoredAs();

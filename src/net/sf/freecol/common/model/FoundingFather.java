@@ -162,7 +162,7 @@ public class FoundingFather extends FreeColGameObjectType {
      * @param event The <code>Event</code> to add.
      */
     private void addEvent(Event event) {
-        if (events == null) events = new ArrayList<Event>();
+        if (events == null) events = new ArrayList<>();
         events.add(event);
     }
 
@@ -193,7 +193,7 @@ public class FoundingFather extends FreeColGameObjectType {
      * @param scope The <code>Scope</code> to add.
      */
     private void addScope(Scope scope) {
-        if (scopes == null) scopes = new ArrayList<Scope>();
+        if (scopes == null) scopes = new ArrayList<>();
         scopes.add(scope);
     }
 
@@ -225,9 +225,7 @@ public class FoundingFather extends FreeColGameObjectType {
      * @param toType The upgraded <code>UnitType</code>.
      */
     private void addUpgrade(UnitType fromType, UnitType toType) {
-        if (upgrades == null) {
-            upgrades = new HashMap<UnitType, UnitType>();
-        }
+        if (upgrades == null) upgrades = new HashMap<>();
         upgrades.put(fromType, toType);
     }
 
@@ -258,7 +256,7 @@ public class FoundingFather extends FreeColGameObjectType {
      * @param unit The <code>AbstractUnit</code> to add.
      */
     private void addUnit(AbstractUnit unit) {
-        if (units == null) units = new ArrayList<AbstractUnit>();
+        if (units == null) units = new ArrayList<>();
         units.add(unit);
     }
 

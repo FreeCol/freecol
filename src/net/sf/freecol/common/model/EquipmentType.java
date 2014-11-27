@@ -149,9 +149,7 @@ public class EquipmentType extends BuildableType {
      * @param equipmentId The equipment identifier.
      */
     private void addCompatibleEquipment(String equipmentId) {
-        if (compatibleEquipment == null) {
-            compatibleEquipment = new ArrayList<String>();
-        }
+        if (compatibleEquipment == null) compatibleEquipment = new ArrayList<>();
         compatibleEquipment.add(equipmentId);
     }
 

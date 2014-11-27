@@ -46,8 +46,7 @@ public class EuropeanNationType extends NationType {
      * Stores the starting units of this Nation at various
      * difficulties.
      */
-    private Map<String, Map<String, AbstractUnit>> startingUnitMap
-        = new HashMap<String, Map<String, AbstractUnit>>();
+    private Map<String, Map<String, AbstractUnit>> startingUnitMap = new HashMap<>();
 
 
     /**
@@ -106,7 +105,7 @@ public class EuropeanNationType extends NationType {
      * @return A list of <code>AbstractUnit</code>s to start with.
      */
     public List<AbstractUnit> getStartingUnits(String key) {
-        Map<String, AbstractUnit> result = new HashMap<String, AbstractUnit>();
+        Map<String, AbstractUnit> result = new HashMap<>();
         Map<String, AbstractUnit> defaultMap = startingUnitMap.get(null);
         Map<String, AbstractUnit> difficultyMap = startingUnitMap.get(key);
         if (defaultMap != null) {
@@ -115,7 +114,7 @@ public class EuropeanNationType extends NationType {
         if (difficultyMap != null) {
             result.putAll(difficultyMap);
         }
-        return new ArrayList<AbstractUnit>(result.values());
+        return new ArrayList<>(result.values());
     }
 
     /**
@@ -129,7 +128,7 @@ public class EuropeanNationType extends NationType {
         String exTag = (expert) ? Boolean.TRUE.toString() : null;
         Map<String, AbstractUnit> units = startingUnitMap.get(exTag);
         if (units == null) {
-            units = new HashMap<String, AbstractUnit>();
+            units = new HashMap<>();
             startingUnitMap.put(exTag, units);
         }
         units.put(id, unit);
@@ -228,8 +227,7 @@ public class EuropeanNationType extends NationType {
         if (parent != this) {
             for (Map.Entry<String, Map<String, AbstractUnit>> entry
                      : parent.startingUnitMap.entrySet()) {
-                startingUnitMap.put(entry.getKey(),
-                    new HashMap<String, AbstractUnit>(entry.getValue()));
+                startingUnitMap.put(entry.getKey(), new HashMap<>(entry.getValue()));
             }
         }
 

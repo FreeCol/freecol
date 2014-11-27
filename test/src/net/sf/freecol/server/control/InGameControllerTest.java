@@ -952,8 +952,7 @@ public class InGameControllerTest extends FreeColTestCase {
                      colonist, colony.getDefendingUnit(attacker));
         dutch.addFather(spec()
                         .getFoundingFather("model.foundingFather.paulRevere"));
-        java.util.Map<GoodsType,Integer> goodsAdded
-            = new HashMap<GoodsType,Integer>();
+        java.util.Map<GoodsType,Integer> goodsAdded = new HashMap<>();
         for (AbstractGoods goods : soldierRole.getRequiredGoods()) {
             colony.addGoods(goods);
             goodsAdded.put(goods.getType(), goods.getAmount());
@@ -1814,7 +1813,7 @@ public class InGameControllerTest extends FreeColTestCase {
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         assertTrue(dutch.getUnits().isEmpty());
-        List<AbstractUnit> units = new ArrayList<AbstractUnit>();
+        List<AbstractUnit> units = new ArrayList<>();
         units.add(new AbstractUnit(colonistType, Specification.DEFAULT_ROLE_ID, 1));
         units.add(new AbstractUnit(statesmanType, Specification.DEFAULT_ROLE_ID, 1));
         FoundingFather father = new FoundingFather("father", spec());
@@ -1841,7 +1840,7 @@ public class InGameControllerTest extends FreeColTestCase {
 
         FoundingFather father = new FoundingFather("father", spec());
         father.setType(FoundingFatherType.TRADE);
-        java.util.Map<UnitType, UnitType> upgrades = new HashMap<UnitType, UnitType>();
+        java.util.Map<UnitType, UnitType> upgrades = new HashMap<>();
         upgrades.put(indenturedServantType, colonistType);
         upgrades.put(colonistType, statesmanType);
         father.setUpgrades(upgrades);
@@ -1863,7 +1862,7 @@ public class InGameControllerTest extends FreeColTestCase {
 
         FoundingFather father = new FoundingFather("father", spec());
         father.setType(FoundingFatherType.TRADE);
-        List<Event> events = new ArrayList<Event>();
+        List<Event> events = new ArrayList<>();
         Event event = new Event("model.event.freeBuilding", spec());
         event.setValue("model.building.printingPress");
         events.add(event);
@@ -1947,7 +1946,7 @@ public class InGameControllerTest extends FreeColTestCase {
                                            -100f, ModifierType.PERCENTAGE);
         Scope pressScope = new Scope();
         pressScope.setType("model.building.printingPress");
-        List<Scope> scopeList = new ArrayList<Scope>();
+        List<Scope> scopeList = new ArrayList<>();
         scopeList.add(pressScope);
         priceBonus.setScopes(scopeList);
         father.addModifier(priceBonus);
@@ -2102,7 +2101,7 @@ public class InGameControllerTest extends FreeColTestCase {
         UnitTypeChange change = new UnitTypeChange();
         change.setNewUnitType(farmerType);
         change.getChangeTypes().put(enterColony, 100);
-        List<UnitTypeChange> ch = new ArrayList<UnitTypeChange>(gardenerType.getTypeChanges());
+        List<UnitTypeChange> ch = new ArrayList<>(gardenerType.getTypeChanges());
         ch.add(change);
         gardenerType.setTypeChanges(ch);
 

@@ -190,9 +190,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * @param scope The <code>Scope</code> to add.
      */
     private void addScope(Scope scope) {
-        if (scopes == null) {
-            scopes = new ArrayList<Scope>();
-        }
+        if (scopes == null) scopes = new ArrayList<>();
         scopes.add(scope);
     }
 
@@ -215,9 +213,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * @param probability The probability of the disaster.
      */
     private void addDisaster(Disaster disaster, int probability) {
-        if (disasters == null) {
-            disasters = new ArrayList<RandomChoice<Disaster>>();
-        }
+        if (disasters == null) disasters = new ArrayList<>();
         disasters.add(new RandomChoice<Disaster>(disaster, probability));
     }
 
@@ -370,9 +366,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * @param change The <code>TileTypeChange</code> to add.
      */
     private void addChange(TileTypeChange change) {
-        if (tileTypeChanges == null) {
-            tileTypeChanges = new HashMap<TileType, TileTypeChange>();
-        }
+        if (tileTypeChanges == null) tileTypeChanges = new HashMap<>();
         tileTypeChanges.put(change.getFrom(), change);
     }
 
@@ -503,8 +497,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
         }
 
         if (tileTypeChanges != null) {
-            List<TileTypeChange> sorted
-                = new ArrayList<TileTypeChange>(tileTypeChanges.values());
+            List<TileTypeChange> sorted = new ArrayList<>(tileTypeChanges.values());
             Collections.sort(sorted);
             for (TileTypeChange change : sorted) change.toXML(xw);
         }

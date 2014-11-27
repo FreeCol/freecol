@@ -43,14 +43,14 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     private static Logger logger = Logger.getLogger(OptionGroup.class.getName());
 
     /** The options in this group. */
-    private final List<Option> options = new ArrayList<Option>();
+    private final List<Option> options = new ArrayList<>();
 
     /**
      * A map of all option ids to its option.  Unlike the options
      * array, this contains all child options of options that are
      * themselves groups.
      */
-    private final Map<String, Option> optionMap = new HashMap<String, Option>();
+    private final Map<String, Option> optionMap = new HashMap<>();
 
     /** Is this option group user editable? */
     private boolean editable = true;

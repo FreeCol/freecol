@@ -72,7 +72,7 @@ public final class ReportTradePanel extends ReportPanel {
         goodsHeader.setBorder(new EmptyBorder(20, 20, 0, 20));
         scrollPane.setColumnHeaderView(goodsHeader);
 
-        List<GoodsType> storableGoods = new ArrayList<GoodsType>();
+        List<GoodsType> storableGoods = new ArrayList<>();
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             if (goodsType.isStorable()) {
                 storableGoods.add(goodsType);

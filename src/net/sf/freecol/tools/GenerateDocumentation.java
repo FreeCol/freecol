@@ -53,8 +53,7 @@ public class GenerateDocumentation {
     private static final File DESTINATION_DIRECTORY =
         new File("doc");
 
-    private static Map<String, String> resources =
-        new HashMap<String, String>();
+    private static Map<String, String> resources = new HashMap<>();
 
     private static String[] sourceFiles = STRING_DIRECTORY.list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -101,8 +100,7 @@ public class GenerateDocumentation {
 
     private static void generateTMX() {
 
-        Map<String, Map<String, String>> translations
-            = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> translations = new HashMap<>();
 
         for (String name : sourceFiles) {
 
@@ -133,7 +131,7 @@ public class GenerateDocumentation {
                             .replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
                         Map<String, String> map = translations.get(key);
                         if (map == null) {
-                            map = new HashMap<String, String>();
+                            map = new HashMap<>();
                             translations.put(key, map);
                         }
                         map.put(languageCode, value);

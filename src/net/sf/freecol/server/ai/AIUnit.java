@@ -539,7 +539,7 @@ public class AIUnit extends TransportableAIObject {
         if (tile.isLand()) return leaveTransport(null);
 
         // Collect neighbouring land tiles, get off if one has our settlement
-        List<Tile> tiles = new ArrayList<Tile>();
+        List<Tile> tiles = new ArrayList<>();
         for (Tile t : tile.getSurroundingTiles(1)) {
             if (!t.isBlocked(unit)) {
                 if (t.getSettlement() != null) {

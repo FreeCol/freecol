@@ -95,7 +95,7 @@ public class ConceptDetailPanel extends FreeColPanel
     public void addSubTrees(DefaultMutableTreeNode root) {
         DefaultMutableTreeNode node =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, id, getName(), null));
-        List<DefaultMutableTreeNode> nodes = new ArrayList<DefaultMutableTreeNode>();
+        List<DefaultMutableTreeNode> nodes = new ArrayList<>();
         for (String concept : concepts) {
             String nodeId = "colopedia.concepts." + concept;
             String nodeName = Messages.getName(nodeId);

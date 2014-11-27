@@ -308,8 +308,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                   resourceType.getMaxValue()));
                     return;
                 default:
-                    List<ChoiceItem<ResourceType>> choices
-                        = new ArrayList<ChoiceItem<ResourceType>>();
+                    List<ChoiceItem<ResourceType>> choices = new ArrayList<>();
                     for (ResourceType rt : resList) {
                         String name = Messages.message(rt.getNameKey());
                         choices.add(new ChoiceItem<ResourceType>(name, rt));

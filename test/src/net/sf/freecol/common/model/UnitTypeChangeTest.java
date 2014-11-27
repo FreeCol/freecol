@@ -60,11 +60,11 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         UnitTypeChange change = new UnitTypeChange();
         change.setNewUnitType(farmer);
         change.getChangeTypes().put(education, 100);
-        List<Scope> scopes = new ArrayList<Scope>(change.getScopes());
+        List<Scope> scopes = new ArrayList<>(change.getScopes());
         scopes.add(scope);
         change.setScopes(scopes);
 
-        List<UnitTypeChange> ch = new ArrayList<UnitTypeChange>(gardener.getTypeChanges());
+        List<UnitTypeChange> ch = new ArrayList<>(gardener.getTypeChanges());
         ch.add(change);
         gardener.setTypeChanges(ch);
 
@@ -93,7 +93,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         change.setNewUnitType(farmer);
         change.getChangeTypes().put(creation, 100);
 
-        List<UnitTypeChange> ch = new ArrayList<UnitTypeChange>(gardener.getTypeChanges());
+        List<UnitTypeChange> ch = new ArrayList<>(gardener.getTypeChanges());
         ch.add(change);
         gardener.setTypeChanges(ch);
 

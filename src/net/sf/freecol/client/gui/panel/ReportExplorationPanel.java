@@ -62,7 +62,7 @@ public final class ReportExplorationPanel extends ReportPanel {
         // Display Panel
         reportPanel.removeAll();
 
-        List<Region> regions = new ArrayList<Region>();
+        List<Region> regions = new ArrayList<>();
         for (Region region : getGame().getMap().getRegions()) {
             if (region.getDiscoveredIn() != null) {
                 regions.add(region);

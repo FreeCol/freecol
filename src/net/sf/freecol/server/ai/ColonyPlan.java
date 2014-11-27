@@ -149,7 +149,7 @@ public class ColonyPlan {
                                  difficulty, getValue());
         }
     };
-    private final List<BuildPlan> buildPlans = new ArrayList<BuildPlan>();
+    private final List<BuildPlan> buildPlans = new ArrayList<>();
 
     /**
      * Comparator to sort buildable types on their priority in the
@@ -164,34 +164,24 @@ public class ColonyPlan {
         };
 
     /** Plans for work locations available to this colony. */
-    private final List<WorkLocationPlan> workPlans
-        = new ArrayList<WorkLocationPlan>();
+    private final List<WorkLocationPlan> workPlans = new ArrayList<>();
 
     /** The goods types to produce. */
-    private final List<GoodsType> produce = new ArrayList<GoodsType>();
+    private final List<GoodsType> produce = new ArrayList<>();
 
     /**
      * Lists of goods types to be produced in this colony.
      * Temporary variables that do not need to be serialized.
      */
-    private final List<GoodsType> foodGoodsTypes
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> libertyGoodsTypes
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> immigrationGoodsTypes
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> militaryGoodsTypes
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> rawBuildingGoodsTypes
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> buildingGoodsTypes
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> rawLuxuryGoodsTypes
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> luxuryGoodsTypes
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> otherRawGoodsTypes
-        = new ArrayList<GoodsType>();
+    private final List<GoodsType> foodGoodsTypes = new ArrayList<>();
+    private final List<GoodsType> libertyGoodsTypes = new ArrayList<>();
+    private final List<GoodsType> immigrationGoodsTypes = new ArrayList<>();
+    private final List<GoodsType> militaryGoodsTypes = new ArrayList<>();
+    private final List<GoodsType> rawBuildingGoodsTypes = new ArrayList<>();
+    private final List<GoodsType> buildingGoodsTypes = new ArrayList<>();
+    private final List<GoodsType> rawLuxuryGoodsTypes = new ArrayList<>();
+    private final List<GoodsType> luxuryGoodsTypes = new ArrayList<>();
+    private final List<GoodsType> otherRawGoodsTypes = new ArrayList<>();
 
 
     /**
@@ -238,7 +228,7 @@ public class ColonyPlan {
      * @return A copy of the preferred goods production list in this plan.
      */
     public List<GoodsType> getPreferredProduction() {
-        return new ArrayList<GoodsType>(produce);
+        return new ArrayList<>(produce);
     }
 
     /**
@@ -248,7 +238,7 @@ public class ColonyPlan {
      * @return A copy of the of <code>BuildableType</code>s list.
      */
     public List<BuildableType> getBuildableTypes() {
-        List<BuildableType> build = new ArrayList<BuildableType>();
+        List<BuildableType> build = new ArrayList<>();
         for (BuildPlan b : buildPlans) build.add(b.type);
         return build;
     }
@@ -285,7 +275,7 @@ public class ColonyPlan {
      * @return A list of food producing plans.
      */
     public List<WorkLocationPlan> getFoodPlans() {
-        List<WorkLocationPlan> plans = new ArrayList<WorkLocationPlan>();
+        List<WorkLocationPlan> plans = new ArrayList<>();
         for (WorkLocationPlan wlp : workPlans) {
             if (wlp.isFoodPlan()
                 && !wlp.getWorkLocation().canAutoProduce()) plans.add(wlp);
@@ -300,7 +290,7 @@ public class ColonyPlan {
      * @return A list of non-food producing plans.
      */
     public List<WorkLocationPlan> getWorkPlans() {
-        List<WorkLocationPlan> plans = new ArrayList<WorkLocationPlan>();
+        List<WorkLocationPlan> plans = new ArrayList<>();
         for (WorkLocationPlan wlp : workPlans) {
             if (!wlp.isFoodPlan()
                 && !wlp.getWorkLocation().canAutoProduce()) plans.add(wlp);
@@ -315,12 +305,11 @@ public class ColonyPlan {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     public void refine(BuildableType build, LogBuilder lb) {
-        List<GoodsType> required = new ArrayList<GoodsType>();
+        List<GoodsType> required = new ArrayList<>();
         for (AbstractGoods ag : colony.getFullRequiredGoods(build)) {
             required.add(ag.getType());
         }
-        Map<GoodsType, List<WorkLocationPlan>> suppressed
-            = new HashMap<GoodsType, List<WorkLocationPlan>>();
+        Map<GoodsType, List<WorkLocationPlan>> suppressed = new HashMap<>();
 
         // Examine a copy of the work plans, but operate on the
         // original list.  Maintain a offset between the index in the
@@ -342,8 +331,7 @@ public class ColonyPlan {
         //
         // FIXME: generalize this further to make tools for pioneers.
         //
-        List<WorkLocationPlan> plans
-            = new ArrayList<WorkLocationPlan>(workPlans);
+        List<WorkLocationPlan> plans = new ArrayList<>(workPlans);
         int offset = 0;
         for (int i = 0; i < plans.size(); i++) {
             List<WorkLocationPlan> wls;
@@ -356,7 +344,7 @@ public class ColonyPlan {
                 workPlans.remove(i - offset);
                 offset++;
                 wls = suppressed.get(g);
-                if (wls == null) wls = new ArrayList<WorkLocationPlan>();
+                if (wls == null) wls = new ArrayList<>();
                 wls.add(0, wlp); // reverses list
                 suppressed.put(g, wls);
                 produce.remove(g);
@@ -426,15 +414,14 @@ public class ColonyPlan {
      * @return The map of potential production.
      */
     private Map<GoodsType, Map<WorkLocation, Integer>> createProductionMap() {
-        Map<GoodsType, Map<WorkLocation, Integer>> production
-            = new HashMap<GoodsType, Map<WorkLocation, Integer>>();
+        Map<GoodsType, Map<WorkLocation, Integer>> production = new HashMap<>();
         for (WorkLocation wl : colony.getAvailableWorkLocations()) {
             for (GoodsType g : spec().getGoodsTypeList()) {
                 int p = wl.getGenericPotential(g);
                 if (p > 0) {
                     Map<WorkLocation, Integer> m = production.get(g);
                     if (m == null) {
-                        m = new HashMap<WorkLocation, Integer>();
+                        m = new HashMap<>();
                         production.put(g, m);
                     }
                     m.put(wl, Integer.valueOf(p));
@@ -473,7 +460,7 @@ public class ColonyPlan {
         rawLuxuryGoodsTypes.clear();
         luxuryGoodsTypes.clear();
         otherRawGoodsTypes.clear();
-        for (GoodsType g : new ArrayList<GoodsType>(production.keySet())) {
+        for (GoodsType g : new ArrayList<>(production.keySet())) {
             if (g.isFoodType()) {
                 foodGoodsTypes.add(g);
             } else if (g.isLibertyType()) {
@@ -520,8 +507,7 @@ public class ColonyPlan {
         int secondaryValue = -1;
 
         produce.clear();
-        List<GoodsType> rawMaterials
-            = new ArrayList<GoodsType>(rawLuxuryGoodsTypes);
+        List<GoodsType> rawMaterials = new ArrayList<>(rawLuxuryGoodsTypes);
         rawMaterials.addAll(otherRawGoodsTypes);
         for (GoodsType g : rawMaterials) {
             int value = 0;
@@ -901,8 +887,7 @@ public class ColonyPlan {
         updateProductionList(production);
 
         // Filter out plans that can not use a unit.
-        List<WorkLocationPlan> oldPlans
-            = new ArrayList<WorkLocationPlan>(workPlans);
+        List<WorkLocationPlan> oldPlans = new ArrayList<>(workPlans);
         workPlans.clear();
         for (WorkLocationPlan wlp : oldPlans) {
             if (wlp.getWorkLocation().canBeWorked()) workPlans.add(wlp);
@@ -950,7 +935,7 @@ public class ColonyPlan {
                     return p2 - p1;
                 }
             };
-        List<GoodsType> toAdd = new ArrayList<GoodsType>();
+        List<GoodsType> toAdd = new ArrayList<>();
 
         // If we need liberty put it before the new world production.
         if (colony.getSoL() < 100) {
@@ -1108,8 +1093,8 @@ public class ColonyPlan {
         }
 
         // Do not mutate the workers list!
-        List<Unit> todo = new ArrayList<Unit>(workers);
-        List<Unit> best = new ArrayList<Unit>();
+        List<Unit> todo = new ArrayList<>(workers);
+        List<Unit> best = new ArrayList<>();
         int bestValue = colony.getAdjustedNetProductionOf(outputType);
         Unit special = null;
         best.clear();
@@ -1237,7 +1222,7 @@ public class ColonyPlan {
         Tile tile = col.getTile();
 
         // Replace the given workers with those in the scratch colony.
-        List<Unit> otherWorkers = new ArrayList<Unit>(workers);
+        List<Unit> otherWorkers = new ArrayList<>(workers);
         workers.clear();
         for (Unit u : otherWorkers) workers.add(col.getCorresponding(u));
 
@@ -1262,7 +1247,7 @@ public class ColonyPlan {
             outdoorRoles[2] = tmp;
         }
         for (int j = 0; j < outdoorRoles.length; j++) {
-            for (Unit u : new ArrayList<Unit>(workers)) {
+            for (Unit u : new ArrayList<>(workers)) {
                 if (workers.size() <= 1) break;
                 Role role = outdoorRoles[j];
                 if (role == null) {
@@ -1302,7 +1287,7 @@ public class ColonyPlan {
             }
         };
         Collections.sort(workers, soldierComparator);
-        for (Unit u : new ArrayList<Unit>(workers)) {
+        for (Unit u : new ArrayList<>(workers)) {
             if (workers.size() <= 1) break;
             if (!col.isBadlyDefended()) break;
             Role role = u.getMilitaryRole();
@@ -1314,7 +1299,7 @@ public class ColonyPlan {
         }
 
         // Greedy assignment of other workers to plans.
-        List<AbstractGoods> buildGoods = new ArrayList<AbstractGoods>();
+        List<AbstractGoods> buildGoods = new ArrayList<>();
         BuildableType build = col.getCurrentlyBuilding();
         if (build != null) buildGoods.addAll(build.getRequiredGoods());
         List<WorkLocationPlan> wlps;
@@ -1480,7 +1465,7 @@ public class ColonyPlan {
         if (col.getUnitCount() == 0) {
             if (getFoodPlans().isEmpty()) {
 locations:      for (WorkLocation wl : col.getAvailableWorkLocations()) {
-                    for (Unit u : new ArrayList<Unit>(workers)) {
+                    for (Unit u : new ArrayList<>(workers)) {
                         for (GoodsType type : libertyGoodsTypes) {
                             if (wl.canAdd(u)
                                 && wl.getPotentialProduction(type,
@@ -1497,7 +1482,7 @@ locations:      for (WorkLocation wl : col.getAvailableWorkLocations()) {
 plans:          for (WorkLocationPlan w : getFoodPlans()) {
                     GoodsType goodsType = w.getGoodsType();
                     WorkLocation wl = col.getCorresponding(w.getWorkLocation());
-                    for (Unit u : new ArrayList<Unit>(workers)) {
+                    for (Unit u : new ArrayList<>(workers)) {
                         GoodsType oldWork = u.getWorkType();
                         u.setLocation(wl);
                         u.changeWorkType(goodsType);
@@ -1518,8 +1503,8 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         // immediately required task than a lesser unit, not knowing
         // that a requirement for their speciality will subsequently
         // follow.  Do a cleanup pass to sort these out.
-        List<Unit> experts = new ArrayList<Unit>();
-        List<Unit> nonExperts = new ArrayList<Unit>();
+        List<Unit> experts = new ArrayList<>();
+        List<Unit> nonExperts = new ArrayList<>();
         for (Unit u : col.getUnitList()) {
             if (u.getType().getExpertProduction() != null) {
                 if (u.getType().getExpertProduction() != u.getWorkType()) {
@@ -1545,7 +1530,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
                 expert++;
             }
         }
-        for (Unit u : new ArrayList<Unit>(workers)) {
+        for (Unit u : new ArrayList<>(workers)) {
             GoodsType work = u.getType().getExpertProduction();
             if (work != null) {
                 Unit other = trySwapExpert(u, col.getUnitList(), col);
@@ -1560,7 +1545,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
 
         // Rearm what remains as far as possible.
         Collections.sort(workers, soldierComparator);
-        for (Unit u : new ArrayList<Unit>(workers)) {
+        for (Unit u : new ArrayList<>(workers)) {
             Role role = u.getMilitaryRole();
             if (role == null) continue;
             if (fullEquipUnit(spec(), u, role, col)) {

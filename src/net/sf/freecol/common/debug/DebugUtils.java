@@ -133,8 +133,7 @@ public class DebugUtils {
         final GUI gui = freeColClient.getGUI();
         final Player player = freeColClient.getMyPlayer();
 
-        List<ChoiceItem<BuildingType>> buildings
-            = new ArrayList<ChoiceItem<BuildingType>>();
+        List<ChoiceItem<BuildingType>> buildings = new ArrayList<>();
         for (BuildingType b : game.getSpecification().getBuildingTypeList()) {
             String msg = Messages.message(b.getNameKey());
             buildings.add(new ChoiceItem<BuildingType>(msg, b));
@@ -150,7 +149,7 @@ public class DebugUtils {
             .getBuildingType(buildingType.getId());
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
-        List<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<>();
         int fails = 0;
         for (Colony sColony : sPlayer.getColonies()) {
             Colony.NoBuildReason reason
@@ -192,8 +191,7 @@ public class DebugUtils {
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
 
-        List<ChoiceItem<FoundingFather>> fathers
-            = new ArrayList<ChoiceItem<FoundingFather>>();
+        List<ChoiceItem<FoundingFather>> fathers = new ArrayList<>();
         for (FoundingFather father : sSpec.getFoundingFathers()) {
             if (!sPlayer.hasFather(father)) {
                 String msg = Messages.message(father.getNameKey());
@@ -340,7 +338,7 @@ public class DebugUtils {
         final Tile sTile = sGame.getFreeColGameObject(tile.getId(), Tile.class);
         final GUI gui = freeColClient.getGUI();
 
-        List<ChoiceItem<UnitType>> uts = new ArrayList<ChoiceItem<UnitType>>();
+        List<ChoiceItem<UnitType>> uts = new ArrayList<>();
         for (UnitType t : sSpec.getUnitTypeList()) {
             String msg = Messages.message(t.getNameKey());
             uts.add(new ChoiceItem<UnitType>(msg, t));
@@ -393,8 +391,7 @@ public class DebugUtils {
         final Specification sSpec = sGame.getSpecification();
         final GUI gui = freeColClient.getGUI();
 
-        List<ChoiceItem<GoodsType>> gtl
-            = new ArrayList<ChoiceItem<GoodsType>>();
+        List<ChoiceItem<GoodsType>> gtl = new ArrayList<>();
         for (GoodsType t : sSpec.getGoodsTypeList()) {
             if (t.isFoodType() && t != sSpec.getPrimaryFoodType()) continue;
             String msg = Messages.message(t.getNameKey());
@@ -441,8 +438,7 @@ public class DebugUtils {
                 + colony.getName());
             return;
         }
-        List<ChoiceItem<Disaster>> choices
-            = new ArrayList<ChoiceItem<Disaster>>();
+        List<ChoiceItem<Disaster>> choices = new ArrayList<>();
         for (RandomChoice<Disaster> rc : disasters) {
             String label = Messages.getName(rc.getObject())
                 + " " + Integer.toString(rc.getProbability());
@@ -483,7 +479,7 @@ public class DebugUtils {
         final GUI gui = freeColClient.getGUI();
         final Game game = freeColClient.getGame();
 
-        List<ChoiceItem<Player>> pcs = new ArrayList<ChoiceItem<Player>>();
+        List<ChoiceItem<Player>> pcs = new ArrayList<>();
         for (Player p : game.getLiveEuropeanPlayers(colony.getOwner())) {
             String msg = Messages.message(p.getNationName());
             pcs.add(new ChoiceItem<Player>(msg, p));
@@ -519,7 +515,7 @@ public class DebugUtils {
         final GUI gui = freeColClient.getGUI();
         final Game game = unit.getGame();
 
-        List<ChoiceItem<Player>> pcs = new ArrayList<ChoiceItem<Player>>();
+        List<ChoiceItem<Player>> pcs = new ArrayList<>();
         for (Player p : game.getLivePlayers(null)) {
             if (unit.getType().isAvailableTo(p)) {
                 String msg = Messages.message(p.getNationName());
@@ -562,7 +558,7 @@ public class DebugUtils {
         final Unit sUnit = sGame.getFreeColGameObject(unit.getId(), Unit.class);
         final GUI gui = freeColClient.getGUI();
 
-        List<ChoiceItem<Role>> rcs = new ArrayList<ChoiceItem<Role>>();
+        List<ChoiceItem<Role>> rcs = new ArrayList<>();
         for (Role role : sGame.getSpecification().getRoles()) {
             rcs.add(new ChoiceItem<Role>(role.getId(), role));
         }
@@ -727,11 +723,10 @@ public class DebugUtils {
         final AIMain aiMain = server.getAIMain();
 
         LogBuilder lb = new LogBuilder(256);
-        List<Unit> inEurope = new ArrayList<Unit>();
-        List<Unit> toEurope = new ArrayList<Unit>();
-        List<Unit> toAmerica = new ArrayList<Unit>();
-        HashMap<String,List<Unit>> units
-            = new HashMap<String, List<Unit>>();
+        List<Unit> inEurope = new ArrayList<>();
+        List<Unit> toEurope = new ArrayList<>();
+        List<Unit> toAmerica = new ArrayList<>();
+        HashMap<String,List<Unit>> units = new HashMap<>();
         for (Player tp : sGame.getLiveEuropeanPlayers(null)) {
             Player p = sGame.getFreeColGameObject(tp.getId(), Player.class);
             if (p.getEurope() == null) continue;
@@ -945,8 +940,7 @@ public class DebugUtils {
     public static void setColonyGoods(final FreeColClient freeColClient,
                                       final Colony colony) {
         final Specification spec = colony.getSpecification();
-        List<ChoiceItem<GoodsType>> gtl
-            = new ArrayList<ChoiceItem<GoodsType>>();
+        List<ChoiceItem<GoodsType>> gtl = new ArrayList<>();
         for (GoodsType t : spec.getGoodsTypeList()) {
             if (t.isFoodType() && t != spec.getPrimaryFoodType()) continue;
             String msg = Messages.message(t.getNameKey());
@@ -997,8 +991,7 @@ public class DebugUtils {
             ServerPlayer.class);
         final GUI gui = freeColClient.getGUI();
 
-        List<ChoiceItem<MonarchAction>> actions
-            = new ArrayList<ChoiceItem<MonarchAction>>();
+        List<ChoiceItem<MonarchAction>> actions = new ArrayList<>();
         for (MonarchAction action : MonarchAction.values()) {
             actions.add(new ChoiceItem<MonarchAction>(action));
         }
@@ -1023,8 +1016,7 @@ public class DebugUtils {
         final Tile sTile = sGame.getFreeColGameObject(tile.getId(),
                                                       Tile.class);
 
-        List<ChoiceItem<RumourType>> rumours
-            = new ArrayList<ChoiceItem<RumourType>>();
+        List<ChoiceItem<RumourType>> rumours = new ArrayList<>();
         for (RumourType rumour : RumourType.values()) {
             if (rumour == RumourType.NO_SUCH_RUMOUR) continue;
             rumours.add(new ChoiceItem<RumourType>(rumour.toString(), rumour));

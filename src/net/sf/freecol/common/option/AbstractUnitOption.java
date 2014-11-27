@@ -188,7 +188,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      */
     public void generateChoices() {
         unitType.generateChoices();
-        List<String> roles = new ArrayList<String>();
+        List<String> roles = new ArrayList<>();
         for (Role r : getSpecification().getRoles()) {
             roles.add(r.getId());
         }

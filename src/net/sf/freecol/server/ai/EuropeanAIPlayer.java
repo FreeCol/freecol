@@ -230,56 +230,48 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Stores temporary information for sessions (trading with another
      * player etc).
      */
-    private final java.util.Map<String, Integer> sessionRegister
-        = new HashMap<String, Integer>();
+    private final java.util.Map<String, Integer> sessionRegister = new HashMap<>();
 
     /**
      * A cached map of the current nation summary for all live nations.
      */
-    private final java.util.Map<Player, NationSummary> nationMap
-        = new HashMap<Player, NationSummary>();
+    private final java.util.Map<Player, NationSummary> nationMap = new HashMap<>();
 
     /**
      * A cached map of Tile to best TileImprovementPlan.
      * Used to choose a tile improvement for a pioneer to work on.
      */
-    private final java.util.Map<Tile, TileImprovementPlan> tipMap
-        = new HashMap<Tile, TileImprovementPlan>();
+    private final java.util.Map<Tile, TileImprovementPlan> tipMap = new HashMap<>();
 
     /**
      * A cached map of destination Location to Wishes awaiting transport.
      */
-    private final java.util.Map<Location, List<Wish>> transportDemand
-        = new HashMap<Location, List<Wish>>();
+    private final java.util.Map<Location, List<Wish>> transportDemand = new HashMap<>();
 
     /** A cached list of transportables awaiting transport. */
-    private final List<TransportableAIObject> transportSupply
-        = new ArrayList<TransportableAIObject>();
+    private final List<TransportableAIObject> transportSupply = new ArrayList<>();
 
     /**
      * A mapping of goods type to the goods wishes where a colony has
      * requested that goods type.  Used to retarget goods that have
      * gone astray.
      */
-    private final java.util.Map<GoodsType, List<GoodsWish>> goodsWishes
-        = new HashMap<GoodsType, List<GoodsWish>>();
+    private final java.util.Map<GoodsType, List<GoodsWish>> goodsWishes = new HashMap<>();
 
     /**
      * A mapping of unit type to the worker wishes for that type.
      * Used to allocate WishRealizationMissions for units.
      */
-    private final java.util.Map<UnitType, List<WorkerWish>> workerWishes
-        = new HashMap<UnitType, List<WorkerWish>>();
+    private final java.util.Map<UnitType, List<WorkerWish>> workerWishes = new HashMap<>();
 
     /**
      * A mapping of contiguity number to number of wagons needed in
      * that landmass.
      */
-    private final java.util.Map<Integer, Integer> wagonsNeeded
-        = new HashMap<Integer, Integer>();
+    private final java.util.Map<Integer, Integer> wagonsNeeded = new HashMap<>();
 
     /** The colonies that start the turn badly defended. */
-    private final List<AIColony> badlyDefended = new ArrayList<AIColony>();
+    private final List<AIColony> badlyDefended = new ArrayList<>();
 
     /**
      * Current estimate of the number of new
@@ -475,7 +467,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         final Market market = player.getMarket();
         final Europe europe = player.getEurope();
         final Random air = getAIRandom();
-        final List<GoodsType> arrears = new ArrayList<GoodsType>();
+        final List<GoodsType> arrears = new ArrayList<>();
         if (market != null) {
             for (GoodsType gt : spec.getGoodsTypeList()) {
                 if (market.getArrears(gt) > 0) arrears.add(gt);
@@ -595,8 +587,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             Location target = null;
             // - collect enemies, prefer not to antagonize the strong or
             //   crush the weak
-            List<Player> enemies = new ArrayList<Player>();
-            List<Player> preferred = new ArrayList<Player>();
+            List<Player> enemies = new ArrayList<>();
+            List<Player> preferred = new ArrayList<>();
             for (Player p : game.getLivePlayers(player)) {
                 if (player.atWarWith(p)) {
                     enemies.add(p);
@@ -613,7 +605,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             List<Colony> colonies = player.getColonies();
             // Few colonies?  Attack the weakest European port
             if (colonies.size() < 3) {
-                List<Colony> targets = new ArrayList<Colony>();
+                List<Colony> targets = new ArrayList<>();
                 for (Player p : enemies) {
                     if (p.isEuropean()) targets.addAll(p.getColonies());
                 }
@@ -633,7 +625,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             // Otherwise attack something near a weak colony
             if (target == null && !colonies.isEmpty()) {
-                List<AIColony> bad = new ArrayList<AIColony>(getBadlyDefended());
+                List<AIColony> bad = new ArrayList<>(getBadlyDefended());
                 if (bad.isEmpty()) bad.addAll(getAIColonies());
                 AIColony defend = getRandomMember(logger,
                     "AIColony to defend", bad, air);
@@ -669,8 +661,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             : (0.0f < naval && naval < 0.5f)
             ? (int)(naval * offensiveNavalUnitCheatPercent)
             : -1;
-        List<RandomChoice<UnitType>> rc
-            = new ArrayList<RandomChoice<UnitType>>();
+        List<RandomChoice<UnitType>> rc = new ArrayList<>();
         if (randoms[cheatIndex++] < nNaval) {
             rc.clear();
             for (UnitType unitType : spec.getUnitTypeList()) {
@@ -1125,8 +1116,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return The most urgent 10% of the available transportables.
      */
     public List<TransportableAIObject> getUrgentTransportables() {
-        List<TransportableAIObject> urgent
-            = new ArrayList<TransportableAIObject>(transportSupply);
+        List<TransportableAIObject> urgent = new ArrayList<>(transportSupply);
         // Do not let the list exceed 10% of all transports
         Collections.sort(urgent);
         int urge = urgent.size();
@@ -1174,7 +1164,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     public List<WorkerWish> getWorkerWishesAt(Location loc, UnitType type) {
         List<Wish> demand = transportDemand.get(upLoc(loc));
         if (demand == null) return Collections.<WorkerWish>emptyList();
-        List<WorkerWish> result = new ArrayList<WorkerWish>();
+        List<WorkerWish> result = new ArrayList<>();
         for (Wish w : demand) {
             if (w instanceof WorkerWish
                 && ((WorkerWish)w).getUnitType() == type) {
@@ -1194,7 +1184,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     public List<GoodsWish> getGoodsWishesAt(Location loc, GoodsType type) {
         List<Wish> demand = transportDemand.get(upLoc(loc));
         if (demand == null) return Collections.<GoodsWish>emptyList();
-        List<GoodsWish> result = new ArrayList<GoodsWish>();
+        List<GoodsWish> result = new ArrayList<>();
         for (Wish w : demand) {
             if (w instanceof GoodsWish
                 && ((GoodsWish)w).getGoodsType() == type) {
@@ -1523,7 +1513,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A list of wishes.
      */
     public List<Wish> getWishes() {
-        List<Wish> wishes = new ArrayList<Wish>();
+        List<Wish> wishes = new ArrayList<>();
         for (AIColony aic : getAIColonies()) {
             wishes.addAll(aic.getWishes());
         }
@@ -1745,7 +1735,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     protected void giveNormalMissions(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
-        java.util.Map<Unit, String> reasons = new HashMap<Unit, String>();
+        java.util.Map<Unit, String> reasons = new HashMap<>();
         BuildColonyMission bcm = null;
         Mission m;
 
@@ -1754,10 +1744,9 @@ public class EuropeanAIPlayer extends AIPlayer {
         nScouts = scoutsNeeded();
 
         List<AIUnit> aiUnits = getAIUnits();
-        List<AIUnit> navalUnits = new ArrayList<AIUnit>();
-        List<AIUnit> done = new ArrayList<AIUnit>();
-        List<TransportMission> transportMissions
-            = new ArrayList<TransportMission>();
+        List<AIUnit> navalUnits = new ArrayList<>();
+        List<AIUnit> done = new ArrayList<>();
+        List<TransportMission> transportMissions = new ArrayList<>();
 
         // For all units, check if it is a candidate for a new
         // mission.  If it is not a candidate remove it from the
@@ -2456,7 +2445,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     @Override
     protected List<AIUnit> doMissions(List<AIUnit> aiUnits, LogBuilder lb) {
         lb.add("\n  Do missions:");
-        List<AIUnit> result = new ArrayList<AIUnit>();
+        List<AIUnit> result = new ArrayList<>();
 
         // For all units, do their mission and collect the ones that need
         // to be revisited.
@@ -2566,8 +2555,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         final Market market = player.getMarket();
         final boolean franklin
             = other.hasAbility(Ability.ALWAYS_OFFERED_PEACE);
-        final java.util.Map<TradeItem, Integer> scores
-            = new HashMap<TradeItem, Integer>();
+        final java.util.Map<TradeItem, Integer> scores = new HashMap<>();
         TradeItem peace = null;
         TradeItem cash = null;
         LogBuilder lb = new LogBuilder(64);
@@ -2744,8 +2732,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             // Dump the negative offers until the sum is positive.
             // Return a proposal with items we like/can accept, or reject
             // if none are left.
-            List<TradeItem> items
-                = new ArrayList<TradeItem>(agreement.getTradeItems());
+            List<TradeItem> items = new ArrayList<>(agreement.getTradeItems());
             Collections.sort(items, new Comparator<TradeItem>() {
                     public int compare(TradeItem t1, TradeItem t2) {
                         return scores.get(t1) - scores.get(t2);

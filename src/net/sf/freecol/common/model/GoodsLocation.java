@@ -315,7 +315,7 @@ public abstract class GoodsLocation extends UnitLocation {
      */
     @Override
     public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        List<FreeColGameObject> objects = new ArrayList<>();
         if (goodsContainer != null) {
             objects.addAll(goodsContainer.disposeList());
             goodsContainer = null;

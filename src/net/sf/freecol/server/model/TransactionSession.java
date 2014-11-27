@@ -38,7 +38,7 @@ public abstract class TransactionSession {
      * A map of all active sessions.
      */
     protected static final Map<String, TransactionSession> allSessions
-        = new HashMap<String, TransactionSession>();
+        = new HashMap<>();
 
     /** Has this session been completed? */
     private boolean completed;

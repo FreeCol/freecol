@@ -32,7 +32,7 @@ import java.util.Set;
  */
 public class TypeCountMap<T extends FreeColGameObjectType> {
 
-    private Map<T, Integer> values = new HashMap<T, Integer>();
+    private Map<T, Integer> values = new HashMap<>();
 
     public Map<T, Integer> getValues() {
         return values;

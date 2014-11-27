@@ -412,8 +412,7 @@ public class DebugMenu extends JMenu {
                 public void actionPerformed(ActionEvent e) {
                     Map<String, Resource> resources
                         = ResourceManager.getResources();
-                    List<String> keys
-                        = new ArrayList<String>(resources.keySet());
+                    List<String> keys = new ArrayList<>(resources.keySet());
                     Collections.sort(keys);
                     StringBuilder builder = new StringBuilder();
                     for (String key : keys) {

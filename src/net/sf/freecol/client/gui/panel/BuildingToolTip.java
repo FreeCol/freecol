@@ -158,7 +158,7 @@ public class BuildingToolTip extends JToolTip {
         }
 
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-            List<Modifier> modifiers = new ArrayList<Modifier>();
+            List<Modifier> modifiers = new ArrayList<>();
             if (output != null) {
                 modifiers.addAll(building.getProductionModifiers(output, null));
             }

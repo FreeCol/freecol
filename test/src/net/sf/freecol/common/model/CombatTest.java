@@ -581,7 +581,7 @@ public class CombatTest extends FreeColTestCase {
         assertTrue(defender.getOwner().isIndian());
         
         MockPseudoRandom random = new MockPseudoRandom();
-        List<Integer> il = new ArrayList<Integer>();
+        List<Integer> il = new ArrayList<>();
         il.add(Integer.valueOf(0));
         random.setNextNumbers(il, true);
 

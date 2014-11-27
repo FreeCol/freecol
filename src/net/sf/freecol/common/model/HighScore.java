@@ -369,7 +369,7 @@ public class HighScore extends FreeColObject {
      * @return A list of <code>HighScore</code>s from the high score file.
      */
     public static List<HighScore> loadHighScores() {
-        List<HighScore> scores = new ArrayList<HighScore>();
+        List<HighScore> scores = new ArrayList<>();
         File hsf = FreeColDirectories.getHighScoreFile();
         if (!hsf.exists()) {
             try {

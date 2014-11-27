@@ -51,15 +51,13 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     public static final int CARGO_SIZE = 100;
 
     /** The list of Goods stored in this <code>GoodsContainer</code>. */
-    private final Map<GoodsType, Integer> storedGoods
-        = new HashMap<GoodsType, Integer>();
+    private final Map<GoodsType, Integer> storedGoods = new HashMap<>();
 
     /** 
      * The previous list of Goods stored in this
      * <code>GoodsContainer</code>.
      */
-    private final Map<GoodsType, Integer> oldStoredGoods
-        = new HashMap<GoodsType, Integer>();
+    private final Map<GoodsType, Integer> oldStoredGoods = new HashMap<>();
 
     /** The location for this <code>GoodsContainer</code>. */
     private Location parent = null;
@@ -352,7 +350,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @see #getGoodsIterator
      */
     public List<Goods> getGoods() {
-        List<Goods> totalGoods = new ArrayList<Goods>();
+        List<Goods> totalGoods = new ArrayList<>();
         synchronized (storedGoods) {
             for (GoodsType goodsType : storedGoods.keySet()) {
                 int amount = storedGoods.get(goodsType);
@@ -374,7 +372,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @return A list of <code>Goods</code>.
      */
     public List<Goods> getCompactGoods() {
-        List<Goods> totalGoods = new ArrayList<Goods>();
+        List<Goods> totalGoods = new ArrayList<>();
         synchronized (storedGoods) {
             for (Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
                 if (entry.getValue() > 0) {
@@ -460,7 +458,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
             oldStoredGoods.clear();
         }
 
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        List<FreeColGameObject> objects = new ArrayList<>();
         objects.addAll(super.disposeList());
         return objects;
     }

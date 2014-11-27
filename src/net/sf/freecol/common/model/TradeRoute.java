@@ -55,7 +55,7 @@ public class TradeRoute extends FreeColGameObject
     private Player owner;
 
     /** A list of stops. */
-    private final List<TradeRouteStop> stops = new ArrayList<TradeRouteStop>();
+    private final List<TradeRouteStop> stops = new ArrayList<>();
 
     /** Silence the messaging for this trade route. */
     private boolean silent = false;
@@ -181,7 +181,7 @@ public class TradeRoute extends FreeColGameObject
      * @return A list of assigned <code>Unit</code>s.
      */
     public List<Unit> getAssignedUnits() {
-        List<Unit> list = new ArrayList<Unit>();
+        List<Unit> list = new ArrayList<>();
         for (Unit unit : owner.getUnits()) {
             if (unit.getTradeRoute() == this) list.add(unit);
         }

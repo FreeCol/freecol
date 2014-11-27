@@ -143,121 +143,86 @@ public final class Specification {
 
 
     /** A map from specification element to a reader for that element. */
-    private final Map<String, ChildReader> readerMap
-        = new HashMap<String, ChildReader>();
+    private final Map<String, ChildReader> readerMap = new HashMap<>();
 
     /* Containers filled from readers in the readerMap. */
 
     // readerMap("building-types")
-    private final List<BuildingType> buildingTypeList
-        = new ArrayList<BuildingType>();
+    private final List<BuildingType> buildingTypeList = new ArrayList<>();
     // readerMap("disasters")
-    private final List<Disaster> disasters
-        = new ArrayList<Disaster>();
+    private final List<Disaster> disasters = new ArrayList<>();
     // @compat 0.10.x readerMap("equipment-types")
-    private final List<EquipmentType> equipmentTypes
-        = new ArrayList<EquipmentType>();
+    private final List<EquipmentType> equipmentTypes = new ArrayList<>();
     // end @compat 0.10.x
     // readerMap("european-nation-types")
-    private final List<EuropeanNationType> europeanNationTypes
-        = new ArrayList<EuropeanNationType>();
+    private final List<EuropeanNationType> europeanNationTypes = new ArrayList<>();
     // readerMap("events")
-    private final List<Event> events
-        = new ArrayList<Event>();
+    private final List<Event> events = new ArrayList<>();
     // readerMap("founding-fathers")
-    private final List<FoundingFather> foundingFathers
-        = new ArrayList<FoundingFather>();
+    private final List<FoundingFather> foundingFathers = new ArrayList<>();
     // readerMap("goods-types")
-    private final List<GoodsType> goodsTypeList
-        = new ArrayList<GoodsType>();
+    private final List<GoodsType> goodsTypeList = new ArrayList<>();
     // readerMap("indian-nation-types")
-    private final List<IndianNationType> indianNationTypes
-        = new ArrayList<IndianNationType>();
+    private final List<IndianNationType> indianNationTypes = new ArrayList<>();
     // readerMap("nations")
-    private final List<Nation> nations
-        = new ArrayList<Nation>();
+    private final List<Nation> nations = new ArrayList<>();
     // readerMap("resource-types")
-    private final List<ResourceType> resourceTypeList
-        = new ArrayList<ResourceType>();
+    private final List<ResourceType> resourceTypeList = new ArrayList<>();
     // readerMap("roles")
-    private final List<Role> roles
-        = new ArrayList<Role>();
+    private final List<Role> roles = new ArrayList<>();
     // readerMap("tile-types")
-    private final List<TileType> tileTypeList
-        = new ArrayList<TileType>();
+    private final List<TileType> tileTypeList = new ArrayList<>();
     // readerMap("tileimprovement-types")
-    private final List<TileImprovementType> tileImprovementTypeList
-        = new ArrayList<TileImprovementType>();
+    private final List<TileImprovementType> tileImprovementTypeList = new ArrayList<>();
     // readerMap("unit-types")
-    private final List<UnitType> unitTypeList
-        = new ArrayList<UnitType>();
+    private final List<UnitType> unitTypeList = new ArrayList<>();
 
     // readerMap("modifiers")
-    private final Map<String, List<Modifier>> allModifiers
-        = new HashMap<String, List<Modifier>>();
-    private final List<Modifier> specialModifiers
-        = new ArrayList<Modifier>();
+    private final Map<String, List<Modifier>> allModifiers = new HashMap<>();
+    private final List<Modifier> specialModifiers = new ArrayList<>();
 
     // readerMap("options")
-    private final Map<String, AbstractOption> allOptions
-        = new HashMap<String, AbstractOption>();
-    private final Map<String, OptionGroup> allOptionGroups
-        = new HashMap<String, OptionGroup>();
+    private final Map<String, AbstractOption> allOptions = new HashMap<>();
+    private final Map<String, OptionGroup> allOptionGroups = new HashMap<>();
 
     /* Containers derived from readerMap containers */
 
     // Derived from readerMap container: goodsTypeList
-    private final List<GoodsType> farmedGoodsTypeList
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> foodGoodsTypeList
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> newWorldGoodsTypeList
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> newWorldLuxuryGoodsTypeList
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> libertyGoodsTypeList
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> immigrationGoodsTypeList
-        = new ArrayList<GoodsType>();
-    private final List<GoodsType> rawBuildingGoodsTypeList
-        = new ArrayList<GoodsType>();
+    private final List<GoodsType> farmedGoodsTypeList = new ArrayList<>();
+    private final List<GoodsType> foodGoodsTypeList = new ArrayList<>();
+    private final List<GoodsType> newWorldGoodsTypeList = new ArrayList<>();
+    private final List<GoodsType> newWorldLuxuryGoodsTypeList = new ArrayList<>();
+    private final List<GoodsType> libertyGoodsTypeList = new ArrayList<>();
+    private final List<GoodsType> immigrationGoodsTypeList = new ArrayList<>();
+    private final List<GoodsType> rawBuildingGoodsTypeList = new ArrayList<>();
     private int storableTypes = 0;
 
     // Derived from readerMap container: nations
-    private final List<Nation> europeanNations = new ArrayList<Nation>();
-    private final List<Nation> REFNations = new ArrayList<Nation>();
-    private final List<Nation> indianNations = new ArrayList<Nation>();
+    private final List<Nation> europeanNations = new ArrayList<>();
+    private final List<Nation> REFNations = new ArrayList<>();
+    private final List<Nation> indianNations = new ArrayList<>();
     // Derived from readerMap containers: indianNationTypes europeanNationTypes
-    private final List<NationType> nationTypes
-        = new ArrayList<NationType>();
+    private final List<NationType> nationTypes = new ArrayList<>();
     // Derived from readerMap container: europeanNationTypes
-    private final List<EuropeanNationType> REFNationTypes
-        = new ArrayList<EuropeanNationType>();
+    private final List<EuropeanNationType> REFNationTypes = new ArrayList<>();
 
     // Derived from readerMap container: unitTypeList
-    private final ArrayList<UnitType> buildableUnitTypes
-        = new ArrayList<UnitType>();
-    private final Map<GoodsType, UnitType> experts
-        = new HashMap<GoodsType, UnitType>();
-    private final List<UnitType> unitTypesTrainedInEurope
-        = new ArrayList<UnitType>();
-    private final List<UnitType> unitTypesPurchasedInEurope
-        = new ArrayList<UnitType>();
+    private final ArrayList<UnitType> buildableUnitTypes = new ArrayList<>();
+    private final Map<GoodsType, UnitType> experts = new HashMap<>();
+    private final List<UnitType> unitTypesTrainedInEurope = new ArrayList<>();
+    private final List<UnitType> unitTypesPurchasedInEurope = new ArrayList<>();
     private UnitType fastestLandUnitType = null;
     private UnitType fastestNavalUnitType = null;
 
     /* Other containers. */
 
     // @compat 0.10.7
-    public final Map<String, String> fatherGoodsFixMap
-        = new HashMap<String, String>();
+    public final Map<String, String> fatherGoodsFixMap = new HashMap<>();
     // end @compat 0.10.7
 
-    private final Map<String, FreeColGameObjectType> allTypes
-        = new HashMap<String, FreeColGameObjectType>();
+    private final Map<String, FreeColGameObjectType> allTypes = new HashMap<>();
 
-    private final Map<String, List<Ability>> allAbilities
-        = new HashMap<String, List<Ability>>();
+    private final Map<String, List<Ability>> allAbilities = new HashMap<>();
 
     /** A cache of the military roles in decreasing order.  Do not serialize. */
     private List<Role> militaryRoles = null;
@@ -1121,35 +1086,35 @@ public final class Specification {
     // -- Goods --
 
     public List<GoodsType> getGoodsTypeList() {
-        return new ArrayList<GoodsType>(goodsTypeList);
+        return new ArrayList<>(goodsTypeList);
     }
 
     public List<GoodsType> getFarmedGoodsTypeList() {
-        return new ArrayList<GoodsType>(farmedGoodsTypeList);
+        return new ArrayList<>(farmedGoodsTypeList);
     }
 
     public List<GoodsType> getNewWorldGoodsTypeList() {
-        return new ArrayList<GoodsType>(newWorldGoodsTypeList);
+        return new ArrayList<>(newWorldGoodsTypeList);
     }
 
     public List<GoodsType> getNewWorldLuxuryGoodsTypeList() {
-        return new ArrayList<GoodsType>(newWorldLuxuryGoodsTypeList);
+        return new ArrayList<>(newWorldLuxuryGoodsTypeList);
     }
 
     public List<GoodsType> getLibertyGoodsTypeList() {
-        return new ArrayList<GoodsType>(libertyGoodsTypeList);
+        return new ArrayList<>(libertyGoodsTypeList);
     }
 
     public List<GoodsType> getImmigrationGoodsTypeList() {
-        return new ArrayList<GoodsType>(immigrationGoodsTypeList);
+        return new ArrayList<>(immigrationGoodsTypeList);
     }
 
     public List<GoodsType> getFoodGoodsTypeList() {
-        return new ArrayList<GoodsType>(foodGoodsTypeList);
+        return new ArrayList<>(foodGoodsTypeList);
     }
 
     public final List<GoodsType> getRawBuildingGoodsTypeList() {
-        return new ArrayList<GoodsType>(rawBuildingGoodsTypeList);
+        return new ArrayList<>(rawBuildingGoodsTypeList);
     }
 
     /**
@@ -1336,7 +1301,7 @@ public final class Specification {
      * @param naval If true, choose naval units, if not, land units.
      */
     public List<UnitType> getREFUnitTypes(boolean naval) {
-        List<UnitType> types = new ArrayList<UnitType>();
+        List<UnitType> types = new ArrayList<>();
         for (UnitType ut : getUnitTypesWithAbility(Ability.REF_UNIT)) {
             if (naval == ut.isNaval()) types.add(ut);
         }
@@ -1531,7 +1496,7 @@ public final class Specification {
      * @param naval If true, choose roles for naval units, if not, land units.
      */
     public List<Role> getREFRoles(boolean naval) {
-        List<Role> roles = new ArrayList<Role>();
+        List<Role> roles = new ArrayList<>();
         if (naval) {
             roles.add(getDefaultRole());
         } else {
@@ -1564,7 +1529,7 @@ public final class Specification {
      * @return A list of difficulty levels in this specification.
      */
     public List<OptionGroup> getDifficultyLevels() {
-        List<OptionGroup> result = new ArrayList<OptionGroup>();
+        List<OptionGroup> result = new ArrayList<>();
         for (Option option : allOptionGroups.get(DIFFICULTY_LEVELS)
                  .getOptions()) {
             if (option instanceof OptionGroup) {
@@ -1736,8 +1701,7 @@ public final class Specification {
      */
     public List<FreeColGameObjectType> getTypesProviding(String id,
                                                          boolean value) {
-        List<FreeColGameObjectType> result
-            = new ArrayList<FreeColGameObjectType>();
+        List<FreeColGameObjectType> result = new ArrayList<>();
         for (Ability ability : getAbilities(id)) {
             if (ability.getValue() == value
                 && ability.getSource() instanceof FreeColGameObjectType) {
@@ -1757,7 +1721,7 @@ public final class Specification {
     public <T extends FreeColGameObjectType> List<T>
                       getTypesWithAbility(Class<T> resultType,
                                           String... abilities) {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         for (FreeColGameObjectType type : allTypes.values()) {
             if (resultType.isInstance(type)) {
                 for (String ability : abilities) {
@@ -1781,7 +1745,7 @@ public final class Specification {
     public <T extends FreeColGameObjectType> List<T>
                       getTypesWithoutAbility(Class<T> resultType,
                                              String... abilities) {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         type: for (FreeColGameObjectType type : allTypes.values()) {
             if (resultType.isInstance(type)) {
                 for (String ability : abilities) {
@@ -1834,7 +1798,7 @@ public final class Specification {
         } finally {
             if (fis != null) try { fis.close(); } catch (IOException ioe) {}
         }
-        List<String> roles = new ArrayList<String>();
+        List<String> roles = new ArrayList<>();
         for (Role r : getRoles()) roles.add(r.getId());
         logger.info("Loading role backward compatibility fragment: "
             + ROLES_COMPAT_FILE_NAME + " with roles: " + join(" ", roles));
@@ -1913,7 +1877,7 @@ public final class Specification {
         }
 
         // Fix all other UnitListOptions
-        List<Option> todo = new ArrayList<Option>();
+        List<Option> todo = new ArrayList<>();
         for (OptionGroup og : getDifficultyLevels()) todo.add(og);
         while (!todo.isEmpty()) {
             Option o = todo.remove(0);

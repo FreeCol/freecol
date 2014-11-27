@@ -92,7 +92,7 @@ public class ProductionType extends FreeColObject {
      */
     public ProductionType(AbstractGoods output, boolean unattended,
                           String level) {
-        this.outputs = new ArrayList<AbstractGoods>();
+        this.outputs = new ArrayList<>();
         this.outputs.add(output);
         this.unattended = unattended;
         this.productionLevel = level;
@@ -108,11 +108,11 @@ public class ProductionType extends FreeColObject {
      */
     public ProductionType(GoodsType input, GoodsType output, int amount) {
         if (input != null) {
-            inputs = new ArrayList<AbstractGoods>();
+            inputs = new ArrayList<>();
             inputs.add(new AbstractGoods(input, amount));
         }
         if (output != null) {
-            outputs = new ArrayList<AbstractGoods>();
+            outputs = new ArrayList<>();
             outputs.add(new AbstractGoods(output, amount));
         }
     }
@@ -157,7 +157,7 @@ public class ProductionType extends FreeColObject {
      * @param amount The amount of goods.
      */
     private void addInput(GoodsType type, int amount) {
-        if (inputs == null) inputs = new ArrayList<AbstractGoods>(1);
+        if (inputs == null) inputs = new ArrayList<>(1);
         inputs.add(new AbstractGoods(type, amount));
     }
 
@@ -187,7 +187,7 @@ public class ProductionType extends FreeColObject {
      * @param amount The amount of goods.
      */
     private void addOutput(GoodsType type, int amount) {
-        if (outputs == null) outputs = new ArrayList<AbstractGoods>(1);
+        if (outputs == null) outputs = new ArrayList<>(1);
         outputs.add(new AbstractGoods(type, amount));
     }
 

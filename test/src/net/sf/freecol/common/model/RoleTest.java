@@ -70,7 +70,7 @@ public class RoleTest extends FreeColTestCase {
 
 
     public void testComparators() {
-        List<Role> roles = new ArrayList<Role>();
+        List<Role> roles = new ArrayList<>();
         roles.add(soldier);
         roles.add(dragoon);
         roles.add(missionary);
@@ -144,7 +144,7 @@ public class RoleTest extends FreeColTestCase {
         final Game game = getStandardGame();
         final List<Role> military = spec().getMilitaryRoles();
 
-        List<Role> expectedRoles = new ArrayList<Role>();
+        List<Role> expectedRoles = new ArrayList<>();
         expectedRoles.add(dragoon);
         expectedRoles.add(soldier);
         expectedRoles.add(scout);

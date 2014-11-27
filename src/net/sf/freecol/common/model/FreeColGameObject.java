@@ -160,7 +160,7 @@ public abstract class FreeColGameObject extends FreeColObject {
     public List<FreeColGameObject> disposeList() {
         fundamentalDispose();
 
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        List<FreeColGameObject> objects = new ArrayList<>();
         objects.add(this);
         return objects;
     }

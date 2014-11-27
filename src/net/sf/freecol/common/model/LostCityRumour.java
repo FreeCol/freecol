@@ -185,8 +185,7 @@ public class LostCityRumour extends TileItem {
         int percentNeutral = Math.max(0, 100 - percentBad - percentGood);
 
         // Add all possible events to a RandomChoice List
-        List<RandomChoice<RumourType>> c
-            = new ArrayList<RandomChoice<RumourType>>();
+        List<RandomChoice<RumourType>> c = new ArrayList<>();
 
         // The GOOD
         if (allowLearn) {

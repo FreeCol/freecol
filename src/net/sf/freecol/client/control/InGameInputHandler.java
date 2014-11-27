@@ -914,7 +914,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element multiple(Connection connection, Element element) {
         NodeList nodes = element.getChildNodes();
-        List<Element> results = new ArrayList<Element>();
+        List<Element> results = new ArrayList<>();
 
         for (int i = 0; i < nodes.getLength(); i++) {
             try {

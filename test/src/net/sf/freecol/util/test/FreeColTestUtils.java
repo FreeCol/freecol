@@ -60,8 +60,7 @@ public class FreeColTestUtils {
             = FreeColTestCase.spec().getDefaultUnitType();
         private Game game;
 
-        private HashMap<UnitType,Integer> colonists
-            = new HashMap<UnitType,Integer>();
+        private HashMap<UnitType,Integer> colonists = new HashMap<>();
         private Player player;
         private String name;
         private int initialColonists;

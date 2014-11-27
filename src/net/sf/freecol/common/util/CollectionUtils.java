@@ -54,7 +54,7 @@ public class CollectionUtils {
      */
     @SafeVarargs
     public static <T> List<T> makeUnmodifiableList(T... members) {
-        List<T> tmp = new ArrayList<T>();
+        List<T> tmp = new ArrayList<>();
         for (T t : members) tmp.add(t);
         return Collections.<T>unmodifiableList(tmp);
     }
@@ -70,7 +70,7 @@ public class CollectionUtils {
                                              K key, T value) {
         List<T> l = map.get(key);
         if (l == null) {
-            l = new ArrayList<T>();
+            l = new ArrayList<>();
             l.add(value);
             map.put(key, l);
         } else if (!l.contains(value)) {
@@ -106,7 +106,7 @@ public class CollectionUtils {
         return new Iterable<List<T>>() {
             public Iterator<List<T>> iterator() {
                 return new Iterator<List<T>>() {
-                    private final List<T> original = new ArrayList<T>(l);
+                    private final List<T> original = new ArrayList<>(l);
                     private final int n = l.size();
                     private final int np = factorial(n);
                     private int index = 0;
@@ -123,8 +123,8 @@ public class CollectionUtils {
 
                     // FIXME: see if we can do it with one array:-)
                     public List<T> next() {
-                        List<T> pick = new ArrayList<T>(original);
-                        List<T> result = new ArrayList<T>();
+                        List<T> pick = new ArrayList<>(original);
+                        List<T> result = new ArrayList<>();
                         int current = index++;
                         int divisor = np;
                         for (int i = n; i > 0; i--) {

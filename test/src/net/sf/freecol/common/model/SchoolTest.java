@@ -95,7 +95,7 @@ public class SchoolTest extends FreeColTestCase {
      * @return A list of all the units of the given type in this colony.
      */
     private List<Unit> getUnitList(Colony colony, UnitType type) {
-        List<Unit> units = new ArrayList<Unit>() ;
+        List<Unit> units = new ArrayList<>() ;
         for (Unit unit : colony.getUnitList()) {
             if (type.equals(unit.getType())) {
                 units.add(unit);

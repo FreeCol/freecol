@@ -415,7 +415,7 @@ public final class InGameController extends Controller {
 
         // Inherit rebel player knowledge of the seas, coasts, claimed
         // land but not full detailed scouting knowledge.
-        List<Tile> explore = new ArrayList<Tile>();
+        List<Tile> explore = new ArrayList<>();
         for (Tile t : getGame().getMap().getAllTiles()) {
             if (!t.isExploredBy(serverPlayer)) continue;
             if (!t.isLand()
@@ -551,7 +551,7 @@ public final class InGameController extends Controller {
      * @return A list of all connected server players, with exclusions.
      */
     private List<ServerPlayer> getOtherPlayers(ServerPlayer... serverPlayers) {
-        List<ServerPlayer> result = new ArrayList<ServerPlayer>();
+        List<ServerPlayer> result = new ArrayList<>();
         outer: for (Player otherPlayer : getGame().getLivePlayers(null)) {
             ServerPlayer enemyPlayer = (ServerPlayer) otherPlayer;
             if (!enemyPlayer.isConnected()) continue;
@@ -953,7 +953,7 @@ public final class InGameController extends Controller {
             .addStringTemplate("%ref%", serverPlayer.getNationName()));
 
         // Who surrenders?
-        List<Unit> surrenderUnits = new ArrayList<Unit>();
+        List<Unit> surrenderUnits = new ArrayList<>();
         for (Unit u : serverPlayer.getUnits()) {
             if (!u.isNaval() && !u.isOnCarrier() && !u.isInEurope()) {
                 surrenderUnits.add(u);
@@ -1347,8 +1347,7 @@ public final class InGameController extends Controller {
 
         // Generalized continental army muster.
         // Do not use UnitType.getTargetType.
-        java.util.Map<UnitType, UnitType> upgrades
-            = new HashMap<UnitType, UnitType>();
+        java.util.Map<UnitType, UnitType> upgrades = new HashMap<>();
         final Game game = getGame();
         final Specification spec = game.getSpecification();
         for (UnitType unitType : spec.getUnitTypeList()) {
@@ -1356,10 +1355,9 @@ public final class InGameController extends Controller {
                                                       serverPlayer);
             if (upgrade != null) upgrades.put(unitType, upgrade);
         }
-        java.util.Map<UnitType, List<Unit>> unitMap
-            = new HashMap<UnitType, List<Unit>>();
+        java.util.Map<UnitType, List<Unit>> unitMap = new HashMap<>();
         for (Colony colony : serverPlayer.getColonies()) {
-            List<Unit> allUnits = new ArrayList<Unit>();
+            List<Unit> allUnits = new ArrayList<>();
             allUnits.addAll(colony.getTile().getUnitList());
             allUnits.addAll(colony.getUnitList());
             int limit = (allUnits.size() + 2) * (colony.getSoL() - 50) / 100;
@@ -1370,7 +1368,7 @@ public final class InGameController extends Controller {
                 if (upgrades.containsKey(unit.getType())) {
                     List<Unit> unitList = unitMap.get(unit.getType());
                     if (unitList == null) {
-                        unitList = new ArrayList<Unit>();
+                        unitList = new ArrayList<>();
                         unitMap.put(unit.getType(), unitList);
                     }
                     unitList.add(unit);
@@ -2232,7 +2230,7 @@ public final class InGameController extends Controller {
 
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
-            List<Tile> tiles = new ArrayList<Tile>();
+            List<Tile> tiles = new ArrayList<>();
             for (Tile t : tile.getSurroundingTiles(1, radius)) {
                 if (!serverPlayer.canSee(t) && (t.isLand() || t.isShore())) {
                     tiles.add(t);
@@ -4102,7 +4100,7 @@ public final class InGameController extends Controller {
     public Element getREFUnits(ServerPlayer serverPlayer) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        List<AbstractUnit> units = new ArrayList<AbstractUnit>();
+        List<AbstractUnit> units = new ArrayList<>();
         final UnitType defaultType = spec.getDefaultUnitType();
 
         if (serverPlayer.getPlayerType() == PlayerType.COLONIAL) {
@@ -4110,7 +4108,7 @@ public final class InGameController extends Controller {
         } else {
             ServerPlayer REFPlayer = (ServerPlayer) serverPlayer.getREFPlayer();
             java.util.Map<UnitType, HashMap<String, Integer>> unitHash
-                = new HashMap<UnitType, HashMap<String, Integer>>();
+                = new HashMap<>();
             for (Unit unit : REFPlayer.getUnits()) {
                 if (unit.isOffensiveUnit()) {
                     UnitType unitType = defaultType;
@@ -4119,9 +4117,7 @@ public final class InGameController extends Controller {
                         unitType = unit.getType();
                     }
                     HashMap<String, Integer> roleMap = unitHash.get(unitType);
-                    if (roleMap == null) {
-                        roleMap = new HashMap<String, Integer>();
-                    }
+                    if (roleMap == null) roleMap = new HashMap<>();
                     String roleId = unit.getRole().getId();
                     Integer count = roleMap.get(roleId);
                     roleMap.put(roleId, Integer.valueOf((count == null) ? 1
@@ -4199,8 +4195,8 @@ public final class InGameController extends Controller {
         stats.putAll(getFreeColServer().getAIMain().getAIStatistics());
 
 
-        List<String> all = new ArrayList<String>();
-        List<String> keys = new ArrayList<String>(stats.keySet());
+        List<String> all = new ArrayList<>();
+        List<String> keys = new ArrayList<>(stats.keySet());
         Collections.sort(keys);
         for (String k : keys) {
             all.add(k);
@@ -4229,8 +4225,8 @@ public final class InGameController extends Controller {
         Game game = getGame();
         List<UnitType> undeads = game.getSpecification()
             .getUnitTypesWithAbility(Ability.UNDEAD);
-        List<UnitType> navalUnits = new ArrayList<UnitType>();
-        List<UnitType> landUnits = new ArrayList<UnitType>();
+        List<UnitType> navalUnits = new ArrayList<>();
+        List<UnitType> landUnits = new ArrayList<>();
         for (UnitType undead : undeads) {
             if (undead.hasAbility(Ability.NAVAL_UNIT)) {
                 navalUnits.add(undead);
@@ -4297,7 +4293,7 @@ public final class InGameController extends Controller {
             }
         }
 
-        List<UnitChange> todo = new ArrayList<UnitChange>(unitChanges);
+        List<UnitChange> todo = new ArrayList<>(unitChanges);
         while (!todo.isEmpty()) {
             UnitChange uc = todo.remove(0);
             if (uc.loc == tile) continue;

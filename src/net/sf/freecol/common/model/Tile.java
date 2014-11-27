@@ -207,9 +207,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         this.settlement = null;
 
         if (game.isInServer()) {
-            this.cachedTiles = new HashMap<Player, Tile>();
-            this.playerIndianSettlements
-                = new HashMap<Player, IndianSettlementInternals>();
+            this.cachedTiles = new HashMap<>();
+            this.playerIndianSettlements = new HashMap<>();
         } else {
             this.cachedTiles = null;
             this.playerIndianSettlements = null;
@@ -228,9 +227,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         super(game, id);
 
         if (game.isInServer()) {
-            this.cachedTiles = new HashMap<Player, Tile>();
-            this.playerIndianSettlements
-                = new HashMap<Player, IndianSettlementInternals>();
+            this.cachedTiles = new HashMap<>();
+            this.playerIndianSettlements = new HashMap<>();
         } else {
             this.cachedTiles = null;
             this.playerIndianSettlements = null;
@@ -492,7 +490,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if this is a river corner.
      */
     public boolean isRiverCorner() {
-        List<Tile> tiles = new ArrayList<Tile>();
+        List<Tile> tiles = new ArrayList<>();
         for (Tile t : getSurroundingTiles(1)) {
             if (t.isOnRiver()) tiles.add(t);
         }
@@ -956,8 +954,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A weighted list of <code>Disaster</code>s.
      */
     public List<RandomChoice<Disaster>> getDisasters() {
-        List<RandomChoice<Disaster>> disasters
-            = new ArrayList<RandomChoice<Disaster>>();
+        List<RandomChoice<Disaster>> disasters = new ArrayList<>();
         disasters.addAll(type.getDisasters());
         for (TileImprovement ti : getCompletedTileImprovements()) {
             disasters.addAll(ti.getType().getDisasters());
@@ -980,7 +977,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public StringTemplate getLabel() {
         StringTemplate label = StringTemplate.key(type.getNameKey());
         if (tileItemContainer != null) {
-            List<String> keys = new ArrayList<String>();
+            List<String> keys = new ArrayList<>();
             for (TileItem item : tileItemContainer.getTileItems()) {
                 if (item instanceof Resource) {
                     keys.add(((Resource) item).getType().getNameKey());
@@ -1113,7 +1110,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of the tiles surrounding this <code>Tile</code>.
      */
     public List<Tile> getSurroundingTiles(int rangeMin, int rangeMax) {
-        List<Tile> result = new ArrayList<Tile>();
+        List<Tile> result = new ArrayList<>();
         if (rangeMin > rangeMax || rangeMin < 0) return result;
 
         if (rangeMin == 0) result.add(this);
@@ -1164,7 +1161,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of adjacent <code>Colony</code>s.
      */
     public List<Colony> getAdjacentColonies() {
-        List<Colony> result = new ArrayList<Colony>();
+        List<Colony> result = new ArrayList<>();
         for (Tile t : getSurroundingTiles(1)) {
             Colony c = t.getColony();
             if (c != null) result.add(c);
@@ -1247,7 +1244,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of land <code>Tile</code>s.
      */
     public List<Tile> getSafestSurroundingLandTiles(Player player) {
-        List<Tile> tiles = new ArrayList<Tile>();
+        List<Tile> tiles = new ArrayList<>();
         for (Tile t : getSurroundingTiles(1)) {
             if (t.isLand()
                 && (!t.hasSettlement() || player.owns(t.getSettlement()))) {
@@ -1307,7 +1304,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of suitable <code>Tile</code>s.
      */
     public List<Tile> getSafeAnchoringTiles(Unit unit) {
-        List<Tile> result = new ArrayList<Tile>();
+        List<Tile> result = new ArrayList<>();
         for (Tile t : getSurroundingTiles(1)) {
             if (!t.isLand() && t.isHighSeasConnected()
                 && !t.isDangerousToShip(unit)) result.add(t);
@@ -1455,7 +1452,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             return Collections.<Modifier>emptyList();
         }
 
-        List<Modifier> result = new ArrayList<Modifier>();
+        List<Modifier> result = new ArrayList<>();
         if (tileItemContainer != null) {
             result.addAll(tileItemContainer
                 .getProductionModifiers(goodsType, unitType));
@@ -1479,7 +1476,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // there are options to change TileType using an improvement,
         // consider that too.
         final Specification spec = getSpecification();
-        List<TileType> tileTypes = new ArrayList<TileType>();
+        List<TileType> tileTypes = new ArrayList<>();
         tileTypes.add(type);
 
         // Add to the list the various possible tile type changes
@@ -1558,7 +1555,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public List<AbstractGoods> getSortedPotential(UnitType unitType,
                                                   Player owner) {
         final Specification spec = getSpecification();
-        List<AbstractGoods> goodsTypeList = new ArrayList<AbstractGoods>();
+        List<AbstractGoods> goodsTypeList = new ArrayList<>();
         if (getType() != null) {
             // It is necessary to consider all farmed goods, since the
             // tile might have a resource that produces goods not

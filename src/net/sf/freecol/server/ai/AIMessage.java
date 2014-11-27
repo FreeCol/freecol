@@ -170,7 +170,7 @@ public class AIMessage {
        
         final String tag = reply.getTagName();
         if ("multiple".equals(tag)) {
-            List<Element> replies = new ArrayList<Element>();
+            List<Element> replies = new ArrayList<>();
             NodeList nodes = reply.getChildNodes();
             Element result = null;
 

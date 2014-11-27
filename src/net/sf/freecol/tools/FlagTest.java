@@ -234,7 +234,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         flag.setUnionColor(unionColor.getColor());
         flag.setStarColor(starColor.getColor());
         flag.setDecorationColor(decorationColor.getColor());
-        List<Color> colors = new ArrayList<Color>();
+        List<Color> colors = new ArrayList<>();
         for (ColorButton button : backgroundColors) {
             Color color = button.getColor();
             if (color != null) {

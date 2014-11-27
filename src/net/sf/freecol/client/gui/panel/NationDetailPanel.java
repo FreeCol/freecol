@@ -61,7 +61,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
      * @param root a <code>DefaultMutableTreeNode</code>
      */
     public void addSubTrees(DefaultMutableTreeNode root) {
-        List<Nation> nations = new ArrayList<Nation>();
+        List<Nation> nations = new ArrayList<>();
         nations.addAll(getSpecification().getEuropeanNations());
         nations.addAll(getSpecification().getIndianNations());
         super.addSubTrees(root, nations);

@@ -355,10 +355,9 @@ public class SimpleMapGenerator implements MapGenerator {
         
         final Game game = map.getGame();
         float shares = 0f;
-        List<IndianSettlement> settlements = new ArrayList<IndianSettlement>();
-        List<Player> indians = new ArrayList<Player>();
-        HashMap<String, Territory> territoryMap
-            = new HashMap<String, Territory>();
+        List<IndianSettlement> settlements = new ArrayList<>();
+        List<Player> indians = new ArrayList<>();
+        HashMap<String, Territory> territoryMap = new HashMap<>();
 
         for (Player player : game.getLiveNativePlayers(null)) {
             switch (((IndianNationType)player.getNationType())
@@ -429,7 +428,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // layer of surrounding tiles to own.
         int minSettlementDistance
             = spec.getRangeOption(GameOptions.SETTLEMENT_NUMBER).getValue();
-        List<Tile> settlementTiles = new ArrayList<Tile>();
+        List<Tile> settlementTiles = new ArrayList<>();
         tiles: for (Tile tile : map.getAllTiles()) {
             if (!tile.isPolar() && suitableForNativeSettlement(tile)) {
                 for (Tile t : settlementTiles) {
@@ -455,7 +454,7 @@ public class SimpleMapGenerator implements MapGenerator {
 
         // Find the capitals
         List<Territory> territories
-            = new ArrayList<Territory>(territoryMap.values());
+            = new ArrayList<>(territoryMap.values());
         int settlementsPlaced = 0;
         for (Territory territory : territories) {
             switch (((IndianNationType) territory.player.getNationType())
@@ -473,7 +472,7 @@ public class SimpleMapGenerator implements MapGenerator {
             int radius = territory.player.getNationType().getCapitalType()
                 .getClaimableRadius();
             IndianSettlement is = placeCapital(map, territory, radius,
-                new ArrayList<Tile>(settlementTiles));
+                new ArrayList<>(settlementTiles));
             if (is != null) {
                 settlements.add(is);
                 settlementsPlaced++;
@@ -522,11 +521,10 @@ public class SimpleMapGenerator implements MapGenerator {
         // Grow some more tiles.
         // FIXME: move the magic numbers below to the spec
         // Also collect the skills provided
-        HashMap<UnitType, List<IndianSettlement>> skills
-            = new HashMap<UnitType, List<IndianSettlement>>();
+        HashMap<UnitType, List<IndianSettlement>> skills = new HashMap<>();
         randomShuffle(logger, "Settlements", settlements, random);
         for (IndianSettlement is : settlements) {
-            List<Tile> tiles = new ArrayList<Tile>();
+            List<Tile> tiles = new ArrayList<>();
             for (Tile tile : is.getOwnedTiles()) {
                 for (Tile t : tile.getSurroundingTiles(1)) {
                     if (t.getOwningSettlement() == null) {
@@ -553,7 +551,7 @@ public class SimpleMapGenerator implements MapGenerator {
             UnitType skill = is.getLearnableSkill();
             List<IndianSettlement> isList = skills.get(skill);
             if (isList == null) {
-                isList = new ArrayList<IndianSettlement>();
+                isList = new ArrayList<>();
                 isList.add(is);
                 skills.put(skill, isList);
             } else {
@@ -563,14 +561,13 @@ public class SimpleMapGenerator implements MapGenerator {
 
         // Require that there be experts for all the new world goods types.
         // Collect the list of needed experts
-        List<UnitType> expertsNeeded = new ArrayList<UnitType>();
+        List<UnitType> expertsNeeded = new ArrayList<>();
         for (GoodsType goodsType : spec.getNewWorldGoodsTypeList()) {
             UnitType expert = spec.getExpertForProducing(goodsType);
             if (!skills.containsKey(expert)) expertsNeeded.add(expert);
         }
         // Extract just the settlement lists.
-        List<List<IndianSettlement>> isList
-            = new ArrayList<List<IndianSettlement>>(skills.values());
+        List<List<IndianSettlement>> isList = new ArrayList<>(skills.values());
         Comparator<List<IndianSettlement>> listComparator
             = new Comparator<List<IndianSettlement>>() {
                 public int compare(List<IndianSettlement> l1,
@@ -584,8 +581,7 @@ public class SimpleMapGenerator implements MapGenerator {
             Collections.sort(isList, listComparator);
             List<IndianSettlement> extras = isList.remove(0);
             UnitType extraSkill = extras.get(0).getLearnableSkill();
-            List<RandomChoice<IndianSettlement>> choices
-                = new ArrayList<RandomChoice<IndianSettlement>>();
+            List<RandomChoice<IndianSettlement>> choices = new ArrayList<>();
             // ...look at the settlements with the most common skill
             // with a bit of favoritism to capitals as the needed skill
             // is so rare,...
@@ -615,8 +611,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 chose.setLearnableSkill(neededSkill);
                 extras.remove(chose);
                 isList.add(0, extras); // Try to stay well sorted
-                List<IndianSettlement> neededList
-                    = new ArrayList<IndianSettlement>();
+                List<IndianSettlement> neededList = new ArrayList<>();
                 neededList.add(chose);
                 isList.add(neededList);
             } else { // `can not happen'
@@ -765,8 +760,7 @@ public class SimpleMapGenerator implements MapGenerator {
                                               NationType nationType) {
         List<RandomChoice<UnitType>> skills
             = ((IndianNationType)nationType).getSkills();
-        java.util.Map<GoodsType, Integer> scale
-            = new HashMap<GoodsType, Integer>();
+        java.util.Map<GoodsType, Integer> scale = new HashMap<>();
         for (RandomChoice<UnitType> skill : skills) {
             scale.put(skill.getObject().getExpertProduction(), 1);
         }
@@ -779,8 +773,7 @@ public class SimpleMapGenerator implements MapGenerator {
             }
         }
 
-        List<RandomChoice<UnitType>> scaledSkills
-            = new ArrayList<RandomChoice<UnitType>>();
+        List<RandomChoice<UnitType>> scaledSkills = new ArrayList<>();
         for (RandomChoice<UnitType> skill : skills) {
             UnitType unitType = skill.getObject();
             int scaleValue = scale.get(unitType.getExpertProduction()).intValue();
@@ -812,7 +805,7 @@ public class SimpleMapGenerator implements MapGenerator {
         final int height = map.getHeight();
         final int poleDistance = (int)(MIN_DISTANCE_FROM_POLE*height/2);
 
-        List<Player> europeanPlayers = new ArrayList<Player>();
+        List<Player> europeanPlayers = new ArrayList<>();
         for (Player player : players) {
             if (player.isREF()) {
                 // eastern edge of the map
@@ -830,9 +823,9 @@ public class SimpleMapGenerator implements MapGenerator {
         }
 
         List<Position> positions = generateStartingPositions(map, europeanPlayers);
-        List<Tile> startingTiles = new ArrayList<Tile>();
-        List<Unit> carriers = new ArrayList<Unit>();
-        List<Unit> passengers = new ArrayList<Unit>();
+        List<Tile> startingTiles = new ArrayList<>();
+        List<Unit> carriers = new ArrayList<>();
+        List<Unit> passengers = new ArrayList<>();
 
         for (int index = 0; index < europeanPlayers.size(); index++) {
             Player player = europeanPlayers.get(index);
@@ -1068,7 +1061,7 @@ public class SimpleMapGenerator implements MapGenerator {
     private List<Position> generateStartingPositions(Map map,
         List<Player> players) {
         int number = players.size();
-        List<Position> positions = new ArrayList<Position>(number);
+        List<Position> positions = new ArrayList<>(number);
         if (number > 0) {
             int west = 0;
             int east = map.getWidth() - 1;

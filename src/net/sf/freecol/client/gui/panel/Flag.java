@@ -216,7 +216,7 @@ public class Flag {
      * starting at the top left. If there are more colors than stripes
      * or quarters, the superfluous colors will be ignored.
      */
-    private List<Color> backgroundColors = new ArrayList<Color>();
+    private List<Color> backgroundColors = new ArrayList<>();
 
     private Color unionColor = Color.BLUE;
     private Color starColor = Color.WHITE;

@@ -58,8 +58,7 @@ public class Mods {
         };
 
     /** A cache of all the mods. */
-    private static final Map<String, FreeColModFile> allMods
-        = new HashMap<String, FreeColModFile>();
+    private static final Map<String, FreeColModFile> allMods = new HashMap<>();
 
 
     /**
@@ -130,7 +129,7 @@ public class Mods {
      * @return A list of <code>FreeColModFile</code>s containing rulesets.
      */
     public static List<FreeColTcFile> getRuleSets() {
-        List<FreeColTcFile> result = new ArrayList<FreeColTcFile>();
+        List<FreeColTcFile> result = new ArrayList<>();
         File directory = FreeColDirectories.getRulesDirectory();
         for (File dir : directory.listFiles()) {
             if (dir.isDirectory()) {

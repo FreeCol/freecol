@@ -38,7 +38,8 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 public class SZAResource extends Resource {
     private static final Logger logger = Logger.getLogger(SZAResource.class.getName());
 
-    private Map<Double, SimpleZippedAnimation> scaledSzAnimations = new HashMap<Double, SimpleZippedAnimation>();
+    private Map<Double, SimpleZippedAnimation> scaledSzAnimations
+        = new HashMap<>();
     private SimpleZippedAnimation szAnimation = null;
     private volatile Object loadingLock = new Object();
 

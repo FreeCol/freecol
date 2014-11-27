@@ -63,7 +63,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
         final ImageLibrary lib = getGUI().getImageLibrary();
 
         this.goodsList = unit.getGoodsList();
-        this.checkBoxes = new ArrayList<JCheckBox>(goodsList.size());
+        this.checkBoxes = new ArrayList<>(goodsList.size());
 
         JLabel header = GUI.getDefaultHeader(Messages.message("dumpCargo"));
         header.setFont(GUI.SMALL_HEADER_FONT);
@@ -99,7 +99,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
      */
     public List<Goods> getResponse() {
         Object value = getValue();
-        List<Goods> gl = new ArrayList<Goods>();
+        List<Goods> gl = new ArrayList<>();
         if (options.get(0).equals(value)) {
             for (int i = 0; i < checkBoxes.size(); i++) {
                 if (checkBoxes.get(i).isSelected()) gl.add(goodsList.get(i));

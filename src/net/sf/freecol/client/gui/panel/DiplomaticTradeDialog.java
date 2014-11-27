@@ -167,7 +167,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 this.colonyBox.removeActionListener(al);
             }
 
-            List<Colony> available = new ArrayList<Colony>(allColonies);
+            List<Colony> available = new ArrayList<>(allColonies);
             for (Colony c : dt.getColoniesGivenBy(source)) {
                 if (available.contains(c)) {
                     available.remove(c);
@@ -361,7 +361,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 this.goodsBox.removeActionListener(al);
             }
 
-            List<Goods> available = new ArrayList<Goods>(allGoods);
+            List<Goods> available = new ArrayList<>(allGoods);
             for (Goods goods : dt.getGoodsGivenBy(source)) {
                 // Remove the ones already on the table
                 for (int i = 0; i < available.size(); i++) {
@@ -434,7 +434,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         private JComboBox<Player> victimBox;
         private JLabel label;
         private JButton clearButton, addButton;
-        private final List<Player> available = new ArrayList<Player>();
+        private final List<Player> available = new ArrayList<>();
 
 
         /**
@@ -721,7 +721,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 unitBox.removeActionListener(al);
             }
 
-            List<Unit> available = new ArrayList<Unit>(allUnits);
+            List<Unit> available = new ArrayList<>(allUnits);
             for (Unit u : dt.getUnitsGivenBy(source)) {
                 // Remove the ones already on the table
                 if (available.contains(u)) {
@@ -994,7 +994,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
      * @return A list of storable <code>Goods</code>.
      */
     private List<Goods> getAnyGoods(GoodsLocation gl) {
-        List<Goods> goodsList = new ArrayList<Goods>();
+        List<Goods> goodsList = new ArrayList<>();
         for (GoodsType type : getSpecification().getGoodsTypeList()) {
             if (type.isStorable()) {
                 Goods g = new Goods(getGame(), null, type,
@@ -1013,7 +1013,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
      * @return A list of <code>Unit</code>s.
      */
     private List<Unit> getUnitUnitList(Unit unit) {
-        List<Unit> ul = new ArrayList<Unit>();
+        List<Unit> ul = new ArrayList<>();
         if (unit != null) {
             if (unit.isCarrier()) {
                 ul.addAll(unit.getUnitList());

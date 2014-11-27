@@ -292,8 +292,7 @@ public final class Canvas extends JDesktopPane {
     private FileFilter[] fileFilters = null;
 
     /** The dialogs in view. */
-    private final List<FreeColDialog<?>> dialogs
-        = new ArrayList<FreeColDialog<?>>();
+    private final List<FreeColDialog<?>> dialogs = new ArrayList<>();
 
 
     /**
@@ -522,7 +521,7 @@ public final class Canvas extends JDesktopPane {
         Rectangle bounds = this.getBounds();
         if (!bounds.contains(x, y)) return null;
         tries = 3 * tries + 1; // 3 new candidates per level
-        List<Point> todo = new ArrayList<Point>();
+        List<Point> todo = new ArrayList<>();
         Point p = new Point(x, y);
         todo.add(p);
         while (!todo.isEmpty()) {
@@ -1353,8 +1352,7 @@ public final class Canvas extends JDesktopPane {
         StringTemplate t = settlement.getAlarmLevelMessage(player);
         JTextArea text = GUI.getDefaultTextArea(Messages.message(t));
 
-        List<ChoiceItem<ArmedUnitSettlementAction>> choices
-            = new ArrayList<ChoiceItem<ArmedUnitSettlementAction>>();
+        List<ChoiceItem<ArmedUnitSettlementAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<ArmedUnitSettlementAction>(
                 Messages.message("armedUnitSettlement.tribute"),
                 ArmedUnitSettlementAction.SETTLEMENT_TRIBUTE));
@@ -1384,8 +1382,7 @@ public final class Canvas extends JDesktopPane {
             .addAmount("%amount%", arrears);
         JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
 
-        List<ChoiceItem<BoycottAction>> choices
-            = new ArrayList<ChoiceItem<BoycottAction>>();
+        List<ChoiceItem<BoycottAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<BoycottAction>(
                 Messages.message("boycottedGoods.payArrears"),
                 BoycottAction.PAY_ARREARS));
@@ -1443,8 +1440,7 @@ public final class Canvas extends JDesktopPane {
             .addAmount("%gold%", gold);
         JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
 
-        List<ChoiceItem<BuyAction>> choices
-            = new ArrayList<ChoiceItem<BuyAction>>();
+        List<ChoiceItem<BuyAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<BuyAction>(
                 Messages.message("buy.takeOffer"),
                 BuyAction.BUY, canBuy));
@@ -1508,8 +1504,7 @@ public final class Canvas extends JDesktopPane {
      */
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,
                                        Player owner) {
-        List<ChoiceItem<ClaimAction>> choices
-            = new ArrayList<ChoiceItem<ClaimAction>>();
+        List<ChoiceItem<ClaimAction>> choices = new ArrayList<>();
         
         StringTemplate template;
         if (owner.hasContacted(player)) {
@@ -1893,8 +1888,7 @@ public final class Canvas extends JDesktopPane {
                                                        boolean canGift) {
         JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
 
-        ArrayList<ChoiceItem<TradeAction>> choices
-            = new ArrayList<ChoiceItem<TradeAction>>();
+        ArrayList<ChoiceItem<TradeAction>> choices = new ArrayList<>();
         if (canBuy) {
             choices.add(new ChoiceItem<TradeAction>(
                     Messages.message("tradeProposition.toBuy"),
@@ -2429,8 +2423,7 @@ public final class Canvas extends JDesktopPane {
                     unit.getLabel(Unit.UnitLabelType.NATIONAL))
                 .addName("%colony%", colony.getName())));
 
-        List<ChoiceItem<ScoutColonyAction>> choices
-            = new ArrayList<ChoiceItem<ScoutColonyAction>>();
+        List<ChoiceItem<ScoutColonyAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<ScoutColonyAction>(
                 Messages.message("scoutColony.negotiate"),
                 ScoutColonyAction.FOREIGN_COLONY_NEGOTIATE, neg));
@@ -2495,8 +2488,7 @@ public final class Canvas extends JDesktopPane {
         }
         JTextArea text = GUI.getDefaultTextArea(sb.toString());
 
-        List<ChoiceItem<ScoutIndianSettlementAction>> choices
-            = new ArrayList<ChoiceItem<ScoutIndianSettlementAction>>();
+        List<ChoiceItem<ScoutIndianSettlementAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
                 Messages.message("scoutSettlement.speak"),
                 ScoutIndianSettlementAction.INDIAN_SETTLEMENT_SPEAK));
@@ -2577,8 +2569,7 @@ public final class Canvas extends JDesktopPane {
             .addAmount("%gold%", gold);
         JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
 
-        List<ChoiceItem<SellAction>> choices
-            = new ArrayList<ChoiceItem<SellAction>>();
+        List<ChoiceItem<SellAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<SellAction>(
                 Messages.message("sell.takeOffer"),
                 SellAction.SELL));
@@ -2775,8 +2766,7 @@ public final class Canvas extends JDesktopPane {
         sb.append(Messages.message(t));
         JTextArea text = GUI.getDefaultTextArea(sb.toString());
 
-        List<ChoiceItem<MissionaryAction>> choices
-            = new ArrayList<ChoiceItem<MissionaryAction>>();
+        List<ChoiceItem<MissionaryAction>> choices = new ArrayList<>();
         if (canEstablish) {
             choices.add(new ChoiceItem<MissionaryAction>(
                     Messages.message("missionarySettlement.establish"),

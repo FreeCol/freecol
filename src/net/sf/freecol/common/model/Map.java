@@ -215,7 +215,7 @@ public class Map extends FreeColGameObject implements Location {
          */
         public static Direction[] getRandomDirections(String logMe,
                                                       Random random) {
-            List<Direction> directions = new ArrayList<Direction>(allDirections);
+            List<Direction> directions = new ArrayList<>(allDirections);
             randomShuffle(logger, logMe, directions, random);
             return directions.toArray(new Direction[0]);
         }
@@ -456,8 +456,7 @@ public class Map extends FreeColGameObject implements Location {
     private float latitudePerRow;
 
     /** The regions, indexed by object identifier. */
-    private final java.util.Map<String, Region> regions
-        = new HashMap<String, Region>();
+    private final java.util.Map<String, Region> regions = new HashMap<>();
 
     /** The search tracing status.  Do not serialize. */
     private boolean traceSearch = false;
@@ -1548,14 +1547,10 @@ public class Map extends FreeColGameObject implements Location {
                                final int maxTurns, final Unit carrier,
                                final SearchHeuristic searchHeuristic,
                                final LogBuilder lb) {
-        final HashMap<String, PathNode> openMap
-            = new HashMap<String, PathNode>();
-        final HashMap<String, PathNode> closedMap
-            = new HashMap<String, PathNode>();
-        final HashMap<String, Integer> f
-            = new HashMap<String, Integer>();
-        final PriorityQueue<PathNode> openMapQueue
-            = new PriorityQueue<PathNode>(1024,
+        final HashMap<String, PathNode> openMap = new HashMap<>();
+        final HashMap<String, PathNode> closedMap = new HashMap<>();
+        final HashMap<String, Integer> f = new HashMap<>();
+        final PriorityQueue<PathNode> openMapQueue = new PriorityQueue<>(1024,
                 new Comparator<PathNode>() {
                     public int compare(PathNode p1, PathNode p2) {
                         return (f.get(p1.getLocation().getId()).intValue()
@@ -2341,8 +2336,8 @@ public class Map extends FreeColGameObject implements Location {
      * tile.
      */
     public void resetHighSeasCount() {
-        List<Tile> curr = new ArrayList<Tile>();
-        List<Tile> next = new ArrayList<Tile>();
+        List<Tile> curr = new ArrayList<>();
+        List<Tile> next = new ArrayList<>();
         int hsc = 0;
         for (Tile t : getAllTiles()) {
             t.setHighSeasCount(-1);
@@ -2557,7 +2552,7 @@ public class Map extends FreeColGameObject implements Location {
     private static final String MINIMUM_LATITUDE_TAG = "minimumLatitude";
     private static final String WIDTH_TAG = "width";
     // @compat 0.10.x, region remediation
-    private final List<Tile> missingRegions = new ArrayList<Tile>();
+    private final List<Tile> missingRegions = new ArrayList<>();
     // end @compat
     // @compat 0.10.5, nasty I/O hack
     private boolean fixupHighSeas = false;

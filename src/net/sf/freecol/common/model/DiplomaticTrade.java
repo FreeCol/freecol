@@ -79,7 +79,7 @@ public class DiplomaticTrade extends FreeColObject {
     private TradeStatus status;
 
     /** The individual items the trade consists of. */
-    private final List<TradeItem> items = new ArrayList<TradeItem>();
+    private final List<TradeItem> items = new ArrayList<>();
 
     /** Counter for the number of iterations on this attempt to agree. */
     private int version;
@@ -295,7 +295,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A list of <code>TradeItem</code>s offered by the player.
      */
     public List<TradeItem> getItemsGivenBy(Player player) {
-        List<TradeItem> goodsList = new ArrayList<TradeItem>();
+        List<TradeItem> goodsList = new ArrayList<>();
         for (TradeItem ti : items) {
             if (player == ti.getSource()) goodsList.add(ti);
         }
@@ -322,7 +322,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A list of <code>Colony</code>s offered in this trade.
      */
     public List<Colony> getColoniesGivenBy(Player player) {
-        List<Colony> colonyList = new ArrayList<Colony>();
+        List<Colony> colonyList = new ArrayList<>();
         for (TradeItem ti : items) {
             if (ti instanceof ColonyTradeItem && player == ti.getSource()) {
                 colonyList.add(((ColonyTradeItem)ti).getColony(player.getGame()));
@@ -352,7 +352,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A list of <code>Goods</code> offered in this trade.
      */
     public List<Goods> getGoodsGivenBy(Player player) {
-        List<Goods> goodsList = new ArrayList<Goods>();
+        List<Goods> goodsList = new ArrayList<>();
         for (TradeItem ti : items) {
             if (ti instanceof GoodsTradeItem && player == ti.getSource()) {
                 goodsList.add(((GoodsTradeItem)ti).getGoods());
@@ -381,7 +381,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A list of <code>Unit</code>s offered in this trade.
      */
     public List<Unit> getUnitsGivenBy(Player player) {
-        List<Unit> unitList = new ArrayList<Unit>();
+        List<Unit> unitList = new ArrayList<>();
         for (TradeItem ti : items) {
             if (ti instanceof UnitTradeItem && player == ti.getSource()) {
                 unitList.add(((UnitTradeItem)ti).getUnit());

@@ -54,8 +54,7 @@ import net.sf.freecol.common.model.Map.Direction;
 public class TileImprovementStyle {
 
     /** Cache all TileImprovementStyles. */
-    private static final Map<String, TileImprovementStyle> cache
-        = new HashMap<String, TileImprovementStyle>();
+    private static final Map<String, TileImprovementStyle> cache = new HashMap<>();
 
     /** A key for the tile improvement style. */
     private final String style;

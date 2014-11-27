@@ -71,7 +71,7 @@ public class MergeTranslations {
 
                 Map<String, String> targetProperties = readFile(targetFile);
 
-                List<Entry<?,?>> missingProperties = new ArrayList<Entry<?,?>>();
+                List<Entry<?,?>> missingProperties = new ArrayList<>();
                 for (Entry<?,?> entry : sourceProperties.entrySet()) {
                     if (!targetProperties.containsKey(entry.getKey())) {
                         missingProperties.add(entry);
@@ -110,7 +110,7 @@ public class MergeTranslations {
     }
 
     private static Map<String, String> readFile(File file) {
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
         BufferedReader bufferedReader = null;
         try {
             FileReader fileReader = new FileReader(file);

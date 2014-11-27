@@ -57,7 +57,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     private TypeSelector selector = TypeSelector.UNITS;
 
     /** A list of choices to provide to the UI. */
-    private final List<UnitType> choices = new ArrayList<UnitType>();
+    private final List<UnitType> choices = new ArrayList<>();
 
 
     /**

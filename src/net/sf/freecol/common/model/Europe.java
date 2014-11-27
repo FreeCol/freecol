@@ -73,11 +73,10 @@ public class Europe extends UnitLocation
      * This list represents the types of the units that can be
      * recruited in Europe.
      */
-    protected List<UnitType> recruitables = new ArrayList<UnitType>();
+    protected List<UnitType> recruitables = new ArrayList<>();
 
     /** Prices for trainable or purchasable units. */
-    protected java.util.Map<UnitType, Integer> unitPrices
-        = new HashMap<UnitType, Integer>();
+    protected java.util.Map<UnitType, Integer> unitPrices = new HashMap<>();
 
     /** Current price to recruit a unit. */
     protected int recruitPrice;

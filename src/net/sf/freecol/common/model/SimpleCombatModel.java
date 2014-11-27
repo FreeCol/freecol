@@ -126,7 +126,7 @@ public class SimpleCombatModel extends CombatModel {
      * @param modSet A set of <code>Modifiers</code> to log.
      */   
     private void logModifiers(LogBuilder lb, Set<Modifier> modSet) {
-        List<Modifier> modList = new ArrayList<Modifier>();
+        List<Modifier> modList = new ArrayList<>();
         modList.addAll(modSet);
         Collections.sort(modList);
         lb.addCollection(" ", modList);
@@ -590,7 +590,7 @@ public class SimpleCombatModel extends CombatModel {
         FreeColGameObject attacker, FreeColGameObject defender) {
         LogBuilder lb = new LogBuilder(256);
         lb.add("Combat");
-        ArrayList<CombatResult> crs = new ArrayList<CombatResult>();
+        ArrayList<CombatResult> crs = new ArrayList<>();
         CombatOdds odds = calculateCombatOdds(attacker, defender, lb);
         float r = randomFloat(logger, "AttackResult", random);
         lb.add(" random(1.0)=", r);

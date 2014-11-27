@@ -233,7 +233,7 @@ public abstract class Settlement extends GoodsLocation
         if (maximal) {
             tiles = owner.getClaimableTiles(tile, getRadius());
         } else {
-            tiles = new ArrayList<Tile>();
+            tiles = new ArrayList<>();
             tiles.add(tile);
         }
 
@@ -455,7 +455,7 @@ public abstract class Settlement extends GoodsLocation
      */
     @Override
     public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        List<FreeColGameObject> objects = new ArrayList<>();
         if (owner != null) {
             owner.removeSettlement(this);
             // It is not safe to setOwner(null).  When a settlement is

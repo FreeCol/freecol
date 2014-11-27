@@ -61,7 +61,7 @@ public class LootCargoMessage extends DOMMessage {
 
         this.winnerId = winner.getId();
         this.loserId = loserId;
-        this.goods = (goods == null) ? null : new ArrayList<Goods>(goods);
+        this.goods = (goods == null) ? null : new ArrayList<>(goods);
     }
 
     /**
@@ -80,7 +80,7 @@ public class LootCargoMessage extends DOMMessage {
         if (children.getLength() == 0) {
             this.goods = null;
         } else {
-            this.goods = new ArrayList<Goods>();
+            this.goods = new ArrayList<>();
             for (int i = 0; i < children.getLength(); i++) {
                 this.goods.add(new Goods(game, (Element) children.item(i)));
             }

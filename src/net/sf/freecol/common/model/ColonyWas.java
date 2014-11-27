@@ -49,8 +49,7 @@ public class ColonyWas {
         this.colony = colony;
         this.population = colony.getUnitCount();
         this.productionBonus = colony.getProductionBonus();
-        this.buildQueue
-            = new ArrayList<BuildableType>(colony.getBuildQueue());
+        this.buildQueue = new ArrayList<>(colony.getBuildQueue());
         if (colony.getGoodsContainer() != null) {
             colony.getGoodsContainer().saveState();
         }

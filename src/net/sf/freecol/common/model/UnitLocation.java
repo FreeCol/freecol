@@ -108,7 +108,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /** The Units present in this Location. */
-    private final List<Unit> units = new ArrayList<Unit>();
+    private final List<Unit> units = new ArrayList<>();
 
 
     /**
@@ -227,7 +227,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @return A list of naval <code>Unit</code>s present.
      */
     public List<Unit> getNavalUnits() {
-        List<Unit> shipList = new ArrayList<Unit>();
+        List<Unit> shipList = new ArrayList<>();
         for (Unit u : getUnitList()) {
             if (u.isNaval()) shipList.add(u);
         }
@@ -242,7 +242,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     @Override
     public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        List<FreeColGameObject> objects = new ArrayList<>();
         synchronized (units) {
             while (!units.isEmpty()) {
                 objects.addAll(units.remove(0).disposeList());
@@ -355,7 +355,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     public List<Unit> getUnitList() {
         synchronized (units) {
-            return new ArrayList<Unit>(units);
+            return new ArrayList<>(units);
         }
     }
 

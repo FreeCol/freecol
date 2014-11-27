@@ -95,7 +95,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
         for (Modifier modifier : type.getModifiers()) {
             String text = ModifierFormat.getModifierAsString(modifier);
             if (modifier.hasScope()) {
-                List<String> scopeStrings = new ArrayList<String>();
+                List<String> scopeStrings = new ArrayList<>();
                 for (Scope scope : modifier.getScopes()) {
                     if (scope.getType() != null) {
                         FreeColGameObjectType fcgot = getSpecification()

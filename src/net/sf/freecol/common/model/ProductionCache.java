@@ -49,8 +49,7 @@ public class ProductionCache {
         = new TypeCountMap<GoodsType>();
 
     /** A map of production info for various producers and consumers. */
-    private Map<Object, ProductionInfo> productionAndConsumption
-        = new HashMap<Object, ProductionInfo>();
+    private Map<Object, ProductionInfo> productionAndConsumption = new HashMap<>();
 
     /** A set of the goods used by the colony. */
     private Set<GoodsType> goodsUsed = new HashSet<GoodsType>();
@@ -119,7 +118,7 @@ public class ProductionCache {
         productionAndConsumption.put(this, bellsInfo);
         netProduction.incrementCount(bells, amount);
 
-        List<AbstractGoods> goods = new ArrayList<AbstractGoods>();
+        List<AbstractGoods> goods = new ArrayList<>();
         for (Consumer consumer : colony.getConsumers()) {
             Set<Modifier> modifiers = consumer
                 .getModifiers(Modifier.CONSUME_ONLY_SURPLUS_PRODUCTION);
@@ -140,7 +139,7 @@ public class ProductionCache {
             ProductionInfo info = null;
             if (consumer instanceof Building) {
                 Building building = (Building)consumer;
-                List<AbstractGoods> outputs = new ArrayList<AbstractGoods>();
+                List<AbstractGoods> outputs = new ArrayList<>();
                 for (AbstractGoods output : building.getOutputs()) {
                     GoodsType outputType = output.getType();
                     goodsUsed.add(outputType);

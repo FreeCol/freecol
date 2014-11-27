@@ -39,7 +39,7 @@ public class LogBuilder {
     private StringBuilder sb;
 
     /** The remembered buffer index. */
-    private final List<Integer> points = new ArrayList<Integer>();
+    private final List<Integer> points = new ArrayList<>();
 
 
     /**

@@ -77,9 +77,7 @@ public final class FeatureContainer {
      */
     private void requireAbilities() {
         synchronized (abilitiesLock) {
-            if (abilities == null) {
-                abilities = new HashMap<String, Set<Ability>>();
-            }
+            if (abilities == null) abilities = new HashMap<>();
         }
     }
 
@@ -99,9 +97,7 @@ public final class FeatureContainer {
      */
     private synchronized void requireModifiers() {
         synchronized (modifiersLock) {
-            if (modifiers == null) {
-                modifiers = new HashMap<String, Set<Modifier>>();
-            }
+            if (modifiers == null) modifiers = new HashMap<>();
         }
     }
 
@@ -289,7 +285,7 @@ public final class FeatureContainer {
     public static float applyModifiers(float number, Turn turn,
                                        Collection<Modifier> mods) {
         if (mods == null || mods.isEmpty()) return number;
-        List<Modifier> modifiers = new ArrayList<Modifier>(mods);
+        List<Modifier> modifiers = new ArrayList<>(mods);
         Collections.sort(modifiers);
         float result = number;
         for (Modifier m : modifiers) {
@@ -363,7 +359,7 @@ public final class FeatureContainer {
             requireAbilities();
             HashMap<String, Set<Ability>> ca;
             synchronized (c.abilitiesLock) {
-                ca = new HashMap<String, Set<Ability>>(c.abilities);
+                ca = new HashMap<>(c.abilities);
             }
             synchronized (abilitiesLock) {
                 for (Entry<String, Set<Ability>> e : ca.entrySet()) {
@@ -381,7 +377,7 @@ public final class FeatureContainer {
             requireModifiers();
             HashMap<String, Set<Modifier>> cm;
             synchronized (c.modifiersLock) {
-                cm = new HashMap<String, Set<Modifier>>(c.modifiers);
+                cm = new HashMap<>(c.modifiers);
             }
             synchronized (modifiersLock) {
                 for (Entry<String, Set<Modifier>> e : cm.entrySet()) {

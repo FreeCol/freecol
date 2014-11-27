@@ -183,8 +183,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
                              new Color(0xd5, 0x2b, 0x1e));
 
     /** A map of default nation flags. */
-    private static final Map<String, Flag> defaultFlags
-        = new HashMap<String, Flag>();
+    private static final Map<String, Flag> defaultFlags = new HashMap<>();
     static {
         defaultFlags.put("model.nation.dutch",      DUTCH_FLAG);
         defaultFlags.put("model.nation.english",    ENGLISH_FLAG);
@@ -373,7 +372,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         this.flag.setUnionColor(this.unionColor.getColor());
         this.flag.setStarColor(this.starColor.getColor());
         this.flag.setDecorationColor(this.decorationColor.getColor());
-        List<Color> colors = new ArrayList<Color>();
+        List<Color> colors = new ArrayList<>();
         for (ColorButton button : this.backgroundColors) {
             Color color = button.getColor();
             if (color != null) {
@@ -439,7 +438,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
     public List<String> getResponse() {
         Object value = getValue();
         if (options.get(0).equals(value)) {
-            List<String> result = new ArrayList<String>();
+            List<String> result = new ArrayList<>();
             // Sanitize user input, used in save file name
             result.add(this.nationField.getText().replaceAll("[^\\s\\w]", ""));
             result.add(this.countryField.getText());

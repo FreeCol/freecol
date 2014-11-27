@@ -82,8 +82,7 @@ public final class TradeRoutePanel extends FreeColPanel {
     private JList<TradeRoute> tradeRoutes;
 
     /** A map of trade route to the number of units using it. */
-    private final Map<TradeRoute, Integer> counts
-        = new HashMap<TradeRoute, Integer>();
+    private final Map<TradeRoute, Integer> counts = new HashMap<>();
 
     /** The button to create a new trade route. */
     private JButton newRouteButton;
@@ -305,8 +304,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         }
 
         // Now create a sorted list of routes
-        List<TradeRoute> routes
-            = new ArrayList<TradeRoute>(player.getTradeRoutes());
+        List<TradeRoute> routes = new ArrayList<>(player.getTradeRoutes());
         Collections.sort(routes, tradeRouteComparator);
 
         // Then add the routes to the list model.
@@ -349,7 +347,7 @@ public final class TradeRoutePanel extends FreeColPanel {
             getGUI().removeFromCanvas(this);
 
         } else if (OK.equals(command)) {
-            List<TradeRoute> routes = new ArrayList<TradeRoute>();
+            List<TradeRoute> routes = new ArrayList<>();
             for (int index = 0; index < listModel.getSize(); index++) {
                 routes.add((TradeRoute)listModel.getElementAt(index));
             }

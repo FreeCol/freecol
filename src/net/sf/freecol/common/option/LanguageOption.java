@@ -50,8 +50,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     public static final String AUTO = "automatic";
 
     /** Extra languages with alternate names. */
-    private static final Map<String, String> languageNames
-        = new HashMap<String, String>();
+    private static final Map<String, String> languageNames = new HashMap<>();
     static { // Add non-standard language names here.
         languageNames.put("arz", "\u0645\u0635\u0631\u064A");
         languageNames.put("hsb", "Serb\u0161\u0107ina");
@@ -167,7 +166,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      * Initialized on demand with initializeLanguages(), as it depends
      * on the location of the i18n directory having stabilized.
      */
-    private static final List<Language> languages = new ArrayList<Language>();
+    private static final List<Language> languages = new ArrayList<>();
 
     /** The default language. */
     private static final Language DEFAULT_LANGUAGE
@@ -239,7 +238,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      * @return A list of the available languages.
      */
     public List<Language> getChoices() {
-        return new ArrayList<Language>(languages);
+        return new ArrayList<>(languages);
     }
 
 

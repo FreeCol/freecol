@@ -115,15 +115,13 @@ public class Messages {
      * The mapping from language-independent key to localized message
      * for the established locale.
      */
-    private static final Map<String, String> messageBundle
-        = new HashMap<String, String>();
+    private static final Map<String, String> messageBundle = new HashMap<>();
 
     /**
      * A map with Selector values and the tag keys used in choice
      * formats.
      */
-    private static Map<String, Selector> tagMap
-        = new HashMap<String, Selector>();
+    private static Map<String, Selector> tagMap = new HashMap<>();
     static {
         tagMap.put("turn", new TurnSelector());
     }
@@ -264,7 +262,7 @@ public class Messages {
      * @param locale The <code>Locale</code> to load resources for.
      */
     public static void setModMessageBundle(Locale locale) {
-        List<FreeColModFile> allMods = new ArrayList<FreeColModFile>();
+        List<FreeColModFile> allMods = new ArrayList<>();
         allMods.addAll(Mods.getAllMods());
         allMods.addAll(Mods.getRuleSets());
 
@@ -613,7 +611,7 @@ public class Messages {
      */
     public static synchronized void requireOtherRivers() {
         if (otherRivers == null) {
-            otherRivers = new ArrayList<String>();
+            otherRivers = new ArrayList<>();
             collectNames("model.other.region.river.", otherRivers);
             // Does not need to use player or system PRNG
             Collections.shuffle(otherRivers);
@@ -677,7 +675,7 @@ public class Messages {
      */
     private static synchronized void requireMercenaryLeaders() {
         if (mercenaryLeaders == null) {
-            mercenaryLeaders = new ArrayList<String>();
+            mercenaryLeaders = new ArrayList<>();
             collectNames("model.mercenaries.", mercenaryLeaders);
         }
     }
@@ -726,7 +724,7 @@ public class Messages {
      *     fallback prefix.
      */
     public static List<String> getSettlementNames(Player player) {
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
 
         collectNames(player.getNationId() + ".settlementName.", names);
 
@@ -754,7 +752,7 @@ public class Messages {
      */
     public static List<String> getShipNames(Player player) {
         final String prefix = player.getNationId() + ".ship.";
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
 
         // Fallback prefix first
         names.add(message("Ship"));

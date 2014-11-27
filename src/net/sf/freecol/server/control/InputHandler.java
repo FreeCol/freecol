@@ -53,8 +53,8 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      * The handler map provides named handlers for network requests. Each
      * handler deals with a given request type.
      */
-    private final Map<String, NetworkRequestHandler> _handlerMap = Collections
-            .synchronizedMap(new HashMap<String, NetworkRequestHandler>());
+    private final Map<String, NetworkRequestHandler> _handlerMap
+        = Collections.synchronizedMap(new HashMap<String, NetworkRequestHandler>());
 
 
     /**

@@ -209,9 +209,7 @@ public class UnitTypeChange extends FreeColObject {
      * @param scope The <code>Scope</code> to add.
      */
     private void addScope(Scope scope) {
-        if (scopes == null) {
-            scopes = new ArrayList<Scope>();
-        }
+        if (scopes == null) scopes = new ArrayList<>();
         scopes.add(scope);
     }
 

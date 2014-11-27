@@ -134,7 +134,7 @@ public final class ReportIndianPanel extends ReportPanel {
                 reportPanel.add(head);
             }
             List<IndianSettlement> settlements
-                = new ArrayList<IndianSettlement>(nativeSettlements.size());
+                = new ArrayList<>(nativeSettlements.size());
             for (IndianSettlement settlement : nativeSettlements) {
                 if (settlement.isCapital()) {
                     settlements.add(0, settlement);

@@ -199,7 +199,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             // Collect the transferred buildables.
             final JList<BuildableType> bql
                 = BuildQueuePanel.this.buildQueueList;
-            List<BuildableType> queue = new ArrayList<BuildableType>();
+            List<BuildableType> queue = new ArrayList<>();
             for (Object object : (List<?>)transferData) {
                 // Fail if:
                 // - dropping a non-Buildable
@@ -521,8 +521,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     /** The check box to enable showing all buildables. */
     private final JCheckBox showAllBox;
 
-    private Map<BuildableType, String> lockReasons
-        = new HashMap<BuildableType, String>();
+    private Map<BuildableType, String> lockReasons = new HashMap<>();
     private Set<BuildableType> unbuildableTypes
         = new HashSet<BuildableType>();
 
@@ -695,7 +694,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         units.clear();
         loop: for (UnitType unitType : spec.getBuildableUnitTypes()) {
             // compare colony.getNoBuildReason()
-            List<String> lockReason = new ArrayList<String>();
+            List<String> lockReason = new ArrayList<>();
             if (unbuildableTypes.contains(unitType)) {
                 continue;
             }
@@ -775,7 +774,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         buildings.clear();
         loop: for (BuildingType buildingType : spec.getBuildingTypeList()) {
             // compare colony.getNoBuildReason()
-            List<String> lockReason = new ArrayList<String>();
+            List<String> lockReason = new ArrayList<>();
             Building colonyBuilding = this.colony.getBuilding(buildingType);
             if (current.contains(buildingType)
                 || hasBuildingType(buildingType)) {
@@ -897,7 +896,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     }
 
     private List<BuildableType> getBuildableTypes(JList<? extends BuildableType> list) {
-        List<BuildableType> result = new ArrayList<BuildableType>();
+        List<BuildableType> result = new ArrayList<>();
         if (list == null) return result;
         ListModel<? extends BuildableType> model = list.getModel();
         for (int index = 0; index < model.getSize(); index++) {
@@ -907,7 +906,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     }
 
     private List<BuildableType> getBuildableTypes(Object[] objects) {
-        List<BuildableType> result = new ArrayList<BuildableType>();
+        List<BuildableType> result = new ArrayList<>();
         if (objects != null) {
             for (Object object : objects) {
                 if (object instanceof BuildableType) {

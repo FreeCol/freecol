@@ -52,10 +52,10 @@ public class NewUnitPanel extends FreeColPanel {
     private final JLabel question;
 
     /** The buttons to display. */
-    private final List<JButton> buttons = new ArrayList<JButton>();
+    private final List<JButton> buttons = new ArrayList<>();
 
     /** The unit types corresponding to the buttons. */
-    private final List<UnitType> units = new ArrayList<UnitType>();
+    private final List<UnitType> units = new ArrayList<>();
 
     /** A comparator for unit prices. */
     private final Comparator<UnitType> priceComparator;

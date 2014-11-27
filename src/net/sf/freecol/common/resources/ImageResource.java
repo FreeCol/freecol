@@ -44,10 +44,8 @@ public class ImageResource extends Resource {
 
     private static final Logger logger = Logger.getLogger(ImageResource.class.getName());
 
-    private Map<Dimension, Image> grayscaleImages
-        = new HashMap<Dimension, Image>();
-    private Map<Dimension, Image> scaledImages
-        = new HashMap<Dimension, Image>();
+    private Map<Dimension, Image> grayscaleImages = new HashMap<>();
+    private Map<Dimension, Image> scaledImages = new HashMap<>();
     private Image image = null;
     private final Object loadingLock = new Object();
     private static final Component _c = new Component() {};

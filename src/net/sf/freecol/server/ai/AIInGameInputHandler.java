@@ -333,7 +333,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                     return p2 - p1;
                 }
             });
-        List<Goods> loot = new ArrayList<Goods>();
+        List<Goods> loot = new ArrayList<>();
         int space = unit.getSpaceLeft();
         while (!goods.isEmpty()) {
             Goods g = goods.remove(0);
@@ -391,7 +391,7 @@ public final class AIInGameInputHandler implements MessageHandler {
      */
     public Element multiple(Connection connection, Element element) {
         NodeList nodes = element.getChildNodes();
-        List<Element> results = new ArrayList<Element>();
+        List<Element> results = new ArrayList<>();
 
         for (int i = 0; i < nodes.getLength(); i++) {
             try {

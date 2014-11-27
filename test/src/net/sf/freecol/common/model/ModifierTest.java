@@ -147,7 +147,7 @@ public class ModifierTest extends FreeColTestCase {
         scope3.setMethodName("getLineOfSight");
         scope3.setMethodValue("2");
 
-        List<Scope> scopes = new ArrayList<Scope>();
+        List<Scope> scopes = new ArrayList<>();
         scopes.add(scope1);
         modifier1.setScopes(scopes);
         assertTrue(modifier1.appliesTo(frigate));
@@ -164,7 +164,7 @@ public class ModifierTest extends FreeColTestCase {
         assertEquals(1.5f + (1.5f * 30) / 100,
             FeatureContainer.applyModifiers(1, null, result));
 
-        List<Scope> scopes2 = new ArrayList<Scope>();
+        List<Scope> scopes2 = new ArrayList<>();
         scopes2.add(scope2);
         scopes2.add(scope3);
         modifier2.setScopes(scopes2);
@@ -287,13 +287,13 @@ public class ModifierTest extends FreeColTestCase {
         assertFalse(modifier1.equals(modifier3));
         assertFalse(modifier1.hashCode() == modifier3.hashCode());
 
-        List<Scope> scopeList1 = new ArrayList<Scope>();
+        List<Scope> scopeList1 = new ArrayList<>();
         scopeList1.add(scope1);
         scopeList1.add(scope3);
-        List<Scope> scopeList2 = new ArrayList<Scope>();
+        List<Scope> scopeList2 = new ArrayList<>();
         scopeList2.add(scope3);
         scopeList2.add(scope1);
-        List<Scope> scopeList3 = new ArrayList<Scope>();
+        List<Scope> scopeList3 = new ArrayList<>();
         scopeList3.add(scope1);
         scopeList3.add(scope2);
 

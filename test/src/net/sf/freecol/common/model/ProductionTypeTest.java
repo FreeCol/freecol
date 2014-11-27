@@ -210,10 +210,8 @@ public class ProductionTypeTest extends FreeColTestCase {
     private static final UnitType colonistType
         = s.getDefaultUnitType();
 
-    private Map<GoodsType, Integer> inputs
-        = new HashMap<GoodsType, Integer>();
-    private Map<GoodsType, Integer> outputs
-        = new HashMap<GoodsType, Integer>();
+    private Map<GoodsType, Integer> inputs = new HashMap<>();
+    private Map<GoodsType, Integer> outputs = new HashMap<>();
 
 
     private void testProduction(Map<GoodsType, Integer> inputs,

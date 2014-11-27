@@ -38,7 +38,7 @@ public class HighSeas extends UnitLocation {
     private static final Logger logger =  Logger.getLogger(HighSeas.class.getName());
 
     /** The destinations this HighSeas object connects. */
-    private final List<Location> destinations = new ArrayList<Location>();
+    private final List<Location> destinations = new ArrayList<>();
 
 
     /**

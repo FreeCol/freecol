@@ -63,8 +63,7 @@ public final class ColopediaPanel extends FreeColPanel
 
     private JTree tree;
 
-    private Map<String, DefaultMutableTreeNode> nodeMap
-        = new HashMap<String, DefaultMutableTreeNode>();
+    private Map<String, DefaultMutableTreeNode> nodeMap = new HashMap<>();
 
 
     /**

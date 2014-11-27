@@ -147,7 +147,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         frenchScope.setMethodValue("model.nationType.cooperation");
         assertTrue(frenchScope.appliesTo(french));
 
-        List<Scope> scopes = new ArrayList<Scope>();
+        List<Scope> scopes = new ArrayList<>();
         scopes.add(dutchScope);
         scopes.add(frenchScope);
         newFather.setScopes(scopes);

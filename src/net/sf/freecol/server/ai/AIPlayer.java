@@ -112,7 +112,7 @@ public abstract class AIPlayer extends AIObject {
      * this list is invalidated as necessary, using clearAIUnits(), so
      * that getAIUnitIterator() will create a new list.
      */
-    private List<AIUnit> aiUnits = new ArrayList<AIUnit>();
+    private List<AIUnit> aiUnits = new ArrayList<>();
 
 
     /**
@@ -281,7 +281,7 @@ public abstract class AIPlayer extends AIObject {
      * @return A list of AI colonies.
      */
     public List<AIColony> getAIColonies() {
-        List<AIColony> ac = new ArrayList<AIColony>();
+        List<AIColony> ac = new ArrayList<>();
         for (Colony colony : getPlayer().getColonies()) {
             AIColony a = getAIColony(colony);
             if (a != null) {
@@ -318,7 +318,7 @@ public abstract class AIPlayer extends AIObject {
      */
     protected List<AIUnit> getAIUnits() {
         if (aiUnits.isEmpty()) createAIUnits();
-        return new ArrayList<AIUnit>(aiUnits);
+        return new ArrayList<>(aiUnits);
     }
 
     /**
@@ -557,7 +557,7 @@ public abstract class AIPlayer extends AIObject {
      */
     protected List<AIUnit> doMissions(List<AIUnit> aiUnits, LogBuilder lb) {
         lb.add("\n  Do Missions:");
-        List<AIUnit> result = new ArrayList<AIUnit>();
+        List<AIUnit> result = new ArrayList<>();
         for (AIUnit aiu : aiUnits) {
             final Unit unit = aiu.getUnit();
             if (unit == null || unit.isDisposed()) continue;

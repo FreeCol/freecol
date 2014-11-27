@@ -126,7 +126,7 @@ public final class MessageMerge {
 
     private static List<String> loadLinesFromFile(String pathToFile) {
         try {
-            List<String> lineList = new ArrayList<String>();
+            List<String> lineList = new ArrayList<>();
             FileInputStream in = new FileInputStream( pathToFile );
             StringBuilder line = new StringBuilder();
             while ( true )

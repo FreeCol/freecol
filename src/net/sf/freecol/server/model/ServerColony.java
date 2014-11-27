@@ -183,8 +183,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // does a build add it to the built list, so that we can
         // remove the item built from it *after* applying the
         // production changes.
-        List<BuildQueue<? extends BuildableType>> built
-            = new ArrayList<BuildQueue<? extends BuildableType>>();
+        List<BuildQueue<? extends BuildableType>> built = new ArrayList<>();
         for (BuildQueue<?> queue : queues) {
             ProductionInfo info = getProductionInfo(queue);
             if (info == null) continue;
@@ -512,7 +511,7 @@ public class ServerColony extends Colony implements ServerModelObject {
      */
     private boolean neededForBuildableType(GoodsType goodsType) {
         final Specification spec = getSpecification();
-        List<BuildableType> buildables = new ArrayList<BuildableType>();
+        List<BuildableType> buildables = new ArrayList<>();
         buildables.addAll(spec.getBuildingTypeList());
         buildables.addAll(spec.getUnitTypesWithoutAbility(Ability.PERSON));
         for (BuildableType bt : buildables) {

@@ -341,8 +341,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     private static Comparator<Destination> destinationComparator = null;
 
     /** The available destinations. */
-    private final List<Destination> destinations
-        = new ArrayList<Destination>();
+    private final List<Destination> destinations = new ArrayList<>();
 
     /** The list of destinations. */
     private final JList<Destination> destinationList;
@@ -363,7 +362,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         super(freeColClient);
 
         // Collect the goods the unit is carrying and set this.destinations.
-        final List<GoodsType> goodsTypes = new ArrayList<GoodsType>();
+        final List<GoodsType> goodsTypes = new ArrayList<>();
         for (Goods goods : unit.getCompactGoodsList()) {
             goodsTypes.add(goods.getType());
         }
@@ -480,7 +479,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             }
         }
         
-        List<Location> locs = new ArrayList<Location>();
+        List<Location> locs = new ArrayList<>();
         for (Player p : game.getLivePlayers(player)) {
             if (!p.hasContacted(player)
                 || (p.isEuropean() && !canTrade)) continue;

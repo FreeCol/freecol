@@ -40,8 +40,8 @@ public class MissionManager {
 
     private static final Logger logger = Logger.getLogger(MissionManager.class.getName());
 
-    private static Map<String, Constructor<? extends Mission>> missionMap =
-        new HashMap<String, Constructor<? extends Mission>>();
+    private static Map<String, Constructor<? extends Mission>> missionMap
+                                                     = new HashMap<>();
 
     static {
         try {

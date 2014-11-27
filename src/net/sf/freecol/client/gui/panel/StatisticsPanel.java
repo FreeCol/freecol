@@ -78,7 +78,7 @@ public final class StatisticsPanel extends FreeColPanel {
         public void setData(java.util.Map<String, String> statsData) {
             this.data = new Object[2][statsData.size()];
             int i = 0;
-            List<String> keys = new ArrayList<String>(statsData.keySet());
+            List<String> keys = new ArrayList<>(statsData.keySet());
             Collections.sort(keys);
             for (String s : keys) {
                 data[NAME_COLUMN][i] = s;
@@ -191,13 +191,13 @@ public final class StatisticsPanel extends FreeColPanel {
         panel.setBorder(BorderFactory.createTitledBorder(title));
         Box b = new Box(BoxLayout.Y_AXIS);
         panel.add(b);
-        Map<String, String> memory = new HashMap<String, String>();
-        Map<String, String> ai = new HashMap<String, String>();
+        Map<String, String> memory = new HashMap<>();
+        Map<String, String> ai = new HashMap<>();
         for (String k : memoryKeys) {
             memory.put(Messages.message("menuBar.debug.memoryManager." + k),
                        stats.remove(k));
         }
-        for (String k : new ArrayList<String>(stats.keySet())) {
+        for (String k : new ArrayList<>(stats.keySet())) {
             if (k.startsWith("AI")) { // FIXME: AIMain.aiStatisticsPrefix
                 ai.put(k, stats.remove(k));
             }

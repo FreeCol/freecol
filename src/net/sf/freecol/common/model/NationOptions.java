@@ -68,8 +68,7 @@ public class NationOptions extends FreeColObject {
     private Advantages nationalAdvantages;
 
     /** All nations in the game. */
-    private final Map<Nation, NationState> nations
-        = new HashMap<Nation, NationState>();
+    private final Map<Nation, NationState> nations = new HashMap<>();
 
 
     /**

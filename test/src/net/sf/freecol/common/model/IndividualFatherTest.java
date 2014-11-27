@@ -94,7 +94,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         final int pop = 5;
         Colony colony = getStandardColony(pop);
         Player player = colony.getOwner();
-        List<AbstractGoods> empty = new ArrayList<AbstractGoods>();
+        List<AbstractGoods> empty = new ArrayList<>();
         Building townHall = colony.getBuilding(townHallType);
 
         // Zero to start
@@ -321,7 +321,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
-        List<AbstractGoods> empty = new ArrayList<AbstractGoods>();
+        List<AbstractGoods> empty = new ArrayList<>();
         Building townHall = colony.getBuilding(townHallType);
 
         Unit statesman1 = colony.getUnitList().get(0);

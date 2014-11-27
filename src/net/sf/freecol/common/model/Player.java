@@ -187,7 +187,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         private UnitPredicate predicate;
 
-        private final List<Unit> units = new ArrayList<Unit>();
+        private final List<Unit> units = new ArrayList<>();
 
 
         /**
@@ -576,15 +576,13 @@ public class Player extends FreeColGameObject implements Nameable {
     /** Current founding father being recruited. */
     protected FoundingFather currentFather;
     /** The offered founding fathers. */
-    protected final List<FoundingFather> offeredFathers
-        = new ArrayList<FoundingFather>();
+    protected final List<FoundingFather> offeredFathers = new ArrayList<>();
 
     /**
      * The tension levels, 0-1000, with 1000 being maximum hostility.
      * Only used by AI.  FIXME: move this to AIPlayer
      */
-    protected java.util.Map<Player, Tension> tension
-        = new HashMap<Player, Tension>();
+    protected java.util.Map<Player, Tension> tension = new HashMap<>();
 
     /** A list of players who can not establish missions to this player. */
     protected Set<Player> bannedMissions = null;
@@ -593,34 +591,30 @@ public class Player extends FreeColGameObject implements Nameable {
      * Stores the stance towards the other players. One of: WAR, CEASE_FIRE,
      * PEACE and ALLIANCE.
      */
-    protected java.util.Map<String, Stance> stance
-        = new HashMap<String, Stance>();
+    protected java.util.Map<String, Stance> stance = new HashMap<>();
 
     /** The trade routes defined by this player. */
-    protected final List<TradeRoute> tradeRoutes = new ArrayList<TradeRoute>();
+    protected final List<TradeRoute> tradeRoutes = new ArrayList<>();
 
     /** The current model messages for this player. */
-    protected final List<ModelMessage> modelMessages
-        = new ArrayList<ModelMessage>();
+    protected final List<ModelMessage> modelMessages = new ArrayList<>();
 
     /** The history events occuring with this player. */
-    protected final List<HistoryEvent> history = new ArrayList<HistoryEvent>();
+    protected final List<HistoryEvent> history = new ArrayList<>();
 
     /** The last-sale data. */
     protected HashMap<String, LastSale> lastSales = null;
 
     /** A map of indices of the largest used region name by type. */
-    protected final HashMap<String, Integer> nameIndex
-        = new HashMap<String, Integer>();
+    protected final HashMap<String, Integer> nameIndex = new HashMap<>();
 
     // Temporary/transient variables, do not serialize.
 
     /** The units this player owns. */
-    private final List<Unit> units = new ArrayList<Unit>();
+    private final List<Unit> units = new ArrayList<>();
 
     /** The settlements this player owns. */
-    protected final List<Settlement> settlements
-        = new ArrayList<Settlement>();
+    protected final List<Settlement> settlements = new ArrayList<>();
 
     /** The tiles the player can see. */
     private boolean[][] canSeeTiles = null;
@@ -886,7 +880,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     private void initializeSettlementNames(Random random) {
         if (settlementNames == null) {
-            settlementNames = new ArrayList<String>();
+            settlementNames = new ArrayList<>();
             settlementNames.addAll(Messages.getSettlementNames(this));
             if (isIndian()) {
                 capitalName = settlementNames.remove(0);
@@ -950,7 +944,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     private void initializeShipNames(Random random) {
         if (shipNames == null) {
-            shipNames = new ArrayList<String>();
+            shipNames = new ArrayList<>();
             shipNames.addAll(Messages.getShipNames(this));
             shipFallback = (shipNames.isEmpty()) ? null
                 : shipNames.remove(0);
@@ -981,7 +975,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (!type.isNaval()) return null;
 
         // Collect all the names of existing naval units.
-        List<String> navalNames = new ArrayList<String>();
+        List<String> navalNames = new ArrayList<>();
         for (Unit u : getUnits()) {
             if (u.isNaval() && u.getName() != null) {
                 navalNames.add(u.getName());
@@ -1305,7 +1299,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of nations in rebellion against us.
      */
     public List<Player> getRebels() {
-        List<Player> rebels = new ArrayList<Player>();
+        List<Player> rebels = new ArrayList<>();
         for (Player p : getGame().getLiveEuropeanPlayers(this)) {
             if (p.getREFPlayer() == this
                 && (p.isRebel() || p.isUndead())) rebels.add(p);
@@ -1765,7 +1759,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A map of father id to <code>Turn</code>s.
      */
     public java.util.Map<String, Turn> getElectionTurns() {
-        java.util.Map<String, Turn> result = new HashMap<String, Turn>();
+        java.util.Map<String, Turn> result = new HashMap<>();
         for (HistoryEvent e : getHistory()) {
             if (e.getEventType() == HistoryEvent.EventType.FOUNDING_FATHER) {
                 result.put(e.getReplacement("%father%").getId(),
@@ -1889,7 +1883,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param sale The <code>LastSale</code> to save.
      */
     public void addLastSale(LastSale sale) {
-        if (lastSales == null) lastSales = new HashMap<String, LastSale>();
+        if (lastSales == null) lastSales = new HashMap<>();
         lastSales.put(sale.getId(), sale);
     }
 
@@ -2159,7 +2153,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<Unit> getUnits() {
         synchronized (units) {
-            return new ArrayList<Unit>(units);
+            return new ArrayList<>(units);
         }
     }
 
@@ -2222,7 +2216,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of suitable carriers.
      */
     public List<Unit> getCarriersForUnit(Unit unit) {
-        List<Unit> ul = new ArrayList<Unit>();
+        List<Unit> ul = new ArrayList<>();
         for (Unit u : getUnits()) {
             if (u.couldCarry(unit)) ul.add(u);
         }
@@ -2469,7 +2463,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<Colony> getPorts() {
         if (!isEuropean()) return Collections.<Colony>emptyList();
-        List<Colony> result = new ArrayList<Colony>();
+        List<Colony> result = new ArrayList<>();
         for (Colony colony : getColonies()) {
             if (colony.isConnectedPort()) result.add(colony);
         }
@@ -2560,7 +2554,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A fresh list of the <code>Colony</code>s this player owns.
      */
     public List<Colony> getColonies() {
-        List<Colony> colonies = new ArrayList<Colony>();
+        List<Colony> colonies = new ArrayList<>();
         for (Settlement s : getSettlements()) {
             if (s instanceof Colony) {
                 colonies.add((Colony)s);
@@ -2590,8 +2584,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The indian settlements this player owns.
      */
     public List<IndianSettlement> getIndianSettlements() {
-        List<IndianSettlement> indianSettlements
-            = new ArrayList<IndianSettlement>();
+        List<IndianSettlement> indianSettlements = new ArrayList<>();
         for (Settlement s : getSettlements()) {
             if (s instanceof IndianSettlement) {
                 indianSettlements.add((IndianSettlement)s);
@@ -2644,7 +2637,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<ModelMessage> getModelMessages() {
         synchronized (modelMessages) {
-            return new ArrayList<ModelMessage>(modelMessages);
+            return new ArrayList<>(modelMessages);
         }
     }
 
@@ -2655,7 +2648,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *     <code>Player</code>.
      */
     public List<ModelMessage> getNewModelMessages() {
-        List<ModelMessage> out = new ArrayList<ModelMessage>();
+        List<ModelMessage> out = new ArrayList<>();
         for (ModelMessage m : getModelMessages()) {
             if (!m.hasBeenDisplayed()) out.add(m); // preserve message order
         }
@@ -3416,12 +3409,12 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of potentially claimable tiles.
      */
     public List<Tile> getClaimableTiles(Tile centerTile, int radius) {
-        List<Tile> tiles = new ArrayList<Tile>();
-        List<Tile> layer = new ArrayList<Tile>();
+        List<Tile> tiles = new ArrayList<>();
+        List<Tile> layer = new ArrayList<>();
         if (canClaimToFoundSettlement(centerTile)) {
             layer.add(centerTile);
             for (int r = 1; r <= radius; r++) {
-                List<Tile> lastLayer = new ArrayList<Tile>(layer);
+                List<Tile> lastLayer = new ArrayList<>(layer);
                 tiles.addAll(layer);
                 layer.clear();
                 for (Tile have : lastLayer) {
@@ -3568,7 +3561,7 @@ public class Player extends FreeColGameObject implements Nameable {
         final int FOOD_VERY_LOW = 1;
 
         // Multiplicative modifiers, to be applied to value later
-        List<Double> values = new ArrayList<Double>();
+        List<Double> values = new ArrayList<>();
         for (ColonyValueCategory c : ColonyValueCategory.values()) {
             values.add(1.0);
         }
@@ -4095,7 +4088,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
 
-            List<String> playerIds = new ArrayList<String>(stance.keySet());
+            List<String> playerIds = new ArrayList<>(stance.keySet());
             Collections.sort(playerIds);
             for (String pid : playerIds) {
                 Stance s = stance.get(pid);

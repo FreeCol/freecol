@@ -48,7 +48,7 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
     private Location location;
 
     /** The cargo expected to be on board on leaving the stop. */
-    private final List<GoodsType> cargo = new ArrayList<GoodsType>();
+    private final List<GoodsType> cargo = new ArrayList<>();
 
 
     /**

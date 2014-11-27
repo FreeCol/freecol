@@ -59,7 +59,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
 
 
     /** A list of Buildable items. */
-    private List<T> buildQueue = new ArrayList<T>();
+    private List<T> buildQueue = new ArrayList<>();
 
     /** What to do when an item has been completed. */
     private CompletionAction completionAction = CompletionAction.REMOVE;
@@ -178,7 +178,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
             // all required goods at once
             boolean overflow = colony.getSpecification()
                 .getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW);
-            List<AbstractGoods> consumption = new ArrayList<AbstractGoods>();
+            List<AbstractGoods> consumption = new ArrayList<>();
             for (AbstractGoods ag : current.getRequiredGoods()) {
                 boolean satisfied = false;
                 AbstractGoods available = AbstractGoods.findByType(ag.getType(), input);

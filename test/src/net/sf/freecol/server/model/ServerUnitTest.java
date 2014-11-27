@@ -401,7 +401,7 @@ public class ServerUnitTest extends FreeColTestCase {
                      expectXP, colonist.getExperience());
 
         // We need a deterministic random
-        List<Integer> setValues = new ArrayList<Integer>();
+        List<Integer> setValues = new ArrayList<>();
         setValues.add(1);
         MockPseudoRandom mockRandom = new MockPseudoRandom(setValues, true);
         ServerTestHelper.setRandom(mockRandom);
@@ -449,7 +449,7 @@ public class ServerUnitTest extends FreeColTestCase {
         ServerTestHelper.newTurn();
 
         // We need a deterministic random
-        List<Integer> setValues = new ArrayList<Integer>();
+        List<Integer> setValues = new ArrayList<>();
         setValues.add(1);
         MockPseudoRandom mockRandom = new MockPseudoRandom(setValues, true);
         ServerTestHelper.setRandom(mockRandom);

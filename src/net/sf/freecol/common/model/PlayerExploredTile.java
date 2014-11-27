@@ -110,7 +110,7 @@ public class PlayerExploredTile extends FreeColGameObject {
      * @param item The <code>TileItem</code> to add.
      */
     private void addTileItem(TileItem item) {
-        if (tileItems == null) tileItems = new ArrayList<TileItem>();
+        if (tileItems == null) tileItems = new ArrayList<>();
         tileItems.add(item);
     }
 

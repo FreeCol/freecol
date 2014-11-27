@@ -183,7 +183,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     }
 
     private List<AbstractOption<T>> getValue() {
-        List<AbstractOption<T>> result = new ArrayList<AbstractOption<T>>();
+        List<AbstractOption<T>> result = new ArrayList<>();
         for (Enumeration<AbstractOption<T>> e = model.elements();
              e.hasMoreElements();) {
             result.add(e.nextElement());

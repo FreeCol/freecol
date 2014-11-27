@@ -59,8 +59,7 @@ public final class Server extends Thread {
     private ServerSocket serverSocket;
 
     /** A hash of Connection objects, keyed by the Socket they relate to. */
-    private HashMap<Socket, Connection> connections
-        = new HashMap<Socket, Connection>();
+    private HashMap<Socket, Connection> connections = new HashMap<>();
 
     /**
      * Whether to keep running the main loop that is awaiting new
@@ -166,7 +165,7 @@ public final class Server extends Thread {
      *     to send to.
      */
     public void sendToAll(Element element, Connection exceptConnection) {
-        for (Connection c : new ArrayList<Connection>(connections.values())) {
+        for (Connection c : new ArrayList<>(connections.values())) {
             if (c == exceptConnection) continue;
             try {
                 c.sendAndWait(element);

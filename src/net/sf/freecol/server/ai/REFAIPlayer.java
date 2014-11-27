@@ -137,8 +137,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     private static final int seekAndDestroyRange = 12;
 
     /** Map of target to count. */
-    private final Map<Location, Integer> targetMap
-        = new HashMap<Location, Integer>();
+    private final Map<Location, Integer> targetMap = new HashMap<>();
 
 
     /**
@@ -182,7 +181,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final Player player = getPlayer();
         final Unit unit = aiu.getUnit();
         final Unit carrier = aiCarrier.getUnit();
-        final List<TargetTuple> targets = new ArrayList<TargetTuple>();
+        final List<TargetTuple> targets = new ArrayList<>();
         for (Player p : player.getRebels()) {
             for (Colony c : p.getColonies()) {
                 if (port && !c.isConnectedPort()) continue;
@@ -368,7 +367,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         // target.  A valid target is needed before giving the carrier
         // a valid transport missions.  Send roughly 2/3 of the force
         // at the best target, decreasing from there.
-        List<AIUnit> navy = new ArrayList<AIUnit>();
+        List<AIUnit> navy = new ArrayList<>();
         Iterator<AIUnit> auIterator = getAIUnits().iterator();
         int land = getPlayer().getNumberOfKingLandUnits();
         int used;
@@ -412,7 +411,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
         // Try to find some rebel naval units near the entry locations
         // for the targets.
-        final List<Unit> rebelNavy = new ArrayList<Unit>();
+        final List<Unit> rebelNavy = new ArrayList<>();
         final GoalDecider navyGD = new GoalDecider() {
                 public PathNode getGoal() { return null; }
                 public boolean hasSubGoals() { return true; }
@@ -439,7 +438,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             = Unit.getMilitaryStrengthComparator(getGame().getCombatModel());
         Collections.sort(rebelNavy, militaryStrength);
         Iterator<Unit> ui = rebelNavy.iterator();
-        List<Tile> entries = new ArrayList<Tile>();
+        List<Tile> entries = new ArrayList<>();
         entries.add(rebel.getEntryLocation().getTile());
         while (!navy.isEmpty()) {
             final AIUnit aiu = navy.remove(0);
@@ -483,8 +482,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                                            List<AIUnit> privateers,
                                            LogBuilder lb) {
         Mission m;
-        List<AIUnit> naval = new ArrayList<AIUnit>();
-        List<AIUnit> result = new ArrayList<AIUnit>();
+        List<AIUnit> naval = new ArrayList<>();
+        List<AIUnit> result = new ArrayList<>();
         if (transports.size() < nt) {
             // Recruit privateers not currently chasing a unit.
             // Collect privateers that are on the map.
@@ -545,12 +544,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     @Override
     public void giveNormalMissions(LogBuilder lb) {
         final Player player = getPlayer();
-        final Map<Location, List<AIUnit>> idlers
-            = new HashMap<Location, List<AIUnit>>();
-        List<AIUnit> privateers = new ArrayList<AIUnit>();
-        List<AIUnit> transports = new ArrayList<AIUnit>();
-        List<AIUnit> todo = new ArrayList<AIUnit>();
-        List<AIUnit> land = new ArrayList<AIUnit>();
+        final Map<Location, List<AIUnit>> idlers = new HashMap<>();
+        List<AIUnit> privateers = new ArrayList<>();
+        List<AIUnit> transports = new ArrayList<>();
+        List<AIUnit> todo = new ArrayList<>();
+        List<AIUnit> land = new ArrayList<>();
         Mission m;
         Colony colony;
         lb.add("\n  REF mission changes:");
@@ -698,8 +696,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             // See what transport is present at a colony already.
             requireTransports(0, transports, privateers, lb);
             todo.clear();
-            Map<Location, List<AIUnit>> ready
-                = new HashMap<Location, List<AIUnit>>();
+            Map<Location, List<AIUnit>> ready = new HashMap<>();
             for (AIUnit aiu : transports) {
                 TransportMission tm = aiu.getMission(TransportMission.class);
                 if (!tm.isEmpty()) continue;
@@ -721,8 +718,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             // missions with them.  Collect the ports that still
             // contain idle units, and accumulate the amount of space
             // needed to move the units.
-            List<Location> idlePorts = new ArrayList<Location>();
-            List<AIUnit> aiCarriers = new ArrayList<AIUnit>();
+            List<Location> idlePorts = new ArrayList<>();
+            List<AIUnit> aiCarriers = new ArrayList<>();
             int space = 0;
             for (Entry<Location, List<AIUnit>> e : idlers.entrySet()) {
                 if (e.getValue() == null) continue;
@@ -867,9 +864,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         super.startWorking();
 
         // Always allocate transport for all land units in Europe.
-        List<TransportMission> transport = new ArrayList<TransportMission>();
-        List<TransportableAIObject> land
-            = new ArrayList<TransportableAIObject>();
+        List<TransportMission> transport = new ArrayList<>();
+        List<TransportableAIObject> land = new ArrayList<>();
         for (AIUnit aiu : getAIUnits()) {
             final Unit u = aiu.getUnit();
             if (u.isNaval()) {

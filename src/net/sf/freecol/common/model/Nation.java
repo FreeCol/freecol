@@ -52,8 +52,7 @@ public class Nation extends FreeColGameObjectType {
     // Colours moved back into the spec at 0.11.  We have to tolerate
     // old specs that lack them while 0.10.x is supported.
     /** A map of default nation colours. */
-    private static final Map<String, Color> defaultColors
-        = new HashMap<String, Color>();
+    private static final Map<String, Color> defaultColors = new HashMap<>();
     static {
         defaultColors.put("model.nation.dutch",         new Color(0xff9d3c));
         defaultColors.put("model.nation.french",        new Color(0x0000ff));

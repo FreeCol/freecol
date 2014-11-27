@@ -167,8 +167,7 @@ public class SoundPlayer {
 
         private final byte[] data = new byte[BUFSIZ];
 
-        private final List<AudioInputStream> playList
-            = new ArrayList<AudioInputStream>();
+        private final List<AudioInputStream> playList = new ArrayList<>();
 
         private boolean playDone = true;
 

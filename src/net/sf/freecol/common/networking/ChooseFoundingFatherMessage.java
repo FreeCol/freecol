@@ -56,7 +56,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
                                        FoundingFather ff) {
         super(getXMLElementTagName());
 
-        this.fathers = new ArrayList<FoundingFather>();
+        this.fathers = new ArrayList<>();
         this.fathers.addAll(fathers);
         setFather(ff);
     }
@@ -72,7 +72,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
         super(getXMLElementTagName());
 
         final Specification spec = game.getSpecification();
-        this.fathers = new ArrayList<FoundingFather>();
+        this.fathers = new ArrayList<>();
         for (FoundingFatherType type : FoundingFatherType.values()) {
             String id = element.getAttribute(type.toString());
             if (id == null || "".equals(id)) continue;

@@ -279,7 +279,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         game.setCurrentPlayer(colony.getOwner());
         Player dutch = getGame().getPlayer("model.nation.dutch");
-        List<Unit> units = new ArrayList<Unit>();
+        List<Unit> units = new ArrayList<>();
         Unit servant = new ServerUnit(getGame(), colony.getTile(),
                                       dutch, servantType);
         units.add(servant);
@@ -294,7 +294,8 @@ public class ColonyPlanTest extends FreeColTestCase {
         }
         assertNotNull(colonyTile);
         assertNull(ColonyPlan.getBestWorker(colonyTile, sugarType, null));
-        assertNull(ColonyPlan.getBestWorker(colonyTile, sugarType, new ArrayList<Unit>()));
+        assertNull(ColonyPlan.getBestWorker(colonyTile, sugarType,
+                                            new ArrayList<Unit>()));
 
         // Should always pick a singleton as long as it is productive.
         assertEquals(servant, ColonyPlan.getBestWorker(colonyTile, sugarType, units));

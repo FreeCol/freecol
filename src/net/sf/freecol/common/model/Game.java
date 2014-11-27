@@ -71,7 +71,7 @@ public class Game extends FreeColGameObject {
     private String clientUserName;
 
     /** All the players in the game. */
-    protected final List<Player> players = new ArrayList<Player>();
+    protected final List<Player> players = new ArrayList<>();
 
     /** A virtual player to use for enemy privateers. */
     private Player unknownEnemy;
@@ -95,7 +95,7 @@ public class Game extends FreeColGameObject {
     private boolean spanishSuccession = false;
 
     /** The cities of Cibola remaining in this game. */
-    protected final List<String> citiesOfCibola = new ArrayList<String>();
+    protected final List<String> citiesOfCibola = new ArrayList<>();
 
     // Serialization not required below.
 
@@ -108,7 +108,7 @@ public class Game extends FreeColGameObject {
      * within { players, unknownEnemy, map } which are directly serialized.
      */
     protected HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects
-        = new HashMap<String, WeakReference<FreeColGameObject>>(10000);
+        = new HashMap<>(10000);
 
     /**
      * The combat model this game uses. At the moment, the only combat
@@ -467,7 +467,7 @@ public class Game extends FreeColGameObject {
      * @return The list of live <code>Player</code>s.
      */
     public List<Player> getLivePlayers(Player other) {
-        List<Player> result = new ArrayList<Player>();
+        List<Player> result = new ArrayList<>();
         for (Player player : players) {
             if (player.isUnknownEnemy() || player.isDead()
                 || player == other) continue;
@@ -483,7 +483,7 @@ public class Game extends FreeColGameObject {
      * @return A list of live European <code>Player</code>s in this game.
      */
     public List<Player> getLiveEuropeanPlayers(Player other) {
-        List<Player> result = new ArrayList<Player>();
+        List<Player> result = new ArrayList<>();
         for (Player player : players) {
             if (player.isUnknownEnemy() || player.isDead()
                 || !player.isEuropean() || player == other) continue;
@@ -499,7 +499,7 @@ public class Game extends FreeColGameObject {
      * @return A list of live native <code>Player</code>s in this game.
      */
     public List<Player> getLiveNativePlayers(Player other) {
-        List<Player> result = new ArrayList<Player>();
+        List<Player> result = new ArrayList<>();
         for (Player player : players) {
             if (player.isUnknownEnemy() || player.isDead()
                 || !player.isIndian() || player == other) continue;
@@ -761,7 +761,7 @@ public class Game extends FreeColGameObject {
      * @return A list of available <code>Nation</code>s.
      */
     public final List<Nation> getVacantNations() {
-        List<Nation> result = new ArrayList<Nation>();
+        List<Nation> result = new ArrayList<>();
         for (Entry<Nation, NationState> entry
                  : nationOptions.getNations().entrySet()) {
             if (entry.getValue() == NationState.AVAILABLE) {
@@ -982,7 +982,7 @@ public class Game extends FreeColGameObject {
      * @return A <code>Map</code> of the statistics.
      */
     public java.util.Map<String, String> getStatistics() {
-        java.util.Map<String, String> stats = new HashMap<String, String>();
+        java.util.Map<String, String> stats = new HashMap<>();
 
         // Memory
         System.gc();
@@ -994,7 +994,7 @@ public class Game extends FreeColGameObject {
         stats.put("maxMemory", Long.toString(max));
 
         // Game objects
-        java.util.Map<String, Long> objStats = new HashMap<String, Long>();
+        java.util.Map<String, Long> objStats = new HashMap<>();
         long disposed = 0;
         Iterator<FreeColGameObject> iter = getFreeColGameObjectIterator();
         while (iter.hasNext()) {

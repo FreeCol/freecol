@@ -61,15 +61,13 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /** The contents of the market, keyed by goods type. */
-    private final Map<GoodsType, MarketData> marketData
-        = new HashMap<GoodsType, MarketData>();
+    private final Map<GoodsType, MarketData> marketData = new HashMap<>();
 
     /** The owning player. */
     private Player owner;
 
     /** Watching listeners.  Do not serialize. */
-    private ArrayList<TransactionListener> transactionListeners
-        = new ArrayList<TransactionListener>();
+    private ArrayList<TransactionListener> transactionListeners = new ArrayList<>();
 
 
     /**

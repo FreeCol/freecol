@@ -161,12 +161,10 @@ public final class InGameController implements NetworkConstants {
     private int turnsPlayed = 0;
 
     /** A map of messages to be ignored. */
-    private HashMap<String, Integer> messagesToIgnore
-        = new HashMap<String, Integer>();
+    private HashMap<String, Integer> messagesToIgnore = new HashMap<>();
 
     /** The messages in the last turn report. */
-    private final List<ModelMessage> turnReportMessages
-        = new ArrayList<ModelMessage>();
+    private final List<ModelMessage> turnReportMessages = new ArrayList<>();
 
     private GUI gui;
 
@@ -445,7 +443,7 @@ public final class InGameController implements NetworkConstants {
         moveMode = moveMode.maximize(MoveMode.EXECUTE_GOTO_ORDERS);
 
         // Deal with the trade route units first.
-        List<ModelMessage> messages = new ArrayList<ModelMessage>();
+        List<ModelMessage> messages = new ArrayList<>();
         while (player.hasNextTradeRouteUnit()) {
             Unit unit = player.getNextTradeRouteUnit();
             gui.setActiveUnit(unit);
@@ -695,7 +693,7 @@ public final class InGameController implements NetworkConstants {
 
         // Make a list of goods to load at this stop.  Collapse multiple
         // loads of the same goods type.
-        List<AbstractGoods> toLoad = new ArrayList<AbstractGoods>();
+        List<AbstractGoods> toLoad = new ArrayList<>();
         for (GoodsType type : stop.getCargo()) {
             AbstractGoods ag = AbstractGoods.findByType(type, toLoad);
             if (ag != null) {
@@ -1325,7 +1323,7 @@ public final class InGameController implements NetworkConstants {
                                      final boolean endOfTurn) {
         Player player = freeColClient.getMyPlayer();
         int thisTurn = freeColClient.getGame().getTurn().getNumber();
-        final ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
+        final ArrayList<ModelMessage> messages = new ArrayList<>();
         for (ModelMessage m : ((allMessages) ? player.getModelMessages()
                 : player.getNewModelMessages())) {
             if (shouldAllowMessage(m)) {
@@ -1358,7 +1356,7 @@ public final class InGameController implements NetworkConstants {
             m.setBeenDisplayed(true);
         }
 
-        List<String> todo = new ArrayList<String>();
+        List<String> todo = new ArrayList<>();
         for (Entry<String, Integer> entry : messagesToIgnore.entrySet()) {
             if (entry.getValue().intValue() < thisTurn - 1) {
                 todo.add(entry.getKey());
@@ -1622,8 +1620,7 @@ public final class InGameController implements NetworkConstants {
         boolean ownedBySelf = false;
         boolean ownedByIndians = false;
 
-        java.util.Map<GoodsType, Integer> goodsMap
-            = new HashMap<GoodsType, Integer>();
+        java.util.Map<GoodsType, Integer> goodsMap = new HashMap<>();
         for (GoodsType goodsType : spec.getGoodsTypeList()) {
             if (goodsType.isBuildingMaterial()) {
                 while (goodsType.isRefined()) {
@@ -2170,7 +2167,7 @@ public final class InGameController implements NetworkConstants {
         // Show the end turn dialog, or not.
         if (freeColClient.getClientOptions()
             .getBoolean(ClientOptions.SHOW_END_TURN_DIALOG)) {
-            List<Unit> units = new ArrayList<Unit>();
+            List<Unit> units = new ArrayList<>();
             for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
                 if (unit.couldMove()) units.add(unit);
             }
@@ -3047,7 +3044,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Disembark selected units able to move.
-        final List<Unit> disembarkable = new ArrayList<Unit>();
+        final List<Unit> disembarkable = new ArrayList<>();
         unit.setStateToAllChildren(UnitState.ACTIVE);
         for (Unit u : unit.getUnitList()) {
             if (u.getMoveType(tile).isProgress()) {
@@ -3068,7 +3065,7 @@ public final class InGameController implements NetworkConstants {
                 }
                 break;
             }
-            List<ChoiceItem<Unit>> choices = new ArrayList<ChoiceItem<Unit>>();
+            List<ChoiceItem<Unit>> choices = new ArrayList<>();
             for (Unit dUnit : disembarkable) {
                 choices.add(new ChoiceItem<Unit>(dUnit.getDescription(Unit.UnitLabelType.NATIONAL),
                         dUnit));
@@ -3119,7 +3116,7 @@ public final class InGameController implements NetworkConstants {
         Tile sourceTile = unit.getTile();
         Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
         Unit carrier = null;
-        List<ChoiceItem<Unit>> choices = new ArrayList<ChoiceItem<Unit>>();
+        List<ChoiceItem<Unit>> choices = new ArrayList<>();
         for (Unit u : destinationTile.getUnitList()) {
             if (u.canAdd(unit)) {
                 String m = u.getDescription(Unit.UnitLabelType.NATIONAL);
@@ -3630,8 +3627,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Choose goods to buy
-            List<ChoiceItem<Goods>> choices
-                = new ArrayList<ChoiceItem<Goods>>();
+            List<ChoiceItem<Goods>> choices = new ArrayList<>();
             for (Goods g : forSale) {
                 String label = Messages.message(g.getLabel(true));
                 choices.add(new ChoiceItem<Goods>(label, g));
@@ -3687,8 +3683,7 @@ public final class InGameController implements NetworkConstants {
         Goods goods = null;
         for (;;) {
             // Choose goods to sell
-            List<ChoiceItem<Goods>> choices
-                = new ArrayList<ChoiceItem<Goods>>();
+            List<ChoiceItem<Goods>> choices = new ArrayList<>();
             for (Goods g : unit.getGoodsList()) {
                 String label = Messages.message(g.getLabel(true));
                 choices.add(new ChoiceItem<Goods>(label, g));
@@ -3744,8 +3739,7 @@ public final class InGameController implements NetworkConstants {
      */
     private StringTemplate attemptGiftToSettlement(Unit unit,
                                                    Settlement settlement) {
-        List<ChoiceItem<Goods>> choices
-            = new ArrayList<ChoiceItem<Goods>>();
+        List<ChoiceItem<Goods>> choices = new ArrayList<>();
         for (Goods g : unit.getGoodsList()) {
             String label = Messages.message(g.getLabel(true));
             choices.add(new ChoiceItem<Goods>(label, g));
@@ -3837,8 +3831,7 @@ public final class InGameController implements NetworkConstants {
             }
             break;
         case INCITE_INDIANS:
-            List<ChoiceItem<Player>> choices
-                = new ArrayList<ChoiceItem<Player>>();
+            List<ChoiceItem<Player>> choices = new ArrayList<>();
             for (Player p : freeColClient.getGame().getLiveEuropeanPlayers(player)) {
                 String label = Messages.message(p.getNationName());
                 choices.add(new ChoiceItem<Player>(label, p));

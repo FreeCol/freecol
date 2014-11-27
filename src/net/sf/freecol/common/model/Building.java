@@ -100,7 +100,7 @@ public class Building extends WorkLocation
         // remove features from current type
         final Colony colony = getColony();
         colony.removeFeatures(buildingType);
-        List<Unit> eject = new ArrayList<Unit>();
+        List<Unit> eject = new ArrayList<>();
 
         if (newBuildingType != null) {
             buildingType = newBuildingType;
@@ -488,7 +488,7 @@ public class Building extends WorkLocation
         final Player owner = getOwner();
         final Turn turn = getGame().getTurn();
 
-        List<Modifier> mods = new ArrayList<Modifier>();
+        List<Modifier> mods = new ArrayList<>();
         if (unitType == null) { // Add only the building-specific bonuses
             mods.addAll(colony.getModifiers(id, type, turn));
             if (owner != null) {
