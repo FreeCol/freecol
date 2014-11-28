@@ -50,6 +50,7 @@ public abstract class UnitAction extends MapboardAction {
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && getGUI().getActiveUnit() != null
-            && getFreeColClient().getMyPlayer().owns(getGUI().getActiveUnit());
+            && getGUI().getActiveUnit().getOwner()
+            == getFreeColClient().getMyPlayer();
     }
 }

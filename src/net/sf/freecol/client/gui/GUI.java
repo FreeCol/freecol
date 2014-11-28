@@ -45,6 +45,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -94,6 +95,7 @@ import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.client.gui.panel.TradeRoutePanel;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
@@ -104,16 +106,20 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighScore;
+import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TypeCountMap;
@@ -195,6 +201,11 @@ public class GUI {
         SELL,
         GIFT
     }
+
+    /** Warning levels. */
+    private static final String levels[] = new String[] {
+        "low", "normal", "high"
+    };
 
     /** How many columns (em-widths) to use in the text area. */
     private static final int DEFAULT_TEXT_COLUMNS = 20;
@@ -1083,10 +1094,10 @@ public class GUI {
     }
 
     public void updateMapControlsInCanvas() {
-        if (mapControls != null && mapControls.isShowing()) {
-            mapControls.removeFromComponent(canvas);
-            mapControls.addToComponent(canvas);
-        }
+        if (canvas == null || mapControls == null) return;
+
+        mapControls.removeFromComponent(canvas);
+        mapControls.addToComponent(canvas);
     }
 
     public void zoomInMapControls() {
@@ -1118,7 +1129,43 @@ public class GUI {
     }
 
 
-    // Dialog display
+    // Dialogs that return values
+
+    /**
+     * Simple confirmation dialog.
+     *
+     * @param textKey A string to use as the message key.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    public boolean confirm(String textKey, String okKey, String cancelKey) {
+        if (canvas == null) return false;
+
+        return canvas.showConfirmDialog(true, null, Messages.message(textKey),
+                                        null, okKey, cancelKey);
+    }
+
+    /**
+     * General confirmation dialog.
+     *
+     * @param modal Is this a modal dialog?
+     * @param tile An optional <code>Tile</code> to expose.
+     * @param template The <code>StringTemplate</code> explaining the choice.
+     * @param obj An optional object to make an icon for the dialog with.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    public boolean confirm(boolean modal, Tile tile,
+                           StringTemplate template, Object obj,
+                           String okKey, String cancelKey) {
+        if (canvas == null) return false;
+
+        return canvas.showConfirmDialog(modal, tile,
+                                        getDefaultTextArea(Messages.message(template)),
+                                        getImageIcon(obj, false), okKey, cancelKey);
+    }
 
     /**
      * If a unit has a trade route, get confirmation that it is
@@ -1127,7 +1174,7 @@ public class GUI {
      * @param unit The <code>Unit</code> to check.
      * @return Whether it is acceptable to set a destination for this unit.
      */
-    public boolean checkClearTradeRoute(Unit unit) {
+    public boolean confirmClearTradeRoute(Unit unit) {
         TradeRoute tr = unit.getTradeRoute();
         if (tr == null) return true;
         StringTemplate template
@@ -1135,39 +1182,544 @@ public class GUI {
                 .addStringTemplate("%unit%",
                     unit.getLabel(Unit.UnitLabelType.NATIONAL))
                 .addName("%route%", tr.getName());
-        return showConfirmDialog(true, unit.getTile(), template,
-                                 unit, "yes", "no");
+        return confirm(true, unit.getTile(), template, unit, "yes", "no");
     }
 
-    public <T> T showChoiceDialog(boolean modal, Tile tile, String text,
-                                  Object obj, String cancelKey,
-                                  List<ChoiceItem<T>> choices) {
+    /**
+     * Confirm declaration of independence.
+     *
+     * @return A list of new nation and country names.
+     */
+    public List<String> confirmDeclaration() {
+        return (canvas == null) ? Collections.<String>emptyList()
+            : canvas.showConfirmDeclarationDialog();
+    }
+
+    /**
+     * Confirm whether the player wants to demand tribute from a colony.
+     *
+     * @param attacker The potential attacking <code>Unit</code>.
+     * @param colony The target <code>Colony</code>.
+     * @param ns A <code>NationSummary</code> of the other nation.
+     * @return The amount of tribute to demand, positive if the demand
+     *     should proceed.
+     */
+    public int confirmEuropeanTribute(Unit attacker, Colony colony,
+                                      NationSummary ns) {
+        Player player = attacker.getOwner();
+        Player other = colony.getOwner();
+        int strength = player.calculateStrength(false);
+        int otherStrength = ns.getMilitaryStrength();
+        int mil = (otherStrength <= 1 || otherStrength * 5 < strength) ? 0
+            : (strength == 0 || strength * 5 < otherStrength) ? 2
+            : 1;
+
+        StringTemplate t;
+        int gold = ns.getGold();
+        if (gold == 0) {
+            t = StringTemplate.template("confirmTribute.broke")
+                .addStringTemplate("%nation%", other.getNationName());
+            showInformationMessage(t);
+            return -1;
+        }
+
+        int fin = (gold <= 100) ? 0 : (gold <= 1000) ? 1 : 2;
+        t = StringTemplate.template("confirmTribute.european")
+            .addStringTemplate("%nation%", other.getNationName())
+            .addStringTemplate("%danger%",
+                StringTemplate.template("danger." + levels[mil]))
+            .addStringTemplate("%finance%",
+                StringTemplate.template("finance." + levels[fin]));
+        return showSelectTributeAmountDialog(t, gold);
+    }
+
+    /**
+     * Check if an attack results in a transition from peace or cease fire to
+     * war and, if so, warn the player.
+     *
+     * @param attacker The potential attacking <code>Unit</code>.
+     * @param target The target <code>Tile</code>.
+     * @return True to attack, false to abort.
+     */
+    public boolean confirmHostileAction(Unit attacker, Tile target) {
+        if (attacker.hasAbility(Ability.PIRACY)) {
+            // Privateers can attack and remain at peace
+            return true;
+        }
+
+        Player enemy;
+        if (target.hasSettlement()) {
+            enemy = target.getSettlement().getOwner();
+        } else if (target == attacker.getTile()) {
+            // Fortify on tile owned by another nation
+            enemy = target.getOwner();
+            if (enemy == null) return true;
+        } else {
+            Unit defender = target.getDefendingUnit(attacker);
+            if (defender == null) {
+                logger.warning("Attacking, but no defender - will try!");
+                return true;
+            }
+            if (defender.hasAbility(Ability.PIRACY)) {
+                // Privateers can be attacked and remain at peace
+                return true;
+            }
+            enemy = defender.getOwner();
+        }
+
+        String messageId = null;
+        switch (attacker.getOwner().getStance(enemy)) {
+        case WAR:
+            logger.finest("Player at war, no confirmation needed");
+            return true;
+        case CEASE_FIRE:
+            messageId = "model.diplomacy.attack.ceaseFire";
+            break;
+        case ALLIANCE:
+            messageId = "model.diplomacy.attack.alliance";
+            break;
+        case UNCONTACTED: case PEACE: default:
+            messageId = "model.diplomacy.attack.peace";
+            break;
+        }
+        return confirm(true, attacker.getTile(),
+                       StringTemplate.template(messageId)
+                           .addStringTemplate("%nation%", enemy.getNationName()),
+                       attacker, "model.diplomacy.attack.confirm", "cancel");
+    }
+
+    /**
+     * Confirm that a unit can leave its colony.
+     * - Check for population limit.
+     * - Query if education should be abandoned.
+     *
+     * @param unit The <code>Unit</code> that is leaving the colony.
+     * @return True if the unit is allowed to leave.
+     */
+    public boolean confirmLeaveColony(Unit unit) {
+        Colony colony = unit.getColony();
+        String message = colony.getReducePopulationMessage();
+        if (message != null) {
+            showInformationMessage(message);
+            return false;
+        }
+        StringTemplate template = unit.getAbandonEducationMessage(true);
+        return template == null
+            || confirm(true, unit.getTile(), template, unit,
+                       "abandonEducation.yes", "abandonEducation.no");
+    }
+
+    /**
+     * Confirm whether the player wants to demand tribute from a native
+     * settlement.
+     *
+     * @param attacker The potential attacking <code>Unit</code>.
+     * @param is The target <code>IndianSettlement</code>.
+     * @param ns A <code>NationSummary</code> of the other nation.
+     * @return The amount of tribute to demand, positive if the demand
+     *     should proceed.
+     */
+    public int confirmNativeTribute(Unit attacker, IndianSettlement is) {
+        Player player = attacker.getOwner();
+        Player other = is.getOwner();
+        int strength = player.calculateStrength(false);
+        String messageId = (other.getNumberOfSettlements() >= strength)
+            ? "confirmTribute.unwise"
+            : (other.getStance(player) == Stance.CEASE_FIRE)
+            ? "confirmTribute.warLikely"
+            : (is.getAlarm(player).getLevel() == Tension.Level.HAPPY)
+            ? "confirmTribute.happy"
+            : "confirmTribute.normal";
+        return (confirm(true, is.getTile(),
+                        StringTemplate.template(messageId)
+                            .addName("%settlement%", is.getName())
+                            .addStringTemplate("%nation%", other.getNationName()),
+                        attacker, "confirmTribute.yes", "confirmTribute.no"))
+            ? 1 : -1;
+    }
+
+    /**
+     * Shows the pre-combat dialog if enabled, allowing the user to
+     * view the odds and possibly cancel the attack.
+     *
+     * @param attacker The attacking <code>Unit</code>.
+     * @param tile The target <code>Tile</code>.
+     * @return True to attack, false to abort.
+     */
+    public boolean confirmPreCombat(Unit attacker, Tile tile) {
+        if (freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.SHOW_PRECOMBAT)) {
+            Settlement settlement = tile.getSettlement();
+            // Don't tell the player how a settlement is defended!
+            FreeColGameObject defender = (settlement != null) ? settlement
+                : tile.getDefendingUnit(attacker);
+            return showPreCombatDialog(attacker, defender, tile);
+        }
+        return true;
+    }
+
+    /**
+     * Confirm whether to stop the current game.
+     *
+     * @return True if confirmation was given.
+     */
+    public boolean confirmStopGame() {
+        return confirm("stopCurrentGame.text",
+                       "stopCurrentGame.yes", "stopCurrentGame.no");
+    }
+
+    /**
+     * Get the choice of what a user wants to do with an armed unit at
+     * a foreign settlement.
+     *
+     * @param settlement The <code>Settlement</code> to consider.
+     * @return The chosen action, tribute, attack or cancel.
+     */
+    public ArmedUnitSettlementAction getArmedUnitSettlementChoice(Settlement settlement) {
+        final Player player = freeColClient.getMyPlayer();
+
+        List<ChoiceItem<ArmedUnitSettlementAction>> choices = new ArrayList<>();
+        choices.add(new ChoiceItem<ArmedUnitSettlementAction>(
+                Messages.message("armedUnitSettlement.tribute"),
+                ArmedUnitSettlementAction.SETTLEMENT_TRIBUTE));
+        choices.add(new ChoiceItem<ArmedUnitSettlementAction>(
+                Messages.message("armedUnitSettlement.attack"),
+                ArmedUnitSettlementAction.SETTLEMENT_ATTACK));
+
+        return getChoice(true, settlement.getTile(), 
+            Messages.message(settlement.getAlarmLevelMessage(player)),
+            settlement, "cancel", choices);
+    }
+
+    /**
+     * Get the user choice of whether to pay arrears for boycotted
+     * goods or to dump them instead.
+     *
+     * @param goods The <code>Goods</code> to possibly dump.
+     * @param europe The player <code>Europe</code> where the boycott
+     *     is in force.
+     * @return The chosen <code>BoycottAction</code>.
+     */
+    public BoycottAction getBoycottChoice(Goods goods, Europe europe) {
+        int arrears = europe.getOwner().getArrears(goods.getType());
+        StringTemplate template = StringTemplate.template("boycottedGoods.text")
+            .add("%goods%", goods.getNameKey())
+            .add("%europe%", europe.getNameKey())
+            .addAmount("%amount%", arrears);
+
+        List<ChoiceItem<BoycottAction>> choices = new ArrayList<>();
+        choices.add(new ChoiceItem<BoycottAction>(
+                Messages.message("boycottedGoods.payArrears"),
+                BoycottAction.PAY_ARREARS));
+        choices.add(new ChoiceItem<BoycottAction>(
+                Messages.message("boycottedGoods.dumpGoods"),
+                BoycottAction.DUMP_CARGO));
+
+        return getChoice(true, null, Messages.message(template),
+                         goods, "cancel", choices);
+    }
+
+    /**
+     * Gets the user choice when negotiating a purchase from a settlement.
+     *
+     * @param unit The <code>Unit</code> that is buying.
+     * @param settlement The <code>Settlement</code> to buy from.
+     * @param goods The <code>Goods</code> to buy.
+     * @param gold The current negotiated price.
+     * @param canBuy True if buy is a valid option.
+     * @return The chosen action, buy, haggle, or cancel.
+     */
+    public BuyAction getBuyChoice(Unit unit, Settlement settlement,
+                                  Goods goods, int gold, boolean canBuy) {
+        StringTemplate template = StringTemplate.template("buy.text")
+            .addStringTemplate("%nation%", settlement.getOwner().getNationName())
+            .addStringTemplate("%goods%", goods.getLabel(true))
+            .addAmount("%gold%", gold);
+
+        List<ChoiceItem<BuyAction>> choices = new ArrayList<>();
+        choices.add(new ChoiceItem<BuyAction>(Messages.message("buy.takeOffer"),
+                                              BuyAction.BUY, canBuy));
+        choices.add(new ChoiceItem<BuyAction>(Messages.message("buy.moreGold"),
+                                              BuyAction.HAGGLE));
+
+        return getChoice(true, unit.getTile(), Messages.message(template),
+                         goods, "buyProposition.cancel", choices);
+    }
+
+    /**
+     * Gets the user choice for claiming a tile.
+     *
+     * @param tile The <code>Tile</code> to claim.
+     * @param player The <code>Player</code> that is claiming.
+     * @param price An asking price, if any.
+     * @param owner The <code>Player</code> that owns the land.
+     * @return The chosen action, accept, steal or cancel.
+     */
+    public ClaimAction getClaimChoice(Tile tile, Player player, int price,
+                                      Player owner) {
+        List<ChoiceItem<ClaimAction>> choices = new ArrayList<>();
+        StringTemplate template;
+        if (owner.hasContacted(player)) {
+            template = StringTemplate.template("indianLand.text")
+                .addStringTemplate("%player%", owner.getNationName());
+            StringTemplate pay = StringTemplate.template("indianLand.pay")
+                .addAmount("%amount%", price);
+            choices.add(new ChoiceItem<ClaimAction>(Messages.message(pay),
+                                                    ClaimAction.ACCEPT,
+                                                    player.checkGold(price)));
+        } else {
+            template = StringTemplate.template("indianLand.unknown");
+        }
+        
+        choices.add(new ChoiceItem<ClaimAction>(Messages.message("indianLand.take"),
+                                                ClaimAction.STEAL));
+
+        return getChoice(true, tile, Messages.message(template),
+                         owner, "indianLand.cancel", choices);
+    }
+
+    /**
+     * Get the user choice when trading with a native settlement.
+     *
+     * @param settlement The native settlement to trade with.
+     * @param template A <code>StringTemplate</code> containing the message
+     *     to display.
+     * @param canBuy Show a "buy" option.
+     * @param canSell Show a "sell" option.
+     * @param canGift Show a "gift" option.
+     * @return The chosen action, buy, sell, gift or cancel.
+     */
+    public TradeAction getIndianSettlementTradeChoice(Settlement settlement,
+                                                      StringTemplate template,
+                                                      boolean canBuy,
+                                                      boolean canSell,
+                                                      boolean canGift) {
+
+        ArrayList<ChoiceItem<TradeAction>> choices = new ArrayList<>();
+        if (canBuy) {
+            choices.add(new ChoiceItem<TradeAction>(
+                    Messages.message("tradeProposition.toBuy"),
+                    TradeAction.BUY, canBuy));
+        }
+        if (canSell) {
+            choices.add(new ChoiceItem<TradeAction>(
+                    Messages.message("tradeProposition.toSell"),
+                    TradeAction.SELL, canSell));
+        }
+        if (canGift) {
+            choices.add(new ChoiceItem<TradeAction>(
+                    Messages.message("tradeProposition.toGift"),
+                    TradeAction.GIFT, canGift));
+        }
+        if (choices.isEmpty()) return null;
+
+        return getChoice(true, settlement.getTile(),
+                         Messages.message(template), settlement,
+                         "tradeProposition.cancel", choices);
+    }
+
+    /**
+     * Get the user choice of what to do with a missionary at a native
+     * settlement.
+     *
+     * @param unit The <code>Unit</code> speaking to the settlement.
+     * @param settlement The <code>IndianSettlement</code> being visited.
+     * @param canEstablish Is establish a valid option.
+     * @param canDenounce Is denounce a valid option.
+     * @return The chosen action, establish mission, denounce, incite
+     *     or cancel.
+     */
+    public MissionaryAction getMissionaryChoice(Unit unit,
+                                                IndianSettlement settlement,
+                                                boolean canEstablish,
+                                                boolean canDenounce) {
+        StringBuilder sb = new StringBuilder(256);
+        StringTemplate t = settlement.getAlarmLevelMessage(unit.getOwner());
+        sb.append(Messages.message(t)).append("\n\n");
+        t = StringTemplate.template("missionarySettlement.question")
+            .addName("%settlement%", settlement.getName());
+        sb.append(Messages.message(t));
+
+        List<ChoiceItem<MissionaryAction>> choices = new ArrayList<>();
+        if (canEstablish) {
+            choices.add(new ChoiceItem<MissionaryAction>(
+                    Messages.message("missionarySettlement.establish"),
+                    MissionaryAction.ESTABLISH_MISSION, canEstablish));
+        }
+        if (canDenounce) {
+            choices.add(new ChoiceItem<MissionaryAction>(
+                    Messages.message("missionarySettlement.heresy"),
+                    MissionaryAction.DENOUNCE_HERESY, canDenounce));
+        }
+        choices.add(new ChoiceItem<MissionaryAction>(
+                Messages.message("missionarySettlement.incite"),
+                MissionaryAction.INCITE_INDIANS));
+
+        return getChoice(true, unit.getTile(), sb.toString(),
+                         settlement, "cancel", choices);
+    }
+
+    /**
+     * Get the user choice for what to do with a scout at a foreign colony.
+     *
+     * @param colony The <code>Colony</code> to be scouted.
+     * @param unit The <code>Unit</code> that is scouting.
+     * @param neg True if negotation is a valid choice.
+     * @return The selected action, either negotiate, spy, attack or cancel.
+     */
+    public ScoutColonyAction getScoutForeignColonyChoice(Colony colony,
+                                                         Unit unit,
+                                                         boolean neg) {
+        StringTemplate template = StringTemplate.template("scoutColony.text")
+            .addStringTemplate("%unit%", unit.getLabel(Unit.UnitLabelType.NATIONAL))
+            .addName("%colony%", colony.getName());
+
+        List<ChoiceItem<ScoutColonyAction>> choices = new ArrayList<>();
+        choices.add(new ChoiceItem<ScoutColonyAction>(
+                Messages.message("scoutColony.negotiate"),
+                ScoutColonyAction.FOREIGN_COLONY_NEGOTIATE, neg));
+        choices.add(new ChoiceItem<ScoutColonyAction>(
+                Messages.message("scoutColony.spy"),
+                ScoutColonyAction.FOREIGN_COLONY_SPY));
+        choices.add(new ChoiceItem<ScoutColonyAction>(
+                Messages.message("scoutColony.attack"),
+                ScoutColonyAction.FOREIGN_COLONY_ATTACK));
+
+        return getChoice(true, unit.getTile(), Messages.message(template),
+                         colony, "cancel", choices);
+    }
+
+    /**
+     * Get the user choice for what to do at a native settlement.
+     *
+     * @param settlement The <code>IndianSettlement</code> to be scouted.
+     * @param number The number of settlements in the settlement owner nation.
+     * @return The chosen action, speak, tribute, attack or cancel.
+     */
+    public ScoutIndianSettlementAction getScoutIndianSettlementChoice(IndianSettlement settlement,
+        String number) {
+        final Player player = freeColClient.getMyPlayer();
+        final Player owner = settlement.getOwner();
+
+        StringBuilder sb = new StringBuilder(400);
+        sb.append(Messages.message(settlement.getAlarmLevelMessage(player)))
+            .append("\n\n");
+        String key = ((IndianNationType)owner.getNationType())
+            .getSettlementTypeKey(true);
+        sb.append(Messages.message(StringTemplate
+                .template("scoutSettlement.greetings")
+                    .addStringTemplate("%nation%", owner.getNationName())
+                    .addName("%settlement%", settlement.getName())
+                    .add("%number%", number)
+                    .add("%settlementType%", key)))
+            .append(" ");
+        if (settlement.getLearnableSkill() != null) {
+            key = settlement.getLearnableSkill().getNameKey();
+            sb.append(Messages.message(StringTemplate
+                    .template("scoutSettlement.skill")
+                        .add("%skill%", key)))
+                .append(" ");
+        }
+        GoodsType[] wantedGoods = settlement.getWantedGoods();
+        int present = 0;
+        for (present = 0; present < wantedGoods.length; present++) {
+            if (wantedGoods[present] == null) break;
+        }
+        if (present > 0) {
+            StringTemplate t = StringTemplate.template("scoutSettlement.trade."
+                + Integer.toString(present));
+            for (int i = 0; i < present; i++) {
+                t.add("%goods" + Integer.toString(i+1) + "%",
+                    wantedGoods[i].getNameKey());
+            }
+            sb.append(Messages.message(t)).append("\n\n");
+        }
+
+        List<ChoiceItem<ScoutIndianSettlementAction>> choices = new ArrayList<>();
+        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
+                Messages.message("scoutSettlement.speak"),
+                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_SPEAK));
+        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
+                Messages.message("scoutSettlement.tribute"),
+                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_TRIBUTE));
+        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
+                Messages.message("scoutSettlement.attack"),
+                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
+
+        return getChoice(true, settlement.getTile(), sb.toString(),
+                         settlement, "cancel", choices);
+    }
+
+    /**
+     * Get the user choice for negotiating a sale to a settlement.
+     *
+     * @param unit The <code>Unit</code> that is selling.
+     * @param settlement The <code>Settlement</code> to sell to.
+     * @param goods The <code>Goods</code> to sell.
+     * @param gold The current negotiated price.
+     * @return The chosen action, sell, gift or haggle, or null.
+     */
+    public SellAction getSellChoice(Unit unit, Settlement settlement,
+                                    Goods goods, int gold) {
+        StringTemplate goodsTemplate = goods.getLabel(true);
+        StringTemplate template = StringTemplate.template("sell.text")
+            .addStringTemplate("%nation%", settlement.getOwner().getNationName())
+            .addStringTemplate("%goods%", goodsTemplate)
+            .addAmount("%gold%", gold);
+
+        List<ChoiceItem<SellAction>> choices = new ArrayList<>();
+        choices.add(new ChoiceItem<SellAction>(
+                Messages.message("sell.takeOffer"),
+                SellAction.SELL));
+        choices.add(new ChoiceItem<SellAction>(
+                Messages.message("sell.moreGold"),
+                SellAction.HAGGLE));
+        choices.add(new ChoiceItem<SellAction>(
+                Messages.message(StringTemplate.template("sell.gift")
+                                 .addStringTemplate("%goods%", goodsTemplate)),
+                SellAction.GIFT));
+
+        return getChoice(true, unit.getTile(), Messages.message(template),
+                         goods, "sellProposition.cancel", choices);
+    }
+
+
+    /**
+     * General choice dialog.
+     *
+     * @param modal Is this a modal dialog?
+     * @param tile An optional <code>Tile</code> to expose.
+     * @param text A string explaining the choice.
+     * @param obj An optional object to make an icon for the dialog with.
+     * @param cancelKey A key for the "cancel" button.
+     * @param choice A list a <code>ChoiceItem</code>s to choose from.
+     * @return The selected value of the selected <code>ChoiceItem</code>,
+     *     or null if cancelled.
+     */
+    public <T> T getChoice(boolean modal, Tile tile, String text, Object obj,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
         if (canvas == null) return null;
+
         return canvas.showChoiceDialog(modal, tile, text, 
                                        getImageIcon(obj, false),
                                        cancelKey, choices);
     }
 
-    public boolean showConfirmDialog(boolean modal, Tile tile,
-                                     StringTemplate template, Object obj,
-                                     String okKey, String cancelKey) {
-        if (canvas == null) return false;
-        return canvas.showConfirmDialog(modal, tile,
-                                        getDefaultTextArea(Messages.message(template)),
-                                        getImageIcon(obj, false), okKey, cancelKey);
-    }
-
-    public boolean showSimpleConfirmDialog(String textKey,
-                                           String okKey, String cancelKey) {
-        if (canvas == null) return false;
-        return canvas.showConfirmDialog(true, null, Messages.message(textKey),
-                                        null, okKey, cancelKey);
-    }
-
-    public String showInputDialog(boolean modal, Tile tile,
-                                  StringTemplate template, String defaultValue,
-                                  String okKey, String cancelKey) {
+    /**
+     * General input dialog.
+     *
+     * @param modal Is this a modal dialog?
+     * @param tile An optional <code>Tile</code> to expose.
+     * @param template A <code>StringTemplate</code> explaining the choice.
+     * @param defaultValue The default value to show initially.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return The chosen value.
+     */
+    public String getInput(boolean modal, Tile tile, StringTemplate template,
+                           String defaultValue, String okKey, String cancelKey) {
         if (canvas == null) return null;
+
         return canvas.showInputDialog(modal, tile, template, defaultValue,
                                       okKey, cancelKey);
     }
@@ -1279,16 +1831,6 @@ public class GUI {
         canvas.showAboutPanel();
     }
 
-    public ArmedUnitSettlementAction showArmedUnitSettlementDialog(Settlement settlement) {
-        if (canvas == null) return null;
-        return canvas.showArmedUnitSettlementDialog(settlement);
-    }
-
-    public BoycottAction showBoycottedGoodsDialog(Goods goods, Europe europe) {
-        if (canvas == null) return null;
-        return canvas.showBoycottedGoodsDialog(goods, europe);
-    }
-
     public void showBuildQueuePanel(Colony colony) {
         if (canvas == null) return;
         canvas.showBuildQueuePanel(colony);
@@ -1297,12 +1839,6 @@ public class GUI {
     public void showBuildQueuePanel(Colony colony, Runnable callBack) {
         if (canvas == null) return;
         canvas.showBuildQueuePanel(colony, callBack);
-    }
-
-    public BuyAction showBuyDialog(Unit unit, Settlement settlement,
-                                   Goods goods, int gold, boolean canBuy) {
-        if (canvas == null) return null;
-        return canvas.showBuyDialog(unit, settlement, goods, gold, canBuy);
     }
 
     public void showCaptureGoodsDialog(final Unit unit, List<Goods> gl,
@@ -1329,12 +1865,6 @@ public class GUI {
                     igc().chooseFoundingFather(ffs, ff);
                 }
             });
-    }
-
-    public ClaimAction showClaimDialog(Tile tile, Player player, int price,
-                                       Player owner) {
-        if (canvas == null) return null;
-        return canvas.showClaimDialog(tile, player, price, owner);
     }
 
     public OptionGroup showClientOptionsDialog() {
@@ -1367,11 +1897,6 @@ public class GUI {
     public void showCompactLabourReport(UnitData unitData) {
         if (canvas == null) return;
         canvas.showCompactLabourReport(unitData);
-    }
-
-    public List<String> showConfirmDeclarationDialog() {
-        return (canvas == null) ? Collections.<String>emptyList()
-            : canvas.showConfirmDeclarationDialog();
     }
 
     public void showDeclarationPanel() {
@@ -1474,14 +1999,6 @@ public class GUI {
     public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
         if (canvas == null) return;
         canvas.showIndianSettlementPanel(indianSettlement);
-    }
-
-    public TradeAction showIndianSettlementTradeDialog(Settlement settlement,
-        StringTemplate template,
-        boolean canBuy, boolean canSell, boolean canGift) {
-        if (canvas == null) return null;
-        return canvas.showIndianSettlementTradeDialog(settlement, template,
-                                                      canBuy, canSell, canGift);
     }
 
     public void showInformationMessage(FreeColObject displayObject,
@@ -1756,20 +2273,6 @@ public class GUI {
         return canvas.showScaleMapSizeDialog();
     }
 
-    public ScoutColonyAction showScoutForeignColonyDialog(Colony colony,
-                                                          Unit unit,
-                                                          boolean neg) {
-        if (canvas == null) return null;
-        return canvas.showScoutForeignColonyDialog(colony, unit, neg);
-    }
-
-    public ScoutIndianSettlementAction
-        showScoutIndianSettlementDialog(IndianSettlement settlement,
-                                        String number) {
-        if (canvas == null) return null;
-        return canvas.showScoutIndianSettlementDialog(settlement, number);
-    }
-
     public int showSelectAmountDialog(GoodsType goodsType, int available,
                                       int defaultAmount, boolean needToPay) {
         if (canvas == null) return -1;
@@ -1786,12 +2289,6 @@ public class GUI {
     public Location showSelectDestinationDialog(Unit unit) {
         if (canvas == null) return null;
         return canvas.showSelectDestinationDialog(unit);
-    }
-
-    public SellAction showSellDialog(Unit unit, Settlement settlement,
-                                     Goods goods, int gold) {
-        if (canvas == null) return null;
-        return canvas.showSellDialog(unit, settlement, goods, gold);
     }
 
     public void showServerListPanel(List<ServerInfo> serverList) {
@@ -1841,14 +2338,6 @@ public class GUI {
     public void showTrainPanel() {
         if (canvas == null) return;
         canvas.showTrainPanel();
-    }
-
-    public MissionaryAction
-        showUseMissionaryDialog(Unit unit, IndianSettlement settlement,
-                                boolean canEstablish, boolean canDenounce) {
-        if (canvas == null) return null;
-        return canvas.showUseMissionaryDialog(unit, settlement,
-                                              canEstablish, canDenounce);
     }
 
     public void showVictoryDialog() {

@@ -538,7 +538,7 @@ public final class EuropePanel extends PortPanel {
                 final Unit unit = ((UnitLabel)comp).getUnit();
 
                 if (unit.getTradeRoute() != null) {
-                    if (!getGUI().checkClearTradeRoute(unit)
+                    if (!getGUI().confirmClearTradeRoute(unit)
                         || !igc().assignTradeRoute(unit, null)) return null;
                 }
 
@@ -556,7 +556,7 @@ public final class EuropePanel extends PortPanel {
                     && unit.hasSpaceLeft()) {
                     StringTemplate locName = destination
                         .getLocationNameFor(unit.getOwner());
-                    if (!getGUI().showConfirmDialog(true, null,
+                    if (!getGUI().confirm(true, null,
                             StringTemplate.template("europe.leaveColonists")
                                 .addStringTemplate("%newWorld%", locName),
                             unit, "ok", "cancel")) return null;
@@ -749,8 +749,8 @@ public final class EuropePanel extends PortPanel {
                 if (getMyPlayer().canTrade(goods.getType())) {
                     igc().sellGoods(goods);
                 } else {
-                    GUI.BoycottAction act
-                        = getGUI().showBoycottedGoodsDialog(goods, europe);
+                    GUI.BoycottAction act = getGUI().getBoycottChoice(goods,
+                                                                      europe);
                     if (act != null) {
                         switch (act) {
                         case PAY_ARREARS:

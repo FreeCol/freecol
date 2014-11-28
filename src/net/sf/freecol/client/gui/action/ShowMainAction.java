@@ -51,8 +51,7 @@ public class ShowMainAction extends FreeColAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        if (!getGUI().showSimpleConfirmDialog("stopCurrentGame.text",
-                "stopCurrentGame.yes", "stopCurrentGame.no")) return;
+        if (!getGUI().confirmStopGame()) return;
         getConnectController().quitGame(true);
         getGUI().removeInGameComponents();
         freeColClient.setMapEditor(false);

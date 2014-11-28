@@ -271,8 +271,8 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             ret = settlement;
 
         } else if (options.get(1).equals(value)) {
-            if (!getGUI().showSimpleConfirmDialog("editor.removeSettlement.text",
-                                                  "ok", "cancel")) {
+            if (!getGUI().confirm("editor.removeSettlement.text", 
+                                  "ok", "cancel")) {
                 return settlement;
             }
             // Dispose of units and settlement on tile
