@@ -35,11 +35,13 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
@@ -108,6 +110,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * connectivity needs recalculation after reading in the map.
      */
     public static final int FLAG_RECALCULATE = Integer.MAX_VALUE;
+
+    /**
+     * Warn about colonies that can not produce this amount of
+     * a building material.
+     */
+    private static final int LOW_PRODUCTION_WARNING_VALUE = 4;
 
     /**
      * The maximum distance that will still be considered "near" when
@@ -1381,6 +1389,106 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         changeOwningSettlement(settlement);//-til
     }
 
+    /**
+     * A colony is proposed to be built on this tile.  Collect
+     * warnings if this has disadvantages.
+     *
+     * @param unit The <code>Unit</code> which is to build the colony.
+     */
+    public String getBuildColonyWarnings(Unit unit) {
+        final Specification spec = getSpecification();
+        boolean landLocked = true;
+        boolean ownedByEuropeans = false;
+        boolean ownedBySelf = false;
+        boolean ownedByIndians = false;
+
+        java.util.Map<GoodsType, Integer> goodsMap = new HashMap<>();
+        for (GoodsType goodsType : spec.getGoodsTypeList()) {
+            if (goodsType.isBuildingMaterial()) {
+                while (goodsType.isRefined()) {
+                    goodsType = goodsType.getInputType();
+                }
+            } else if (!goodsType.isFoodType()) {
+                continue;
+            }
+            for (ProductionType productionType : getType()
+                     .getAvailableProductionTypes(false)) {
+                int potential = (productionType.getOutput(goodsType) == null)
+                    ? 0 : getPotentialProduction(goodsType, null);
+                Integer oldPotential = goodsMap.get(goodsType);
+                if (oldPotential == null || potential > oldPotential) {
+                    goodsMap.put(goodsType, potential);
+                }
+            }
+        }
+
+        for (Tile t : getSurroundingTiles(1)) {
+            if (!t.isLand()) landLocked = false;
+            for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
+                entry.setValue(entry.getValue()
+                    + t.getPotentialProduction(entry.getKey(),
+                        spec.getDefaultUnitType()));
+            }
+            Player tileOwner = t.getOwner();
+            if (unit.getOwner() == tileOwner) {
+                if (t.getOwningSettlement() != null) {
+                    // we are using newTile
+                    ownedBySelf = true;
+                } else {
+                    for (Tile ownTile : t.getSurroundingTiles(1)) {
+                        Colony colony = ownTile.getColony();
+                        if (colony != null
+                            && colony.getOwner() == unit.getOwner()) {
+                            // newTile can be used from an own colony
+                            ownedBySelf = true;
+                            break;
+                        }
+                    }
+                }
+            } else if (tileOwner != null && tileOwner.isEuropean()) {
+                ownedByEuropeans = true;
+            } else if (tileOwner != null) {
+                ownedByIndians = true;
+            }
+        }
+
+        int food = 0;
+        for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
+            if (entry.getKey().isFoodType()) {
+                food += entry.getValue().intValue();
+            }
+        }
+
+        LogBuilder lb = new LogBuilder(256);
+        lb.mark();
+        if (landLocked) {
+            lb.add(Messages.message("buildColony.landLocked"), "\n");
+        }
+        if (food < 8) {
+            lb.add(Messages.message("buildColony.noFood"), "\n");
+        }
+        for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
+            if (!entry.getKey().isFoodType()
+                && entry.getValue().intValue() < LOW_PRODUCTION_WARNING_VALUE) {
+                lb.add(Messages.message(StringTemplate
+                        .template("buildColony.noBuildingMaterials")
+                        .add("%goods%", entry.getKey().getNameKey())),
+                    "\n");
+            }
+        }
+
+        if (ownedBySelf) {
+            lb.add(Messages.message("buildColony.ownLand"), "\n");
+        }
+        if (ownedByEuropeans) {
+            lb.add(Messages.message("buildColony.EuropeanLand"), "\n");
+        }
+        if (ownedByIndians) {
+            lb.add(Messages.message("buildColony.IndianLand"), "\n");
+        }
+
+        return (!lb.grew()) ? null : lb.toString();
+    }
 
     //
     // Production

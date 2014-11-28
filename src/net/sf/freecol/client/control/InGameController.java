@@ -1424,9 +1424,12 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)
-            && !buildColonyShowWarnings(tile, unit)) {
-            return;
+            .getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)) {
+            String warnings = tile.getBuildColonyWarnings(unit);
+            if (!gui.confirm(true, tile, StringTemplate.label(warnings), unit,
+                             "buildColony.yes", "buildColony.no")) {
+                return;
+            }
         }
 
         if (tile.getOwner() != null && !player.owns(tile)) {
