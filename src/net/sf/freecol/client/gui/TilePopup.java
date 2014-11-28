@@ -198,7 +198,7 @@ public final class TilePopup extends JPopupMenu {
                     ji = new JMenuItem(Messages.message("clearUnitOrders"));
                     ji.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent event) {
-                                igc.setDestination(activeUnit, null);
+                                igc.clearOrders(activeUnit);
                             }
                         });
                     add(ji);
