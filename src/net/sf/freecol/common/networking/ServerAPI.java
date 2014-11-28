@@ -611,15 +611,15 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response to claim a piece of land.
+     * Server query-response to claim a tile.
      *
-     * @param tile The land to claim.
+     * @param tile The <code>Tile</code> to claim.
      * @param claimant The <code>Unit</code> or <code>Settlement</code> that is
-     *     claiming the land.
+     *     claiming the tile.
      * @param price The amount to pay.
      * @return True if the server interaction succeeded.
      */
-    public boolean claimLand(Tile tile, FreeColGameObject claimant, int price) {
+    public boolean claimTile(Tile tile, FreeColGameObject claimant, int price) {
         return askHandling(new ClaimLandMessage(tile, claimant, price),
             null, null);
     }

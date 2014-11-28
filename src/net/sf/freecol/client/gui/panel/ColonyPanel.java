@@ -2088,7 +2088,7 @@ public final class ColonyPanel extends PortPanel
                         = player.canClaimForSettlementReason(tile);
                     switch (claim) {
                     case NONE: case NATIVES:
-                        if (igc().claimLand(tile, colony)
+                        if (igc().claimTile(tile, colony)
                             && tile.getOwningSettlement() == colony) {
                             logger.info("Colony " + colony.getName()
                                 + " claims tile " + tile

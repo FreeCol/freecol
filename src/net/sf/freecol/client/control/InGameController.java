@@ -790,7 +790,7 @@ public final class InGameController implements NetworkConstants {
         } // else price == 0 and we can just proceed to claim
 
         // Ask the server
-        if (askServer().claimLand(tile, claimant, price)
+        if (askServer().claimTile(tile, claimant, price)
             && player.owns(tile)) {
             gui.updateMenuBar();
             return true;
@@ -1790,7 +1790,7 @@ public final class InGameController implements NetworkConstants {
      * @param claimant The <code>Unit</code> or <code>Colony</code> claiming.
      * @return True if the claim succeeded.
      */
-    public boolean claimLand(Tile tile, FreeColGameObject claimant) {
+    public boolean claimTile(Tile tile, FreeColGameObject claimant) {
         if (!requireOurTurn()) return false;
 
         Player player = freeColClient.getMyPlayer();
@@ -2545,12 +2545,14 @@ public final class InGameController implements NetworkConstants {
     /**
      * Move a unit in a given direction.
      *
+     * Public for the test suite.
+     *
      * @param unit The <code>Unit</code> to move.
      * @param direction The <code>Direction</code> to move in.
      * @param interactive Interactive mode: play sounds and emit errors.
      * @return True if the unit can possibly move further.
      */
-    private boolean moveDirection(Unit unit, Direction direction,
+    public boolean moveDirection(Unit unit, Direction direction,
                                   boolean interactive) {
         // If this move would reach the unit destination but we
         // discover that it would be permanently impossible to complete,
@@ -4497,8 +4499,7 @@ public final class InGameController implements NetworkConstants {
                 return;
             }
             if (tile.getOwner() != unit.getOwner()) {
-                if (!claimLand(tile, ((colony != null) ? colony : unit)))
-                    return;
+                if (!claimTile(tile, colony)) return;
             }
         }
 
