@@ -48,6 +48,6 @@ public class ReconnectAction extends FreeColAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getInGameController().reconnect();
+        igc().reconnect();
     }
 }

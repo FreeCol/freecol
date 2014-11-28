@@ -717,7 +717,7 @@ public final class ColonyPanel extends PortPanel
         // Set the unit to work.  Note this might upgrade the unit,
         // and possibly even change its work type as the server has
         // the right to maintain consistency.
-        getController().work(unit, wl);
+        igc().work(unit, wl);
 
         // Did it work?
         if (unit.getLocation() != wl) return false;
@@ -725,7 +725,7 @@ public final class ColonyPanel extends PortPanel
         // Now recheck, and see if we want to change to the expected
         // work type.
         if (workType != null && workType != unit.getWorkType()) {
-            getController().changeWorkType(unit, workType);
+            igc().changeWorkType(unit, workType);
         }
         return true;
     }
@@ -885,14 +885,14 @@ public final class ColonyPanel extends PortPanel
         getGUI().updateMapControls();
 
         // Talk to the controller last, allow all the cleanup to happen first.
-        if (abandon) getController().abandonColony(colony);
+        if (abandon) igc().abandonColony(colony);
         if (getFreeColClient().currentPlayerIsMyPlayer()) {
-            getController().nextModelMessage();
+            igc().nextModelMessage();
             Unit activeUnit = getGUI().getActiveUnit();
             if (activeUnit == null || !activeUnit.hasTile()
                 || (!(activeUnit.getLocation() instanceof Tile)
                     && !activeUnit.isOnCarrier())) {
-                getController().nextActiveUnit();
+                igc().nextActiveUnit();
             }
         }
     }
@@ -935,10 +935,10 @@ public final class ColonyPanel extends PortPanel
             case UNLOAD:
                 if (unit == null || !unit.isCarrier()) break;
                 for (Goods goods : unit.getGoodsContainer().getGoods()) {
-                    getController().unloadCargo(goods, false);
+                    igc().unloadCargo(goods, false);
                 }
                 for (Unit u : unit.getUnitList()) {
-                    getController().leaveShip(u);
+                    igc().leaveShip(u);
                 }
                 cargoPanel.update();
                 updateOutsideColonyPanel();
@@ -963,7 +963,7 @@ public final class ColonyPanel extends PortPanel
                         Goods newGoods = new Goods(goods.getGame(), colony,
                                                    goods.getType(),
                                                    Math.min(space, count));
-                        getController().loadCargo(newGoods, unit);
+                        igc().loadCargo(newGoods, unit);
                     }
                 }
                 break;
@@ -1343,7 +1343,7 @@ public final class ColonyPanel extends PortPanel
                     Unit unit = unitLabel.getUnit();
 
                     if (!unit.isOnCarrier()) {
-                        getController().putOutsideColony(unit);
+                        igc().putOutsideColony(unit);
                     }
 
                     if (unit.getColony() == null) {
@@ -2087,7 +2087,7 @@ public final class ColonyPanel extends PortPanel
                         = player.canClaimForSettlementReason(tile);
                     switch (claim) {
                     case NONE: case NATIVES:
-                        if (getController().claimLand(tile, colony)
+                        if (igc().claimLand(tile, colony)
                             && tile.getOwningSettlement() == colony) {
                             logger.info("Colony " + colony.getName()
                                 + " claims tile " + tile

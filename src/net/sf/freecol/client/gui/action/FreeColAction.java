@@ -123,7 +123,7 @@ public abstract class FreeColAction extends AbstractAction
      *
      * @return The <code>InGameController</code>.
      */
-    protected InGameController getInGameController() {
+    protected InGameController igc() {
         return freeColClient.getInGameController();
     }
 

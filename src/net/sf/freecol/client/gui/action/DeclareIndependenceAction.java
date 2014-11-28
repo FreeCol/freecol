@@ -65,7 +65,7 @@ public class DeclareIndependenceAction extends MapboardAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getInGameController().declareIndependence();
+        igc().declareIndependence();
         update();
     }
 }

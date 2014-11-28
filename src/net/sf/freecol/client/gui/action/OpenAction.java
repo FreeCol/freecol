@@ -49,7 +49,7 @@ public class OpenAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         if (!freeColClient.isMapEditor()) {
-            getInGameController().loadGame();
+            igc().loadGame();
         } else {
             freeColClient.getMapEditorController().loadGame();
         }

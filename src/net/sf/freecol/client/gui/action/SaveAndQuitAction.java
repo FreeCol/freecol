@@ -51,7 +51,7 @@ public class SaveAndQuitAction extends FreeColAction {
         if (freeColClient.isMapEditor()) {
             freeColClient.getMapEditorController().saveGame();
         } else {
-            if (!getInGameController().saveGame()) return;
+            if (!igc().saveGame()) return;
         }
         freeColClient.quit();
     }

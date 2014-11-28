@@ -186,7 +186,7 @@ public final class ReportTurnPanel extends ReportPanel {
                 ignoreButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
                             boolean flag = label.isEnabled();
-                            getController().ignoreMessage(m, flag);
+                            igc().ignoreMessage(m, flag);
                             textPane.setEnabled(!flag);
                             label.setEnabled(!flag);
                         }

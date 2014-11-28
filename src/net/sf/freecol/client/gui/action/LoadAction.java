@@ -69,20 +69,19 @@ public class LoadAction extends MapboardAction {
      */
     public void actionPerformed(ActionEvent e) {
         Unit unit = getGUI().getActiveUnit();
-        if (unit != null) {
-            Colony colony = unit.getColony();
-            if (colony != null) {
-                Iterator<Goods> goodsIterator = unit.getGoodsIterator();
-                while (goodsIterator.hasNext()) {
-                    Goods goods = goodsIterator.next();
-                    if (goods.getAmount() < GoodsContainer.CARGO_SIZE
-                        && colony.getGoodsCount(goods.getType()) > 0) {
-                        int amount = Math.min(GoodsContainer.CARGO_SIZE - goods.getAmount(),
-                            colony.getGoodsCount(goods.getType()));
-                        Goods newGoods = new Goods(goods.getGame(), colony, goods.getType(), amount);
-                        getInGameController().loadCargo(newGoods, unit);
-                    }
-                }
+        if (unit == null) return;
+        Colony colony = unit.getColony();
+        if (colony == null) return;
+        Iterator<Goods> goodsIterator = unit.getGoodsIterator();
+        while (goodsIterator.hasNext()) {
+            Goods goods = goodsIterator.next();
+            if (goods.getAmount() < GoodsContainer.CARGO_SIZE
+                && colony.getGoodsCount(goods.getType()) > 0) {
+                int amount = Math.min(colony.getGoodsCount(goods.getType()),
+                    GoodsContainer.CARGO_SIZE - goods.getAmount());
+                Goods newGoods = new Goods(goods.getGame(), colony,
+                                           goods.getType(), amount);
+                igc().loadCargo(newGoods, unit);
             }
         }
     }

@@ -220,7 +220,7 @@ public class CargoPanel extends FreeColPanel
                 Unit unit = ((UnitLabel) comp).getUnit();
                 if (carrier.canAdd(unit)) {
                     Container oldParent = comp.getParent();
-                    if (getController().boardShip(unit, carrier)) {
+                    if (igc().boardShip(unit, carrier)) {
                         ((UnitLabel) comp).setSmall(false);
                         if (oldParent != null) oldParent.remove(comp);
                         update();
@@ -239,7 +239,7 @@ public class CargoPanel extends FreeColPanel
                 Goods goodsToAdd = new Goods(goods.getGame(), goods.getLocation(),
                                              goods.getType(), loadableAmount);
                 goods.setAmount(goods.getAmount() - loadableAmount);
-                getController().loadCargo(goodsToAdd, carrier);
+                igc().loadCargo(goodsToAdd, carrier);
                 update();
                 return comp;
 
@@ -247,13 +247,12 @@ public class CargoPanel extends FreeColPanel
                 MarketLabel label = (MarketLabel) comp;
                 Player player = carrier.getOwner();
                 if (player.canTrade(label.getType())) {
-                    getController().buyGoods(label.getType(), 
-                                             label.getAmount(), carrier);
-                    getController().nextModelMessage();
+                    igc().buyGoods(label.getType(), label.getAmount(), carrier);
+                    igc().nextModelMessage();
                     update();
                     return comp;
                 } else {
-                    getController().payArrears(label.getType());
+                    igc().payArrears(label.getType());
                     return null;
                 }
             } else {
@@ -296,11 +295,11 @@ public class CargoPanel extends FreeColPanel
     public void remove(Component comp) {
         if (comp instanceof UnitLabel) {
             Unit unit = ((UnitLabel)comp).getUnit();
-            getController().leaveShip(unit);
+            igc().leaveShip(unit);
             update();
         } else if (comp instanceof GoodsLabel) {
             Goods g = ((GoodsLabel)comp).getGoods();
-            getController().unloadCargo(g, false);
+            igc().unloadCargo(g, false);
             update();
         }
     }

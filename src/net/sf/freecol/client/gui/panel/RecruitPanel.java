@@ -139,7 +139,7 @@ public final class RecruitPanel extends FreeColPanel {
             try {
                 int index = Integer.parseInt(command);
                 if (index >= 0 && index < Europe.RECRUIT_COUNT) {
-                    getController().recruitUnitInEurope(index);
+                    igc().recruitUnitInEurope(index);
                     getGUI().updateEuropeanSubpanels();
                     if (!shouldEnable) getGUI().removeFromCanvas(this);
                     return;

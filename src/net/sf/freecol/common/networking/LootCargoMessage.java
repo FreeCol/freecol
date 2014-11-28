@@ -91,7 +91,7 @@ public class LootCargoMessage extends DOMMessage {
     // Public interface
 
     /**
-     * Public accessor to help the client igc.
+     * Public accessor to help the client in game controller.
      *
      * @return The winner unit.
      */
@@ -100,7 +100,7 @@ public class LootCargoMessage extends DOMMessage {
     }
 
     /**
-     * Public accessor to help the client igc.
+     * Public accessor to help the client in game controller.
      *
      * @return The defender Object Identifier.
      */
@@ -109,7 +109,7 @@ public class LootCargoMessage extends DOMMessage {
     }
 
     /**
-     * Public accessor to help the client igc.
+     * Public accessor to help the client in game controller.
      *
      * @return The goods to loot.
      */

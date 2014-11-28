@@ -95,7 +95,7 @@ public final class ReportIndianPanel extends ReportPanel {
      * @param opponent a <code>Player</code> value
      */
     private void buildIndianAdvisorPanel(Player player, Player opponent) {
-        final NationSummary ns = getController().getNationSummary(opponent);
+        final NationSummary ns = igc().getNationSummary(opponent);
         List<IndianSettlement> nativeSettlements
             = opponent.getIndianSettlements();
         String numSettlements = String.valueOf(nativeSettlements.size())

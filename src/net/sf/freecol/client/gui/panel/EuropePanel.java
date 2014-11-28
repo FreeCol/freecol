@@ -338,7 +338,7 @@ public final class EuropePanel extends PortPanel {
     private void exitAction() {
         cleanup();
         getGUI().removeFromCanvas(this);
-        getController().nextModelMessage();
+        igc().nextModelMessage();
     }
 
     /**
@@ -351,15 +351,15 @@ public final class EuropePanel extends PortPanel {
             while (goodsIterator.hasNext()) {
                 Goods goods = goodsIterator.next();
                 if (getMyPlayer().canTrade(goods.getType())) {
-                    getController().sellGoods(goods);
+                    igc().sellGoods(goods);
                 } else {
-                    getController().payArrears(goods.getType());
+                    igc().payArrears(goods.getType());
                 }
             }
             Iterator<Unit> unitIterator = unit.getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit newUnit = unitIterator.next();
-                getController().leaveShip(newUnit);
+                igc().leaveShip(newUnit);
             }
             cargoPanel.update();
             docksPanel.update();
@@ -539,8 +539,7 @@ public final class EuropePanel extends PortPanel {
 
                 if (unit.getTradeRoute() != null) {
                     if (!getGUI().checkClearTradeRoute(unit)
-                        || !getController().assignTradeRoute(unit, null))
-                        return null;
+                        || !igc().assignTradeRoute(unit, null)) return null;
                 }
 
                 Location dest = destination;
@@ -564,7 +563,7 @@ public final class EuropePanel extends PortPanel {
                 }
 
                 comp.getParent().remove(comp);
-                getController().moveTo(unit, dest);
+                igc().moveTo(unit, dest);
                 inPortPanel.update();
                 docksPanel.update();
                 cargoPanel.update();
@@ -748,17 +747,17 @@ public final class EuropePanel extends PortPanel {
 
                 Goods goods = ((GoodsLabel)comp).getGoods();
                 if (getMyPlayer().canTrade(goods.getType())) {
-                    getController().sellGoods(goods);
+                    igc().sellGoods(goods);
                 } else {
                     GUI.BoycottAction act
                         = getGUI().showBoycottedGoodsDialog(goods, europe);
                     if (act != null) {
                         switch (act) {
                         case PAY_ARREARS:
-                            getController().payArrears(goods.getType());
+                            igc().payArrears(goods.getType());
                             break;
                         case DUMP_CARGO:
-                            getController().unloadCargo(goods, true);
+                            igc().unloadCargo(goods, true);
                             break;
                         default:
                             logger.warning("showBoycottedGoodsDialog fail: "
@@ -769,7 +768,7 @@ public final class EuropePanel extends PortPanel {
                 }
                 cargoPanel.revalidate();
                 revalidate();
-                getController().nextModelMessage();
+                igc().nextModelMessage();
             }
             EuropePanel.this.refresh();
             return comp;

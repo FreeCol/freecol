@@ -71,10 +71,10 @@ public class MoveAction extends MapboardAction {
     public void actionPerformed(ActionEvent e) { 
         switch (getGUI().getViewMode()) {
         case GUI.MOVE_UNITS_MODE:
-            getInGameController().moveActiveUnit(direction);
+            igc().moveActiveUnit(direction);
             break;
         case GUI.VIEW_TERRAIN_MODE:
-            getInGameController().moveTileCursor(direction);
+            igc().moveTileCursor(direction);
             break;
         default:
             break;

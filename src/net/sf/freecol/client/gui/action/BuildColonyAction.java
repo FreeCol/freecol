@@ -71,6 +71,6 @@ public class BuildColonyAction extends UnitAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getInGameController().buildColony();
+        igc().buildColony();
     }
 }

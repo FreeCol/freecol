@@ -64,7 +64,7 @@ public class SaveAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         if (!freeColClient.isMapEditor()) {
-            getInGameController().saveGame();
+            igc().saveGame();
         } else {
             freeColClient.getMapEditorController().saveGame();
         }

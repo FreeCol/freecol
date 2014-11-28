@@ -49,6 +49,6 @@ public class ReportHighScoresAction extends FreeColAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getInGameController().displayHighScores(null);
+        igc().displayHighScores(null);
     }
 }

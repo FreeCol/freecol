@@ -1041,14 +1041,14 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 command = FAIL;
                 removeBuildable(buildables.remove(0));
             }
-            getController().setBuildQueue(this.colony, buildables);
+            igc().setBuildQueue(this.colony, buildables);
             if (FAIL.equals(command)) { // Let the user reconsider.
                 updateAllLists();
                 return;
             } else if (OK.equals(command)) {
                 // do nothing?
             } else if (BUY.equals(command)) {
-                getController().payForBuilding(this.colony);
+                igc().payForBuilding(this.colony);
             } else {
                 super.actionPerformed(event);
             }

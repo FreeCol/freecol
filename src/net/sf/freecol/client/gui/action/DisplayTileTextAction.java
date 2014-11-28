@@ -85,7 +85,8 @@ public class DisplayTileTextAction extends SelectableAction {
         if (freeColClient.getClientOptions() == null || display == null) {
             return false;
         } else {
-            return freeColClient.getClientOptions().getDisplayTileText() == display.ordinal();
+            return freeColClient.getClientOptions()
+                .getDisplayTileText() == display.ordinal();
         }
     }
 
@@ -97,7 +98,8 @@ public class DisplayTileTextAction extends SelectableAction {
      */
     public void actionPerformed(ActionEvent e) {
         if (((JRadioButtonMenuItem) e.getSource()).isSelected()) {
-            freeColClient.getClientOptions().setInteger(ClientOptions.DISPLAY_TILE_TEXT, display.ordinal());
+            freeColClient.getClientOptions()
+                .setInteger(ClientOptions.DISPLAY_TILE_TEXT, display.ordinal());
             getGUI().refresh();
         }
     }

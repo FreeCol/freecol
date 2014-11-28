@@ -295,11 +295,11 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     }
 
     /**
-     * Get the controller.
+     * Get the client controller.
      *
-     * @return The <code>InGameController</code>.
+     * @return The client <code>InGameController</code>.
      */
-    protected InGameController getController() {
+    protected InGameController igc() {
         return freeColClient.getInGameController();
     }
 

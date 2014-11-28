@@ -103,7 +103,7 @@ public final class ChatPanel extends FreeColPanel {
             switch (Integer.parseInt(command)) {
             case CHAT:
                 String message = getChatText();
-                getController().sendChat(message);
+                igc().sendChat(message);
                 getGUI().displayChatMessage(getMyPlayer(), message, false);
                 getGUI().removeFromCanvas(this);
                 break;

@@ -48,6 +48,6 @@ public class ReportTurnAction extends FreeColAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getInGameController().displayTurnReportMessages();
+        igc().displayTurnReportMessages();
     }
 }

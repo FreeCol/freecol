@@ -162,7 +162,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                                 if (selected.getName() == null) { // Cancelled
                                     selected.setName(name);
                                 } else if ((template = selected.verify()) == null) {
-                                    getController().updateTradeRoute(selected);
+                                    igc().updateTradeRoute(selected);
                                     updateList(selected);
                                 } else {
                                     getGUI().showInformationMessage(template);
@@ -181,7 +181,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                     TradeRoute route = getRoute();
                     if (route != null) {
                         for (Unit u : route.getAssignedUnits()) {
-                            getController().assignTradeRoute(u, null);
+                            igc().assignTradeRoute(u, null);
                         }
                         deleteTradeRoute(route);
                         updateList(null);
@@ -243,7 +243,7 @@ public final class TradeRoutePanel extends FreeColPanel {
     private void newRoute() {
         final Player player = getMyPlayer();
         final Unit u = this.unit;
-        final TradeRoute newRoute = getController().getNewTradeRoute(player);
+        final TradeRoute newRoute = igc().getNewTradeRoute(player);
         getGUI().showTradeRouteInputPanel(newRoute,
             new Runnable() {
                 public void run() {
@@ -253,10 +253,8 @@ public final class TradeRoutePanel extends FreeColPanel {
                         updateList(null);
                     } else {
                         if ((template = newRoute.verify()) == null) {
-                            getController().updateTradeRoute(newRoute);
-                            if (u != null) {
-                                getController().assignTradeRoute(u, newRoute);
-                            }
+                            igc().updateTradeRoute(newRoute);
+                            if (u != null) igc().assignTradeRoute(u, newRoute);
                             updateList(newRoute);
                         } else {
                             updateList(null);
@@ -327,7 +325,7 @@ public final class TradeRoutePanel extends FreeColPanel {
     private void deleteTradeRoute(TradeRoute route) {
         List<TradeRoute> routes = getMyPlayer().getTradeRoutes();
         routes.remove(route);
-        getController().setTradeRoutes(routes);
+        igc().setTradeRoutes(routes);
     }
 
 
@@ -342,7 +340,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         final TradeRoute route = getRoute();
         if (DEASSIGN.equals(command)) {
             if (unit != null && route == unit.getTradeRoute()) {
-                getController().clearOrders(unit);
+                igc().clearOrders(unit);
             }
             getGUI().removeFromCanvas(this);
 
@@ -351,9 +349,9 @@ public final class TradeRoutePanel extends FreeColPanel {
             for (int index = 0; index < listModel.getSize(); index++) {
                 routes.add((TradeRoute)listModel.getElementAt(index));
             }
-            getController().setTradeRoutes(routes);
+            igc().setTradeRoutes(routes);
             if (unit != null && route != null) {
-                getController().assignTradeRoute(unit, route);
+                igc().assignTradeRoute(unit, route);
             }
             super.actionPerformed(event);
 

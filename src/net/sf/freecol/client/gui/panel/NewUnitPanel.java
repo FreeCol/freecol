@@ -149,7 +149,7 @@ public class NewUnitPanel extends FreeColPanel {
             super.actionPerformed(event);
         } else {
             UnitType unitType = getSpecification().getUnitType(command);
-            getController().trainUnitInEurope(unitType);
+            igc().trainUnitInEurope(unitType);
             // Close early if there is nothing affordable remaining.
             getGUI().updateEuropeanSubpanels();
             if (!shouldEnable) getGUI().removeFromCanvas(this);            

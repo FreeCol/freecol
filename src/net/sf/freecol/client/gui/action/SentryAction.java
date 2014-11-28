@@ -51,7 +51,6 @@ public class SentryAction extends UnitAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent actionEvent) {
-        getInGameController().changeState(getGUI().getActiveUnit(),
-            Unit.UnitState.SENTRY);
+        igc().changeState(getGUI().getActiveUnit(), Unit.UnitState.SENTRY);
     }
 }

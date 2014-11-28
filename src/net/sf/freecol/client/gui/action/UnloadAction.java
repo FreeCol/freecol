@@ -77,7 +77,8 @@ public class UnloadAction extends MapboardAction {
         return super.shouldBeEnabled()
             && carrier != null
             && carrier.isCarrier()
-            && carrier.getCargoSpaceTaken() > 0;
+            && carrier.getCargoSpaceTaken() > 0
+            && freeColClient.getMyPlayer().owns(carrier);
     }
 
 
@@ -88,9 +89,6 @@ public class UnloadAction extends MapboardAction {
      */
     public void actionPerformed(ActionEvent e) {
         Unit carrier = getUnit();
-        if (carrier != null) {
-            getInGameController().unload(carrier);
-            getGUI().updateMapControls();
-        }
+        if (carrier != null) igc().unload(carrier);
     }
 }

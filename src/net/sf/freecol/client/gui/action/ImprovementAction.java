@@ -79,9 +79,9 @@ public class ImprovementAction extends UnitAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getInGameController()
-            .changeWorkImprovementType(getGUI().getActiveUnit(),
-                                       improvement);
-        getInGameController().nextActiveUnit();
+        Unit unit = getGUI().getActiveUnit();
+        if (unit == null) return;
+
+        igc().changeWorkImprovementType(unit, improvement);
     }
 }

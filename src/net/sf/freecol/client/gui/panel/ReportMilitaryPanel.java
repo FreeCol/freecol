@@ -94,7 +94,7 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
                         "span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
-        List<AbstractUnit> refUnits = getController().getREFUnits();
+        List<AbstractUnit> refUnits = igc().getREFUnits();
         if (refUnits != null) {
             for (AbstractUnit au : refUnits) {
                 if (!au.getType(spec).isNaval()) {

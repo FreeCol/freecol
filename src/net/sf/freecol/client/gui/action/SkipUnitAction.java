@@ -50,6 +50,6 @@ public class SkipUnitAction extends UnitAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getInGameController().skipActiveUnit();
+        igc().skipActiveUnit();
     }
 }

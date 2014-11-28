@@ -48,6 +48,6 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getInGameController().executeGotoOrders();
+        igc().executeGotoOrders();
     }
 }

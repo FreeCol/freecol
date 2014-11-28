@@ -63,7 +63,7 @@ public class FortifyAction extends UnitAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getInGameController().changeState(getGUI().getActiveUnit(),
+        igc().changeState(getGUI().getActiveUnit(),
             Unit.UnitState.FORTIFYING);
     }
 }

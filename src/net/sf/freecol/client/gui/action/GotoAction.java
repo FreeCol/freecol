@@ -45,6 +45,7 @@ public class GotoAction extends UnitAction {
         super(freeColClient, id);
     }
 
+
     /**
      * Checks if this action should be enabled.
      *
@@ -64,7 +65,7 @@ public class GotoAction extends UnitAction {
     public void actionPerformed(ActionEvent e) {
         Unit unit = getGUI().getActiveUnit();
         if (unit != null) {
-            getInGameController().selectDestination(unit);
+            igc().selectDestination(unit);
         }
     }
 }

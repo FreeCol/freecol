@@ -50,6 +50,6 @@ public class ClearOrdersAction extends UnitAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getInGameController().clearOrders(getGUI().getActiveUnit());
+        igc().clearOrders(getGUI().getActiveUnit());
     }
 }

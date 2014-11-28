@@ -48,6 +48,6 @@ public class RenameAction extends UnitAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getInGameController().rename(getGUI().getActiveUnit());
+        igc().rename(getGUI().getActiveUnit());
     }
 }
