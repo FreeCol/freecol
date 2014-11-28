@@ -86,6 +86,7 @@ public class Unit extends GoodsLocation
 
 
     public static final String CARGO_CHANGE = "CARGO_CHANGE";
+    public static final String MOVE_CHANGE = "MOVE_CHANGE";
     public static final String ROLE_CHANGE = "ROLE_CHANGE";
 
     /** A state a Unit can have. */

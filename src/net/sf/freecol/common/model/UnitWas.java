@@ -44,7 +44,7 @@ public class UnitWas implements Comparable<UnitWas> {
     private int roleCount;
     private Location loc;
     private GoodsType work;
-    private int workAmount;
+    private int workAmount, movesLeft;
     private Colony colony;
 
 
@@ -61,6 +61,7 @@ public class UnitWas implements Comparable<UnitWas> {
         this.loc = unit.getLocation();
         this.work = unit.getWorkType();
         this.workAmount = getAmount(loc, work);
+        this.movesLeft = unit.getMovesLeft();
         this.colony = unit.getColony();
         if (unit.getGoodsContainer() != null) {
             unit.getGoodsContainer().saveState();
@@ -90,6 +91,7 @@ public class UnitWas implements Comparable<UnitWas> {
         Location newLoc = null;
         GoodsType newWork = null;
         int newWorkAmount = 0;
+        int newMovesLeft = 0;
         if (!unit.isDisposed()) {
             newLoc = unit.getLocation();
             if (colony != null) {
@@ -100,6 +102,7 @@ public class UnitWas implements Comparable<UnitWas> {
                 newWorkAmount = (newWork == null) ? 0
                     : getAmount(newLoc, newWork);
             }
+            newMovesLeft = unit.getMovesLeft();
         }
 
         FreeColGameObject oldFcgo = (FreeColGameObject)loc;
@@ -139,6 +142,9 @@ public class UnitWas implements Comparable<UnitWas> {
         }
         if (unit.getGoodsContainer() != null) {
             unit.getGoodsContainer().fireChanges();
+        }
+        if (movesLeft != newMovesLeft) {
+            unit.firePropertyChange(Unit.MOVE_CHANGE, movesLeft, newMovesLeft);
         }
     }
 
@@ -214,6 +220,7 @@ public class UnitWas implements Comparable<UnitWas> {
         hash = 37 * hash + Utils.hashCode(loc);
         hash = 37 * hash + Utils.hashCode(work);
         hash = 37 * hash + workAmount;
+        hash = 37 * hash + movesLeft;
         return 37 * hash + Utils.hashCode(colony);
     }
 

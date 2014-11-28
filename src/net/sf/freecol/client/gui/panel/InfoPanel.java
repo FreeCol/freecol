@@ -28,6 +28,8 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -47,6 +49,7 @@ import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -197,7 +200,8 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * Panel for displaying <code>Unit</code>-information.
      */
-    public class UnitInfoPanel extends JPanel {
+    public class UnitInfoPanel extends JPanel
+        implements PropertyChangeListener {
 
         /** The unit to display. */
         private Unit unit;
@@ -215,12 +219,36 @@ public final class InfoPanel extends FreeColPanel {
 
 
         /**
-         * Updates this unit information panel.
+         * Does this panel have a unit to display?
+         *
+         * @return True if this panel has a non-null unit.
+         */
+        public boolean hasUnit() {
+            return this.unit != null;
+        }
+
+        /**
+         * Updates this unit information panel to use a new unit.
          *
          * @param unit The displayed <code>Unit</code> (may be null).
          */
         public void update(Unit unit) {
-            this.unit = unit;
+            if (this.unit != unit) {
+                if (this.unit != null) {
+                    this.unit.removePropertyChangeListener(this);
+                }
+                if (unit != null) {
+                    unit.addPropertyChangeListener(this);
+                }
+                this.unit = unit;
+                update();
+            }
+        }
+
+        /**
+         * Unconditionally update this panel.
+         */
+        public void update() {
             removeAll();
 
             final ImageLibrary lib = getLibrary();
@@ -265,15 +293,14 @@ public final class InfoPanel extends FreeColPanel {
             revalidate();
         }
 
+
+        // Interface PropertyChangeListener
+
         /**
-         * Gets the <code>Unit</code> in which this <code>InfoPanel</code>
-         * is displaying information about.
-         *
-         * @return The <code>Unit</code> or <i>null</i> if no
-         *         <code>Unit</code> applies.
+         * {@inheritDoc}
          */
-        public Unit getUnit() {
-            return unit;
+        public void propertyChange(PropertyChangeEvent event) {
+            update();
         }
     }
 
@@ -284,6 +311,8 @@ public final class InfoPanel extends FreeColPanel {
     private static final int PANEL_WIDTH = 256;
 
     public static final int PANEL_HEIGHT = 128;
+
+    private final Player player;
 
     private InfoPanelMode mode = InfoPanelMode.NONE;
 
@@ -316,6 +345,7 @@ public final class InfoPanel extends FreeColPanel {
     public InfoPanel(final FreeColClient freeColClient, boolean useSkin) {
         super(freeColClient);
 
+        this.player = freeColClient.getMyPlayer();
         this.endTurnPanel = new EndTurnPanel(getGUI());
         this.mapEditorPanel = new JPanel(null);
         this.mapEditorPanel.setSize(130, 100);
@@ -370,13 +400,15 @@ public final class InfoPanel extends FreeColPanel {
      * @return The panel mode.
      */
     private InfoPanelMode getMode() {
+        Player player;
         return (getFreeColClient().isMapEditor())
             ? InfoPanelMode.MAP
             : (getGUI().getViewMode() == GUI.VIEW_TERRAIN_MODE)
             ? InfoPanelMode.TILE
-            : (unitInfoPanel.getUnit() != null)
+            : (unitInfoPanel.hasUnit())
             ? InfoPanelMode.UNIT
-            : (getMyPlayer() != null && !getMyPlayer().hasNextActiveUnit())
+            : ((player = getFreeColClient().getMyPlayer()) != null
+                && player.hasNextActiveUnit())
             ? InfoPanelMode.END
             : InfoPanelMode.NONE;
     }
@@ -420,9 +452,7 @@ public final class InfoPanel extends FreeColPanel {
      * @param unit The displayed unit (or null if none)
      */
     public void update(Unit unit) {
-        if (this.unitInfoPanel.getUnit() != unit) {
-            this.unitInfoPanel.update(unit);
-        }
+        this.unitInfoPanel.update(unit);
         update();
     }
 
@@ -441,22 +471,22 @@ public final class InfoPanel extends FreeColPanel {
                 this.unitInfoPanel.setVisible(false);
                 break;
             case MAP:
-                this.endTurnPanel.setVisible(false);
                 this.mapEditorPanel.setVisible(true);
+                this.endTurnPanel.setVisible(false);
                 this.tileInfoPanel.setVisible(false);
                 this.unitInfoPanel.setVisible(false);
                 break;
             case TILE:
+                this.tileInfoPanel.setVisible(true);
                 this.endTurnPanel.setVisible(false);
                 this.mapEditorPanel.setVisible(false);
-                this.tileInfoPanel.setVisible(true);
                 this.unitInfoPanel.setVisible(false);
                 break;
             case UNIT:
+                this.unitInfoPanel.setVisible(true);
                 this.endTurnPanel.setVisible(false);
                 this.mapEditorPanel.setVisible(false);
                 this.tileInfoPanel.setVisible(false);
-                this.unitInfoPanel.setVisible(true);
                 break;
             case NONE: default:
                 this.endTurnPanel.setVisible(false);
