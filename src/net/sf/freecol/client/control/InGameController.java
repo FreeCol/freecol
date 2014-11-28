@@ -136,37 +136,28 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
-    /** Warning levels. */
-    private static final String levels[] = new String[] {
-        "low", "normal", "high"
-    };
+    private static final short UNIT_LAST_MOVE_DELAY = 300;
 
     /** A template to use as a magic cookie for aborted trades. */
     private static final StringTemplate abortTrade
         = StringTemplate.template("");
 
+    /** The enclosing <code>FreeColClient</code>. */
     private final FreeColClient freeColClient;
 
-    /**
-     * Warn about colonies that can not produce this amount of
-     * a building material.
-     */
-    private static final int LOW_PRODUCTION_WARNING_VALUE = 4;
-
-    private final short UNIT_LAST_MOVE_DELAY = 300;
+    /** A cache reference to the gui. */
+    private GUI gui;
 
     /** Current mode for moving units. */
     private MoveMode moveMode = MoveMode.NEXT_ACTIVE_UNIT;
 
-    private int turnsPlayed = 0;
-
     /** A map of messages to be ignored. */
-    private HashMap<String, Integer> messagesToIgnore = new HashMap<>();
+    private HashMap<String, Integer> messagesToIgnore
+        = new HashMap<String, Integer>();
 
     /** The messages in the last turn report. */
-    private final List<ModelMessage> turnReportMessages = new ArrayList<>();
-
-    private GUI gui;
+    private final List<ModelMessage> turnReportMessages
+        = new ArrayList<ModelMessage>();
 
 
     /**
@@ -184,30 +175,7 @@ public final class InGameController implements NetworkConstants {
     }
 
 
-    // Public configuration.
-
-    /**
-     * Informs this controller that a game has been newly loaded.
-     */
-    public void setGameConnected () {
-        turnsPlayed = 0;
-        Player player = freeColClient.getMyPlayer();
-        if (player != null) {
-            player.refilterModelMessages(freeColClient.getClientOptions());
-        }
-        gui.updateMenuBar();
-    }
-
-    /**
-     * Sets the debug mode to include the extra menu commands.
-     */
-    public void setInDebugMode() {
-        FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
-        gui.updateMenuBar();
-    }
-
-
-    // Private utilities
+    // Simple utilities
 
     /**
      * Meaningfully named access to the ServerAPI.
@@ -225,22 +193,6 @@ public final class InGameController implements NetworkConstants {
      */
     private Specification getSpecification() {
         return freeColClient.getGame().getSpecification();
-    }
-
-    /**
-     * Require that it is this client's player's turn.
-     * Put up the notYourTurn message if not.
-     *
-     * @return True if it is our turn.
-     */
-    private boolean requireOurTurn() {
-        if (!freeColClient.currentPlayerIsMyPlayer()) {
-            if (freeColClient.isInGame()) {
-                gui.showInformationMessage("notYourTurn");
-            }
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -281,9 +233,23 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Updates the GUI after a unit moves.
+     * Require that it is this client's player's turn.
+     * Put up the notYourTurn message if not.
      *
-     * FIXME: check if this is necessary for all actions?
+     * @return True if it is our turn.
+     */
+    private boolean requireOurTurn() {
+        if (!freeColClient.currentPlayerIsMyPlayer()) {
+            if (freeColClient.isInGame()) {
+                gui.showInformationMessage("notYourTurn");
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Updates the menus after a unit moves.
      */
     private void updateAfterMove() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -298,7 +264,7 @@ public final class InGameController implements NetworkConstants {
     // execute-orders and end-turn controller states.
 
     /**
-     * Actually do the goto orders operation.
+     * Do the goto orders operation.
      *
      * @return True if all goto orders have been performed and no units
      *     reached their destination and are free to move again.
@@ -377,7 +343,7 @@ public final class InGameController implements NetworkConstants {
         // Make sure all goto orders are complete before ending turn.
         if (!doExecuteGotoOrders()) return false;
 
-        // Check for desync as last thing!
+        // Last check for desync!
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)
             && DebugUtils.checkDesyncAction(freeColClient)) {
             freeColClient.getConnectController().reconnect();
@@ -400,7 +366,6 @@ public final class InGameController implements NetworkConstants {
 
         // Restart the selection cycle.
         moveMode = MoveMode.NEXT_ACTIVE_UNIT;
-        turnsPlayed++;
 
         // Clear outdated turn report messages.
         turnReportMessages.clear();
@@ -1477,112 +1442,6 @@ public final class InGameController implements NetworkConstants {
             }
         }
     }
-
-    /**
-     * A colony is proposed to be built.  Show warnings if this has
-     * disadvantages.
-     *
-     * @param tile The <code>Tile</code> on which the colony is to be built.
-     * @param unit The <code>Unit</code> which is to build the colony.
-     */
-    private boolean buildColonyShowWarnings(Tile tile, Unit unit) {
-        final Specification spec = getSpecification();
-        boolean landLocked = true;
-        boolean ownedByEuropeans = false;
-        boolean ownedBySelf = false;
-        boolean ownedByIndians = false;
-
-        java.util.Map<GoodsType, Integer> goodsMap = new HashMap<>();
-        for (GoodsType goodsType : spec.getGoodsTypeList()) {
-            if (goodsType.isBuildingMaterial()) {
-                while (goodsType.isRefined()) {
-                    goodsType = goodsType.getInputType();
-                }
-            } else if (!goodsType.isFoodType()) {
-                continue;
-            }
-            for (ProductionType productionType : tile.getType()
-                     .getAvailableProductionTypes(false)) {
-                int potential = (productionType.getOutput(goodsType) == null)
-                    ? 0 : tile.getPotentialProduction(goodsType, null);
-                Integer oldPotential = goodsMap.get(goodsType);
-                if (oldPotential == null || potential > oldPotential) {
-                    goodsMap.put(goodsType, potential);
-                }
-            }
-        }
-
-        for (Tile t : tile.getSurroundingTiles(1)) {
-            if (!t.isLand()) landLocked = false;
-            for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
-                entry.setValue(entry.getValue()
-                    + t.getPotentialProduction(entry.getKey(),
-                        spec.getDefaultUnitType()));
-            }
-            Player tileOwner = t.getOwner();
-            if (unit.getOwner() == tileOwner) {
-                if (t.getOwningSettlement() != null) {
-                    // we are using newTile
-                    ownedBySelf = true;
-                } else {
-                    for (Tile ownTile : t.getSurroundingTiles(1)) {
-                        Colony colony = ownTile.getColony();
-                        if (colony != null
-                            && colony.getOwner() == unit.getOwner()) {
-                            // newTile can be used from an own colony
-                            ownedBySelf = true;
-                            break;
-                        }
-                    }
-                }
-            } else if (tileOwner != null && tileOwner.isEuropean()) {
-                ownedByEuropeans = true;
-            } else if (tileOwner != null) {
-                ownedByIndians = true;
-            }
-        }
-
-        int food = 0;
-        for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
-            if (entry.getKey().isFoodType()) {
-                food += entry.getValue().intValue();
-            }
-        }
-
-        LogBuilder lb = new LogBuilder(256);
-        lb.mark();
-        if (landLocked) {
-            lb.add(Messages.message("buildColony.landLocked"), "\n");
-        }
-        if (food < 8) {
-            lb.add(Messages.message("buildColony.noFood"), "\n");
-        }
-        for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
-            if (!entry.getKey().isFoodType()
-                && entry.getValue().intValue() < LOW_PRODUCTION_WARNING_VALUE) {
-                lb.add(Messages.message(StringTemplate
-                        .template("buildColony.noBuildingMaterials")
-                        .add("%goods%", entry.getKey().getNameKey())),
-                    "\n");
-            }
-        }
-
-        if (ownedBySelf) {
-            lb.add(Messages.message("buildColony.ownLand"), "\n");
-        }
-        if (ownedByEuropeans) {
-            lb.add(Messages.message("buildColony.EuropeanLand"), "\n");
-        }
-        if (ownedByIndians) {
-            lb.add(Messages.message("buildColony.IndianLand"), "\n");
-        }
-
-        return (!lb.grew()) ? true
-            : gui.confirm(true, unit.getTile(),
-                          StringTemplate.label(lb.toString()), unit,
-                          "buildColony.yes", "buildColony.no");
-    }
-
 
     /**
      * Buy goods in Europe.
@@ -4180,7 +4039,7 @@ public final class InGameController implements NetworkConstants {
 
             // Save the game (if it isn't newly loaded)
             if (freeColClient.getFreeColServer() != null
-                && turnsPlayed > 0) autoSaveGame();
+                && game.getTurn().getNumber() > 0) autoSaveGame();
 
             // Check for emigration.
             if (player.hasAbility(Ability.SELECT_RECRUIT)) {
@@ -4266,6 +4125,19 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Informs this controller that a game has been newly loaded.
+     *
+     * Called from CC.startSavedGame
+     */
+    public void setGameConnected () {
+        final Player player = freeColClient.getMyPlayer();
+        if (player != null) {
+            player.refilterModelMessages(freeColClient.getClientOptions());
+        }
+        updateAfterMove();
+    }
+
+    /**
      * Sets the export settings of the custom house.
      *
      * @param colony The colony with the custom house.
@@ -4274,6 +4146,16 @@ public final class InGameController implements NetworkConstants {
     public void setGoodsLevels(Colony colony, GoodsType goodsType) {
         askServer().setGoodsLevels(colony,
             colony.getExportData(goodsType));
+    }
+
+    /**
+     * Sets the debug mode to include the extra menu commands.
+     *
+     * Called from DebugAction
+     */
+    public void setInDebugMode() {
+        FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
+        updateAfterMove();
     }
 
     /**
