@@ -1950,7 +1950,7 @@ public class GUI {
             new DialogHandler<Boolean>() {
                 public void handle(Boolean value) {
                     if (value != null && value.booleanValue()) {
-                        igc().endTurn();
+                        igc().endTurn(false);
                     }
                 }
             });

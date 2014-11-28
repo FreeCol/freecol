@@ -354,14 +354,34 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Really end the turn.
+     * End the turn.
+     *
+     * @param showDialog Show the end turn dialog?
+     * @return True if the turn ended.
      */
-    private void doEndTurn() {
+    private boolean doEndTurn(boolean showDialog) {
+        if (showDialog) {
+            List<Unit> units = new ArrayList<Unit>();
+            for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
+                if (unit.couldMove()) units.add(unit);
+            }
+            if (!units.isEmpty()) {
+                gui.showEndTurnDialog(units); // Modal dialog takes over
+                return false;
+            }
+        }
+
+        // Ensure end-turn mode sticks.
+        moveMode = moveMode.maximize(MoveMode.END_TURN);
+
+        // Make sure all goto orders are complete before ending turn.
+        if (!doExecuteGotoOrders()) return false;
+
         // Check for desync as last thing!
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)
             && DebugUtils.checkDesyncAction(freeColClient)) {
             freeColClient.getConnectController().reconnect();
-            return;
+            return false;
         }
 
         // Clean up lingering menus.
@@ -386,7 +406,7 @@ public final class InGameController implements NetworkConstants {
         turnReportMessages.clear();
 
         // Inform the server of end of turn.
-        askServer().endTurn();
+        return askServer().endTurn();
     }
 
 
@@ -796,21 +816,6 @@ public final class InGameController implements NetworkConstants {
             return true;
         }
         return false;
-    }
-
-    /**
-     * End the turn command.
-     *
-     * Called out of the end turn dialog and by endMyTurn below.
-     */
-    public void endTurn() {
-        // Ensure end-turn mode sticks.
-        moveMode = moveMode.maximize(MoveMode.END_TURN);
-
-        // Make sure all goto orders are complete before ending turn.
-        if (!doExecuteGotoOrders()) return;
-
-        doEndTurn();
     }
 
     /**
@@ -2019,28 +2024,19 @@ public final class InGameController implements NetworkConstants {
         return null;
     }
 
-
     /**
      * End the turn command.
      *
-     * Called from the end turn action.
+     * Called from EndTurnAction, GUI.showEndTurnDialog
+     *
+     * @param showDialog If false, suppress showing the end turn dialog.
+     * @return True if the turn was ended.
      */
-    public void endMyTurn() {
-        if (!requireOurTurn()) return;
+    public boolean endTurn(boolean showDialog) {
+        if (!requireOurTurn()) return false;
 
-        // Show the end turn dialog, or not.
-        if (freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.SHOW_END_TURN_DIALOG)) {
-            List<Unit> units = new ArrayList<>();
-            for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
-                if (unit.couldMove()) units.add(unit);
-            }
-            if (!units.isEmpty()) {
-                gui.showEndTurnDialog(units); // Modal dialog ends turn
-                return;
-            }
-        }
-        endTurn();
+        return doEndTurn(showDialog && freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.SHOW_END_TURN_DIALOG));
     }
 
     /**
@@ -3870,7 +3866,7 @@ public final class InGameController implements NetworkConstants {
         if (tile != null) {
             gui.setSelectedTile(tile, false);
         } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
-            endMyTurn();
+            doEndTurn(options.getBoolean(ClientOptions.SHOW_END_TURN_DIALOG));
         }
     }
 
