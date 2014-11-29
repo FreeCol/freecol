@@ -50,6 +50,6 @@ public class WaitAction extends UnitAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        igc().waitActiveUnit();
+        igc().waitUnit();
     }
 }
