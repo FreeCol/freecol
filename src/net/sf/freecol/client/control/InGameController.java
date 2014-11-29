@@ -152,12 +152,10 @@ public final class InGameController implements NetworkConstants {
     private MoveMode moveMode = MoveMode.NEXT_ACTIVE_UNIT;
 
     /** A map of messages to be ignored. */
-    private HashMap<String, Integer> messagesToIgnore
-        = new HashMap<String, Integer>();
+    private HashMap<String, Integer> messagesToIgnore = new HashMap<>();
 
     /** The messages in the last turn report. */
-    private final List<ModelMessage> turnReportMessages
-        = new ArrayList<ModelMessage>();
+    private final List<ModelMessage> turnReportMessages = new ArrayList<>();
 
 
     /**
@@ -193,6 +191,22 @@ public final class InGameController implements NetworkConstants {
      */
     private Specification getSpecification() {
         return freeColClient.getGame().getSpecification();
+    }
+
+    /**
+     * Require that it is this client's player's turn.
+     * Put up the notYourTurn message if not.
+     *
+     * @return True if it is our turn.
+     */
+    private boolean requireOurTurn() {
+        if (!freeColClient.currentPlayerIsMyPlayer()) {
+            if (freeColClient.isInGame()) {
+                gui.showInformationMessage("notYourTurn");
+            }
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -233,23 +247,8 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Require that it is this client's player's turn.
-     * Put up the notYourTurn message if not.
+     * Updates the GUI after a unit moves.
      *
-     * @return True if it is our turn.
-     */
-    private boolean requireOurTurn() {
-        if (!freeColClient.currentPlayerIsMyPlayer()) {
-            if (freeColClient.isInGame()) {
-                gui.showInformationMessage("notYourTurn");
-            }
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Updates the menus after a unit moves.
      */
     private void updateAfterMove() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -343,7 +342,7 @@ public final class InGameController implements NetworkConstants {
         // Make sure all goto orders are complete before ending turn.
         if (!doExecuteGotoOrders()) return false;
 
-        // Last check for desync!
+        // Check for desync as last thing!
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)
             && DebugUtils.checkDesyncAction(freeColClient)) {
             freeColClient.getConnectController().reconnect();
@@ -372,6 +371,1351 @@ public final class InGameController implements NetworkConstants {
 
         // Inform the server of end of turn.
         return askServer().endTurn();
+    }
+
+    /**
+     * Makes a new unit active if any, or focus on a tile (useful if the
+     * current unit just died).
+     *
+     * Displays any new <code>ModelMessage</code>s with
+     * {@link #nextModelMessage}.
+     *
+     * @param tile The <code>Tile</code> to select if no new unit can
+     *     be made active.
+     */
+    private void nextActiveUnit(Tile tile) {
+        // Always flush outstanding messages first.
+        nextModelMessage();
+
+        // Flush any outstanding orders once the mode is raised.
+        if (moveMode != MoveMode.NEXT_ACTIVE_UNIT
+            && !doExecuteGotoOrders()) {
+            return;
+        }
+
+        // Look for active units.
+        Player player = freeColClient.getMyPlayer();
+        Unit unit = gui.getActiveUnit();
+        if (unit != null && !unit.isDisposed()
+            && unit.couldMove()) return; // Current active unit has more to do.
+        if (player.hasNextActiveUnit()) {
+            gui.setActiveUnit(player.getNextActiveUnit());
+            return; // Successfully found a unit to display
+        }
+        gui.setActiveUnit(null);
+
+        // No active units left.  Do the goto orders.
+        if (!doExecuteGotoOrders()) return;
+
+        // If not already ending the turn, use the fallback tile if
+        // supplied, then check for automatic end of turn, otherwise
+        // just select nothing and wait.
+        ClientOptions options = freeColClient.getClientOptions();
+        if (tile != null) {
+            gui.setSelectedTile(tile, false);
+        } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
+            doEndTurn(options.getBoolean(ClientOptions.SHOW_END_TURN_DIALOG));
+        }
+    }
+
+
+    // Movement support.
+
+    /**
+     * Moves the given unit towards its destination/s if possible.
+     *
+     * @param unit The <code>Unit</code> to move.
+     * @param messages An optional list in which to retain any
+     *     trade route <code>ModelMessage</code>s generated.
+     * @return True if the unit reached its destination and has more moves
+     *     to make.
+     */
+    private boolean moveToDestination(Unit unit, List<ModelMessage> messages) {
+        Location destination;
+        if (!requireOurTurn()
+            || unit.isAtSea()
+            || unit.getMovesLeft() <= 0
+            || unit.getState() == UnitState.SKIPPED) {
+            return false;
+        } else if (unit.getTradeRoute() != null) {
+            return followTradeRoute(unit, messages);
+        } else if ((destination = unit.getDestination()) == null) {
+            return unit.getMovesLeft() > 0;
+        }
+
+        // Find a path to the destination and try to follow it.
+        final Player player = freeColClient.getMyPlayer();
+        PathNode path = unit.findPath(destination);
+        if (path == null) {
+            StringTemplate src = unit.getLocation()
+                .getLocationNameFor(player);
+            StringTemplate dst = destination.getLocationNameFor(player);
+            StringTemplate template = StringTemplate
+                .template("selectDestination.failed")
+                .addStringTemplate("%unit%",
+                    unit.getLabel(Unit.UnitLabelType.NATIONAL))
+                .addStringTemplate("%location%", src)
+                .addStringTemplate("%destination%", dst);
+            gui.showInformationMessage(unit, template);
+            return false;
+        }
+        gui.setActiveUnit(unit);
+
+        // Clear ordinary destinations if arrived.
+        if (movePath(unit, path) && unit.isAtLocation(destination)) {
+            clearGotoOrders(unit);
+            // Check cash-in, and if the unit has moves left and was
+            // not set to SKIPPED by moveDirection, then return true
+            // to show that this unit could continue.
+            if (!checkCashInTreasureTrain(unit)
+                && unit.getMovesLeft() > 0
+                && unit.getState() != UnitState.SKIPPED) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Move a unit in a given direction.
+     *
+     * Public for the test suite.
+     *
+     * @param unit The <code>Unit</code> to move.
+     * @param direction The <code>Direction</code> to move in.
+     * @param interactive Interactive mode: play sounds and emit errors.
+     * @return True if the unit can possibly move further.
+     */
+    public boolean moveDirection(Unit unit, Direction direction,
+                                 boolean interactive) {
+        // If this move would reach the unit destination but we
+        // discover that it would be permanently impossible to complete,
+        // clear the destination.
+        Unit.MoveType mt = unit.getMoveType(direction);
+        Location destination = unit.getDestination();
+        boolean clearDestination = destination != null
+            && unit.hasTile()
+            && Map.isSameLocation(unit.getTile().getNeighbourOrNull(direction),
+                                  destination);
+
+        // Consider all the move types.
+        boolean result = mt.isLegal();
+        switch (mt) {
+        case MOVE_HIGH_SEAS:
+            if (freeColClient.getMyPlayer().getEurope() == null) {
+                ; // do nothing
+            } else if (destination == null) {
+                result = moveHighSeas(unit, direction);
+                break;
+            } else if (destination instanceof Europe) {
+                result = moveTo(unit, destination);
+                break;
+            }
+            // Fall through
+        case MOVE:
+            result = moveMove(unit, direction);
+            break;
+        case EXPLORE_LOST_CITY_RUMOUR:
+            result = moveExplore(unit, direction);
+            break;
+        case ATTACK_UNIT:
+            result = moveAttack(unit, direction);
+            break;
+        case ATTACK_SETTLEMENT:
+            result = moveAttackSettlement(unit, direction);
+            break;
+        case EMBARK:
+            result = moveEmbark(unit, direction);
+            break;
+        case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
+            result = moveLearnSkill(unit, direction);
+            break;
+        case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
+            result = moveScoutIndianSettlement(unit, direction);
+            break;
+        case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
+            result = moveUseMissionary(unit, direction);
+            break;
+        case ENTER_FOREIGN_COLONY_WITH_SCOUT:
+            result = moveScoutColony(unit, direction);
+            break;
+        case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+            result = moveTrade(unit, direction);
+            break;
+
+        // Illegal moves
+        case MOVE_NO_ACCESS_BEACHED:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessBeached")
+                    .addStringTemplate("%nation%", nation));
+            }
+            break;
+        case MOVE_NO_ACCESS_CONTACT:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessContact")
+                    .addStringTemplate("%nation%", nation));
+            }
+            break;
+        case MOVE_NO_ACCESS_GOODS:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessGoods")
+                    .addStringTemplate("%nation%", nation)
+                    .addStringTemplate("%unit%",
+                        unit.getLabel(Unit.UnitLabelType.NATIONAL)));
+            }
+            break;
+        case MOVE_NO_ACCESS_LAND:
+            if (!moveDisembark(unit, direction)) {
+                if (interactive) {
+                    gui.playSound("sound.event.illegalMove");
+                }
+            }
+            break;
+        case MOVE_NO_ACCESS_MISSION_BAN:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessMissionBan")
+                    .addStringTemplate("%unit%",
+                        unit.getLabel(Unit.UnitLabelType.NATIONAL))
+                    .addStringTemplate("%nation%", nation));
+            }
+            break;
+        case MOVE_NO_ACCESS_SETTLEMENT:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessSettlement")
+                    .addStringTemplate("%unit%",
+                        unit.getLabel(Unit.UnitLabelType.NATIONAL))
+                    .addStringTemplate("%nation%", nation));
+            }
+            break;
+        case MOVE_NO_ACCESS_SKILL:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessSkill")
+                    .addStringTemplate("%unit%",
+                        unit.getLabel(Unit.UnitLabelType.NATIONAL)));
+            }
+            break;
+        case MOVE_NO_ACCESS_TRADE:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessTrade")
+                    .addStringTemplate("%nation%", nation));
+            }
+            break;
+        case MOVE_NO_ACCESS_WAR:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+                StringTemplate nation = getNationAt(unit.getTile(), direction);
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessWar")
+                    .addStringTemplate("%nation%", nation));
+            }
+            break;
+        case MOVE_NO_ACCESS_WATER:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("move.noAccessWater")
+                    .addStringTemplate("%unit%",
+                        unit.getLabel(Unit.UnitLabelType.NATIONAL)));
+            }
+            break;
+        case MOVE_NO_ATTACK_MARINE:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("move.noAttackWater")
+                    .addStringTemplate("%unit%",
+                        unit.getLabel(Unit.UnitLabelType.NATIONAL)));
+            }
+            break;
+        case MOVE_NO_MOVES:
+            // The unit may have some moves left, but not enough
+            // to move to the next node.  The move is illegal
+            // this turn, but might not be next turn, so do not cancel the
+            // destination but set the state to skipped instead.
+            clearDestination = false;
+            unit.setState(UnitState.SKIPPED);
+            break;
+        case MOVE_NO_TILE:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("move.noTile")
+                    .addStringTemplate("%unit%",
+                        unit.getLabel(Unit.UnitLabelType.NATIONAL)));
+            }
+            break;
+        default:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+            }
+            result = false;
+            break;
+        }
+        if (clearDestination && !unit.isDisposed()) clearGotoOrders(unit);
+        return result;
+    }
+
+    /**
+     * Follow a path.
+     *
+     * @param unit The <code>Unit</code> to move.
+     * @param path The path to follow.
+     * @return True if the unit has completed the path and can move further.
+     */
+    private boolean movePath(Unit unit, PathNode path) {
+        // Traverse the path to the destination.
+        for (; path != null; path = path.next) {
+            if (unit.isAtLocation(path.getLocation())) continue;
+
+            if (path.getLocation() instanceof Europe) {
+                if (unit.hasTile()
+                    && unit.getTile().isDirectlyHighSeasConnected()) {
+                    moveTo(unit, path.getLocation());
+                } else {
+                    logger.warning("Can not move to Europe from "
+                        + unit.getLocation()
+                        + " on path: " + path.fullPathToString());
+                }
+                return false;
+            } else if (path.getLocation() instanceof Tile) {
+                if (path.getDirection() == null) {
+                    if (unit.isInEurope()) {
+                        moveTo(unit, unit.getGame().getMap());
+                    } else {
+                        logger.warning("Null direction on path: "
+                            + path.fullPathToString());
+                    }
+                    return false;
+                } else {
+                    if (!moveDirection(unit, path.getDirection(), false)) {
+                        return false;
+                    }
+                    if (unit.hasTile()
+                        && unit.getTile().getDiscoverableRegion() != null) {
+                        // Break up the goto to allow region naming to occur,
+                        // BR#2707
+                        return false;
+                    }
+                }
+            } else {
+                logger.warning("Bad path: " + path.fullPathToString());
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Confirm attack or demand a tribute from a native settlement, following
+     * an attacking move.
+     *
+     * @param unit The <code>Unit</code> to perform the attack.
+     * @param direction The direction in which to attack.
+     * @return True if the unit could move further.
+     */
+    private boolean moveAttack(Unit unit, Direction direction) {
+        clearGotoOrders(unit);
+
+        Tile tile = unit.getTile();
+        Tile target = tile.getNeighbourOrNull(direction);
+        Unit u = target.getFirstUnit();
+        if (u == null) {
+            throw new IllegalStateException("Attacking empty tile!");
+        } else if (unit.getOwner().owns(u)) {
+            throw new IllegalStateException("Attacking own unit!");
+        }
+        if (gui.confirmHostileAction(unit, target)
+            && gui.confirmPreCombat(unit, target)) {
+            askServer().attack(unit, direction);
+            nextActiveUnit();
+        }
+        // Always return false, as the unit has either attacked and lost
+        // its remaining moves, or the move can not proceed because it is
+        // blocked.
+        return false;
+    }
+
+    /**
+     * Confirm attack or demand a tribute from a settlement, following
+     * an attacking move.
+     *
+     * @param unit The <code>Unit</code> to perform the attack.
+     * @param direction The direction in which to attack.
+     * @return True if the unit could move further.
+     */
+    private boolean moveAttackSettlement(Unit unit, Direction direction) {
+        Tile tile = unit.getTile();
+        Tile target = tile.getNeighbourOrNull(direction);
+        Settlement settlement = target.getSettlement();
+        if (settlement == null) {
+            throw new IllegalStateException("Attacking empty tile!");
+        } else if (unit.getOwner().owns(settlement)) {
+            throw new IllegalStateException("Attacking own settlement!");
+        }
+        GUI.ArmedUnitSettlementAction act
+            = gui.getArmedUnitSettlementChoice(settlement);
+        if (act == null) return true; // Cancelled
+        switch (act) {
+        case SETTLEMENT_ATTACK:
+            if (gui.confirmHostileAction(unit, target)
+                && gui.confirmPreCombat(unit, target)) {
+                askServer().attack(unit, direction);
+                nextActiveUnit();
+                Colony col = target.getColony();
+                if (col != null && unit.getOwner().owns(col)) {
+                    gui.showColonyPanel(col, unit);
+                }
+                return false;
+            }
+            break;
+        case SETTLEMENT_TRIBUTE:
+            int amount = (settlement instanceof Colony)
+                ? gui.confirmEuropeanTribute(unit, (Colony)settlement,
+                    getNationSummary(settlement.getOwner()))
+                : (settlement instanceof IndianSettlement)
+                ? gui.confirmNativeTribute(unit, (IndianSettlement)settlement)
+                : -1;
+            if (amount <= 0) return true; // Cancelled
+            return moveTribute(unit, amount, direction);
+
+        default:
+            logger.warning("showArmedUnitSettlementDialog fail: " + act);
+            break;
+        }
+        return true;
+    }
+
+    /**
+     * Initiates diplomacy with a foreign power.
+     *
+     * @param unit The <code>Unit</code> negotiating.
+     * @param direction The direction of a settlement to negotiate with.
+     * @param dt The base <code>DiplomaticTrade</code> agreement to
+     *     begin the negotiation with.
+     * @return True if the unit can move further.
+     */
+    private boolean moveDiplomacy(Unit unit, Direction direction,
+                                  DiplomaticTrade dt) {
+        Settlement settlement = getSettlementAt(unit.getTile(), direction);
+        if (settlement == null) return false;
+        if (!(settlement instanceof Colony)) return false;
+        Colony colony = (Colony)settlement;
+
+        // Can not negotiate with the REF.
+        final Game game = freeColClient.getGame();
+        final Player player = unit.getOwner();
+        final Player other = colony.getOwner();
+        if (other == player.getREFPlayer()) {
+            throw new IllegalStateException("Unit tried to negotiate with REF");
+        }
+
+        StringTemplate nation = other.getNationName();
+        ModelMessage m = null;
+        TradeStatus status;
+        while (dt != null) {
+            // Inform server of current agreement, exit if it did not
+            // require a response (i.e. was not a proposal).
+            status = dt.getStatus();
+            dt = askServer().diplomacy(game, unit, colony, dt);
+            if (status != TradeStatus.PROPOSE_TRADE) break;
+            
+            // Process the result of a proposal.
+            status = (dt == null) ? TradeStatus.REJECT_TRADE : dt.getStatus();
+            m = null;
+            switch (status) {
+            case PROPOSE_TRADE:
+                break;
+            case ACCEPT_TRADE:
+                m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                                     "negotiationDialog.offerAccepted",
+                                     colony)
+                    .addStringTemplate("%nation%", nation);
+                dt = null;
+                break;
+            case REJECT_TRADE:
+                m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                                     "negotiationDialog.offerRejected",
+                                     colony)
+                    .addStringTemplate("%nation%", nation);
+                dt = null;
+                break;
+            default:
+                throw new IllegalStateException("Bogus trade status" + status);
+            }
+            if (m != null) player.addModelMessage(m);
+
+            // If it was a counter proposal, consider it.
+            if (dt != null) {
+                dt = gui.showDiplomaticTradeDialog(unit, colony, dt,
+                    dt.getSendMessage(player, colony));
+            }
+        }
+        updateAfterMove();
+        nextActiveUnit();
+        return false;
+    }
+
+    /**
+     * Check the carrier for passengers to disembark, possibly
+     * snatching a useful result from the jaws of a
+     * MOVE_NO_ACCESS_LAND failure.
+     *
+     * @param unit The carrier containing the unit to disembark.
+     * @param direction The direction in which to disembark the unit.
+     * @return True if the disembark "succeeds" (which deliberately includes
+     *     declined disembarks).
+     */
+    private boolean moveDisembark(Unit unit, final Direction direction) {
+        Tile tile = unit.getTile().getNeighbourOrNull(direction);
+        if (tile.getFirstUnit() != null
+            && tile.getFirstUnit().getOwner() != unit.getOwner()) {
+            return false; // Can not disembark onto other nation units.
+        }
+
+        // Disembark selected units able to move.
+        final List<Unit> disembarkable = new ArrayList<>();
+        unit.setStateToAllChildren(UnitState.ACTIVE);
+        for (Unit u : unit.getUnitList()) {
+            if (u.getMoveType(tile).isProgress()) {
+                disembarkable.add(u);
+            }
+        }
+        if (disembarkable.isEmpty()) {
+            // Did not find any unit that could disembark, fail.
+            return false;
+        }
+
+        while (!disembarkable.isEmpty()) {
+            if (disembarkable.size() == 1) {
+                if (gui.confirm(true, tile,
+                                StringTemplate.key("disembark.text"),
+                                disembarkable.get(0), "ok", "cancel")) {
+                    moveDirection(disembarkable.get(0), direction, false);
+                }
+                break;
+            }
+            List<ChoiceItem<Unit>> choices = new ArrayList<>();
+            for (Unit dUnit : disembarkable) {
+                choices.add(new ChoiceItem<Unit>(dUnit.getDescription(Unit.UnitLabelType.NATIONAL),
+                        dUnit));
+            }
+            if (disembarkable.size() > 1) {
+                choices.add(new ChoiceItem<Unit>(Messages.message("all"), unit));
+            }
+
+            // Use moveDirection() to disembark units as while the
+            // destination tile is known to be clear of other player
+            // units or settlements, it may have a rumour or need
+            // other special handling.
+            Unit u = gui.getChoice(true, unit.getTile(),
+                                   Messages.message("disembark.text"), unit,
+                                   "disembark.cancel", choices);
+            if (u == null) { // Cancelled, done.
+                break;
+            } else if (u == unit) { // Disembark all.
+                for (Unit dUnit : disembarkable) {
+                    // Guard against loss of control when asking the
+                    // server to move the unit.
+                    try {
+                        moveDirection(dUnit, direction, false);
+                    } finally {
+                        continue;
+                    }
+                }
+                return true;
+            }
+            moveDirection(u, direction, false);
+            disembarkable.remove(u);
+        }
+        return true;
+    }
+
+    /**
+     * Embarks the specified unit onto a carrier in a specified direction
+     * following a move of MoveType.EMBARK.
+     *
+     * @param unit The <code>Unit</code> that wishes to embark.
+     * @param direction The direction in which to embark.
+     * @return True if the unit could move further.
+     */
+    private boolean moveEmbark(Unit unit, Direction direction) {
+        if (unit.getColony() != null
+            && !gui.confirmLeaveColony(unit)) return false;
+
+        Tile sourceTile = unit.getTile();
+        Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
+        Unit carrier = null;
+        List<ChoiceItem<Unit>> choices = new ArrayList<>();
+        for (Unit u : destinationTile.getUnitList()) {
+            if (u.canAdd(unit)) {
+                String m = u.getDescription(Unit.UnitLabelType.NATIONAL);
+                choices.add(new ChoiceItem<Unit>(m, u));
+                carrier = u; // Save a default
+            }
+        }
+        if (choices.isEmpty()) {
+            throw new RuntimeException("Unit " + unit.getId()
+                + " found no carrier to embark upon.");
+        } else if (choices.size() == 1) {
+            // Use the default
+        } else {
+            carrier = gui.getChoice(true, unit.getTile(),
+                                    Messages.message("embark.text"), unit,
+                                    "embark.cancel", choices);
+            if (carrier == null) return true; // User cancelled
+        }
+
+        // Proceed to embark
+        clearGotoOrders(unit);
+        if (!askServer().embark(unit, carrier, direction)
+            || unit.getLocation() != carrier) {
+            unit.setState(UnitState.SKIPPED);
+            return false;
+        }
+        unit.getOwner().invalidateCanSeeTiles();
+        if (carrier.getMovesLeft() > 0) {
+            gui.setActiveUnit(carrier);
+        } else {
+            nextActiveUnit();
+        }
+        return false;
+    }
+
+    /**
+     * Confirm exploration of a lost city rumour, following a move of
+     * MoveType.EXPLORE_LOST_CITY_RUMOUR.
+     *
+     * @param unit The <code>Unit</code> that is exploring.
+     * @param direction The direction of a rumour.
+     * @return True if the unit can move further.
+     */
+    private boolean moveExplore(Unit unit, Direction direction) {
+        Tile tile = unit.getTile().getNeighbourOrNull(direction);
+        if (!gui.confirm(true, unit.getTile(),
+                StringTemplate.key("exploreLostCityRumour.text"), unit,
+                "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
+            return true;
+        }
+        if (tile.getLostCityRumour().getType()== LostCityRumour.RumourType.MOUNDS
+            && !gui.confirm(true, unit.getTile(),
+                StringTemplate.key("exploreMoundsRumour.text"), unit,
+                "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
+            askServer().declineMounds(unit, direction);
+        }
+        return moveMove(unit, direction);
+    }
+
+    /**
+     * Moves a unit onto the "high seas" in a specified direction following
+     * a move of MoveType.MOVE_HIGH_SEAS.
+     * This may result in a move to Europe, no move, or an ordinary move.
+     *
+     * @param unit The <code>Unit</code> to be moved.
+     * @param direction The direction in which to move.
+     * @return True if the unit can move further.
+     */
+    private boolean moveHighSeas(Unit unit, Direction direction) {
+        // Confirm moving to Europe if told to move to a null tile
+        // (FIXME: can this still happen?), or if crossing the boundary
+        // between coastal and high sea.  Otherwise just move.
+        Tile oldTile = unit.getTile();
+        Tile newTile = oldTile.getNeighbourOrNull(direction);
+        if (newTile == null
+            || (!oldTile.isDirectlyHighSeasConnected()
+                && newTile.isDirectlyHighSeasConnected())) {
+            if (unit.getTradeRoute() != null) {
+                TradeRouteStop stop = unit.getStop();
+                if (stop != null && TradeRoute.isStopValid(unit, stop)
+                    && stop.getLocation() instanceof Europe) {
+                    moveTo(unit, stop.getLocation());
+                    return false;
+                }
+            } else if (unit.getDestination() instanceof Europe) {
+                moveTo(unit, unit.getDestination());
+                return false;
+            } else {
+                if (gui.confirm(true, oldTile,
+                        StringTemplate.template("highseas.text")
+                            .addAmount("%number%", unit.getSailTurns()),
+                        unit, "highseas.yes", "highseas.no")) {
+                    moveTo(unit, unit.getOwner().getEurope());
+                    return false;
+                }
+            }
+        }
+        return moveMove(unit, direction);
+    }
+
+    /**
+     * Move a free colonist to a native settlement to learn a skill following
+     * a move of MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST.
+     * The colonist does not physically get into the village, it will
+     * just stay where it is and gain the skill.
+     *
+     * @param unit The <code>Unit</code> to learn the skill.
+     * @param direction The direction in which the Indian settlement lies.
+     * @return True if the unit can move further.
+     */
+    private boolean moveLearnSkill(Unit unit, Direction direction) {
+        clearGotoOrders(unit);
+        // Refresh knowledge of settlement skill.  It may have been
+        // learned by another player.
+        if (!askServer().askSkill(unit, direction)) return false;
+
+        IndianSettlement settlement
+            = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
+        UnitType skill = settlement.getLearnableSkill();
+        if (skill == null) {
+            gui.showInformationMessage(settlement,
+                                       "indianSettlement.noMoreSkill");
+        } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
+            gui.showInformationMessage(settlement,
+                StringTemplate.template("indianSettlement.cantLearnSkill")
+                    .addStringTemplate("%unit%",
+                        unit.getLabel(Unit.UnitLabelType.NATIONAL))
+                    .add("%skill%", skill.getNameKey()));
+        } else if (gui.confirm(true, unit.getTile(),
+                StringTemplate.template("learnSkill.text")
+                    .add("%skill%", skill.getNameKey()),
+                unit, "learnSkill.yes", "learnSkill.no")) {
+            if (askServer().learnSkill(unit, direction)) {
+                if (unit.isDisposed()) {
+                    gui.showInformationMessage(settlement, "learnSkill.die");
+                    nextActiveUnit(unit.getTile());
+                    return false;
+                }
+                if (unit.getType() != skill) {
+                    gui.showInformationMessage(settlement, "learnSkill.leave");
+                }
+            }
+        }
+        nextActiveUnit();
+        return false;
+    }
+
+    /**
+     * Actually move a unit in a specified direction, following a move
+     * of MoveType.MOVE.
+     *
+     * @param unit The <code>Unit</code> to be moved.
+     * @param direction The direction in which to move the Unit.
+     * @return True if the unit can move further.
+     */
+    private boolean moveMove(Unit unit, Direction direction) {
+        // If we are in a colony, or Europe, load sentries.
+        if (unit.canCarryUnits() && unit.hasSpaceLeft()
+            && (unit.getColony() != null || unit.isInEurope())) {
+            boolean boarded = false;
+            for (Unit sentry : unit.getLocation().getUnitList()) {
+                if (sentry.getState() == UnitState.SENTRY) {
+                    if (unit.canAdd(sentry)) {
+                        boarded |= boardShip(sentry, unit);
+                        logger.finest("Unit " + unit
+                            + " loaded sentry " + sentry);
+                    } else {
+                        logger.finest("Unit " + sentry
+                            + " is too big to board " + unit);
+                    }
+                }
+            }
+            // Boarding consumed this unit's moves.
+            if (boarded && unit.getMovesLeft() <= 0) return false;
+        }
+
+        // Ask the server
+        UnitWas unitWas = new UnitWas(unit);
+        if (!askServer().move(unit, direction)) {
+            // Can fail due to desynchronization.  Skip this unit so
+            // we do not end up retrying indefinitely.
+            unit.setState(UnitState.SKIPPED);
+            return false;
+        }
+
+        unit.getOwner().invalidateCanSeeTiles();
+        unitWas.fireChanges();
+        
+        final Tile tile = unit.getTile();
+
+        // Perform a short pause on an active unit's last move if
+        // the option is enabled.
+        ClientOptions options = freeColClient.getClientOptions();
+        if (unit.getMovesLeft() <= 0
+            && options.getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
+            gui.paintImmediatelyCanvasInItsBounds();
+            try {
+                Thread.sleep(UNIT_LAST_MOVE_DELAY);
+            } catch (InterruptedException e) {} // Ignore
+        }
+
+        // Update the active unit and GUI.
+        if (unit.isDisposed() || checkCashInTreasureTrain(unit)) return false;
+        if (tile.getColony() != null
+            && unit.isCarrier()
+            && unit.getTradeRoute() == null
+            && (unit.getDestination() == null
+                || unit.getDestination().getTile() == tile.getTile())) {
+            gui.showColonyPanel(tile.getColony(), unit);
+        }
+        if (unit.getMovesLeft() <= 0) return false;
+        displayModelMessages(false);
+        if (!gui.onScreen(tile)) gui.setSelectedTile(tile, false);
+        return true;
+    }
+
+    /**
+     * Move to a foreign colony and either attack, negotiate with the
+     * foreign power or spy on them.  Follows a move of
+     * MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT.
+     *
+     * FIXME: Unify trade and negotiation.
+     *
+     * @param unit The unit that will spy, negotiate or attack.
+     * @param direction The direction in which the foreign colony lies.
+     * @return True if the unit can move further.
+     */
+    private boolean moveScoutColony(Unit unit, Direction direction) {
+        final Game game = freeColClient.getGame();
+        Colony colony = (Colony) getSettlementAt(unit.getTile(), direction);
+        boolean canNeg = colony.getOwner() != unit.getOwner().getREFPlayer();
+        clearGotoOrders(unit);
+
+        GUI.ScoutColonyAction act
+            = gui.getScoutForeignColonyChoice(colony, unit, canNeg);
+        if (act == null) return true; // Cancelled
+        switch (act) {
+        case FOREIGN_COLONY_ATTACK:
+            return moveAttackSettlement(unit, direction);
+        case FOREIGN_COLONY_NEGOTIATE:
+            Player player = unit.getOwner();
+            DiplomaticTrade agreement
+                = new DiplomaticTrade(game, TradeContext.DIPLOMATIC,
+                                      player, colony.getOwner(), null, 0);
+            agreement = gui.showDiplomaticTradeDialog(unit, colony,
+                agreement, agreement.getSendMessage(player, colony));
+            return (agreement == null
+                || agreement.getStatus() == TradeStatus.REJECT_TRADE) ? true
+                : moveDiplomacy(unit, direction, agreement);
+        case FOREIGN_COLONY_SPY:
+            return moveSpy(unit, direction);
+        default:
+            logger.warning("showScoutForeignColonyDialog fail: " + act);
+            break;
+        }
+        return true;
+    }
+
+    /**
+     * Move a scout into an Indian settlement to speak with the chief,
+     * or demand a tribute following a move of
+     * MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT.
+     * The scout does not physically get into the village, it will
+     * just stay where it is.
+     *
+     * @param unit The <code>Unit</code> that is scouting.
+     * @param direction The direction in which the Indian settlement lies.
+     * @return True if the unit can move further.
+     */
+    private boolean moveScoutIndianSettlement(Unit unit, Direction direction) {
+        Tile unitTile = unit.getTile();
+        Tile tile = unitTile.getNeighbourOrNull(direction);
+        IndianSettlement settlement = tile.getIndianSettlement();
+        Player player = unit.getOwner();
+        clearGotoOrders(unit);
+
+        // Offer the choices.
+        String number = askServer().scoutSettlement(unit, direction);
+        if (number == null) number = Messages.message("many");
+        GUI.ScoutIndianSettlementAction act
+            = gui.getScoutIndianSettlementChoice(settlement, number);
+        if (act == null) return true; // Cancelled
+        switch (act) {
+        case INDIAN_SETTLEMENT_ATTACK:
+            if (!gui.confirmPreCombat(unit, tile)) return true;
+            askServer().attack(unit, direction);
+            return false;
+        case INDIAN_SETTLEMENT_SPEAK:
+            final int oldGold = player.getGold();
+            String result = askServer().scoutSpeakToChief(unit, direction);
+            if (result == null) {
+                return false; // Fail
+            } else if ("die".equals(result)) {
+                gui.showInformationMessage(settlement,
+                    "scoutSettlement.speakDie");
+                nextActiveUnit(unitTile);
+                return false;
+            } else if ("expert".equals(result)) {
+                gui.showInformationMessage(settlement,
+                    StringTemplate.template("scoutSettlement.expertScout")
+                    .add("%unit%", unit.getType().getNameKey()));
+            } else if ("tales".equals(result)) {
+                gui.showInformationMessage(settlement,
+                    "scoutSettlement.speakTales");
+            } else if ("beads".equals(result)) {
+                gui.showInformationMessage(settlement,
+                    StringTemplate.template("scoutSettlement.speakBeads")
+                    .addAmount("%amount%", player.getGold() - oldGold));
+            } else if ("nothing".equals(result)) {
+                gui.showInformationMessage(settlement,
+                    StringTemplate.template("scoutSettlement.speakNothing")
+                    .addStringTemplate("%nation%", player.getNationName()));
+            } else {
+                logger.warning("Invalid result from askScoutSpeak: " + result);
+            }
+            updateAfterMove();
+            nextActiveUnit();
+            return false;
+        case INDIAN_SETTLEMENT_TRIBUTE:
+            return moveTribute(unit, 1, direction);
+        default:
+            logger.warning("showScoutIndianSettlementDialog fail: " + act);
+            break;
+        }
+        return true;
+    }
+
+    /**
+     * Spy on a foreign colony.
+     *
+     * @param unit The <code>Unit</code> that is spying.
+     * @param direction The <code>Direction</code> of a colony to spy on.
+     * @return True if the unit can move further.
+     */
+    private boolean moveSpy(Unit unit, Direction direction) {
+        UnitWas unitWas = new UnitWas(unit);
+        if (askServer().spy(unit, direction)) {
+            unitWas.fireChanges();
+            nextActiveUnit();
+        }
+        return false;
+    }
+
+    /**
+     * Arrive at a settlement with a laden carrier following a move of
+     * MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS.
+     *
+     * @param unit The carrier.
+     * @param direction The direction to the settlement.
+     * @return True if the unit can move further.
+     */
+    private boolean moveTrade(Unit unit, Direction direction) {
+        clearGotoOrders(unit);
+
+        Settlement settlement = getSettlementAt(unit.getTile(), direction);
+        if (settlement instanceof Colony) {
+            final Game game = freeColClient.getGame();
+            final Player player = unit.getOwner();
+            DiplomaticTrade agreement
+                = new DiplomaticTrade(game, TradeContext.TRADE,
+                    player, settlement.getOwner(), null, 0);
+            agreement = gui.showDiplomaticTradeDialog(unit, settlement,
+                agreement, agreement.getSendMessage(player, settlement));
+            return (agreement == null
+                || agreement.getStatus() == TradeStatus.REJECT_TRADE) ? true
+                : moveDiplomacy(unit, direction, agreement);
+        } else if (settlement instanceof IndianSettlement) {
+            return moveTradeIndianSettlement(unit, direction);
+        } else {
+            throw new IllegalStateException("Bogus settlement: "
+                + settlement.getId());
+        }
+    }
+
+    /**
+     * Trading with the natives, including buying, selling and
+     * delivering gifts.  (Deliberate use of Settlement rather than
+     * IndianSettlement throughout these routines as some unification
+     * with colony trading is anticipated, and the native AI already
+     * uses the same DeliverGiftMessage to deliver gifts to Colonies).
+     *
+     * @param unit The <code>Unit</code> that is a carrier containing goods.
+     * @param direction The direction the unit could move in order to enter a
+     *            <code>Settlement</code>.
+     * @exception IllegalArgumentException if the unit is not a carrier, or if
+     *                there is no <code>Settlement</code> in the given
+     *                direction.
+     * @see Settlement
+     * @return True if the unit can move further.
+     */
+    private boolean moveTradeIndianSettlement(Unit unit, Direction direction) {
+        Settlement settlement = getSettlementAt(unit.getTile(), direction);
+
+        StringTemplate baseTemplate
+            = StringTemplate.template("tradeProposition.welcome")
+                .addStringTemplate("%nation%",
+                    settlement.getOwner().getNationName())
+                .addName("%settlement%", settlement.getName());
+        StringTemplate template = baseTemplate;
+        UnitWas unitWas = new UnitWas(unit);
+        boolean[] results = askServer()
+            .openTransactionSession(unit, settlement);
+        while (results != null) {
+            // The session tracks buy/sell/gift events and disables
+            // them when one happens.  So only offer such options if
+            // the session allows it and the carrier is in good shape.
+            boolean buy = results[0] && unit.hasSpaceLeft();
+            boolean sel = results[1] && unit.hasGoodsCargo();
+            boolean gif = results[2] && unit.hasGoodsCargo();
+            if (!buy && !sel && !gif) break;
+
+            GUI.TradeAction act = gui.getIndianSettlementTradeChoice(settlement,
+                template, buy, sel, gif);
+            if (act == null) break;
+            StringTemplate t = null;
+            switch (act) {
+            case BUY:
+                t = attemptBuyFromSettlement(unit, settlement);
+                if (t == null) {
+                    results[0] = false;
+                    template = baseTemplate;
+                } else {
+                    template = t;
+                }
+                break;
+            case SELL:
+                t = attemptSellToSettlement(unit, settlement);
+                if (t == null) {
+                    results[1] = false;
+                    template = baseTemplate;
+                } else {
+                    template = t;
+                }
+                break;
+            case GIFT:
+                t = attemptGiftToSettlement(unit, settlement);
+                if (t == null) {
+                    results[2] = false;
+                    template = baseTemplate;
+                } else {
+                    template = t;
+                }
+                break;
+            default:
+                logger.warning("showIndianSettlementTradeDialog fail: "
+                    + act);
+                results = null;
+                break;
+            }
+            if (template == abortTrade) template = baseTemplate;
+        }
+
+        askServer().closeTransactionSession(unit, settlement);
+        if (unit.getMovesLeft() > 0) gui.setActiveUnit(unit); // No trade?
+        unitWas.fireChanges();
+        if (!unit.couldMove()) nextActiveUnit();
+        return false;
+    }
+
+    /**
+     * Displays an appropriate trade failure message.
+     *
+     * @param fail The failure state.
+     * @param settlement The <code>Settlement</code> that failed to trade.
+     * @param goods The <code>Goods</code> that failed to trade.
+     * @return A <code>StringTemplate</code> describing the failure.
+     */
+    private StringTemplate tradeFailMessage(int fail, Settlement settlement,
+                                            Goods goods) {
+        switch (fail) {
+        case NO_TRADE_GOODS:
+            return StringTemplate.template("trade.noTradeGoods")
+                .add("%goods%", goods.getNameKey());
+        case NO_TRADE_HAGGLE:
+            return StringTemplate.template("trade.noTradeHaggle");
+        case NO_TRADE_HOSTILE:
+            return StringTemplate.template("trade.noTradeHostile");
+        case NO_TRADE: // Proposal was refused
+        default:
+            break;
+        }
+        return StringTemplate.template("trade.noTrade")
+            .addName("%settlement%",
+                settlement.getLocationNameFor(freeColClient.getMyPlayer()));
+    }
+
+    /**
+     * User interaction for buying from the natives.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @return A <code>StringTemplate</code> containing a message if
+     *     there is problem, or null on success.
+     */
+    private StringTemplate attemptBuyFromSettlement(Unit unit,
+                                                    Settlement settlement) {
+        final Game game = freeColClient.getGame();
+        Player player = freeColClient.getMyPlayer();
+        Goods goods = null;
+
+        // Get list of goods for sale
+        List<Goods> forSale = askServer()
+            .getGoodsForSaleInSettlement(game, unit, settlement);
+        for (;;) {
+            if (forSale.isEmpty()) { // Nothing to sell to the player
+                return StringTemplate.template("trade.nothingToSell");
+            }
+
+            // Choose goods to buy
+            List<ChoiceItem<Goods>> choices = new ArrayList<>();
+            for (Goods g : forSale) {
+                String label = Messages.message(g.getLabel(true));
+                choices.add(new ChoiceItem<Goods>(label, g));
+            }
+            goods = gui.getChoice(true, unit.getTile(),
+                                  Messages.message("buyProposition.text"),
+                                  settlement, "buyProposition.nothing",
+                                  choices);
+            if (goods == null) break; // Trade aborted by the player
+
+            int gold = -1; // Initially ask for a price
+            for (;;) {
+                gold = askServer().buyProposition(unit, settlement,
+                    goods, gold);
+                if (gold <= 0) {
+                    return tradeFailMessage(gold, settlement, goods);
+                }
+
+                // Show dialog for buy proposal
+                boolean canBuy = player.checkGold(gold);
+                GUI.BuyAction act
+                    = gui.getBuyChoice(unit, settlement, goods, gold, canBuy);
+                if (act == null) break; // User cancelled
+                switch (act) {
+                case BUY: // Accept price, make purchase
+                    if (askServer().buyFromSettlement(unit,
+                            settlement, goods, gold)) {
+                        updateAfterMove(); // Assume success
+                        return null;
+                    }
+                    return abortTrade;
+                case HAGGLE: // Try to negotiate a lower price
+                    gold = gold * 9 / 10;
+                    break;
+                default:
+                    logger.warning("showBuyDialog fail: " + act);
+                    return null;
+                }
+            }
+        }
+        return abortTrade;
+    }
+
+    /**
+     * User interaction for selling to the natives.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @return A <code>StringTemplate</code> containing a message if
+     *     there is problem, or null on success.
+     */
+    private StringTemplate attemptSellToSettlement(Unit unit,
+                                                   Settlement settlement) {
+        Goods goods = null;
+        for (;;) {
+            // Choose goods to sell
+            List<ChoiceItem<Goods>> choices = new ArrayList<>();
+            for (Goods g : unit.getGoodsList()) {
+                String label = Messages.message(g.getLabel(true));
+                choices.add(new ChoiceItem<Goods>(label, g));
+            }
+            goods = gui.getChoice(true, unit.getTile(),
+                                  Messages.message("sellProposition.text"),
+                                  settlement, "sellProposition.nothing",
+                                  choices);
+            if (goods == null) break; // Trade aborted by the player
+
+            int gold = -1; // Initially ask for a price
+            for (;;) {
+                gold = askServer().sellProposition(unit, settlement,
+                    goods, gold);
+                if (gold <= 0) {
+                    return tradeFailMessage(gold, settlement, goods);
+                }
+
+                // Show dialog for sale proposal
+                GUI.SellAction act = gui.getSellChoice(unit, settlement, goods, gold);
+                if (act == null) break; // Cancelled
+                switch (act) {
+                case SELL: // Accepted price, make the sale
+                    if (askServer().sellToSettlement(unit,
+                            settlement, goods, gold)) {
+                        updateAfterMove(); // Assume success
+                        return null;
+                    }
+                    return abortTrade;
+                case HAGGLE: // Ask for more money
+                    gold = (gold * 11) / 10;
+                    break;
+                case GIFT: // Decide to make a gift of the goods
+                    askServer().deliverGiftToSettlement(unit,
+                        settlement, goods);
+                    return abortTrade;
+                default:
+                    logger.warning("showSellDialog fail: " + act);
+                    return null;
+                }
+            }
+        }
+        return abortTrade;
+    }
+
+    /**
+     * User interaction for delivering a gift to the natives.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @return A <code>StringTemplate</code> containing a message if
+     *     there is problem, or null on success.
+     */
+    private StringTemplate attemptGiftToSettlement(Unit unit,
+                                                   Settlement settlement) {
+        List<ChoiceItem<Goods>> choices = new ArrayList<>();
+        for (Goods g : unit.getGoodsList()) {
+            String label = Messages.message(g.getLabel(true));
+            choices.add(new ChoiceItem<Goods>(label, g));
+        }
+        Goods goods = gui.getChoice(true, unit.getTile(),
+                                    Messages.message("gift.text"), settlement,
+                                    "cancel", choices);
+        if (goods != null
+            && askServer().deliverGiftToSettlement(unit, settlement, goods)) {
+            return null;
+        }
+        return abortTrade;
+    }
+
+    /**
+     * Demand a tribute.
+     *
+     * @param unit The <code>Unit</code> to perform the attack.
+     * @param amount An amount of tribute to demand.
+     * @param direction The direction in which to attack.
+     * @return True if the unit can move further.
+     */
+    private boolean moveTribute(Unit unit, int amount, Direction direction) {
+        final Game game = freeColClient.getGame();
+        Player player = unit.getOwner();
+        Tile tile = unit.getTile();
+        Tile target = tile.getNeighbourOrNull(direction);
+        Settlement settlement = target.getSettlement();
+        Player other = settlement.getOwner();
+
+        // Indians are easy and can use the basic tribute mechanism.
+        if (settlement.getOwner().isIndian()) {
+            UnitWas unitWas = new UnitWas(unit);
+            if (askServer().demandTribute(unit, direction)) {
+                // Assume tribute paid
+                unitWas.fireChanges();
+                updateAfterMove();
+                nextActiveUnit();
+            }
+            return false;
+        }
+        
+        // Europeans might be human players, so we convert to a diplomacy
+        // dialog.
+        DiplomaticTrade agreement
+            = new DiplomaticTrade(game, TradeContext.TRIBUTE, player, other,
+                                  null, 0);
+        agreement.add(new StanceTradeItem(game, player, other, Stance.PEACE));
+        agreement.add(new GoldTradeItem(game, other, player, amount));
+        return moveDiplomacy(unit, direction, agreement);
+    }
+
+    /**
+     * Move a missionary into a native settlement, following a move of
+     * MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY.
+     *
+     * @param unit The <code>Unit</code> that will enter the settlement.
+     * @param direction The direction in which the Indian settlement lies.
+     * @return True if the unit can move further.
+     */
+    private boolean moveUseMissionary(Unit unit, Direction direction) {
+        IndianSettlement settlement
+            = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
+        Player player = unit.getOwner();
+        boolean canEstablish = !settlement.hasMissionary();
+        boolean canDenounce = !canEstablish
+            && !settlement.hasMissionary(player);
+        clearGotoOrders(unit);
+
+        // Offer the choices.
+        GUI.MissionaryAction act = gui.getMissionaryChoice(unit, settlement,
+            canEstablish, canDenounce);
+        if (act == null) return true;
+        switch (act) {
+        case ESTABLISH_MISSION:
+            if (askServer().missionary(unit, direction, false)) {
+                if (settlement.hasMissionary(player)) {
+                    gui.playSound("sound.event.missionEstablished");
+                }
+                player.invalidateCanSeeTiles();
+                nextActiveUnit();
+            }
+            break;
+        case DENOUNCE_HERESY:
+            if (askServer().missionary(unit, direction, true)) {
+                if (settlement.hasMissionary(player)) {
+                    gui.playSound("sound.event.missionEstablished");
+                }
+                nextModelMessage();
+                nextActiveUnit();
+            }
+            break;
+        case INCITE_INDIANS:
+            List<ChoiceItem<Player>> choices = new ArrayList<>();
+            for (Player p : freeColClient.getGame().getLiveEuropeanPlayers(player)) {
+                String label = Messages.message(p.getNationName());
+                choices.add(new ChoiceItem<Player>(label, p));
+            }
+            Player enemy = gui.getChoice(true, unit.getTile(),
+                Messages.message("missionarySettlement.inciteQuestion"), unit,
+                "missionarySettlement.cancel", choices);
+            if (enemy == null) return true;
+            int gold = askServer().incite(unit, direction, enemy, -1);
+            if (gold < 0) {
+                // protocol fail
+            } else if (!player.checkGold(gold)) {
+                gui.showInformationMessage(settlement,
+                    StringTemplate.template("missionarySettlement.inciteGoldFail")
+                    .add("%player%", enemy.getName())
+                    .addAmount("%amount%", gold));
+            } else {
+                if (gui.confirm(true, unit.getTile(),
+                        StringTemplate.template("missionarySettlement.inciteConfirm")
+                            .add("%player%", enemy.getName())
+                            .addAmount("%amount%", gold),
+                        unit, "yes", "no")) {
+                    if (askServer().incite(unit, direction, enemy, gold) >= 0) {
+                        updateAfterMove();
+                    }
+                }
+                nextActiveUnit();
+            }
+            break;
+        default:
+            logger.warning("showUseMissionaryDialog fail");
+            break;
+        }
+        return false;
     }
 
 
@@ -511,7 +1855,7 @@ public final class InGameController implements NetworkConstants {
 
             // Try to follow the path.  Mark if the path is complete
             // but loop so as to check for unload before returning.
-            more = followPath(unit, path);
+            more = movePath(unit, path);
             if (!more) unit.setState(UnitState.SKIPPED);
         }
 
@@ -784,55 +2128,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Follow a path.
-     *
-     * @param unit The <code>Unit</code> to move.
-     * @param path The path to follow.
-     * @return True if the unit has completed the path and can move further.
-     */
-    private boolean followPath(Unit unit, PathNode path) {
-        // Traverse the path to the destination.
-        for (; path != null; path = path.next) {
-            if (unit.isAtLocation(path.getLocation())) continue;
-
-            if (path.getLocation() instanceof Europe) {
-                if (unit.hasTile()
-                    && unit.getTile().isDirectlyHighSeasConnected()) {
-                    moveTo(unit, path.getLocation());
-                } else {
-                    logger.warning("Can not move to Europe from "
-                        + unit.getLocation()
-                        + " on path: " + path.fullPathToString());
-                }
-                return false;
-            } else if (path.getLocation() instanceof Tile) {
-                if (path.getDirection() == null) {
-                    if (unit.isInEurope()) {
-                        moveTo(unit, unit.getGame().getMap());
-                    } else {
-                        logger.warning("Null direction on path: "
-                            + path.fullPathToString());
-                    }
-                    return false;
-                } else {
-                    if (!moveDirection(unit, path.getDirection(), false)) {
-                        return false;
-                    }
-                    if (unit.hasTile()
-                        && unit.getTile().getDiscoverableRegion() != null) {
-                        // Break up the goto to allow region naming to occur,
-                        // BR#2707
-                        return false;
-                    }
-                }
-            } else {
-                logger.warning("Bad path: " + path.fullPathToString());
-            }
-        }
-        return true;
-    }
-
-    /**
      * Load some goods onto a carrier.
      *
      * @param goods The <code>Goods</code> to load.
@@ -890,6 +2185,26 @@ public final class InGameController implements NetworkConstants {
     // Utilities connected with saving the game
 
     /**
+     * Returns a string representation of the given turn suitable for
+     * savegame files.
+     *
+     * @param turn a <code>Turn</code> value
+     * @return A string with the format: "<i>[season] year</i>".
+     *         Examples: "1602_1_Spring", "1503"...
+     */
+    private String getSaveGameString(Turn turn) {
+        int year = turn.getYear();
+        switch (turn.getSeason()) {
+        case SPRING:
+            return Integer.toString(year) + "_1_" + Messages.message("spring");
+        case AUTUMN:
+            return Integer.toString(year) + "_2_" + Messages.message("autumn");
+        case YEAR: default:
+            return Integer.toString(year);
+        }
+    }
+
+    /**
      * Creates at least one autosave game file of the currently played
      * game in the autosave directory.  Does nothing if there is no
      * game running.
@@ -899,7 +2214,7 @@ public final class InGameController implements NetworkConstants {
         final ClientOptions options = freeColClient.getClientOptions();
         if (game == null) return;
 
-        // unconditional save per round (fix file "last-turn")
+        // unconditional save per round (fixed file "last-turn")
         String prefix = options.getText(ClientOptions.AUTO_SAVE_PREFIX);
         String lastTurnName = prefix + "-"
             + options.getText(ClientOptions.LAST_TURN_NAME)
@@ -935,116 +2250,12 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Returns a string representation of the given turn suitable for
-     * savegame files.
-     *
-     * @param turn a <code>Turn</code> value
-     * @return A string with the format: "<i>[season] year</i>".
-     *         Examples: "1602_1_Spring", "1503"...
-     */
-    private String getSaveGameString(Turn turn) {
-        int year = turn.getYear();
-        switch (turn.getSeason()) {
-        case SPRING:
-            return Integer.toString(year) + "_1_" + Messages.message("spring");
-        case AUTUMN:
-            return Integer.toString(year) + "_2_" + Messages.message("autumn");
-        case YEAR:
-        default:
-            return Integer.toString(year);
-        }
-    }
-
-    /**
-     * Opens a dialog where the user should specify the filename and
-     * loads the game.
-     */
-    public void loadGame() {
-        File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
-        if (file == null) return;
-        if (!file.isFile()) {
-            gui.showErrorMessage("fileNotFound");
-            return;
-        }
-        if (freeColClient.isInGame() && !gui.confirmStopGame()) return;
-
-        freeColClient.getConnectController().quitGame(true);
-        turnReportMessages.clear();
-        gui.setActiveUnit(null);
-        gui.removeInGameComponents();
-        freeColClient.getConnectController().startSavedGame(file, null);
-    }
-
-    /**
-     * Reloads a game state which was previously saved via
-     * <code>quicksaveGame</code>.
-     *
-     * @return boolean <b>true</b> if and only if a game was loaded
-     */
-    public boolean quickReload () {
-        Game game = freeColClient.getGame();
-        if (game != null) {
-            String gid = Integer.toHexString(game.getUUID().hashCode());
-            String filename = "quicksave-" + gid
-                + FreeCol.FREECOL_SAVE_EXTENSION;
-            File file = new File(FreeColDirectories.getAutosaveDirectory(), filename);
-            if (file.isFile()) {
-                // ask user to confirm reload action
-                boolean ok = true; // canvas.confirm(gid, gid, filename);
-
-                // perform loading game state if answer == ok
-                if (ok) {
-                    freeColClient.getConnectController().quitGame(true);
-                    gui.removeInGameComponents();
-                    freeColClient.getConnectController().startSavedGame(file, null);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Opens a dialog where the user should specify the filename and
-     * saves the game.
-     *
-     * @return True if the game was saved.
-     */
-    public boolean saveGame() {
-        if (!freeColClient.canSaveCurrentGame()) return false;
-
-        Player player = freeColClient.getMyPlayer();
-        Game game = freeColClient.getGame();
-        if (game == null) return false; // Keyboard handling can race init
-        String gid = Integer.toHexString(game.getUUID().hashCode());
-        String fileName = /* player.getName() + "_" */ gid + "_"
-            + Messages.message(player.getNationName()) + "_"
-            + getSaveGameString(game.getTurn());
-        fileName = fileName.replaceAll(" ", "_");
-
-        File file = gui.showSaveDialog(FreeColDirectories.getSaveDirectory(),
-                                       fileName);
-        if (file == null) return false;
-        
-        final boolean confirm = freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.CONFIRM_SAVE_OVERWRITE);
-        if (!confirm
-            || !file.exists()
-            || gui.confirm("saveConfirmationDialog.areYouSure.text",
-                           "ok", "cancel")) {
-            FreeColDirectories.setSaveDirectory(file.getParentFile());
-            return saveGame(file);
-        }
-        return false;
-    }
-
-    /**
      * Saves the game to the given file.
      *
      * @param file The <code>File</code>.
      * @return True if the game was saved.
      */
-    public boolean saveGame(final File file) {
+    private boolean saveGame(final File file) {
         FreeColServer server = freeColClient.getFreeColServer();
         boolean result = false;
         gui.showStatusPanel(Messages.message("status.savingGame"));
@@ -1058,25 +2269,6 @@ public final class InGameController implements NetworkConstants {
         }
         return result;
     }
-
-    /**
-     * Saves the game to a fix-named file in the autosave directory, which may
-     * be used for quick-reload.
-     *
-     * @return boolean <b>true</b> if and only if the game was saved
-     */
-    public boolean quicksaveGame () {
-        Game game = freeColClient.getGame();
-        if (game != null) {
-            String gid = Integer.toHexString(game.getUUID().hashCode());
-            String filename = "quicksave-" + gid
-                + FreeCol.FREECOL_SAVE_EXTENSION;
-            File file = new File(FreeColDirectories.getAutosaveDirectory(), filename);
-            return saveGame(file);
-        }
-        return false;
-    }
-
 
     // Utilities for message handling.
 
@@ -2231,6 +3423,28 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Opens a dialog where the user should specify the filename and
+     * loads the game.
+     *
+     * Called from OpenAction.
+     */
+    public void loadGame() {
+        File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
+        if (file == null) return;
+        if (!file.isFile()) {
+            gui.showErrorMessage("fileNotFound");
+            return;
+        }
+        if (freeColClient.isInGame() && !gui.confirmStopGame()) return;
+
+        freeColClient.getConnectController().quitGame(true);
+        turnReportMessages.clear();
+        gui.setActiveUnit(null);
+        gui.removeInGameComponents();
+        freeColClient.getConnectController().startSavedGame(file, null);
+    }
+
+    /**
      * Loot some cargo.
      *
      * @param unit The <code>Unit</code> that is looting.
@@ -2317,1284 +3531,29 @@ public final class InGameController implements NetworkConstants {
      * Moves the active unit in a specified direction. This may result in an
      * attack, move... action.
      *
-     * @param direction The direction in which to move the active unit.
+     * @param direction The <code>Direction</code> in which to move
+     *     the active unit.
+     * @return True if the unit may move further.
      */
-    public void moveActiveUnit(Direction direction) {
+    public boolean moveActiveUnit(Direction direction) {
         Unit unit = gui.getActiveUnit();
-        if (unit != null && requireOurTurn()) {
-            unit.setState(UnitState.ACTIVE);
-            clearGotoOrders(unit);
-            move(unit, direction);
-        } // else: nothing: There is no active unit that can be moved.
-    }
+        if (!requireOurTurn() || unit == null) return false;
 
-    /**
-     * Moves the specified unit in a specified direction. This may
-     * result in many different types of action.
-     *
-     * @param unit The <code>Unit</code> to be moved.
-     * @param direction The direction in which to move the unit.
-     */
-    public void move(Unit unit, Direction direction) {
-        if (!requireOurTurn()) return;
-
-        if (!moveDirection(unit, direction, true)) nextActiveUnit();
-        updateAfterMove();
-    }
-    
-    /**
-     * Moves the given unit towards its destination/s if possible.
-     *
-     * @param unit The <code>Unit</code> to move.
-     * @param messages An optional list in which to retain any
-     *     trade route <code>ModelMessage</code>s generated.
-     * @return True if the unit reached its destination and has more moves
-     *     to make.
-     */
-    public boolean moveToDestination(Unit unit, List<ModelMessage> messages) {
-        Location destination;
-        if (!requireOurTurn()
-            || unit.isAtSea()
-            || unit.getMovesLeft() <= 0
-            || unit.getState() == UnitState.SKIPPED) {
-            return false;
-        } else if (unit.getTradeRoute() != null) {
-            return followTradeRoute(unit, messages);
-        } else if ((destination = unit.getDestination()) == null) {
-            return unit.getMovesLeft() > 0;
-        }
-
-        // Find a path to the destination and try to follow it.
-        final Player player = freeColClient.getMyPlayer();
-        PathNode path = unit.findPath(destination);
-        if (path == null) {
-            StringTemplate src = unit.getLocation()
-                .getLocationNameFor(player);
-            StringTemplate dst = destination.getLocationNameFor(player);
-            StringTemplate template = StringTemplate
-                .template("selectDestination.failed")
-                .addStringTemplate("%unit%",
-                    unit.getLabel(Unit.UnitLabelType.NATIONAL))
-                .addStringTemplate("%location%", src)
-                .addStringTemplate("%destination%", dst);
-            gui.showInformationMessage(unit, template);
-            return false;
-        }
-        gui.setActiveUnit(unit);
-
-        // Clear ordinary destinations if arrived.
-        if (followPath(unit, path) && unit.isAtLocation(destination)) {
-            clearGotoOrders(unit);
-            // Check cash-in, and if the unit has moves left and was
-            // not set to SKIPPED by moveDirection, then return true
-            // to show that this unit could continue.
-            if (!checkCashInTreasureTrain(unit)
-                && unit.getMovesLeft() > 0
-                && unit.getState() != UnitState.SKIPPED) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Move a unit in a given direction.
-     *
-     * Public for the test suite.
-     *
-     * @param unit The <code>Unit</code> to move.
-     * @param direction The <code>Direction</code> to move in.
-     * @param interactive Interactive mode: play sounds and emit errors.
-     * @return True if the unit can possibly move further.
-     */
-    public boolean moveDirection(Unit unit, Direction direction,
-                                  boolean interactive) {
-        // If this move would reach the unit destination but we
-        // discover that it would be permanently impossible to complete,
-        // clear the destination.
-        Unit.MoveType mt = unit.getMoveType(direction);
-        Location destination = unit.getDestination();
-        boolean clearDestination = destination != null
-            && unit.hasTile()
-            && Map.isSameLocation(unit.getTile().getNeighbourOrNull(direction),
-                                  destination);
-
-        // Consider all the move types.
-        boolean result = mt.isLegal();
-        switch (mt) {
-        case MOVE_HIGH_SEAS:
-            if (freeColClient.getMyPlayer().getEurope() == null) {
-                ; // do nothing
-            } else if (destination == null) {
-                result = moveHighSeas(unit, direction);
-                break;
-            } else if (destination instanceof Europe) {
-                result = moveTo(unit, destination);
-                break;
-            }
-            // Fall through
-        case MOVE:
-            result = moveMove(unit, direction);
-            break;
-        case EXPLORE_LOST_CITY_RUMOUR:
-            result = moveExplore(unit, direction);
-            break;
-        case ATTACK_UNIT:
-            result = moveAttack(unit, direction);
-            break;
-        case ATTACK_SETTLEMENT:
-            result = moveAttackSettlement(unit, direction);
-            break;
-        case EMBARK:
-            result = moveEmbark(unit, direction);
-            break;
-        case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
-            result = moveLearnSkill(unit, direction);
-            break;
-        case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
-            result = moveScoutIndianSettlement(unit, direction);
-            break;
-        case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
-            result = moveUseMissionary(unit, direction);
-            break;
-        case ENTER_FOREIGN_COLONY_WITH_SCOUT:
-            result = moveScoutColony(unit, direction);
-            break;
-        case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-            result = moveTrade(unit, direction);
-            break;
-
-        // Illegal moves
-        case MOVE_NO_ACCESS_BEACHED:
-            if (interactive || clearDestination) {
-                gui.playSound("sound.event.illegalMove");
-                StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessBeached")
-                    .addStringTemplate("%nation%", nation));
-            }
-            break;
-        case MOVE_NO_ACCESS_CONTACT:
-            if (interactive || clearDestination) {
-                gui.playSound("sound.event.illegalMove");
-                StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessContact")
-                    .addStringTemplate("%nation%", nation));
-            }
-            break;
-        case MOVE_NO_ACCESS_GOODS:
-            if (interactive || clearDestination) {
-                gui.playSound("sound.event.illegalMove");
-                StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessGoods")
-                    .addStringTemplate("%nation%", nation)
-                    .addStringTemplate("%unit%",
-                        unit.getLabel(Unit.UnitLabelType.NATIONAL)));
-            }
-            break;
-        case MOVE_NO_ACCESS_LAND:
-            if (!moveDisembark(unit, direction)) {
-                if (interactive) {
-                    gui.playSound("sound.event.illegalMove");
-                }
-            }
-            break;
-        case MOVE_NO_ACCESS_MISSION_BAN:
-            if (interactive || clearDestination) {
-                gui.playSound("sound.event.illegalMove");
-                StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessMissionBan")
-                    .addStringTemplate("%unit%",
-                        unit.getLabel(Unit.UnitLabelType.NATIONAL))
-                    .addStringTemplate("%nation%", nation));
-            }
-            break;
-        case MOVE_NO_ACCESS_SETTLEMENT:
-            if (interactive || clearDestination) {
-                gui.playSound("sound.event.illegalMove");
-                StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessSettlement")
-                    .addStringTemplate("%unit%",
-                        unit.getLabel(Unit.UnitLabelType.NATIONAL))
-                    .addStringTemplate("%nation%", nation));
-            }
-            break;
-        case MOVE_NO_ACCESS_SKILL:
-            if (interactive || clearDestination) {
-                gui.playSound("sound.event.illegalMove");
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessSkill")
-                    .addStringTemplate("%unit%",
-                        unit.getLabel(Unit.UnitLabelType.NATIONAL)));
-            }
-            break;
-        case MOVE_NO_ACCESS_TRADE:
-            if (interactive || clearDestination) {
-                gui.playSound("sound.event.illegalMove");
-                StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessTrade")
-                    .addStringTemplate("%nation%", nation));
-            }
-            break;
-        case MOVE_NO_ACCESS_WAR:
-            if (interactive || clearDestination) {
-                gui.playSound("sound.event.illegalMove");
-                StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessWar")
-                    .addStringTemplate("%nation%", nation));
-            }
-            break;
-        case MOVE_NO_ACCESS_WATER:
-            if (interactive || clearDestination) {
-                gui.playSound("sound.event.illegalMove");
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessWater")
-                    .addStringTemplate("%unit%",
-                        unit.getLabel(Unit.UnitLabelType.NATIONAL)));
-            }
-            break;
-        case MOVE_NO_ATTACK_MARINE:
-            if (interactive || clearDestination) {
-                gui.playSound("sound.event.illegalMove");
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAttackWater")
-                    .addStringTemplate("%unit%",
-                        unit.getLabel(Unit.UnitLabelType.NATIONAL)));
-            }
-            break;
-        case MOVE_NO_MOVES:
-            // The unit may have some moves left, but not enough
-            // to move to the next node.  The move is illegal
-            // this turn, but might not be next turn, so do not cancel the
-            // destination but set the state to skipped instead.
-            clearDestination = false;
-            unit.setState(UnitState.SKIPPED);
-            break;
-        case MOVE_NO_TILE:
-            if (interactive || clearDestination) {
-                gui.playSound("sound.event.illegalMove");
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noTile")
-                    .addStringTemplate("%unit%",
-                        unit.getLabel(Unit.UnitLabelType.NATIONAL)));
-            }
-            break;
-        default:
-            if (interactive || clearDestination) {
-                gui.playSound("sound.event.illegalMove");
-            }
-            result = false;
-            break;
-        }
-        if (clearDestination && !unit.isDisposed()) clearGotoOrders(unit);
-        return result;
-    }
-
-    /**
-     * Confirm attack or demand a tribute from a native settlement, following
-     * an attacking move.
-     *
-     * @param unit The <code>Unit</code> to perform the attack.
-     * @param direction The direction in which to attack.
-     * @return True if the unit could move further.
-     */
-    private boolean moveAttack(Unit unit, Direction direction) {
+        unit.setState(UnitState.ACTIVE);
         clearGotoOrders(unit);
-
-        Tile tile = unit.getTile();
-        Tile target = tile.getNeighbourOrNull(direction);
-        Unit u = target.getFirstUnit();
-        if (u == null) {
-            throw new IllegalStateException("Attacking empty tile!");
-        } else if (unit.getOwner().owns(u)) {
-            throw new IllegalStateException("Attacking own unit!");
-        }
-        if (gui.confirmHostileAction(unit, target)
-            && gui.confirmPreCombat(unit, target)) {
-            askServer().attack(unit, direction);
-            nextActiveUnit();
-        }
-        // Always return false, as the unit has either attacked and lost
-        // its remaining moves, or the move can not proceed because it is
-        // blocked.
-        return false;
-    }
-
-    /**
-     * Confirm attack or demand a tribute from a settlement, following
-     * an attacking move.
-     *
-     * @param unit The <code>Unit</code> to perform the attack.
-     * @param direction The direction in which to attack.
-     * @return True if the unit could move further.
-     */
-    private boolean moveAttackSettlement(Unit unit, Direction direction) {
-        Tile tile = unit.getTile();
-        Tile target = tile.getNeighbourOrNull(direction);
-        Settlement settlement = target.getSettlement();
-        if (settlement == null) {
-            throw new IllegalStateException("Attacking empty tile!");
-        } else if (unit.getOwner().owns(settlement)) {
-            throw new IllegalStateException("Attacking own settlement!");
-        }
-        GUI.ArmedUnitSettlementAction act
-            = gui.getArmedUnitSettlementChoice(settlement);
-        if (act == null) return true; // Cancelled
-        switch (act) {
-        case SETTLEMENT_ATTACK:
-            if (gui.confirmHostileAction(unit, target)
-                && gui.confirmPreCombat(unit, target)) {
-                askServer().attack(unit, direction);
-                nextActiveUnit();
-                Colony col = target.getColony();
-                if (col != null && unit.getOwner().owns(col)) {
-                    gui.showColonyPanel(col, unit);
-                }
-                return false;
-            }
-            break;
-        case SETTLEMENT_TRIBUTE:
-            int amount = (settlement instanceof Colony)
-                ? gui.confirmEuropeanTribute(unit, (Colony)settlement,
-                    getNationSummary(settlement.getOwner()))
-                : (settlement instanceof IndianSettlement)
-                ? gui.confirmNativeTribute(unit, (IndianSettlement)settlement)
-                : -1;
-            if (amount <= 0) return true; // Cancelled
-            return moveTribute(unit, amount, direction);
-
-        default:
-            logger.warning("showArmedUnitSettlementDialog fail: " + act);
-            break;
-        }
-        return true;
-    }
-
-    /**
-     * Initiates diplomacy with a foreign power.
-     *
-     * @param unit The <code>Unit</code> negotiating.
-     * @param direction The direction of a settlement to negotiate with.
-     * @param dt The base <code>DiplomaticTrade</code> agreement to
-     *     begin the negotiation with.
-     * @return True if the unit can move further.
-     */
-    private boolean moveDiplomacy(Unit unit, Direction direction,
-                                  DiplomaticTrade dt) {
-        Settlement settlement = getSettlementAt(unit.getTile(), direction);
-        if (settlement == null) return false;
-        if (!(settlement instanceof Colony)) return false;
-        Colony colony = (Colony)settlement;
-
-        // Can not negotiate with the REF.
-        final Game game = freeColClient.getGame();
-        final Player player = unit.getOwner();
-        final Player other = colony.getOwner();
-        if (other == player.getREFPlayer()) {
-            throw new IllegalStateException("Unit tried to negotiate with REF");
-        }
-
-        StringTemplate nation = other.getNationName();
-        ModelMessage m = null;
-        TradeStatus status;
-        while (dt != null) {
-            // Inform server of current agreement, exit if it did not
-            // require a response (i.e. was not a proposal).
-            status = dt.getStatus();
-            dt = askServer().diplomacy(game, unit, colony, dt);
-            if (status != TradeStatus.PROPOSE_TRADE) break;
-            
-            // Process the result of a proposal.
-            status = (dt == null) ? TradeStatus.REJECT_TRADE : dt.getStatus();
-            m = null;
-            switch (status) {
-            case PROPOSE_TRADE:
-                break;
-            case ACCEPT_TRADE:
-                m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                     "negotiationDialog.offerAccepted",
-                                     colony)
-                    .addStringTemplate("%nation%", nation);
-                dt = null;
-                break;
-            case REJECT_TRADE:
-                m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                     "negotiationDialog.offerRejected",
-                                     colony)
-                    .addStringTemplate("%nation%", nation);
-                dt = null;
-                break;
-            default:
-                throw new IllegalStateException("Bogus trade status" + status);
-            }
-            if (m != null) player.addModelMessage(m);
-
-            // If it was a counter proposal, consider it.
-            if (dt != null) {
-                dt = gui.showDiplomaticTradeDialog(unit, colony, dt,
-                    dt.getSendMessage(player, colony));
-            }
-        }
-        gui.updateMenuBar();
-        nextActiveUnit();
-        return false;
-    }
-
-    /**
-     * Check the carrier for passengers to disembark, possibly
-     * snatching a useful result from the jaws of a
-     * MOVE_NO_ACCESS_LAND failure.
-     *
-     * @param unit The carrier containing the unit to disembark.
-     * @param direction The direction in which to disembark the unit.
-     * @return True if the disembark "succeeds" (which deliberately includes
-     *     declined disembarks).
-     */
-    private boolean moveDisembark(Unit unit, final Direction direction) {
-        Tile tile = unit.getTile().getNeighbourOrNull(direction);
-        if (tile.getFirstUnit() != null
-            && tile.getFirstUnit().getOwner() != unit.getOwner()) {
-            return false; // Can not disembark onto other nation units.
-        }
-
-        // Disembark selected units able to move.
-        final List<Unit> disembarkable = new ArrayList<>();
-        unit.setStateToAllChildren(UnitState.ACTIVE);
-        for (Unit u : unit.getUnitList()) {
-            if (u.getMoveType(tile).isProgress()) {
-                disembarkable.add(u);
-            }
-        }
-        if (disembarkable.isEmpty()) {
-            // Did not find any unit that could disembark, fail.
-            return false;
-        }
-
-        while (!disembarkable.isEmpty()) {
-            if (disembarkable.size() == 1) {
-                if (gui.confirm(true, tile,
-                                StringTemplate.key("disembark.text"),
-                                disembarkable.get(0), "ok", "cancel")) {
-                    move(disembarkable.get(0), direction);
-                }
-                break;
-            }
-            List<ChoiceItem<Unit>> choices = new ArrayList<>();
-            for (Unit dUnit : disembarkable) {
-                choices.add(new ChoiceItem<Unit>(dUnit.getDescription(Unit.UnitLabelType.NATIONAL),
-                        dUnit));
-            }
-            if (disembarkable.size() > 1) {
-                choices.add(new ChoiceItem<Unit>(Messages.message("all"), unit));
-            }
-
-            // Use moveDirection() to disembark units as while the
-            // destination tile is known to be clear of other player
-            // units or settlements, it may have a rumour or need
-            // other special handling.
-            Unit u = gui.getChoice(true, unit.getTile(),
-                                   Messages.message("disembark.text"), unit,
-                                   "disembark.cancel", choices);
-            if (u == null) { // Cancelled, done.
-                break;
-            } else if (u == unit) { // Disembark all.
-                for (Unit dUnit : disembarkable) {
-                    // Guard against loss of control when asking the
-                    // server to move the unit.
-                    try {
-                        moveDirection(dUnit, direction, false);
-                    } finally {
-                        continue;
-                    }
-                }
-                return true;
-            }
-            moveDirection(u, direction, false);
-            disembarkable.remove(u);
-        }
-        return true;
-    }
-
-    /**
-     * Embarks the specified unit onto a carrier in a specified direction
-     * following a move of MoveType.EMBARK.
-     *
-     * @param unit The <code>Unit</code> that wishes to embark.
-     * @param direction The direction in which to embark.
-     * @return True if the unit could move further.
-     */
-    private boolean moveEmbark(Unit unit, Direction direction) {
-        if (unit.getColony() != null
-            && !tryLeaveColony(unit)) return false;
-
-        Tile sourceTile = unit.getTile();
-        Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
-        Unit carrier = null;
-        List<ChoiceItem<Unit>> choices = new ArrayList<>();
-        for (Unit u : destinationTile.getUnitList()) {
-            if (u.canAdd(unit)) {
-                String m = u.getDescription(Unit.UnitLabelType.NATIONAL);
-                choices.add(new ChoiceItem<Unit>(m, u));
-                carrier = u; // Save a default
-            }
-        }
-        if (choices.isEmpty()) {
-            throw new RuntimeException("Unit " + unit.getId()
-                + " found no carrier to embark upon.");
-        } else if (choices.size() == 1) {
-            // Use the default
-        } else {
-            carrier = gui.getChoice(true, unit.getTile(),
-                                    Messages.message("embark.text"), unit,
-                                    "embark.cancel", choices);
-            if (carrier == null) return true; // User cancelled
-        }
-
-        // Proceed to embark
-        clearGotoOrders(unit);
-        if (!askServer().embark(unit, carrier, direction)
-            || unit.getLocation() != carrier) {
-            unit.setState(UnitState.SKIPPED);
-            return false;
-        }
-        unit.getOwner().invalidateCanSeeTiles();
-        if (carrier.getMovesLeft() > 0) {
-            gui.setActiveUnit(carrier);
+        boolean ret = moveDirection(unit, direction, true);
+        if (ret) {
+            updateAfterMove();
         } else {
             nextActiveUnit();
         }
-        return false;
+        return ret;
     }
 
-    /**
-     * Confirm exploration of a lost city rumour, following a move of
-     * MoveType.EXPLORE_LOST_CITY_RUMOUR.
+   /**
+     * Move the tile cursor.
      *
-     * @param unit The <code>Unit</code> that is exploring.
-     * @param direction The direction of a rumour.
-     * @return True if the unit can move further.
-     */
-    private boolean moveExplore(Unit unit, Direction direction) {
-        Tile tile = unit.getTile().getNeighbourOrNull(direction);
-        if (!gui.confirm(true, unit.getTile(),
-                StringTemplate.key("exploreLostCityRumour.text"), unit,
-                "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
-            return true;
-        }
-        if (tile.getLostCityRumour().getType()
-            == LostCityRumour.RumourType.MOUNDS
-            && !gui.confirm(true, unit.getTile(),
-                StringTemplate.key("exploreMoundsRumour.text"), unit,
-                "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
-            askServer().declineMounds(unit, direction);
-        }
-        return moveMove(unit, direction);
-    }
-
-    /**
-     * Moves a unit onto the "high seas" in a specified direction following
-     * a move of MoveType.MOVE_HIGH_SEAS.
-     * This may result in a move to Europe, no move, or an ordinary move.
-     *
-     * @param unit The <code>Unit</code> to be moved.
-     * @param direction The direction in which to move.
-     * @return True if the unit can move further.
-     */
-    private boolean moveHighSeas(Unit unit, Direction direction) {
-        // Confirm moving to Europe if told to move to a null tile
-        // (FIXME: can this still happen?), or if crossing the boundary
-        // between coastal and high sea.  Otherwise just move.
-        Tile oldTile = unit.getTile();
-        Tile newTile = oldTile.getNeighbourOrNull(direction);
-        if (newTile == null
-            || (!oldTile.isDirectlyHighSeasConnected()
-                && newTile.isDirectlyHighSeasConnected())) {
-            if (unit.getTradeRoute() != null) {
-                TradeRouteStop stop = unit.getStop();
-                if (stop != null && TradeRoute.isStopValid(unit, stop)
-                    && stop.getLocation() instanceof Europe) {
-                    moveTo(unit, stop.getLocation());
-                    return false;
-                }
-            } else if (unit.getDestination() instanceof Europe) {
-                moveTo(unit, unit.getDestination());
-                return false;
-            } else {
-                if (gui.confirm(true, oldTile,
-                        StringTemplate.template("highseas.text")
-                            .addAmount("%number%", unit.getSailTurns()),
-                        unit, "highseas.yes", "highseas.no")) {
-                    moveTo(unit, unit.getOwner().getEurope());
-                    return false;
-                }
-            }
-        }
-        return moveMove(unit, direction);
-    }
-
-    /**
-     * Move a free colonist to a native settlement to learn a skill following
-     * a move of MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST.
-     * The colonist does not physically get into the village, it will
-     * just stay where it is and gain the skill.
-     *
-     * @param unit The <code>Unit</code> to learn the skill.
-     * @param direction The direction in which the Indian settlement lies.
-     * @return True if the unit can move further.
-     */
-    private boolean moveLearnSkill(Unit unit, Direction direction) {
-        clearGotoOrders(unit);
-        // Refresh knowledge of settlement skill.  It may have been
-        // learned by another player.
-        if (!askServer().askSkill(unit, direction)) return false;
-
-        IndianSettlement settlement
-            = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
-        UnitType skill = settlement.getLearnableSkill();
-        if (skill == null) {
-            gui.showInformationMessage(settlement,
-                                       "indianSettlement.noMoreSkill");
-        } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
-            gui.showInformationMessage(settlement,
-                StringTemplate.template("indianSettlement.cantLearnSkill")
-                    .addStringTemplate("%unit%",
-                        unit.getLabel(Unit.UnitLabelType.NATIONAL))
-                    .add("%skill%", skill.getNameKey()));
-        } else if (gui.confirm(true, unit.getTile(),
-                StringTemplate.template("learnSkill.text")
-                    .add("%skill%", skill.getNameKey()),
-                unit, "learnSkill.yes", "learnSkill.no")) {
-            if (askServer().learnSkill(unit, direction)) {
-                if (unit.isDisposed()) {
-                    gui.showInformationMessage(settlement, "learnSkill.die");
-                    nextActiveUnit(unit.getTile());
-                    return false;
-                }
-                if (unit.getType() != skill) {
-                    gui.showInformationMessage(settlement, "learnSkill.leave");
-                }
-            }
-        }
-        nextActiveUnit();
-        return false;
-    }
-
-    /**
-     * Actually move a unit in a specified direction, following a move
-     * of MoveType.MOVE.
-     *
-     * @param unit The <code>Unit</code> to be moved.
-     * @param direction The direction in which to move the Unit.
-     * @return True if the unit can move further.
-     */
-    private boolean moveMove(Unit unit, Direction direction) {
-        // If we are in a colony, or Europe, load sentries.
-        if (unit.canCarryUnits() && unit.hasSpaceLeft()
-            && (unit.getColony() != null || unit.isInEurope())) {
-            boolean boarded = false;
-            for (Unit sentry : unit.getLocation().getUnitList()) {
-                if (sentry.getState() == UnitState.SENTRY) {
-                    if (unit.canAdd(sentry)) {
-                        boarded |= boardShip(sentry, unit);
-                        logger.finest("Unit " + unit
-                            + " loaded sentry " + sentry);
-                    } else {
-                        logger.finest("Unit " + sentry
-                            + " is too big to board " + unit);
-                    }
-                }
-            }
-            // Boarding consumed this unit's moves.
-            if (boarded && unit.getMovesLeft() <= 0) return false;
-        }
-
-        // Ask the server
-        UnitWas unitWas = new UnitWas(unit);
-        if (!askServer().move(unit, direction)) {
-            // Can fail due to desynchronization.  Skip this unit so
-            // we do not end up retrying indefinitely.
-            unit.setState(UnitState.SKIPPED);
-            return false;
-        }
-
-        unit.getOwner().invalidateCanSeeTiles();
-        unitWas.fireChanges();
-        
-        final Tile tile = unit.getTile();
-
-        // Perform a short pause on an active unit's last move if
-        // the option is enabled.
-        ClientOptions options = freeColClient.getClientOptions();
-        if (unit.getMovesLeft() <= 0
-            && options.getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
-            gui.paintImmediatelyCanvasInItsBounds();
-            try {
-                Thread.sleep(UNIT_LAST_MOVE_DELAY);
-            } catch (InterruptedException e) {} // Ignore
-        }
-
-        // Update the active unit and GUI.
-        if (unit.isDisposed() || checkCashInTreasureTrain(unit)) return false;
-        if (tile.getColony() != null
-            && unit.isCarrier()
-            && unit.getTradeRoute() == null
-            && (unit.getDestination() == null
-                || unit.getDestination().getTile() == tile.getTile())) {
-            gui.showColonyPanel(tile.getColony(), unit);
-        }
-        if (unit.getMovesLeft() <= 0) return false;
-        displayModelMessages(false);
-        if (!gui.onScreen(tile)) gui.setSelectedTile(tile, false);
-        return true;
-    }
-
-    /**
-     * Move to a foreign colony and either attack, negotiate with the
-     * foreign power or spy on them.  Follows a move of
-     * MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT.
-     *
-     * FIXME: Unify trade and negotiation.
-     *
-     * @param unit The unit that will spy, negotiate or attack.
-     * @param direction The direction in which the foreign colony lies.
-     * @return True if the unit can move further.
-     */
-    private boolean moveScoutColony(Unit unit, Direction direction) {
-        final Game game = freeColClient.getGame();
-        Colony colony = (Colony) getSettlementAt(unit.getTile(), direction);
-        boolean canNeg = colony.getOwner() != unit.getOwner().getREFPlayer();
-        clearGotoOrders(unit);
-
-        GUI.ScoutColonyAction act
-            = gui.getScoutForeignColonyChoice(colony, unit, canNeg);
-        if (act == null) return true; // Cancelled
-        switch (act) {
-        case FOREIGN_COLONY_ATTACK:
-            return moveAttackSettlement(unit, direction);
-        case FOREIGN_COLONY_NEGOTIATE:
-            Player player = unit.getOwner();
-            DiplomaticTrade agreement
-                = new DiplomaticTrade(game, TradeContext.DIPLOMATIC,
-                                      player, colony.getOwner(), null, 0);
-            agreement = gui.showDiplomaticTradeDialog(unit, colony,
-                agreement, agreement.getSendMessage(player, colony));
-            return (agreement == null
-                || agreement.getStatus() == TradeStatus.REJECT_TRADE) ? true
-                : moveDiplomacy(unit, direction, agreement);
-        case FOREIGN_COLONY_SPY:
-            return moveSpy(unit, direction);
-        default:
-            logger.warning("showScoutForeignColonyDialog fail: " + act);
-            break;
-        }
-        return true;
-    }
-
-    /**
-     * Move a scout into an Indian settlement to speak with the chief,
-     * or demand a tribute following a move of
-     * MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT.
-     * The scout does not physically get into the village, it will
-     * just stay where it is.
-     *
-     * @param unit The <code>Unit</code> that is scouting.
-     * @param direction The direction in which the Indian settlement lies.
-     * @return True if the unit can move further.
-     */
-    private boolean moveScoutIndianSettlement(Unit unit, Direction direction) {
-        Tile unitTile = unit.getTile();
-        Tile tile = unitTile.getNeighbourOrNull(direction);
-        IndianSettlement settlement = tile.getIndianSettlement();
-        Player player = unit.getOwner();
-        clearGotoOrders(unit);
-
-        // Offer the choices.
-        String number = askServer().scoutSettlement(unit, direction);
-        if (number == null) number = Messages.message("many");
-        GUI.ScoutIndianSettlementAction act
-            = gui.getScoutIndianSettlementChoice(settlement, number);
-        if (act == null) return true; // Cancelled
-        switch (act) {
-        case INDIAN_SETTLEMENT_ATTACK:
-            if (!gui.confirmPreCombat(unit, tile)) return true;
-            askServer().attack(unit, direction);
-            return false;
-        case INDIAN_SETTLEMENT_SPEAK:
-            final int oldGold = player.getGold();
-            String result = askServer().scoutSpeakToChief(unit, direction);
-            if (result == null) {
-                return false; // Fail
-            } else if ("die".equals(result)) {
-                gui.showInformationMessage(settlement,
-                    "scoutSettlement.speakDie");
-                nextActiveUnit(unitTile);
-                return false;
-            } else if ("expert".equals(result)) {
-                gui.showInformationMessage(settlement,
-                    StringTemplate.template("scoutSettlement.expertScout")
-                    .add("%unit%", unit.getType().getNameKey()));
-            } else if ("tales".equals(result)) {
-                gui.showInformationMessage(settlement,
-                    "scoutSettlement.speakTales");
-            } else if ("beads".equals(result)) {
-                gui.updateMenuBar();
-                gui.showInformationMessage(settlement,
-                    StringTemplate.template("scoutSettlement.speakBeads")
-                    .addAmount("%amount%", player.getGold() - oldGold));
-            } else if ("nothing".equals(result)) {
-                gui.showInformationMessage(settlement,
-                    StringTemplate.template("scoutSettlement.speakNothing")
-                    .addStringTemplate("%nation%", player.getNationName()));
-            } else {
-                logger.warning("Invalid result from askScoutSpeak: " + result);
-            }
-            nextActiveUnit();
-            return false;
-        case INDIAN_SETTLEMENT_TRIBUTE:
-            return moveTribute(unit, 1, direction);
-        default:
-            logger.warning("showScoutIndianSettlementDialog fail: " + act);
-            break;
-        }
-        return true;
-    }
-
-    /**
-     * Spy on a foreign colony.
-     *
-     * @param unit The <code>Unit</code> that is spying.
-     * @param direction The <code>Direction</code> of a colony to spy on.
-     * @return True if the unit can move further.
-     */
-    private boolean moveSpy(Unit unit, Direction direction) {
-        if (askServer().spy(unit, direction)) {
-            nextActiveUnit();
-        }
-        return false;
-    }
-
-    /**
-     * Arrive at a settlement with a laden carrier following a move of
-     * MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS.
-     *
-     * @param unit The carrier.
-     * @param direction The direction to the settlement.
-     * @return True if the unit can move further.
-     */
-    private boolean moveTrade(Unit unit, Direction direction) {
-        clearGotoOrders(unit);
-
-        Settlement settlement = getSettlementAt(unit.getTile(), direction);
-        if (settlement instanceof Colony) {
-            final Game game = freeColClient.getGame();
-            final Player player = unit.getOwner();
-            DiplomaticTrade agreement
-                = new DiplomaticTrade(game, TradeContext.TRADE,
-                    player, settlement.getOwner(), null, 0);
-            agreement = gui.showDiplomaticTradeDialog(unit, settlement,
-                agreement, agreement.getSendMessage(player, settlement));
-            return (agreement == null
-                || agreement.getStatus() == TradeStatus.REJECT_TRADE) ? true
-                : moveDiplomacy(unit, direction, agreement);
-        } else if (settlement instanceof IndianSettlement) {
-            return moveTradeIndianSettlement(unit, direction);
-        } else {
-            throw new IllegalStateException("Bogus settlement: "
-                + settlement.getId());
-        }
-    }
-
-    /**
-     * Trading with the natives, including buying, selling and
-     * delivering gifts.  (Deliberate use of Settlement rather than
-     * IndianSettlement throughout these routines as some unification
-     * with colony trading is anticipated, and the native AI already
-     * uses the same DeliverGiftMessage to deliver gifts to Colonies).
-     *
-     * @param unit The <code>Unit</code> that is a carrier containing goods.
-     * @param direction The direction the unit could move in order to enter a
-     *            <code>Settlement</code>.
-     * @exception IllegalArgumentException if the unit is not a carrier, or if
-     *                there is no <code>Settlement</code> in the given
-     *                direction.
-     * @see Settlement
-     * @return True if the unit can move further.
-     */
-    private boolean moveTradeIndianSettlement(Unit unit, Direction direction) {
-        Settlement settlement = getSettlementAt(unit.getTile(), direction);
-
-        StringTemplate baseTemplate
-            = StringTemplate.template("tradeProposition.welcome")
-                .addStringTemplate("%nation%",
-                    settlement.getOwner().getNationName())
-                .addName("%settlement%", settlement.getName());
-        StringTemplate template = baseTemplate;
-        boolean[] results = askServer()
-            .openTransactionSession(unit, settlement);
-        while (results != null) {
-            // The session tracks buy/sell/gift events and disables
-            // them when one happens.  So only offer such options if
-            // the session allows it and the carrier is in good shape.
-            boolean buy = results[0] && unit.hasSpaceLeft();
-            boolean sel = results[1] && unit.hasGoodsCargo();
-            boolean gif = results[2] && unit.hasGoodsCargo();
-            if (!buy && !sel && !gif) break;
-
-            GUI.TradeAction act = gui.getIndianSettlementTradeChoice(settlement,
-                template, buy, sel, gif);
-            if (act == null) break;
-            StringTemplate t = null;
-            switch (act) {
-            case BUY:
-                t = attemptBuyFromSettlement(unit, settlement);
-                if (t == null) {
-                    results[0] = false;
-                    template = baseTemplate;
-                } else {
-                    template = t;
-                }
-                break;
-            case SELL:
-                t = attemptSellToSettlement(unit, settlement);
-                if (t == null) {
-                    results[1] = false;
-                    template = baseTemplate;
-                } else {
-                    template = t;
-                }
-                break;
-            case GIFT:
-                t = attemptGiftToSettlement(unit, settlement);
-                if (t == null) {
-                    results[2] = false;
-                    template = baseTemplate;
-                } else {
-                    template = t;
-                }
-                break;
-            default:
-                logger.warning("showIndianSettlementTradeDialog fail: "
-                    + act);
-                results = null;
-                break;
-            }
-            if (template == abortTrade) template = baseTemplate;
-        }
-
-        askServer().closeTransactionSession(unit, settlement);
-        if (unit.getMovesLeft() > 0) { // May have been restored if no trade
-            gui.setActiveUnit(unit);
-            return true;
-        }
-        nextActiveUnit();
-        return false;
-    }
-
-    /**
-     * Displays an appropriate trade failure message.
-     *
-     * @param fail The failure state.
-     * @param settlement The <code>Settlement</code> that failed to trade.
-     * @param goods The <code>Goods</code> that failed to trade.
-     * @return A <code>StringTemplate</code> describing the failure.
-     */
-    private StringTemplate tradeFailMessage(int fail, Settlement settlement,
-                                            Goods goods) {
-        switch (fail) {
-        case NO_TRADE_GOODS:
-            return StringTemplate.template("trade.noTradeGoods")
-                .add("%goods%", goods.getNameKey());
-        case NO_TRADE_HAGGLE:
-            return StringTemplate.template("trade.noTradeHaggle");
-        case NO_TRADE_HOSTILE:
-            return StringTemplate.template("trade.noTradeHostile");
-        case NO_TRADE: // Proposal was refused
-        default:
-            break;
-        }
-        return StringTemplate.template("trade.noTrade")
-            .addName("%settlement%",
-                settlement.getLocationNameFor(freeColClient.getMyPlayer()));
-    }
-
-    /**
-     * User interaction for buying from the natives.
-     *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @return A <code>StringTemplate</code> containing a message if
-     *     there is problem, or null on success.
-     */
-    private StringTemplate attemptBuyFromSettlement(Unit unit,
-                                                    Settlement settlement) {
-        final Game game = freeColClient.getGame();
-        Player player = freeColClient.getMyPlayer();
-        Goods goods = null;
-
-        // Get list of goods for sale
-        List<Goods> forSale = askServer()
-            .getGoodsForSaleInSettlement(game, unit, settlement);
-        for (;;) {
-            if (forSale.isEmpty()) { // Nothing to sell to the player
-                return StringTemplate.template("trade.nothingToSell");
-            }
-
-            // Choose goods to buy
-            List<ChoiceItem<Goods>> choices = new ArrayList<>();
-            for (Goods g : forSale) {
-                String label = Messages.message(g.getLabel(true));
-                choices.add(new ChoiceItem<Goods>(label, g));
-            }
-            goods = gui.getChoice(true, unit.getTile(),
-                                  Messages.message("buyProposition.text"),
-                                  settlement, "buyProposition.nothing",
-                                  choices);
-            if (goods == null) break; // Trade aborted by the player
-
-            int gold = -1; // Initially ask for a price
-            for (;;) {
-                gold = askServer().buyProposition(unit, settlement,
-                    goods, gold);
-                if (gold <= 0) {
-                    return tradeFailMessage(gold, settlement, goods);
-                }
-
-                // Show dialog for buy proposal
-                boolean canBuy = player.checkGold(gold);
-                GUI.BuyAction act
-                    = gui.getBuyChoice(unit, settlement, goods, gold, canBuy);
-                if (act == null) break; // User cancelled
-                switch (act) {
-                case BUY: // Accept price, make purchase
-                    if (askServer().buyFromSettlement(unit,
-                            settlement, goods, gold)) {
-                        gui.updateMenuBar(); // Assume success
-                        return null;
-                    }
-                    return abortTrade;
-                case HAGGLE: // Try to negotiate a lower price
-                    gold = gold * 9 / 10;
-                    break;
-                default:
-                    logger.warning("showBuyDialog fail: " + act);
-                    return null;
-                }
-            }
-        }
-        return abortTrade;
-    }
-
-    /**
-     * User interaction for selling to the natives.
-     *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @return A <code>StringTemplate</code> containing a message if
-     *     there is problem, or null on success.
-     */
-    private StringTemplate attemptSellToSettlement(Unit unit,
-                                                   Settlement settlement) {
-        Goods goods = null;
-        for (;;) {
-            // Choose goods to sell
-            List<ChoiceItem<Goods>> choices = new ArrayList<>();
-            for (Goods g : unit.getGoodsList()) {
-                String label = Messages.message(g.getLabel(true));
-                choices.add(new ChoiceItem<Goods>(label, g));
-            }
-            goods = gui.getChoice(true, unit.getTile(),
-                                  Messages.message("sellProposition.text"),
-                                  settlement, "sellProposition.nothing",
-                                  choices);
-            if (goods == null) break; // Trade aborted by the player
-
-            int gold = -1; // Initially ask for a price
-            for (;;) {
-                gold = askServer().sellProposition(unit, settlement,
-                    goods, gold);
-                if (gold <= 0) {
-                    return tradeFailMessage(gold, settlement, goods);
-                }
-
-                // Show dialog for sale proposal
-                GUI.SellAction act
-                    = gui.getSellChoice(unit, settlement, goods, gold);
-                if (act == null) break; // Cancelled
-                switch (act) {
-                case SELL: // Accepted price, make the sale
-                    if (askServer().sellToSettlement(unit,
-                            settlement, goods, gold)) {
-                        gui.updateMenuBar(); // Assume success
-                        return null;
-                    }
-                    return abortTrade;
-                case HAGGLE: // Ask for more money
-                    gold = (gold * 11) / 10;
-                    break;
-                case GIFT: // Decide to make a gift of the goods
-                    askServer().deliverGiftToSettlement(unit,
-                        settlement, goods);
-                    return abortTrade;
-                default:
-                    logger.warning("showSellDialog fail: " + act);
-                    return null;
-                }
-            }
-        }
-        return abortTrade;
-    }
-
-    /**
-     * User interaction for delivering a gift to the natives.
-     *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @return A <code>StringTemplate</code> containing a message if
-     *     there is problem, or null on success.
-     */
-    private StringTemplate attemptGiftToSettlement(Unit unit,
-                                                   Settlement settlement) {
-        List<ChoiceItem<Goods>> choices = new ArrayList<>();
-        for (Goods g : unit.getGoodsList()) {
-            String label = Messages.message(g.getLabel(true));
-            choices.add(new ChoiceItem<Goods>(label, g));
-        }
-        Goods goods = gui.getChoice(true, unit.getTile(),
-                                    Messages.message("gift.text"), settlement,
-                                    "cancel", choices);
-        if (goods != null
-            && askServer().deliverGiftToSettlement(unit, settlement, goods)) {
-            return null;
-        }
-        return abortTrade;
-    }
-
-    /**
-     * Demand a tribute.
-     *
-     * @param unit The <code>Unit</code> to perform the attack.
-     * @param amount An amount of tribute to demand.
-     * @param direction The direction in which to attack.
-     * @return True if the unit can move further.
-     */
-    private boolean moveTribute(Unit unit, int amount, Direction direction) {
-        final Game game = freeColClient.getGame();
-        Player player = unit.getOwner();
-        Tile tile = unit.getTile();
-        Tile target = tile.getNeighbourOrNull(direction);
-        Settlement settlement = target.getSettlement();
-        Player other = settlement.getOwner();
-
-        // Indians are easy and can use the basic tribute mechanism.
-        if (settlement.getOwner().isIndian()) {
-            if (askServer().demandTribute(unit, direction)) {
-                // Assume tribute paid
-                gui.updateMenuBar();
-                nextActiveUnit();
-            }
-            return false;
-        }
-        
-        // Europeans might be human players, so we convert to a diplomacy
-        // dialog.
-        DiplomaticTrade agreement
-            = new DiplomaticTrade(game, TradeContext.TRIBUTE, player, other,
-                                  null, 0);
-        agreement.add(new StanceTradeItem(game, player, other, Stance.PEACE));
-        agreement.add(new GoldTradeItem(game, other, player, amount));
-        return moveDiplomacy(unit, direction, agreement);
-    }
-
-    /**
-     * Move a missionary into a native settlement, following a move of
-     * MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY.
-     *
-     * @param unit The <code>Unit</code> that will enter the settlement.
-     * @param direction The direction in which the Indian settlement lies.
-     * @return True if the unit can move further.
-     */
-    private boolean moveUseMissionary(Unit unit, Direction direction) {
-        IndianSettlement settlement
-            = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
-        Player player = unit.getOwner();
-        boolean canEstablish = !settlement.hasMissionary();
-        boolean canDenounce = !canEstablish
-            && !settlement.hasMissionary(player);
-        clearGotoOrders(unit);
-
-        // Offer the choices.
-        GUI.MissionaryAction act = gui.getMissionaryChoice(unit, settlement,
-            canEstablish, canDenounce);
-        if (act == null) return true;
-        switch (act) {
-        case ESTABLISH_MISSION:
-            if (askServer().missionary(unit, direction, false)) {
-                if (settlement.hasMissionary(player)) {
-                    gui.playSound("sound.event.missionEstablished");
-                }
-                player.invalidateCanSeeTiles();
-                nextActiveUnit();
-            }
-            break;
-        case DENOUNCE_HERESY:
-            if (askServer().missionary(unit, direction, true)) {
-                if (settlement.hasMissionary(player)) {
-                    gui.playSound("sound.event.missionEstablished");
-                }
-                nextModelMessage();
-                nextActiveUnit();
-            }
-            break;
-        case INCITE_INDIANS:
-            List<ChoiceItem<Player>> choices = new ArrayList<>();
-            for (Player p : freeColClient.getGame().getLiveEuropeanPlayers(player)) {
-                String label = Messages.message(p.getNationName());
-                choices.add(new ChoiceItem<Player>(label, p));
-            }
-            Player enemy = gui.getChoice(true, unit.getTile(),
-                Messages.message("missionarySettlement.inciteQuestion"), unit,
-                "missionarySettlement.cancel", choices);
-            if (enemy == null) return true;
-            int gold = askServer().incite(unit, direction, enemy, -1);
-            if (gold < 0) {
-                // protocol fail
-            } else if (!player.checkGold(gold)) {
-                gui.showInformationMessage(settlement,
-                    StringTemplate.template("missionarySettlement.inciteGoldFail")
-                    .add("%player%", enemy.getName())
-                    .addAmount("%amount%", gold));
-            } else {
-                if (gui.confirm(true, unit.getTile(),
-                        StringTemplate.template("missionarySettlement.inciteConfirm")
-                            .add("%player%", enemy.getName())
-                            .addAmount("%amount%", gold),
-                        unit, "yes", "no")) {
-                    if (askServer().incite(unit, direction, enemy, gold) >= 0) {
-                        gui.updateMenuBar();
-                    }
-                }
-                nextActiveUnit();
-            }
-            break;
-        default:
-            logger.warning("showUseMissionaryDialog fail");
-            break;
-        }
-        return false;
-    }
-
-    // end move-consequents
-
-    /**
-     * Describe <code>moveTileCursor</code> method here.
-     *
-     * @param direction a <code>Direction</code> value 
+     * @param direction The <code>Direction</code> to move the tile cursor.
      */
     public void moveTileCursor(Direction direction) {
         Tile tile = gui.getSelectedTile();
@@ -3681,52 +3640,6 @@ public final class InGameController implements NetworkConstants {
      */
     public void nextActiveUnit() {
         nextActiveUnit(null);
-    }
-
-    /**
-     * Makes a new unit active if any, or focus on a tile (useful if the
-     * current unit just died).
-     * Displays any new <code>ModelMessage</code>s with
-     * {@link #nextModelMessage}.
-     *
-     * @param tile The <code>Tile</code> to select if no new unit can
-     *             be made active.
-     */
-    public void nextActiveUnit(Tile tile) {
-        if (!requireOurTurn()) return;
-
-        // Always flush outstanding messages first.
-        nextModelMessage();
-
-        // Flush any outstanding orders once the mode is raised.
-        if (moveMode != MoveMode.NEXT_ACTIVE_UNIT
-            && !doExecuteGotoOrders()) {
-            return;
-        }
-
-        // Look for active units.
-        Player player = freeColClient.getMyPlayer();
-        Unit unit = gui.getActiveUnit();
-        if (unit != null && !unit.isDisposed()
-            && unit.couldMove()) return; // Current active unit has more to do.
-        if (player.hasNextActiveUnit()) {
-            gui.setActiveUnit(player.getNextActiveUnit());
-            return; // Successfully found a unit to display
-        }
-        gui.setActiveUnit(null);
-
-        // No active units left.  Do the goto orders.
-        if (!doExecuteGotoOrders()) return;
-
-        // If not already ending the turn, use the fallback tile if
-        // supplied, then check for automatic end of turn, otherwise
-        // just select nothing and wait.
-        ClientOptions options = freeColClient.getClientOptions();
-        if (tile != null) {
-            gui.setSelectedTile(tile, false);
-        } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
-            doEndTurn(options.getBoolean(ClientOptions.SHOW_END_TURN_DIALOG));
-        }
     }
 
     /**
@@ -3901,6 +3814,43 @@ public final class InGameController implements NetworkConstants {
         }
 
         askServer().rename((FreeColGameObject)object, name);
+    }
+
+    /**
+     * Opens a dialog where the user should specify the filename and
+     * saves the game.
+     *
+     * Called from SaveAction and SaveAndQuitAction.
+     *
+     * @return True if the game was saved.
+     */
+    public boolean saveGame() {
+        if (!freeColClient.canSaveCurrentGame()) return false;
+
+        Player player = freeColClient.getMyPlayer();
+        Game game = freeColClient.getGame();
+        if (game == null) return false; // Keyboard handling can race init
+
+        String gid = Integer.toHexString(game.getUUID().hashCode());
+        String fileName = /* player.getName() + "_" */ gid + "_"
+            + Messages.message(player.getNationName()) + "_"
+            + getSaveGameString(game.getTurn());
+        fileName = fileName.replaceAll(" ", "_");
+
+        File file = gui.showSaveDialog(FreeColDirectories.getSaveDirectory(),
+                                       fileName);
+        if (file == null) return false;
+        
+        final boolean confirm = freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.CONFIRM_SAVE_OVERWRITE);
+        if (!confirm
+            || !file.exists()
+            || gui.confirm("saveConfirmationDialog.areYouSure.text",
+                           "ok", "cancel")) {
+            FreeColDirectories.setSaveDirectory(file.getParentFile());
+            return saveGame(file);
+        }
+        return false;
     }
 
     /**
