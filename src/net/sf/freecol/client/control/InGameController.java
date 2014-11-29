@@ -1932,7 +1932,7 @@ public final class InGameController implements NetworkConstants {
             if (export > 0) {
                 int amount = Math.min(demand, export);
                 Goods cargo = new Goods(game, loc, type, amount);
-                if (loadGoods(cargo, unit)) {
+                if (askLoadGoods(cargo, unit)) {
                     lb.add(" ", getLoadGoodsMessage(type, amount, present,
                                                     export, demand));
                     ret = true;
@@ -2035,7 +2035,9 @@ public final class InGameController implements NetworkConstants {
             // Try to unload.
             Goods cargo = new Goods(game, unit, type, amount);
             ret = (cargo.getAmount() == 0) ? false
-                : unloadGoods(cargo, unit, colony);
+                : (unit.isInEurope())
+                ? askSellGoods(cargo, unit, unit.getOwner().getEurope())
+                : askUnloadGoods(cargo, unit, colony);
             lb.add(" ", getUnloadGoodsMessage(unit, type, amount,
                                               present, atStop, toUnload));
         }
@@ -2097,8 +2099,8 @@ public final class InGameController implements NetworkConstants {
      * @param price The price required.
      * @return True if the claim succeeded.
      */
-    private boolean claimTile(Player player, Tile tile,
-                              FreeColGameObject claimant, int price) {
+    private boolean askClaimTile(Player player, Tile tile,
+                                 FreeColGameObject claimant, int price) {
         final Player owner = tile.getOwner();
         if (price < 0) { // not for sale
             return false;
@@ -2113,18 +2115,18 @@ public final class InGameController implements NetworkConstants {
                 price = NetworkConstants.STEAL_LAND;
                 break;
             default:
-                logger.warning("showClaimDialog fail: " + act);
+                logger.warning("Claim dialog fail: " + act);
                 return false;
             }
         } // else price == 0 and we can just proceed to claim
 
         // Ask the server
-        if (askServer().claimTile(tile, claimant, price)
-            && player.owns(tile)) {
-            gui.updateMenuBar();
-            return true;
+        boolean ret = askServer().claimTile(tile, claimant, price)
+            && player.owns(tile);
+        if (ret) {
+            updateAfterMove();
         }
-        return false;
+        return ret;
     }
 
     /**
@@ -2134,23 +2136,61 @@ public final class InGameController implements NetworkConstants {
      * @param carrier The <code>Unit</code> to load onto.
      * @return True if the load succeeded.
      */
-    private boolean loadGoods(Goods goods, Unit carrier) {
+    private boolean askLoadGoods(Goods goods, Unit carrier) {
         if (carrier.isInEurope() && goods.getLocation() instanceof Europe) {
             if (!carrier.getOwner().canTrade(goods.getType())) return false;
             return buyGoods(goods.getType(), goods.getAmount(), carrier);
         }
+
         GoodsType type = goods.getType();
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
         UnitWas unitWas = new UnitWas(carrier);
         Colony colony = carrier.getColony();
         ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
-        if (askServer().loadCargo(goods, carrier)
-            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
+        boolean ret = askServer().loadCargo(goods, carrier)
+            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount;
+        if (ret) {
             if (colonyWas != null) colonyWas.fireChanges();
             unitWas.fireChanges();
-            return true;
+            gui.playSound("sound.event.loadCargo");
         }
-        return false;
+        return ret;
+    }
+
+    /**
+     * Sell some goods from a carrier.
+     *
+     * @param goods The <code>Goods</code> to unload.
+     * @param carrier The <code>Unit</code> carrying the goods.
+     * @param europe The <code>Europe</code> to sell to.
+     * @return True if the unload succeeded.
+     */
+    private boolean askSellGoods(Goods goods, Unit carrier, Europe europe) {
+        // Try to sell.  Remember a bunch of stuff first so the transaction
+        // can be logged.
+        final Player player = freeColClient.getMyPlayer();
+        final Market market = player.getMarket();
+        final GoodsType type = goods.getType();
+        final int amount = goods.getAmount();
+        final int price = market.getPaidForSale(type);
+        final int tax = player.getTax();
+        final int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
+
+        UnitWas unitWas = new UnitWas(carrier);
+        EuropeWas europeWas = new EuropeWas(europe);
+        boolean ret = askServer().sellGoods(goods, carrier)
+            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount;
+        if (ret) {
+            unitWas.fireChanges();
+            europeWas.fireChanges();
+            for (TransactionListener l : market.getTransactionListener()) {
+                l.logSale(type, amount, price, tax);
+            }
+            gui.playSound("sound.event.sellCargo");
+            gui.updateMenuBar();
+            nextModelMessage();
+        }
+        return ret;
     }
 
     /**
@@ -2158,27 +2198,22 @@ public final class InGameController implements NetworkConstants {
      *
      * @param goods The <code>Goods</code> to unload.
      * @param carrier The <code>Unit</code> carrying the goods.
-     * @param colony The <code>Colony</code> to unload to,
-     *               or null if unloading in Europe.
+     * @param colony The <code>Colony</code> to unload to.
      * @return True if the unload succeeded.
      */
-    private boolean unloadGoods(Goods goods, Unit carrier, Colony colony) {
-        if (colony == null && carrier.isInEurope()
-            && carrier.getOwner().canTrade(goods.getType())) {
-            return sellGoods(goods);
-        }
-
+    private boolean askUnloadGoods(Goods goods, Unit carrier, Colony colony) {
         GoodsType type = goods.getType();
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
-        ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
+        ColonyWas colonyWas = new ColonyWas(colony);
         UnitWas unitWas = new UnitWas(carrier);
-        if (askServer().unloadCargo(goods)
-            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
-            if (colonyWas != null) colonyWas.fireChanges();
+        boolean ret = askServer().unloadCargo(goods)
+            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount;
+        if (ret) {
+            colonyWas.fireChanges();
             unitWas.fireChanges();
-            return true;
+            gui.playSound("sound.event.unloadCargo");
         }
-        return false;
+        return ret;
     }
 
 
@@ -2598,7 +2633,7 @@ public final class InGameController implements NetworkConstants {
             // Claim tile from other owners before founding a settlement.
             // Only native owners that we can steal, buy from, or use a
             // bonus center tile exception should be possible by this point.
-            if (!claimTile(player, tile, unit, player.getLandPrice(tile)))
+            if (!askClaimTile(player, tile, unit, player.getLandPrice(tile)))
                 return;
             // One more check that founding can now proceed.
             if (!player.canClaimToFoundSettlement(tile)) return;
@@ -2755,7 +2790,7 @@ public final class InGameController implements NetworkConstants {
         Player player = freeColClient.getMyPlayer();
         Tile tile = unit.getTile();
         if (!player.owns(tile)) {
-            if (!claimTile(player, tile, unit, player.getLandPrice(tile))
+            if (!askClaimTile(player, tile, unit, player.getLandPrice(tile))
                 || !player.owns(tile)) return;
         }
 
@@ -2855,7 +2890,7 @@ public final class InGameController implements NetworkConstants {
                 : player.canClaimForImprovement(tile))
             ? 0
             : player.getLandPrice(tile);
-        return claimTile(player, tile, claimant, price);
+        return askClaimTile(player, tile, claimant, price);
     }
 
     /**
@@ -3417,9 +3452,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Try to load.
-        if (loadGoods(goods, carrier)) {
-            gui.playSound("sound.event.loadCargo");
-        }
+        askLoadGoods(goods, carrier);
     }
 
     /**
@@ -3899,7 +3932,7 @@ public final class InGameController implements NetworkConstants {
         }
         Unit carrier = null;
         if (goods.getLocation() instanceof Unit) {
-            carrier = (Unit) goods.getLocation();
+            carrier = (Unit)goods.getLocation();
         }
         if (carrier == null) {
             throw new IllegalStateException("Goods not on carrier.");
@@ -3909,29 +3942,7 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalStateException("Goods are boycotted.");
         }
 
-        // Try to sell.  Remember a bunch of stuff first so the transaction
-        // can be logged.
-        Market market = player.getMarket();
-        GoodsType type = goods.getType();
-        int amount = goods.getAmount();
-        int price = market.getPaidForSale(type);
-        int tax = player.getTax();
-        int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
-        UnitWas unitWas = new UnitWas(carrier);
-        if (askServer().sellGoods(goods, carrier)
-            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
-            gui.playSound("sound.event.sellCargo");
-            unitWas.fireChanges();
-            for (TransactionListener l : market.getTransactionListener()) {
-                l.logSale(type, amount, price, tax);
-            }
-            gui.updateMenuBar();
-            nextModelMessage();
-            return true;
-        }
-
-        // Sale failed for some reason.
-        return false;
+        return askSellGoods(goods, carrier, player.getEurope());
     }
 
     /**
@@ -4262,7 +4273,9 @@ public final class InGameController implements NetworkConstants {
         }
         carrier = (Unit) goods.getLocation();
         Colony colony = null;
-        if (!carrier.isInEurope()) {
+        if (carrier.isInEurope()) {
+            askSellGoods(goods, carrier, carrier.getOwner().getEurope());
+        } else {
             if (!carrier.hasTile()) {
                 throw new IllegalArgumentException("Carrier with null location.");
             }
@@ -4270,10 +4283,8 @@ public final class InGameController implements NetworkConstants {
             if (!dump && colony == null) {
                 throw new IllegalArgumentException("Unload is really a dump.");
             }
+            askUnloadGoods(goods, carrier, colony);
         }
-
-        // Try to unload.  FIXME: should there be a sound for this?
-        unloadGoods(goods, carrier, colony);
     }
 
     /**
