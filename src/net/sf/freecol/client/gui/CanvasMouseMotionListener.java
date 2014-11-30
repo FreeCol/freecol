@@ -32,15 +32,18 @@ import net.sf.freecol.common.model.Unit;
 /**
  * Listens to the mouse being moved at the level of the Canvas.
  */
-public final class CanvasMouseMotionListener extends AbstractCanvasListener implements MouseMotionListener {
+public final class CanvasMouseMotionListener extends AbstractCanvasListener
+    implements MouseMotionListener {
 
     private static final Logger logger = Logger.getLogger(CanvasMouseMotionListener.class.getName());
 
-    // Number of pixels that must be moved before a goto is enabled.
+    /** Number of pixels that must be moved before a goto is enabled. */
     private static final int DRAG_THRESHOLD = 16;
 
-    // Temporary variable for checking if we need to recalculate the path when
-    // dragging units.
+    /**
+     * Temporary variable for checking if we need to recalculate the
+     * path when dragging units.
+     */
     private Tile lastTile;
     
 
@@ -60,7 +63,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener impl
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseMoved(MouseEvent e) {
-        if (e.getY() >= AUTO_SCROLLSPACE) {
+        if (e.getY() >= AUTO_SCROLL_SPACE) {
             performAutoScrollIfActive(e);
         }
 

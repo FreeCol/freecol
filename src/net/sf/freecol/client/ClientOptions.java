@@ -156,13 +156,13 @@ public class ClientOptions extends OptionGroup {
         = "model.option.jumpToActiveUnit";
 
     /**
-     * Option for activating autoscroll when dragging units on the mapboard.
+     * Option to scroll when dragging units on the mapboard.
      */
     public static final String MAP_SCROLL_ON_DRAG
         = "model.option.mapScrollOnDrag";
 
     /**
-     * Option for activating autoscroll when dragging units on the mapboard.
+     * Option to auto-scroll on mouse movement.
      */
     public static final String AUTO_SCROLL
         = "model.option.autoScroll";

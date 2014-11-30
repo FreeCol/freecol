@@ -31,8 +31,11 @@ import net.sf.freecol.common.model.Map.Direction;
  */
 public class AbstractCanvasListener {
 
-    private static final int DRAG_SCROLLSPACE = 100;
-    protected static final int AUTO_SCROLLSPACE = 1;
+    /** Space to auto-scroll. */
+    protected static final int AUTO_SCROLL_SPACE = 1;
+
+    /** Space to drag-scroll. */
+    private static final int DRAG_SCROLL_SPACE = 100;
 
     /** The enclosing client. */
     protected final FreeColClient freeColClient;
@@ -57,34 +60,14 @@ public class AbstractCanvasListener {
 
 
     /**
-     * Auto-scroll from a given position.
-     *
-     * @param x The x coordinate.
-     * @param y The y coordinate.
-     */
-    private void autoScroll(int x, int y) {
-        scroll(x, y, AUTO_SCROLLSPACE);
-    }
-
-    /**
-     * Drag-scroll from a given position.
-     *
-     * @param x The x coordinate.
-     * @param y The y coordinate.
-     */
-    private void dragScroll(int x, int y) {
-        scroll(x, y, DRAG_SCROLLSPACE);
-    }
-
-    /**
      * Auto-scroll to a mouse position if necessary.
      *
      * @param e The <code>MouseEvent</code> that initiating the scroll.
      */
     protected void performAutoScrollIfActive(MouseEvent e) {
-        if (e.getComponent().isEnabled()
-            && freeColClient.getClientOptions().getBoolean(ClientOptions.AUTO_SCROLL)) {
-            autoScroll(e.getX(), e.getY());
+        if (e.getComponent().isEnabled() && freeColClient
+            .getClientOptions().getBoolean(ClientOptions.AUTO_SCROLL)) {
+            scroll(e.getX(), e.getY(), AUTO_SCROLL_SPACE);
         } else {
             stopScrollIfScrollIsActive();
         }
@@ -96,9 +79,9 @@ public class AbstractCanvasListener {
      * @param e The <code>MouseEvent</code> that initiating the scroll.
      */
     protected void performDragScrollIfActive(MouseEvent e) {
-        if (e.getComponent().isEnabled()
-            && freeColClient.getClientOptions().getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
-            dragScroll(e.getX(), e.getY());
+        if (e.getComponent().isEnabled() && freeColClient
+            .getClientOptions().getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
+            scroll(e.getX(), e.getY(), DRAG_SCROLL_SPACE);
         } else {
             stopScrollIfScrollIsActive();
         }
