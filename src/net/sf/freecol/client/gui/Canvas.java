@@ -1505,14 +1505,14 @@ public final class Canvas extends JDesktopPane {
      * Display the difficulty dialog.
      *
      * @param editable Should this difficulty level be editable?
+     * @return The resulting <code>OptionGroup</code>.
      */
-    public void showDifficultyDialog(boolean editable) {
+    public OptionGroup showDifficultyDialog(boolean editable) {
         Game game = freeColClient.getGame();
         Specification spec = game.getSpecification();
-        showFreeColDialog(new DifficultyDialog(freeColClient, spec,
-                                               spec.getDifficultyOptionGroup(),
-                                               editable),
-                          null);
+        return showFreeColDialog(new DifficultyDialog(freeColClient, spec,
+                spec.getDifficultyOptionGroup(), editable),
+            null);
     }
 
     /**
@@ -1520,11 +1520,13 @@ public final class Canvas extends JDesktopPane {
      *
      * @param spec The enclosing <code>Specification</code>.
      * @param group The <code>OptionGroup</code> containing the difficulty.
+     * @return The resulting <code>OptionGroup</code>.
      */
-    public void showDifficultyDialog(Specification spec, OptionGroup group) {
-        showFreeColDialog(new DifficultyDialog(freeColClient, spec, 
-                                               group, group.isEditable()),
-                          null);
+    public OptionGroup showDifficultyDialog(Specification spec,
+                                            OptionGroup group) {
+        return showFreeColDialog(new DifficultyDialog(freeColClient, spec, 
+                group, group.isEditable()),
+            null);
     }
 
     /**

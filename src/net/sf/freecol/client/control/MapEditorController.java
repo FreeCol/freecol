@@ -123,11 +123,8 @@ public final class MapEditorController {
      * @throws IOException on failure to find the spec.
      */
     public Specification getDefaultSpecification() throws IOException {
-        final String tc = FreeCol.getTC();
-        FreeColTcFile tcData = new FreeColTcFile(tc);
-        Specification spec = tcData.getSpecification();
-        spec.applyDifficultyLevel(FreeCol.getDifficulty());
-        return spec;
+        return FreeCol.loadSpecification(FreeCol.getTCFile(), 
+            FreeCol.getAdvantages(), FreeCol.getDifficulty());
     }
         
     /**
@@ -175,10 +172,6 @@ public final class MapEditorController {
         OptionGroup mgo = gui.showMapGeneratorOptionsDialog(true);
         if (mgo == null) return;
         game.setMapGeneratorOptions(mgo);
-
-        if (spec.getDifficultyOptionGroup() == null) {
-            spec.applyDifficultyLevel(FreeCol.getDifficulty());
-        }
         Map map = freeColClient.getFreeColServer().getMapGenerator()
             .createMap();
         requireNativeNations(game);

@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -581,7 +582,7 @@ public class HighScore extends FreeColObject {
         newLandName = xr.getAttribute(NEW_LAND_NAME_TAG, "New World");
         
         difficulty = xr.getAttribute(DIFFICULTY_TAG,
-                                     "model.difficulty.medium");
+                                     FreeCol.getDifficulty());
 
         units = xr.getAttribute(UNITS_TAG, 0);
 

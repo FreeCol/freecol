@@ -48,6 +48,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.BooleanOption;
@@ -236,7 +237,7 @@ public final class Specification {
     private String version;
 
     /** The name of the difficulty level option group. */
-    private String difficultyLevel;
+    private String difficultyLevel = null;
 
 
     /**
@@ -339,6 +340,30 @@ public final class Specification {
         applyFixes();
         clean("load from InputStream");
         initialized = true;
+    }
+
+    /**
+     * Prepare a specification with given advantages and difficulty level.
+     *
+     * @param advantages The <code>Advantages</code> setting.
+     * @param difficulty The identifier for the difficulty level.
+     */
+    public void prepare(Advantages advantages, String difficulty) {
+        prepare(advantages, (difficulty == null) ? null
+            : getDifficultyOptionGroup(difficulty));
+    }
+
+    /**
+     * Prepare a specification with given advantages and difficulty level.
+     *
+     * @param advantages The <code>Advantages</code> setting.
+     * @param difficulty The difficulty level <code>OptionGroup</code>.
+     */
+    public void prepare(Advantages advantages, OptionGroup difficulty) {
+        if (advantages == Advantages.NONE) {
+            clearEuropeanNationalAdvantages();
+        }
+        if (difficulty != null) applyDifficultyLevel(difficulty);
     }
 
     /**
@@ -589,11 +614,6 @@ public final class Specification {
                     fastestLandUnitType = unitType;
                 }
             }
-        }
-
-        // Set difficulty level before options processing.
-        if (difficultyLevel != null) {
-            applyDifficultyLevel(difficultyLevel);
         }
 
         // Initialize UI containers.
@@ -957,7 +977,7 @@ public final class Specification {
                     addOptionGroup((OptionGroup)option, true);
                 }
             } else {
-                addAbstractOption((AbstractOption) option);
+                addAbstractOption((AbstractOption)option);
             }
         }
     }
@@ -1545,7 +1565,7 @@ public final class Specification {
      * @return The difficulty level.
      */
     public String getDifficultyLevel() {
-        return difficultyLevel;
+        return this.difficultyLevel;
     }
 
     /**
@@ -1554,7 +1574,7 @@ public final class Specification {
      * @return The current difficulty level <code>OptionGroup</code>.
      */
     public OptionGroup getDifficultyOptionGroup() {
-        return allOptionGroups.get(difficultyLevel);
+        return allOptionGroups.get(this.difficultyLevel);
     }
 
     /**
@@ -1572,10 +1592,10 @@ public final class Specification {
      * Applies the difficulty level identified by the given String to
      * the current specification.
      *
-     * @param difficultyLevel The id of a difficulty level to apply
+     * @param difficulty The identifier of a difficulty level to apply.
      */
-    public void applyDifficultyLevel(String difficultyLevel) {
-        applyDifficultyLevel(getDifficultyOptionGroup(difficultyLevel));
+    public void applyDifficultyLevel(String difficulty) {
+        applyDifficultyLevel(getDifficultyOptionGroup(difficulty));
     }
 
     /**
@@ -1585,8 +1605,11 @@ public final class Specification {
      * @param level The difficulty level <code>OptionGroup</code> to apply.
      */
     public void applyDifficultyLevel(OptionGroup level) {
-        if (level == null) return;
-        logger.fine("Applying difficulty level " + level.getId());
+        if (level == null) {
+            logger.warning("Null difficulty level supplied");
+            return;
+        }
+        logger.info("Applying difficulty level " + level.getId());
         addOptionGroup(level, true);
         this.difficultyLevel = level.getId();
     }

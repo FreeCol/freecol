@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import junit.framework.TestCase;
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -129,8 +130,7 @@ public class FreeColTestCase extends TestCase {
         if (result == null) {
             try {
                 FreeColTcFile tc = new FreeColTcFile(name);
-                result = tc.getSpecification();
-                result.applyDifficultyLevel("model.difficulty.medium");
+                result = FreeCol.loadSpecification(tc, null, "model.difficulty.medium");
                 specifications.put(name, result);
             } catch (Exception e) {
                 e.printStackTrace();

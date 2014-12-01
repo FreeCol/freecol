@@ -1265,9 +1265,6 @@ public class Game extends FreeColGameObject {
         } else if (NationOptions.getXMLElementTagName().equals(tag)) {
             nationOptions = new NationOptions(xr, specification);
 
-        } else if (OptionGroup.getXMLElementTagName().equals(tag)) {
-            specification.applyDifficultyLevel(new OptionGroup(xr, specification));
-
         } else if (Player.getXMLElementTagName().equals(tag)) {
             Player player = xr.readFreeColGameObject(game, Player.class);
             if (player.isUnknownEnemy()) {

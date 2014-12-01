@@ -783,30 +783,41 @@ public final class FreeCol {
     }
 
     /**
+     * Get the specification from a given TC file.
+     *
+     * @param tcf The <code>FreeColTcFile</code> to load.
+     * @param advantages An optional <code>Advantages</code> setting.
+     * @param difficulty An optional difficulty level.
+     * @return A <code>Specification</code>.
+     */
+    public static Specification loadSpecification(FreeColTcFile tcf,
+                                                  Advantages advantages,
+                                                  String difficulty) {
+        Specification spec = null;
+        try {
+            if (tcf != null) spec = tcf.getSpecification();
+        } catch (IOException ioe) {
+            System.err.println("Spec read failed in " + tcf.getId()
+                + ": " + ioe.getMessage() + "\n");
+        }
+        if (spec != null) spec.prepare(advantages, difficulty);
+        return spec;
+    }
+
+    /**
      * Get the specification from the specified TC.
      *
-     * @return A <code>Specification</code>.  Quits on error.
+     * @return A <code>Specification</code>, quits on error.
      */
     private static Specification getTCSpecification() {
-        Specification spec;
-        try {
-            FreeColTcFile tcf = FreeCol.getTCFile();
-            if (tcf == null) {
-                spec = null;
-            } else {
-                spec = tcf.getSpecification();
-                spec.applyDifficultyLevel(FreeCol.getDifficulty());
-            }
-        } catch (IOException ioe) {
-            spec = null;
-        }
+        Specification spec = loadSpecification(getTCFile(), getAdvantages(),
+                                               getDifficulty());
         if (spec == null) {
             fatal(StringTemplate.template("cli.error.badTC")
                 .addName("%tc%", getTC()));
         }
         return spec;
     }
-
 
     // Accessors, mutators and support for the cli variables.
 
@@ -1174,7 +1185,6 @@ public final class FreeCol {
         } else {
             Specification spec = FreeCol.getTCSpecification();
             try {
-                // FIXME: command line advantages setting?
                 freeColServer = new FreeColServer(publicServer, false, spec,
                                                   serverPort, serverName);
             } catch (NoRouteToServerException nrtse) {

@@ -81,10 +81,23 @@ public final class NewPanel extends FreeColPanel
     /**
      * A particular specification to use for the new game.  If not
      * null, the specification box just contains this spec, but if
-     * nullthe user chooses from available specs using the
+     * null the user chooses from available specs using the
      * specification box.
      */
     private final Specification fixedSpecification;
+
+    /**
+     * The current specification, driven by the contents of the TC box.
+     */
+    private Specification specification = null;
+
+    /**
+     * A current difficulty level, driven by the contents of the
+     * difficulty box..  Difficulty levels are relative to the rules,
+     * so this can be invalidated by a change to the current
+     * specificiation.
+     */
+    private OptionGroup difficulty = null;
 
     /** Field to input the player name. */
     private final JTextField nameBox;
@@ -190,7 +203,9 @@ public final class NewPanel extends FreeColPanel
         meta.addActionListener(this);
         single.setSelected(true);
 
-        this.nameBox = new JTextField(getPlayerName(), 20);
+        String name = getClientOptions().getText(ClientOptions.NAME);
+        if (name == null || name.isEmpty()) name = FreeCol.getName();
+        this.nameBox = new JTextField(name, 20);
 
         this.advantagesLabel
             = localizedLabel("playerOptions.nationalAdvantages");
@@ -205,6 +220,11 @@ public final class NewPanel extends FreeColPanel
         this.serverPortLabel = localizedLabel("startServerOnPort");
         this.serverPortField
             = new JTextField(Integer.toString(FreeCol.getServerPort()));
+        this.serverPortField.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    getSelectedPort(NewPanel.this.serverPortField);
+                }
+            });
 
         this.rulesLabel = localizedLabel("rules");
         this.rulesBox = new JComboBox<FreeColTcFile>();
@@ -246,6 +266,11 @@ public final class NewPanel extends FreeColPanel
         this.joinPortLabel = localizedLabel("port");
         this.joinPortField
             = new JTextField(Integer.toString(FreeCol.getServerPort()));
+        this.joinPortField.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    getSelectedPort(NewPanel.this.joinPortField);
+                }
+            });
 
         okButton.setActionCommand(String.valueOf(NewPanelAction.OK));
 
@@ -293,47 +318,76 @@ public final class NewPanel extends FreeColPanel
             this.difficultyLabel, this.difficultyBox, this.difficultyButton
         };
 
+        this.specification = getSpecification();
+        this.difficulty = null;
         updateDifficulty();
         enableComponents();
         setSize(getPreferredSize());
     }
 
-
+    
+    /**
+     * If the TC box changed, update the specification.
+     */
+    private void updateSpecification() {
+        if (this.specification.getId().equals(getSelectedTC().getId())) return;
+        this.specification = getSpecification();
+        // Spec changed.  If using a custom difficulty, preserve it.
+        // Otherwise reset the difficulty wrt the new spec.
+        if (this.difficulty.isEditable()) {
+            this.specification.prepare(null, this.difficulty);
+        } else {
+            String oldId = this.difficulty.getId();
+            this.difficulty = this.specification
+                .getDifficultyOptionGroup(oldId);
+        }
+        updateDifficulty();
+    }
+        
     /**
      * Update the contents of the difficulty level box depending on
      * the specification currently selected.
      */
     private void updateDifficulty() {
-        final Specification spec = getSpecification();
-
-        OptionGroup selected = getDifficulty();
+        this.difficultyBox.removeItemListener(this);
         this.difficultyBox.removeAllItems();
-        for (OptionGroup og : spec.getDifficultyLevels()) {
+        for (OptionGroup og : this.specification.getDifficultyLevels()) {
             this.difficultyBox.addItem(og);
         }
-        if (selected == null) {
-            selected = spec.getDifficultyOptionGroup("model.difficulty.medium");
-            if (selected == null) {
+        if (this.difficulty == null) {
+            this.difficulty = this.specification
+                .getDifficultyOptionGroup(FreeCol.getDifficulty());
+            if (this.difficulty == null) {
                 int index = this.difficultyBox.getItemCount() / 2;
-                selected = this.difficultyBox.getItemAt(index);
+                this.difficulty = this.difficultyBox.getItemAt(index);
             }
         }
-        this.difficultyBox.setSelectedItem(selected);
+        this.difficultyBox.setSelectedItem(this.difficulty);
         updateShowButton();
+        this.difficultyBox.addItemListener(this);
     }
 
     /**
      * Update the show button.
      */
     private void updateShowButton() {
-        OptionGroup selected = getDifficulty();
-        if (selected == null) {
-            difficultyButton.setEnabled(false);
+        if (this.difficulty == null) {
+            this.difficultyButton.setEnabled(false);
         } else {
-            difficultyButton.setEnabled(true);
-            difficultyButton.setText(Messages.message((selected.isEditable())
-                    ? "editDifficulty" : "showDifficulty"));
+            this.difficultyButton.setEnabled(true);
+            String text = (this.difficulty.isEditable()) ? "editDifficulty"
+                : "showDifficulty";
+            this.difficultyButton.setText(Messages.message(text));
         }
+    }
+
+    /**
+     * Get the selected player name from the nameBox.
+     *
+     * @return The selected player name.
+     */
+    private String getSelectedName() {
+        return this.nameBox.getText();
     }
 
     /**
@@ -342,7 +396,7 @@ public final class NewPanel extends FreeColPanel
      *
      * @return The selected advantages type.
      */
-    private Advantages getAdvantages() {
+    private Advantages getSelectedAdvantages() {
         return (Advantages)this.advantagesBox.getSelectedItem();
     }
 
@@ -351,7 +405,7 @@ public final class NewPanel extends FreeColPanel
      *
      * @return The selected TC.
      */
-    private FreeColTcFile getTC() {
+    private FreeColTcFile getSelectedTC() {
         return (FreeColTcFile)this.rulesBox.getSelectedItem();
     }
 
@@ -360,23 +414,26 @@ public final class NewPanel extends FreeColPanel
      *
      * @return The difficulty <code>OptionGroup</code>.
      */
-    private OptionGroup getDifficulty() {
+    private OptionGroup getSelectedDifficulty() {
         return (OptionGroup)this.difficultyBox.getSelectedItem();
     }
 
     /**
-     * Get the preferred player name.
+     * Get the value of a port field.
      *
-     * This is either the value of the client option
-     * "model.option.playerName", or the value of the system property
-     * "user.name", or the localized value of "defaultPlayerName".
-     *
-     * @return A name for the player.
+     * @param field The field to read.
+     * @return The port number in the field, or negative on error.
      */
-    private String getPlayerName() {
-        String name = getClientOptions().getText(ClientOptions.NAME);
-        if (name == null || name.isEmpty()) name = FreeCol.getName();
-        return name;
+    private int getSelectedPort(JTextField field) {
+        int port;
+        try {
+            port = Integer.parseInt(field.getText());
+        } catch (NumberFormatException e) {
+            port = -1;
+        }
+        if (0 < port && port < 0x10000) return port;
+        field.setForeground(Color.red);
+        return -1;
     }
 
     /**
@@ -439,16 +496,7 @@ public final class NewPanel extends FreeColPanel
     @Override
     public Specification getSpecification() {
         if (this.fixedSpecification != null) return this.fixedSpecification;
-        FreeColTcFile tcFile = getTC();
-        if (tcFile != null) {
-            try {
-                return tcFile.getSpecification();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Spec read failed in "
-                    + tcFile.getId(), e);
-            }
-        }
-        return null;
+        return FreeCol.loadSpecification(getSelectedTC(), null, null);
     }
 
 
@@ -458,46 +506,37 @@ public final class NewPanel extends FreeColPanel
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent event) {
-        final Specification spec = getSpecification();
         final ConnectController cc = getFreeColClient().getConnectController();
         final String command = event.getActionCommand();
 
         int port;
         switch (Enum.valueOf(NewPanelAction.class, command)) {
         case OK:
-            FreeCol.setName(this.nameBox.getText());
-            FreeCol.setTC(getTC().getId());
-            FreeCol.setAdvantages(getAdvantages());
-            if (getAdvantages() == Advantages.NONE) {
-                spec.clearEuropeanNationalAdvantages();
-            }
+            FreeCol.setName(getSelectedName());
+            FreeCol.setAdvantages(getSelectedAdvantages());
+            FreeCol.setTC(getSelectedTC().getId());
+
             NewPanelAction action = Enum.valueOf(NewPanelAction.class,
                 buttonGroup.getSelection().getActionCommand());
             switch (action) {
             case SINGLE:
-                spec.applyDifficultyLevel(getDifficulty());
-                if (cc.startSinglePlayerGame(spec, false)) return;
+                this.specification.prepare(getSelectedAdvantages(),
+                                           this.difficulty);
+                if (cc.startSinglePlayerGame(this.specification, false)) return;
                 break;
             case JOIN:
-                try {
-                    port = Integer.parseInt(this.joinPortField.getText());
-                } catch (NumberFormatException e) {
-                    this.joinPortLabel.setForeground(Color.red);
-                    break;
-                }
+                int joinPort = getSelectedPort(this.joinPortField);
+                if (joinPort < 0) break;
                 if (cc.joinMultiplayerGame(this.joinNameField.getText(),
-                                           port)) return;
+                                           joinPort)) return;
                 break;
             case START:
-                try {
-                    port = Integer.parseInt(this.serverPortField.getText());
-                } catch (NumberFormatException e) {
-                    this.serverPortLabel.setForeground(Color.red);
-                    break;
-                }
-                spec.applyDifficultyLevel(getDifficulty());
-                if (cc.startMultiplayerGame(spec,
-                        this.publicServer.isSelected(), port)) return;
+                int serverPort = getSelectedPort(this.serverPortField);
+                if (serverPort < 0) break;
+                this.specification.prepare(getSelectedAdvantages(),
+                                           this.difficulty);
+                if (cc.startMultiplayerGame(this.specification,
+                        this.publicServer.isSelected(), serverPort)) return;
                 break;
             case META_SERVER:
                 List<ServerInfo> servers = cc.getServerList();
@@ -512,7 +551,8 @@ public final class NewPanel extends FreeColPanel
             getGUI().showMainPanel(null);
             break;
         case SHOW_DIFFICULTY:
-            getGUI().showDifficultyDialog(spec, getDifficulty());
+            this.difficulty = getGUI().showDifficultyDialog(this.specification,
+                                                            this.difficulty);
             break;
         case SINGLE: case JOIN: case START: case META_SERVER:
             enableComponents();
@@ -531,8 +571,9 @@ public final class NewPanel extends FreeColPanel
      */
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource() == this.rulesBox) {
-            updateDifficulty();
+            updateSpecification();
         } else if (e.getSource() == this.difficultyBox) {
+            this.difficulty = getSelectedDifficulty();
             updateShowButton();
         }
     }

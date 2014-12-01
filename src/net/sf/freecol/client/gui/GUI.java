@@ -1904,14 +1904,15 @@ public class GUI {
         canvas.showDeclarationPanel();
     }
 
-    public void showDifficultyDialog(boolean editable) {
-        if (canvas == null) return;
-        canvas.showDifficultyDialog(editable);
+    public OptionGroup showDifficultyDialog(boolean editable) {
+        if (canvas == null) return null;
+        return canvas.showDifficultyDialog(editable);
     }
 
-    public void showDifficultyDialog(Specification spec, OptionGroup group) {
-        if (canvas == null) return;
-        canvas.showDifficultyDialog(spec, group);
+    public OptionGroup showDifficultyDialog(Specification spec,
+                                            OptionGroup group) {
+        if (canvas == null) return null;
+        return canvas.showDifficultyDialog(spec, group);
     }
 
     public void showDumpCargoDialog(Unit unit) {
