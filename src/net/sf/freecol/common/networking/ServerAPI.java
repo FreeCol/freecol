@@ -1323,7 +1323,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setBuildQueue(Colony colony,
-                                     List<BuildableType> buildQueue) {
+                                 List<BuildableType> buildQueue) {
         return askHandling(new SetBuildQueueMessage(colony, buildQueue),
             null, null);
     }

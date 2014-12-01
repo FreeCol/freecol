@@ -58,16 +58,45 @@ public class Europe extends UnitLocation
     public static final Ability ABILITY_DRESS_MISSIONARY
         = new Ability(Ability.DRESS_MISSIONARY, true);
 
+    /** The number of recruitable unit types. */
+    public static final int RECRUIT_COUNT = 3;
+
+    /**
+     * Migration routines operate on:
+     * - "indexes" which refer to a valid member of the recruitables
+     *   list, and must be [0, RECRUIT_COUNT)
+     * - "slots", where slot zero means "pick a random migrant" and the
+     *   other slots in [1, RECRUIT_COUNT] refer to the index == slot-1
+     * The following constant should be used when the random choice
+     * behaviour is desired.
+     */
+    public static final int CHOOSE_MIGRANT_SLOT = 0;
+
+    /**
+     * The migrant slot to use when there is no reason to choose
+     * between them.
+     */
+    public static final int DEFAULT_MIGRANT_SLOT = 1;
+
     /** Reasons to migrate. */
     public static enum MigrationType {
         NORMAL,     // Unit decided to migrate
         RECRUIT,    // Player is paying
         FOUNTAIN,   // As a result of a Fountain of Youth discovery
-        SURVIVAL    // Emergency autorecruit in server
-    }
+        SURVIVAL;   // Emergency autorecruit in server
 
-    /** The number of recruitable units. */
-    public static final int RECRUIT_COUNT = 3;
+        public static boolean validMigrantIndex(int x) {
+            return 0 <= x && x < RECRUIT_COUNT;
+        }
+
+        public static boolean validMigrantSlot(int x) {
+            return 0 <= x && x <= RECRUIT_COUNT;
+        }
+
+        public static int migrantIndexToSlot(int x) {
+            return x + 1;
+        }
+    }
 
     /**
      * This list represents the types of the units that can be

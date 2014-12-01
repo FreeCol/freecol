@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Europe.MigrationType;
 import net.sf.freecol.common.model.EuropeWas;
 import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.FoundingFather;
@@ -385,10 +386,13 @@ public final class InGameController implements NetworkConstants {
      * structure, but it is needed to extract the unit.
      *
      * @param europe The <code>Europe</code> where the unit appears.
-     * @param slot The slot to choose.
+     * @param slot The slot to choose, [0..RECRUIT_COUNT].
      * @return The new <code>Unit</code> or null on failure.
      */
     private Unit askEmigrate(Europe europe, int slot) {
+        if (europe == null
+            || !MigrationType.validMigrantSlot(slot)) return null;
+
         EuropeWas europeWas = new EuropeWas(europe);
         Unit ret = null;
         if (askServer().emigrate(slot)) {
@@ -1164,16 +1168,12 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unit could move further.
      */
     private boolean moveAttack(Unit unit, Direction direction) {
-        askClearGotoOrders(unit);
-
         Tile tile = unit.getTile();
         Tile target = tile.getNeighbourOrNull(direction);
         Unit u = target.getFirstUnit();
-        if (u == null) {
-            throw new RuntimeException("Attacking empty tile!");
-        } else if (unit.getOwner().owns(u)) {
-            throw new RuntimeException("Attacking own unit!");
-        }
+        if (u == null || unit.getOwner().owns(u)) return false;
+
+        askClearGotoOrders(unit);
         if (gui.confirmHostileAction(unit, target)
             && gui.confirmPreCombat(unit, target)) {
             askServer().attack(unit, direction);
@@ -1196,11 +1196,9 @@ public final class InGameController implements NetworkConstants {
         Tile tile = unit.getTile();
         Tile target = tile.getNeighbourOrNull(direction);
         Settlement settlement = target.getSettlement();
-        if (settlement == null) {
-            throw new RuntimeException("Attacking empty tile!");
-        } else if (unit.getOwner().owns(settlement)) {
-            throw new RuntimeException("Attacking own settlement!");
-        }
+        if (settlement == null
+            || unit.getOwner().owns(settlement)) return false;
+
         GUI.ArmedUnitSettlementAction act
             = gui.getArmedUnitSettlementChoice(settlement);
         if (act == null) return true; // Cancelled
@@ -1245,17 +1243,15 @@ public final class InGameController implements NetworkConstants {
     private boolean moveDiplomacy(Unit unit, Direction direction,
                                   DiplomaticTrade dt) {
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
-        if (settlement == null) return false;
-        if (!(settlement instanceof Colony)) return false;
+        if (settlement == null
+            || !(settlement instanceof Colony)) return false;
         Colony colony = (Colony)settlement;
 
         // Can not negotiate with the REF.
         final Game game = freeColClient.getGame();
         final Player player = unit.getOwner();
         final Player other = colony.getOwner();
-        if (other == player.getREFPlayer()) {
-            throw new RuntimeException("Unit tried to negotiate with REF");
-        }
+        if (other == player.getREFPlayer()) return false;
 
         StringTemplate nation = other.getNationName();
         ModelMessage m = null;
@@ -2516,14 +2512,9 @@ public final class InGameController implements NetworkConstants {
      * @return True if the colony was abandoned.
      */
     public boolean abandonColony(Colony colony) {
-        if (!requireOurTurn()) return false;
-        Player player = freeColClient.getMyPlayer();
-
-        // Sanity check
-        if (colony == null || !player.owns(colony)
-            || colony.getUnitCount() > 0) {
-            throw new RuntimeException("Abandon bogus colony");
-        }
+        final Player player = freeColClient.getMyPlayer();
+        if (!requireOurTurn() || colony == null
+            || !player.owns(colony) || colony.getUnitCount() > 0) return false;
 
         // Proceed to abandon
         Tile tile = colony.getTile();
@@ -2633,7 +2624,7 @@ public final class InGameController implements NetworkConstants {
      * @return True if a colony was built.
      */
     public boolean buildColony(Unit unit) {
-        if (!requireOurTurn()) return false;
+        if (!requireOurTurn() || unit == null) return false;
 
         // Check unit, which must be on the map and able to build.
         if (unit == null) return false;
@@ -2743,7 +2734,7 @@ public final class InGameController implements NetworkConstants {
     public boolean buyGoods(GoodsType type, int amount, Unit carrier) {
         if (!requireOurTurn() || type == null || amount <= 0
             || carrier == null
-            || freeColClient.getMyPlayer() != carrier.getOwner()) return false;
+            || !freeColClient.getMyPlayer().owns(carrier)) return false;
 
         Europe europe = carrier.getOwner().getEurope();
         EuropeWas europeWas = new EuropeWas(europe);
@@ -2769,7 +2760,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if the state was changed.
      */
     public boolean changeState(Unit unit, UnitState state) {
-        if (!requireOurTurn() || !unit.checkSetState(state)) return false;
+        if (!requireOurTurn() || unit == null
+            || !unit.checkSetState(state)) return false;
 
         // Check if this is a hostile fortification, and give the player
         // a chance to confirm.
@@ -2807,7 +2799,7 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean changeWorkImprovementType(Unit unit,
                                              TileImprovementType improvementType) {
-        if (!requireOurTurn()
+        if (!requireOurTurn() || unit == null || improvementType == null
             || !unit.hasTile()
             || !unit.checkSetState(UnitState.IMPROVING)
             || improvementType.isNatural()) return false;
@@ -2840,7 +2832,7 @@ public final class InGameController implements NetworkConstants {
      * @return True if the work type was changed.
      */
     public boolean changeWorkType(Unit unit, GoodsType workType) {
-        if (!requireOurTurn()) return false;
+        if (!requireOurTurn() || unit == null) return false;
 
         UnitWas unitWas = new UnitWas(unit);
         boolean ret = askServer().changeWorkType(unit, workType)
@@ -2861,7 +2853,7 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unit was cashed in (and disposed).
      */
     public boolean checkCashInTreasureTrain(Unit unit) {
-        if (!requireOurTurn()
+        if (!requireOurTurn() || unit == null
             || !unit.canCarryTreasure() || !unit.canCashInTreasureTrain()) {
             return false; // Fail quickly if just not a candidate.
         }
@@ -2909,6 +2901,8 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean chooseFoundingFather(List<FoundingFather> ffs,
                                         FoundingFather ff) {
+        if (ffs == null) return false;
+
         Player player = freeColClient.getMyPlayer();
         player.setCurrentFather(ff);
         return askServer().chooseFoundingFather(ffs, ff);
@@ -2924,7 +2918,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if the claim succeeded.
      */
     public boolean claimTile(Tile tile, FreeColGameObject claimant) {
-        if (!requireOurTurn()) return false;
+        if (!requireOurTurn() || tile == null
+            || claimant == null) return false;
 
         final Player player = freeColClient.getMyPlayer();
         int price = ((claimant instanceof Settlement)
@@ -2997,7 +2992,7 @@ public final class InGameController implements NetworkConstants {
      * @return True if the speciality was cleared.
      */
     public boolean clearSpeciality(Unit unit) {
-        if (!requireOurTurn()) return false;
+        if (!requireOurTurn() || unit == null) return false;
 
         UnitType oldType = unit.getType();
         UnitType newType = oldType.getTargetType(ChangeType.CLEAR_SKILL,
@@ -3194,11 +3189,12 @@ public final class InGameController implements NetworkConstants {
      * Called from GUI.showEmigrationDialog
      *
      * @param player The <code>Player</code> that owns the unit.
-     * @param slot The slot to emigrate from.
+     * @param slot The slot to emigrate from, [0..RECRUIT_COUNT].
      * @return True if a unit emigrated.
      */
     public boolean emigrate(Player player, int slot) {
-        if (!player.isColonial()) return false;
+        if (player == null || !player.isColonial()
+            || !MigrationType.validMigrantSlot(slot)) return false;
 
         return askEmigrate(player.getEurope(), slot) != null;
     }
@@ -3226,14 +3222,13 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code>.
      * @param role The <code>Role</code> to assume.
      * @param roleCount The role count.
-     * @return True if the role was changed.
+     * @return True if the role is taken.
      */
     public boolean equipUnitForRole(Unit unit, Role role, int roleCount) {
-        if (!requireOurTurn() || unit == null || role == null
-            || roleCount < 0 || roleCount > role.getMaximumCount()
-            || (role == unit.getRole() && roleCount == unit.getRoleCount())) {
-            return false;
-        }
+        if (!requireOurTurn() || unit == null || role == null || 0 > roleCount
+            || roleCount > role.getMaximumCount()) return false;
+        if (role == unit.getRole()
+            && roleCount == unit.getRoleCount()) return true;
 
         final Player player = freeColClient.getMyPlayer();
         final Colony colony = unit.getColony();
@@ -3306,6 +3301,9 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean firstContact(Player player, Player other, Tile tile,
                                 boolean result) {
+        if (player == null || player == null || player == other
+            || tile == null) return false;
+
         return askServer().firstContact(player, other, tile, result);
     }
 
@@ -3330,6 +3328,8 @@ public final class InGameController implements NetworkConstants {
      * @return A summary of that nation, or null on error.
      */
     public NationSummary getNationSummary(Player player) {
+        if (player == null) return null;
+
         return askServer().getNationSummary(player);
     }
 
@@ -3342,6 +3342,8 @@ public final class InGameController implements NetworkConstants {
      * @return A new <code>TradeRoute</code>.
      */
     public TradeRoute getNewTradeRoute(Player player) {
+        if (player == null) return null;
+
         int n = player.getTradeRoutes().size();
         if (askServer().getNewTradeRoute()
             && player.getTradeRoutes().size() == n + 1) {
@@ -3409,6 +3411,8 @@ public final class InGameController implements NetworkConstants {
      * @return True, ignore message status changes can not fail.
      */
     public boolean ignoreMessage(ModelMessage message, boolean flag) {
+        if (message == null) return false;
+
         String key = message.getSourceId();
         if (message.getTemplateType() == StringTemplate.TemplateType.TEMPLATE) {
             for (String otherkey : message.getKeys()) {
@@ -3440,11 +3444,11 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean indianDemand(Unit unit, Colony colony,
                                 GoodsType type, int amount) {
-        if (unit == null) return false;
+        if (unit == null || colony == null) return false;
+
         final Player player = freeColClient.getMyPlayer();
         final int opt = freeColClient.getClientOptions()
             .getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE);
-
         boolean accepted;
         ModelMessage m = null;
         String nation = Messages.message(unit.getOwner().getNationName());
@@ -3579,7 +3583,7 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean loadCargo(Goods goods, Unit carrier) {
         if (!requireOurTurn() || goods == null || goods.getAmount() <= 0
-            || carrier == null) return false;
+            || carrier == null || !carrier.isCarrier()) return false;
 
         if (carrier.isInEurope()) {
             return buyGoods(goods.getType(), goods.getAmount(), carrier);
@@ -3633,7 +3637,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if looting occurs.
      */
     public boolean lootCargo(Unit unit, List<Goods> goods, String defenderId) {
-        if (unit == null || goods.isEmpty()) return false;
+        if (unit == null || goods == null || goods.isEmpty()
+            || defenderId == null) return false;
 
         UnitWas unitWas = new UnitWas(unit);
         boolean ret = askServer().loot(unit, defenderId, goods);
@@ -3652,6 +3657,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if the monarch was answered.
      */
     public boolean monarchAction(MonarchAction action, boolean accept) {
+        if (action == null) return false;
+
         switch (action) {
         case RAISE_TAX_ACT: case RAISE_TAX_WAR:
         case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
@@ -3729,7 +3736,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unit may move further.
      */
     public boolean moveUnit(Unit unit, Direction direction) {
-        if (!requireOurTurn() || unit == null) return false;
+        if (!requireOurTurn() || unit == null
+            || direction == null) return false;
 
         UnitWas unitWas = new UnitWas(unit);
         unit.setState(UnitState.ACTIVE);
@@ -3750,6 +3758,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if the tile cursor is moved.
      */
     public boolean moveTileCursor(Direction direction) {
+        if (direction == null) return false;
+
         Tile tile = gui.getSelectedTile();
         if (tile == null) return false;
 
@@ -3770,6 +3780,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if the new land was named.
      */
     public boolean nameNewLand(Unit unit, String name) {
+        if (unit == null || name == null) return false;
+
         // Respond to the server.
         if (!askServer().newLandName(unit, name)) return false;
 
@@ -3806,6 +3818,8 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean nameNewRegion(final Tile tile, final Unit unit,
                                  final Region region, final String name) {
+        if (tile == null || unit == null || region == null) return false;
+
         return askServer().newRegionName(region, tile, unit, name);
     }
 
@@ -3876,7 +3890,7 @@ public final class InGameController implements NetworkConstants {
      * @return True if the arrears were paid.
      */
     public boolean payArrears(GoodsType type) {
-        if (!requireOurTurn()) return false;
+        if (!requireOurTurn() || type == null) return false;
 
         Player player = freeColClient.getMyPlayer();
         int arrears = player.getArrears(type);
@@ -3909,7 +3923,7 @@ public final class InGameController implements NetworkConstants {
      * @return True if the building was bought.
      */
     public boolean payForBuilding(Colony colony) {
-        if (!requireOurTurn()) return false;
+        if (!requireOurTurn() || colony == null) return false;
 
         if (!getSpecification().getBoolean(GameOptions.PAY_FOR_BUILDING)) {
             gui.showErrorMessage("payForBuilding.disabled");
@@ -3920,6 +3934,7 @@ public final class InGameController implements NetworkConstants {
             gui.showErrorMessage("notEnoughGold");
             return false;
         }
+
         int price = colony.getPriceForBuilding();
         if (!gui.confirm(true, null,
                          StringTemplate.template("payForBuilding.text")
@@ -3946,7 +3961,7 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean putOutsideColony(Unit unit) {
         Colony colony;
-        if (!requireOurTurn()
+        if (!requireOurTurn() || unit == null
             || (colony = unit.getColony()) == null) return false;
 
         if (!gui.confirmLeaveColony(unit)) return false;
@@ -3983,11 +3998,12 @@ public final class InGameController implements NetworkConstants {
      *
      * Called from RecruitPanel
      *
-     * @param index The index in Europe to recruit from ([0..2]).
+     * @param index The index in Europe to recruit from, [0..RECRUIT_COUNT).
      * @return True if a unit was recruited.
      */
     public boolean recruitUnitInEurope(int index) {
-        if (!requireOurTurn()) return false;
+        if (!requireOurTurn()
+            || !MigrationType.validMigrantIndex(index)) return false;
 
         final Player player = freeColClient.getMyPlayer();
         if (!player.isColonial()) return false;
@@ -3997,7 +4013,8 @@ public final class InGameController implements NetworkConstants {
             return false;
         }
 
-        Unit newUnit = askEmigrate(player.getEurope(), index + 1);
+        Unit newUnit = askEmigrate(player.getEurope(),
+                                   MigrationType.migrantIndexToSlot(index));
         if (newUnit != null) {
             player.setNextActiveUnit(newUnit);
             gui.setActiveUnit(newUnit);
@@ -4017,11 +4034,9 @@ public final class InGameController implements NetworkConstants {
      * @return True if the object was renamed.
      */
     public boolean rename(Nameable object) {
-        Player player = freeColClient.getMyPlayer();
+        final Player player = freeColClient.getMyPlayer();
         if (!(object instanceof Ownable)
-            || !player.owns((Ownable) object)) {
-            return false;
-        }
+            || !player.owns((Ownable)object)) return false;
 
         String name = null;
         if (object instanceof Colony) {
@@ -4107,7 +4122,7 @@ public final class InGameController implements NetworkConstants {
      * @return True if the destination change succeeds.
      */
     public boolean selectDestination(Unit unit) {
-        if (!requireOurTurn()) return false;
+        if (!requireOurTurn() || unit == null) return false;
 
         if (!gui.confirmClearTradeRoute(unit)) return false;
         Location destination = gui.showSelectDestinationDialog(unit);
@@ -4176,6 +4191,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if the message was sent.
      */
     public boolean sendChat(String chat) {
+        if (chat == null) return false;
+
         return askServer().chat(freeColClient.getMyPlayer(), chat);
     }
 
@@ -4188,8 +4205,10 @@ public final class InGameController implements NetworkConstants {
      * @param buildQueue List of <code>BuildableType</code>
      * @return True if the build queue was changed.
      */
-    public boolean setBuildQueue(Colony colony, List<BuildableType> buildQueue) {
-        if (!requireOurTurn()) return false;
+    public boolean setBuildQueue(Colony colony,
+                                 List<BuildableType> buildQueue) {
+        if (!requireOurTurn() || colony == null
+            || buildQueue == null) return false;
 
         ColonyWas colonyWas = new ColonyWas(colony);
         boolean ret = askServer().setBuildQueue(colony, buildQueue);
@@ -4232,16 +4251,20 @@ public final class InGameController implements NetworkConstants {
                 && game.getTurn().getNumber() > 0) autoSaveGame();
 
             // Check for emigration.
+            Europe europe = player.getEurope();
             if (player.hasAbility(Ability.SELECT_RECRUIT)) {
                 if (player.checkEmigrate()) {
-                    if (player.getEurope().recruitablesDiffer()) {
-                        gui.showEmigrationDialog(player, 1, false);
+                    if (europe.recruitablesDiffer()) {
+                        gui.showEmigrationDialog(player,
+                            Europe.DEFAULT_MIGRANT_SLOT, false);
                     } else {
-                        emigrate(player, 1);
+                        askEmigrate(europe, Europe.DEFAULT_MIGRANT_SLOT);
                     }
                 }
             } else {
-                while (player.checkEmigrate()) emigrate(player, 0);
+                while (player.checkEmigrate()) {
+                    askEmigrate(europe, Europe.CHOOSE_MIGRANT_SLOT);
+                }
             }
             
             try {
@@ -4277,8 +4300,9 @@ public final class InGameController implements NetworkConstants {
      * @return True if the player is marked as dead.
      */
     public boolean setDead(Player dead) {
+        if (dead == null) return false;
+
         final Player player = freeColClient.getMyPlayer();
-        
         if (player == dead) {
             FreeColDebugger.finishDebugRun(freeColClient, true);
             if (freeColClient.isSinglePlayer()) {
@@ -4328,6 +4352,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if the levels were set.
      */
     public boolean setGoodsLevels(Colony colony, GoodsType goodsType) {
+        if (colony == null || goodsType == null) return false;
+
         return askServer().setGoodsLevels(colony,
                                           colony.getExportData(goodsType));
     }
@@ -4356,8 +4382,9 @@ public final class InGameController implements NetworkConstants {
      * @return True if the stance change succeeds.
      */
     public boolean setStance(Stance stance, Player first, Player second) {
-        final Player player = freeColClient.getMyPlayer();
+        if (stance == null || first == null || second == null) return false;
 
+        final Player player = freeColClient.getMyPlayer();
         Stance old = first.getStance(second);
         try {
             first.setStance(second, stance);
@@ -4380,6 +4407,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if the trade routes were set.
      */
     public boolean setTradeRoutes(List<TradeRoute> routes) {
+        if (routes == null) return false;
+
         return askServer().setTradeRoutes(routes);
     }
 
@@ -4410,7 +4439,7 @@ public final class InGameController implements NetworkConstants {
      * @return True if a new unit was trained.
      */
     public boolean trainUnitInEurope(UnitType unitType) {
-        if (!requireOurTurn()) return false;
+        if (!requireOurTurn() || unitType == null) return false;
 
         final Player player = freeColClient.getMyPlayer();
         Europe europe = player.getEurope();
@@ -4524,6 +4553,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if the trade route was updated.
      */
     public boolean updateTradeRoute(TradeRoute route) {
+        if (route == null) return false;
+
         return askServer().updateTradeRoute(route);
     }
 
@@ -4566,7 +4597,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unit is now working at the new work location.
      */
     public boolean work(Unit unit, WorkLocation workLocation) {
-        if (!requireOurTurn()) return false;
+        if (!requireOurTurn() || unit == null
+            || workLocation == null) return false;
 
         StringTemplate template;
         if (unit.getStudent() != null

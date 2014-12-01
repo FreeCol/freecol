@@ -138,7 +138,7 @@ public final class RecruitPanel extends FreeColPanel {
         } else {
             try {
                 int index = Integer.parseInt(command);
-                if (index >= 0 && index < Europe.RECRUIT_COUNT) {
+                if (Europe.MigrationType.validMigrantIndex(index)) {
                     igc().recruitUnitInEurope(index);
                     getGUI().updateEuropeanSubpanels();
                     if (!shouldEnable) getGUI().removeFromCanvas(this);

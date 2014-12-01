@@ -1935,7 +1935,10 @@ public class GUI {
         canvas.showEmigrationDialog(player, fountainOfYouth,
             new DialogHandler<Integer>() {
                 public void handle(Integer value) {
-                    int i = (value == null) ? 0 : value.intValue();
+                    // Value should be a valid slot
+                    int i = (value == null || !Europe.MigrationType.validMigrantSlot(value))
+                        ? Europe.CHOOSE_MIGRANT_SLOT
+                        : value.intValue();
                     igc().emigrate(player, i);
                     if (n > 1) {
                         showEmigrationDialog(player, n-1, fountainOfYouth);
