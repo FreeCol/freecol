@@ -89,7 +89,8 @@ public final class DifficultyDialog extends OptionsDialog
                             Specification specification,
                             OptionGroup level, boolean editable) {
         super(freeColClient, editable, level, Messages.message("difficulty"),
-            "custom.xml", "model.difficulty.custom");
+              FreeColDirectories.CUSTOM_DIFFICULTY_FILE_NAME,
+              "model.difficulty.custom");
 
         this.specification = specification;
         this.selected = level;
@@ -97,6 +98,8 @@ public final class DifficultyDialog extends OptionsDialog
         getOptionUI().getTree().addTreeSelectionListener(this);
 
         if (isEditable()) {
+            loadDefaultOptions();
+
             JButton resetButton = new JButton(Messages.message("reset"));
             addResetAction(resetButton);
             

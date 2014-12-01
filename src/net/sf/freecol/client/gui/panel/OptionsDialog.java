@@ -191,7 +191,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
             .loadOptionsFile(getOptionGroupId(), file);
         if (og == null) return false;
 
-        reset(group);
+        reset(og);
         return true;
     }
 

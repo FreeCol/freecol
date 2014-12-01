@@ -443,8 +443,8 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         if (value != null) {
             for (Option other : value.getOptions()) {
                 Option mine = getOption(other.getId());
-                // could be null if using custom.xml generated from an
-                // older version of the specification, for example
+                // could be null if using custom options generated
+                // from an older version of the specification
                 if (mine != null) {
                     mine.setValue(other.getValue());
                 }

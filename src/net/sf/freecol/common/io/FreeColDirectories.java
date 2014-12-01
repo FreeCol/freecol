@@ -78,6 +78,8 @@ public class FreeColDirectories {
 
     public static final String CLIENT_OPTIONS_FILE_NAME = "options.xml";
 
+    public static final String CUSTOM_DIFFICULTY_FILE_NAME = "custom.xml";
+
     public static final String GAME_OPTIONS_FILE_NAME = "game_options.xml";
 
     public static final String MAP_FILE_NAME = "my_map.fsg";
