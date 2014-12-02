@@ -511,13 +511,14 @@ public class ServerUnit extends Unit implements ServerModelObject {
         final ServerPlayer owner = (ServerPlayer)getOwner();
 
         Location oldLocation = getLocation();
-        if (oldLocation instanceof WorkLocation) {
-            oldLocation.getTile().cacheUnseen();//+til
-        }
+        Colony colony = (oldLocation instanceof WorkLocation) ? getColony()
+            : null;
+        if (colony != null) oldLocation.getTile().cacheUnseen();//+til
         setLocation(carrier);//-vis: only if on a different tile
-                                  //-til if moving from colony
+                             //-til if moving from colony
         setMovesLeft(0);
-        cs.add(See.only(owner), (FreeColGameObject)oldLocation);
+        cs.add(See.only(owner), (colony != null) ? colony
+            : (FreeColGameObject)oldLocation);
         if (carrier.getLocation() != oldLocation) {
             cs.add(See.only(owner), carrier);
         }

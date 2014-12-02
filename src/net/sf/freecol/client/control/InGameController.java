@@ -2609,7 +2609,7 @@ public final class InGameController implements NetworkConstants {
         }
         unitWas.fireChanges();
         if (colonyWas != null) colonyWas.fireChanges();
-        if (europeWas != null) colonyWas.fireChanges();
+        if (europeWas != null) europeWas.fireChanges();
         updateControls();
         updateActiveUnit(null);
         return ret;
@@ -3740,10 +3740,13 @@ public final class InGameController implements NetworkConstants {
             || direction == null) return false;
 
         UnitWas unitWas = new UnitWas(unit);
+        ColonyWas colonyWas = (unit.getColony() == null) ? null
+            : new ColonyWas(unit.getColony());
         unit.setState(UnitState.ACTIVE);
         boolean ret = askClearGotoOrders(unit)
             && moveDirection(unit, direction, true);
         unitWas.fireChanges();
+        if (colonyWas != null) colonyWas.fireChanges();
         updateControls();
         updateActiveUnit(null);
         return ret;
