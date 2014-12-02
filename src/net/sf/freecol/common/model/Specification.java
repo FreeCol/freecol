@@ -309,13 +309,13 @@ public final class Specification {
         this();
         initialized = false;
         load(xr);
-        applyFixes();
+        prepare(null, difficultyLevel);
         clean("load from stream");
         initialized = true;
     }
 
     /**
-     * Load a specification from a stream.
+     * Load a specification or fragment from a stream.
      *
      * @param xr The <code>FreeColXMLReader</code> to read from.
      */
@@ -337,37 +337,13 @@ public final class Specification {
         this();
         initialized = false;
         load(in);
-        applyFixes();
+        prepare(null, difficultyLevel);
         clean("load from InputStream");
         initialized = true;
     }
 
     /**
-     * Prepare a specification with given advantages and difficulty level.
-     *
-     * @param advantages The <code>Advantages</code> setting.
-     * @param difficulty The identifier for the difficulty level.
-     */
-    public void prepare(Advantages advantages, String difficulty) {
-        prepare(advantages, (difficulty == null) ? null
-            : getDifficultyOptionGroup(difficulty));
-    }
-
-    /**
-     * Prepare a specification with given advantages and difficulty level.
-     *
-     * @param advantages The <code>Advantages</code> setting.
-     * @param difficulty The difficulty level <code>OptionGroup</code>.
-     */
-    public void prepare(Advantages advantages, OptionGroup difficulty) {
-        if (advantages == Advantages.NONE) {
-            clearEuropeanNationalAdvantages();
-        }
-        if (difficulty != null) applyDifficultyLevel(difficulty);
-    }
-
-    /**
-     * Load a specification from a stream.
+     * Load a specification or fragment from a stream.
      *
      * @param in The <code>InputStream</code> to read from.
      */
@@ -382,6 +358,31 @@ public final class Specification {
         } finally {
             if (xr != null) xr.close();
         }
+    }
+
+    /**
+     * Prepare a specification with given advantages and difficulty level.
+     *
+     * @param advantages An optional <code>Advantages</code> setting.
+     * @param difficulty An optional identifier for the difficulty level.
+     */
+    public void prepare(Advantages advantages, String difficulty) {
+        prepare(advantages, (difficulty == null) ? null
+            : getDifficultyOptionGroup(difficulty));
+    }
+
+    /**
+     * Prepare a specification with given advantages and difficulty level.
+     *
+     * @param advantages An optional <code>Advantages</code> setting.
+     * @param difficulty An optional difficulty level <code>OptionGroup</code>.
+     */
+    public void prepare(Advantages advantages, OptionGroup difficulty) {
+        applyFixes();
+        if (advantages == Advantages.NONE) {
+            clearEuropeanNationalAdvantages();
+        }
+        if (difficulty != null) applyDifficultyLevel(difficulty);
     }
 
     /**
@@ -1832,6 +1833,7 @@ public final class Specification {
      * Specification backward compatibility for the spec in general.
      */
     private void fixSpec() {
+        // @compat 0.10.0
         if (getModifiers(Modifier.SHIP_TRADE_PENALTY) == null) {
             addModifier(new Modifier(Modifier.SHIP_TRADE_PENALTY,
                                      -30.0f, Modifier.ModifierType.PERCENTAGE,
@@ -2113,7 +2115,7 @@ public final class Specification {
         if (!customs.hasAbility(Ability.COASTAL_ONLY)) {
             customs.addAbility(new Ability(Ability.COASTAL_ONLY, null, false));
         }
-        // end @compat 0.11.x
+        // end @compat 0.11.0
     }
 
     /**
@@ -2385,6 +2387,9 @@ public final class Specification {
                 ret = true;
             }
         }
+        if (ret) {
+            logger.info("Added difficulty integer option: " + id);
+        }
         return ret;
     }
         
@@ -2398,6 +2403,9 @@ public final class Specification {
                 if (ulo == null) ulo = new UnitListOption(id, this);
                 og.add(ulo);
             }
+        }
+        if (ulo != null) {
+            logger.info("Added difficulty unit list option: " + id);
         }
         return ulo;
     }
