@@ -3768,7 +3768,7 @@ public class Unit extends GoodsLocation
     // Interface Location (from GoodsLocation via UnitLocation)
     // Inherits
     //   FreeColObject.getId
-    //   UnitLocation.getLocationNameFor
+    //   UnitLocation.getLocationLabelFor
     //   UnitLocation.contains
     //   UnitLocation.canAdd
     //   UnitLocation.getUnitCount
@@ -3787,7 +3787,7 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public StringTemplate getLocationName() {
+    public StringTemplate getLocationLabel() {
         return StringTemplate.template("onBoard")
             .addStringTemplate("%unit%", this.getLabel());
     }

@@ -377,7 +377,7 @@ public abstract class WorkLocation extends UnitLocation
     // Interface Location
     // Inherits:
     //   FreeColObject.getId
-    //   UnitLocation.getLocationName
+    //   UnitLocation.getLocationLabel
     //   UnitLocation.contains
     //   UnitLocation.canAdd
     //   UnitLocation.getUnitCount
@@ -387,9 +387,9 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getLocationNameFor(Player player) {
-        return (getOwner() == player) ? getLocationName()
-            : getColony().getLocationNameFor(player);
+    public StringTemplate getLocationLabelFor(Player player) {
+        return (getOwner() == player) ? getLocationLabel()
+            : getColony().getLocationLabelFor(player);
     }
 
     /**

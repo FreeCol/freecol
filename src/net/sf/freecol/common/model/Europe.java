@@ -281,7 +281,7 @@ public class Europe extends UnitLocation
     // Inheriting:
     //   FreeColObject.getId()
     //   UnitLocation.getTile
-    //   UnitLocation.getLocationNameFor
+    //   UnitLocation.getLocationLabelFor
     //   UnitLocation.remove
     //   UnitLocation.contains
     //   UnitLocation.getUnitCount
@@ -293,7 +293,7 @@ public class Europe extends UnitLocation
      * {@inheritDoc}
      */
     @Override
-    public StringTemplate getLocationName() {
+    public StringTemplate getLocationLabel() {
         return StringTemplate.key(getNameKey());
     }
 

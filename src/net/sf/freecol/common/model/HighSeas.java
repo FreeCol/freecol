@@ -102,7 +102,7 @@ public class HighSeas extends UnitLocation {
     // Inherits
     //   FreeColObject.getId
     //   UnitLocation.getTile
-    //   UnitLocation.getLocationNameFor
+    //   UnitLocation.getLocationLabelFor
     //   UnitLocation.add
     //   UnitLocation.remove
     //   UnitLocation.contains
@@ -116,7 +116,7 @@ public class HighSeas extends UnitLocation {
      * {@inheritDoc}
      */
     @Override
-    public StringTemplate getLocationName() {
+    public StringTemplate getLocationLabel() {
         return StringTemplate.key("model.tile.highSeas.name");
     }
 

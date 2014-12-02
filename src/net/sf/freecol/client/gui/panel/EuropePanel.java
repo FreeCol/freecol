@@ -504,7 +504,7 @@ public final class EuropePanel extends PortPanel {
             StringTemplate t = StringTemplate.template("goingTo")
                 .addName("%type%", "ship")
                 .addStringTemplate("%location%",
-                    destination.getLocationNameFor(getMyPlayer()));
+                    destination.getLocationLabelFor(getMyPlayer()));
             ((TitledBorder) getBorder()).setTitle(Messages.message(t));
             revalidate();
         }
@@ -555,7 +555,7 @@ public final class EuropePanel extends PortPanel {
                     && docksPanel.getComponentCount() > 0
                     && unit.hasSpaceLeft()) {
                     StringTemplate locName = destination
-                        .getLocationNameFor(unit.getOwner());
+                        .getLocationLabelFor(unit.getOwner());
                     if (!getGUI().confirm(true, null,
                             StringTemplate.template("europe.leaveColonists")
                                 .addStringTemplate("%newWorld%", locName),

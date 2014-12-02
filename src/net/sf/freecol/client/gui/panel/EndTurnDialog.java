@@ -79,7 +79,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
             this.unit = unit;
             this.name = unit.getDescription(Unit.UnitLabelType.NATIONAL);
             this.location = Messages.message(unit.getLocation()
-                .getLocationNameFor(unit.getOwner()));
+                .getLocationLabelFor(unit.getOwner()));
         }
 
         /**

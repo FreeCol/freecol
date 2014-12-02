@@ -515,7 +515,7 @@ public abstract class Settlement extends GoodsLocation
     // Interface Location (from GoodsLocation via UnitLocation)
     // Inherits
     //   FreeColObject.getId
-    //   UnitLocation.getLocationNameFor
+    //   UnitLocation.getLocationFor
     //   GoodsLocation.add
     //   GoodsLocation.remove
     //   GoodsLocation.contains
@@ -535,7 +535,7 @@ public abstract class Settlement extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public StringTemplate getLocationName() {
+    public StringTemplate getLocationLabel() {
         return StringTemplate.name(getName());
     }
 

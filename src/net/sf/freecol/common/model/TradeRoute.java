@@ -244,7 +244,7 @@ public class TradeRoute extends FreeColGameObject
         for (TradeRouteStop stop : stops) {
             if (!TradeRoute.isStopValid(owner, stop)) {
                 String badStop = Messages.message(stop.getLocation()
-                    .getLocationNameFor(owner));
+                    .getLocationLabelFor(owner));
                 return StringTemplate.template("tradeRoute.invalidStop")
                     .addName("%name%", badStop);
             }

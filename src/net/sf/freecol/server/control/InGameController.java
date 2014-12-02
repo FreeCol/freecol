@@ -2312,7 +2312,8 @@ public final class InGameController extends Controller {
                              "indianSettlement.mission.enemyDenounce",
                              enemy, settlement)
                 .addStringTemplate("%enemy%", serverPlayer.getNationName())
-                .addStringTemplate("%settlement%", settlement.getLocationNameFor(enemy))
+                .addStringTemplate("%settlement%",
+                    settlement.getLocationLabelFor(enemy))
                 .addStringTemplate("%nation%", owner.getNationName()));
         cs.add(See.perhaps().always(serverPlayer),
                (FreeColGameObject)unit.getLocation());
@@ -2877,7 +2878,8 @@ public final class InGameController extends Controller {
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                      "buildColony.others", settlement)
                         .addStringTemplate("%nation%", nation)
-                        .addStringTemplate("%colony%", settlement.getLocationNameFor(sp))
+                        .addStringTemplate("%colony%",
+                            settlement.getLocationLabelFor(sp))
                         .addName("%region%", tile.getRegion().getName()));
             }
         } else {

@@ -1056,7 +1056,7 @@ public class IndianSettlement extends Settlement {
     // Inherits
     //   FreeColObject.getId()
     //   Settlement.getTile
-    //   Settlement.getLocationName
+    //   Settlement.getLocationLabel
     //   GoodsLocation.remove
     //   GoodsLocation.contains
     //   UnitLocation.canAdd
@@ -1068,7 +1068,7 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
-    public StringTemplate getLocationNameFor(Player player) {
+    public StringTemplate getLocationLabelFor(Player player) {
         return (hasContacted(player)) ? StringTemplate.name(getName())
             : StringTemplate.label("indianSettlement.nameUnknown");
     }

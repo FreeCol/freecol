@@ -137,11 +137,11 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 this.icon = new ImageIcon(lib.getCoatOfArmsImage(nation)
                     .getScaledInstance(-1, CELL_HEIGHT, Image.SCALE_SMOOTH));
             } else if (location instanceof Map) {
-                name = Messages.message(location.getLocationNameFor(player));
+                name = Messages.message(location.getLocationLabelFor(player));
                 this.icon = lib.getMiscImageIcon(ImageLibrary.LOST_CITY_RUMOUR);
             } else if (location instanceof Settlement) {
                 Settlement settlement = (Settlement) location;
-                name = Messages.message(settlement.getLocationNameFor(player));
+                name = Messages.message(settlement.getLocationLabelFor(player));
                 this.icon = new ImageIcon(lib.getSettlementImage(settlement)
                     .getScaledInstance(64, -1, Image.SCALE_SMOOTH));
             }
@@ -279,9 +279,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             if (!(loc1 instanceof Settlement)) return -1;
             if (!(loc2 instanceof Settlement)) return 1;
             Settlement s1 = (Settlement)loc1;
-            String name1 = Messages.message(s1.getLocationNameFor(owner));
+            String name1 = Messages.message(s1.getLocationLabelFor(owner));
             Settlement s2 = (Settlement)loc2;
-            String name2 = Messages.message(s2.getLocationNameFor(owner));
+            String name2 = Messages.message(s2.getLocationLabelFor(owner));
             return name1.compareTo(name2);
         }
     }

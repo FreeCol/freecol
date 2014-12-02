@@ -2117,7 +2117,8 @@ public final class MapViewer {
                                    + settlement.getName());
                     continue;
                 }
-                String name = Messages.message(settlement.getLocationNameFor(player));
+                String name
+                    = Messages.message(settlement.getLocationLabelFor(player));
                 if (name == null) continue;
                 Color backgroundColor = settlement.getOwner().getNationColor();
                 if (backgroundColor == null) backgroundColor = Color.WHITE;

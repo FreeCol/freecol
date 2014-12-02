@@ -2495,7 +2495,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     // Inherits
     //   FreeColObject.getId
     //   Settlement.getTile
-    //   Settlement.getLocationName
+    //   Settlement.getLocationLabel
     //   GoodsLocation.canAdd
     //   GoodsLocation.getGoodsContainer
     //   Settlement.getSettlement
@@ -2504,7 +2504,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public StringTemplate getLocationNameFor(Player player) {
+    public StringTemplate getLocationLabelFor(Player player) {
         // Everyone can always work out a colony name.
         return StringTemplate.name(getName());
     }

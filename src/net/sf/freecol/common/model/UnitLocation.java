@@ -267,15 +267,15 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getLocationName() {
+    public StringTemplate getLocationLabel() {
         return StringTemplate.key(getId());
     }
 
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getLocationNameFor(Player player) {
-        return getLocationName();
+    public StringTemplate getLocationLabelFor(Player player) {
+        return getLocationLabel();
     }
 
     /**

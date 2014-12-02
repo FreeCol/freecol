@@ -128,14 +128,14 @@ public class InformationPanel extends FreeColPanel {
     private String displayLabel(FreeColObject fco) {
         return (fco instanceof Colony)
             ? ((getMyPlayer().owns((Colony)fco))
-                ? Messages.message(((Colony)fco).getLocationName())
+                ? Messages.message(((Colony)fco).getLocationLabel())
                 : null)
 
             : (fco instanceof Europe)
-            ? Messages.message(((Europe)fco).getLocationName())
+            ? Messages.message(((Europe)fco).getLocationLabel())
 
             : (fco instanceof IndianSettlement)
-            ? Messages.message(((IndianSettlement)fco).getLocationName())
+            ? Messages.message(((IndianSettlement)fco).getLocationLabel())
 
             : (fco instanceof Tile)
             ? ((((Tile)fco).hasSettlement())
@@ -149,7 +149,7 @@ public class InformationPanel extends FreeColPanel {
 
             : (fco instanceof WorkLocation)
             ? Messages.message(((WorkLocation)fco).getColony()
-                .getLocationName())
+                .getLocationLabel())
             : null;
     }
 

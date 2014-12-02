@@ -192,7 +192,7 @@ public class ColonyTile extends WorkLocation {
     // Inheriting
     //   FreeColObject.getId
     //   WorkLocation.getTile (Beware this returns the colony center tile!),
-    //   UnitLocation.getLocationNameFor
+    //   UnitLocation.getLocationLabelFor
     //   UnitLocation.contains
     //   UnitLocation.canAdd
     //   WorkLocation.remove
@@ -206,7 +206,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getLocationName() {
+    public StringTemplate getLocationLabel() {
         String name = getColony().getName();
         return (isColonyCenterTile()) ? StringTemplate.name(name)
             : StringTemplate.template("nearLocation")

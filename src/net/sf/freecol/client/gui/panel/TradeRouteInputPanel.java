@@ -255,7 +255,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
                                                       boolean cellHasFocus) {
             FreeColGameObject fcgo = getGame().getFreeColGameObject(value);
             if (fcgo instanceof Location) {
-                setText(Messages.message(((Location)fcgo).getLocationName()));
+                setText(Messages.message(((Location)fcgo).getLocationLabel()));
             } else {
                 setText(value);
             }
@@ -765,7 +765,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             TradeRouteStop stop = this.stopListModel.get(index);
             if (!TradeRoute.isStopValid(player, stop)) {
                 String badStop = Messages.message(stop.getLocation()
-                    .getLocationNameFor(player));
+                    .getLocationLabelFor(player));
                 StringTemplate template
                     = StringTemplate.template("tradeRoute.invalidStop")
                         .addName("%name%", badStop);

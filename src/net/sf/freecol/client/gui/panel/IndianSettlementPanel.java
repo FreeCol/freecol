@@ -60,7 +60,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         Player player = getMyPlayer();
         boolean contacted = settlement.hasContacted(player);
         boolean visited = settlement.hasVisited(player);
-        String text = Messages.message(settlement.getLocationNameFor(player))
+        String text = Messages.message(settlement.getLocationLabelFor(player))
             + ", "
             + Messages.message(StringTemplate.template(settlement.isCapital()
                                                        ? "indianCapital"

@@ -538,13 +538,13 @@ public class ServerIndianSettlement extends IndianSettlement
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                  messageId, this)
                     .addStringTemplate("%settlement%", 
-                        getLocationNameFor(missionaryOwner)));
+                        getLocationLabelFor(missionaryOwner)));
         } else if ("indianSettlement.mission.destroyed".equals(messageId)) {
             cs.addMessage(See.only(missionaryOwner),
                 new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
                                  messageId, this)
                     .addStringTemplate("%settlement%", 
-                        getLocationNameFor(missionaryOwner)));
+                        getLocationLabelFor(missionaryOwner)));
         }
     }
 

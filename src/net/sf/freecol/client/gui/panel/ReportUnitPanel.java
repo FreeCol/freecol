@@ -158,7 +158,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         } else {
             Colony colony = unit.getLocation().getColony();
             if (colony == null) {
-                String locationName = getLocationNameFor(unit);
+                String locationName = getLocationLabelFor(unit);
                 List<Unit> unitList = inLocations.get(locationName);
                 if (unitList == null) {
                     unitList = new ArrayList<>();
@@ -237,9 +237,9 @@ public abstract class ReportUnitPanel extends ReportPanel {
                 : "other";
             toolTip += "\n"
                 + Messages.message(StringTemplate.template("goingTo")
-                                   .addName("%type%", type)
-                                   .addStringTemplate("%location%", unit.getDestination()
-                                                      .getLocationNameFor(getMyPlayer())));
+                    .addName("%type%", type)
+                    .addStringTemplate("%location%", unit.getDestination()
+                        .getLocationLabelFor(getMyPlayer())));
         }
         button.setToolTipText(toolTip);
         return button;

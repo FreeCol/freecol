@@ -373,7 +373,7 @@ public class Building extends WorkLocation
     // Inherits:
     //   FreeColObject.getId
     //   WorkLocation.getTile
-    //   UnitLocation.getLocationNameFor
+    //   UnitLocation.getLocationLabelFor
     //   UnitLocation.contains
     //   UnitLocation.canAdd
     //   WorkLocation.remove
@@ -387,7 +387,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getLocationName() {
+    public StringTemplate getLocationLabel() {
         return StringTemplate.template("inLocation")
             .add("%location%", getNameKey());
     }

@@ -121,7 +121,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * The maximum distance that will still be considered "near" when
      * determining the location name.
      *
-     * @see #getLocationName
+     * @see #getLocationLabel
      */
     public static final int NEAR_RADIUS = 8;
 
@@ -2023,48 +2023,40 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getLocationName() {
-        if (settlement == null) {
-            Settlement nearSettlement = null;
-            for (Tile tile: getSurroundingTiles(NEAR_RADIUS)) {
-                nearSettlement = tile.getSettlement();
-                if (nearSettlement != null
-                    && nearSettlement.getName() != null) {
-                    String name = nearSettlement.getName();
-                    int x = getX() - tile.getX();
-                    int y = getY() - tile.getY();
-                    double theta = Math.atan2(y, x) + Math.PI/2 + Math.PI/8;
-                    if (theta < 0) {
-                        theta += 2*Math.PI;
-                    }
-                    Direction d = Direction.angleToDirection(theta);
-                    StringTemplate l = StringTemplate.template("nearLocation")
-                        .add("%direction%", "direction." + d)
-                        .addName("%location%", name);
-                    return StringTemplate.template("nameLocation")
-                        .add("%name%", ((type == null) ? "unexplored"
-                                : type.getNameKey()))
-                        .addStringTemplate("%location%", l);
-                }
-            }
-            if (region != null && region.getName() != null) {
+    public StringTemplate getLocationLabel() {
+        if (settlement != null) return settlement.getLocationLabel();
+
+        Settlement nearSettlement = null;
+        for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
+            nearSettlement = tile.getSettlement();
+            if (nearSettlement != null
+                && nearSettlement.getName() != null) {
+                String name = nearSettlement.getName();
+                Direction d = Map.getRoughDirection(tile, this);
+                StringTemplate l = StringTemplate.template("nearLocation")
+                    .add("%direction%", "direction." + d)
+                    .addName("%location%", name);
                 return StringTemplate.template("nameLocation")
-                    .add("%name%", type.getNameKey())
-                    .add("%location%", region.getNameKey());
-            } else {
-                return StringTemplate.key(type.getNameKey());
+                    .add("%name%", ((type == null) ? "unexplored"
+                            : type.getNameKey()))
+                    .addStringTemplate("%location%", l);
             }
+        }
+        if (region != null && region.getName() != null) {
+            return StringTemplate.template("nameLocation")
+                .add("%name%", type.getNameKey())
+                .add("%location%", region.getNameKey());
         } else {
-            return settlement.getLocationName();
+            return StringTemplate.key(type.getNameKey());
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getLocationNameFor(Player player) {
-        return (settlement == null) ? getLocationName()
-            : settlement.getLocationNameFor(player);
+    public StringTemplate getLocationLabelFor(Player player) {
+        if (settlement != null) return settlement.getLocationLabelFor(player);
+        return getLocationLabel();
     }
 
     /**

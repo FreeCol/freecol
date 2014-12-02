@@ -197,8 +197,8 @@ public abstract class GoodsLocation extends UnitLocation {
     // Inheriting
     //    FreeColObject.getId()
     //    UnitLocation.getTile()
-    //    UnitLocation.getLocationName
-    //    UnitLocation.getLocationNameFor
+    //    UnitLocation.getLocationLabel
+    //    UnitLocation.getLocationLabelFor
     //    UnitLocation.canAdd
     //    UnitLocation.getUnitCount
     //    UnitLocation.getUnitList

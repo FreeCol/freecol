@@ -199,14 +199,16 @@ public class DiplomaticTrade extends FreeColObject {
      * agreement from a player to a settlement owner.
      *
      * @param player The sending <code>Player</code>.
-     * @param sett The <code>Settlement</code> to send to.
+     * @param settlement The <code>Settlement</code> to send to.
      * @return A <code>StringTemplate</code> for the message.
      */
-    public StringTemplate getSendMessage(Player player, Settlement sett) {
+    public StringTemplate getSendMessage(Player player, Settlement settlement) {
         return StringTemplate.template("negotiationDialog.send."
             + getContext().getKey())
-            .addStringTemplate("%nation%", sett.getOwner().getNationName())
-            .addStringTemplate("%settlement%", sett.getLocationNameFor(player));
+            .addStringTemplate("%nation%",
+                settlement.getOwner().getNationName())
+            .addStringTemplate("%settlement%",
+                settlement.getLocationLabelFor(player));
     }
 
     /**

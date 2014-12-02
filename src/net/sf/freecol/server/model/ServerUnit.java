@@ -238,7 +238,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         "model.unit.attrition", this)
                     .addStringTemplate("%unit%", getLabel())
                     .addStringTemplate("%location%",
-                                       loc.getLocationNameFor(owner)));
+                        loc.getLocationLabelFor(owner)));
                 cs.add(See.perhaps(), (Tile)loc);
                 cs.addDispose(See.perhaps().always(owner), loc,
                               this);//-vis(owner)
@@ -476,7 +476,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             // ti.getType().getRequiredRole().getRequiredGoods()
             ServerPlayer owner = (ServerPlayer)getOwner();
             StringTemplate locName
-                = getLocation().getLocationNameFor(owner);
+                = getLocation().getLocationLabelFor(owner);
             String messageId = getType() + ".noMoreTools";
             if (!Messages.containsKey(messageId)) {
                 messageId = "model.unit.noMoreTools";
@@ -546,7 +546,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     this, (FreeColGameObject)loc)
                 .addStringTemplate("%unit%", getLabel())
                 .addStringTemplate("%repairLocation%",
-                    loc.getLocationNameFor(owner)));
+                    loc.getLocationLabelFor(owner)));
             setState(UnitState.ACTIVE);
         }
         cs.addPartial(See.only(owner), this, "hitPoints");

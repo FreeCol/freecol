@@ -750,7 +750,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             new ModelMessage(ModelMessage.MessageType.WARNING,
                              "model.colony.workersEvicted", this, this)
                 .addName("%colony%", getName())
-                .addStringTemplate("%location%", tile.getLocationName())
+                .addStringTemplate("%location%", tile.getLocationLabel())
                 .addStringTemplate("%enemyUnit%", enemyUnit.getLabel()));
         cs.add(See.only(serverPlayer), ct);
         cs.add(See.perhaps(), getTile()); // Colony size might have changed

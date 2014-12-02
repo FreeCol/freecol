@@ -883,8 +883,8 @@ public final class InGameController implements NetworkConstants {
         PathNode path = unit.findPath(destination);
         if (path == null) {
             StringTemplate src = unit.getLocation()
-                .getLocationNameFor(player);
-            StringTemplate dst = destination.getLocationNameFor(player);
+                .getLocationLabelFor(player);
+            StringTemplate dst = destination.getLocationLabelFor(player);
             StringTemplate template = StringTemplate
                 .template("selectDestination.failed")
                 .addStringTemplate("%unit%",
@@ -1849,7 +1849,7 @@ public final class InGameController implements NetworkConstants {
         }
         return StringTemplate.template("trade.noTrade")
             .addName("%settlement%",
-                settlement.getLocationNameFor(freeColClient.getMyPlayer()));
+                settlement.getLocationLabelFor(freeColClient.getMyPlayer()));
     }
 
     /**
@@ -2124,7 +2124,7 @@ public final class InGameController implements NetworkConstants {
     private String stopMessage(String key, TradeRouteStop stop, Player player) {
         return Messages.message(StringTemplate.template(key)
             .addStringTemplate("%location%",
-                stop.getLocation().getLocationNameFor(player)));
+                stop.getLocation().getLocationLabelFor(player)));
     }
 
     /**
@@ -2409,7 +2409,7 @@ public final class InGameController implements NetworkConstants {
                 : colony.getImportAmount(type);
             int amount = toUnload;
             if (amount > atStop) {
-                StringTemplate locName = loc.getLocationName();
+                StringTemplate locName = loc.getLocationLabel();
                 String overflow = Integer.toString(toUnload - atStop);
                 int option = freeColClient.getClientOptions()
                     .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);

@@ -3002,13 +3002,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loserPlayer.getNationName();
         StringTemplate loserLocation = loser.getLocation()
-            .getLocationNameFor(loserPlayer);
+            .getLocationLabelFor(loserPlayer);
         StringTemplate oldName = loser.getLabel();
         String messageId = loser.getType().getId() + ".captured";
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winnerPlayer.getNationName();
         StringTemplate winnerLocation = winner.getLocation()
-            .getLocationNameFor(winnerPlayer);
+            .getLocationLabelFor(winnerPlayer);
 
         // Capture the unit.  There are visibility implications for
         // both players because the captured unit might be the only
@@ -3078,7 +3078,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         StringTemplate attackerNation = attacker.getApparentOwnerName();
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
         Location repair = ship.getRepairLocation();
-        StringTemplate repairLoc = repair.getLocationNameFor(shipPlayer);
+        StringTemplate repairLoc = repair.getLocationLabelFor(shipPlayer);
         StringTemplate shipNation = ship.getApparentOwnerName();
 
         cs.addMessage(See.only(attackerPlayer),
@@ -3110,7 +3110,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer attackerPlayer = (ServerPlayer) settlement.getOwner();
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
         Location repair = ship.getRepairLocation();
-        StringTemplate repairLoc = repair.getLocationNameFor(shipPlayer);
+        StringTemplate repairLoc = repair.getLocationLabelFor(shipPlayer);
         StringTemplate shipNation = ship.getApparentOwnerName();
 
         cs.addMessage(See.only(attackerPlayer),
@@ -3171,13 +3171,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loser.getApparentOwnerName();
         StringTemplate loserLocation = loser.getLocation()
-            .getLocationNameFor(loserPlayer);
+            .getLocationLabelFor(loserPlayer);
         StringTemplate oldName = loser.getLabel();
         String messageId = loser.getType().getId() + ".demoted";
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winner.getApparentOwnerName();
         StringTemplate winnerLocation = winner.getLocation()
-            .getLocationNameFor(winnerPlayer);
+            .getLocationLabelFor(winnerPlayer);
 
         UnitType type = loser.getTypeChange(ChangeType.DEMOTION, loserPlayer);
         if (type == null || type == loser.getType()) {
@@ -3542,11 +3542,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
         StringTemplate defenderNation = defenderPlayer.getNationName();
         Settlement settlement = defender.getSettlement();
         StringTemplate defenderLocation = defender.getLocation()
-            .getLocationNameFor(defenderPlayer);
+            .getLocationLabelFor(defenderPlayer);
         Role role = defender.getAutomaticRole();
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerLocation = attacker.getLocation()
-            .getLocationNameFor(attackerPlayer);
+            .getLocationLabelFor(attackerPlayer);
         StringTemplate attackerNation = attacker.getApparentOwnerName();
 
         // Autoequipment is not actually with the unit, it is stored
@@ -3561,7 +3561,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .addStringTemplate("%location%", attackerLocation)
             .addStringTemplate("%nation%", attackerPlayer.getNationName())
             .addStringTemplate("%unit%", attacker.getLabel())
-            .addStringTemplate("%settlement%", settlement.getLocationNameFor(attackerPlayer))
+            .addStringTemplate("%settlement%",
+                settlement.getLocationLabelFor(attackerPlayer))
             .addStringTemplate("%enemyNation%", defenderNation)
             .addStringTemplate("%enemyUnit%", defender.getLabel()));
         cs.addMessage(See.only(defenderPlayer),
@@ -3570,7 +3571,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .addStringTemplate("%location%", defenderLocation)
             .addStringTemplate("%nation%", defenderNation)
             .addStringTemplate("%unit%", defender.getLabel())
-            .addStringTemplate("%settlement%", settlement.getLocationNameFor(defenderPlayer))
+            .addStringTemplate("%settlement%",
+                settlement.getLocationLabelFor(defenderPlayer))
             .addStringTemplate("%enemyNation%", attackerNation)
             .addStringTemplate("%enemyUnit%", attacker.getLabel()));
     }
@@ -3587,12 +3589,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loserPlayer.getNationName();
         StringTemplate loserLocation = loser.getLocation()
-            .getLocationNameFor(loserPlayer);
+            .getLocationLabelFor(loserPlayer);
         StringTemplate oldName = loser.getLabel();
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerNation = winner.getApparentOwnerName();
         StringTemplate winnerLocation = winner.getLocation()
-            .getLocationNameFor(winnerPlayer);
+            .getLocationLabelFor(winnerPlayer);
         Role role = loser.getRole();
 
         Role downgrade = role.getDowngrade();
@@ -3897,12 +3899,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Location winnerLoc = (winner.isInColony()) ? winner.getColony()
             : winner.getLocation();
         StringTemplate winnerLocation
-            = winnerLoc.getLocationNameFor(winnerPlayer);
+            = winnerLoc.getLocationLabelFor(winnerPlayer);
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loser.getApparentOwnerName();
         Location loserLoc = (loser.isInColony()) ? loser.getColony()
             : loser.getLocation();
-        StringTemplate loserLocation = loserLoc.getLocationNameFor(loserPlayer);
+        StringTemplate loserLocation
+            = loserLoc.getLocationLabelFor(loserPlayer);
         String messageId = loser.getType().getId() + ".destroyed";
 
         cs.addMessage(See.only(winnerPlayer),

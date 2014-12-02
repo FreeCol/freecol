@@ -48,19 +48,19 @@ public interface Location extends ObjectWithId {
     public Tile getTile();
 
     /**
-     * Gets the name of this location.
+     * Get a label for this location.
      *
-     * @return The name of this location.
+     * @return A label for this location.
      */
-    public StringTemplate getLocationName();
+    public StringTemplate getLocationLabel();
 
     /**
-     * Gets the name of this location for a particular player.
+     * Get a label for this location for a particular player.
      *
      * @param player The <code>Player</code> to return the name for.
-     * @return The name of this location.
+     * @return A label for this location.
      */
-    public StringTemplate getLocationNameFor(Player player);
+    public StringTemplate getLocationLabelFor(Player player);
 
     /**
      * Adds a <code>Locatable</code> to this Location.

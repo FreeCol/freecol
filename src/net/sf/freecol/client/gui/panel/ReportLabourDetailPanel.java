@@ -105,7 +105,8 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
         }
         for (Entry<Location, Integer> entry : unitLocations.entrySet()) {
             if (!(entry.getKey() instanceof Colony)) {
-                String locationName = Messages.message(entry.getKey().getLocationName());
+                String locationName
+                    = Messages.message(entry.getKey().getLocationLabel());
                 JButton linkButton = GUI.getLinkButton(locationName, null,
                     entry.getKey().getId());
                 linkButton.addActionListener(this);

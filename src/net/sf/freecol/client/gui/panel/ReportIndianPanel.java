@@ -149,7 +149,7 @@ public final class ReportIndianPanel extends ReportPanel {
                 final boolean visited = settlement.hasVisited(player);
                 final boolean scouted = settlement.hasScouted(player);
                 String locationName
-                    = Messages.message(settlement.getLocationNameFor(player));
+                    = Messages.message(settlement.getLocationLabelFor(player));
                 if (known && settlement.isCapital()) {
                     locationName += Messages.message("indianSettlement.capital");
                 }

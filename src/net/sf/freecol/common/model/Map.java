@@ -793,6 +793,21 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Get the approximate direction from one tile to another.
+     *
+     * @param src The source <code>Tile</code>.
+     * @param dst The destination <code>Tile</code>.
+     * @return The approximate direction from source to direction.
+     */
+    public static Direction getRoughDirection(Tile t1, Tile t2) {
+        int x = t2.getX() - t1.getX();
+        int y = t2.getY() - t1.getY();
+        double theta = Math.atan2(y, x) + Math.PI/2 + Math.PI/8;
+        if (theta < 0) theta += 2 * Math.PI;
+        return Direction.angleToDirection(theta);
+    }
+
+    /**
      * Gets the adjacent tile in a given direction from the given coordinates.
      *
      * @param x The x coordinate to work from.
@@ -2421,16 +2436,16 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getLocationName() {
+    public StringTemplate getLocationLabel() {
         return StringTemplate.key("NewWorld");
     }
 
     /**
      * {@inheritDoc}
      */
-    public StringTemplate getLocationNameFor(Player player) {
+    public StringTemplate getLocationLabelFor(Player player) {
         String name = player.getNewLandName();
-        return (name == null) ? getLocationName() : StringTemplate.name(name);
+        return (name == null) ? getLocationLabel() : StringTemplate.name(name);
     }
 
     /**
