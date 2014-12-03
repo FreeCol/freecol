@@ -1539,6 +1539,18 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get the current trade location.
+     *
+     * @return The <code>TradeLocation</code> for this unit.
+     */
+    public TradeLocation getTradeLocation() {
+        Colony colony = getColony();
+        return (colony != null) ? (TradeLocation)colony
+            : (isInEurope()) ? (TradeLocation)getOwner().getEurope()
+            : null;
+    }
+
+    /**
      * Get the current amount of treasure in this unit.
      *
      * @return The amount of treasure.

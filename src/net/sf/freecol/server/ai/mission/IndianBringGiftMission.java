@@ -265,7 +265,8 @@ public class IndianBringGiftMission extends Mission {
             lbAt(lb);
             Goods gift = is.getRandomGift(getAIRandom());
             if (gift == null) return lbFail(lb, false, "found no gift");
-            if (!AIMessage.askLoadCargo(aiUnit, gift) || !hasGift()) {
+            if (!AIMessage.askLoadGoods(gift.getType(), gift.getAmount(),
+                                        aiUnit) || !hasGift()) {
                 return lbFail(lb, false, "failed to collect gift");
             }
             this.collected = true;

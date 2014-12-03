@@ -177,20 +177,7 @@ public class AIGoods extends TransportableAIObject {
 
         final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
         int oldAmount = carrier.getGoodsCount(type);
-        Goods newGoods = new Goods(carrier.getGame(), carrier, type, amount);
-        boolean result;
-        if (carrier.isInEurope()) {
-            if (carrier.getOwner().canTrade(type)) {
-                result = AIMessage.askSellGoods(aiCarrier, newGoods);
-                logger.finest("Sell " + newGoods + " in Europe "
-                    + ((result) ? "succeeds" : "fails")
-                    + ": " + this);
-            } else { // dump
-                result = AIMessage.askUnloadCargo(aiCarrier, newGoods);
-            }
-        } else {
-            result = AIMessage.askUnloadCargo(aiCarrier, newGoods);
-        }
+        boolean result = AIMessage.askUnloadGoods(type, amount, aiCarrier);
         if (result) {
             int newAmount = carrier.getGoodsCount(type);
             if (oldAmount - newAmount != amount) {
@@ -296,12 +283,9 @@ public class AIGoods extends TransportableAIObject {
         GoodsType goodsType = goods.getType();
         int goodsAmount = goods.getAmount();
         int oldAmount = carrier.getGoodsCount(goodsType);
-        boolean result;
-        if (carrier.isInEurope()) {
-            result = AIMessage.askBuyGoods(aiCarrier, goodsType, goodsAmount);
-        } else {
-            result = AIMessage.askLoadCargo(aiCarrier, goods);
-        }
+        boolean result
+            = AIMessage.askLoadGoods(goods.getType(), goods.getAmount(),
+                                     aiCarrier);
         if (result) {
             int newAmount = carrier.getGoodsCount(goodsType);
             if (newAmount - oldAmount != goodsAmount) {

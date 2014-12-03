@@ -31,7 +31,6 @@ import net.sf.freecol.common.networking.AssignTeacherMessage;
 import net.sf.freecol.common.networking.AssignTradeRouteMessage;
 import net.sf.freecol.common.networking.AttackMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
-import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
@@ -63,7 +62,7 @@ import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.JoinColonyMessage;
 import net.sf.freecol.common.networking.LearnSkillMessage;
-import net.sf.freecol.common.networking.LoadCargoMessage;
+import net.sf.freecol.common.networking.LoadGoodsMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
@@ -81,7 +80,6 @@ import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
-import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.SellMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
@@ -91,7 +89,7 @@ import net.sf.freecol.common.networking.SetGoodsLevelsMessage;
 import net.sf.freecol.common.networking.SetTradeRoutesMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
-import net.sf.freecol.common.networking.UnloadCargoMessage;
+import net.sf.freecol.common.networking.UnloadGoodsMessage;
 import net.sf.freecol.common.networking.UpdateTradeRouteMessage;
 import net.sf.freecol.common.networking.WorkMessage;
 import net.sf.freecol.server.FreeColServer;
@@ -169,14 +167,6 @@ public final class InGameInputHandler extends InputHandler
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new BuyMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
-        register(BuyGoodsMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new BuyGoodsMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(BuyPropositionMessage.getXMLElementTagName(),
@@ -387,12 +377,12 @@ public final class InGameInputHandler extends InputHandler
                 return new LearnSkillMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(LoadCargoMessage.getXMLElementTagName(),
+        register(LoadGoodsMessage.getXMLElementTagName(),
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
-                return new LoadCargoMessage(getGame(), element)
+                return new LoadGoodsMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(LootCargoMessage.getXMLElementTagName(),
@@ -515,14 +505,6 @@ public final class InGameInputHandler extends InputHandler
                 return new SellMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(SellGoodsMessage.getXMLElementTagName(),
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new SellGoodsMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
         register(SellPropositionMessage.getXMLElementTagName(),
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
@@ -555,12 +537,12 @@ public final class InGameInputHandler extends InputHandler
                 return new TrainUnitInEuropeMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(UnloadCargoMessage.getXMLElementTagName(),
+        register(UnloadGoodsMessage.getXMLElementTagName(),
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
-                return new UnloadCargoMessage(getGame(), element)
+                return new UnloadGoodsMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(WorkMessage.getXMLElementTagName(),

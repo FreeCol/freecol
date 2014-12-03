@@ -507,19 +507,6 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for buying goods in Europe.
-     *
-     * @param carrier The <code>Unit</code> to load with the goods.
-     * @param type The type of goods to buy.
-     * @param amount The amount of goods to buy.
-     * @return True if the server interaction succeeded.
-     */
-    public boolean buyGoods(Unit carrier, GoodsType type, int amount) {
-        return askHandling(new BuyGoodsMessage(carrier, type, amount),
-            null, null);
-    }
-
-    /**
      * Server query-response to ask the natives if a purchase is acceptable.
      *
      * @param unit The <code>Unit</code> that is trading.
@@ -1018,14 +1005,15 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for loading cargo.
+     * Server query-response for loading goods.
      *
-     * @param goods The <code>Goods</code> to load.
+     * @param type The <code>GoodsType</code> to load.
+     * @param amount The amount of goods to load.
      * @param carrier The <code>Unit</code> to load onto.
      * @return True if the query-response succeeds.
      */
-    public boolean loadCargo(Goods goods, Unit carrier) {
-        return askHandling(new LoadCargoMessage(goods, carrier),
+    public boolean loadGoods(GoodsType type, int amount, Unit carrier) {
+        return askHandling(new LoadGoodsMessage(type, amount, carrier),
             null, null);
     }
 
@@ -1254,18 +1242,6 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for selling goods in Europe.
-     *
-     * @param goods The <code>Goods</code> to sell.
-     * @param carrier The <code>Unit</code> in Europe with the goods.
-     * @return True if the server interaction succeeded.
-     */
-    public boolean sellGoods(Goods goods, Unit carrier) {
-        return askHandling(new SellGoodsMessage(goods, carrier),
-            null, null);
-    }
-
-    /**
      * Server query-response to ask the natives if a sale is acceptable.
      *
      * @param unit The <code>Unit</code> that is trading.
@@ -1462,13 +1438,15 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for unloading cargo.
+     * Server query-response for unloading goods.
      *
-     * @param goods The <code>Goods</code> to unload.
+     * @param type The <code>GoodsType</code> to unload.
+     * @param amount The amount of goods to unload.
+     * @param carrier The <code>Unit</code> to unload from.
      * @return True if the query-response succeeds.
      */
-    public boolean unloadCargo(Goods goods) {
-        return askHandling(new UnloadCargoMessage(goods),
+    public boolean unloadGoods(GoodsType type, int amount, Unit carrier) {
+        return askHandling(new UnloadGoodsMessage(type, amount, carrier),
             null, null);
     }
 

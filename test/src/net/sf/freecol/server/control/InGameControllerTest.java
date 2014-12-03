@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Event;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Game;
@@ -313,21 +314,29 @@ public class InGameControllerTest extends FreeColTestCase {
         Unit privateer = new ServerUnit(game, tile, dutch, privateerType);
         assertEquals("Privateer should not carry anything",
                      0, privateer.getGoodsSpaceTaken());
-        Goods cotton = new Goods(game,privateer,cottonType,100);
-        privateer.add(cotton);
-        assertEquals("Privateer should carry cotton",
-                     1, privateer.getGoodsSpaceTaken());
-        assertTrue("Cotton should be aboard privateer",
-                   cotton.getLocation() == privateer);
+        privateer.addGoods(cottonType, 75);
+        assertEquals("Privateer should carry cotton", 75,
+                     privateer.getGoodsCount(cottonType));
 
-        // Moving a good to a null location means dumping the good
-        igc.moveGoods(cotton, null);
+        // Unloading more than present should fail
+        igc.unloadGoods(dutch, cottonType, 100, privateer);
+        assertEquals(75, privateer.getGoodsCount(cottonType));
 
-        assertEquals("Privateer should no longer carry cotton",
-                     0, privateer.getGoodsSpaceTaken());
-        assertNull("Cotton should have no location",
-                   cotton.getLocation());
+        // Unloading otherwise should succeed
+        igc.unloadGoods(dutch, cottonType, 25, privateer);
+        assertEquals(50, privateer.getGoodsCount(cottonType));
+
+        Europe europe = dutch.getEurope();
+        privateer.setLocation(europe);
+        dutch.getMarket().setArrears(cottonType, 1); // boycott in effect
+        int gold = dutch.getGold();
+        igc.unloadGoods(dutch, cottonType, 50, privateer);
+        assertEquals("Privateer in Europe should no longer carry cotton", 0,
+                     privateer.getGoodsCount(cottonType));
+        assertEquals("No payment for boycotted goods", gold,
+                     dutch.getGold());
     }
+
 
     public void testCashInTreasure() {
         final Game game = ServerTestHelper.startServerGame(getCoastTestMap(plains, true));

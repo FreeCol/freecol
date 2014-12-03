@@ -176,157 +176,81 @@ public class ServerPlayerTest extends FreeColTestCase {
         InGameController igc = ServerTestHelper.getInGameController();
         
         Colony colony = getStandardColony();
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        Unit wagonInColony = new ServerUnit(game, colony.getTile(), dutch,
-                                            wagonTrainType);
-        Unit wagonNotInColony = new ServerUnit(game, map.getTile(10, 10), dutch,
-                                               wagonTrainType);
-        Goods cotton = new Goods(game, null, cottonType, 75);
+        colony.addGoods(cottonType, 200);
+        ServerPlayer dutch
+            = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        Unit wagonInColony
+            = new ServerUnit(game, colony.getTile(), dutch, wagonTrainType);
+        Unit wagonNotInColony
+            = new ServerUnit(game, map.getTile(10, 10), dutch, wagonTrainType);
 
-        // Check if location null
-        assertEquals(null, cotton.getTile());
+        // Fail to move to wagon not in colony
+        igc.loadGoods(dutch, cottonType, 50, wagonNotInColony);
+        assertEquals(0, wagonNotInColony.getGoodsCount(cottonType));
+        assertEquals(200, colony.getGoodsCount(cottonType));
 
-        // Check that it does not work if current Location == null
-        try {
-            igc.moveGoods(cotton, wagonInColony);
-            fail("Goods move must fail(1).");
-        } catch (IllegalStateException e) {
-        }
-        try {
-            igc.moveGoods(cotton, wagonNotInColony);
-            fail("Goods move must fail(2).");
-        } catch (IllegalStateException e) {
-        }
+        // Check colony to wagon
+        igc.loadGoods(dutch, cottonType, 10, wagonInColony);
+        assertEquals(10, wagonInColony.getGoodsCount(cottonType));
+        assertEquals(190, colony.getGoodsCount(cottonType));
 
         // Check wagon to colony
-        cotton.setLocation(wagonInColony);
-        igc.moveGoods(cotton, colony);
-        assertEquals(cotton.getLocation(), colony);
-        assertEquals(75, colony.getGoodsCount(cottonType));
+        igc.unloadGoods(dutch, cottonType, 5, wagonInColony);
+        assertEquals(5, wagonInColony.getGoodsCount(cottonType));
+        assertEquals(195, colony.getGoodsCount(cottonType));
 
-        // Check from colony to wagon train
-        igc.moveGoods(cotton, wagonInColony);
-        assertEquals(wagonInColony, cotton.getLocation());
+        // Fail to load more than present
+        igc.loadGoods(dutch, cottonType, 200, wagonInColony);
+        assertEquals(5, wagonInColony.getGoodsCount(cottonType));
+        assertEquals(195, colony.getGoodsCount(cottonType));
+
+        // Fill wagon
+        igc.loadGoods(dutch, cottonType, 195, wagonInColony);
+        assertEquals(200, wagonInColony.getGoodsCount(cottonType));
         assertEquals(0, colony.getGoodsCount(cottonType));
+        assertFalse(wagonInColony.hasSpaceLeft());
 
-        // Check failure units not co-located
-        try {
-            igc.moveGoods(cotton, wagonNotInColony);
-            fail("Goods move must fail(3).");
-        } catch (IllegalStateException e) {
-        }
-
-        // Check failure to non-GoodsContainer (Tile)
-        try {
-            igc.moveGoods(cotton, map.getTile(9, 10));
-            fail("Goods move must fail(4).");
-        } catch (IllegalStateException e) {
-        }
-
-        // Check from unit to unit
-        wagonInColony.setLocation(wagonNotInColony.getTile());
-        igc.moveGoods(cotton, wagonNotInColony);
-        assertEquals(wagonNotInColony, cotton.getLocation());
+        // Fail to add more
+        colony.addGoods(cottonType, 1);
+        igc.loadGoods(dutch, cottonType, 1, wagonInColony);
+        assertEquals(200, wagonInColony.getGoodsCount(cottonType));
+        assertEquals(1, colony.getGoodsCount(cottonType));
     }
 
     public void testLoadInEurope() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        Goods cotton = new Goods(game, null, cottonType, 75);
+        ServerPlayer dutch
+            = (ServerPlayer)game.getPlayer("model.nation.dutch");
         Europe europe = dutch.getEurope();
-        Map america = game.getMap();
-        Unit privateer1 = new ServerUnit(game, europe, dutch, privateerType);
-        Unit privateer2 = new ServerUnit(game, europe, dutch, privateerType);
+        Unit privateer1
+            = new ServerUnit(game, europe, dutch, privateerType);
+        Unit privateer2
+            = new ServerUnit(game, map.getTile(1,1), dutch, privateerType);
 
-        // While source in Europe, target in Europe
-        cotton.setLocation(privateer1);
-        igc.moveGoods(cotton, privateer2);
-        assertEquals(privateer2, cotton.getLocation());
+        // Check Europe to privateer, should fail due to funds
+        igc.loadGoods(dutch, cottonType, 10, privateer1);
+        assertEquals(0, privateer1.getGoodsCount(cottonType));
 
-        // Can not unload directly to Europe
-        try {
-            igc.moveGoods(cotton, europe);
-            fail("Goods move must fail(5).");
-        } catch (IllegalStateException e) {
-        }
+        // Add gold and succeed
+        dutch.setGold(10000);
+        igc.loadGoods(dutch, cottonType, 10, privateer1);
+        assertEquals(10, privateer1.getGoodsCount(cottonType));
 
-        // While source moving from America, target in Europe
-        cotton.setLocation(privateer1);
-        assertEquals(europe, privateer1.getLocation());
-        igc.moveTo(dutch, privateer1, america);
-        try {
-            igc.moveGoods(cotton, privateer2);
-            fail("Goods move must fail(6).");
-        } catch (IllegalStateException e) {
-        }
+        // Check Privateer to Europe
+        igc.unloadGoods(dutch, cottonType, 5, privateer1);
+        assertEquals(5, privateer1.getGoodsCount(cottonType));
 
-        // While source moving to America, target in Europe
-        cotton.setLocation(privateer1);
-        igc.moveTo(dutch, privateer1, europe);
-        try {
-            igc.moveGoods(cotton, privateer2);
-            fail("Goods move must fail(7).");
-        } catch (IllegalStateException e) {
-        }
+        // Fail to load to privateer not in Europe
+        igc.loadGoods(dutch, cottonType, 10, privateer2);
+        assertEquals(0, privateer2.getGoodsCount(cottonType));
 
-        // While source in Europe, target moving to America
-        privateer1.setLocation(europe);
-        igc.moveTo(dutch, privateer2, america);
-        cotton.setLocation(privateer1);
-        try {
-            igc.moveGoods(cotton, privateer2);
-            fail("Goods move must fail(8).");
-        } catch (IllegalStateException e) {
-        }
-
-        // While source moving to America, target moving to America
-        cotton.setLocation(privateer1);
-        igc.moveTo(dutch, privateer1, america);
-        try {
-            igc.moveGoods(cotton, privateer2);
-            fail("Goods move must fail(9).");
-        } catch (IllegalStateException e) {
-        }
-
-        // While source moving from America, target moving to America
-        cotton.setLocation(privateer1);
-        igc.moveTo(dutch, privateer1, europe);
-        try {
-            igc.moveGoods(cotton, privateer2);
-            fail("Goods move must fail(10).");
-        } catch (IllegalStateException e) {
-        }
-
-        // While source in Europe, target moving from America
-        privateer1.setLocation(europe);
-        igc.moveTo(dutch, privateer2, europe);
-
-        cotton.setLocation(privateer1);
-        try {
-            igc.moveGoods(cotton, privateer2);
-            fail("Goods move must fail(11).");
-        } catch (IllegalStateException e) {
-        }
-
-        // While source moving to America, target moving from America
-        cotton.setLocation(privateer1);
-        igc.moveTo(dutch, privateer1, america);
-        try {
-            igc.moveGoods(cotton, privateer2);
-            fail("Goods move must fail(12).");
-        } catch (IllegalStateException e) {
-        }
-
-        // While source moving from America, target moving from America
-        cotton.setLocation(privateer1);
-        igc.moveTo(dutch, privateer1, europe);
-        try {
-            igc.moveGoods(cotton, privateer2);
-            fail("Goods move must fail(13).");
-        } catch (IllegalStateException e) {
-        }
+        // Establish boycott and fail again
+        dutch.getMarket().setArrears(cottonType, 1);
+        igc.loadGoods(dutch, cottonType, 10, privateer1);
+        assertEquals(5, privateer1.getGoodsCount(cottonType));
     }
 
     public void testCheckGameOverNoUnits() {

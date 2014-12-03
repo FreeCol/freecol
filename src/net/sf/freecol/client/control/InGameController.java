@@ -99,6 +99,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.TradeLocation;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.TransactionListener;
@@ -280,56 +281,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Buy some goods with a carrier in Europe.
-     *
-     * Remember a bunch of stuff first so the transaction
-     * can be logged.
-     *
-     * @param type The <code>GoodsType</code> to buy.
-     * @param amount The amount of goods to buy.
-     * @param carrier The <code>Unit</code> to carry the goods.
-     * @param europe The <code>Europe</code> to buy from.
-     * @return True if the unload succeeded.
-     */
-    private boolean askBuyGoods(GoodsType type, int amount, Unit carrier,
-                                Europe europe) {
-        if (!carrier.isInEurope()) return false;
-        final Player player = carrier.getOwner();
-        if (!player.canTrade(type)) return false;
-
-        // Size check, if there are spare holds they can be filled, but...
-        int toBuy = GoodsContainer.CARGO_SIZE;
-        if (!carrier.hasSpaceLeft()) {
-            // ...if there are no spare holds, we can only fill a hold
-            // already partially filled with this type, otherwise fail.
-            int partial = carrier.getGoodsContainer().getGoodsCount(type)
-                % GoodsContainer.CARGO_SIZE;
-            if (partial == 0) return false;
-            toBuy -= partial;
-        }
-        if (amount < toBuy) toBuy = amount;
-
-        // Check that the purchase is funded.
-        Market market = player.getMarket();
-        if (!player.checkGold(market.getBidPrice(type, toBuy))) {
-            gui.showErrorMessage("notEnoughGold");
-            return false;
-        }
-
-        // Try to purchase.
-        int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
-        int price = market.getCostToBuy(type);
-        boolean ret = askServer().buyGoods(carrier, type, toBuy)
-            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount;
-        if (ret) {
-            for (TransactionListener l : market.getTransactionListener()) {
-                l.logPurchase(type, toBuy, price);
-            }
-        }
-        return ret;
-    }
-
-    /**
      * Claim a tile.
      *
      * @param player The <code>Player</code> that is claiming.
@@ -405,50 +356,47 @@ public final class InGameController implements NetworkConstants {
     /**
      * Load some goods onto a carrier.
      *
-     * @param goods The <code>Goods</code> to load.
+     * @param type The <code>GoodsType</code> to load.
+     * @param amount The amount of goods to load.
      * @param carrier The <code>Unit</code> to load onto.
-     * @param colony The <code>Colony</code> to load from.
      * @return True if the load succeeded.
      */
-    private boolean askLoadGoods(Goods goods, Unit carrier, Colony colony) {
-        GoodsType type = goods.getType();
-        int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
-        return askServer().loadCargo(goods, carrier)
-            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount;
-    }
+    private boolean askLoadGoods(GoodsType type, int amount, Unit carrier) {
+        TradeLocation trl = carrier.getTradeLocation();
+        if (trl == null) return false;
 
-    /**
-     * Sell some goods from a carrier in Europe.
-     *
-     * Remember a bunch of stuff first so the transaction
-     * can be logged.
-     *
-     * @param goods The <code>Goods</code> to unload.
-     * @param carrier The <code>Unit</code> carrying the goods.
-     * @param europe The <code>Europe</code> to sell to.
-     * @return True if the unload succeeded.
-     */
-    private boolean askSellGoods(Goods goods, Unit carrier, Europe europe) {
-        if (!carrier.isInEurope()) return false;
-        final Player player = freeColClient.getMyPlayer();
-        final GoodsType type = goods.getType();
-        if (!player.canTrade(type)) return false;
+        // Size check, if there are spare holds they can be filled, but...
+        int loadable = carrier.getLoadableAmount(type);
+        if (amount > loadable) amount = loadable;
+
+        final Player player = carrier.getOwner();
         final Market market = player.getMarket();
-        final int amount = goods.getAmount();
-        final int price = market.getPaidForSale(type);
-        final int tax = player.getTax();
-        final int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
+        int price = 0;
 
-        boolean ret = askServer().sellGoods(goods, carrier)
+        if (carrier.isInEurope()) {
+            // Are the goods boycotted?
+            if (!player.canTrade(type)) return false;
+
+            // Check that the purchase is funded.
+            if (!player.checkGold(market.getBidPrice(type, amount))) {
+                gui.showErrorMessage("notEnoughGold");
+                return false;
+            }
+            price = market.getCostToBuy(type);
+        }
+
+        // Try to purchase.
+        int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
+        boolean ret = askServer().loadGoods(type, amount, carrier)
             && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount;
-        if (ret) {
+        if (ret && price > 0) {
             for (TransactionListener l : market.getTransactionListener()) {
-                l.logSale(type, amount, price, tax);
+                l.logPurchase(type, amount, price);
             }
         }
         return ret;
     }
-
+    
     /**
      * Set a destination for a unit.
      *
@@ -464,16 +412,32 @@ public final class InGameController implements NetworkConstants {
     /**
      * Unload some goods from a carrier.
      *
-     * @param goods The <code>Goods</code> to unload.
+     * @param type The <code>GoodsType</code> to unload.
+     * @param amount The amount of goods to unload.
      * @param carrier The <code>Unit</code> carrying the goods.
-     * @param colony The <code>Colony</code> to unload to.
      * @return True if the unload succeeded.
      */
-    private boolean askUnloadGoods(Goods goods, Unit carrier, Colony colony) {
-        GoodsType type = goods.getType();
+    private boolean askUnloadGoods(GoodsType type, int amount, Unit carrier) {
+        // Do not check for trade location, unloading can include dumping
+        // which can happen anywhere
+        final Player player = freeColClient.getMyPlayer();
+        final Market market = player.getMarket();
+        int price = 0, tax = 0;
+
+        if (carrier.isInEurope() && player.canTrade(type)) {
+            price = market.getPaidForSale(type);
+            tax = player.getTax();
+        }
+
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
-        return askServer().unloadCargo(goods)
+        boolean ret = askServer().unloadGoods(type, amount, carrier)
             && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount;
+        if (ret && price > 0) {
+            for (TransactionListener l : market.getTransactionListener()) {
+                l.logSale(type, amount, price, tax);
+            }
+        }
+        return ret;
     }
 
 
@@ -2328,9 +2292,7 @@ public final class InGameController implements NetworkConstants {
             if (export > 0) {
                 int amount = Math.min(demand, export);
                 Goods cargo = new Goods(game, loc, type, amount);
-                ret = (unit.isInEurope())
-                    ? askBuyGoods(type, amount, unit, europe)
-                    : askLoadGoods(cargo, unit, colony);
+                ret = askLoadGoods(type, amount, unit);
                 if (ret) {
                     lb.add(" ", getLoadGoodsMessage(type, amount, present,
                                                     export, demand));
@@ -2438,11 +2400,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Try to unload.
-            Goods cargo = new Goods(game, unit, type, amount);
-            ret = (cargo.getAmount() == 0) ? false
-                : (unit.isInEurope())
-                ? askSellGoods(cargo, unit, europe)
-                : askUnloadGoods(cargo, unit, colony);
+            ret = (amount == 0) ? false : askUnloadGoods(type, amount, unit);
             if (ret) {
                 lb.add(" ", getUnloadGoodsMessage(unit, type, amount,
                                                   present, atStop, toUnload));
@@ -2739,7 +2697,7 @@ public final class InGameController implements NetworkConstants {
         Europe europe = carrier.getOwner().getEurope();
         EuropeWas europeWas = new EuropeWas(europe);
         UnitWas unitWas = new UnitWas(carrier);
-        boolean ret = askBuyGoods(type, amount, carrier, europe);
+        boolean ret = askLoadGoods(type, amount, carrier);
         if (ret) {
             gui.playSound("sound.event.loadCargo");
             displayModelMessages(false, false);
@@ -3592,7 +3550,7 @@ public final class InGameController implements NetworkConstants {
         Colony colony = carrier.getColony();
         ColonyWas colonyWas = new ColonyWas(colony);
         UnitWas unitWas = new UnitWas(carrier);
-        boolean ret = askLoadGoods(goods, carrier, colony);
+        boolean ret = askLoadGoods(goods.getType(), goods.getAmount(), carrier);
         if (ret) {
             gui.playSound("sound.event.loadCargo");
         }
@@ -4174,7 +4132,8 @@ public final class InGameController implements NetworkConstants {
         Europe europe = player.getEurope();
         EuropeWas europeWas = new EuropeWas(europe);
         UnitWas unitWas = new UnitWas(carrier);
-        boolean ret = askSellGoods(goods, carrier, europe);
+        boolean ret = askUnloadGoods(goods.getType(), goods.getAmount(),
+                                     carrier);
         if (ret) {
             gui.playSound("sound.event.sellCargo");
             displayModelMessages(false, false);
@@ -4481,29 +4440,28 @@ public final class InGameController implements NetworkConstants {
         boolean ret = true;
         boolean inEurope = unit.isInEurope();
         Colony colony = unit.getColony();
-        if (colony != null) {
-            // In colony, unload units and goods.
+        if (colony != null) { // In colony, unload units and goods.
             for (Unit u : unit.getUnitList()) {
                 ret = leaveShip(u) && ret;
             }
             for (Goods goods : unit.getGoodsList()) {
                 ret = unloadCargo(goods, false) && ret;
             }
-        } else if (unit.isInEurope()) {
-            // In Europe, unload non-boycotted goods
+        } else if (unit.isInEurope()) { // In Europe, unload non-boycotted goods
             Player player = freeColClient.getMyPlayer();
             for (Goods goods : unit.getCompactGoodsList()) {
                 if (player.canTrade(goods.getType())) {
                     ret = sellGoods(goods) && ret;
                 }
             }
-            // Goods left here must be dumped.
-            if (unit.hasGoodsCargo()) {
+            if (unit.hasGoodsCargo()) { // Goods left here must be dumped.
                 gui.showDumpCargoDialog(unit);
                 return false;
             }
-        } else {
-            ret = false;
+        } else { // Dump goods, units dislike jumping overboard
+            for (Goods goods : unit.getGoodsList()) {
+                ret = unloadCargo(goods, false) && ret;
+            }
         }
         return ret;
     }
@@ -4537,7 +4495,8 @@ public final class InGameController implements NetworkConstants {
         // Unload
         ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
         UnitWas unitWas = new UnitWas(carrier);
-        boolean ret = askUnloadGoods(goods, carrier, colony);
+        boolean ret = askUnloadGoods(goods.getType(), goods.getAmount(),
+                                     carrier);
         if (ret) {
             gui.playSound("sound.event.unloadCargo");
         }

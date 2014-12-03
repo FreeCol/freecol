@@ -30,53 +30,53 @@ import org.w3c.dom.Element;
 
 
 /**
- * The message sent when buying goods in Europe.
+ * The message sent when loading goods.
  */
-public class BuyGoodsMessage extends DOMMessage {
+public class LoadGoodsMessage extends DOMMessage {
+
+    /** The identifier of the type of goods to load. */
+    private String goodsTypeId;
+
+    /** The amount of goods to load. */
+    private String amountString;
 
     /** The identifier of the carrier to load to goods onto. */
     private String carrierId;
 
-    /** The identifier of the type of goods to buy. */
-    private String goodsTypeId;
-
-    /** The amount of goods to buy. */
-    private String amountString;
-
 
     /**
-     * Create a new <code>BuyGoodsMessage</code>.
+     * Create a new <code>LoadGoodsMessage</code>.
      *
+     * @param type The type of goods to load.
+     * @param amount The amount of goods to load.
      * @param carrier The <code>Unit</code> to load the goods onto.
-     * @param type The type of goods to buy.
-     * @param amount The amount of goods to buy.
      */
-    public BuyGoodsMessage(Unit carrier, GoodsType type, int amount) {
+    public LoadGoodsMessage(GoodsType type, int amount, Unit carrier) {
         super(getXMLElementTagName());
 
-        this.carrierId = carrier.getId();
         this.goodsTypeId = type.getId();
         this.amountString = Integer.toString(amount);
+        this.carrierId = carrier.getId();
     }
 
     /**
-     * Create a new <code>BuyGoodsMessage</code> from a
+     * Create a new <code>LoadGoodsMessage</code> from a
      * supplied element.
      *
      * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
      */
-    public BuyGoodsMessage(Game game, Element element) {
+    public LoadGoodsMessage(Game game, Element element) {
         super(getXMLElementTagName());
 
-        this.carrierId = element.getAttribute("carrier");
         this.goodsTypeId = element.getAttribute("type");
         this.amountString = element.getAttribute("amount");
+        this.carrierId = element.getAttribute("carrier");
     }
 
 
     /**
-     * Handle a "buyGoods"-message.
+     * Handle a "loadGoods"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
@@ -96,16 +96,13 @@ public class BuyGoodsMessage extends DOMMessage {
         }
         if (!carrier.canCarryGoods()) {
             return DOMMessage.clientError("Not a goods carrier: " + carrierId);
-        } else if (!carrier.isInEurope()) {
-            return DOMMessage.clientError("Not in Europe: " + carrierId);
+        } else if (carrier.getTradeLocation() == null) {
+            return DOMMessage.clientError("Not at a trade location: " + carrierId);
         }
 
         GoodsType type = server.getSpecification().getGoodsType(goodsTypeId);
         if (type == null) {
             return DOMMessage.clientError("Not a goods type: " + goodsTypeId);
-        } else if (!player.canTrade(type)) {
-            return DOMMessage.clientError("Goods are boycotted: "
-                + goodsTypeId);
         }
 
         int amount;
@@ -117,33 +114,33 @@ public class BuyGoodsMessage extends DOMMessage {
         if (amount <= 0) {
             return DOMMessage.clientError("Amount must be positive: "
                 + amountString);
+        } else if (amount > carrier.getLoadableAmount(type)) {
+            return DOMMessage.clientError("Too much goods:  " + amountString);
         }
 
-        // Try to buy.
+        // Load the goods
         return server.getInGameController()
-            .buyGoods(serverPlayer, carrier, type, amount);
+            .loadGoods(serverPlayer, type, amount, carrier);
     }
 
     /**
-     * Convert this BuyGoodsMessage to XML.
+     * Convert this LoadGoodsMessage to XML.
      *
      * @return The XML representation of this message.
      */
     public Element toXMLElement() {
         return createMessage(getXMLElementTagName(),
-            "carrier", carrierId,
             "type", goodsTypeId,
-            "amount", amountString);
+            "amount", amountString,
+            "carrier", carrierId);
     }
 
     /**
      * The tag name of the root element representing this object.
      *
-     * @return "buyGoods".
+     * @return "loadGoods".
      */
     public static String getXMLElementTagName() {
-        return "buyGoods";
+        return "loadGoods";
     }
 }
-// FIXME: this and SellGoodsMessage are almost identical, collapse into
-// a single TradeGoods?

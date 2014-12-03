@@ -334,6 +334,24 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Move goods from one location to another.
+     *
+     * @param src The source <code>GoodsLocation</code>.
+     * @param goodsType The <code>GoodsType</code> to move.
+     * @param amount The amount of goods to move.
+     * @param dst The new <code>GoodsLocation</code>.
+     */
+    private void moveGoods(GoodsLocation src, GoodsType goodsType, int amount,
+                           GoodsLocation dst) {
+        src.getGoodsContainer().saveState();
+        src.removeGoods(goodsType, amount);
+        if (dst != null) {
+            dst.getGoodsContainer().saveState();
+            dst.addGoods(goodsType, amount);
+        }
+    }
+
+    /**
      * Gets a nation summary.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is querying.
@@ -343,58 +361,6 @@ public final class InGameController extends Controller {
     public NationSummary getNationSummary(ServerPlayer serverPlayer,
                                           Player player) {
         return new NationSummary(player, serverPlayer);
-    }
-
-    /**
-     * Move goods from current location to another.
-     *
-     * @param goods The <code>Goods</code> to move.
-     * @param loc The new <code>Location</code>.
-     */
-    public void moveGoods(Goods goods, Location loc)
-        throws IllegalStateException {
-        Location oldLoc = goods.getLocation();
-        if (oldLoc == null) {
-            throw new IllegalStateException("Goods in null location.");
-        } else if (loc == null) {
-            ; // Dumping is allowed
-        } else if (loc instanceof Unit) {
-            if (((Unit) loc).isInEurope()) {
-                if (!(oldLoc instanceof Unit && ((Unit) oldLoc).isInEurope())) {
-                    throw new IllegalStateException("Goods and carrier not both in Europe.");
-                }
-            } else if (loc.getTile() == null) {
-                throw new IllegalStateException("Carrier not on the map.");
-            } else if (oldLoc instanceof Settlement) {
-                // Can not be co-located when buying from natives, or
-                // when natives are demanding goods from a colony.
-            } else if (loc.getTile() != oldLoc.getTile()) {
-                throw new IllegalStateException("Goods and carrier not co-located.");
-            }
-        } else if (loc instanceof IndianSettlement) {
-            // Can not be co-located when selling to natives.
-        } else if (loc instanceof Colony) {
-            if (oldLoc instanceof Unit
-                && ((Unit) oldLoc).getOwner() != ((Colony) loc).getOwner()) {
-                // Gift delivery
-            } else if (loc.getTile() != oldLoc.getTile()) {
-                throw new IllegalStateException("Goods and carrier not both in Colony.");
-            }
-        } else if (loc.getGoodsContainer() == null) {
-            throw new IllegalStateException("New location with null GoodsContainer.");
-        }
-
-        // Save state of the goods container/s, allowing simpler updates.
-        oldLoc.getGoodsContainer().saveState();
-        if (loc != null) loc.getGoodsContainer().saveState();
-
-        oldLoc.remove(goods);
-        goods.setLocation(null);
-
-        if (loc != null) {
-            loc.add(goods);
-            goods.setLocation(loc);
-        }
     }
 
     /**
@@ -1636,28 +1602,29 @@ public final class InGameController extends Controller {
      * Buy goods in Europe.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is buying.
-     * @param unit The <code>Unit</code> to carry the goods.
      * @param type The <code>GoodsType</code> to buy.
      * @param amount The amount of goods to buy.
+     * @param carrier The <code>Unit</code> to carry the goods.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element buyGoods(ServerPlayer serverPlayer, Unit unit,
-                            GoodsType type, int amount) {
+    public Element buyGoods(ServerPlayer serverPlayer, GoodsType type,
+                            int amount, Unit carrier) {
         if (!serverPlayer.canTrade(type, Access.EUROPE)) {
             return DOMMessage.clientError("Can not trade boycotted goods");
         }
+
         ChangeSet cs = new ChangeSet();
-        GoodsContainer container = unit.getGoodsContainer();
+        GoodsContainer container = carrier.getGoodsContainer();
         container.saveState();
-        if ((amount = serverPlayer.buy(container, type, amount)) < 0) {
+        if (serverPlayer.buy(container, type, amount) < 0) {
             return DOMMessage.clientError("Player " + serverPlayer.getName()
                 + " tried to buy " + amount + " " + type);
         }
         serverPlayer.propagateToEuropeanMarkets(type, -amount, random);
         serverPlayer.csFlushMarket(type, cs);
-        unit.setMovesLeft(0);
+        carrier.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        cs.add(See.only(serverPlayer), unit);
+        cs.add(See.only(serverPlayer), carrier);
         // Action occurs in Europe, nothing is visible to other players.
         return cs.build(serverPlayer);
     }
@@ -1666,27 +1633,30 @@ public final class InGameController extends Controller {
      * Sell goods in Europe.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is selling.
-     * @param unit The <code>Unit</code> carrying the goods.
      * @param type The <code>GoodsType</code> to sell.
      * @param amount The amount of goods to sell.
+     * @param carrier The <code>Unit</code> carrying the goods.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element sellGoods(ServerPlayer serverPlayer, Unit unit,
-                             GoodsType type, int amount) {
-        if (!serverPlayer.canTrade(type, Access.EUROPE)) {
-            return DOMMessage.clientError("Can not trade boycotted goods");
-        }
+    public Element sellGoods(ServerPlayer serverPlayer, GoodsType type,
+                             int amount, Unit carrier) {
+
         ChangeSet cs = new ChangeSet();
-        GoodsContainer container = unit.getGoodsContainer();
+        GoodsContainer container = carrier.getGoodsContainer();
         container.saveState();
-        amount = serverPlayer.sell(container, type, amount);
-        if (amount > 0) {
-            serverPlayer.propagateToEuropeanMarkets(type, amount, random);
+        if (serverPlayer.canTrade(type, Access.EUROPE)) {
+            amount = serverPlayer.sell(container, type, amount);
+            if (amount > 0) {
+                serverPlayer.propagateToEuropeanMarkets(type, amount, random);
+            }
+            serverPlayer.csFlushMarket(type, cs);
+            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+        } else {
+            // Dumping goods in Europe
+            moveGoods(carrier, type, amount, null);
         }
-        serverPlayer.csFlushMarket(type, cs);
-        unit.setMovesLeft(0);
-        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        cs.add(See.only(serverPlayer), unit);
+        carrier.setMovesLeft(0);
+        cs.add(See.only(serverPlayer), carrier);
         // Action occurs in Europe, nothing is visible to other players.
         return cs.build(serverPlayer);
     }
@@ -2533,7 +2503,7 @@ public final class InGameController extends Controller {
         }
 
         // Valid, make the trade.
-        moveGoods(goods, unit);
+        moveGoods(settlement, goods.getType(), goods.getAmount(), unit);
         cs.add(See.perhaps(), unit);
 
         Player settlementPlayer = settlement.getOwner();
@@ -2587,7 +2557,7 @@ public final class InGameController extends Controller {
         }
 
         // Valid, make the trade.
-        moveGoods(goods, settlement);
+        moveGoods(unit, goods.getType(), goods.getAmount(), settlement);
         cs.add(See.perhaps(), unit);
 
         Player settlementPlayer = settlement.getOwner();
@@ -2633,7 +2603,7 @@ public final class InGameController extends Controller {
 
         ChangeSet cs = new ChangeSet();
         Tile tile = settlement.getTile();
-        moveGoods(goods, settlement);
+        moveGoods(unit, goods.getType(), goods.getAmount(), settlement);
         cs.add(See.perhaps(), unit);
         if (settlement instanceof ServerIndianSettlement) {
             ServerIndianSettlement sis = (ServerIndianSettlement)settlement;
@@ -2671,94 +2641,74 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Load cargo.
+     * Load goods.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is loading.
-     * @param unit The <code>Unit</code> to load.
-     * @param goods The <code>Goods</code> to load.
+     * @param goodsType The <code>GoodsType</code> to load.
+     * @param amount The amount of goods to load.
+     * @param carrier The <code>Unit</code> to load.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element loadCargo(ServerPlayer serverPlayer, Unit unit,
-                             Goods goods) {
+    public Element loadGoods(ServerPlayer serverPlayer, GoodsType goodsType,
+                             int amount, Unit carrier) {
+        if (carrier.getLoadableAmount(goodsType) < amount) {
+            return DOMMessage.clientError("Too much goods");
+        }
+        if (carrier.isInEurope()) {
+            return buyGoods(serverPlayer, goodsType, amount, carrier);
+        }
+
+        Settlement settlement = carrier.getSettlement();
+        if (settlement == null) {
+            return DOMMessage.clientError("Carrier not at settlement");
+        } else if (settlement.getGoodsCount(goodsType) < amount) {
+            return DOMMessage.clientError("Not enough goods");
+        }
+
         ChangeSet cs = new ChangeSet();
-        Location oldLocation = goods.getLocation();
-
-        goods.adjustAmount();
-        moveGoods(goods, unit);
-        boolean moved = false;
-        if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
-            unit.setMovesLeft(0);
-            moved = true;
-        }
-        Unit oldUnit = null;
-        if (oldLocation instanceof Unit) {
-            oldUnit = (Unit) oldLocation;
-            if (oldUnit.getInitialMovesLeft() != oldUnit.getMovesLeft()) {
-                oldUnit.setMovesLeft(0);
-            } else {
-                oldUnit = null;
-            }
+        moveGoods(settlement, goodsType, amount, carrier);
+        cs.add(See.only(serverPlayer), settlement.getGoodsContainer());
+        cs.add(See.only(serverPlayer), carrier.getGoodsContainer());
+        if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
+            carrier.setMovesLeft(0);
+            cs.addPartial(See.only(serverPlayer), carrier, "movesLeft");
         }
 
-        // Update the goodsContainers only if within a settlement,
-        // otherwise update the shared location so that others can
-        // see capacity changes.
-        if (unit.getSettlement() != null) {
-            cs.add(See.only(serverPlayer), oldLocation.getGoodsContainer());
-            cs.add(See.only(serverPlayer), unit.getGoodsContainer());
-            if (moved) {
-                cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
-            }
-            if (oldUnit != null) {
-                cs.addPartial(See.only(serverPlayer), oldUnit, "movesLeft");
-            }
-        } else {
-            cs.add(See.perhaps(), (FreeColGameObject)unit.getLocation());
-        }
-
-        // Others might see capacity change.
-        sendToOthers(serverPlayer, cs);
+        // Invisible in settlement
         return cs.build(serverPlayer);
     }
 
     /**
-     * Unload cargo.
+     * Unload goods.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is unloading.
-     * @param unit The <code>Unit</code> to unload.
-     * @param goods The <code>Goods</code> to unload.
+     * @param goodsType The <code>GoodsType</code> to unload.
+     * @param amount The amount of goods to unload.
+     * @param carrier The <code>Unit</code> to unload.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element unloadCargo(ServerPlayer serverPlayer, Unit unit,
-                               Goods goods) {
+    public Element unloadGoods(ServerPlayer serverPlayer, GoodsType goodsType,
+                               int amount, Unit carrier) {
+        if (carrier.getGoodsCount(goodsType) < amount) {
+            return DOMMessage.clientError("Too few goods");
+        }
+        if (carrier.isInEurope()) {
+            return sellGoods(serverPlayer, goodsType, amount, carrier);
+        }
+
         ChangeSet cs = new ChangeSet();
-
-        Location loc;
-        Settlement settlement = null;
-        if (unit.isInEurope()) { // Must be a dump of boycotted goods
-            loc = null;
-        } else if (!unit.hasTile()) {
-            return DOMMessage.clientError("Unit not on the map.");
-        } else if (unit.getSettlement() != null) {
-            settlement = unit.getTile().getSettlement();
-            loc = settlement;
-        } else { // Dump of goods onto a tile
-            loc = null;
-        }
-        goods.adjustAmount();
-        moveGoods(goods, loc);
-        boolean moved = false;
-        if (unit.getInitialMovesLeft() != unit.getMovesLeft()) {
-            unit.setMovesLeft(0);
-            moved = true;
-        }
-
-        if (settlement != null) {
+        if (carrier.getSettlement() != null) {
+            Settlement settlement = carrier.getSettlement();
+            moveGoods(carrier, goodsType, amount, settlement);
             cs.add(See.only(serverPlayer), settlement.getGoodsContainer());
-            cs.add(See.only(serverPlayer), unit.getGoodsContainer());
-            if (moved) cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
-        } else {
-            cs.add(See.perhaps(), (FreeColGameObject)unit.getLocation());
+            cs.add(See.only(serverPlayer), carrier.getGoodsContainer());
+            if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
+                carrier.setMovesLeft(0);
+                cs.addPartial(See.only(serverPlayer), carrier, "movesLeft");
+            }
+        } else { // Dump of goods onto a tile
+            moveGoods(carrier, goodsType, amount, null);
+            cs.add(See.perhaps(), (FreeColGameObject)carrier.getLocation());
         }
 
         // Others might see a capacity change.
@@ -3143,12 +3093,12 @@ public final class InGameController extends Controller {
             if (goods != null && settlement != null) {
                 if (dest.owns(settlement)) {
                     goods.setLocation(unit);
-                    moveGoods(goods, settlement);
+                    moveGoods(unit, goods.getType(), goods.getAmount(), settlement);
                     cs.add(See.only(source), unit);
                     cs.add(See.only(dest), settlement.getGoodsContainer());
                 } else {
                     goods.setLocation(settlement);
-                    moveGoods(goods, unit);
+                    moveGoods(settlement, goods.getType(), goods.getAmount(), unit);
                     cs.add(See.only(dest), unit);
                     cs.add(See.only(source), settlement.getGoodsContainer());
                 }
@@ -3771,7 +3721,7 @@ public final class InGameController extends Controller {
                 colonyContainer.saveState();
                 GoodsContainer unitContainer = unit.getGoodsContainer();
                 unitContainer.saveState();
-                moveGoods(new Goods(game, colony, type, amount), unit);
+                moveGoods(colony, type, amount, unit);
                 cs.add(See.only(victim), colonyContainer);
                 //cs.add(See.only(serverPlayer), unitContainer);
             }

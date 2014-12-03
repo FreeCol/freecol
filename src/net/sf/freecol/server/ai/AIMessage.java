@@ -46,7 +46,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.AttackMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
-import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.ChangeStateMessage;
 import net.sf.freecol.common.networking.ChangeWorkImprovementTypeMessage;
@@ -65,7 +64,7 @@ import net.sf.freecol.common.networking.EquipForRoleMessage;
 import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
-import net.sf.freecol.common.networking.LoadCargoMessage;
+import net.sf.freecol.common.networking.LoadGoodsMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
@@ -74,10 +73,9 @@ import net.sf.freecol.common.networking.PutOutsideColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
-import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
-import net.sf.freecol.common.networking.UnloadCargoMessage;
+import net.sf.freecol.common.networking.UnloadGoodsMessage;
 import net.sf.freecol.common.networking.WorkMessage;
 
 import org.w3c.dom.Element;
@@ -278,22 +276,6 @@ public class AIMessage {
     public static boolean askBuildColony(AIUnit aiUnit, String name) {
         return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new BuildColonyMessage(name, aiUnit.getUnit()));
-    }
-
-
-    /**
-     * An AIUnit buys goods.
-     *
-     * @param aiUnit The <code>AIUnit</code> buys goods.
-     * @param type The <code>GoodsType</code> to buy.
-     * @param amount The amount of goods to buy.
-     * @return True if the message was sent, and a non-error reply returned.
-     */
-    public static boolean askBuyGoods(AIUnit aiUnit, GoodsType type,
-                                      int amount) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new BuyGoodsMessage(aiUnit.getUnit(), type,
-                                               amount));
     }
 
 
@@ -571,13 +553,15 @@ public class AIMessage {
     /**
      * An AI unit loads some cargo.
      *
+     * @param type The <code>GoodsType</code> to load.
+     * @param amount The amount of goods to load.
      * @param aiUnit The <code>AIUnit</code> that is loading.
-     * @param goods The <code>Goods</code> to load.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askLoadCargo(AIUnit aiUnit, Goods goods) {
+    public static boolean askLoadGoods(GoodsType type, int amount,
+                                       AIUnit aiUnit) {
         return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new LoadCargoMessage(goods, aiUnit.getUnit()));
+            new LoadGoodsMessage(type, amount, aiUnit.getUnit()));
     }
 
 
@@ -680,19 +664,6 @@ public class AIMessage {
 
 
     /**
-     * An AI unit sells some cargo.
-     *
-     * @param aiUnit The <code>AIUnit</code> that is selling.
-     * @param goods The <code>Goods</code> to sell.
-     * @return True if the message was sent, and a non-error reply returned.
-     */
-    public static boolean askSellGoods(AIUnit aiUnit, Goods goods) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new SellGoodsMessage(goods, aiUnit.getUnit()));
-    }
-
-
-    /**
      * Set the build queue in a colony.
      *
      * @param aiColony The <code>AIColony</code> that is building.
@@ -724,13 +695,15 @@ public class AIMessage {
     /**
      * An AI unit unloads some cargo.
      *
+     * @param type The <code>GoodsType</code> to unload.
+     * @param amount The amount of goods to unload.
      * @param aiUnit The <code>AIUnit</code> that is unloading.
-     * @param goods The <code>Goods</code> to unload.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askUnloadCargo(AIUnit aiUnit, Goods goods) {
+    public static boolean askUnloadGoods(GoodsType type, int amount,
+                                         AIUnit aiUnit) {
         return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new UnloadCargoMessage(goods));
+            new UnloadGoodsMessage(type, amount, aiUnit.getUnit()));
     }
 
 
