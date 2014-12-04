@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Graphics;
@@ -41,19 +42,20 @@ import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
- * A collection of panels and buttons that are used to provide
- * the user with a more detailed view of certain elements on the
- * map and also to provide a means of input in case the user
- * can't use the keyboard.
+ * A collection of panels and buttons that are used to provide the
+ * user with a more detailed view of certain elements on the map and
+ * also to provide a means of input in case the user can't use the
+ * keyboard.
  *
- * The MapControls are useless by themselves, this object needs to
- * be placed on a JComponent in order to be usable.
+ * The MapControls are useless by themselves, this object needs to be
+ * placed on a JComponent in order to be usable.
  */
 public final class CornerMapControls extends MapControls {
 
     private static final Logger logger = Logger.getLogger(CornerMapControls.class.getName());
 
     public class MiniMapPanel extends JPanel {
+
         /**
          * {@inheritDoc}
          */
@@ -85,6 +87,7 @@ public final class CornerMapControls extends MapControls {
         compassRose.setFocusable(false);
         compassRose.setSize(compassRose.getPreferredSize());
         compassRose.addMouseListener(new MouseAdapter() {
+
                 /**
                  * {@inheritDoc}
                  */
@@ -104,7 +107,6 @@ public final class CornerMapControls extends MapControls {
             });
 
         miniMapSkin = ResourceManager.getImage("MiniMap.skin");
-
         miniMapPanel = new MiniMapPanel();
         miniMapPanel.setFocusable(false);
         
@@ -148,6 +150,25 @@ public final class CornerMapControls extends MapControls {
         }
     }
 
+
+    /**
+     * Add a component to the canvas.
+     *
+     * @param canvas The <code>Canvas</code> to add to.
+     * @param component The component to add.
+     */
+    private void addToCanvas(Canvas canvas, Component component) {
+        try {
+            canvas.add(component, CONTROLS_LAYER);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Component add fail: "
+                + component.getLocation() + " in " + canvas.getSize(), e);
+        }
+    }
+
+
+    // Implement MapControls
+
     /**
      * Adds the map controls to the given canvas.
      *
@@ -173,7 +194,6 @@ public final class CornerMapControls extends MapControls {
         if (rose) {
             compassRose.setLocation(cw - compassRose.getWidth() - 20, 20);
         }
-
         if (!unitButtons.isEmpty()) {
             final int SPACE = 5;
             int width = -SPACE, height = 0;
@@ -184,7 +204,6 @@ public final class CornerMapControls extends MapControls {
             int x = miniMapPanel.getWidth() + 1
                 + (infoPanel.getX() - miniMapPanel.getWidth() - width) / 2;
             int y = ch - height - SPACE;
-
             for (UnitButton ub : unitButtons) {
                 ub.setLocation(x, y);
                 x += SPACE + ub.getWidth();
@@ -194,23 +213,12 @@ public final class CornerMapControls extends MapControls {
         //
         // Add the GUI Objects to the container
         //
-        canvas.add(infoPanel, CONTROLS_LAYER);
-        try {
-            canvas.add(miniMapPanel, CONTROLS_LAYER);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Minimap add fail: "
-                + miniMapPanel.getLocation() + " in " + canvas.getSize(), e);
-        }
-        if (rose) canvas.add(compassRose, CONTROLS_LAYER);
-
+        addToCanvas(canvas, infoPanel);
+        addToCanvas(canvas, miniMapPanel);
+        if (rose) addToCanvas(canvas, compassRose);
         if (!freeColClient.isMapEditor()) {
             for (UnitButton button : unitButtons) {
-                try {
-                    canvas.add(button, CONTROLS_LAYER);
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "Button add fail: "
-                        + button.getLocation() + " in " + canvas.getSize(), e);
-                }
+                addToCanvas(canvas, button);
                 button.refreshAction();
             }
         }

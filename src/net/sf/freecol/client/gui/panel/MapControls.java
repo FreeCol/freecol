@@ -132,6 +132,7 @@ public abstract class MapControls {
 
     /**
      * Adds the map controls to the given component.
+     *
      * @param component The component to add the map controls to.
      */
     public abstract void addToComponent(Canvas component);
