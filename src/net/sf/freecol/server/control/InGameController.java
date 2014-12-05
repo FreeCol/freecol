@@ -2709,10 +2709,9 @@ public final class InGameController extends Controller {
         } else { // Dump of goods onto a tile
             moveGoods(carrier, goodsType, amount, null);
             cs.add(See.perhaps(), (FreeColGameObject)carrier.getLocation());
+            // Others might see a capacity change.
+            sendToOthers(serverPlayer, cs);
         }
-
-        // Others might see a capacity change.
-        sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
