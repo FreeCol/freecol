@@ -344,7 +344,7 @@ public final class ReportTurnPanel extends ReportPanel {
                             insertText(document, item[1]);
                         }
                     } else if ("%europe%".equals(var)
-                        || "%market%".equals(var)) {
+                        || ("%market%".equals(var) && player.isColonial())) {
                         insertLinkButton(document, player.getEurope(),
                             Messages.message(player.getEurope().getNameKey()));
                     } else if ("%unit%".equals(var)
