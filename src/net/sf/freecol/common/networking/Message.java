@@ -110,10 +110,8 @@ public class Message {
         } catch (ParserConfigurationException pce) {
             // Parser with specified options can't be built
             logger.log(Level.WARNING, "Parser error", pce);
-        } catch (SAXException se) {
-            throw se;
-        } catch (IOException ie) {
-            throw ie;
+        } catch (IOException|SAXException ex) {
+            throw ex;
         } catch (ArrayIndexOutOfBoundsException e) {
             // Xerces throws ArrayIndexOutOfBoundsException when it barfs on
             // some FreeCol messages. I'd like to see the messages upon which

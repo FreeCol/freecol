@@ -464,19 +464,13 @@ public class FreeColDirectories {
     private static boolean copyFile(File src, File dst) {
         byte[] buf = new byte[16384];
         int len;
-        FileInputStream in = null;
-        FileOutputStream out = null;
-    		try {
-            in = new FileInputStream(src);
-            out = new FileOutputStream(dst);
+    		try (
+            FileInputStream in = new FileInputStream(src);
+            FileOutputStream out = new FileOutputStream(dst);
+        ) {
             while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
         } catch (IOException ioe) {
             return false;
-        } finally {
-            try {
-                if (out != null) out.close();
-                if (in != null) in.close();
-            } catch (IOException ioe) {} // Ignore
         }
         return true;
     }

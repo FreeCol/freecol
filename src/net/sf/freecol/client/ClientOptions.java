@@ -682,25 +682,21 @@ public class ClientOptions extends OptionGroup {
      */
     public boolean loadOptions(File optionsFile) {
         boolean ret = false;
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(optionsFile);
+        try (
+            FileInputStream fis = new FileInputStream(optionsFile);
+        ) {
             try {
                 ret = loadOptions(new BufferedInputStream(fis));
-            } catch (IOException ioe) {
+            } catch (IOException|XMLStreamException ex) {
                 logger.log(Level.WARNING, "Error reading client options file: "
-                    + optionsFile.getPath(), ioe);
-            } catch (XMLStreamException xse) {
-                logger.log(Level.WARNING, "Error reading client options file: "
-                    + optionsFile.getPath(), xse);
+                    + optionsFile.getPath(), ex);
             }
         } catch (FileNotFoundException fnfe) {
             logger.log(Level.WARNING, "Client options file not found: "
                 + optionsFile.getPath(), fnfe);
-        } finally {
-            try { if (fis != null) fis.close(); } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Failed to close stream.", ioe);
-            }
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error opening client options file: "
+                + optionsFile.getPath(), ioe);
         }
         return ret;
     }
@@ -717,14 +713,12 @@ public class ClientOptions extends OptionGroup {
     public boolean loadOptions(InputStream in)
         throws IOException, XMLStreamException {
         if (in != null) {
-            FreeColXMLReader xr = null;
-            try {
-                xr = new FreeColXMLReader(in);
+            try (
+                FreeColXMLReader xr = new FreeColXMLReader(in);
+            ) {
                 xr.nextTag();
                 readFromXML(xr);
                 return true;
-            } finally {
-                if (xr != null) xr.close();
             }
         }
         return false;
@@ -750,16 +744,13 @@ public class ClientOptions extends OptionGroup {
      * @param in The <code>InputStream</code> to read the options from.
      */
     public void updateOptions(InputStream in) {
-        FreeColXMLReader xr = null;
-        try {
-            xr = new FreeColXMLReader(in);
+        try (
+            FreeColXMLReader xr = new FreeColXMLReader(in);
+        ) {
             xr.nextTag();
             readFromXML(xr);
-
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception when loading options.", e);
-        } finally {
-            if (xr != null) xr.close();
         }
     }
 
@@ -771,9 +762,10 @@ public class ClientOptions extends OptionGroup {
     public static String getLanguageOption() {
         File options = FreeColDirectories.getClientOptionsFile();
         if (options.canRead()) {
-            FreeColXMLReader xr = null;
-            try {
-                xr = new FreeColXMLReader(new FileInputStream(options));
+            try (
+                FileInputStream fis = new FileInputStream(options);
+                FreeColXMLReader xr = new FreeColXMLReader(fis);
+            ) {
                 xr.nextTag();
                 for (int type = xr.getEventType();
                      type != XMLEvent.END_DOCUMENT; type = xr.getEventType()) {
@@ -785,11 +777,8 @@ public class ClientOptions extends OptionGroup {
                 }
                 // We don't have a language option in our file, it is
                 // either not there or the file is corrupt
-
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Failure getting language.", e);
-            } finally {
-                if (xr != null) xr.close();
             }
         }
         return null;

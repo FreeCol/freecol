@@ -184,10 +184,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
                     TradeRouteInputPanel.this.stopList.repaint();
                 }
                 return true;
-            } catch (UnsupportedFlavorException ufe) {
-                logger.log(Level.WARNING, "CargoHandler import", ufe);
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "CargoHandler import", ioe);
+            } catch (IOException|UnsupportedFlavorException ex) {
+                logger.log(Level.WARNING, "CargoHandler import", ex);
             }
             return false;
         }
@@ -221,10 +219,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
                     TradeRouteInputPanel.this.cargoPanel.revalidate();
                     TradeRouteInputPanel.this.cargoPanel.repaint();
                 }
-            } catch (UnsupportedFlavorException ufe) {
-                logger.log(Level.WARNING, "CargoHandler export", ufe);
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "CargoHandler export", ioe);
+            } catch (IOException|UnsupportedFlavorException ex) {
+                logger.log(Level.WARNING, "CargoHandler export", ex);
             }
         }
 

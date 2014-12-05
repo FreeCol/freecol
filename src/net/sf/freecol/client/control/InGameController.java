@@ -642,10 +642,8 @@ public final class InGameController implements NetworkConstants {
             } else {
                 try {
                     SwingUtilities.invokeAndWait(uiTask);
-                } catch (InterruptedException e) {
-                    logger.log(Level.WARNING, "Message display", e);
-                } catch (InvocationTargetException e) {
-                    logger.log(Level.WARNING, "Message display", e);
+                } catch (InterruptedException|InvocationTargetException ex) {
+                    logger.log(Level.WARNING, "Message display", ex);
                 }
             }
         }

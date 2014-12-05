@@ -84,15 +84,13 @@ public class FreeColSavegameFile extends FreeColDataFile {
      * @return The saved game version, or negative on error.
      */
     public int getSavegameVersion() {
-        FreeColXMLReader xr = null;
-        try {
-            xr = this.getFreeColXMLReader();
+        try (
+            FreeColXMLReader xr = this.getFreeColXMLReader();
+        ) {
             xr.nextTag();
             return xr.getAttribute(VERSION_TAG, -1);
         } catch (Exception e) {
             ; // Just fail
-        } finally {
-            if (xr != null) xr.close();
         }
         return -1;
     }

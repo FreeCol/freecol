@@ -245,15 +245,8 @@ public final class Xml {
         try {
             DocumentBuilder  builder = factory.newDocumentBuilder();
             return builder.parse( source );
-        }
-        catch ( ParserConfigurationException e ) {
-            throw new Exception( e );
-        }
-        catch ( SAXException e ) {
-            throw new Exception( e );
-        }
-        catch ( IOException e ) {
-            throw new Exception( e );
+        } catch (IOException|ParserConfigurationException|SAXException e) {
+            throw new Exception(e);
         }
     }
 

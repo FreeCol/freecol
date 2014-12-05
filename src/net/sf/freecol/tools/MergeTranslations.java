@@ -111,10 +111,10 @@ public class MergeTranslations {
 
     private static Map<String, String> readFile(File file) {
         Map<String, String> result = new HashMap<>();
-        BufferedReader bufferedReader = null;
-        try {
+        try (
             FileReader fileReader = new FileReader(file);
-            bufferedReader = new BufferedReader(fileReader); 
+            BufferedReader bufferedReader = new BufferedReader(fileReader); 
+        ) {
             String line = bufferedReader.readLine();
             while (line != null) {
                 int index = line.indexOf('=');
@@ -123,10 +123,8 @@ public class MergeTranslations {
                 }
                 line = bufferedReader.readLine();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             // forget it
-        } finally {
-            if (bufferedReader != null) try { bufferedReader.close(); } catch (IOException ioe) {}
         }
         return result;
     }

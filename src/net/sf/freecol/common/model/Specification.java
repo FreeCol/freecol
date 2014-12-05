@@ -348,15 +348,13 @@ public final class Specification {
      * @param in The <code>InputStream</code> to read from.
      */
     private void load(InputStream in) {
-        FreeColXMLReader xr = null;
-        try {
-            xr = new FreeColXMLReader(in);
+        try (
+            FreeColXMLReader xr = new FreeColXMLReader(in);
+        ) {
             xr.nextTag();
             load(xr);
         } catch (Exception e) {
             throw new RuntimeException("Load specification stream error", e);
-        } finally {
-            if (xr != null) xr.close();
         }
     }
 
@@ -429,9 +427,10 @@ public final class Specification {
      */
     public OptionGroup loadOptionsFile(String optionId, File file) {
         OptionGroup group = null;
-        FreeColXMLReader xr = null;
-        try {
-            xr = new FreeColXMLReader(new FileInputStream(file));
+        try (
+            FileInputStream fis = new FileInputStream(file);
+            FreeColXMLReader xr = new FreeColXMLReader(fis);
+        ) {
             xr.nextTag();
             group = new OptionGroup(this);
             group.readFromXML(xr);
@@ -445,8 +444,6 @@ public final class Specification {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to load OptionGroup "
                 + optionId + " from " + file.getName(), e);
-        } finally {
-            if (xr != null) xr.close();
         }
         return group;
     }
@@ -1811,16 +1808,15 @@ public final class Specification {
             zero10X = true;
         }
         if (!zero10X) return;
-        FileInputStream fis = null;
-        try {
-            File base = FreeColDirectories.getBaseDirectory();
-            fis = new FileInputStream(new File(base, ROLES_COMPAT_FILE_NAME)); 
+        File base = FreeColDirectories.getBaseDirectory();
+        File rolf = new File(base, ROLES_COMPAT_FILE_NAME); 
+        try (
+            FileInputStream fis = new FileInputStream(rolf);
+        ) {
             load(fis);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to load remedial roles.", e);
             return;
-        } finally {
-            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
         }
         List<String> roles = new ArrayList<>();
         for (Role r : getRoles()) roles.add(r.getId());

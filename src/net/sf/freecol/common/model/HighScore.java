@@ -385,9 +385,10 @@ public class HighScore extends FreeColObject {
             return scores;
         }
 
-        FreeColXMLReader xr = null;
-        try {
-            xr = new FreeColXMLReader(new FileInputStream(hsf));
+        try (
+            FileInputStream fis = new FileInputStream(hsf);
+            FreeColXMLReader xr = new FreeColXMLReader(fis);
+        ) {
             xr.nextTag();
 
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -396,11 +397,8 @@ public class HighScore extends FreeColObject {
                     scores.add(new HighScore(xr));
                 }
             }
-
         } catch (Exception e) { // Do not crash on high score fail.
             logger.log(Level.WARNING, "Error loading high scores.", e);
-        } finally {
-            if (xr != null) xr.close();
         }
         tidyScores(scores);
         return scores;
@@ -418,36 +416,31 @@ public class HighScore extends FreeColObject {
         tidyScores(scores);
 
         File hsf = FreeColDirectories.getHighScoreFile();
-        FreeColXMLWriter xw = null;
-        try {
-            xw = new FreeColXMLWriter(new FileOutputStream(hsf),
+        try (
+            FileOutputStream fos = new FileOutputStream(hsf);
+            FreeColXMLWriter xw = new FreeColXMLWriter(fos,
                 FreeColXMLWriter.WriteScope.toSave(), true);
+        ) {
             ret = true;
+            xw.writeStartDocument("UTF-8", "1.0");
+            xw.writeStartElement(HIGH_SCORES_TAG);
+            int count = 0;
+            for (HighScore score : scores) {
+                score.toXML(xw);
+                count++;
+            }
+            xw.writeEndElement();
+            xw.writeEndDocument();
+            xw.flush();
         } catch (FileNotFoundException fnfe) {
             logger.log(Level.WARNING, "Failed to open high scores file.", fnfe);
+            ret = false;
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
-        }
-
-        if (ret) {
-            try {
-                xw.writeStartDocument("UTF-8", "1.0");
-                xw.writeStartElement(HIGH_SCORES_TAG);
-                int count = 0;
-                for (HighScore score : scores) {
-                    score.toXML(xw);
-                    count++;
-                }
-                xw.writeEndElement();
-                xw.writeEndDocument();
-                xw.flush();
-            } catch (XMLStreamException xse) {
-                logger.log(Level.WARNING, "Failed to write high scores file.",
-                           xse);
-                ret = false;
-            } finally {
-                xw.close();
-            }
+            ret = false;
+        } catch (XMLStreamException xse) {
+            logger.log(Level.WARNING, "Failed to write high scores file.", xse);
+            ret = false;
         }
         return ret;
     }

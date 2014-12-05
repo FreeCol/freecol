@@ -79,22 +79,15 @@ public final class ErrorPanel extends FreeColPanel {
 
         File logFile = new File(FreeColDirectories.getLogFilePath());
         byte[] buffer = new byte[(int) logFile.length()];
-        BufferedInputStream logFileStream = null;
         String message = null;
-        try {
-            logFileStream = new BufferedInputStream(new FileInputStream(logFile));
+        try (
+            FileInputStream fis = new FileInputStream(logFile);
+            BufferedInputStream logFileStream = new BufferedInputStream(fis);
+        ) {
             logFileStream.read(buffer);
             message = new String(buffer, "UTF-8");
         } catch (Exception e) {
-            // ignore
-        } finally {
-            if (logFileStream != null) {
-                try {
-                    logFileStream.close();
-                } catch (IOException e) {
-                    // failed
-                }
-            }
+            ;// ignore
         }
 
         JTextArea textArea = GUI.getDefaultTextArea(message, 40);

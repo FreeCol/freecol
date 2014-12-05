@@ -54,7 +54,7 @@ public class FontTest extends FreeColTestCase {
                 assertTrue(font.getName() + " can not display " + entry.getValue(),
                            font.canDisplay(entry.getKey()));
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail(e.toString());
         }
     }
@@ -70,7 +70,7 @@ public class FontTest extends FreeColTestCase {
                 assertTrue(font.getName() + " can not display " + entry.getValue(),
                            font.canDisplay(entry.getKey()));
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail(e.toString());
         }
     }

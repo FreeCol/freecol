@@ -677,24 +677,15 @@ public final class FreeColServer {
     public void removeFromMetaServer() {
         if (!publicServer) return;
 
-        Connection mc;
-        try {
-            mc = new Connection(FreeCol.META_SERVER_ADDRESS,
-                                FreeCol.META_SERVER_PORT,
-                                null, FreeCol.SERVER_THREAD);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not connect to meta-server.", e);
-            return;
-        }
-
-        try {
+        try (
+            Connection mc = new Connection(FreeCol.META_SERVER_ADDRESS,
+                FreeCol.META_SERVER_PORT,
+                null, FreeCol.SERVER_THREAD);
+        ) {
             mc.send(DOMMessage.createMessage("remove",
                     "port", Integer.toString(port)));
         } catch (IOException e) {
             logger.log(Level.WARNING, "Network error with meta-server.", e);
-            return;
-        } finally {
-            mc.close();
         }
     }
 
@@ -765,11 +756,9 @@ public final class FreeColServer {
     public void saveGame(File file, OptionGroup options, BufferedImage image)
         throws IOException {
         final ServerGame game = getGame();
-        JarOutputStream fos = null;
-        FreeColXMLWriter xw = null;
-        try {
-            fos = new JarOutputStream(new FileOutputStream(file));
-
+        try (
+            JarOutputStream fos = new JarOutputStream(new FileOutputStream(file));
+        ) {
             if (image != null) {
                 fos.putNextEntry(new JarEntry(FreeColSavegameFile.THUMBNAIL_FILE));
                 ImageIO.write(image, "png", fos);
@@ -791,63 +780,60 @@ public final class FreeColServer {
 
             // save the actual game data
             fos.putNextEntry(new JarEntry(FreeColSavegameFile.SAVEGAME_FILE));
-            xw = new FreeColXMLWriter(fos, FreeColXMLWriter.WriteScope.toSave(),
-                                      false);
+            try (
+                FreeColXMLWriter xw = new FreeColXMLWriter(fos,
+                    FreeColXMLWriter.WriteScope.toSave(), false);
+            ) {
+                xw.writeStartDocument("UTF-8", "1.0");
 
-            xw.writeStartDocument("UTF-8", "1.0");
+                xw.writeComment("Game version: " + FreeCol.getRevision());
 
-            xw.writeComment("Game version: " + FreeCol.getRevision());
+                xw.writeStartElement(SAVED_GAME_TAG);
 
-            xw.writeStartElement(SAVED_GAME_TAG);
+                // Add the attributes:
+                xw.writeAttribute(OWNER_TAG, FreeCol.getName());
 
-            // Add the attributes:
-            xw.writeAttribute(OWNER_TAG, FreeCol.getName());
+                xw.writeAttribute(PUBLIC_SERVER_TAG, publicServer);
 
-            xw.writeAttribute(PUBLIC_SERVER_TAG, publicServer);
+                xw.writeAttribute(SINGLE_PLAYER_TAG, singlePlayer);
 
-            xw.writeAttribute(SINGLE_PLAYER_TAG, singlePlayer);
+                xw.writeAttribute(FreeColSavegameFile.VERSION_TAG,
+                                  SAVEGAME_VERSION);
 
-            xw.writeAttribute(FreeColSavegameFile.VERSION_TAG,
-                              SAVEGAME_VERSION);
+                xw.writeAttribute(RANDOM_STATE_TAG, Utils.getRandomState(random));
 
-            xw.writeAttribute(RANDOM_STATE_TAG, Utils.getRandomState(random));
+                xw.writeAttribute(DEBUG_TAG, FreeColDebugger.getDebugModes());
 
-            xw.writeAttribute(DEBUG_TAG, FreeColDebugger.getDebugModes());
-
-            if (getActiveUnit() != null) {
-                xw.writeAttribute(ACTIVE_UNIT_TAG, getActiveUnit());
-            }
+                if (getActiveUnit() != null) {
+                    xw.writeAttribute(ACTIVE_UNIT_TAG, getActiveUnit());
+                }
             
-            // Add server side model information:
-            xw.writeStartElement(SERVER_OBJECTS_TAG);
+                // Add server side model information:
+                xw.writeStartElement(SERVER_OBJECTS_TAG);
 
-            for (ServerModelObject smo : game.getServerModelObjects()) {
-                xw.writeStartElement(smo.getServerXMLElementTagName());
+                for (ServerModelObject smo : game.getServerModelObjects()) {
+                    xw.writeStartElement(smo.getServerXMLElementTagName());
 
-                xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, smo.getId());
+                    xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, smo.getId());
+
+                    xw.writeEndElement();
+                }
 
                 xw.writeEndElement();
+
+                game.toXML(xw); // Add the game
+
+                if (aiMain != null) aiMain.toXML(xw); // Add the AIObjects
+
+                xw.writeEndElement();
+                xw.writeEndDocument();
+                xw.flush();
             }
-
-            xw.writeEndElement();
-
-            game.toXML(xw); // Add the game
-
-            if (aiMain != null) aiMain.toXML(xw); // Add the AIObjects
-
-            xw.writeEndElement();
-            xw.writeEndDocument();
-            xw.flush();
-            xw.close();
             fos.closeEntry();
-
         } catch (XMLStreamException e) {
             throw new IOException("Failed to save (XML)", e);
         } catch (Exception e) {
             throw new IOException("Failed to save", e);
-        } finally {
-            if (xw != null) xw.close();
-            if (fos != null) fos.close();
         }
     }
 
@@ -922,11 +908,11 @@ public final class FreeColServer {
         logger.info("Found savegame version " + savegameVersion);
 
         List<String> serverStrings = null;
-        FreeColXMLReader xr = null;
         ServerGame game = null;
-        try {
+        try (
+            FreeColXMLReader xr = fis.getFreeColXMLReader();
+        ) {
             String active = null;
-            xr = fis.getFreeColXMLReader();
             xr.nextTag();
 
             if (server != null) {
@@ -977,8 +963,6 @@ public final class FreeColServer {
                 Unit u = game.getFreeColGameObject(active, Unit.class);
                 server.setActiveUnit(u);
             }
-        } finally {
-            if (xr != null) xr.close();
         }
         return game;
     }

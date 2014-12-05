@@ -165,7 +165,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
 
             panel.add(localizedLabel("colopedia.buildings.requires"), "top");
             panel.add(textPane, "span, growx");
-        } catch(BadLocationException e) {
+        } catch (BadLocationException e) {
             //logger.warning(e.toString());
         }
 

@@ -142,7 +142,7 @@ public class MessagesTest extends FreeColTestCase {
         try {
             message = Messages.message(StringTemplate.template("model.history.FOUND_COLONY")
                                        .addName("%colony%", colNameWithSpecialChars));
-        } catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("Illegal group reference")){
                 fail("Does not process messages with special chars");
             }

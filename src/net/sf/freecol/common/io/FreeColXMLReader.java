@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.io;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -55,7 +56,8 @@ import net.sf.freecol.server.ai.AIMain;
  * underlying stream.  Adds on many useful utilities for reading
  * XML and FreeCol values.
  */
-public class FreeColXMLReader extends StreamReaderDelegate {
+public class FreeColXMLReader extends StreamReaderDelegate
+    implements Closeable {
 
     private static final Logger logger = Logger.getLogger(FreeColXMLReader.class.getName());
 
@@ -164,6 +166,8 @@ public class FreeColXMLReader extends StreamReaderDelegate {
     /**
      * Closes both the <code>XMLStreamReader</code> and
      * the underlying stream if any.
+     *
+     * Implements interface Closeable.
      */
     @Override
     public void close() {
@@ -176,8 +180,8 @@ public class FreeColXMLReader extends StreamReaderDelegate {
         if (inputStream != null) {
             try {
                 inputStream.close();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Error closing InputStream.", e);
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Error closing stream.", ioe);
             }
             inputStream = null;
         }
@@ -505,13 +509,8 @@ public class FreeColXMLReader extends StreamReaderDelegate {
                     object = c.newInstance(new Object[] {value});
                 }
                 list.add(object);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
+            } catch (IllegalAccessException|InstantiationException
+                |InvocationTargetException|NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
         }

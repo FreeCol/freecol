@@ -81,17 +81,15 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
      * @exception IOException if thrown while reading the "mod.xml" file.
      */
     protected void readModDescriptor() throws IOException {
-        FreeColXMLReader xr = null;
-        try {
-            xr = new FreeColXMLReader(getModDescriptorInputStream());
+        try (
+            FreeColXMLReader xr
+                = new FreeColXMLReader(getModDescriptorInputStream());
+        ) {
             xr.nextTag();
             id = xr.readId();
             parent = xr.getAttribute("parent", (String)null);
-
         } catch (XMLStreamException xse) {
             throw new IOException(xse);
-        } finally {
-            if (xr != null) xr.close();
         }
     }
 

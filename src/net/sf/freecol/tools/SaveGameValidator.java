@@ -67,11 +67,11 @@ public class SaveGameValidator {
                 FreeColSavegameFile mapFile = new FreeColSavegameFile(file);
                 saveGameValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
                 System.out.println("Successfully validated " + file.getName());
-            } catch(SAXParseException e) {
+            } catch (SAXParseException e) {
                 System.out.println(e.getMessage() 
                                    + " at line=" + e.getLineNumber() 
                                    + " column=" + e.getColumnNumber());
-            } catch(Exception e) {
+            } catch (Exception e) {
                 System.out.println("Failed to read " + file.getName());
             }
         }

@@ -108,15 +108,13 @@ public class NumberRules {
      * @param in an <code>InputStream</code> value
      */
     public static void load(InputStream in) {
-        FreeColXMLReader xr = null;
-        try {
-            xr = new FreeColXMLReader(in);
+        try (
+            FreeColXMLReader xr = new FreeColXMLReader(in);
+        ) {
             readFromXML(xr);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Load parse", e);
             throw new RuntimeException("Error parsing number rules.", e);
-        } finally {
-            if (xr != null) xr.close();
         }
     }
 

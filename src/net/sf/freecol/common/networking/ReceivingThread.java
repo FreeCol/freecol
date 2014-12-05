@@ -332,17 +332,11 @@ final class ReceivingThread extends Thread {
                 try {
                     listen();
                     timesFailed = 0;
-                } catch (XMLStreamException e) {
+                } catch (SAXException|XMLStreamException e) {
                     if (!shouldRun()) break;
                     logger.log(Level.WARNING, "XML fail", e);
                     if (++timesFailed > MAXIMUM_RETRIES) {
                         disconnect("Too many failures (XML)");
-                    }
-                } catch (SAXException e) {
-                    if (!shouldRun()) break;
-                    logger.log(Level.WARNING, "SAX fail", e);
-                    if (++timesFailed > MAXIMUM_RETRIES) {
-                        disconnect("Too many failures (SAX)");
                     }
                 } catch (IOException e) {
                     if (!shouldRun()) break;

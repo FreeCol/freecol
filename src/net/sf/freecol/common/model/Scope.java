@@ -232,7 +232,7 @@ public class Scope extends FreeColObject {
                     } else {
                         return matchNegated;
                     }
-                } catch(Exception e) {
+                } catch (Exception e) {
                     return matchNegated;
                 }
             } else {
@@ -249,7 +249,7 @@ public class Scope extends FreeColObject {
                     && !String.valueOf(method.invoke(object)).equals(methodValue)) {
                     return matchNegated;
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 return matchNegated;
             }
         }

@@ -60,14 +60,14 @@ public class CLDRTest extends FreeColTestCase {
         assertTrue(inputFile.exists());
         try {
             in = new FileInputStream(inputFile);
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail("Failed to open input stream.");
         }
         NumberRules numberRules = new NumberRules(in);
 
         try {
             in.close();
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail("Failed to close input stream.");
         }
 

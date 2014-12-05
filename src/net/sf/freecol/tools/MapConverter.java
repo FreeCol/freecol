@@ -66,7 +66,7 @@ public class MapConverter {
                     System.out.println("Saved updated savegame.");
                     server.shutdown();
                     System.out.println("Shut down server.");
-                } catch(Exception e) {
+                } catch (Exception e) {
                     System.out.println(e);
                 }
             }

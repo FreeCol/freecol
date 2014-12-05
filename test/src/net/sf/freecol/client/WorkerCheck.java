@@ -61,9 +61,7 @@ public final class WorkerCheck {
                     // this example sleeps, but time-consuming work could be done
                     Thread.sleep( 7000 );
                     SwingUtilities.invokeLater( new TestJob("the job is done\n", true) );
-                }
-                catch ( InterruptedException e )
-                {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }

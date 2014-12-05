@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.io;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -62,7 +63,7 @@ import net.sf.freecol.common.model.Tile;
  * Strange, there is no StreamWriterDelegate, so we are stuck with
  * all the delegation functions.
  */
-public class FreeColXMLWriter implements XMLStreamWriter {
+public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
 
     private static final Logger logger = Logger.getLogger(FreeColXMLWriter.class.getName());
 
@@ -216,6 +217,8 @@ public class FreeColXMLWriter implements XMLStreamWriter {
     /**
      * Closes both the <code>XMLStreamWriter</code> and
      * the underlying stream if any.
+     *
+     * Implement interface Closeable.
      */
     public void close() {
         if (xmlStreamWriter != null) {
@@ -242,11 +245,13 @@ public class FreeColXMLWriter implements XMLStreamWriter {
                                                   indentProps[i+1]);
                 }
                 transformer.transform(source, result);
-                this.outputWriter.flush();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "IO fail", ioe);
             } catch (TransformerException te) {
                 logger.log(Level.WARNING, "Transformer fail", te);
+            }
+            try {
+                this.outputWriter.flush();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Flush fail", ioe);
             }
         }
     }

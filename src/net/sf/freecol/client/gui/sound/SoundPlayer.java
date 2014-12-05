@@ -210,13 +210,12 @@ public class SoundPlayer {
                         continue;
                     }
                 } else {
-                    AudioInputStream in = playList.remove(0);
-                    try {
+                    try (
+                        AudioInputStream in = playList.remove(0);
+                    ) {
                         playSound(in);
                     } catch (IOException e) {
                         logger.log(Level.WARNING, "Failure playing audio.", e);
-                    } finally {
-                        try { in.close(); } catch (IOException e) {}
                     }
                 }
             }
@@ -309,7 +308,7 @@ public class SoundPlayer {
 
             SourceDataLine line = openLine(in.getFormat());
             if (line == null) return false;
-            try { 
+            try {
                 startPlaying();
                 int rd;
                 while (keepPlaying() && (rd = in.read(data)) > 0) {

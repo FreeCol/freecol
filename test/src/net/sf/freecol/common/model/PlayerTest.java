@@ -287,7 +287,7 @@ public class PlayerTest extends FreeColTestCase {
             french.addUnit(colonist);
             fail("An IllegalStateException should have been raised");
         }
-        catch(IllegalStateException e){
+        catch (IllegalStateException e) {
             assertTrue("Colonist owner should not have been changed", colonist.getOwner() == dutch);
             assertEquals("Wrong number of units for dutch player",1,dutch.getUnits().size());
             assertEquals("Wrong number of units for french player",0,french.getUnits().size());

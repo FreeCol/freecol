@@ -153,14 +153,8 @@ public final class MessageMerge {
             }
             in.close();
             return lineList;
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new RuntimeException( e );
-        }
-        catch ( IOException e )
-        {
-            throw new RuntimeException( e );
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
@@ -179,14 +173,8 @@ public final class MessageMerge {
                 out.write( '\n' );
             }
             out.close();
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new RuntimeException( e );
-        }
-        catch ( IOException e )
-        {
-            throw new RuntimeException( e );
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 

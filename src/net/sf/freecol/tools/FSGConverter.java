@@ -85,15 +85,11 @@ public class FSGConverter {
      * @throws IOException if thrown while reading or writing the files. 
      */
     public void convertToXML(File in, File out) throws FileNotFoundException, IOException {
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
-        try {
-            fis = new FileInputStream(in);
-            fos = new FileOutputStream(out);
+        try (
+            FileInputStream fis = new FileInputStream(in);
+            FileOutputStream fos = new FileOutputStream(out);
+        ) {
             convertToXML(fis, fos);
-        } finally {
-            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
 

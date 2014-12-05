@@ -376,7 +376,7 @@ public final class SpecificationTest extends FreeColTestCase {
         // restore original values
         try {
             spec = new Specification(new FreeColTcFile("freecol").getSpecificationInputStream());
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
@@ -394,7 +394,7 @@ public final class SpecificationTest extends FreeColTestCase {
         try {
             spec.getUnitType("model.unit.caravel");
             fail("Caravel is defined.");
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
         }
 
         for (UnitType unitType : spec.getUnitTypeList()) {
@@ -404,7 +404,7 @@ public final class SpecificationTest extends FreeColTestCase {
         // restore original values
         try {
             spec = new Specification(new FreeColTcFile("freecol").getSpecificationInputStream());
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
@@ -419,7 +419,7 @@ public final class SpecificationTest extends FreeColTestCase {
             UnitType milkmaid = specification.getUnitType("model.unit.milkmaid");
             assertEquals(numberOfUnitTypes + 1, 
                 specification.getUnitTypeList().size());
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
     }

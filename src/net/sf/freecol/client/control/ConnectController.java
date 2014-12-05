@@ -179,12 +179,12 @@ public final class ConnectController {
      * @return The <code>GameState</code>.
      */
     private GameState getGameState(String host, int port) {
-        Connection mc = getConnection(host, port);
-        if (mc == null) return null;
-        
         String state = null;
         Element element = DOMMessage.createMessage("gameState");
-        try {
+        try (
+            Connection mc = getConnection(host, port);
+        ) {
+            if (mc == null) return null;
             Element reply = mc.ask(element);
             if (reply == null) {
                 gui.showErrorMessage("server.couldNotConnect", "no reply");
@@ -202,8 +202,6 @@ public final class ConnectController {
             logger.log(Level.WARNING, "Could not send message to server.", e);
             gui.showErrorMessage("server.couldNotConnect", e.getMessage());
             return null;
-        } finally {
-            mc.close();
         }
 
         try {
@@ -224,12 +222,12 @@ public final class ConnectController {
      * @return A list of available {@link Player#getName() user names}.
      */
     private List<String> getVacantPlayers(String host, int port) {
-        Connection mc = getConnection(host, port);
-        if (mc == null) return null;
-
         List<String> items = new ArrayList<>();
         Element element = DOMMessage.createMessage("getVacantPlayers");
-        try {
+        try (
+            Connection mc = getConnection(host, port);
+        ) {
+            if (mc == null) return null;
             Element reply = mc.ask(element);
             if (reply == null) {
                 logger.warning("The server did not return a list.");
@@ -246,8 +244,6 @@ public final class ConnectController {
             }
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not send message to server.", e);
-        } finally {
-            mc.close();
         }
 
         return items;
@@ -518,13 +514,22 @@ public final class ConnectController {
 
         final boolean defaultSinglePlayer;
         final boolean defaultPublicServer;
-        final FreeColSavegameFile fis;
-        FreeColXMLReader xr = null;
+        FreeColSavegameFile fis = null;
         try {
-            // Get suggestions for "singlePlayer" and "publicServer"
-            // settings from the file
             fis = new FreeColSavegameFile(file);
-            xr = fis.getFreeColXMLReader();
+        } catch (IOException ioe) {
+            SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
+            logger.log(Level.WARNING, "Could not open save file: "
+                + file.getName());
+            return false;
+        }
+
+        // Get suggestions for "singlePlayer" and "publicServer"
+        // settings from the file, and update the client options if
+        // possible.
+        try (
+            FreeColXMLReader xr = fis.getFreeColXMLReader();
+        ) {
             xr.nextTag();
 
             String str = xr.getAttribute(FreeColServer.OWNER_TAG,
@@ -535,6 +540,10 @@ public final class ConnectController {
                 = xr.getAttribute(FreeColServer.SINGLE_PLAYER_TAG, false);
             defaultPublicServer
                 = xr.getAttribute(FreeColServer.PUBLIC_SERVER_TAG, false);
+
+            ClientOptions options = freeColClient.getClientOptions();
+            options.updateOptions(fis.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS));
+            options.fixClientOptions();
 
         } catch (FileNotFoundException e) {
             SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
@@ -551,22 +560,9 @@ public final class ConnectController {
             logger.log(Level.WARNING, "Could not load game from: "
                 + file.getName(), e);
             return false;
-        } finally {
-            if (xr != null) xr.close();
         }
 
         // Reload the client options saved with this game.
-        try {
-            ClientOptions options = freeColClient.getClientOptions();
-            options.updateOptions(fis.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS));
-            options.fixClientOptions();
-        } catch (FileNotFoundException e) {
-            ; // Do not care if there are no client options
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error getting client option stream.",
-                       ioe);
-        }
-
         final boolean singlePlayer;
         final String name;
         final int port;
@@ -725,37 +721,32 @@ public final class ConnectController {
      * @return A list of {@link ServerInfo} objects.
      */
     public List<ServerInfo> getServerList() {
-        Connection mc;
-        try {
-            mc = new Connection(FreeCol.META_SERVER_ADDRESS,
-                                FreeCol.META_SERVER_PORT, null,
-                                FreeCol.CLIENT_THREAD);
-        } catch (IOException e) {
-            gui.showErrorMessage("metaServer.couldNotConnect");
-            logger.log(Level.WARNING, "Could not connect to meta-server.", e);
-            return null;
-        }
-
-        try {
-            Element reply = mc.ask(DOMMessage.createMessage("getServerList"));
+        try (
+            Connection mc = new Connection(FreeCol.META_SERVER_ADDRESS,
+                FreeCol.META_SERVER_PORT, null,
+                FreeCol.CLIENT_THREAD);
+        ) {
+            Element reply = null;
+            try {
+                reply = mc.ask(DOMMessage.createMessage("getServerList"));
+            } catch (IOException e) {
+                reply = null;
+            }
             if (reply == null) {
                 gui.showErrorMessage("metaServer.communicationError");
                 logger.warning("The meta-server did not return a list.");
                 return null;
-            } else {
-                List<ServerInfo> items = new ArrayList<>();
-                NodeList nl = reply.getChildNodes();
-                for (int i = 0; i < nl.getLength(); i++) {
-                    items.add(new ServerInfo((Element)nl.item(i)));
-                }
-                return items;
             }
+            List<ServerInfo> items = new ArrayList<>();
+            NodeList nl = reply.getChildNodes();
+            for (int i = 0; i < nl.getLength(); i++) {
+                items.add(new ServerInfo((Element)nl.item(i)));
+            }
+            return items;
         } catch (IOException e) {
-            gui.showErrorMessage("metaServer.communicationError");
-            logger.log(Level.WARNING, "Network error with meta-server.", e);
+            gui.showErrorMessage("metaServer.couldNotConnect");
+            logger.log(Level.WARNING, "Could not connect to the meta-server.", e);
             return null;
-        } finally {
-            mc.close();
         }
     }
 }

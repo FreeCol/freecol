@@ -112,9 +112,9 @@ public class FreeColDataFile {
      * @return The name of the base directory in the zip-file.
      */
     private static String findJarDirectory(final String expectedName, File file) {
-        JarFile jf = null;
-        try {
-            jf = new JarFile(file);
+        try (
+            JarFile jf = new JarFile(file);
+        ) {
             final JarEntry entry = jf.entries().nextElement();
             final String en = entry.getName();
             final int index = en.lastIndexOf('/');
@@ -126,10 +126,6 @@ public class FreeColDataFile {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception while reading data file.", e);
             return expectedName;
-        } finally {
-            try {
-                jf.close();
-            } catch (Exception e) {}
         }
     }
 
@@ -236,15 +232,12 @@ public class FreeColDataFile {
     public ResourceMapping getResourceMapping() {
         final Properties properties = new Properties();
         for (String fileName : getResourceFileNames()) {
-            try {
+            try (
                 final InputStream is = getInputStream(fileName);
-                try {
-                    properties.load(is);
-                    logger.info("ResourceMapping loaded: " + file
-                        + "/" + fileName);
-                } finally {
-                    try { is.close(); } catch (Exception e) {}
-                }
+            ) {
+                properties.load(is);
+                logger.info("ResourceMapping loaded: " + file
+                    + "/" + fileName);
             } catch (FileNotFoundException e) { // Expected failure
                 logger.finest("ResourceMapping not found: " + file
                     + "/" + fileName);

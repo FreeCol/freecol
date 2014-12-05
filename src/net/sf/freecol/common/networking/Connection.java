@@ -20,6 +20,7 @@
 package net.sf.freecol.common.networking;
 
 import java.io.BufferedInputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -53,7 +54,7 @@ import org.xml.sax.SAXException;
  * @see #sendAndWait(Element)
  * @see #ask(Element)
  */
-public class Connection {
+public class Connection implements Closeable {
 
     private static final Logger logger = Logger.getLogger(Connection.class.getName());
 

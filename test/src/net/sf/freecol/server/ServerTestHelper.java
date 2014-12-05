@@ -93,10 +93,8 @@ public final class ServerTestHelper {
             // FIXME: Pass tc
             server = new FreeColServer(publicServer, singlePlayer,
                                        spec, port, name);
-        } catch (NoRouteToServerException e) {
-            fail(e.getMessage());
-        } catch (IOException e) {
-            fail(e.getMessage());
+        } catch (IOException|NoRouteToServerException ex) {
+            fail(ex.getMessage());
         }
         assertNotNull(server);
         assertEquals(FreeColServer.GameState.STARTING_GAME,

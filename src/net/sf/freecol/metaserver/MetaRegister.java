@@ -113,20 +113,21 @@ public final class MetaRegister {
         MetaItem mi = getItem(address, port);
         if (mi == null) {
             // Check connection before adding the server:
-            Connection mc = null;
-            try {                
-                mc = new Connection(address, port, null, FreeCol.METASERVER_THREAD);
+            try (
+                Connection mc = new Connection(address, port, null,
+                                               FreeCol.METASERVER_THREAD);
+            ) {
                 mc.send(DOMMessage.createMessage("disconnect"));
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Server rejected disconnect.", e);
                 throw e;
-            } finally {
-                if (mc != null) mc.close();
             }
-            items.add(new MetaItem(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState));
+            items.add(new MetaItem(name, address, port, slotsAvailable,
+                    currentlyPlaying, isGameStarted, version, gameState));
             logger.info("Server added:" + address + ":" + port);
         } else {
-            updateServer(mi, name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
+            updateServer(mi, name, address, port, slotsAvailable,
+                currentlyPlaying, isGameStarted, version, gameState);
         }
     }
 

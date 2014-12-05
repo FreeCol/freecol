@@ -386,7 +386,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
             }
 
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, "Production warning fail", e);
         }
 

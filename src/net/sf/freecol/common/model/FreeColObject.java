@@ -790,13 +790,8 @@ public abstract class FreeColObject
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 tempDocument = builder.parse(new InputSource(new StringReader(sw.toString())));
                 return (Element)document.importNode(tempDocument.getDocumentElement(), true);
-            } catch (ParserConfigurationException pce) {
-                // Parser with specified options can't be built
-                throw new IllegalStateException("Parser failure", pce);
-            } catch (SAXException se) {
-                throw new IllegalStateException("SAX failure", se);
-            } catch (IOException ie) {
-                throw new IllegalStateException("IO failure", ie);
+            } catch (IOException|ParserConfigurationException|SAXException ex) {
+                throw new RuntimeException("Parse fail", ex);
             }
         } catch (XMLStreamException e) {
             throw new IllegalStateException("Error writing stream", e);
@@ -827,7 +822,6 @@ public abstract class FreeColObject
      *      this object.
      */
     public void readFromXMLElement(Element element) {
-        FreeColXMLReader xr = null;
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xmlTransformer = factory.newTransformer();
@@ -835,18 +829,16 @@ public abstract class FreeColObject
             xmlTransformer.transform(new DOMSource(element),
                                      new StreamResult(stringWriter));
             String xml = stringWriter.toString();
-            xr = new FreeColXMLReader(new StringReader(xml));
-            xr.nextTag();
-            readFromXML(xr);
-
-        } catch (IOException ioe) {
-            throw new IllegalStateException("IO failure", ioe);
-        } catch (TransformerException te) {
-            throw new IllegalStateException("Transformer failure", te);
-        } catch (XMLStreamException xe) {
-            throw new IllegalStateException("XML failure", xe);
-        } finally {
-            if (xr != null) xr.close();
+            try (
+                FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
+            ) {
+                xr.nextTag();
+                readFromXML(xr);
+            } catch (XMLStreamException xe) {
+                throw new IllegalStateException("XML failure", xe);
+            }
+        } catch (IOException|TransformerException ex) {
+            throw new RuntimeException("Read failure", ex);
         }
     }
 
@@ -947,13 +939,14 @@ public abstract class FreeColObject
      * @exception FileNotFoundException
      */
     public boolean save(File file, WriteScope scope, boolean pretty) throws FileNotFoundException {
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
+        try (
+            FileOutputStream fos = new FileOutputStream(file);
+        ) {
             return save(fos, scope, pretty);
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error creating FileOutputStream", ioe);
         }
+        return false;
     }
 
     /**
@@ -965,16 +958,9 @@ public abstract class FreeColObject
      * @return True if the save proceeded without error.
      */
     public boolean save(OutputStream out, WriteScope scope, boolean pretty) {
-        FreeColXMLWriter xw = null;
-        try {
-            xw = new FreeColXMLWriter(out, scope, pretty);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
-            return false;
-        }
-
-        boolean ret = false;
-        try {
+        try (
+            FreeColXMLWriter xw = new FreeColXMLWriter(out, scope, pretty);
+        ) {
             xw.writeStartDocument("UTF-8", "1.0");
 
             this.toXML(xw);
@@ -983,13 +969,14 @@ public abstract class FreeColObject
 
             xw.flush();
 
-            ret = true;
+            return true;
         } catch (XMLStreamException xse) {
             logger.log(Level.WARNING, "Exception writing object.", xse);
-        } finally {
-            if (xw != null) xw.close();
+
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
         }
-        return ret;
+        return false;
     }
 
     /**
@@ -1003,18 +990,13 @@ public abstract class FreeColObject
      */
     public String serialize(WriteScope scope) throws XMLStreamException {
         StringWriter sw = new StringWriter();
-        FreeColXMLWriter xw = null;
-        try {
-            xw = new FreeColXMLWriter(sw, scope);
+        try (
+            FreeColXMLWriter xw = new FreeColXMLWriter(sw, scope);
+        ) {
+            this.toXML(xw);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
             return null;
-        }
-
-        try {
-            this.toXML(xw);
-        } finally {
-            if (xw != null) xw.close();
         }
 
         return sw.toString();
@@ -1049,14 +1031,12 @@ public abstract class FreeColObject
      */
     public <T extends FreeColObject> T copy(Game game, Class<T> returnClass) {
         T ret = null;
-        FreeColXMLReader xr = null;
-        try {
-            xr = new FreeColXMLReader(new StringReader(this.serialize()));
+        try (
+            FreeColXMLReader xr = new FreeColXMLReader(new StringReader(this.serialize()));
+        ) {
             ret = xr.copy(game, returnClass);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to copy: " + getId(), e);
-        } finally {
-            if (xr != null) xr.close();
         }
         return ret;
     }

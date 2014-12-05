@@ -66,7 +66,7 @@ public class SerializationTest extends FreeColTestCase {
             FreeColSavegameFile mapFile = new FreeColSavegameFile(new File(name));
 
             mapValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
-        } catch(SAXParseException e) {
+        } catch (SAXParseException e) {
             String errMsg = e.getMessage()
                 + " at line=" + e.getLineNumber()
                 + " column=" + e.getColumnNumber();
