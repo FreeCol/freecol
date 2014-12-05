@@ -1654,6 +1654,8 @@ public final class InGameController extends Controller {
         } else {
             // Dumping goods in Europe
             moveGoods(carrier, type, amount, null);
+            logger.finest(carrier + " dumped " + amount
+                + " " + type.getSuffix() + " in Europe");
         }
         carrier.setMovesLeft(0);
         cs.add(See.only(serverPlayer), carrier);
@@ -2667,6 +2669,8 @@ public final class InGameController extends Controller {
 
         ChangeSet cs = new ChangeSet();
         moveGoods(settlement, goodsType, amount, carrier);
+        logger.finest(settlement.getName() + " loaded " + amount
+            + " " + goodsType.getSuffix() + " onto " + carrier);
         cs.add(See.only(serverPlayer), settlement.getGoodsContainer());
         cs.add(See.only(serverPlayer), carrier.getGoodsContainer());
         if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
@@ -2700,6 +2704,8 @@ public final class InGameController extends Controller {
         if (carrier.getSettlement() != null) {
             Settlement settlement = carrier.getSettlement();
             moveGoods(carrier, goodsType, amount, settlement);
+            logger.finest(carrier + " unloaded " + amount
+                + " " + goodsType.getSuffix() + " to " + settlement.getName());
             cs.add(See.only(serverPlayer), settlement.getGoodsContainer());
             cs.add(See.only(serverPlayer), carrier.getGoodsContainer());
             if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
@@ -2708,6 +2714,8 @@ public final class InGameController extends Controller {
             }
         } else { // Dump of goods onto a tile
             moveGoods(carrier, goodsType, amount, null);
+            logger.finest(carrier + " dumped " + amount
+                + " " + goodsType.getSuffix() + " to " + carrier.getLocation());
             cs.add(See.perhaps(), (FreeColGameObject)carrier.getLocation());
             // Others might see a capacity change.
             sendToOthers(serverPlayer, cs);
