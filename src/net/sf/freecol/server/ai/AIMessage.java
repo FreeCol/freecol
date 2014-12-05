@@ -101,7 +101,7 @@ public class AIMessage {
     private static Element ask(Connection conn, Element request) {
         Element reply;
         try {
-            reply = conn.askDumping(request);
+            reply = conn.ask(request);
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not send \""
                 + request.getTagName() + "\"-message.", e);

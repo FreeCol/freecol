@@ -103,7 +103,7 @@ public final class PreGameController extends Controller {
             update.appendChild(game.toXMLElement(update.getOwnerDocument(),
                                                  player));
             try {
-                conn.askDumping(update);
+                conn.ask(update);
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Unable to updateGame", e);
             }

@@ -447,7 +447,7 @@ public final class InGameController extends Controller {
         public DOMMessage call() {
             Element reply;
             try {
-                reply = connection.askDumping(message.toXMLElement());
+                reply = connection.ask(message.toXMLElement());
             } catch (IOException e) {
                 return null;
             }
@@ -609,7 +609,7 @@ public final class InGameController extends Controller {
         while (request != null) {
             Element reply;
             try {
-                reply = connection.askDumping(request);
+                reply = connection.ask(request);
                 if (reply == null) break;
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Could not send \""

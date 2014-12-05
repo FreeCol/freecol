@@ -635,7 +635,7 @@ public final class FreeColServer {
         int nPlayers = getNumberOfLivingHumanPlayers();
         boolean started = gameState != GameState.STARTING_GAME;
         try {
-            Element reply = mc.askDumping(DOMMessage.createMessage(tag,
+            Element reply = mc.ask(DOMMessage.createMessage(tag,
                     "name", addr,
                     "port", Integer.toString(port),
                     "slotsAvailable", Integer.toString(getSlotsAvailable()),
@@ -688,7 +688,7 @@ public final class FreeColServer {
         }
 
         try {
-            mc.sendDumping(DOMMessage.createMessage("remove",
+            mc.send(DOMMessage.createMessage("remove",
                     "port", Integer.toString(port)));
         } catch (IOException e) {
             logger.log(Level.WARNING, "Network error with meta-server.", e);
@@ -1286,7 +1286,7 @@ public final class FreeColServer {
         for (Player player : getGame().getLiveEuropeanPlayers(null)) {
             try {
                 ((ServerPlayer)player).getConnection()
-                    .sendDumping(DOMMessage.createMessage("reconnect"));
+                    .send(DOMMessage.createMessage("reconnect"));
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Error sending reconnect.", e);
             }

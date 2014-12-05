@@ -185,7 +185,7 @@ public final class ConnectController {
         String state = null;
         Element element = DOMMessage.createMessage("gameState");
         try {
-            Element reply = mc.askDumping(element);
+            Element reply = mc.ask(element);
             if (reply == null) {
                 gui.showErrorMessage("server.couldNotConnect", "no reply");
                 return null;
@@ -230,7 +230,7 @@ public final class ConnectController {
         List<String> items = new ArrayList<>();
         Element element = DOMMessage.createMessage("getVacantPlayers");
         try {
-            Element reply = mc.askDumping(element);
+            Element reply = mc.ask(element);
             if (reply == null) {
                 logger.warning("The server did not return a list.");
                 return null;
@@ -737,7 +737,7 @@ public final class ConnectController {
         }
 
         try {
-            Element reply = mc.askDumping(DOMMessage.createMessage("getServerList"));
+            Element reply = mc.ask(DOMMessage.createMessage("getServerList"));
             if (reply == null) {
                 gui.showErrorMessage("metaServer.communicationError");
                 logger.warning("The meta-server did not return a list.");

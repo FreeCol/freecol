@@ -127,7 +127,7 @@ public final class Client {
      * @exception IOException
      */
     public void send(DOMMessage message) throws IOException {
-        c.sendDumping(message.toXMLElement());
+        c.send(message.toXMLElement());
     }
 
     /**
@@ -140,7 +140,7 @@ public final class Client {
      * @exception IOException
      */
     public void send(Element element) throws IOException {
-        c.sendDumping(element);
+        c.send(element);
     }
 
     /**
@@ -181,7 +181,7 @@ public final class Client {
      * @exception IOException
      */
     public Element ask(DOMMessage message) throws IOException {
-        return c.askDumping(message.toXMLElement());
+        return c.ask(message.toXMLElement());
     }
 
     /**
@@ -196,7 +196,7 @@ public final class Client {
      * @exception IOException
      */
     public Element ask(Element element) throws IOException {
-        return c.askDumping(element);
+        return c.ask(element);
     }
     
     /**

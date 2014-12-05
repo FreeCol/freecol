@@ -136,7 +136,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      */
     private void sendReconnectSafely(Connection connection) {
         try {
-            connection.sendDumping(DOMMessage.createMessage("reconnect"));
+            connection.send(DOMMessage.createMessage("reconnect"));
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not send reconnect message!", e);
         }

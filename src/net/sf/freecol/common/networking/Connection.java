@@ -206,7 +206,7 @@ public class Connection {
     public void close() {
         if (this.out != null) {
             try {
-                sendDumping(DOMMessage.createMessage(DISCONNECT_TAG));
+                send(DOMMessage.createMessage(DISCONNECT_TAG));
             } catch (IOException ioe) {
                 logger.fine("Error disconnecting " + this.name
                     + ": " + ioe.getMessage());
@@ -254,85 +254,54 @@ public class Connection {
     }
 
     /**
-     * Fundamental routine to send a message over this Connection.
+     * Transform a DOMsource to output.  Duplicate to System.err if required.
+     *
+     * @param source The <code>DOMSource</code> to log.
+     * @param out An <code>OutputStream</code> to write to.
+     * @exception IOException If an error occur while sending the message.
+     */
+    private void transform(DOMSource source, OutputStream out) throws IOException {
+        try {
+            xmlTransformer.transform(source, new StreamResult(out));
+            out.write('\n');
+        } catch (TransformerException te) {
+            logger.log(Level.WARNING, "Failed to transform", te);
+        }
+        if (dump) {
+            try {
+                System.err.println(getName());
+                xmlTransformer.transform(source, new StreamResult(System.err));
+                System.err.write('\n');
+            } catch (TransformerException te) {}
+        }
+    }
+
+    /**
+     * Low level routine to send a message over this Connection.
      *
      * @param element The <code>Element</code> (root element in a
      *     DOM-parsed XML tree) that holds all the information
      * @param logOK Log the send if true.
      * @exception IOException If an error occur while sending the message.
      */
-    private void send(Element element, boolean logOK) throws IOException {
-        if (logOK) logger.fine("Send: " + element.getTagName());
+    private void sendInternal(Element element) throws IOException {
+        DOMSource src = new DOMSource(element);
         synchronized (this.out) {
-            try {
-                xmlTransformer.transform(new DOMSource(element),
-                                         new StreamResult(this.out));
-                this.out.write('\n');
-                this.out.flush();
-                this.out.notifyAll(); // Just in case others are waiting
-            } catch (TransformerException te) {
-                logger.log(Level.WARNING, "Failed to transform", te);
-            }
+            transform(src, this.out);
+            this.out.flush();
+            this.out.notifyAll(); // Just in case others are waiting
         }
     }
 
     /**
-     * Sends the given message over this Connection.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information
-     * @exception IOException If an error occur while sending the message.
-     * @see #sendAndWait(Element)
-     * @see #ask(Element)
-     */
-    public void send(Element element) throws IOException {
-        send(element, logger.isLoggable(Level.FINE));
-    }
-
-    /**
-     * Dumping wrapper for send().
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information
-     * @exception IOException If an error occur while sending the message.
-     * @see #sendAndWait(Element)
-     * @see #ask(Element)
-     */
-    public void sendDumping(Element element) throws IOException {
-        if (dump) {
-            String x = getName() + "-send";
-            try {
-                System.err.println("<" + x + ">"
-                    + DOMMessage.elementToString(element) + "</" + x + ">\n");
-            } catch (Exception e) {}
-        }
-        send(element);
-    }
-
-    /**
-     * Sends the given message over this <code>Connection</code> and waits for
-     * confirmation of reception before returning.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information
-     * @exception IOException If an error occur while sending the message.
-     * @see #send(Element)
-     * @see #ask(Element)
-     */
-    public void sendAndWait(Element element) throws IOException {
-        askDumping(element);
-    }
-
-    /**
-     * Sends a message to the other peer and returns the reply.
+     * Low level routine to sends a message and return the reply.
      *
      * @param element The question for the other peer.
      * @return The reply from the other peer.
      * @exception IOException if an error occur while sending the message.
-     * @see #send(Element)
-     * @see #sendAndWait(Element)
+     * @see #sendInternal(Element)
      */
-    public Element ask(Element element) throws IOException {
+    private Element askInternal(Element element) throws IOException {
         int networkReplyId = thread.getNextNetworkReplyId();
         String tag = element.getTagName();
 
@@ -347,45 +316,58 @@ public class Connection {
         question.appendChild(element);
 
         NetworkReplyObject nro = thread.waitForNetworkReply(networkReplyId);
-        send(question, false);
+        sendInternal(question);
         DOMMessage response = (DOMMessage)nro.getResponse();
         Element reply = (response == null) ? null
             : response.getDocument().getDocumentElement();
-        Element child = (reply == null) ? null
-            : (Element)reply.getFirstChild();
 
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Ask(" + networkReplyId + "): " + tag + ", reply: "
-                + ((child == null) ? "null" : child.getTagName()));
-        }
+        Element child = (reply==null) ? null : (Element)reply.getFirstChild();
         return child;
     }
 
+
     /**
-     * Dumping wrapper for ask().
+     * Main public routine to send a message over this connection.
      *
-     * Dumps to System.err with a faked-XML prefix so the whole line can
-     * be fed to an XML-pretty printer if required.
-     *
-     * @param request The <code>Element</code> to send.
-     * @return The reply <code>Element</code>.
-     * @exception IOException if ask() fails.
+     * @param element The <code>Element</code> (root element in a
+     *     DOM-parsed XML tree) that holds all the information
+     * @exception IOException If an error occur while sending the message.
+     * @see #sendAndWait(Element)
+     * @see #ask(Element)
      */
-    public Element askDumping(Element request) throws IOException {
-        Element reply = ask(request);
-        if (dump) {
-            final String name = getName();
-            try {
-                System.err.println("<" + name + "-request>"
-                    + DOMMessage.elementToString(request)
-                    + "</" + name + "-request>\n"
-                    + "<" + name + "-reply>"
-                    + DOMMessage.elementToString(reply)
-                    + "</" + name + "-reply>\n");
-            } catch (Exception x) {
-                logger.log(Level.WARNING, "Dump log fail for " + name, x);
-            }
-        }
+    public void send(Element element) throws IOException {
+        sendInternal(element);
+        logger.fine("Send: " + element.getTagName());
+    }
+
+    /**
+     * Sends the given message over this connection and waits for
+     * confirmation of reception before returning.
+     *
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information
+     * @exception IOException If an error occur while sending the message.
+     * @see #send(Element)
+     * @see #ask(Element)
+     */
+    public void sendAndWait(Element element) throws IOException {
+        askInternal(element);
+        logger.fine("SendAndWait: " + element.getTagName());
+    }
+
+    /**
+     * Sends a message to the other peer and returns the reply.
+     *
+     * @param element The question for the peer.
+     * @return The reply from the peer.
+     * @exception IOException if an error occur while sending the message.
+     * @see #send(Element)
+     * @see #sendAndWait(Element)
+     */
+    public Element ask(Element element) throws IOException {
+        Element reply = askInternal(element);
+        logger.fine("Ask: " + element.getTagName()
+            + ", reply: " + ((reply == null) ? "null" : reply.getTagName()));
         return reply;
     }
 
@@ -453,7 +435,7 @@ public class Connection {
                         } else {
                             reply = conn.handle(element);
                         }
-                        if (reply != null) conn.sendDumping(reply);
+                        if (reply != null) conn.send(reply);
                     } catch (Exception e) {
                         logger.log(Level.WARNING, "Handler failed: "
                             + element, e);
