@@ -399,14 +399,16 @@ public class Europe extends UnitLocation
      * {@inheritDoc}
      */
     public int getExportAmount(GoodsType goodsType) {
-        return (getOwner().canTrade(goodsType)) ? Integer.MAX_VALUE : 0;
+        return (getOwner().canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
+            : 0;
     }
 
     /**
      * {@inheritDoc}
      */
     public int getImportAmount(GoodsType goodsType) {
-        return (getOwner().canTrade(goodsType)) ? Integer.MAX_VALUE : 0;
+        return (getOwner().canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
+            : 0;
     }
 
     /**

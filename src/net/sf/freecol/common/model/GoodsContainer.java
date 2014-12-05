@@ -50,12 +50,29 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /** The size of a standard `hold' of data. */
     public static final int CARGO_SIZE = 100;
 
-    /** The list of Goods stored in this <code>GoodsContainer</code>. */
+    /**
+     * Value to use for apparent unlimited quantities of goods
+     * (e.g. warehouse contents in Europe, amount of food a colony can
+     * import).  Has to be signficantly bigger than any one unit could
+     * expect to carry, but not so huge as to look silly in user
+     * messages.
+     */
+    public static final int HUGE_CARGO_SIZE = 100 * CARGO_SIZE;
+
+    /**
+     * The list of Goods stored in this <code>GoodsContainer</code>.
+     *
+     * Always accessed synchronized (except I/O).
+     */
     private final Map<GoodsType, Integer> storedGoods = new HashMap<>();
 
     /** 
      * The previous list of Goods stored in this
      * <code>GoodsContainer</code>.
+     *
+     * Always accessed synchronized and *after synchronized(storedGoods)*.
+     * This is only touched rarely so the extra lock is tolerable.
+     * (Not synchronized during I/O)
      */
     private final Map<GoodsType, Integer> oldStoredGoods = new HashMap<>();
 
@@ -150,10 +167,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *     the beginning of the turn
      */
     public int getOldGoodsCount(GoodsType type) {
-        synchronized (oldStoredGoods) {
-            return (oldStoredGoods.containsKey(type))
-                ? oldStoredGoods.get(type).intValue()
-                : 0;
+        synchronized (storedGoods) {
+            synchronized (oldStoredGoods) {
+                return (oldStoredGoods.containsKey(type))
+                    ? oldStoredGoods.get(type).intValue()
+                    : 0;
+            }
         }
     }
 
@@ -268,6 +287,18 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     public void removeAll() {
         synchronized (storedGoods) {
             storedGoods.clear();
+        }
+    }
+
+    /**
+     * Clear both containers.
+     */
+    private void clearContainers() {
+        synchronized (storedGoods) {
+            storedGoods.clear();
+            synchronized (oldStoredGoods) {
+                oldStoredGoods.clear();
+            }
         }
     }
 
@@ -389,11 +420,23 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * stored goods.
      */
     public void saveState() {
-        List<Goods> current = getCompactGoods();
-        synchronized (oldStoredGoods) {
-            oldStoredGoods.clear();
-            for (Goods g : current) {
-                oldStoredGoods.put(g.getType(), g.getAmount());
+        synchronized (storedGoods) {
+            synchronized (oldStoredGoods) {
+                oldStoredGoods.clear();
+                oldStoredGoods.putAll(storedGoods);
+            }
+        }
+    }
+
+    /**
+     * Restore the current stored goods of this goods container to the
+     * old state.
+     */
+    public void restoreState() {
+        synchronized (storedGoods) {
+            synchronized (oldStoredGoods) {
+                storedGoods.clear();
+                storedGoods.putAll(oldStoredGoods);
             }
         }
     }
@@ -451,12 +494,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     @Override
     public List<FreeColGameObject> disposeList() {
-        synchronized (storedGoods) {
-            storedGoods.clear();
-        }
-        synchronized (oldStoredGoods) {
-            oldStoredGoods.clear();
-        }
+        clearContainers();
 
         List<FreeColGameObject> objects = new ArrayList<>();
         objects.addAll(super.disposeList());
@@ -522,12 +560,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        synchronized (storedGoods) {
-            storedGoods.clear();
-        }
-        synchronized (oldStoredGoods) {
-            oldStoredGoods.clear();
-        }
+        clearContainers();
 
         super.readChildren(xr);
     }
@@ -587,19 +620,16 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append("[").append(getId()).append(" [");
-        synchronized (storedGoods) {
-            for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
-                sb.append(entry.getKey()).append("=").append(entry.getValue())
-                    .append(", ");
-            }
+        // Do not bother to synchronize containers for display
+        for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
+            sb.append(entry.getKey()).append("=").append(entry.getValue())
+                .append(", ");
         }
         sb.setLength(sb.length() - ", ".length());
         sb.append("][");
-        synchronized (oldStoredGoods) {
-            for (Map.Entry<GoodsType, Integer> entry : oldStoredGoods.entrySet()) {
-                sb.append(entry.getKey()).append("=").append(entry.getValue())
-                    .append(", ");
-            }
+        for (Map.Entry<GoodsType, Integer> entry : oldStoredGoods.entrySet()) {
+            sb.append(entry.getKey()).append("=").append(entry.getValue())
+                .append(", ");
         }
         sb.setLength(sb.length() - ", ".length());
         sb.append("]]");
