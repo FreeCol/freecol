@@ -271,6 +271,9 @@
            to visit a stop? -->
       <booleanOption id="model.option.stockAccountsForProduction"
                      defaultValue="false"/>
+      <!-- Enhanced trade routes. -->
+      <booleanOption id="model.option.enhancedTradeRoutes"
+                     defaultValue="false"/>
     </optionGroup>
 
     <optionGroup id="clientOptions.audio">

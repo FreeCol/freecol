@@ -367,12 +367,13 @@ public class ClientOptions extends OptionGroup {
     public static final String HIGH_LEVEL
         = "model.option.highLevel";
 
-    /**
-     * Should trade route units check production to determine goods levels at
-     * stops along its route?
-     */
+    /** Trade routes check production to determine whether to visit a stop. */
     public static final String STOCK_ACCOUNTS_FOR_PRODUCTION
         = "model.option.stockAccountsForProduction";
+
+    /** Use enhanced trade routes? */
+    public static final String ENHANCED_TRADE_ROUTES
+        = "model.option.enhancedTradeRoutes";
 
 
     // clientOptions.audio
@@ -404,14 +405,14 @@ public class ClientOptions extends OptionGroup {
     public static final String SHOW_END_TURN_DIALOG
         = "model.option.showEndTurnDialog";
 
-    /** Set the default native demand action. */
+    /** The Indian demand action. */
     public static final String INDIAN_DEMAND_RESPONSE
         = "model.option.indianDemandResponse";
     public static final int INDIAN_DEMAND_RESPONSE_ASK = 0;
     public static final int INDIAN_DEMAND_RESPONSE_ACCEPT = 1;
     public static final int INDIAN_DEMAND_RESPONSE_REJECT = 2;
 
-    /** Set the default warehouse overflow on unload action. */
+    /** The warehouse overflow on unload action. */
     public static final String UNLOAD_OVERFLOW_RESPONSE
         = "model.option.unloadOverflowResponse";
     public static final int UNLOAD_OVERFLOW_RESPONSE_ASK = 0;
@@ -801,6 +802,11 @@ public class ClientOptions extends OptionGroup {
         addBooleanOption(STOCK_ACCOUNTS_FOR_PRODUCTION,
             "clientOptions.warehouse", false);
         // end @compat 0.11.1
+
+        // @compat 0.11.2
+        addBooleanOption(ENHANCED_TRADE_ROUTES,
+            "clientOptions.warehouse", false);
+        // end @compat 0.11.2
     }
 
     private void addBooleanOption(String id, String gr, boolean val) {

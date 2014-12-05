@@ -409,6 +409,13 @@ public class Europe extends UnitLocation
             : 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isMaintained(GoodsType goodsType) {
+        return false;
+    }
+
 
     // Override FreeColGameObject
 

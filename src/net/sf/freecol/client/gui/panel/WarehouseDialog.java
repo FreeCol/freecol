@@ -78,10 +78,8 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
             setBorder(GUI.localizedBorder(goodsType.getNameKey()));
             GUI.padBorder(this, 6,6,6,6);
 
-            final boolean enhanced = false;
-            // Placeholder for:
-            //   freeColClient.getClientOptions()
-            //       .getBoolean(ClientOptions.ENHANCED_TRADE_ROUTES);
+            final boolean enhanced = freeColClient.getClientOptions()
+                .getBoolean(ClientOptions.ENHANCED_TRADE_ROUTES);
             final ExportData exportData = colony.getExportData(goodsType);
 
             // goods label

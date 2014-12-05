@@ -240,6 +240,18 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
             : 0;
     }
 
+    /**
+     * Check whether to maintain stock level for a goods type at this stop.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return True if the stock level should be maintained.
+     */
+    public boolean isMaintained(GoodsType goodsType) {
+        return (location instanceof TradeLocation)
+            ? ((TradeLocation)location).isMaintained(goodsType)
+            : false;
+    }
+
 
     // Serialization
 
