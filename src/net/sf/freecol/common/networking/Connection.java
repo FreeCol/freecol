@@ -271,18 +271,23 @@ public class Connection implements Closeable {
      * @exception IOException If an error occur while sending the message.
      */
     private void transform(DOMSource source, OutputStream out) throws IOException {
-        try {
-            xmlTransformer.transform(source, new StreamResult(out));
-            out.write('\n');
-        } catch (TransformerException te) {
-            logger.log(Level.WARNING, "Failed to transform", te);
+        if (out != null) {
+            try {
+                xmlTransformer.transform(source, new StreamResult(out));
+                out.write('\n');
+            } catch (TransformerException te) {
+                logger.log(Level.WARNING, "Failed to transform", te);
+            }
         }
         if (dump) {
             try {
-                System.err.println(getName());
+                System.err.println(getName()
+                    + ((out == null) ? "-reply" : "-send"));
                 xmlTransformer.transform(source, new StreamResult(System.err));
                 System.err.write('\n');
-            } catch (TransformerException te) {}
+            } catch (TransformerException te) {
+                ; // Ignore logging failure
+            }
         }
     }
 
@@ -329,6 +334,7 @@ public class Connection implements Closeable {
         DOMMessage response = (DOMMessage)nro.getResponse();
         Element reply = (response == null) ? null
             : response.getDocument().getDocumentElement();
+        if (dump) transform(new DOMSource(reply), null);
 
         Element child = (reply==null) ? null : (Element)reply.getFirstChild();
         return child;
