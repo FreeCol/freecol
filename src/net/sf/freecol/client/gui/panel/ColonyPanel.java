@@ -1755,14 +1755,28 @@ public final class ColonyPanel extends PortPanel
             public void update() {
                 super.update();
 
+                boolean recheck = getBuilding().getProductionType() == null;
                 if (ColonyPanel.this.isEditable()) {
                     for (UnitLabel unitLabel : getUnitLabels()) {
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
+                        if (recheck) fixWorkType(unitLabel.getUnit());
                     }
                 }
             }
 
+            /**
+             * Fix the work type of this unit in this building.
+             *
+             * @param unit The <code>Unit</code> to check.
+             */
+            private void fixWorkType(Unit unit) {
+                Building building = getBuilding();
+                GoodsType workType = colony.getWorkTypeFor(unit, building);
+                if (workType != null && workType != unit.getWorkType()) {
+                    igc().changeWorkType(unit, workType);
+                }
+            }
 
             /**
              * Try to assign a unit to work this building.
