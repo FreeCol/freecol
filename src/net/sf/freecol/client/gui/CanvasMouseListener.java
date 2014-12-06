@@ -122,50 +122,51 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
      * @param e The MouseEvent that holds all the information.
      */
     public void mousePressed(MouseEvent e) {
-        if (!e.getComponent().isEnabled()) {
-            return;
-        }
-        try {
-            if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
-                // Cancel goto if one is active
-                if (mapViewer.isGotoStarted()) {
-                    mapViewer.stopGoto();
-                }
+        if (!e.getComponent().isEnabled()) return;
 
-                canvas.showTilePopup(mapViewer.convertToMapTile(e.getX(), e.getY()), e.getX(), e.getY());
-            } else if (e.getButton() == MouseEvent.BUTTON2) {
-                Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
-                if (tile != null) {
-                    Unit unit = mapViewer.getActiveUnit();
-                    if (unit != null && unit.getTile() != tile) {
-                        PathNode dragPath = unit.findPath(tile);
-                        mapViewer.startGoto();
-                        mapViewer.setGotoPath(dragPath);
-                    }
+        int me = e.getButton();
+        if (e.isPopupTrigger()) me = MouseEvent.BUTTON3;
+        Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
+
+        switch (me) {
+        case MouseEvent.BUTTON1:
+            // Record initial click point for purposes of dragging
+            mapViewer.setDragPoint(e.getX(), e.getY());
+            if (mapViewer.isGotoStarted()) {
+                PathNode path = mapViewer.getGotoPath();
+                if (path != null) {
+                    mapViewer.stopGoto();
+                    // Move the unit
+                    freeColClient.getInGameController()
+                        .goToTile(mapViewer.getActiveUnit(),
+                            path.getLastNode().getTile());
                 }
-            } else if (e.getButton() == MouseEvent.BUTTON1) {
-                // Record initial click point for purposes of dragging
-                mapViewer.setDragPoint(e.getX(), e.getY());
-                if (mapViewer.isGotoStarted()) {
-                    PathNode path = mapViewer.getGotoPath();
-                    if (path != null) {
-                        mapViewer.stopGoto();
-                        // Move the unit
-                        freeColClient.getInGameController()
-                            .goToTile(mapViewer.getActiveUnit(),
-                                      path.getLastNode().getTile());
-                    }
-                } else if (doubleClickTimer.isRunning()) {
-                    doubleClickTimer.stop();
-                } else {
-                    centerX = e.getX();
-                    centerY = e.getY();
-                    doubleClickTimer.start();
-                }
-                canvas.requestFocus();
+            } else if (doubleClickTimer.isRunning()) {
+                doubleClickTimer.stop();
+            } else {
+                centerX = e.getX();
+                centerY = e.getY();
+                doubleClickTimer.start();
             }
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Error in mousePressed!", ex);
+            canvas.requestFocus();
+            break;
+        case MouseEvent.BUTTON2:
+            if (tile != null) {
+                Unit unit = mapViewer.getActiveUnit();
+                if (unit != null && unit.getTile() != tile) {
+                    PathNode dragPath = unit.findPath(tile);
+                    mapViewer.startGoto();
+                    mapViewer.setGotoPath(dragPath);
+                }
+            }
+            break;
+        case MouseEvent.BUTTON3:
+            // Cancel goto if one is active
+            if (mapViewer.isGotoStarted()) mapViewer.stopGoto();
+            canvas.showTilePopup(tile, e.getX(), e.getY());
+            break;
+        default:
+            break;
         }
     }
 

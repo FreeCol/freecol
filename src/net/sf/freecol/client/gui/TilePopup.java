@@ -93,8 +93,11 @@ public final class TilePopup extends JPopupMenu {
 
         final Player player = freeColClient.getMyPlayer();
         final Unit activeUnit = gui.getActiveUnit();
+        final boolean owned = player != null && activeUnit != null
+            && player.owns(activeUnit);
         Tile unitTile;
-        if (activeUnit != null && (unitTile = activeUnit.getTile()) != null) {
+        if (activeUnit != null && owned
+            && (unitTile = activeUnit.getTile()) != null) {
             JMenuItem gotoMenuItem = null;
             if (activeUnit.isOffensiveUnit()
                 && unitTile.isAdjacent(tile)

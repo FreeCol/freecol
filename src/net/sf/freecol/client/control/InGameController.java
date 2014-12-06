@@ -3341,7 +3341,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if the destination change was successful.
      */
     public boolean goToTile(Unit unit, Tile tile) {
-        if (!requireOurTurn() || unit == null) return false;
+        if (!requireOurTurn() || unit == null
+            || !freeColClient.getMyPlayer().owns(unit)) return false;
 
         if (!gui.confirmClearTradeRoute(unit)) return false;
 
