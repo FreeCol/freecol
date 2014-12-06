@@ -49,7 +49,7 @@ import static net.sf.freecol.common.util.RandomUtils.*;
 /**
  * Represents an Indian settlement.
  */
-public class IndianSettlement extends Settlement {
+public class IndianSettlement extends Settlement implements TradeLocation {
 
     private static final Logger logger = Logger.getLogger(IndianSettlement.class.getName());
 
@@ -1236,6 +1236,35 @@ public class IndianSettlement extends Settlement {
             : new Tension(Tension.TENSION_MIN);
         return StringTemplate.template("indianSettlement." + alarm.getKey())
             .addStringTemplate("%nation%", getOwner().getNationName());
+    }
+
+
+    // Interface TradeLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getExportAmount(GoodsType goodsType) {
+        int present = getGoodsCount(goodsType);
+        int wanted = getWantedGoodsAmount(goodsType);
+        return present - wanted;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getImportAmount(GoodsType goodsType) {
+        int present = getGoodsCount(goodsType);
+        if (goodsType.limitIgnored()) return Integer.MAX_VALUE;
+        int capacity = getWarehouseCapacity();
+        return capacity - present;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getNetProductionOf(GoodsType goodsType) {
+        return 0;
     }
 
 

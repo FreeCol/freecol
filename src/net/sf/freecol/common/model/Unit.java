@@ -38,8 +38,10 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
@@ -47,6 +49,7 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.model.TradeRouteStop;
+import net.sf.freecol.common.model.TradeLocation;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.EmptyIterator;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -1544,8 +1547,10 @@ public class Unit extends GoodsLocation
      * @return The <code>TradeLocation</code> for this unit.
      */
     public TradeLocation getTradeLocation() {
-        Colony colony = getColony();
-        return (colony != null) ? (TradeLocation)colony
+        Colony colony;
+        IndianSettlement is;
+        return ((colony = getColony()) != null) ? (TradeLocation)colony
+            : ((is = getIndianSettlement()) != null) ? (TradeLocation)is
             : (isInEurope()) ? (TradeLocation)getOwner().getEurope()
             : null;
     }
