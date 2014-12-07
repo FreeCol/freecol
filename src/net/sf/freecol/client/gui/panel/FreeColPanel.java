@@ -19,12 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.LayoutManager;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -32,11 +28,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
@@ -45,12 +36,8 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import net.sf.freecol.client.ClientOptions;
@@ -61,17 +48,10 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColGameObjectType;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.HistoryEvent;
-import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Turn;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**

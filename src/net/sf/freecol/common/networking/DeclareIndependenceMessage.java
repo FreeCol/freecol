@@ -19,12 +19,8 @@
 
 package net.sf.freecol.common.networking;
 
-import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;

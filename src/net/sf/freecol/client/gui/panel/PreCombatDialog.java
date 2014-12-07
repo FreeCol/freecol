@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
-import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -32,17 +31,13 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Modifier;
-import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 

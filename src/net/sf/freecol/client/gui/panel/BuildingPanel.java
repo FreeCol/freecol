@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -31,12 +30,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JToolTip;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.Ability;

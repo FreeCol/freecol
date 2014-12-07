@@ -35,11 +35,9 @@ import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.RiverStyleDialog;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.TileTypeTransform;
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
-import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.generator.TerrainGenerator;
 
 

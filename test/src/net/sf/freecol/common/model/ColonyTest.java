@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.List;
-
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;

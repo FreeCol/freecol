@@ -22,8 +22,6 @@ package net.sf.freecol.client.gui.plaf;
 import java.awt.Graphics;
 
 import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicListUI;
 

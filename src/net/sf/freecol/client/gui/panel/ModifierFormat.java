@@ -24,7 +24,6 @@ import java.text.DecimalFormat;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Feature;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.FreeColObject;

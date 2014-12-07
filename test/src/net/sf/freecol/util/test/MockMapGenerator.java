@@ -21,20 +21,15 @@ package net.sf.freecol.util.test;
 
 import java.util.Iterator;
 
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HighSeas;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.MarketData;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Region;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.generator.MapGenerator;
 
 

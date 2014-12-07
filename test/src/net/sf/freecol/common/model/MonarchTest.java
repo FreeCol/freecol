@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.io.StringWriter;
 import java.util.List;
-import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;

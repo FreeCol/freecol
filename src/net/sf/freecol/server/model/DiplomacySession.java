@@ -21,7 +21,6 @@ package net.sf.freecol.server.model;
 
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;

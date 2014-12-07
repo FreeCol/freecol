@@ -19,9 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.gui.i18n.Messages;

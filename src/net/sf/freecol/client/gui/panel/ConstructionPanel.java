@@ -25,11 +25,9 @@ import java.awt.event.MouseListener;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
@@ -41,7 +39,6 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**

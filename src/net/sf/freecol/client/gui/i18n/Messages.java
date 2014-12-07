@@ -33,7 +33,6 @@ import java.util.Locale;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.UIManager;
@@ -44,17 +43,12 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.Mods;
-import net.sf.freecol.common.model.AbstractGoods;
-import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.StringTemplate.TemplateType;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.option.Option;
 
 
 /**

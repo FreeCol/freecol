@@ -27,13 +27,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import javax.swing.plaf.UIResource;
-import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import java.lang.reflect.Method;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.ObjectWithId;

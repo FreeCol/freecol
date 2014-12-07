@@ -29,13 +29,11 @@ import java.util.logging.Logger;
 import javax.swing.Timer;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 
 
 /**

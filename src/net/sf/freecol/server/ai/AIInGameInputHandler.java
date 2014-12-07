@@ -51,7 +51,6 @@ import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
-import net.sf.freecol.server.networking.DummyConnection;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

@@ -28,7 +28,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,10 +44,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
 
 
 /**

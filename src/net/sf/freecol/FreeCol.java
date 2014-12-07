@@ -22,16 +22,11 @@ package net.sf.freecol;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
 import java.net.JarURLConnection;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
-import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -52,8 +47,6 @@ import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.NoRouteToServerException;
-import net.sf.freecol.common.option.LanguageOption;
-import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 

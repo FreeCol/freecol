@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.i18n;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.sf.freecol.common.model.Turn;
 
 
 /**

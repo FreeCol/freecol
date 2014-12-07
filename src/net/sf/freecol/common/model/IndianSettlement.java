@@ -23,13 +23,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -42,7 +39,6 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Tension.Level;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
 

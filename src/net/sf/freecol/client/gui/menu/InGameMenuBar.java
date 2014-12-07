@@ -30,7 +30,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.i18n.Messages;

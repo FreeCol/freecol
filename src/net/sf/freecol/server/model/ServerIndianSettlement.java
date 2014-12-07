@@ -24,9 +24,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;

@@ -19,14 +19,11 @@
 
 package net.sf.freecol.common.model.pathfinding;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;

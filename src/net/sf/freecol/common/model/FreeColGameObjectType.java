@@ -19,14 +19,12 @@
 
 package net.sf.freecol.common.model;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Modifier;
-import net.sf.freecol.common.option.OptionGroup;
 
 
 /**

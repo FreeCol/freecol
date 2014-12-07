@@ -25,7 +25,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;

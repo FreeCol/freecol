@@ -22,8 +22,6 @@ package net.sf.freecol.client.gui.sound;
 import java.io.File;
 import java.io.IOException;
 
-import javax.sound.sampled.AudioSystem;
-
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColDirectories;

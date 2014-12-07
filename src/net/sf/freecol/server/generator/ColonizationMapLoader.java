@@ -21,16 +21,13 @@ package net.sf.freecol.server.generator;
 
 import java.io.File;
 import java.io.RandomAccessFile;
-import java.util.Arrays;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Layer;
 import net.sf.freecol.common.model.Specification;
 

@@ -22,14 +22,10 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -51,7 +47,6 @@ import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.TradeLocation;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
-import net.sf.freecol.common.util.EmptyIterator;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 // @compat 0.10.x

@@ -25,11 +25,9 @@ import java.util.Map;
 
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.FreeColTestUtils;
 
 
 public class ProductionTypeTest extends FreeColTestCase {

@@ -20,8 +20,6 @@
 
 package net.sf.freecol.common.networking;
 
-import java.io.IOException;
-
 import org.w3c.dom.Element;
 
 

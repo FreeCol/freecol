@@ -20,7 +20,6 @@
 package net.sf.freecol.server.model;
 
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -33,7 +32,6 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.UnitListOption;

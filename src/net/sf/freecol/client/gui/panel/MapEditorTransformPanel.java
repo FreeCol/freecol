@@ -27,7 +27,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
@@ -39,10 +38,8 @@ import javax.swing.JToggleButton;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map.Direction;
@@ -50,20 +47,14 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.ResourceType;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.SettlementType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.generator.RiverSection;
 import net.sf.freecol.server.model.ServerIndianSettlement;
-import net.sf.freecol.server.model.ServerPlayer;
-import net.sf.freecol.server.model.ServerUnit;
 
 
 /**

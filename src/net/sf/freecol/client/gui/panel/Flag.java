@@ -26,7 +26,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;

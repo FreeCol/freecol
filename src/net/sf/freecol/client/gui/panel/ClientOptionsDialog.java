@@ -19,11 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.io.File;
-
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.OptionGroup;
 

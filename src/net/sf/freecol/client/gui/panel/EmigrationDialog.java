@@ -19,8 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JTextArea;
 
 import java.util.ArrayList;

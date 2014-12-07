@@ -29,8 +29,6 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.WindowedFrameListener;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**

@@ -31,7 +31,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ChangeWindowedModeAction;
 import net.sf.freecol.client.gui.action.DetermineHighSeasAction;
 import net.sf.freecol.client.gui.action.DisplayGridAction;

@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.action;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 

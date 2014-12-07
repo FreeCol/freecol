@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamException;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.AbstractUnit;

@@ -21,8 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.LayoutManager;
-import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;

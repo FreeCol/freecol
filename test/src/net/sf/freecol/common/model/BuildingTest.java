@@ -24,8 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.stream.XMLStreamException;
-
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;

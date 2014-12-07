@@ -46,8 +46,6 @@ import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The main AI-class.

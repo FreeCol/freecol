@@ -22,8 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 

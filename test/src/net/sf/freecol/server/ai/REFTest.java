@@ -24,8 +24,6 @@ import java.util.List;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;

@@ -19,10 +19,8 @@
 
 package net.sf.freecol.common.model;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -30,7 +28,6 @@ import java.util.Set;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;

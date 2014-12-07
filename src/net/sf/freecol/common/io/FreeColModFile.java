@@ -30,7 +30,6 @@ import java.util.Set;
 
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColXMLReader;
-import net.sf.freecol.common.model.FreeColObject;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 

@@ -21,7 +21,6 @@ package net.sf.freecol.common.resources;
 
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 import java.util.logging.Logger;

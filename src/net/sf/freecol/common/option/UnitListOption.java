@@ -19,9 +19,6 @@
 
 package net.sf.freecol.common.option;
 
-import javax.xml.stream.XMLStreamException;
-
-import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Specification;
 

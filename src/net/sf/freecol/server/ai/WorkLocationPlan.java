@@ -21,14 +21,9 @@ package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamException;
-
-import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.WorkLocation;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 

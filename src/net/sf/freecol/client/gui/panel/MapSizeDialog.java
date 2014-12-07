@@ -21,14 +21,10 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColInputDialog;
 import net.sf.freecol.client.gui.panel.MigPanel;

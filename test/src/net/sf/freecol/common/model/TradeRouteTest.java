@@ -19,14 +19,8 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.List;
-
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.NoClaimReason;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.server.model.ServerUnit;
-import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 

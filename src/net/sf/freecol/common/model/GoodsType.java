@@ -27,8 +27,6 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.model.BuildableType;
-import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.UnitType;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;

@@ -25,12 +25,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import java.util.Locale;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.LogRecord;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.FreeColServer;

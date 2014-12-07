@@ -20,7 +20,6 @@
 package net.sf.freecol.common.util;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 

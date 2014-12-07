@@ -22,8 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.freecol.common.model.Map.Direction;
-
 
 /**
  * Represents the style of a tile improvement, such as a river or

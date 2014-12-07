@@ -28,13 +28,11 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
-import javax.swing.JColorChooser;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 
 

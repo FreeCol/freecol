@@ -23,7 +23,6 @@ package net.sf.freecol.server.generator;
 
 import java.util.EnumMap;
 
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;

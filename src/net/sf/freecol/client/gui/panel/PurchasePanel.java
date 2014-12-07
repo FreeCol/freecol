@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.miginfocom.swing.MigLayout;

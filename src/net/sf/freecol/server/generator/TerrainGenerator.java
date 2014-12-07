@@ -29,7 +29,6 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.LandMap;
 import net.sf.freecol.common.model.Map;

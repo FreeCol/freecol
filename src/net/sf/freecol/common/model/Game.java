@@ -21,8 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -33,17 +31,12 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.NationOptions.NationState;
-import net.sf.freecol.common.option.BooleanOption;
-import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.MapGeneratorOptions;
-import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;

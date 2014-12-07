@@ -23,10 +23,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.freecol.client.FreeColClient;
@@ -35,7 +33,6 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
-import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.StringTemplate;
 
 import net.miginfocom.swing.MigLayout;

@@ -20,17 +20,14 @@
 package net.sf.freecol.server.generator;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.Player;
@@ -39,7 +36,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
-import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;

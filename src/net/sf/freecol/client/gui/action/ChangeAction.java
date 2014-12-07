@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import java.util.Iterator;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;

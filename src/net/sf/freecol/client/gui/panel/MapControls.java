@@ -44,7 +44,6 @@ import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
 

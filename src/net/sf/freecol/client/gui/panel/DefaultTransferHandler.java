@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Point;
@@ -59,7 +58,6 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Role;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 
 

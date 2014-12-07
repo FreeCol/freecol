@@ -23,7 +23,6 @@ import java.awt.Dimension;
 import javax.swing.JSeparator;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;

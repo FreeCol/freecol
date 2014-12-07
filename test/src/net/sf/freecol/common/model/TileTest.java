@@ -19,12 +19,9 @@
 
 package net.sf.freecol.common.model;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 import net.sf.freecol.client.gui.MapViewer;
-import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 

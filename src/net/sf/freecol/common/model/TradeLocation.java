@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Location;
 
 
 /**

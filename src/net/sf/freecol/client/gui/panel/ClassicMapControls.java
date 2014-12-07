@@ -25,7 +25,6 @@ import javax.swing.JPanel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.common.resources.ResourceManager;
 

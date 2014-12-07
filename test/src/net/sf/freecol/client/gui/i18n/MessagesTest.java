@@ -27,7 +27,6 @@ import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;

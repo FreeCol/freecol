@@ -25,7 +25,6 @@ import javax.swing.AbstractButton;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**

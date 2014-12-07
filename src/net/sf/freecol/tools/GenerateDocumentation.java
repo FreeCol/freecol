@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +35,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 

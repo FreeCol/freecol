@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.gui.i18n.Messages;

@@ -21,8 +21,6 @@ package net.sf.freecol.client.gui.video;
 
 import java.awt.Insets;
 import java.awt.event.MouseListener;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

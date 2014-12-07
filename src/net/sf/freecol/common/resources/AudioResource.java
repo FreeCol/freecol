@@ -19,14 +19,8 @@
 
 package net.sf.freecol.common.resources;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.URI;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 

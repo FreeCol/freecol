@@ -20,31 +20,16 @@
 package net.sf.freecol.server.control;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
-import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.ai.AIMain;
-import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;

@@ -71,7 +71,6 @@ import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.PutOutsideColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage;
-import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
