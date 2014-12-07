@@ -401,15 +401,16 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * from a list.
      *
      * @param goodsList A list of <code>AbstractGoods</code> to require.
-     * @return The minimum goods count.
+     * @return The minimum goods count, INFINITY if not constraints.
      */
     private int getMinimumGoodsCount(List<AbstractGoods> goodsList) {
-        if (goodsList == null || goodsList.isEmpty()) return INFINITY;
         int result = INFINITY;
-        for (AbstractGoods ag : goodsList) {
-            result = Math.min(result, 
-                              Math.max(getGoodsCount(ag.getType()),
-                                       getNetProductionOf(ag.getType())));
+        if (goodsList != null) {
+            for (AbstractGoods ag : goodsList) {
+                result = Math.min(result, 
+                                  Math.max(getGoodsCount(ag.getType()),
+                                           getNetProductionOf(ag.getType())));
+            }
         }
         return result;
     }
