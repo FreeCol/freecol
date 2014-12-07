@@ -3471,10 +3471,10 @@ public final class InGameController extends Controller {
     public Element work(ServerPlayer serverPlayer, Unit unit,
                         WorkLocation workLocation) {
         final Specification spec = getGame().getSpecification();
-        ChangeSet cs = new ChangeSet();
-        Colony colony = workLocation.getColony();
+        final Colony colony = workLocation.getColony();
         colony.getGoodsContainer().saveState();
 
+        ChangeSet cs = new ChangeSet();
         if (workLocation instanceof ColonyTile) {
             Tile tile = ((ColonyTile) workLocation).getWorkTile();
             if (tile.getOwningSettlement() != colony) {

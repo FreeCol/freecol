@@ -407,7 +407,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     public void paintComponent(Graphics g) {
 
         if (goodsIcon == null || (getAmount() == 0 && stockNumber<0) ) {
-            logger.fine("Empty production label: fix this!");
+            logger.fine("FIXME, empty production, icon=" + goodsIcon
+                + " amount=" + getAmount() + " stock=" + stockNumber);
             return;
         }
 

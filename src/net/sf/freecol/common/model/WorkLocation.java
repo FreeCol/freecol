@@ -114,7 +114,7 @@ public abstract class WorkLocation extends UnitLocation
         Unit unit = getFirstUnit();
         GoodsType workType = (unit == null) ? null : unit.getWorkType();
         ProductionType best = null;
-        int amount = 0;
+        int amount = -1;
         for (ProductionType pt : getAvailableProductionTypes(unit == null)) {
             for (AbstractGoods output : pt.getOutputs()) {
                 if (workType != null && workType != output.getType()) continue;
@@ -297,11 +297,9 @@ public abstract class WorkLocation extends UnitLocation
             if (output.getType() != goodsType) continue;
             int amount = getBaseProduction(getProductionType(), goodsType,
                                            unitType);
-            if (amount > 0) {
-                amount = (int)applyModifiers(amount, turn,
-                    getProductionModifiers(goodsType, unitType));
-                if (bestAmount < amount) bestAmount = amount;
-            }
+            amount = (int)applyModifiers(amount, turn,
+                getProductionModifiers(goodsType, unitType));
+            if (bestAmount < amount) bestAmount = amount;
         }
         return bestAmount;
     }
