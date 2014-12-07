@@ -93,9 +93,9 @@
                      defaultValue="true"/>
       <!-- Map controls -->
       <stringOption id="model.option.mapControls"
-                    defaultValue="CornerMapControls">
-        <choice value="CornerMapControls"/>
-        <choice value="ClassicMapControls"/>
+                    defaultValue="clientOptions.gui.mapControls.CornerMapControls">
+        <choice value="clientOptions.gui.mapControls.CornerMapControls"/>
+        <choice value="clientOptions.gui.mapControls.ClassicMapControls"/>
       </stringOption>
       <!-- The color to fill in around the actual map on the minimap. -->
       <selectOption id="model.option.color.background"
@@ -175,13 +175,13 @@
                      defaultValue="true"/>
       <booleanOption id="model.option.guiShowWarehouseCapacity"
                      defaultValue="true"/>
+      <booleanOption id="model.option.guiShowUnitAdded"
+                     defaultValue="true"/>
       <booleanOption id="model.option.guiShowUnitImproved"
                      defaultValue="true"/>
       <booleanOption id="model.option.guiShowUnitDemoted"
                      defaultValue="true"/>
       <booleanOption id="model.option.guiShowUnitLost"
-                     defaultValue="true"/>
-      <booleanOption id="model.option.guiShowUnitAdded"
                      defaultValue="true"/>
       <booleanOption id="model.option.guiShowBuildingCompleted"
                      defaultValue="true"/>
@@ -211,14 +211,14 @@
       <!-- Type of colony report. -->
       <selectOption id="model.option.colonyReport"
                     defaultValue="0" localizedLabels="true">
-        <selectValue label="clientOptions.colonyReport.classic" value="0"/>
-        <selectValue label="clientOptions.colonyReport.compact" value="1"/>
+        <selectValue label="clientOptions.messages.colonyReport.classic" value="0"/>
+        <selectValue label="clientOptions.messages.colonyReport.compact" value="1"/>
       </selectOption>
       <!-- Type of labour report. -->
       <selectOption id="model.option.labourReport"
                     defaultValue="0" localizedLabels="true">
-        <selectValue label="clientOptions.labourReport.classic" value="0"/>
-        <selectValue label="clientOptions.labourReport.compact" value="1"/>
+        <selectValue label="clientOptions.messages.labourReport.classic" value="0"/>
+        <selectValue label="clientOptions.messages.labourReport.compact" value="1"/>
       </selectOption>
     </optionGroup>
 
@@ -255,6 +255,7 @@
       <textOption id="model.option.beforeLastTurnName"
                   defaultValue="before-last-turn"/>
     </optionGroup>
+
     <optionGroup id="clientOptions.warehouse" >
       <!-- The Stock the custom house should keep when selling goods. -->
       <integerOption id="model.option.customStock"
@@ -297,22 +298,22 @@
       <!-- What to do when the natives make a demand. -->
       <selectOption id="model.option.indianDemandResponse"
                     defaultValue="0" localizedLabels="true">
-        <selectValue label="clientOptions.indianDemandResponse.ask" value="0"/>
-        <selectValue label="clientOptions.indianDemandResponse.accept" value="1"/>
-        <selectValue label="clientOptions.indianDemandResponse.reject" value="2"/>
+        <selectValue label="clientOptions.other.indianDemandResponse.ask" value="0"/>
+        <selectValue label="clientOptions.other.indianDemandResponse.accept" value="1"/>
+        <selectValue label="clientOptions.other.indianDemandResponse.reject" value="2"/>
       </selectOption>
       <!-- The action to take on warehouse overflow. -->
       <selectOption id="model.option.unloadOverflowResponse"
                     defaultValue="0" localizedLabels="true">
-        <selectValue label="clientOptions.unloadOverflowResponse.ask" value="0"/>
-        <selectValue label="clientOptions.unloadOverflowResponse.never" value="1"/>
-        <selectValue label="clientOptions.unloadOverflowResponse.always" value="2"/>
+        <selectValue label="clientOptions.other.unloadOverflowResponse.ask" value="0"/>
+        <selectValue label="clientOptions.other.unloadOverflowResponse.never" value="1"/>
+        <selectValue label="clientOptions.other.unloadOverflowResponse.always" value="2"/>
       </selectOption>
     </optionGroup>
 
     <optionGroup id="clientOptions.mods">
       <!-- Which mods are enabled. -->
-      <modListOption id="userMods">
+      <modListOption id="clientOptions.mods.userMods">
         <!-- <template>
           <modOption id="model.option.mod" />
         </template> -->
