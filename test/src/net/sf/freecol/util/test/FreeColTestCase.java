@@ -201,7 +201,7 @@ public class FreeColTestCase extends TestCase {
      * Does not call Game.setMap(Map) with the returned map. The map
      * is unexplored.
      *
-     * @param type The type of land with which to initialize the map.
+     * @param tileType The type of land with which to initialize the map.
      *
      * @return The map created as described above.
      */
@@ -218,7 +218,7 @@ public class FreeColTestCase extends TestCase {
      *
      * Does not call Game.setMap(Map) with the returned map.
      *
-     * @param type The type of land with which to initialize the map.
+     * @param tileType The type of land with which to initialize the map.
      * @param explored Set to true if you want all the tiles on the
      *     map to have been explored by all players.
      * @return The map created as described above.
@@ -248,7 +248,7 @@ public class FreeColTestCase extends TestCase {
      *
      * Does not call Game.setMap(Map) with the returned map.
      *
-     * @param type The type of land with which to initialize the map.
+     * @param landTileType The type of land with which to initialize the map.
      *
      * @param explored Set to true if you want all the tiles on the map to have been explored by all players.
      *

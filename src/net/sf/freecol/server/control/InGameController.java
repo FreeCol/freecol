@@ -2440,7 +2440,6 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
      * @param unit The <code>Unit</code> to set the destination for.
-     * @param destination The <code>Location</code> to set as destination.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element setCurrentStop(ServerPlayer serverPlayer, Unit unit,

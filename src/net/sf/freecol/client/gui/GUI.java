@@ -1309,7 +1309,6 @@ public class GUI {
      *
      * @param attacker The potential attacking <code>Unit</code>.
      * @param is The target <code>IndianSettlement</code>.
-     * @param ns A <code>NationSummary</code> of the other nation.
      * @return The amount of tribute to demand, positive if the demand
      *     should proceed.
      */
@@ -1686,7 +1685,7 @@ public class GUI {
      * @param text A string explaining the choice.
      * @param obj An optional object to make an icon for the dialog with.
      * @param cancelKey A key for the "cancel" button.
-     * @param choice A list a <code>ChoiceItem</code>s to choose from.
+     * @param choices A list a <code>ChoiceItem</code>s to choose from.
      * @return The selected value of the selected <code>ChoiceItem</code>,
      *     or null if cancelled.
      */
