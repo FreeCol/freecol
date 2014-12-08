@@ -1236,12 +1236,14 @@ public class IndianSettlement extends Settlement implements TradeLocation {
 
 
     // Interface TradeLocation
+    //   getGoodsCount provided by GoodsLocation
 
     /**
      * {@inheritDoc}
      */
-    public int getExportAmount(GoodsType goodsType) {
-        int present = getGoodsCount(goodsType);
+    public int getExportAmount(GoodsType goodsType, int turns) {
+        int present = Math.max(0, getGoodsCount(goodsType)
+            + turns * getTotalProductionOf(goodsType));
         int wanted = getWantedGoodsAmount(goodsType);
         return present - wanted;
     }
@@ -1249,9 +1251,11 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
-    public int getImportAmount(GoodsType goodsType) {
-        int present = getGoodsCount(goodsType);
+    public int getImportAmount(GoodsType goodsType, int turns) {
         if (goodsType.limitIgnored()) return Integer.MAX_VALUE;
+
+        int present = Math.max(0, getGoodsCount(goodsType)
+            - turns * getTotalProductionOf(goodsType));
         int capacity = getWarehouseCapacity();
         return capacity - present;
     }

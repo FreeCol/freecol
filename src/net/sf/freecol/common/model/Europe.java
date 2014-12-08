@@ -397,7 +397,14 @@ public class Europe extends UnitLocation
     /**
      * {@inheritDoc}
      */
-    public int getExportAmount(GoodsType goodsType) {
+    public int getGoodsCount(GoodsType goodsType) {
+        return GoodsContainer.HUGE_CARGO_SIZE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getExportAmount(GoodsType goodsType, int turns) {
         return (getOwner().canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
             : 0;
     }
@@ -405,16 +412,9 @@ public class Europe extends UnitLocation
     /**
      * {@inheritDoc}
      */
-    public int getImportAmount(GoodsType goodsType) {
+    public int getImportAmount(GoodsType goodsType, int turns) {
         return (getOwner().canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
             : 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getNetProductionOf(GoodsType goodsType) {
-        return 0;
     }
 
 

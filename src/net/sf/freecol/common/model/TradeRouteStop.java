@@ -98,6 +98,15 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
     }
 
     /**
+     * Get the location of this stop as a TradeLocation.
+     *
+     * @return The <code>TradeLocation</code> for this stop.
+     */
+    public TradeLocation getTradeLocation() {
+        return (TradeLocation)location;
+    }
+
+    /**
      * Is this stop valid?
      *
      * @return True if the stop is valid.
@@ -137,105 +146,83 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
         cargo.add(newCargo);
     }
 
+    /**
+     * Get a list of the maximum abstract goods that could be loaded
+     * at this stop.  That is, a list of all the cargo goods types
+     * normally with amount equal to one CARGO_SIZE, but with
+     * duplicates removed and amounts accumulated.
+     *
+     * @return A list of <code>AbstractGoods</code> to load.
+     */
+    public List<AbstractGoods> getCompactCargo() {
+        List<AbstractGoods> result = new ArrayList<>();
+        for (GoodsType type : getCargo()) {
+            AbstractGoods ag = AbstractGoods.findByType(type, result);
+            if (ag != null) {
+                ag.setAmount(ag.getAmount() + GoodsContainer.CARGO_SIZE);
+            } else {
+                result.add(new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
+            }
+        }
+        return result;
+    }
+        
+    /**
+     * Is there work for a unit to do at this stop?
+     *
+     * @param unit The <code>Unit</code> to test.
+     * @param turns Account for production from this many turns.
+     * @return True if this unit should load or unload cargo at the stop.
+     */
+    public boolean hasWork(Unit unit, int turns) {
+        // Look for goods to load.
+        List<AbstractGoods> stopGoods = getCompactCargo();
+        for (AbstractGoods ag : stopGoods) {
+            if (unit.getGoodsCount(ag.getType()) >= ag.getAmount()) continue;
+            // There is space on the unit to load some more
+            // of this goods type, so return true if there is
+            // some available at the stop.
+            if (getExportAmount(ag.getType(), turns) > 0) return true;
+        }
 
-    // Disabled routines for a proposed functionality extension.
+        // Look for goods to unload.
+        for (Goods goods : unit.getCompactGoodsList()) {
+            GoodsType type = goods.getType();
+            if (AbstractGoods.findByType(type, stopGoods) != null) continue;
+            // There are goods on board this unit that need to be unloaded.
+            if (getImportAmount(type, turns) > 0) return true;
+        }
+            
+        return false;
+    }
 
-    ///**
-    // * Whether the stop has been modified. This is of interest only to the
-    // * client and can be ignored for XML serialization.
-    // *
-    //private boolean modified = false;
-    //
-    ///**
-    // * The AbstractGoods to unload in this Location.
-    // *
-    //private List<AbstractGoods> goodsToUnload;
-    //
-    ///**
-    // * The AbstractGoods to load in this Location.
-    // *
-    //private List<AbstractGoods> goodsToLoad;
-    //
-    ///**
-    // * Get the <code>GoodsToLoad</code> value.
-    // *
-    // * @return a <code>List<AbstractGoods></code> value
-    // *
-    //public final List<AbstractGoods> getGoodsToLoad() {
-    //    return goodsToLoad;
-    //}
-    //
-    ///**
-    // * Set the <code>GoodsToLoad</code> value.
-    // *
-    // * @param newGoodsToLoad The new GoodsToLoad value.
-    // *
-    //public final void setGoodsToLoad(final List<AbstractGoods> newGoodsToLoad) {
-    //    this.goodsToLoad = newGoodsToLoad;
-    //}
-    //
-    ///**
-    // * Get the <code>GoodsToUnload</code> value.
-    // *
-    // * @return a <code>List<AbstractGoods></code> value
-    // *
-    //public final List<AbstractGoods> getGoodsToUnload() {
-    //    return goodsToUnload;
-    //}
-    //
-    ///**
-    // * Set the <code>GoodsToUnload</code> value.
-    // *
-    // * @param newGoodsToUnload The new GoodsToUnload value.
-    // *
-    //public final void setGoodsToUnload(final List<AbstractGoods> newGoodsToUnload) {
-    //    this.goodsToUnload = newGoodsToUnload;
-    //}
-    //
-    ///**
-    // * Get the <code>Modified</code> value.
-    // * 
-    // * @return a <code>boolean</code> value
-    // *
-    //public final boolean isModified() {
-    //    return modified;
-    //}
-    //
-    ///**
-    // * Set the <code>Modified</code> value.
-    // * 
-    // * @param newModified The new Modified value.
-    // *
-    //public final void setModified(final boolean newModified) {
-    //    this.modified = newModified;
-    //}
 
     // Interface TradeLocation
 
     /**
      * {@inheritDoc}
      */
-    public int getExportAmount(GoodsType goodsType) {
+    public int getGoodsCount(GoodsType goodsType) {
         return (location instanceof TradeLocation)
-            ? ((TradeLocation)location).getExportAmount(goodsType)
+            ? ((TradeLocation)location).getGoodsCount(goodsType)
             : 0;
     }
 
     /**
      * {@inheritDoc}
      */
-    public int getImportAmount(GoodsType goodsType) {
+    public int getExportAmount(GoodsType goodsType, int turns) {
         return (location instanceof TradeLocation)
-            ? ((TradeLocation)location).getImportAmount(goodsType)
+            ? ((TradeLocation)location).getExportAmount(goodsType, turns)
             : 0;
     }
 
     /**
      * {@inheritDoc}
      */
-    public int getNetProductionOf(GoodsType goodsType) {
+    public int getImportAmount(GoodsType goodsType, int turns) {
         return (location instanceof TradeLocation)
-            ? ((TradeLocation)location).getNetProductionOf(goodsType)
+            ? ((TradeLocation)location).getImportAmount(goodsType, turns)
             : 0;
     }
 

@@ -2149,7 +2149,7 @@ public final class InGameController implements NetworkConstants {
                         // No work was found anywhere on the trade
                         // route, so we should skip this unit.
                         lb.add(" ", Messages.message("tradeRoute.wait"));
-                        askServer().changeState(unit, UnitState.SKIPPED);
+                        unit.setState(UnitState.SKIPPED);
                         break outer;
                     }
                     stop = stops.get(next);
@@ -2161,12 +2161,14 @@ public final class InGameController implements NetworkConstants {
                         result = true;
                         break outer;
                     }
-                    if (unit.hasWorkAtStop(stop, checkProduction)) break;
+                    int turns = (!checkProduction) ? 0
+                        : unit.getTurnsToReach(stop.getLocation());
+                    if (stop.hasWork(unit, turns)) break;
                 }
-                // A new stop was found, inform the server.
+                // A new stop was found, inform the server, skip on error.
                 if (!askServer().setCurrentStop(unit, next)) {
-                    askServer().changeState(unit, UnitState.SKIPPED);
-                    break outer;
+                    unit.setState(UnitState.SKIPPED);
+                    break;
                 }
 
                 // Add messages for any skipped stops now that we know
@@ -2218,6 +2220,7 @@ public final class InGameController implements NetworkConstants {
                 player.addModelMessage(m);
             }
         }
+        if (result) result = unit.getMovesLeft() > 0;
         return result;
     }
 
@@ -2230,15 +2233,9 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean loadUnitAtStop(Unit unit, LogBuilder lb) {
         final Game game = freeColClient.getGame();
-        final Colony colony = unit.getColony();
-        final Europe europe = (unit.isInEurope())
-            ? unit.getOwner().getEurope() : null;
-        final Location loc = (colony != null) ? colony
-            : (europe != null) ? europe
-            : null;
-        if (loc == null) return false;
-
         final TradeRouteStop stop = unit.getStop();
+        final TradeLocation trl = stop.getTradeLocation();
+        if (trl == null) return false;
         boolean ret = false;
 
         // Make a list of goods to load at this stop.  Collapse multiple
@@ -2272,16 +2269,11 @@ public final class InGameController implements NetworkConstants {
         // Load as much as possible
         for (AbstractGoods ag : toLoad) {
             GoodsType type = ag.getType();
-            int present, export, demand = ag.getAmount();
-            if (unit.isInEurope()) {
-                present = export = Integer.MAX_VALUE;
-            } else {
-                present = colony.getGoodsCount(ag.getType());
-                export = colony.getExportAmount(ag.getType());
-            }
+            int demand = ag.getAmount(),
+                present = trl.getGoodsCount(type),
+                export = trl.getExportAmount(type, 0);
             if (export > 0) {
                 int amount = Math.min(demand, export);
-                Goods cargo = new Goods(game, loc, type, amount);
                 ret = askLoadGoods(type, amount, unit);
                 if (ret) {
                     lb.add(" ", getLoadGoodsMessage(type, amount, present,
@@ -2336,15 +2328,10 @@ public final class InGameController implements NetworkConstants {
      * @return True if something was unloaded.
      */
     private boolean unloadUnitAtStop(Unit unit, LogBuilder lb) {
-        final Colony colony = unit.getColony();
-        final Europe europe = (unit.isInEurope()) ? unit.getOwner().getEurope()
-            : null;
-        Location loc = (colony != null) ? colony
-            : (europe != null) ? europe
-            : null;
-        if (loc == null) return false;
+        final TradeRouteStop stop = unit.getStop();
+        final TradeLocation trl = stop.getTradeLocation();
+        if (trl == null) return false;
 
-        TradeRouteStop stop = unit.getStop();
         final List<GoodsType> goodsTypesToLoad = stop.getCargo();
         boolean ret = false;
 
@@ -2357,11 +2344,10 @@ public final class InGameController implements NetworkConstants {
 
             int present = goods.getAmount();
             int toUnload = present;
-            int atStop = (colony == null) ? Integer.MAX_VALUE // Europe
-                : colony.getImportAmount(type);
+            int atStop = trl.getImportAmount(type, 0);
             int amount = toUnload;
             if (amount > atStop) {
-                StringTemplate locName = loc.getLocationLabel();
+                StringTemplate locName = stop.getLocation().getLocationLabel();
                 String overflow = Integer.toString(toUnload - atStop);
                 int option = freeColClient.getClientOptions()
                     .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);
@@ -2374,7 +2360,7 @@ public final class InGameController implements NetworkConstants {
                         .addStringTemplate("%colony%", locName)
                         .addName("%amount%", overflow)
                         .add("%goods%", goods.getNameKey());
-                    if (!gui.confirm(true, colony.getTile(), template,
+                    if (!gui.confirm(true, unit.getTile(), template,
                                      unit, "yes", "no")) amount = atStop;
                     break;
                 case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_NEVER:

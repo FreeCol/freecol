@@ -3194,47 +3194,6 @@ public class Unit extends GoodsLocation
         return result;
     }
 
-    /**
-     * Is there work for this unit to do at a stop?
-     *
-     * @param stop The <code>TradeRouteStop</code> to test.
-     * @param checkProduction Account for production levels.
-     * @return True if this unit should load or unload cargo at the stop.
-     */
-    public boolean hasWorkAtStop(TradeRouteStop stop,
-                                 boolean checkProduction) {
-        final int multiplier = (checkProduction)
-            ? getTurnsToReach(stop.getLocation())
-            : 0;
-        // Look for goods to load.
-        List<GoodsType> stopGoods = stop.getCargo();
-        for (GoodsType type : stopGoods) {
-            if (getLoadableAmount(type) <= 0) continue;
-            // There is space on the unit to load some more
-            // of this goods type, so return true if there is
-            // some available at the stop.
-            int amount = stop.getExportAmount(type);
-            if (multiplier > 0) {
-                amount += multiplier * stop.getNetProductionOf(type);
-            }
-            if (amount > 0) return true;
-        }
-
-        // Look for goods to unload.
-        for (Goods goods : getCompactGoodsList()) {
-            GoodsType type = goods.getType();
-            if (stopGoods.contains(type)) continue;
-            // There are goods on board this unit that need to be unloaded.
-            int amount = stop.getImportAmount(type);
-            if (multiplier > 0) {
-                amount -= multiplier * stop.getNetProductionOf(type);
-            }
-            if (amount > 0) return true;
-        }
-            
-        return false;
-    }
-
 
     // Miscellaneous more complex functionality
 

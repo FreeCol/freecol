@@ -99,7 +99,8 @@ public class ChangeStateMessage extends DOMMessage {
         }
         if (!unit.checkSetState(state)) {
             return DOMMessage.clientError("Unit " + unitId
-                + " can not set state: " + stateString);
+                + " can not change state: " + unit.getState().toString()
+                + " -> " + stateString);
         }
 
         // Proceed to change.

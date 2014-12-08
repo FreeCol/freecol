@@ -105,47 +105,51 @@ public class TradeRouteTest extends FreeColTestCase {
         colony1.getExportData(fursGoodsType).setExportLevel(ex);
         colony2.getExportData(fursGoodsType).setExportLevel(ex);
         colony3.getExportData(fursGoodsType).setExportLevel(ex);
-        assertEquals(-ex, colony1.getExportAmount(fursGoodsType));
-        assertEquals(-ex, colony2.getExportAmount(fursGoodsType));
-        assertEquals(-ex, colony3.getExportAmount(fursGoodsType));
-        assertEquals(-ex, trs1.getExportAmount(fursGoodsType));
-        assertEquals(-ex, trs2.getExportAmount(fursGoodsType));
-        assertEquals(-ex, trs3.getExportAmount(fursGoodsType));
+        assertEquals(0, colony1.getExportAmount(fursGoodsType, 0));
+        assertEquals(0, colony2.getExportAmount(fursGoodsType, 0));
+        assertEquals(0, colony3.getExportAmount(fursGoodsType, 0));
+        assertEquals(0, trs1.getExportAmount(fursGoodsType, 0));
+        assertEquals(0, trs2.getExportAmount(fursGoodsType, 0));
+        assertEquals(0, trs3.getExportAmount(fursGoodsType, 0));
         assertEquals(GoodsContainer.CARGO_SIZE,
-                     trs1.getImportAmount(fursGoodsType));
+                     trs1.getImportAmount(fursGoodsType, 0));
         assertEquals(GoodsContainer.CARGO_SIZE,
-                     trs2.getImportAmount(fursGoodsType));
+                     trs2.getImportAmount(fursGoodsType, 0));
         assertEquals(GoodsContainer.CARGO_SIZE,
-                     trs3.getImportAmount(fursGoodsType));
-        assertTrue(trs1.getNetProductionOf(fursGoodsType) > 0);
-        assertTrue(trs2.getNetProductionOf(fursGoodsType) > 0);
-        assertTrue(trs3.getNetProductionOf(fursGoodsType) > 0);
+                     trs3.getImportAmount(fursGoodsType, 0));
 
         // Which stops have work?
         // Initially nothing to collect, and therefore nothing to deliver
-        assertFalse(wagon.hasWorkAtStop(trs1, false));
-        assertFalse(wagon.hasWorkAtStop(trs2, false));
-        assertFalse(wagon.hasWorkAtStop(trs3, false));
+        assertFalse(trs1.hasWork(wagon, 0));
+        assertFalse(trs2.hasWork(wagon, 0));
+        assertFalse(trs3.hasWork(wagon, 0));
+
         // Add some goods and delivery becomes valid
         wagon.addGoods(fursGoodsType, 10);
-        assertFalse(wagon.hasWorkAtStop(trs1, false));
-        assertFalse(wagon.hasWorkAtStop(trs2, false));
-        assertTrue(wagon.hasWorkAtStop(trs3, false));
+        assertFalse(trs1.hasWork(wagon, 0));
+        assertFalse(trs2.hasWork(wagon, 0));
+        assertTrue(trs3.hasWork(wagon, 0));
         wagon.removeGoods(fursGoodsType);
+
         // Now allow production check.  There will still be nothing to
         // collect because of the export level.
-        assertFalse(wagon.hasWorkAtStop(trs1, true));
-        assertFalse(wagon.hasWorkAtStop(trs2, true));
-        assertFalse(wagon.hasWorkAtStop(trs3, true));
+        assertFalse(trs1.hasWork(wagon, 0));
+        assertFalse(trs2.hasWork(wagon, 2));
+        assertFalse(trs3.hasWork(wagon, 4));
+
         // Zero the export levels.  Now first colony will still not
         // export because it has not produced anything yet, but the
         // second (for which turnsToReach() > 0) will have goods to
-        // export.
+        // export.  The third colony will still not show work needed
+        // unless there are goods on this wagon.
         colony1.getExportData(fursGoodsType).setExportLevel(0);
         colony2.getExportData(fursGoodsType).setExportLevel(0);
         colony3.getExportData(fursGoodsType).setExportLevel(0);
-        assertFalse(wagon.hasWorkAtStop(trs1, true));
-        assertTrue(wagon.hasWorkAtStop(trs2, true));
-        assertFalse(wagon.hasWorkAtStop(trs3, true));
+        assertFalse(trs1.hasWork(wagon, 0));
+        assertTrue(trs2.hasWork(wagon, 2));
+        assertFalse(trs3.hasWork(wagon, 4));
+        wagon.addGoods(fursGoodsType, 10);
+        assertTrue(trs3.hasWork(wagon, 4));
+        wagon.removeGoods(fursGoodsType);
     }
 }

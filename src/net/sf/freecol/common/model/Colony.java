@@ -2583,34 +2583,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
 
-    // Interface TradeLocation
-
-    /**
-     * How much of a goods type can be exported from this colony?
-     *
-     * @param goodsType The <code>GoodsType</code> to export.
-     * @return The amount of this type of goods available for export.
-     */
-    public int getExportAmount(GoodsType goodsType) {
-        int present = getGoodsCount(goodsType);
-        int exportable = getExportData(goodsType).getExportLevel();
-        return present - exportable;
-    }
-
-    /**
-     * How much of a goods type can be imported into this colony?
-     *
-     * @param goodsType The <code>GoodsType</code> to import.
-     * @return The amount of this type of goods that can be imported.
-     */
-    public int getImportAmount(GoodsType goodsType) {
-        int present = getGoodsCount(goodsType);
-        if (goodsType.limitIgnored()) return Integer.MAX_VALUE;
-        int capacity = getWarehouseCapacity();
-        return capacity - present;
-    }
-
-
     // Interface UnitLocation
     // Inherits
     //   UnitLocation.getSpaceTaken [Irrelevant!]
@@ -2814,6 +2786,33 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         Stance stance = getOwner().getStance(player);
         return StringTemplate.template("colony.tension." + stance.getKey())
             .addStringTemplate("%nation%", getOwner().getNationName());
+    }
+
+
+    // Interface TradeLocation
+    //   getGoodsCount provided by in GoodsContainer
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getExportAmount(GoodsType goodsType, int turns) {
+        ExportData ed = getExportData(goodsType);
+        int present = Math.max(0, getGoodsCount(goodsType)
+            + turns * getNetProductionOf(goodsType));
+        int wanted = ed.getExportLevel();
+        return Math.max(0, present - wanted);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getImportAmount(GoodsType goodsType, int turns) {
+        if (goodsType.limitIgnored()) return GoodsContainer.HUGE_CARGO_SIZE;
+
+        int present = Math.max(0, getGoodsCount(goodsType)
+            - turns * getNetProductionOf(goodsType));
+        int capacity = getWarehouseCapacity();
+        return Math.max(0, capacity - present);
     }
 
 

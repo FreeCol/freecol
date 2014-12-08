@@ -30,29 +30,30 @@ import net.sf.freecol.common.model.GoodsType;
 public interface TradeLocation {
 
     /**
-     * Gets the amount of a given goods type that can be exported from
-     * this trade location.
+     * Get the amount of a given goods type at this trade location.
      *
      * @param goodsType The <code>GoodsType</code> to check.
+     * @return The amount of goods present.
+     */
+    public int getGoodsCount(GoodsType goodsType);
+
+    /**
+     * Gets the amount of a given goods type that can be exported from
+     * this trade location after a given number of turns.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @param turns The number of turns before the goods is required.
      * @return The amount of goods to export.
      */
-    public int getExportAmount(GoodsType goodsType);
+    public int getExportAmount(GoodsType goodsType, int turns);
 
     /**
      * Gets the amount of a given goods type that can be imported to
-     * this trade location.
+     * this trade location after a given number of turns.
      *
      * @param goodsType The <code>GoodsType</code> to check.
+     * @param turns The number of turns before the goods will arrive.
      * @return The amount of goods to import.
      */
-    public int getImportAmount(GoodsType goodsType);
-
-    /**
-     * Gets the new amount of a given goods type that is being produced
-     * at this trade location.
-     *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @return The amount of goods to being produced.
-     */
-    public int getNetProductionOf(GoodsType goodsType);
+    public int getImportAmount(GoodsType goodsType, int turns);
 }
