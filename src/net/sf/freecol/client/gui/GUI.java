@@ -662,10 +662,10 @@ public class GUI {
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      *
-     * @param innerWindowSize The desired size of the GUI window.
+     * @param desiredWindowSize The desired size of the GUI window.
      * @param sound Enable sound if true.
      */
-    public void startGUI(GraphicsDevice gd, Dimension innerWindowSize,
+    public void startGUI(GraphicsDevice gd, Dimension desiredWindowSize,
                          boolean sound) {
         final ClientOptions opts = freeColClient.getClientOptions();
 
@@ -727,6 +727,11 @@ public class GUI {
                 }
             });
 
+        final Dimension innerWindowSize = (desiredWindowSize != null
+            && (desiredWindowSize.width <= 0 || desiredWindowSize.height <= 0))
+            ? determineWindowSize(gd)
+            : desiredWindowSize;
+        logger.info("Window size is " + innerWindowSize);
         this.mapViewer = new MapViewer(freeColClient, innerWindowSize,
                                        imageLibrary);
         this.canvas = new Canvas(freeColClient, innerWindowSize, mapViewer);
@@ -803,7 +808,6 @@ public class GUI {
      * @return A suitable window size.
      */
     public static Dimension determineFullScreenSize(GraphicsDevice gd) {
-        if (gd == null) return null;
         Rectangle bounds = gd.getDefaultConfiguration().getBounds();
         return new Dimension(bounds.width - bounds.x,
             bounds.height - bounds.y);
@@ -814,9 +818,7 @@ public class GUI {
      *
      * @return A suitable window size.
      */
-    public static Dimension determineWindowSize(GraphicsDevice gd) {
-        if (gd == null) return null;
-
+    private static Dimension determineWindowSize(GraphicsDevice gd) {
         // This is supposed to maximize a window
         //   setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
         // but there have been problems.

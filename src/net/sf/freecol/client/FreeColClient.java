@@ -191,19 +191,6 @@ public final class FreeColClient {
         this.serverAPI = new UserServerAPI(gui);
         if (!headless) gui.displaySplashScreen(splashFilename, gd);
 
-        // Determine the window size.
-        if (size == null && !GUI.checkFullScreen(gd)) {
-            logger.warning("Full screen not supported.");
-            System.err.println(Messages.message("client.fullScreen"));
-            size = new Dimension(-1, -1);
-        }
-        gui.setWindowed(size != null);
-        final Dimension windowSize = (headless) ? null
-            : (size == null) ? GUI.determineFullScreenSize(gd)
-            : (size.width <= 0 || size.height <= 0) ? GUI.determineWindowSize(gd)
-            : size;
-        logger.info("Window size is " + windowSize);
-
         // Control.  Controllers expect GUI to be available.
         this.connectController = new ConnectController(this);
         this.preGameController = new PreGameController(this);
@@ -241,7 +228,7 @@ public final class FreeColClient {
         loadClientOptions(savedGame);
 
         if (!headless) {
-            // Work out the main font now that resources are loaded.
+            // Work out the main font now that base resources are loaded.
             Font font = null;
             if (fontName != null) {
                 font = Font.decode(fontName);
@@ -265,6 +252,18 @@ public final class FreeColClient {
 
             gui.hideSplashScreen();
         }
+
+        // Determine the window size.
+        if (size == null && !GUI.checkFullScreen(gd)) {
+            logger.warning("Full screen not supported.");
+            System.err.println(Messages.message("client.fullScreen"));
+            size = new Dimension(-1, -1);
+        }
+        gui.setWindowed(size != null);
+        final Dimension windowSize = (headless || gd==null) ? null
+            : (size == null) ? GUI.determineFullScreenSize(gd)
+            : size;
+        logger.info("Desired window size is " + windowSize);
 
         // Start the GUI (headless-safe)
         gui.startGUI(gd, windowSize, sound);
