@@ -833,6 +833,8 @@ public class FreeColDirectories {
         }
         setSavegameFile(file);
         setSaveDirectory(file.getParentFile());
+        File autoDirectory = new File(getSaveDirectory(), AUTOSAVE_DIRECTORY);
+        if (insistDirectory(autoDirectory)) autosaveDirectory = autoDirectory;
         return true;
     }
 

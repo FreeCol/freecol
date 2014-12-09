@@ -436,23 +436,30 @@ public final class InGameController implements NetworkConstants {
     // Utilities connected with saving the game
 
     /**
-     * Returns a string representation of the given turn suitable for
-     * savegame files.
+     * Get the trunk of the save game string.
      *
-     * @param turn a <code>Turn</code> value
-     * @return A string with the format: "<i>[season] year</i>".
-     *         Examples: "1602_1_Spring", "1503"...
+     * @param game The <code>Game</code> to query.
+     * @return The trunk of the file name to use for saved games.
      */
-    private String getSaveGameString(Turn turn) {
-        int year = turn.getYear();
+    private String getSaveGameString(Game game) {
+        final Player player = freeColClient.getMyPlayer();
+        final String gid = Integer.toHexString(game.getUUID().hashCode());
+        final Turn turn = game.getTurn();
+        String turnString = Integer.toString(turn.getYear());
         switch (turn.getSeason()) {
         case SPRING:
-            return Integer.toString(year) + "_1_" + Messages.message("spring");
+            turnString += "_1_" + Messages.message("spring");
+            break;
         case AUTUMN:
-            return Integer.toString(year) + "_2_" + Messages.message("autumn");
+            turnString += "_2_" + Messages.message("autumn");
+            break;
         case YEAR: default:
-            return Integer.toString(year);
+            break;
         }
+
+        String fileName = /* player.getName() + "_" */ gid + "_"
+            + Messages.message(player.getNationName()) + "_" + turnString;
+        return fileName.replaceAll(" ", "_");
     }
 
     /**
@@ -462,21 +469,20 @@ public final class InGameController implements NetworkConstants {
      */
     private void autoSaveGame () {
         final Game game = freeColClient.getGame();
-        final ClientOptions options = freeColClient.getClientOptions();
         if (game == null) return;
 
         // unconditional save per round (fixed file "last-turn")
-        String prefix = options.getText(ClientOptions.AUTO_SAVE_PREFIX);
-        String lastTurnName = prefix + "-"
+        final ClientOptions options = freeColClient.getClientOptions();
+        final String prefix = options.getText(ClientOptions.AUTO_SAVE_PREFIX);
+        final String lastTurnName = prefix + "-"
             + options.getText(ClientOptions.LAST_TURN_NAME)
             + FreeCol.FREECOL_SAVE_EXTENSION;
-        String beforeLastTurnName = prefix + "-"
+        final String beforeLastTurnName = prefix + "-"
             + options.getText(ClientOptions.BEFORE_LAST_TURN_NAME)
             + FreeCol.FREECOL_SAVE_EXTENSION;
         File autoSaveDir = FreeColDirectories.getAutosaveDirectory();
         File lastTurnFile = new File(autoSaveDir, lastTurnName);
         File beforeLastTurnFile = new File(autoSaveDir, beforeLastTurnName);
-
         // if "last-turn" file exists, shift it to "before-last-turn" file
         if (lastTurnFile.exists()) {
             beforeLastTurnFile.delete();
@@ -489,14 +495,9 @@ public final class InGameController implements NetworkConstants {
         int turnNumber = game.getTurn().getNumber();
         if (saveGamePeriod <= 1
             || (saveGamePeriod != 0 && turnNumber % saveGamePeriod == 0)) {
-            Player player = freeColClient.getMyPlayer();
-            String playerNation = (player == null) ? ""
-                : Messages.message(player.getNation().getNameKey());
-            String gid = Integer.toHexString(game.getUUID().hashCode());
-            String name = prefix + "-" + gid  + "_" + playerNation
-                + "_" + getSaveGameString(game.getTurn())
+            String fileName = prefix + "-" + getSaveGameString(game)
                 + FreeCol.FREECOL_SAVE_EXTENSION;
-            saveGame(new File(autoSaveDir, name));
+            saveGame(new File(autoSaveDir, fileName));
         }
     }
 
@@ -507,16 +508,17 @@ public final class InGameController implements NetworkConstants {
      * @return True if the game was saved.
      */
     private boolean saveGame(final File file) {
-        FreeColServer server = freeColClient.getFreeColServer();
+        final FreeColServer server = freeColClient.getFreeColServer();
         boolean result = false;
         gui.showStatusPanel(Messages.message("status.savingGame"));
         try {
             server.setActiveUnit(gui.getActiveUnit());
             server.saveGame(file, freeColClient.getClientOptions());
-            gui.closeStatusPanel();
             result = true;
         } catch (IOException e) {
             gui.showErrorMessage("couldNotSaveGame");
+        } finally {
+            gui.closeStatusPanel();
         }
         return result;
     }
@@ -3558,6 +3560,7 @@ public final class InGameController implements NetworkConstants {
         turnReportMessages.clear();
         gui.setActiveUnit(null);
         gui.removeInGameComponents();
+        FreeColDirectories.setSavegameFile(file);
         freeColClient.getConnectController().startSavedGame(file, null);
     }
 
@@ -4024,16 +4027,9 @@ public final class InGameController implements NetworkConstants {
     public boolean saveGame() {
         if (!freeColClient.canSaveCurrentGame()) return false;
 
-        Player player = freeColClient.getMyPlayer();
-        Game game = freeColClient.getGame();
+        final Game game = freeColClient.getGame();
         if (game == null) return false; // Keyboard handling can race init
-
-        String gid = Integer.toHexString(game.getUUID().hashCode());
-        String fileName = /* player.getName() + "_" */ gid + "_"
-            + Messages.message(player.getNationName()) + "_"
-            + getSaveGameString(game.getTurn());
-        fileName = fileName.replaceAll(" ", "_");
-
+        String fileName = getSaveGameString(game);
         File file = gui.showSaveDialog(FreeColDirectories.getSaveDirectory(),
                                        fileName);
         if (file == null) return false;
