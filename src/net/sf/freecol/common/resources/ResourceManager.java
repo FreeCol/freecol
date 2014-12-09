@@ -65,8 +65,6 @@ public class ResourceManager {
 
     private static volatile boolean dirty = false;
 
-    private static Dimension lastWindowSize = null;
-
 
     /**
      * Sets the mappings specified in the date/base-directory.
@@ -153,16 +151,9 @@ public class ResourceManager {
 
     /**
      * Preload resources.
-     *
-     * @param windowSize
      */
-    public static void preload(final Dimension windowSize) {
-        if (windowSize != null && !windowSize.equals(lastWindowSize)) {
-            dirty = true;
-            logger.info("Window size changes from " + lastWindowSize
-                + " to " + windowSize);
-            lastWindowSize = windowSize;
-        }
+    public static void preload() {
+        dirty = true;
         updateIfDirty();
     }
 
@@ -173,7 +164,6 @@ public class ResourceManager {
         if ("true".equals(System.getProperty("java.awt.headless", "false"))) {
             return; // Do not preload in headless mode
         }
-        if (lastWindowSize == null) return; // Wait for initial preload.
 
         preloadThread = new Thread(FreeCol.CLIENT_THREAD
             + "-Resource loader") {

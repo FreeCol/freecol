@@ -435,7 +435,8 @@ public class GUI {
             this.frame.addComponentListener(new ComponentAdapter() {
                     @Override
                     public void componentResized(ComponentEvent e) {
-                        ResourceManager.preload(canvas.getSize());
+                        logger.info("Window size changes to " + canvas.getSize());
+                        ResourceManager.preload();
                     }
                 });
         }
@@ -1111,12 +1112,12 @@ public class GUI {
     public boolean canZoomOutMapControls() {
         return mapControls != null && mapControls.canZoomOutMapControls();
     }
-    
+
     public void miniMapToggleViewControls() {
         if (mapControls == null) return;
         mapControls.toggleView();
     }
-    
+
     public void miniMapToggleFogOfWarControls() {
         if (mapControls == null) return;
         mapControls.toggleFogOfWar();
@@ -1379,7 +1380,7 @@ public class GUI {
                 Messages.message("armedUnitSettlement.attack"),
                 ArmedUnitSettlementAction.SETTLEMENT_ATTACK));
 
-        return getChoice(true, settlement.getTile(), 
+        return getChoice(true, settlement.getTile(),
             Messages.message(settlement.getAlarmLevelMessage(player)),
             settlement, "cancel", choices);
     }
@@ -1463,7 +1464,7 @@ public class GUI {
         } else {
             template = StringTemplate.template("indianLand.unknown");
         }
-        
+
         choices.add(new ChoiceItem<ClaimAction>(Messages.message("indianLand.take"),
                                                 ClaimAction.STEAL));
 
@@ -1693,7 +1694,7 @@ public class GUI {
                            String cancelKey, List<ChoiceItem<T>> choices) {
         if (canvas == null) return null;
 
-        return canvas.showChoiceDialog(modal, tile, text, 
+        return canvas.showChoiceDialog(modal, tile, text,
                                        getImageIcon(obj, false),
                                        cancelKey, choices);
     }
@@ -1837,7 +1838,7 @@ public class GUI {
     public void showCaptureGoodsDialog(final Unit unit, List<Goods> gl,
                                        final String defenderId) {
         if (canvas == null) return;
-        canvas.showCaptureGoodsDialog(unit, gl, 
+        canvas.showCaptureGoodsDialog(unit, gl,
             new DialogHandler<List<Goods>>() {
                 public void handle(List<Goods> gl) {
                     igc().lootCargo(unit, gl, defenderId);
@@ -1852,7 +1853,7 @@ public class GUI {
 
     public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs) {
         if (canvas == null) return;
-        canvas.showChooseFoundingFatherDialog(ffs, 
+        canvas.showChooseFoundingFatherDialog(ffs,
             new DialogHandler<FoundingFather>() {
                 public void handle(FoundingFather ff) {
                     igc().chooseFoundingFather(ffs, ff);
@@ -2093,7 +2094,7 @@ public class GUI {
                                         final Unit unit, final Tile tile,
                                         final Region region) {
         if (canvas == null) return;
-        canvas.showNameNewRegionDialog(template, defaultName, unit, 
+        canvas.showNameNewRegionDialog(template, defaultName, unit,
             new DialogHandler<String>() {
                 public void handle(String name) {
                     if (name == null || name.isEmpty()) name = defaultName;
@@ -2370,7 +2371,7 @@ public class GUI {
     }
 
     // Trivial delegations to MapViewer
-    
+
     public void centerActiveUnit() {
         if (mapViewer == null) return;
         mapViewer.centerActiveUnit();

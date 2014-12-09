@@ -260,7 +260,8 @@ public final class FreeColClient {
             }
 
             // Once resources are in place, get preloading started.
-            ResourceManager.preload(windowSize);
+            logger.info("Preload of resources starting.");
+            ResourceManager.preload();
 
             gui.hideSplashScreen();
         }
