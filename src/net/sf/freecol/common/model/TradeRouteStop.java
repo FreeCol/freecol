@@ -30,6 +30,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeLocation;
 
 
@@ -167,6 +168,19 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
         return result;
     }
         
+    /**
+     * Create a template for this trade route stop.
+     *
+     * @param key A message key.
+     * @param player The <code>Player</code> who will see the message.
+     * @return A <code>StringTemplate</code> for this stop.
+     */
+    public StringTemplate getLabelFor(String key, Player player) {
+        return StringTemplate.template(key)
+            .addStringTemplate("%location%",
+                this.getLocation().getLocationLabelFor(player));
+    }
+
     /**
      * Is there work for a unit to do at this stop?
      *

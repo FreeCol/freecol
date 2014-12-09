@@ -388,7 +388,7 @@ public final class InGameController implements NetworkConstants {
         }
         return ret;
     }
-    
+
     /**
      * Set a destination for a unit.
      *
@@ -2070,20 +2070,6 @@ public final class InGameController implements NetworkConstants {
     // Trade route support.
 
     /**
-     * Create a message about a trade route stop.
-     *
-     * @param key A message key.
-     * @param stop The <code>TradeRouteStop</code> to mention.
-     * @param player The <code>Player</code> who will see the message.
-     * @return A message incorporating the stop.
-     */
-    private String stopMessage(String key, TradeRouteStop stop, Player player) {
-        return Messages.message(StringTemplate.template(key)
-            .addStringTemplate("%location%",
-                stop.getLocation().getLocationLabelFor(player)));
-    }
-
-    /**
      * Follows a trade route, doing load/unload actions, moving the unit,
      * and updating the stop and destination.
      *
@@ -2114,7 +2100,8 @@ public final class InGameController implements NetworkConstants {
             stop = unit.getStop();
             // Complain and return if the stop is no longer valid.
             if (!TradeRoute.isStopValid(unit, stop)) {
-                lb.add(" ", stopMessage("tradeRoute.invalidStop", stop, player));
+                lb.add(" ", Messages.message(stop
+                        .getLabelFor("tradeRoute.invalidStop", player)));
                 clearOrders(unit);
                 result = true;
                 break;
@@ -2133,7 +2120,8 @@ public final class InGameController implements NetworkConstants {
                 loadUnitAtStop(unit, lb);
 
                 // Wrap load/unload messages.
-                lb.grew(" ", stopMessage("tradeRoute.atStop", stop, player));
+                lb.grew(" ", Messages.message(stop
+                        .getLabelFor("tradeRoute.atStop", player)));
 
                 // If the un/load consumed the moves, break now before
                 // updating the stop.  This allows next move to arrive
@@ -2157,8 +2145,8 @@ public final class InGameController implements NetworkConstants {
                     stop = stops.get(next);
                     if (!TradeRoute.isStopValid(unit, stop)) {
                         // Invalid stop found, throw the unit off the route.
-                        lb.add(" ", stopMessage("tradeRoute.invalidStop",
-                                                stop, player));
+                        lb.add(" ", Messages.message(stop
+                                .getLabelFor("tradeRoute.invalidStop", player)));
                         clearOrders(unit);
                         result = true;
                         break outer;
@@ -2178,8 +2166,9 @@ public final class InGameController implements NetworkConstants {
                 for (;;) {
                     if (++index >= stops.size()) index = 0;
                     if (index == next) break;
-                    lb.add(" ", stopMessage("tradeRoute.skipStop",
-                                            stops.get(index), player));
+                    TradeRouteStop skip = stops.get(index);
+                    lb.add(" ", Messages.message(skip
+                            .getLabelFor("tradeRoute.skipStop", player)));
                 }
 
                 continue; // Stop was updated, loop.
@@ -2190,7 +2179,8 @@ public final class InGameController implements NetworkConstants {
             if (unit.getMovesLeft() <= 0
                 || unit.getState() == UnitState.SKIPPED
                 || !more) {
-                lb.add(" ", stopMessage("tradeRoute.toStop", stop, player));
+                lb.add(" ", Messages.message(stop
+                        .getLabelFor("tradeRoute.toStop", player)));
                 break;
             }
 
@@ -2198,7 +2188,8 @@ public final class InGameController implements NetworkConstants {
             Location destination = stop.getLocation();
             PathNode path = unit.findPath(destination);
             if (path == null) {
-                lb.add(" ", stopMessage("tradeRoute.pathStop", stop, player));
+                lb.add(" ", Messages.message(stop
+                        .getLabelFor("tradeRoute.pathStop", player)));
                 unit.setState(UnitState.SKIPPED);
                 break;
             }
@@ -2234,55 +2225,69 @@ public final class InGameController implements NetworkConstants {
      * @return True if goods were loaded.
      */
     private boolean loadUnitAtStop(Unit unit, LogBuilder lb) {
-        final Game game = freeColClient.getGame();
-        final TradeRouteStop stop = unit.getStop();
-        final TradeLocation trl = stop.getTradeLocation();
+        final TradeLocation trl = unit.getTradeLocation();
         if (trl == null) return false;
+
+        final TradeRouteStop stop = unit.getStop();
         boolean ret = false;
 
-        // Make a list of goods to load at this stop.  Collapse multiple
-        // loads of the same goods type.
-        List<AbstractGoods> toLoad = new ArrayList<>();
-        for (GoodsType type : stop.getCargo()) {
-            AbstractGoods ag = AbstractGoods.findByType(type, toLoad);
+        // Get the collapsed list of goods to load at this stop.
+        List<AbstractGoods> toLoad = stop.getCompactCargo();
+        
+        // If already at capacity for a goods type, drop it from the
+        // toLoad list, otherwise reduce its amount by the amount
+        // already loaded.  Handle excess goods.
+        for (Goods g : unit.getCompactGoods()) {
+            AbstractGoods ag = AbstractGoods.findByType(g.getType(), toLoad);
             if (ag != null) {
-                ag.setAmount(ag.getAmount() + GoodsContainer.CARGO_SIZE);
-            } else {
-                toLoad.add(new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
-            }
-        }
-
-        // Adjust for what is already being carried.
-        Iterator<AbstractGoods> ig = toLoad.iterator();
-        while (ig.hasNext()) {
-            AbstractGoods ag = ig.next();
-            int amount = unit.getGoodsCount(ag.getType());
-            if (amount > 0) {
-                amount = ag.getAmount() - amount;
-                if (amount <= 0) {
-                    // Already at capacity for this goods type.  Ignore it.
-                    ig.remove();
-                } else {
+                int goodsAmount = g.getAmount();
+                int amount = ag.getAmount() - goodsAmount;
+                if (amount <= 0) { // At capacity
+                    toLoad.remove(ag);
+                } else { // Modify amount
                     ag.setAmount(amount);
                 }
-            }
+            } else {
+                // Excess goods on board.  They either must have
+                // failed to unload somewhere, or are maintained goods
+                // to deliver downstream.  Since they are already on
+                // board we might as well top them up if possible.
+                int loadable = unit.getLoadableAmount(g.getType());
+                if (loadable > 0) {
+                    toLoad.add(0, new AbstractGoods(g.getType(), loadable));
+                }
+            }                
         }
 
-        // Load as much as possible
+        // Adjust toLoad with the actual export amount.  Some goods
+        // may not have an export surplus.  Add messages for them and
+        // drop from the toLoad list.
+        Iterator<AbstractGoods> iterator = toLoad.iterator();
+        while (iterator.hasNext()) {
+            AbstractGoods ag = iterator.next();
+            int amount = stop.getExportAmount(ag.getType(), 0);
+            if (amount <= 0) {
+                if (stop.getCargo().contains(ag.getType())) {
+                    // Complain only if this goods type was planned to load
+                    int present = stop.getGoodsCount(ag.getType());
+                    lb.add(" ", getLoadGoodsMessage(ag.getType(), 0, present,
+                                                    0, -1));
+                }
+                iterator.remove();
+            } else {
+                ag.setAmount(Math.min(amount, ag.getAmount()));
+            }
+        }
+        // Load the goods.
         for (AbstractGoods ag : toLoad) {
             GoodsType type = ag.getType();
-            int demand = ag.getAmount(),
-                present = trl.getGoodsCount(type),
-                export = trl.getExportAmount(type, 0);
-            if (export > 0) {
-                int amount = Math.min(demand, export);
-                ret = askLoadGoods(type, amount, unit);
-                if (ret) {
-                    lb.add(" ", getLoadGoodsMessage(type, amount, present,
-                                                    export, demand));
-                }
-            } else if (present > 0) {
-                lb.add(" ", getLoadGoodsMessage(type, 0, present, 0, demand));
+            int demand = ag.getAmount();
+            ret = askLoadGoods(type, demand, unit);
+            if (ret) {
+                int present = stop.getGoodsCount(type);
+                int export = stop.getExportAmount(type, 0);
+                lb.add(" ", getLoadGoodsMessage(type, demand, present,
+                                                export, demand));
             }
         }
         return ret;
@@ -2330,10 +2335,10 @@ public final class InGameController implements NetworkConstants {
      * @return True if something was unloaded.
      */
     private boolean unloadUnitAtStop(Unit unit, LogBuilder lb) {
-        final TradeRouteStop stop = unit.getStop();
-        final TradeLocation trl = stop.getTradeLocation();
+        final TradeLocation trl = unit.getTradeLocation();
         if (trl == null) return false;
 
+        final TradeRouteStop stop = unit.getStop();
         final List<GoodsType> goodsTypesToLoad = stop.getCargo();
         boolean ret = false;
 
@@ -2349,7 +2354,7 @@ public final class InGameController implements NetworkConstants {
             int atStop = trl.getImportAmount(type, 0);
             int amount = toUnload;
             if (amount > atStop) {
-                StringTemplate locName = stop.getLocation().getLocationLabel();
+                StringTemplate locName = ((Location)trl).getLocationLabel();
                 String overflow = Integer.toString(toUnload - atStop);
                 int option = freeColClient.getClientOptions()
                     .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);
@@ -2670,6 +2675,7 @@ public final class InGameController implements NetworkConstants {
     public boolean buyGoods(GoodsType type, int amount, Unit carrier) {
         if (!requireOurTurn() || type == null || amount <= 0
             || carrier == null
+            || !carrier.isInEurope()
             || !freeColClient.getMyPlayer().owns(carrier)) return false;
 
         Europe europe = carrier.getOwner().getEurope();
@@ -3527,6 +3533,8 @@ public final class InGameController implements NetworkConstants {
         }
 
         Colony colony = carrier.getColony();
+        if (colony == null) return false;
+
         ColonyWas colonyWas = new ColonyWas(colony);
         UnitWas unitWas = new UnitWas(carrier);
         boolean ret = askLoadGoods(goods.getType(), goods.getAmount(), carrier);
@@ -4460,10 +4468,10 @@ public final class InGameController implements NetworkConstants {
         Unit carrier = (Unit)goods.getLocation();
 
         // Use Europe-specific routine if needed
-        if (!dump && carrier.isInEurope()) return sellGoods(goods);
+        if (carrier.isInEurope()) return sellGoods(goods);
 
-        // Find the goods destination
-        Colony colony = (dump) ? null : carrier.getColony();
+        // Check for a colony
+        Colony colony = carrier.getColony();
 
         // Unload
         ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
@@ -4471,7 +4479,7 @@ public final class InGameController implements NetworkConstants {
         boolean ret = askUnloadGoods(goods.getType(), goods.getAmount(),
                                      carrier);
         if (ret) {
-            gui.playSound("sound.event.unloadCargo");
+            if (!dump) gui.playSound("sound.event.unloadCargo");
         }
         if (colonyWas != null) colonyWas.fireChanges();
         unitWas.fireChanges();
