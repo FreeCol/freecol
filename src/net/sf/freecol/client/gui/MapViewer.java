@@ -1574,7 +1574,7 @@ public final class MapViewer {
      */
     private void centerString(Graphics2D g, String text) {
         g.setColor(Color.BLACK);
-        g.setFont(ResourceManager.getFont("NormalFont", 12f));
+        g.setFont(lib.getScaledFont("NormalFont", 12f));
         g.drawString(text,
                      (tileWidth - g.getFontMetrics().stringWidth(text))/2,
                      (tileHeight - g.getFontMetrics().getAscent())/2);
@@ -1869,7 +1869,7 @@ public final class MapViewer {
      * @param path The <code>PathNode</code> to display.
      */
     private void displayPath(Graphics2D g, PathNode path) {
-        final Font font = ResourceManager.getFont("NormalFont", 12f);
+        final Font font = lib.getScaledFont("NormalFont", 12f);
         final boolean debug = FreeColDebugger
             .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
 
@@ -1881,7 +1881,7 @@ public final class MapViewer {
 
             Image image = (p.isOnCarrier())
                 ? lib.getPathImage(ImageLibrary.PathType.NAVAL)
-                : (activeUnit != null) 
+                : (activeUnit != null)
                 ? lib.getPathImage(activeUnit)
                 : null;
 
@@ -2120,9 +2120,9 @@ public final class MapViewer {
                 if (name == null) continue;
                 Color backgroundColor = settlement.getOwner().getNationColor();
                 if (backgroundColor == null) backgroundColor = Color.WHITE;
-                Font font = ResourceManager.getFont("NormalFont", 18f);
-                Font italicFont = ResourceManager.getFont("NormalFont", Font.ITALIC, 18f);
-                Font productionFont = ResourceManager.getFont("NormalFont", 12f);
+                Font font = lib.getScaledFont("NormalFont", 18f);
+                Font italicFont = lib.getScaledFont("NormalFont", Font.ITALIC, 18f);
+                Font productionFont = lib.getScaledFont("NormalFont", 12f);
                 // int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
                 int yOffset = tileHeight;
                 g.setTransform(settlementTransforms.get(index));
@@ -2265,7 +2265,7 @@ public final class MapViewer {
         if (getMessageCount() > 0) {
             // Don't edit the list of messages while I'm drawing them.
             synchronized (this) {
-                Font font = ResourceManager.getFont("NormalFont", 12f);
+                Font font = lib.getScaledFont("NormalFont", 12f);
                 GUIMessage message = getMessage(0);
                 Image si = lib.getStringImage(g, message.getMessage(),
                                               message.getColor(), font);
@@ -2340,7 +2340,7 @@ public final class MapViewer {
                 centerString(g, text);
             } else {
                 g.setColor(Color.BLACK);
-                g.setFont(ResourceManager.getFont("NormalFont", 12f));
+                g.setFont(lib.getScaledFont("NormalFont", 12f));
                 g.drawString(text.substring(0, b),
                              (tileWidth -
                               g.getFontMetrics().stringWidth(text.substring(0, b)))/2,
@@ -2391,8 +2391,8 @@ public final class MapViewer {
                     // if government admits even more units, use
                     // italic and bigger number icon
                     Font font = (colony.getPreferredSizeChange() > 0)
-                        ? ResourceManager.getFont("SimpleFont", Font.BOLD | Font.ITALIC, 18f)
-                        : ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
+                        ? lib.getScaledFont("SimpleFont", Font.BOLD | Font.ITALIC, 18f)
+                        : lib.getScaledFont("SimpleFont", Font.BOLD, 12f);
                     Image stringImage = lib.getStringImage(g, populationString,
                                                            theColor, font);
                     centerImage(g, stringImage);
@@ -2931,7 +2931,7 @@ public final class MapViewer {
                             best = c.getMovesLeft();
                             result = c;
                         }
-                    }                            
+                    }
                 }
             }
         }
