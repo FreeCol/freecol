@@ -1455,18 +1455,20 @@ public class EuropeanAIPlayer extends AIPlayer {
      * FIXME: Move this to a specialized Handler class (AIEurope?)
      * FIXME: Give protected access?
      *
-     * @param index The index of the unit to recruit in the recruitables list,
-     *     (if not a valid index, recruit a random unit).
+     * @param slot The migration slot to recruit from.
      * @return The new AIUnit created by this action or null on failure.
      */
-    public AIUnit recruitAIUnitInEurope(int index) {
+    public AIUnit recruitAIUnitInEurope(int slot) {
         AIUnit aiUnit = null;
         Europe europe = getPlayer().getEurope();
         if (europe == null) return null;
         int n = europe.getUnitCount();
         final String selectAbility = Ability.SELECT_RECRUIT;
-        int slot = (index >= 0 && index < Europe.RECRUIT_COUNT
-            && getPlayer().hasAbility(selectAbility)) ? (index + 1) : 0;
+        if (!Europe.MigrationType.validMigrantSlot(slot)) {
+            slot = (getPlayer().hasAbility(selectAbility))
+                ? Europe.MigrationType.getDefaultSlot()
+                : Europe.MigrationType.getUnspecificSlot();
+        }
         if (AIMessage.askEmigrate(this, slot)
             && europe.getUnitCount() == n+1) {
             aiUnit = getAIUnit(europe.getUnitList().get(n));

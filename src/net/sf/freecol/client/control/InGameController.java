@@ -102,6 +102,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.ServerAPI;
@@ -4198,16 +4199,18 @@ public final class InGameController implements NetworkConstants {
             Europe europe = player.getEurope();
             if (player.hasAbility(Ability.SELECT_RECRUIT)) {
                 if (player.checkEmigrate()) {
-                    if (europe.recruitablesDiffer()) {
-                        gui.showEmigrationDialog(player,
-                            Europe.DEFAULT_MIGRANT_SLOT, false);
+                    if (allSame(europe.getRecruitables())) {
+                        askEmigrate(europe,
+                            Europe.MigrationType.getDefaultSlot());
                     } else {
-                        askEmigrate(europe, Europe.DEFAULT_MIGRANT_SLOT);
+                        gui.showEmigrationDialog(player,
+                            Europe.MigrationType.getDefaultSlot(), false);
                     }
                 }
             } else {
                 while (player.checkEmigrate()) {
-                    askEmigrate(europe, Europe.CHOOSE_MIGRANT_SLOT);
+                    askEmigrate(europe,
+                        Europe.MigrationType.getUnspecificSlot());
                 }
             }
             

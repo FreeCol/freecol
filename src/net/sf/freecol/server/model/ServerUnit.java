@@ -826,7 +826,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                      .addAmount("%money%", ruinsAmount));
             break;
         case FOUNTAIN_OF_YOUTH:
-            Europe europe = serverPlayer.getEurope();
+            ServerEurope europe = (ServerEurope)serverPlayer.getEurope();
             if (europe == null) {
                 // FoY should now be disabled for non-colonial
                 // players, but leave this in for now as it is harmless.
@@ -835,22 +835,15 @@ public class ServerUnit extends Unit implements ServerModelObject {
                          "lostCityRumour.fountainOfYouthWithoutEurope",
                          serverPlayer, this));
             } else {
-                if (!serverPlayer.isAI()) { // FIXME: let the AI select
+                if (serverPlayer.isAI()) { // FIXME: let the AI select
+                    europe.generateFountainRecruits(dx, random);
+                    cs.add(See.only(serverPlayer), europe);
+                } else {
                     // Remember, and ask player to select
                     serverPlayer.setRemainingEmigrants(dx);
                     cs.addTrivial(See.only(serverPlayer), "fountainOfYouth",
                                   ChangeSet.ChangePriority.CHANGE_LATE,
                                   "migrants", Integer.toString(dx));
-                } else {
-                    List<RandomChoice<UnitType>> recruitables
-                        = serverPlayer.generateRecruitablesList();
-                    for (int k = 0; k < dx; k++) {
-                        UnitType type = RandomChoice.getWeightedRandom(logger,
-                            "Choose FoY", recruitables, random);
-                        new ServerUnit(game, europe, serverPlayer,
-                                       type);//-vis: safe, Europe
-                    }
-                    cs.add(See.only(serverPlayer), europe);
                 }
                 cs.addMessage(See.only(serverPlayer),
                      new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,

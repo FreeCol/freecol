@@ -53,7 +53,8 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
         super(freeColClient);
 
         final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
-        final List<UnitType> recruitables = new ArrayList<>(europe.getRecruitables());
+        final List<UnitType> recruitables
+            = new ArrayList<>(europe.getRecruitables());
 
         String hdr = Messages.message("chooseImmigrant");
         JTextArea header = GUI.getDefaultTextArea(hdr);
@@ -67,14 +68,15 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
         panel.setSize(panel.getPreferredSize());
 
         List<ChoiceItem<Integer>> c = choices();
-        int i = 1;
+        int i = Europe.MigrationType.getDefaultSlot();
         UnitType u0 = recruitables.remove(0);
         c.add(new ChoiceItem<Integer>(Messages.message(u0.getNameKey()),
-                Integer.valueOf(i++)).defaultOption()
+                                                       Integer.valueOf(i++))
+            .defaultOption()
             .setIcon(lib.getUnitImageIcon(u0, 0.66)));
         for (UnitType ut : recruitables) {
             c.add(new ChoiceItem<Integer>(Messages.message(ut.getNameKey()),
-                    Integer.valueOf(i++))
+                                                           Integer.valueOf(i++))
                 .setIcon(lib.getUnitImageIcon(ut, 0.66)));
         }
 

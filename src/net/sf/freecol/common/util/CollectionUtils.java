@@ -20,6 +20,7 @@
 package net.sf.freecol.common.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -142,5 +143,20 @@ public class CollectionUtils {
                 };
             }
         };
+    }
+
+    /**
+     * Are all members of a collection the same (in the sense of ==).
+     *
+     * @param collection The <code>Collection</code> to examine.
+     * @return True if all members are the same.
+     */
+    public static <T> boolean allSame(final Collection<T> collection) {
+        T datum = null;
+        boolean first = true;
+        for (T t : collection) {
+            if (first) datum = t; else if (t != datum) return false;
+        }
+        return true;
     }
 }

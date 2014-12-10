@@ -19,10 +19,12 @@
 
 package net.sf.freecol.server.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Europe;
@@ -37,6 +39,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
 
@@ -113,32 +116,36 @@ public class ServerEurope extends Europe implements ServerModelObject {
      */
     public void initializeMigration(Random random) {
         final Specification spec = getGame().getSpecification();
-        ServerPlayer player = (ServerPlayer) getOwner();
-        List<RandomChoice<UnitType>> recruits
-            = player.generateRecruitablesList();
+        UnitType unitType;
+
         if (spec.hasOption(GameOptions.IMMIGRANTS)) {
             UnitListOption option
                 = (UnitListOption)spec.getOption(GameOptions.IMMIGRANTS);
-            for (AbstractUnit immigrant : option.getOptionValues()) {
-                addRecruitable(immigrant.getType(spec));
+            for (AbstractUnit au : option.getOptionValues()) {
+                unitType = au.getType(spec);
+                addRecruitable(au.getType(spec));
             }
         } else {
             // @compat 0.10.3
-            for (int index = 0; index < RECRUIT_COUNT; index++) {
+            for (int index = 0;; index++) {
                 String optionId = "model.option.recruitable.slot" + index;
-                if (spec.hasOption(optionId)) {
-                    String unitTypeId = spec.getString(optionId);
-                    if (unitTypeId != null) {
-                        addRecruitable(spec.getUnitType(unitTypeId));
-                    }
-                }
+                String unitTypeId;
+                if (spec.hasOption(optionId)
+                    && (unitTypeId = spec.getString(optionId)) != null
+                    && (unitType = spec.getUnitType(unitTypeId)) != null
+                    && addRecruitable(unitType)) continue;
+                break; // Failed
             }
             // end @compat
         }
-        while (recruitables.size() < RECRUIT_COUNT) {
-            addRecruitable(RandomChoice
-                .getWeightedRandom(logger, "Recruits", recruits, random));
-        }
+
+        // Fill out to the full amount of recruits if the above failed
+        List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
+        do {
+            unitType = RandomChoice.getWeightedRandom(logger, "Recruits",
+                                                      recruits, random);
+if (unitType == null) logger.info("MIGRANTRANDOM " + recruits.size());
+        } while (addRecruitable(unitType));
     }
 
     /**
@@ -148,6 +155,91 @@ public class ServerEurope extends Europe implements ServerModelObject {
         final Specification spec = getSpecification();
         recruitPrice += spec.getInteger(GameOptions.RECRUIT_PRICE_INCREASE);
         recruitLowerCap += spec.getInteger(GameOptions.LOWER_CAP_INCREASE);
+    }
+
+    /**
+     * Extract the recruitable at a given slot, and replace it with
+     * the given new recruitable type.
+     *
+     * Note that we shift the old units down, because the AI always
+     * recruits from the lowest slot.
+     *
+     * @param slot The slot to recruit with.
+     * @param random A pseudo-random number source.
+     * @return The recruited <code>UnitType</code>.
+     */
+    public UnitType extractRecruitable(int slot, Random random) {
+        // An invalid slot is normal when the player has no control over
+        // recruit type.
+        final int count = MigrationType.getMigrantCount();
+        int index = (MigrationType.specificMigrantSlot(slot))
+            ? MigrationType.migrantSlotToIndex(slot)
+            : randomInt(logger, "Choose emigrant", random, count);
+        UnitType result = recruitables.get(index);
+        for (int i = index; i < count-1; i++) {
+            recruitables.set(i, recruitables.get(i+1));
+        }
+        recruitables.set(count-1, RandomChoice.getWeightedRandom(logger,
+                "Replace recruit", generateRecruitablesList(), random));
+        return result;
+    }
+
+    /**
+     * Generate a weighted list of unit types recruitable by this player.
+     *
+     * @return A weighted list of recruitable unit types.
+     */
+    public List<RandomChoice<UnitType>> generateRecruitablesList() {
+        final Player owner = (Player)getOwner();
+        List<RandomChoice<UnitType>> recruits = new ArrayList<>();
+        for (UnitType unitType : getSpecification().getUnitTypeList()) {
+            if (unitType.isRecruitable()
+                && owner.hasAbility(Ability.CAN_RECRUIT_UNIT, unitType)) {
+                recruits.add(new RandomChoice<UnitType>(unitType,
+                        unitType.getRecruitProbability()));
+            }
+        }
+        return recruits;
+    }
+
+    /**
+     * Replace any non-recruitable recruits.
+     *
+     * @param random A pseudo-random number source.
+     * @return True if any recruit was replaced.
+     */
+    public boolean replaceRecruits(Random random) {
+        List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
+        boolean result = false;
+        int i = 0;
+        for (UnitType ut : recruitables) {
+            if (hasAbility(Ability.CAN_RECRUIT_UNIT, ut)) continue;
+            UnitType newType = RandomChoice.getWeightedRandom(logger,
+                "Replace recruit", recruits, random);
+            recruitables.set(i, newType);
+            result = true;
+            i++;
+        }
+        return result;
+    }
+
+    /**
+     * Generate new recruits following a Fountain of Youth discovery.
+     *
+     * FIXME: Get rid of this, it is only used because the AI is stupid.
+     *
+     * @param n The number of new units.
+     * @param random A pseudo-random number source.
+     */
+    public void generateFountainRecruits(int n, Random random) {
+        final Game game = getGame();
+        final Player owner = getOwner();
+        List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
+        for (int k = 0; k < n; k++) {
+            UnitType ut = RandomChoice.getWeightedRandom(logger, "Choose FoY",
+                                                         recruits, random);
+            new ServerUnit(game, this, owner, ut);//-vis: safe, Europe
+        }
     }
 
     /**

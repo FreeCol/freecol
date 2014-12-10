@@ -753,23 +753,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Generate a weighted list of unit types recruitable by this player.
-     *
-     * @return A weighted list of recruitable unit types.
-     */
-    public List<RandomChoice<UnitType>> generateRecruitablesList() {
-        ArrayList<RandomChoice<UnitType>> recruitables = new ArrayList<>();
-        for (UnitType unitType : getSpecification().getUnitTypeList()) {
-            if (unitType.isRecruitable()
-                && hasAbility(Ability.CAN_RECRUIT_UNIT, unitType)) {
-                recruitables.add(new RandomChoice<UnitType>(unitType,
-                        unitType.getRecruitProbability()));
-            }
-        }
-        return recruitables;
-    }
-
-    /**
      * Add a HistoryEvent to this player.
      *
      * @param event The <code>HistoryEvent</code> to add.
@@ -1320,7 +1303,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (checkEmigrate()
                 && !hasAbility(Ability.SELECT_RECRUIT)) {
                 // Auto-emigrate if selection not allowed.
-                csEmigrate(0, MigrationType.NORMAL, random, cs);
+                csEmigrate(MigrationType.getUnspecificSlot(),
+                           MigrationType.NORMAL, random, cs);
             } else {
                 cs.addPartial(See.only(this), this, "immigration");
             }
@@ -1932,7 +1916,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                     ChangeSet cs) {
         Game game = getGame();
         Specification spec = game.getSpecification();
-        Europe europe = getEurope();
+        ServerEurope europe = (ServerEurope)getEurope();
         boolean europeDirty = false, visibilityChange = false;
 
         // FIXME: We do not want to have to update the whole player
@@ -2052,18 +2036,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
             } else if ("model.event.newRecruits".equals(eventId)
                        && europe != null) {
-                List<RandomChoice<UnitType>> recruits
-                    = generateRecruitablesList();
-                for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
-                    if (!hasAbility(Ability.CAN_RECRUIT_UNIT,
-                                    europe.getRecruitable(i))) {
-                        UnitType newType = RandomChoice
-                            .getWeightedRandom(logger,
-                                "Replace recruit", recruits, random);
-                        europe.setRecruitable(i, newType);
-                        europeDirty = true;
-                    }
-                }
+                europeDirty = europe.replaceRecruits(random);
 
             } else if ("model.event.movementChange".equals(eventId)) {
                 for (Unit u : getUnits()) {
@@ -2150,16 +2123,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void csEmigrate(int slot, MigrationType type, Random random,
                            ChangeSet cs) {
-        // An invalid slot is normal when the player has no control over
-        // recruit type.
-        boolean selected = 1 <= slot && slot <= Europe.RECRUIT_COUNT;
-        int index = (selected) ? slot-1
-            : randomInt(logger, "Choose emigrant", random,
-                        Europe.RECRUIT_COUNT);
-
         // Create the recruit, move it to the docks.
         ServerEurope europe = (ServerEurope)getEurope();
-        UnitType recruitType = europe.getRecruitable(index);
+        UnitType recruitType = europe.extractRecruitable(slot, random);
         final Game game = getGame();
         final Specification spec = game.getSpecification();
         Role role = (spec.getBoolean(GameOptions.EQUIP_EUROPEAN_RECRUITS))
@@ -2183,44 +2149,29 @@ public class ServerPlayer extends Player implements ServerModelObject {
             reduceImmigration();
             cs.addPartial(See.only(this), this,
                           "immigration", "immigrationRequired");
+            if (!MigrationType.specificMigrantSlot(slot)) {
+                cs.addMessage(See.only(this),
+                    new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                     "model.europe.emigrate",
+                                     this, unit)
+                        .add("%europe%", europe.getNameKey())
+                        .addStringTemplate("%unit%", unit.getLabel()));
+            }
             break;
         case SURVIVAL:
-            break;
-        default:
-            throw new IllegalArgumentException("Bogus migration type");
-        }
-
-        // Replace the recruit we used.  Shuffle them down first
-        // as AI is always recruiting slot 0.
-        for (int i = index; i < Europe.RECRUIT_COUNT-1; i++) {
-            europe.setRecruitable(i, europe.getRecruitable(i+1));
-        }
-        List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
-        europe.setRecruitable(Europe.RECRUIT_COUNT-1,
-            RandomChoice.getWeightedRandom(logger, "Replace recruit", recruits,
-                                           random));
-        cs.add(See.only(this), europe);
-
-        // Add an informative message if this was a survival recruitment,
-        // or an ordinary migration where we did not select the unit type.
-        // Other cases were selected.
-        if (type == MigrationType.SURVIVAL) {
+            // Add an informative message if this was a survival recruitment,
             cs.addMessage(See.only(this),
                 new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                  "model.europe.autoRecruit",
                                  this, unit)
-                .add("%europe%", europe.getNameKey())
-                .addStringTemplate("%unit%", unit.getLabel()));
-        } else if (!selected) {
-            cs.addMessage(See.only(this),
-                new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                 "model.europe.emigrate",
-                                 this, unit)
                     .add("%europe%", europe.getNameKey())
                     .addStringTemplate("%unit%", unit.getLabel()));
+            break;
+        default:
+            throw new IllegalArgumentException("Bogus migration type");
         }
+        cs.add(See.only(this), europe);
     }
-
 
     /**
      * Combat.

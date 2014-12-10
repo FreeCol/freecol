@@ -86,34 +86,30 @@ public class EmigrateUnitMessage extends DOMMessage {
         } catch (NumberFormatException e) {
             return DOMMessage.clientError("Bad slot: " + slotString);
         }
-
-        boolean selected = 1 <= slot && slot <= Europe.RECRUIT_COUNT;
+        if (!MigrationType.validMigrantSlot(slot)) {
+            return DOMMessage.clientError("Invalid slot for recruitment: "
+                + slot);
+        }
+            
         MigrationType type;
-        int remaining = serverPlayer.getRemainingEmigrants();
-        if (remaining > 0) {
-            if (!selected) {
-                return DOMMessage.clientError("Invalid slot for FoY migration.");
+        if (serverPlayer.getRemainingEmigrants() > 0) {
+            if (MigrationType.unspecificMigrantSlot(slot)) {
+                return DOMMessage.clientError("Specific slot expected for FoY migration.");
             }
             type = MigrationType.FOUNTAIN;
         } else if (player.checkEmigrate()) {
-            if (selected) {
-                if (!player.hasAbility(Ability.SELECT_RECRUIT)) {
-                    return DOMMessage.clientError("selectRecruit ability absent.");
-                }
-            } else if (slot != 0) {
-                return DOMMessage.clientError("Invalid slot for normal migration.");
+            if (MigrationType.specificMigrantSlot(slot)
+                && !player.hasAbility(Ability.SELECT_RECRUIT)) {
+                return DOMMessage.clientError("selectRecruit ability absent.");
             }
             type = MigrationType.NORMAL;
-        } else if (player.checkGold(europe.getRecruitPrice())) {
-            if (!selected && slot != 0) {
-                return DOMMessage.clientError("Invalid slot for recruitment: "
-                    + slot);
+        } else {
+            if (!player.checkGold(europe.getRecruitPrice())) {
+                return DOMMessage.clientError("No migrants available at cost "
+                    + europe.getRecruitPrice()
+                    + " for player with " + player.getGold() + " gold.");
             }
             type = MigrationType.RECRUIT;
-        } else {
-            return DOMMessage.clientError("No migrants available at cost "
-                + europe.getRecruitPrice()
-                + " for player with " + player.getGold() + " gold.");
         }
 
         // Proceed to emigrate.

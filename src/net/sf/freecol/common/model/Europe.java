@@ -57,10 +57,9 @@ public class Europe extends UnitLocation
     public static final Ability ABILITY_DRESS_MISSIONARY
         = new Ability(Ability.DRESS_MISSIONARY, true);
 
-    /** The number of recruitable unit types. */
-    public static final int RECRUIT_COUNT = 3;
-
     /**
+     * Migration handling.
+     *
      * Migration routines operate on:
      * - "indexes" which refer to a valid member of the recruitables
      *   list, and must be [0, RECRUIT_COUNT)
@@ -69,31 +68,66 @@ public class Europe extends UnitLocation
      * The following constant should be used when the random choice
      * behaviour is desired.
      */
-    public static final int CHOOSE_MIGRANT_SLOT = 0;
-
-    /**
-     * The migrant slot to use when there is no reason to choose
-     * between them.
-     */
-    public static final int DEFAULT_MIGRANT_SLOT = 1;
-
-    /** Reasons to migrate. */
     public static enum MigrationType {
         NORMAL,     // Unit decided to migrate
         RECRUIT,    // Player is paying
         FOUNTAIN,   // As a result of a Fountain of Youth discovery
         SURVIVAL;   // Emergency autorecruit in server
 
-        public static boolean validMigrantIndex(int x) {
-            return 0 <= x && x < RECRUIT_COUNT;
+        /** The number of recruitable unit types. */
+        private static final int MIGRANT_COUNT = 3;
+
+        /**
+         * The unspecific migrant slot to use to denote a random
+         * choice between specific slots.
+         */
+        private static final int CHOOSE_MIGRANT_SLOT = 0;
+
+        /**
+         * The migrant slot to use when there is no reason to choose
+         * between them.
+         */
+        private static final int DEFAULT_MIGRANT_SLOT = 1;
+
+        public static int getMigrantCount() {
+            return MIGRANT_COUNT;
         }
 
-        public static boolean validMigrantSlot(int x) {
-            return 0 <= x && x <= RECRUIT_COUNT;
+        public static int getUnspecificSlot() {
+            return CHOOSE_MIGRANT_SLOT;
+        }
+
+        public static int getDefaultSlot() {
+            return DEFAULT_MIGRANT_SLOT;
+        }
+
+        public static boolean validMigrantIndex(int x) {
+            return 0 <= x && x < MIGRANT_COUNT;
         }
 
         public static int migrantIndexToSlot(int x) {
             return x + 1;
+        }
+
+        public static int migrantSlotToIndex(int x) {
+            return x - 1;
+        }
+
+        public static int convertToMigrantSlot(Integer i) {
+            return (i == null || !validMigrantSlot(i)) ? CHOOSE_MIGRANT_SLOT
+                : i;
+        }
+
+        public static boolean validMigrantSlot(int x) {
+            return 0 <= x && x <= MIGRANT_COUNT;
+        }
+
+        public static boolean specificMigrantSlot(int x) {
+            return 1 <= x && x <= MIGRANT_COUNT;
+        }
+
+        public static boolean unspecificMigrantSlot(int x) {
+            return CHOOSE_MIGRANT_SLOT == x;
         }
     }
 
@@ -148,68 +182,26 @@ public class Europe extends UnitLocation
 
 
     /**
-     * Are any of the recruitables not of the same type?
+     * Get a list of the current recruitables.
      *
-     * @return True if the recruitables are not all of the same type.
+     * @return A list of recruitable <code>UnitType</code>s.
      */
-    public boolean recruitablesDiffer() {
-        UnitType template = null;
-        for (UnitType unitType : recruitables) {
-            if (template == null) {
-                template = unitType;
-            } else if (template != unitType) {
-                return true;
-            }
+    public List<UnitType> getRecruitables() {
+        return new ArrayList<UnitType>(recruitables);
+    }
+
+    /**
+     * Add a recruitable unit type.
+     *
+     * @param unitType The recruitable <code>UnitType</code> to add.
+     * @return True if the recruitable was added.
+     */
+    protected boolean addRecruitable(UnitType unitType) {
+        if (recruitables.size() < MigrationType.MIGRANT_COUNT) {
+            recruitables.add(unitType);
+            return true;
         }
         return false;
-    }
-
-    public List<UnitType> getRecruitables() {
-        return recruitables;
-    }
-
-    /**
-     * Gets the type of the recruitable in Europe at the given slot.
-     *
-     * @param slot The slot of the recruitable whose type needs to be
-     *     returned.
-     * @return The type of the recruitable in Europe at the given slot.
-     * @exception IllegalArgumentException if the given
-     *     <code>slot</code> does not exist.
-     */
-    public UnitType getRecruitable(int slot) {
-        if (slot >= 0 && slot < RECRUIT_COUNT && slot < recruitables.size()) {
-            return recruitables.get(slot);
-        } else {
-            throw new IllegalArgumentException("Invalid recruitment slot: "
-                + slot);
-        }
-    }
-
-    /**
-     * Gets the type of the recruitable in Europe at the given slot.
-     *
-     * @param slot The slot of the recruitable whose type needs to be
-     *     returned.
-     * @param type The <code>UnitType</code> of the recruitable in
-     *     Europe at the given slot.
-     * @exception IllegalArgumentException if the given
-     *     <code>slot</code> does not exist.
-     */
-    public void setRecruitable(int slot, UnitType type) {
-        if (slot >= 0 && slot < RECRUIT_COUNT && slot < recruitables.size()) {
-            recruitables.set(slot, type);
-        } else {
-            throw new IllegalArgumentException("Invalid recruitment slot: "
-                + slot);
-        }
-    }
-
-    /**
-     * Only used by ServerEurope.
-     */
-    protected void addRecruitable(UnitType unitType) {
-        recruitables.add(unitType);
     }
 
     /**
@@ -517,7 +509,7 @@ public class Europe extends UnitLocation
             UnitType unitType = xr.getType(spec, RECRUIT_TAG + index,
                                            UnitType.class, (UnitType)null);
             if (unitType != null) {
-                recruitables.add(unitType);
+                addRecruitable(unitType);
                 clearRecruitables = false;
             }
         }
@@ -577,7 +569,7 @@ public class Europe extends UnitLocation
         } else if (RECRUIT_TAG.equals(tag)) {
             UnitType unitType = xr.getType(spec, RECRUIT_ID_TAG,
                                            UnitType.class, (UnitType)null);
-            recruitables.add(unitType);
+            if (unitType != null) addRecruitable(unitType);
             xr.closeTag(RECRUIT_TAG);
 
         } else if (UNIT_PRICE_TAG.equals(tag)) {

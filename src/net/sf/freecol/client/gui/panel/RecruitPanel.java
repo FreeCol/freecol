@@ -49,7 +49,7 @@ public final class RecruitPanel extends FreeColPanel {
     private final JTextArea question;
 
     /** The array of recruitable units. */
-    private final JButton[] person = new JButton[Europe.RECRUIT_COUNT];
+    private final JButton[] person;
 
     /** Is there at least one recruitable unit? */
     private boolean shouldEnable = false;
@@ -63,8 +63,9 @@ public final class RecruitPanel extends FreeColPanel {
     public RecruitPanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap 1", "", ""));
 
+        person = new JButton[getMyPlayer().getEurope().getRecruitables().size()];
         question = GUI.getDefaultTextArea("");
-        for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
+        for (int i = 0; i < person.length; i++) {
             person[i] = new JButton();
             person[i].setActionCommand(String.valueOf(i));
             person[i].addActionListener(this);
@@ -105,15 +106,15 @@ public final class RecruitPanel extends FreeColPanel {
         add(question, "wrap 20");
 
         shouldEnable = false;
-        for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
-            UnitType unitType = europe.getRecruitable(i);
-            ImageIcon icon = getLibrary().getUnitImageIcon(unitType, 0.66);
+        int i = 0;
+        for (UnitType ut : europe.getRecruitables()) {
             boolean enable = player.checkGold(recruitPrice);
-            person[i].setText(Messages.message(unitType.getNameKey()));
-            person[i].setIcon(icon);
+            person[i].setText(Messages.getName(ut));
+            person[i].setIcon(getLibrary().getUnitImageIcon(ut, 0.66));
             person[i].setEnabled(enable);
             add(person[i], "growx");
             shouldEnable |= enable;
+            i++;
         }
 
         okButton.setText(Messages.message("recruitPanel.ok"));
