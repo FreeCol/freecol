@@ -1391,6 +1391,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * warnings if this has disadvantages.
      *
      * @param unit The <code>Unit</code> which is to build the colony.
+     * @return A string containing the warnings, or null if none.
      */
     public String getBuildColonyWarnings(Unit unit) {
         final Specification spec = getSpecification();
