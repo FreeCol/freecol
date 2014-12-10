@@ -39,7 +39,7 @@ import net.sf.freecol.common.option.ModOption;
 public final class ModOptionUI extends OptionUI<ModOption>  {
 
 
-    private static class ChoiceRenderer
+    private static class BoxRenderer
         extends FreeColComboBoxRenderer<FreeColModFile> {
 
         /**
@@ -48,11 +48,24 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
         @Override
         public void setLabelValues(JLabel label, FreeColModFile value) {
             if (value != null) {
-                String key = "mod." + value.getId();
-                label.setText(Messages.getName(key));
-                if (Messages.containsKey(Messages.shortDescriptionKey(key))) {
-                    label.setToolTipText(Messages.getShortDescription(key));
-                }
+                ModOptionUI.labelModFile(label, value);
+            }
+        }
+    }
+
+    private class ModOptionRenderer
+        extends FreeColComboBoxRenderer<ModOption> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void setLabelValues(JLabel label, ModOption value) {
+            FreeColModFile modFile = value.getValue();
+            if (modFile == null) {
+                label.setText(value.toString());
+            } else {
+                ModOptionUI.labelModFile(label, modFile);
             }
         }
     }
@@ -77,11 +90,26 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
             model.addElement(choice);
         }
         box.setModel(model);
-        box.setRenderer(new ChoiceRenderer());
+        box.setRenderer(new BoxRenderer());
         if (option.getValue() != null) {
             box.setSelectedItem(option.getValue());
         }
         initialize();
+    }
+
+
+    /**
+     * Add information from a mod file to a label.
+     *
+     * @param label The <code>JLabel</code> to modify.
+     * @param modFile The <code>FreeColModFile</code> to use.
+     */
+    private static void labelModFile(JLabel label, FreeColModFile modFile) {
+        String key = "mod." + modFile.getId();
+        label.setText(Messages.getName(key));
+        if (Messages.containsKey(Messages.shortDescriptionKey(key))) {
+            label.setToolTipText(Messages.getShortDescription(key));
+        }
     }
 
 
@@ -91,7 +119,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
      * {@inheritDoc}
      */
     public ListCellRenderer getListCellRenderer() {
-        return new ChoiceRenderer();
+        return new ModOptionRenderer();
     }
 
     /**
