@@ -27,7 +27,7 @@
     <optionGroup id="clientOptions.gui" >
       <!-- Option for setting the language -->
       <languageOption id="model.option.languageOption"
-                      defaultValue="automatic" />
+                      defaultValue="clientOptions.gui.languageOption.automatic" />
       <!-- Used by GUI, the number will be displayed when a group of
            goods are higher than this number. -->
       <integerOption id="model.option.guiMinNumberToDisplayGoodsCount"

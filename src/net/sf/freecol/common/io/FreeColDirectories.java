@@ -76,6 +76,8 @@ public class FreeColDirectories {
 
     // Public names, used by the respective dialogs
 
+    public static final String BASE_CLIENT_OPTIONS_FILE_NAME = "client-options.xml";
+
     public static final String CLIENT_OPTIONS_FILE_NAME = "options.xml";
 
     public static final String CUSTOM_DIFFICULTY_FILE_NAME = "custom.xml";
@@ -663,6 +665,15 @@ public class FreeColDirectories {
      */
     public static File getBaseDirectory() {
         return new File(getDataDirectory(), BASE_DIRECTORY);
+    }
+
+    /**
+     * Gets the base client options file.
+     *
+     * @return The base client options file.
+     */
+    public static File getBaseClientOptionsFile() {
+        return new File(getBaseDirectory(), BASE_CLIENT_OPTIONS_FILE_NAME);
     }
 
     /**
