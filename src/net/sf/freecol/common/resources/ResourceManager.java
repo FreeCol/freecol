@@ -47,10 +47,14 @@ public class ResourceManager {
      * resources.  A mapping is defined within a specific context.
      * See the comment on each field's setter for more information:
      */
+    // TODO: Combine these (array or just update one directly), merge the setters.
+    // It may be a good idea to keep all on combining and choose through a
+    // priority value that could be added on to each key/value pair.
     private static ResourceMapping baseMapping;
     private static ResourceMapping tcMapping;
     private static ResourceMapping campaignMapping;
     private static ResourceMapping scenarioMapping;
+    // TODO: Check if game and mod resources are always added in a predetermined fixed order.
     private static ResourceMapping gameMapping;
     private static List<ResourceMapping> modMappings
         = new LinkedList<ResourceMapping>();
@@ -168,7 +172,13 @@ public class ResourceManager {
         preloadThread = new Thread(FreeCol.CLIENT_THREAD
             + "-Resource loader") {
                 public void run() {
-                    // Make a local copy of the resources to load.
+                    // Make a local list of the resources to load.
+                    // TODO: There are no obvious flaws currently, but this
+                    // needs deeper verification, including checking all
+                    // Resource classes another time, by someone knowledgeable
+                    // in thread safety issues in Java. 
+                    // Could lead to a race condition in case a Resource class
+                    // is not completely thread safe, as references are shared.
                     List<Resource> resources
                         = new LinkedList<Resource>(getResources().values());
                     int n = 0;
@@ -193,6 +203,7 @@ public class ResourceManager {
             dirty = false;
             preloadThread = null;
             createMergedContainer();
+            // TODO: This should wait for the thread to exit, if one was running.
             startBackgroundPreloading();
         }
     }
