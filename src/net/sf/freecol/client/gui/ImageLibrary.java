@@ -154,15 +154,14 @@ public final class ImageLibrary {
     private Image createChip(String text, Color border,
                              Color background, Color foreground) {
         // Draw it and put it in the cache
-        Font font = ResourceManager.getFont("SimpleFont", Font.BOLD,
-            (float)Math.rint(12 * getScalingFactor()));
+        Font font = getScaledFont("SimpleFont", Font.BOLD, 12f);
         // hopefully, this is big enough
         BufferedImage bi = new BufferedImage(100, 100,
                                              BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();
         TextLayout label = new TextLayout(text, font,
                                           g2.getFontRenderContext());
-        float padding = 6 * getScalingFactor();
+        float padding = 6 * scalingFactor;
         int width = (int)(label.getBounds().getWidth() + padding);
         int height = (int)(label.getAscent() + label.getDescent() + padding);
         g2.setColor(border);
@@ -191,15 +190,14 @@ public final class ImageLibrary {
                                    double amount, Color fill,
                                    Color foreground) {
         // Draw it and put it in the cache
-        Font font = ResourceManager.getFont("SimpleFont", Font.BOLD,
-            (float)Math.rint(12 * getScalingFactor()));
+        Font font = getScaledFont("SimpleFont", Font.BOLD, 12f);
         // hopefully, this is big enough
         BufferedImage bi = new BufferedImage(100, 100,
                                              BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();
         TextLayout label = new TextLayout(text, font,
                                           g2.getFontRenderContext());
-        float padding = 6 * getScalingFactor();
+        float padding = 6 * scalingFactor;
         int width = (int)(label.getBounds().getWidth() + padding);
         int height = (int)(label.getAscent() + label.getDescent() + padding);
         g2.setColor(border);
@@ -352,7 +350,7 @@ public final class ImageLibrary {
                                        : "indianSettlement.scouted");
         String key = "dynamic.alarm." + text + "." + ownerColor.getRGB()
             + "." + amount + "." + enemyColor.getRGB();
-        Image img = (Image)ResourceManager.getImage(key);
+        Image img = ResourceManager.getImage(key);
         if (img == null) {
             img = createFilledChip(text, Color.BLACK, ownerColor, amount/4.0,
                                    enemyColor, foreground);
@@ -969,6 +967,16 @@ public final class ImageLibrary {
         return new ImageLibrary(scalingFactor);
     }
 
+    public Font getScaledFont(final String resource, float size) {
+        return ResourceManager.getFont(resource,
+            (float)Math.rint(size * scalingFactor));
+    }
+
+    public Font getScaledFont(final String resource, int style, float size) {
+        return ResourceManager.getFont(resource, style,
+            (float)Math.rint(size * scalingFactor));
+    }
+
     /**
      * Returns the scaling factor used when creating this ImageLibrary.
      * @return 1 unless {@link #getScaledImageLibrary} was used to create
@@ -1038,7 +1046,7 @@ public final class ImageLibrary {
             + "." + font.getFontName().replace(' ', '-')
             + "." + Integer.toString(font.getSize())
             + "." + Integer.toHexString(color.getRGB());
-        Image img = ResourceManager.getImage(key);// ,getScalingFactor());
+        Image img = ResourceManager.getImage(key);// ,scalingFactor);
         if (img == null) {
             // create an image of the appropriate size
             FontMetrics fm = g.getFontMetrics(font);
@@ -1072,7 +1080,7 @@ public final class ImageLibrary {
                 }
             }
             ResourceManager.addGameMapping(key, new ImageResource(bi));
-            img = ResourceManager.getImage(key);//, getScalingFactor());
+            img = ResourceManager.getImage(key);//, scalingFactor);
         }
         return img;
     }
