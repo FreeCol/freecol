@@ -43,7 +43,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -131,16 +130,31 @@ public final class ImageLibrary {
 
 
     /**
-     * The constructor to use.
+     * The constructor to use when needing an unscaled <code>ImageLibrary</code>.
      */
     public ImageLibrary() {
         this(1);
     }
 
+    /**
+     * The constructor to use when needing a scaled <code>ImageLibrary</code>.
+     * @param scalingFactor The factor used when scaling. 2 is twice
+     *      the size of the original images and 0.5 is half.
+     */
     public ImageLibrary(float scalingFactor) {
         this.scalingFactor = scalingFactor;
     }
 
+
+    /**
+     * Returns the scaling factor used when creating this <code>ImageLibrary</code>.
+     * It is 1 if the constructor without scaling factor was used to create
+     * this object.
+     * @return The scaling factor of this ImageLibrary.
+     */
+    public float getScalingFactor() {
+        return scalingFactor;
+    }
 
     /**
      * Create a "chip" with the given text and colors.
@@ -223,7 +237,7 @@ public final class ImageLibrary {
      * @param target The offset.
      * @return The faded image.
      */
-    public BufferedImage fadeImage(Image img, float fade, float target) {
+    public static BufferedImage fadeImage(Image img, float fade, float target) {
         int w = img.getWidth(null);
         int h = img.getHeight(null);
         BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
@@ -251,7 +265,7 @@ public final class ImageLibrary {
      * @param background The background <code>Color</code> to complement.
      * @return A suitable foreground <code>Color</code>.
      */
-    public Color getForegroundColor(Color background) {
+    public static Color getForegroundColor(Color background) {
         return (background == null
             || (background.getRed() * 0.3 + background.getGreen() * 0.59
                 + background.getBlue() * 0.11 >= 126))
@@ -268,7 +282,7 @@ public final class ImageLibrary {
      * @param color The <code>Color</code> to complement.
      * @return A suitable border <code>Color</code>.
      */
-    public Color getStringBorderColor(Color color) {
+    public static Color getStringBorderColor(Color color) {
         return (color.getRed() * 0.3
             + color.getGreen() * 0.59
             + color.getBlue() * 0.11 < 10) ? Color.WHITE
@@ -369,7 +383,7 @@ public final class ImageLibrary {
      * @param y an <code>int</code> value
      * @return a <code>boolean</code> value
      */
-    private boolean isEven(int x, int y) {
+    private static boolean isEven(int x, int y) {
         return ((y % 8 <= 2) || ((x + y) % 2 == 0 ));
     }
 
@@ -411,7 +425,7 @@ public final class ImageLibrary {
         return getBonusImage(type, scalingFactor);
     }
 
-    public Image getBonusImage(ResourceType type, double scale) {
+    public static Image getBonusImage(ResourceType type, double scale) {
         return ResourceManager.getImage(type.getId() + ".image", scale);
     }
 
@@ -466,7 +480,7 @@ public final class ImageLibrary {
         return getCoatOfArmsImage(nation, scalingFactor);
     }
 
-    public Image getCoatOfArmsImage(Nation nation, double scale) {
+    public static Image getCoatOfArmsImage(Nation nation, double scale) {
         return ResourceManager.getImage(nation.getId() + ".image", scale);
     }
 
@@ -476,7 +490,7 @@ public final class ImageLibrary {
      * @param nation The nation.
      * @return the coat-of-arms of this nation
      */
-    public ImageIcon getCoatOfArmsImageIcon(Nation nation) {
+    public static ImageIcon getCoatOfArmsImageIcon(Nation nation) {
         return ResourceManager.getImageIcon(nation.getId() + ".image");
     }
 
@@ -562,11 +576,11 @@ public final class ImageLibrary {
         return getForestImage(type, riverStyle, scalingFactor);
     }
 
-    public Image getForestImage(TileType type, double scale) {
+    public static Image getForestImage(TileType type, double scale) {
         return ResourceManager.getImage(type.getId() + ".forest", scale);
     }
 
-    public Image getForestImage(TileType type, TileImprovementStyle riverStyle, double scale) {
+    public static Image getForestImage(TileType type, TileImprovementStyle riverStyle, double scale) {
         if (riverStyle == null) {
             return ResourceManager.getImage(type.getId() + ".forest", scale);
         } else {
@@ -580,7 +594,7 @@ public final class ImageLibrary {
      * @param father a <code>FoundingFather</code> value
      * @return an <code>Image</code> value
      */
-    public Image getFoundingFatherImage(FoundingFather father) {
+    public static Image getFoundingFatherImage(FoundingFather father) {
         return ResourceManager.getImage(father.getId() + ".image");
     }
 
@@ -594,7 +608,7 @@ public final class ImageLibrary {
         return getGoodsImage(goodsType, scalingFactor);
     }
 
-    public Image getGoodsImage(GoodsType goodsType, double scale) {
+    public static Image getGoodsImage(GoodsType goodsType, double scale) {
         return ResourceManager.getImage(goodsType.getId() + ".image", scale);
     }
 
@@ -604,7 +618,7 @@ public final class ImageLibrary {
      * @param goodsType The type of the goods-image to return.
      * @return The goods-image at the given index.
      */
-    public ImageIcon getGoodsImageIcon(GoodsType goodsType) {
+    public static ImageIcon getGoodsImageIcon(GoodsType goodsType) {
         return ResourceManager.getImageIcon(goodsType.getId() + ".image");
     }
 
@@ -612,11 +626,11 @@ public final class ImageLibrary {
         return getBuildingImage(building.getType(), building.getOwner(), scalingFactor);
     }
 
-    public Image getBuildingImage(Building building, double scale) {
+    public static Image getBuildingImage(Building building, double scale) {
         return getBuildingImage(building.getType(), building.getOwner(), scale);
     }
 
-    public Image getBuildingImage(BuildingType buildingType, Player player, double scale) {
+    public static Image getBuildingImage(BuildingType buildingType, Player player, double scale) {
         String key = buildingType.getId() + "." + player.getNationNameKey() + ".image";
         if (!ResourceManager.hasResource(key)) {
             key = buildingType.getId() + ".image";
@@ -648,7 +662,7 @@ public final class ImageLibrary {
         return ResourceManager.getImage(type.getId() + ".image", scalingFactor);
     }
 
-    public Image getImage(FreeColGameObjectType type, double scale) {
+    public static Image getImage(FreeColGameObjectType type, double scale) {
         return ResourceManager.getImage(type.getId() + ".image", scale);
     }
 
@@ -725,7 +739,7 @@ public final class ImageLibrary {
         return getMiscImage(id, scalingFactor);
     }
 
-    public Image getMiscImage(String id, double scale) {
+    public static Image getMiscImage(String id, double scale) {
         return ResourceManager.getImage(id, scale);
     }
 
@@ -769,7 +783,7 @@ public final class ImageLibrary {
      * @param nation The nation this monarch rules.
      * @return the monarch-image for the given nation.
      */
-    public Image getMonarchImage(Nation nation) {
+    public static Image getMonarchImage(Nation nation) {
         return ResourceManager.getImage(nation.getId() + ".monarch.image");
     }
 
@@ -779,7 +793,7 @@ public final class ImageLibrary {
      * @param nation The nation this monarch rules.
      * @return the monarch-image for the given nation.
      */
-    public ImageIcon getMonarchImageIcon(Nation nation) {
+    public static ImageIcon getMonarchImageIcon(Nation nation) {
         return ResourceManager.getImageIcon(nation.getId() + ".monarch.image");
     }
 
@@ -797,7 +811,7 @@ public final class ImageLibrary {
             ? Color.GRAY : getForegroundColor(backgroundColor);
         String key = "dynamic.occupationIndicator." + text
             + "." + Integer.toHexString(backgroundColor.getRGB());
-        Image img = ResourceManager.getImage(key, getScalingFactor());
+        Image img = ResourceManager.getImage(key, scalingFactor);
         if (img == null) {
             img = createChip(text, Color.BLACK,
                              backgroundColor, foregroundColor);
@@ -829,6 +843,8 @@ public final class ImageLibrary {
     }
 
     private Image getRandomizedImage(String prefix, String id, double scale) {
+        // TODO: Fix this brittle way of randomly choosing. Would be better to
+        // keep the list of image names, sort and choose one available string.
         int count = getImageCount(prefix);
         if (count > 0) {
             String key = prefix + Math.abs(id.hashCode() % count) + ".image";
@@ -840,6 +856,10 @@ public final class ImageLibrary {
     }
 
     private int getImageCount(String prefix) {
+        // TODO: Remove method after getRandomizedImage got changed. If its not
+        // removed fix inefficient usage of getKeys discarding a result list
+        // and then try to remove imageCounts cache, which may get outdated
+        // when the ResourceMapping changes.
         if (!imageCounts.containsKey(prefix)) {
             imageCounts.put(prefix, ResourceManager.getKeys(prefix).size());
         }
@@ -852,7 +872,7 @@ public final class ImageLibrary {
      * @param pt The <code>PathType</code>
      * @return The <code>Image</code>.
      */
-    public Image getPathImage(PathType pt) {
+    public static Image getPathImage(PathType pt) {
         return (pt == null) ? null
             : ResourceManager.getImage(pt.getImageKey());
     }
@@ -863,7 +883,7 @@ public final class ImageLibrary {
      * @param u The <code>Unit</code>
      * @return The <code>Image</code>.
      */
-    public Image getPathImage(Unit u) {
+    public static Image getPathImage(Unit u) {
         return (u == null) ? null
             : getPathImage(PathType.getPathType(u));
     }
@@ -874,7 +894,7 @@ public final class ImageLibrary {
      * @param pt The <code>PathType</code>
      * @return The <code>Image</code>.
      */
-    public Image getPathNextTurnImage(PathType pt) {
+    public static Image getPathNextTurnImage(PathType pt) {
         return (pt == null) ? null
             : ResourceManager.getImage(pt.getNextTurnImageKey());
     }
@@ -885,7 +905,7 @@ public final class ImageLibrary {
      * @param u The <code>Unit</code>
      * @return The <code>Image</code>.
      */
-    public Image getPathNextTurnImage(Unit u) {
+    public static Image getPathNextTurnImage(Unit u) {
         return (u == null) ? null
             : getPathNextTurnImage(PathType.getPathType(u));
     }
@@ -907,7 +927,7 @@ public final class ImageLibrary {
      * @param scale a <code>double</code> value
      * @return The image with the given style.
      */
-    public Image getRiverImage(TileImprovementStyle style, double scale) {
+    public static Image getRiverImage(TileImprovementStyle style, double scale) {
         return getRiverImage(style.getString(), scale);
     }
 
@@ -918,7 +938,7 @@ public final class ImageLibrary {
      * @param scale a <code>double</code> value
      * @return The image with the given style.
      */
-    public Image getRiverImage(String style, double scale) {
+    public static Image getRiverImage(String style, double scale) {
         return ResourceManager.getImage("model.tile.river" + style, scale);
     }
 
@@ -940,7 +960,7 @@ public final class ImageLibrary {
         return ResourceManager.getImage(key, scalingFactor);
     }
 
-    public ImageIcon getScaledBonusImageIcon(ResourceType type, float scale) {
+    public static ImageIcon getScaledBonusImageIcon(ResourceType type, float scale) {
         return new ImageIcon(getBonusImage(type, scale));
     }
 
@@ -951,20 +971,8 @@ public final class ImageLibrary {
      * @param scale The scale of the goods-ImageIcon to return.
      * @return The goods-ImageIcon at the given index.
      */
-    public ImageIcon getScaledGoodsImageIcon(GoodsType type, double scale) {
+    public static ImageIcon getScaledGoodsImageIcon(GoodsType type, double scale) {
         return new ImageIcon(getGoodsImage(type, scale));
-    }
-
-    /**
-     * Gets a scaled version of this <code>ImageLibrary</code>.
-     * @param scalingFactor The factor used when scaling. 2 is twice
-     *      the size of the original images and 0.5 is half.
-     * @return A new <code>ImageLibrary</code>.
-     * @throws FreeColException
-     */
-    public ImageLibrary getScaledImageLibrary(float scalingFactor)
-        throws FreeColException {
-        return new ImageLibrary(scalingFactor);
     }
 
     public Font getScaledFont(final String resource, float size) {
@@ -975,15 +983,6 @@ public final class ImageLibrary {
     public Font getScaledFont(final String resource, int style, float size) {
         return ResourceManager.getFont(resource, style,
             (float)Math.rint(size * scalingFactor));
-    }
-
-    /**
-     * Returns the scaling factor used when creating this ImageLibrary.
-     * @return 1 unless {@link #getScaledImageLibrary} was used to create
-     *      this object.
-     */
-    public float getScalingFactor() {
-        return scalingFactor;
     }
 
     /**
@@ -1003,7 +1002,7 @@ public final class ImageLibrary {
      * @param scale a <code>double</code> value
      * @return The graphics that will represent the given settlement.
      */
-    public Image getSettlementImage(Settlement settlement, double scale) {
+    public static Image getSettlementImage(Settlement settlement, double scale) {
         return ResourceManager.getImage(settlement.getImageKey(), scale);
     }
 
@@ -1018,7 +1017,7 @@ public final class ImageLibrary {
         return getSettlementImage(settlementType, scalingFactor);
     }
 
-    public Image getSettlementImage(SettlementType settlementType,
+    public static Image getSettlementImage(SettlementType settlementType,
                                     double scale) {
         return ResourceManager.getImage(settlementType.getId() + ".image",
                                         scale);
@@ -1034,7 +1033,7 @@ public final class ImageLibrary {
      * @param font The <code>Font</code> to display the text with.
      * @return The image that was created.
      */
-    public Image getStringImage(Graphics g, String text, Color color,
+    public static Image getStringImage(Graphics g, String text, Color color,
                                 Font font) {
         if (color == null) {
             logger.warning("createStringImage called with color null");
@@ -1073,7 +1072,6 @@ public final class ImageLibrary {
                                 && biX+cX < bi.getWidth() && biY+cY < bi.getHeight()
                                 && bi.getRGB(biX + cX, biY + cY) == textColor) {
                                 bi.setRGB(biX, biY, borderColor);
-                                continue;
                             }
                         }
                     }
@@ -1099,7 +1097,7 @@ public final class ImageLibrary {
         return getTerrainImage(type, x, y, scalingFactor);
     }
 
-    public Image getTerrainImage(TileType type, int x, int y, double scale) {
+    public static Image getTerrainImage(TileType type, int x, int y, double scale) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
         return ResourceManager.getImage(key + ".center"
             + (isEven(x, y) ? "0" : "1") + ".image", scale);
@@ -1121,13 +1119,13 @@ public final class ImageLibrary {
             unit.hasNativeEthnicity(), grayscale, scalingFactor);
     }
 
-    public ImageIcon getUnitImageIcon(Unit unit, boolean grayscale,
+    public static ImageIcon getUnitImageIcon(Unit unit, boolean grayscale,
                                       double scale) {
         return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), grayscale, scale);
     }
 
-    public ImageIcon getUnitImageIcon(Unit unit, double scale) {
+    public static ImageIcon getUnitImageIcon(Unit unit, double scale) {
         return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), false, scale);
     }
@@ -1148,13 +1146,13 @@ public final class ImageLibrary {
                                 false, grayscale, scalingFactor);
     }
 
-    public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale,
+    public static ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale,
                                       double scale) {
         return getUnitImageIcon(unitType, unitType.getDisplayRoleId(),
                                 false, grayscale, scale);
     }
 
-    public ImageIcon getUnitImageIcon(UnitType unitType, double scale) {
+    public static ImageIcon getUnitImageIcon(UnitType unitType, double scale) {
         return getUnitImageIcon(unitType, unitType.getDisplayRoleId(),
                                 false, false, scale);
     }
@@ -1170,13 +1168,13 @@ public final class ImageLibrary {
                                 false, grayscale, scalingFactor);
     }
 
-    public ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
+    public static ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
                                       boolean grayscale, double scale) {
         return getUnitImageIcon(unitType, roleId,
                                 false, grayscale, scale);
     }
 
-    public ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
+    public static ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
                                       double scale) {
         return getUnitImageIcon(unitType, roleId,
                                 false, false, scale);
@@ -1191,7 +1189,7 @@ public final class ImageLibrary {
      * @param grayscale If true draw in inactive/disabled-looking state.
      * @return A suitable <code>ImageIcon</code>.
      */
-    public ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
+    public static ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
                                       boolean nativeEthnicity,
                                       boolean grayscale, double scale) {
         // units that can only be native don't need the .native key part
