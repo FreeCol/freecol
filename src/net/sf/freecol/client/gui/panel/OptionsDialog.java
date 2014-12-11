@@ -33,6 +33,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -190,8 +191,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the save succeeded.
      */
     protected boolean save(File file) {
-        OptionGroup og = getSpecification()
-            .saveOptionsFile(this.group, file);
+        OptionGroup og = Specification.saveOptionsFile(this.group, file);
         if (og != null) return true;
 
         StringTemplate t = StringTemplate.template("failedToSave")

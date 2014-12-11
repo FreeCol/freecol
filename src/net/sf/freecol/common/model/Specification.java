@@ -477,7 +477,7 @@ public final class Specification {
      * @param file The <code>File</code> to save to.
      * @return The <code>OptionGroup</code> saved, or null on error.
      */
-    public OptionGroup saveOptionsFile(OptionGroup group, File file) {
+    public static OptionGroup saveOptionsFile(OptionGroup group, File file) {
         if (group != null) {
             try {
                 return (group.save(file, FreeColXMLWriter.WriteScope.toSave(),
