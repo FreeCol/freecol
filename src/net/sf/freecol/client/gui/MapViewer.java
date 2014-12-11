@@ -2387,7 +2387,8 @@ public final class MapViewer {
                 if (withNumber) {
                     String populationString = Integer.toString(colony.getDisplayUnitCount());
                     int bonus = colony.getProductionBonus();
-                    Color theColor = ResourceManager.getProductionColor(bonus);
+                    Color theColor = ResourceManager.getColor(
+                        "productionBonus." + bonus + ".color");
                     // if government admits even more units, use
                     // italic and bigger number icon
                     Font font = (colony.getPreferredSizeChange() > 0)

@@ -408,19 +408,6 @@ public class ResourceManager {
     }
 
     /**
-     * Returns the <code>Color</code> for the given production bonus.
-     *
-     * @param bonus The production bonus to look up.
-     * @return An <code>Color</code> created with the image
-     *      identified by <code>resource</code> or
-     *      <code>null</code> if there is no color identified
-     *      by that name.
-     */
-    public static Color getProductionColor(int bonus) {
-        return ResourceManager.getColor("productionBonus." + bonus + ".color");
-    }
-
-    /**
      * Gets the font with the given name.
      *
      * @param resource The name of the resource to query.
