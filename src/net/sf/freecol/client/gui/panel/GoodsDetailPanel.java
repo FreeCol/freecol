@@ -196,12 +196,14 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
         }
 
         if (type.getBreedingNumber() < FreeColObject.INFINITY) {
-            panel.add(localizedLabel("colopedia.goods.breedingNumber"), "newline 20");
+            panel.add(localizedLabel("colopedia.goods.breedingNumber"),
+                      "newline 20");
             panel.add(new JLabel(Integer.toString(type.getBreedingNumber())));
         }
 
         panel.add(localizedLabel("colopedia.goods.description"), "newline 20");
-        panel.add(GUI.getDefaultTextArea(Messages.message(type.getDescriptionKey()), 30), "span, growx");
+        panel.add(GUI.getDefaultTextArea(Messages.getDescription(type), 30),
+                  "span, growx");
     }
 
 

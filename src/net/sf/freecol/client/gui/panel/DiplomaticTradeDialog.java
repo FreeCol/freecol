@@ -905,8 +905,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         this.summary = new MigPanel(new MigLayout("wrap 2", "[20px][]"));
         this.summary.setOpaque(false);
-        this.summary.add(GUI.getDefaultTextArea(Messages.message(comment)),
-                         "center, span 2");
+        this.summary.add(GUI.getDefaultTextArea(comment), "center, span 2");
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 3",
                 "[200, fill][300, fill][200, fill]", ""));
@@ -1087,8 +1086,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         summary.removeAll();
 
-        summary.add(GUI.getDefaultTextArea(Messages.message(comment)),
-                    "center, span 2");
+        summary.add(GUI.getDefaultTextArea(comment), "center, span 2");
 
         List<TradeItem> offers = agreement.getItemsGivenBy(player);
         if (!offers.isEmpty()) {

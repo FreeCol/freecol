@@ -285,7 +285,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         // Create the main panel
         MigPanel panel = new MigPanel(new MigLayout("wrap 2", "[][fill]",
                                                     "[fill]"));
-        panel.add(GUI.getDefaultTextArea(Messages.message(sure)), "span");
+        panel.add(GUI.getDefaultTextArea(sure), "span");
         panel.add(GUI.getDefaultTextArea(cPrompt), "span");
         panel.add(this.countryField, "span");
         panel.add(GUI.getDefaultTextArea(nPrompt), "span");

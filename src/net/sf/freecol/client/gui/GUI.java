@@ -915,6 +915,32 @@ public class GUI {
      * Gets a text area with standard settings suitable for use in FreeCol
      * panels.
      *
+     * @param template A <code>StringTemplate</code> for the text to
+     *     display in the text area.
+     * @return A suitable text area.
+     */
+    public static JTextArea getDefaultTextArea(StringTemplate template) {
+        return getDefaultTextArea(Messages.message(template));
+    }
+
+    /**
+     * Gets a text area with standard settings suitable for use in FreeCol
+     * panels.
+     *
+     * @param template A <code>StringTemplate</code> for the text to
+     *     display in the text area.
+     * @param columns The em-width number of columns to display the text in.
+     * @return A suitable text area.
+     */
+    public static JTextArea getDefaultTextArea(StringTemplate template,
+                                               int columns) {
+        return getDefaultTextArea(Messages.message(template), columns);
+    }
+
+    /**
+     * Gets a text area with standard settings suitable for use in FreeCol
+     * panels.
+     *
      * @param text The text to display in the text area.
      * @return A suitable text area.
      */
@@ -938,8 +964,7 @@ public class GUI {
         textArea.setWrapStyleWord(true);
         textArea.setFocusable(false);
         textArea.setFont(DEFAULT_FONT);
-        // necessary because of resizing
-        textArea.setSize(textArea.getPreferredSize());
+        //textArea.setSize(textArea.getPreferredSize());// necessary because of resizing
         return textArea;
     }
 
@@ -1139,8 +1164,9 @@ public class GUI {
     public boolean confirm(String textKey, String okKey, String cancelKey) {
         if (canvas == null) return false;
 
-        return canvas.showConfirmDialog(true, null, Messages.message(textKey),
-                                        null, okKey, cancelKey);
+        return canvas.showConfirmDialog(true, null,
+                                        Messages.message(textKey), null,
+                                        okKey, cancelKey);
     }
 
     /**
@@ -1160,8 +1186,9 @@ public class GUI {
         if (canvas == null) return false;
 
         return canvas.showConfirmDialog(modal, tile,
-                                        getDefaultTextArea(Messages.message(template)),
-                                        getImageIcon(obj, false), okKey, cancelKey);
+                                        getDefaultTextArea(template),
+                                        getImageIcon(obj, false),
+                                        okKey, cancelKey);
     }
 
     /**
@@ -1383,7 +1410,7 @@ public class GUI {
                 ArmedUnitSettlementAction.SETTLEMENT_ATTACK));
 
         return getChoice(true, settlement.getTile(),
-            Messages.message(settlement.getAlarmLevelMessage(player)),
+            getDefaultTextArea(settlement.getAlarmLevelMessage(player)),
             settlement, "cancel", choices);
     }
 
@@ -1411,7 +1438,7 @@ public class GUI {
                 Messages.message("boycottedGoods.dumpGoods"),
                 BoycottAction.DUMP_CARGO));
 
-        return getChoice(true, null, Messages.message(template),
+        return getChoice(true, null, getDefaultTextArea(template),
                          goods, "cancel", choices);
     }
 
@@ -1438,7 +1465,7 @@ public class GUI {
         choices.add(new ChoiceItem<BuyAction>(Messages.message("buy.moreGold"),
                                               BuyAction.HAGGLE));
 
-        return getChoice(true, unit.getTile(), Messages.message(template),
+        return getChoice(true, unit.getTile(), getDefaultTextArea(template),
                          goods, "buyProposition.cancel", choices);
     }
 
@@ -1470,7 +1497,7 @@ public class GUI {
         choices.add(new ChoiceItem<ClaimAction>(Messages.message("indianLand.take"),
                                                 ClaimAction.STEAL));
 
-        return getChoice(true, tile, Messages.message(template),
+        return getChoice(true, tile, getDefaultTextArea(template),
                          owner, "indianLand.cancel", choices);
     }
 
@@ -1510,7 +1537,7 @@ public class GUI {
         if (choices.isEmpty()) return null;
 
         return getChoice(true, settlement.getTile(),
-                         Messages.message(template), settlement,
+                         getDefaultTextArea(template), settlement,
                          "tradeProposition.cancel", choices);
     }
 
@@ -1551,7 +1578,7 @@ public class GUI {
                 Messages.message("missionarySettlement.incite"),
                 MissionaryAction.INCITE_INDIANS));
 
-        return getChoice(true, unit.getTile(), sb.toString(),
+        return getChoice(true, unit.getTile(), getDefaultTextArea(sb.toString()),
                          settlement, "cancel", choices);
     }
 
@@ -1581,7 +1608,7 @@ public class GUI {
                 Messages.message("scoutColony.attack"),
                 ScoutColonyAction.FOREIGN_COLONY_ATTACK));
 
-        return getChoice(true, unit.getTile(), Messages.message(template),
+        return getChoice(true, unit.getTile(), getDefaultTextArea(template),
                          colony, "cancel", choices);
     }
 
@@ -1642,7 +1669,7 @@ public class GUI {
                 Messages.message("scoutSettlement.attack"),
                 ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
 
-        return getChoice(true, settlement.getTile(), sb.toString(),
+        return getChoice(true, settlement.getTile(), getDefaultTextArea(sb.toString()),
                          settlement, "cancel", choices);
     }
 
@@ -1675,7 +1702,7 @@ public class GUI {
                                  .addStringTemplate("%goods%", goodsTemplate)),
                 SellAction.GIFT));
 
-        return getChoice(true, unit.getTile(), Messages.message(template),
+        return getChoice(true, unit.getTile(), getDefaultTextArea(template),
                          goods, "sellProposition.cancel", choices);
     }
 
@@ -1685,18 +1712,18 @@ public class GUI {
      *
      * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
-     * @param text A string explaining the choice.
+     * @param explain An object explaining the choice.
      * @param obj An optional object to make an icon for the dialog with.
      * @param cancelKey A key for the "cancel" button.
      * @param choices A list a <code>ChoiceItem</code>s to choose from.
      * @return The selected value of the selected <code>ChoiceItem</code>,
      *     or null if cancelled.
      */
-    public <T> T getChoice(boolean modal, Tile tile, String text, Object obj,
+    public <T> T getChoice(boolean modal, Tile tile, Object explain, Object obj,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         if (canvas == null) return null;
 
-        return canvas.showChoiceDialog(modal, tile, getDefaultTextArea(text),
+        return canvas.showChoiceDialog(modal, tile, explain,
                                        getImageIcon(obj, false),
                                        cancelKey, choices);
     }

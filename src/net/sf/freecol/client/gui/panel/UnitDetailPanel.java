@@ -243,7 +243,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
 
         panel.add(localizedLabel("colopedia.unit.description"),
                   "newline 20");
-        panel.add(GUI.getDefaultTextArea(Messages.message(type.getDescriptionKey()), 30), "span");
+        panel.add(GUI.getDefaultTextArea(Messages.getDescription(type), 30),
+                  "span");
     }
-
 }

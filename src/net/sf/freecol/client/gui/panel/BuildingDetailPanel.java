@@ -272,7 +272,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
 
         // Notes
         panel.add(localizedLabel("colopedia.buildings.notes"), "newline 20, top");
-        panel.add(GUI.getDefaultTextArea(Messages.message(buildingType.getDescriptionKey()), 20),
+        panel.add(GUI.getDefaultTextArea(Messages.getDescription(buildingType)),
                   "span, growx");
     }
 

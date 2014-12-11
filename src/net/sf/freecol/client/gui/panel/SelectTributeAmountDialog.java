@@ -66,7 +66,7 @@ public final class SelectTributeAmountDialog
         this.input = new JTextField(Integer.toString(maximum), COLUMNS);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1"));
-        panel.add(GUI.getDefaultTextArea(Messages.message(question)));
+        panel.add(GUI.getDefaultTextArea(question));
         panel.add(this.input);
         
         panel.setSize(panel.getPreferredSize());

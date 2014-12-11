@@ -149,7 +149,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
         StringTemplate template
             = StringTemplate.template("endTurnDialog.areYouSure")
                 .addAmount("%number%", units.size());
-        JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
+        JTextArea text = GUI.getDefaultTextArea(template);
 
         DefaultListModel<UnitWrapper> model = new DefaultListModel<UnitWrapper>();
         for (Unit unit : units) {

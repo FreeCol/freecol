@@ -115,7 +115,8 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
         panel.add(goodsPanel);
 
         panel.add(localizedLabel("colopedia.resource.description"), "newline 20");
-        panel.add(GUI.getDefaultTextArea(Messages.message(type.getDescriptionKey()), 30), "growx");
+        panel.add(GUI.getDefaultTextArea(Messages.getDescription(type), 30),
+                  "growx");
     }
 
 }

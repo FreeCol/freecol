@@ -89,7 +89,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
             .addStringTemplate("%nation%", other.getNationName())
             .addName("%camps%", Integer.toString(settlementCount))
             .add("%settlementType%", type);
-        JTextArea text = GUI.getDefaultTextArea(Messages.message(template));
+        JTextArea text = GUI.getDefaultTextArea(template);
 
         // Resize the text areas to better match the image.
         int columns = (int)Math.floor(text.getColumns()
