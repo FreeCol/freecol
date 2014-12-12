@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import javax.swing.ImageIcon;
+import java.util.Comparator;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -31,7 +32,7 @@ import net.sf.freecol.common.model.Player;
  * Can be used as a single choice for the
  * {@link net.sf.freecol.client.gui.panel.FreeColChoiceDialog}.
  */
-public class ChoiceItem<T> {
+public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
 
     private String text;
     private T object;
@@ -203,5 +204,14 @@ public class ChoiceItem<T> {
     public ChoiceItem<T> defaultOption() {
         optionDefault = true;
         return this;
+    }
+
+    // Interface Comparable
+
+    /** 
+     * {@inheritDoc}
+     */
+    public int compareTo(ChoiceItem<T> other) {
+        return this.text.compareTo(other.text);
     }
 }

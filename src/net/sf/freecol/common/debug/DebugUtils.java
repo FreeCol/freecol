@@ -20,6 +20,7 @@
 package net.sf.freecol.common.debug;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -117,6 +118,7 @@ public class DebugUtils {
             String msg = Messages.message(b.getNameKey());
             buildings.add(new ChoiceItem<BuildingType>(msg, b));
         }
+        Collections.sort(buildings);
 
         BuildingType buildingType
             = gui.getChoice(true, null, buildingTitle, null, "cancel",
@@ -177,6 +179,7 @@ public class DebugUtils {
                 fathers.add(new ChoiceItem<FoundingFather>(msg, father));
             }
         }
+        Collections.sort(fathers);
 
         FoundingFather father = gui.getChoice(true, null, fatherTitle, null,
                                               "cancel", fathers);
@@ -322,6 +325,7 @@ public class DebugUtils {
             String msg = Messages.message(t.getNameKey());
             uts.add(new ChoiceItem<UnitType>(msg, t));
         }
+        Collections.sort(uts);
         UnitType unitChoice = gui.getChoice(true, null, "Select Unit Type",
                                             null, "cancel", uts);
         if (unitChoice == null) return;
@@ -375,6 +379,7 @@ public class DebugUtils {
             String msg = Messages.message(t.getNameKey());
             gtl.add(new ChoiceItem<GoodsType>(msg, t));
         }
+        Collections.sort(gtl);
         GoodsType goodsType = gui.getChoice(true, null, "Select Goods Type",
                                             null, "cancel", gtl);
         if (goodsType == null) return;
@@ -421,6 +426,7 @@ public class DebugUtils {
                 + " " + Integer.toString(rc.getProbability());
             choices.add(new ChoiceItem<Disaster>(label, rc.getObject()));
         }
+        Collections.sort(choices);
         Disaster disaster = gui.getChoice(true, null, "Select disaster",
                                           null, "cancel", choices);
         if (disaster == null) return;
@@ -461,6 +467,7 @@ public class DebugUtils {
             String msg = Messages.message(p.getNationName());
             pcs.add(new ChoiceItem<Player>(msg, p));
         }
+        Collections.sort(pcs);
         Player player = gui.getChoice(true, null, "Select owner", null,
                                       "cancel", pcs);
         if (player == null) return;
@@ -499,6 +506,7 @@ public class DebugUtils {
                 pcs.add(new ChoiceItem<Player>(msg, p));
             }
         }
+        Collections.sort(pcs);
         Player player = gui.getChoice(true, null, "Select owner", null,
                                       "cancel", pcs);
         if (player == null || unit.getOwner() == player) return;
@@ -539,6 +547,7 @@ public class DebugUtils {
         for (Role role : sGame.getSpecification().getRoles()) {
             rcs.add(new ChoiceItem<Role>(role.getId(), role));
         }
+        Collections.sort(rcs);
         Role roleChoice = gui.getChoice(true, null, "Select role", null,
                                         "cancel", rcs);
         if (roleChoice == null) return;
@@ -923,6 +932,7 @@ public class DebugUtils {
             String msg = Messages.message(t.getNameKey());
             gtl.add(new ChoiceItem<GoodsType>(msg, t));
         }
+        Collections.sort(gtl);
         GoodsType goodsType = freeColClient.getGUI().getChoice(true, null,
             "Select Goods Type", null, "cancel", gtl);
         if (goodsType == null) return;
@@ -971,6 +981,7 @@ public class DebugUtils {
         for (MonarchAction action : MonarchAction.values()) {
             actions.add(new ChoiceItem<MonarchAction>(action));
         }
+        Collections.sort(actions);
         MonarchAction action = gui.getChoice(true, null, monarchTitle, null,
                                              "cancel", actions);
         server.getInGameController().setMonarchAction(sPlayer, action);
@@ -996,6 +1007,7 @@ public class DebugUtils {
             if (rumour == RumourType.NO_SUCH_RUMOUR) continue;
             rumours.add(new ChoiceItem<RumourType>(rumour.toString(), rumour));
         }
+        Collections.sort(rumours);
         RumourType rumourChoice = freeColClient.getGUI().getChoice(true, null,
             "Select Lost City Rumour", null, "cancel", rumours);
         tile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
