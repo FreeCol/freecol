@@ -1922,7 +1922,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // just to get the FF into the client.  Use this hack until
         // the client gets proper containers.
         cs.addFather(this, father);
-
         cs.addMessage(See.only(this),
             new ModelMessage(ModelMessage.MessageType.SONS_OF_LIBERTY,
                              "model.player.foundingFatherJoinedCongress",
@@ -2027,10 +2026,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 visibilityChange = true;//-vis(this), can now see other colonies
                 for (Tile t : game.getMap().getAllTiles()) {
                     Colony colony = t.getColony();
+                    Set<Tile> tiles = new HashSet<>();
                     if (colony != null && !this.owns(colony)) {
-                        cs.add(See.only(this), exploreForSettlement(colony));
-                        cs.add(See.only(this), colony.getOwnedTiles());
+                        tiles.addAll(exploreForSettlement(colony));
                     }
+                    cs.add(See.only(this), tiles);
                 }
 
             } else if ("model.event.newRecruits".equals(eventId)

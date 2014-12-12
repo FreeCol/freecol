@@ -1849,6 +1849,14 @@ public final class Specification {
             }
         }
 
+        // Coronado gained an ability
+        FoundingFather coronado
+            = getFoundingFather("model.foundingFather.franciscoDeCoronado");
+        if (!coronado.hasAbility(Ability.SEE_ALL_COLONIES)) {
+            coronado.addAbility(new Ability(Ability.SEE_ALL_COLONIES,
+                                            coronado, true));
+        }
+
         // Require the scopes added to founding fathers in git.8971674
         fatherGoodsFixMap.clear();
         fatherGoodsFixMap.put("model.foundingFather.thomasJefferson",

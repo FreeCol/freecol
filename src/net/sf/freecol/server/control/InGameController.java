@@ -2822,8 +2822,7 @@ public final class InGameController extends Controller {
             // Coronado
             for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
                 if (!sp.hasAbility(Ability.SEE_ALL_COLONIES)) continue;
-                cs.add(See.only(serverPlayer),
-                       sp.exploreForSettlement(settlement));//-vis(sp)
+                cs.add(See.only(sp), sp.exploreForSettlement(settlement));//-vis(sp)
                 sp.invalidateCanSeeTiles();//+vis(sp)
                 cs.addMessage(See.only(sp),
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
