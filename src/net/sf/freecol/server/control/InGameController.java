@@ -376,7 +376,7 @@ public final class InGameController extends Controller {
 
         // Inherit rebel player knowledge of the seas, coasts, claimed
         // land but not full detailed scouting knowledge.
-        List<Tile> explore = new ArrayList<>();
+        Set<Tile> explore = new HashSet<>();
         for (Tile t : getGame().getMap().getAllTiles()) {
             if (!t.isExploredBy(serverPlayer)) continue;
             if (!t.isLand()
@@ -2197,7 +2197,7 @@ public final class InGameController extends Controller {
 
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
-            List<Tile> tiles = new ArrayList<>();
+            Set<Tile> tiles = new HashSet<>();
             for (Tile t : tile.getSurroundingTiles(1, radius)) {
                 if (!serverPlayer.canSee(t) && (t.isLand() || t.isShore())) {
                     tiles.add(t);

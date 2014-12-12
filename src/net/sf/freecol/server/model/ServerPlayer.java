@@ -21,9 +21,11 @@ package net.sf.freecol.server.model;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -855,13 +857,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return A list of newly explored <code>Tile</code>s.
      * @see #hasExplored
      */
-    public List<Tile> exploreTiles(List<Tile> tiles) {
-        List<Tile> result = new ArrayList<>();
-        List<Tile> done = new ArrayList<>();
+    public Set<Tile> exploreTiles(Collection<? extends Tile> tiles) {
+        Set<Tile> result = new HashSet<>();
         for (Tile t : tiles) {
-            if (done.contains(t)) continue; // Ignore duplicates
             if (exploreTile(t)) result.add(t);
-            done.add(t);
         }
         return result;
     }
@@ -874,8 +873,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *
      * @return A list of newly explored <code>Tile</code>s.
      */
-    public List<Tile> exploreForSettlement(Settlement settlement) {
-        List<Tile> tiles = new ArrayList<>(settlement.getOwnedTiles());
+    public Set<Tile> exploreForSettlement(Settlement settlement) {
+        Set<Tile> tiles = new HashSet<>(settlement.getOwnedTiles());
         tiles.addAll(settlement.getTile().getSurroundingTiles(1,
                      settlement.getLineOfSight()));
         return exploreTiles(tiles);
@@ -889,10 +888,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return A list of newly explored <code>Tile</code>s.
      * @see #hasExplored
      */
-    public List<Tile> exploreForUnit(Unit unit) {
+    public Set<Tile> exploreForUnit(Unit unit) {
         return (getGame() == null || getGame().getMap() == null || unit == null
             || !(unit.getLocation() instanceof Tile)) 
-            ? Collections.<Tile>emptyList()
+            ? Collections.<Tile>emptySet()
             : exploreTiles(unit.getTile().getSurroundingTiles(0,
                     unit.getLineOfSight()));
     }
@@ -903,8 +902,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param reveal If true, reveal the map, if false, hide it.
      * @return A list of tiles whose visibility changed.
      */
-    public List<Tile> exploreMap(boolean reveal) {
-        List<Tile> result = new ArrayList<>();
+    public Set<Tile> exploreMap(boolean reveal) {
+        Set<Tile> result = new HashSet<>();
         for (Tile tile : getGame().getMap().getAllTiles()) {
             if (hasExplored(tile) != reveal) {
                 tile.setExplored(this, reveal);//-vis(this)
@@ -1356,7 +1355,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         unit.setLocationNoUpdate(null);//-vis: safe, off map
                         unit.disposeList();//-vis: safe, never sighted
                     }
-                    List<Tile> tiles = exploreForUnit(navalUnits.get(0));
+                    Set<Tile> tiles = exploreForUnit(navalUnits.get(0));
                     if (!tiles.contains(entry)) tiles.add(entry);
                     invalidateCanSeeTiles();//+vis(this)
                     cs.add(See.perhaps(), tiles);
@@ -2818,7 +2817,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // tiles, and process possible increase in line of sight.  Do
         // not include the colony tile, which is updated in
         // csCombat().
-        List<Tile> explored = attackerPlayer.exploreForSettlement(colony);
+        Set<Tile> explored = attackerPlayer.exploreForSettlement(colony);
         Set<Tile> tiles = colony.getOwnedTiles();
         for (Tile t : tiles) {
             t.cacheUnseen(attackerPlayer);//+til
@@ -3901,7 +3900,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param newTiles A list of <code>Tile</code>s to update.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csSeeNewTiles(List<Tile> newTiles, ChangeSet cs) {
+    public void csSeeNewTiles(Collection<? extends Tile> newTiles,
+                              ChangeSet cs) {
         exploreTiles(newTiles);
         cs.add(See.only(this), newTiles);
     }
