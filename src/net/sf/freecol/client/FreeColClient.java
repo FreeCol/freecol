@@ -147,16 +147,16 @@ public final class FreeColClient {
      *     a new game immediately.
      */
     public FreeColClient(final File savedGame,
-                         Dimension size,
+                         final Dimension size,
                          final boolean sound,
                          final String splashFilename,
                          final boolean showOpeningVideo,
                          final String fontName,
                          final String userMsg,
                          final Specification spec) {
-        this.mapEditor = false;
-        this.headless = "true".equals(System.getProperty("java.awt.headless",
-                                                        "false"));
+        mapEditor = false;
+        headless = "true".equals(System.getProperty("java.awt.headless",
+                                                    "false"));
         if (headless) {
             if (!FreeColDebugger.isInDebugMode()
                 || FreeColDebugger.getDebugRunTurns() <= 0) {
@@ -186,20 +186,24 @@ public final class FreeColClient {
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
         // Once the basic resources are in place the GUI can be started.
-        final GraphicsDevice gd = GUI.getGoodGraphicsDevice();
-        this.gui = new GUI(this);
-        this.serverAPI = new UserServerAPI(gui);
-        if (!headless) gui.displaySplashScreen(splashFilename, gd);
+        gui = new GUI(this);
+        serverAPI = new UserServerAPI(gui);
+        GraphicsDevice gd = null;
+        if (!headless) {
+            gd = GUI.getGoodGraphicsDevice();
+            gui.displaySplashScreen(splashFilename, gd);
+        }
 
         // Control.  Controllers expect GUI to be available.
-        this.connectController = new ConnectController(this);
-        this.preGameController = new PreGameController(this);
-        this.preGameInputHandler = new PreGameInputHandler(this);
-        this.inGameController = new InGameController(this);
-        this.inGameInputHandler = new InGameInputHandler(this);
-        this.mapEditorController = new MapEditorController(this);
-        this.worker = new Worker();
-        this.worker.start();
+        connectController = new ConnectController(this);
+        preGameController = new PreGameController(this);
+        preGameInputHandler = new PreGameInputHandler(this);
+        inGameController = new InGameController(this);
+        inGameInputHandler = new InGameInputHandler(this);
+        mapEditorController = new MapEditorController(this);
+
+        worker = new Worker();
+        worker.start();
 
         // Load resources.
         //   - base resources
@@ -220,7 +224,7 @@ public final class FreeColClient {
         } catch (IOException e) {
             fatal(Messages.message("client.classic") + "\n" + e.getMessage());
         }
-        this.actionManager = new ActionManager(this);
+        actionManager = new ActionManager(this);
         actionManager.initializeActions(inGameController, connectController);
 
         // Load the client options, which handle reloading the
@@ -253,20 +257,8 @@ public final class FreeColClient {
             gui.hideSplashScreen();
         }
 
-        // Determine the window size.
-        if (size == null && !GUI.checkFullScreen(gd)) {
-            logger.warning("Full screen not supported.");
-            System.err.println(Messages.message("client.fullScreen"));
-            size = new Dimension(-1, -1);
-        }
-        gui.setWindowed(size != null);
-        final Dimension windowSize = (headless || gd==null) ? null
-            : (size == null) ? GUI.determineFullScreenSize(gd)
-            : size;
-        logger.info("Desired window size is " + windowSize);
-
         // Start the GUI (headless-safe)
-        gui.startGUI(gd, windowSize, sound);
+        gui.startGUI(gd, size, sound);
 
         // Now the GUI is going, either:
         //   - load the saved game if one was supplied

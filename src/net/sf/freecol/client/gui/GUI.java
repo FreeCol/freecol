@@ -665,7 +665,7 @@ public class GUI {
      * @param desiredWindowSize The desired size of the GUI window.
      * @param sound Enable sound if true.
      */
-    public void startGUI(GraphicsDevice gd, Dimension desiredWindowSize,
+    public void startGUI(GraphicsDevice gd, final Dimension desiredWindowSize,
                          boolean sound) {
         final ClientOptions opts = freeColClient.getClientOptions();
 
@@ -727,16 +727,31 @@ public class GUI {
                 }
             });
 
-        final Dimension innerWindowSize = (desiredWindowSize != null
-            && (desiredWindowSize.width <= 0 || desiredWindowSize.height <= 0))
-            ? determineWindowSize(gd)
-            : desiredWindowSize;
-        logger.info("Window size is " + innerWindowSize);
-        this.mapViewer = new MapViewer(freeColClient, innerWindowSize,
-                                       imageLibrary);
-        this.canvas = new Canvas(freeColClient, innerWindowSize, mapViewer);
-        this.colonyTileGUI = new MapViewer(freeColClient, innerWindowSize,
-                                           imageLibrary);
+        // Determine the window size.
+        Dimension windowSize;
+        if (desiredWindowSize == null) {
+            if(gd.isFullScreenSupported()) {
+                setWindowed(false);
+                windowSize = determineFullScreenSize(gd);
+                logger.info("Full screen window size is " + windowSize);
+            } else {
+                setWindowed(true);
+                windowSize = new Dimension(-1, -1);
+                logger.warning("Full screen not supported.");
+                System.err.println(Messages.message("client.fullScreen"));
+            }
+        } else {
+            setWindowed(true);
+            windowSize = desiredWindowSize;
+            logger.info("Desired window size is " + windowSize);
+        }
+        if(isWindowed() && (windowSize.width <= 0 || windowSize.height <= 0)) {
+            windowSize = determineWindowSize(gd);
+            logger.info("Inner window size is " + windowSize);
+        }
+        this.mapViewer = new MapViewer(freeColClient, windowSize, imageLibrary);
+        this.canvas = new Canvas(freeColClient, windowSize, mapViewer);
+        this.colonyTileGUI = new MapViewer(freeColClient, windowSize, imageLibrary);
 
         changeWindowedMode(isWindowed());
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
@@ -794,20 +809,11 @@ public class GUI {
     // Static utilities.
 
     /**
-     * Determine whether full screen mode can be used.
-     *
-     * @return True if full screen is available.
-     */
-    public static boolean checkFullScreen(GraphicsDevice gd) {
-        return gd != null && gd.isFullScreenSupported();
-    }
-
-    /**
      * Estimate size of client area when using the full screen.
      *
      * @return A suitable window size.
      */
-    public static Dimension determineFullScreenSize(GraphicsDevice gd) {
+    private static Dimension determineFullScreenSize(GraphicsDevice gd) {
         Rectangle bounds = gd.getDefaultConfiguration().getBounds();
         return new Dimension(bounds.width - bounds.x,
             bounds.height - bounds.y);
