@@ -155,6 +155,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
         bottom.setOpaque(false);
         bottom.setName("OptionPane.buttonArea");
         addButtonComponents(bottom, buttons, getInitialValueIndex());
+        bottom.setSize(bottom.getPreferredSize());
         return bottom;
     }
 

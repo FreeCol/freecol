@@ -980,7 +980,7 @@ public class GUI {
         textArea.setWrapStyleWord(true);
         textArea.setFocusable(false);
         textArea.setFont(DEFAULT_FONT);
-        //textArea.setSize(textArea.getPreferredSize());// necessary because of resizing
+        textArea.setSize(textArea.getPreferredSize());
         return textArea;
     }
 
@@ -1674,7 +1674,8 @@ public class GUI {
             sb.append(Messages.message(t)).append("\n\n");
         }
 
-        List<ChoiceItem<ScoutIndianSettlementAction>> choices = new ArrayList<>();
+        List<ChoiceItem<ScoutIndianSettlementAction>> choices
+            = new ArrayList<>();
         choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
                 Messages.message("scoutSettlement.speak"),
                 ScoutIndianSettlementAction.INDIAN_SETTLEMENT_SPEAK));
@@ -1685,7 +1686,8 @@ public class GUI {
                 Messages.message("scoutSettlement.attack"),
                 ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
 
-        return getChoice(true, settlement.getTile(), getDefaultTextArea(sb.toString()),
+        return getChoice(true, settlement.getTile(),
+                         getDefaultTextArea(sb.toString()),
                          settlement, "cancel", choices);
     }
 
