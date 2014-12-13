@@ -1107,7 +1107,7 @@ public final class FreeCol {
      *
      * @param arg The window size specification.
      */
-    public static void setWindowSize(String arg) {
+    private static void setWindowSize(String arg) {
         String[] xy;
         if (arg != null
             && (xy = arg.split("[^0-9]")) != null
