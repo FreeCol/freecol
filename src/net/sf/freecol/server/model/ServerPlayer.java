@@ -1299,8 +1299,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         if (isEuropean()) { // Update liberty and immigration
-            if (checkEmigrate()
-                && !hasAbility(Ability.SELECT_RECRUIT)) {
+            if (checkEmigrate() && !hasAbility(Ability.SELECT_RECRUIT)) {
                 // Auto-emigrate if selection not allowed.
                 csEmigrate(MigrationType.getUnspecificSlot(),
                            MigrationType.NORMAL, random, cs);

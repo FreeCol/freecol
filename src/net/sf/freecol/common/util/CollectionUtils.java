@@ -156,6 +156,7 @@ public class CollectionUtils {
         boolean first = true;
         for (T t : collection) {
             if (first) datum = t; else if (t != datum) return false;
+            first = false;
         }
         return true;
     }
