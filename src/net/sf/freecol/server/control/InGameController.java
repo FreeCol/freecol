@@ -1743,14 +1743,15 @@ public final class InGameController extends Controller {
      * Set region name.
      *
      * @param serverPlayer The <code>ServerPlayer</code> discovering.
+     * @param unit The <code>Unit</code> that is discovering.
      * @param region The <code>Region</code> to discover.
      * @param name The new region name.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element setNewRegionName(ServerPlayer serverPlayer,
+    public Element setNewRegionName(ServerPlayer serverPlayer, Unit unit,
                                     Region region, String name) {
         ChangeSet cs = new ChangeSet();
-        cs.addRegion(serverPlayer, region, name);
+        cs.addRegion(serverPlayer, unit, region, name);
 
         // Others do find out about region name changes.
         sendToOthers(serverPlayer, cs);

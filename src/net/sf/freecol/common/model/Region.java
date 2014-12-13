@@ -92,6 +92,12 @@ public class Region extends FreeColGameObject implements Nameable {
     /** Which Player the Region was discovered by. */
     protected Player discoveredBy;
 
+    /**
+     * Identifier for the unit the region was discovered by.   Using
+     * an identifier as units may subsequently die.
+     */
+    protected String discoverer;
+
     /** Whether the Region is already discovered when the game starts. */
     protected boolean prediscovered = false;
 
@@ -319,6 +325,24 @@ public class Region extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get the identifier for the unit that discovered the region.
+     *
+     * @return The unit identifier, or null if none yet.
+     */
+    public String getDiscoverer() {
+        return this.discoverer;
+    }
+
+    /**
+     * Set the identifier for the unit the discovered the region.
+     *
+     * @param discoverer The unit identifier to set.
+     */
+    public void setDiscoverer(String discoverer) {
+        this.discoverer = discoverer;
+    }
+
+    /**
      * Gets a discoverable Region or null.  If this region is
      * discoverable, it is returned.  If not, a discoverable parent is
      * returned, unless there is none.  This is intended for
@@ -399,8 +423,9 @@ public class Region extends FreeColGameObject implements Nameable {
      * @param newName The name of the region.
      * @return A <code>HistoryEvent</code> documenting the discovery.
      */
-    public HistoryEvent discover(Player player, Turn turn, String newName) {
+    public HistoryEvent discover(Unit unit, Turn turn, String newName) {
         if (!isPacific()) this.name = newName;
+        Player player = unit.getOwner();
         this.discoveredBy = player;
         this.discoveredIn = turn;
         this.discoverable = false;

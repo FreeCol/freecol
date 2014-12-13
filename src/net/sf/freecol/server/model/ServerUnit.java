@@ -1097,7 +1097,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         // Check for region discovery
         Region region = newTile.getDiscoverableRegion();
         if (serverPlayer.isEuropean() && region != null
-            && region.getName() == null) {
+            && region.getDiscoverer() == null) {
             String defaultName = (region.isPacific())
                 ? Messages.message("model.region.pacific")
                 : Messages.getDefaultRegionName(serverPlayer,
@@ -1105,10 +1105,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new NewRegionNameMessage(region, newTile, this,
                                          defaultName));
-            // Set a placeholder name on the server for now, so that
-            // we do not ask again if another unit moves in before we
-            // asynchronously answer the new region name message.
-            region.setName(defaultName);
+            region.setDiscoverer(getId());
         }
     }
 

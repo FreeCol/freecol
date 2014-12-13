@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -150,10 +151,6 @@ public class NewRegionNameMessage extends DOMMessage {
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        if (unit.getTile() != tile) {
-            return DOMMessage.clientError("Discovering unit " + unitId
-                + " is not at tile: " + tileId);
-        }
 
         Region region = tile.getDiscoverableRegion();
         if (region == null) {
@@ -164,10 +161,16 @@ public class NewRegionNameMessage extends DOMMessage {
             return DOMMessage.clientError("Region mismatch, " + region.getId()
                 + " != " + regionId);
         }
-
+        // Discoverer is set when unit moves in.
+        if (!Utils.equals(region.getDiscoverer(), unit.getId())) {
+            return DOMMessage.clientError("Discoverer mismatch, "
+                + region.getDiscoverer() + " expected, "
+                + unit.getId() + " provided.");
+        }
+        
         // Do the discovery
         return server.getInGameController()
-            .setNewRegionName(serverPlayer, region, newRegionName);
+            .setNewRegionName(serverPlayer, unit, region, newRegionName);
     }
 
     /**
