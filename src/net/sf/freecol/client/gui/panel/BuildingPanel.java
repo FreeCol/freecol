@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
@@ -34,6 +33,7 @@ import javax.swing.JToolTip;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.Ability;
@@ -42,7 +42,6 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -246,7 +245,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             image = lib.getStringImage(freeColClient.getGUI().getCanvas()
                 .getGraphics(),
                 Integer.toString(number), getForeground(),
-                ResourceManager.getFont("SimpleFont", Font.BOLD, 12f));
+                GUI.TINY_SIMPLE_FONT);
         }
 
         /**
@@ -255,7 +254,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
         @Override
         public void paintComponent(Graphics g) {
             getIcon().paintIcon(null, g, 0, 0);
-            g.drawImage(image, 
+            g.drawImage(image,
                 (getIcon().getIconWidth() - image.getWidth(null))/2,
                 (getIcon().getIconHeight() - image.getHeight(null))/2, null);
         }

@@ -30,11 +30,11 @@ import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -144,7 +144,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         maxIcons = options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         displayNumber = options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
 
-        setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 12f));
+        setFont(GUI.TINY_SIMPLE_FONT);
         if (goods.getAmount() < 0) {
             setForeground(Color.RED);
         } else {
@@ -475,7 +475,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
                 if (maximumProduction > getAmount() && getAmount() > 0) {
                     number = number + "/" + String.valueOf(maximumProduction);
                 }
-                Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
+                Font font = GUI.TINY_SIMPLE_FONT;
                 stringImage = getGUI().getImageLibrary().getStringImage(getGUI().getCanvas().getGraphics(),
                                                                      number, getForeground(), font);
             }

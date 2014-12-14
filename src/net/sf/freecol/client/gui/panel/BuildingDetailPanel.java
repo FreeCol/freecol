@@ -58,10 +58,6 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingType> {
 
-    private static final Font arrowFont
-        = ResourceManager.getFont("SimpleFont", Font.BOLD, 24f);
-
-
     /**
      * Creates a new instance of this ColopediaDetailPanel.
      *
@@ -213,7 +209,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
                 if (!inputs.isEmpty()) {
                     panel.add(getGoodsButton(inputs.get(0)), "span, split 3");
                     JLabel arrow = new JLabel("\u2192");
-                    arrow.setFont(arrowFont);
+                    arrow.setFont(GUI.SMALL_SIMPLE_FONT);
                     panel.add(arrow);
                 }
                 if (!outputs.isEmpty()) {

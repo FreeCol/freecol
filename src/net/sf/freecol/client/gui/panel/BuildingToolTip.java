@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Font;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +29,7 @@ import javax.swing.JToolTip;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -51,7 +51,7 @@ public class BuildingToolTip extends JToolTip {
 
     private static final JLabel arrow = new JLabel("\u2192");
     static {
-        arrow.setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 24f));
+        arrow.setFont(GUI.SMALL_SIMPLE_FONT);
     }
 
 
@@ -81,7 +81,7 @@ public class BuildingToolTip extends JToolTip {
 
         JLabel buildingName
             = new JLabel(Messages.message(building.getNameKey()));
-        buildingName.setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 16f));
+        buildingName.setFont(GUI.SMALLER_SIMPLE_FONT);
         add(buildingName, "span");
 
         ProductionInfo info = building.getProductionInfo();
@@ -128,7 +128,7 @@ public class BuildingToolTip extends JToolTip {
             } else if (building.canTeach() && unit.getStudent() != null) {
                 JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/"
                                            + unit.getNeededTurnsOfTraining());
-                UnitLabel sLabel = new UnitLabel(freeColClient, 
+                UnitLabel sLabel = new UnitLabel(freeColClient,
                                                  unit.getStudent(), true);
                 sLabel.setIgnoreLocation(true);
                 add(unitLabel);

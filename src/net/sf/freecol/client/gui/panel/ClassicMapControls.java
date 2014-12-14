@@ -23,12 +23,12 @@ import java.awt.Font;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import net.miginfocom.swing.MigLayout;
+
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.action.ActionManager;
-import net.sf.freecol.common.resources.ResourceManager;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -56,7 +56,7 @@ public final class ClassicMapControls extends MapControls {
         super(freeColClient, false);
 
         am = freeColClient.getActionManager();
-        arrowFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 24f);
+        arrowFont = GUI.SMALL_SIMPLE_FONT;
 
         panel = new MigPanel();
         panel.setLayout(new MigLayout("wrap 3"));

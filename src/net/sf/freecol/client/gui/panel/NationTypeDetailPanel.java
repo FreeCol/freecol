@@ -116,7 +116,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
      */
     private void buildEuropeanNationTypeDetail(EuropeanNationType nationType, JPanel panel) {
 
-        Font boldFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 16f);
+        Font boldFont = GUI.SMALLER_SIMPLE_FONT;
 
         Set<Ability> abilities = nationType.getAbilities();
         Set<Modifier> modifiers = nationType.getModifiers();
