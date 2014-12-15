@@ -43,14 +43,21 @@ public final class FullScreenFrame extends FreeColFrame {
     public FullScreenFrame(final FreeColClient freeColClient,
                            GraphicsDevice gd) {
         super(freeColClient, gd);
-		
+
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setUndecorated(true);
         gd.setFullScreenWindow(this);
     }
 
 
-    // Inherit FreeColFrame.setCanvas
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setCanvas(Canvas canvas) {
+        addWindowListener(new FullScreenFrameListener(freeColClient));
+        super.setCanvas(canvas);
+    }
 
     /**
      * {@inheritDoc}
