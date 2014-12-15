@@ -304,10 +304,7 @@ public class LabourData {
         }
 
         public String getUnitName() {
-            if (isSummary()) {
-                return null;
-            }
-            return Messages.message(unitType.getNameKey());
+            return (isSummary()) ? null : Messages.getName(unitType);
         }
 
         public boolean hasDetails() {

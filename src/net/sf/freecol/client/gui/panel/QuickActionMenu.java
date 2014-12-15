@@ -418,7 +418,7 @@ public final class QuickActionMenu extends JPopupMenu {
                         menuItem.setActionCommand(UnitAction.ASSIGN + "/" + teacher.getId());
                         menuItem.addActionListener(unitLabel);
                     } else {
-                        String teacherName = Messages.message(teacher.getType().getNameKey());
+                        String teacherName = Messages.getName(teacher.getType());
                         menuItem = new JMenuItem(Messages.message(StringTemplate
                                 .template("menu.unit.apprentice")
                                     .addName("%unit%", teacherName))
@@ -434,7 +434,7 @@ public final class QuickActionMenu extends JPopupMenu {
         }
         if (unit.getStudent() != null) {
             Unit student = unit.getStudent();
-            String studentName = Messages.message(student.getType().getNameKey());
+            String studentName = Messages.getName(student.getType());
             JMenuItem menuItem = new JMenuItem(Messages.message(StringTemplate
                     .template("menuBar.teacher")
                         .addName("%unit%", studentName))
@@ -717,8 +717,7 @@ public final class QuickActionMenu extends JPopupMenu {
      */
     private void addTileItem(final Tile tile) {
         if (tile != null) {
-            JMenuItem menuItem
-                = new JMenuItem(Messages.message(tile.getNameKey()));
+            JMenuItem menuItem = new JMenuItem(Messages.getName(tile));
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     gui.showTilePanel(tile);
@@ -762,7 +761,7 @@ public final class QuickActionMenu extends JPopupMenu {
         final ImageLibrary imageLibrary = gui.getImageLibrary();
 
         this.setLabel(Messages.message("cargo"));
-        JMenuItem name = new JMenuItem(Messages.message(goods.getNameKey())
+        JMenuItem name = new JMenuItem(Messages.getName(goods)
             + " (" + Messages.message("menuBar.colopedia") + ")",
             imageLibrary.getScaledGoodsImageIcon(goods.getType(), 0.66f));
         name.addActionListener(new ActionListener() {
@@ -848,7 +847,7 @@ public final class QuickActionMenu extends JPopupMenu {
         final ImageLibrary imageLibrary = gui.getImageLibrary();
 
         this.setLabel(Messages.message("cargo"));
-        JMenuItem name = new JMenuItem(Messages.message(ag.getNameKey())
+        JMenuItem name = new JMenuItem(Messages.getName(ag)
             + " (" + Messages.message("menuBar.colopedia") + ")",
             imageLibrary.getScaledGoodsImageIcon(ag.getType(), 0.66f));
         name.addActionListener(new ActionListener() {

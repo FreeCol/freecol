@@ -80,7 +80,7 @@ public class RebelToolTip extends JToolTip {
             .getModifiers(Modifier.LIBERTY);
         int libertyProduction = 0;
         for (GoodsType goodsType : spec.getLibertyGoodsTypeList()) {
-            add(new JLabel(Messages.message(goodsType.getNameKey())));
+            add(new JLabel(Messages.getName(goodsType)));
             int production = colony.getNetProductionOf(goodsType);
             libertyProduction += production;
             add(new ProductionLabel(freeColClient, goodsType, production),

@@ -77,7 +77,7 @@ public final class GoodsLabel extends AbstractGoodsLabel
             || (location instanceof Colony
                 && player.getGame().getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
                 && ((Colony) location).hasAbility(Ability.EXPORT))) {
-            setToolTipText(Messages.message(goods.getNameKey()));
+            setToolTipText(Messages.getName(goods));
         } else {
             setToolTipText(Messages.message(goods.getLabel(false)));
             setIcon(getDisabledIcon());

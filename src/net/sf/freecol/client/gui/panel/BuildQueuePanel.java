@@ -73,8 +73,10 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Limit;
+import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
@@ -448,7 +450,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             ((ImageIcon)imageLabel.getIcon()).setImage(ResourceManager
                 .getImage(value.getId() + ".image", buildingDimension));
 
-            nameLabel.setText(Messages.message(value.getNameKey()));
+            nameLabel.setText(Messages.getName(value));
             panel.setToolTipText(lockReasons.get(value));
             panel.add(imageLabel, "span 1 2");
             if (lockReasons.get(value) == null) {
@@ -715,12 +717,15 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                         unitType, null))) {
                 boolean builderFound = false;
                 for (Ability ability : spec.getAbilities(Ability.BUILD)) {
+                    FreeColObject source = ability.getSource();
                     if (ability.appliesTo(unitType)
                         && ability.getValue()
-                        && ability.getSource() != null
-                        && !unbuildableTypes.contains(ability.getSource())) {
+                        && source != null
+                        && !unbuildableTypes.contains(source)) {
                         builderFound = true;
-                        lockReason.add(Messages.getName(ability.getSource()));
+                        if (source instanceof Named) {
+                            lockReason.add(Messages.getName((Named)source));
+                        }
                         break;
                     }
                 }

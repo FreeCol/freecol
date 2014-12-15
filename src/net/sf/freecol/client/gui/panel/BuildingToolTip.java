@@ -79,8 +79,7 @@ public class BuildingToolTip extends JToolTip {
             + (2 * workplaces + 1), columns, "[][][align bottom]");
         setLayout(layout);
 
-        JLabel buildingName
-            = new JLabel(Messages.message(building.getNameKey()));
+        JLabel buildingName = new JLabel(Messages.getName(building));
         buildingName.setFont(GUI.SMALLER_SIMPLE_FONT);
         add(buildingName, "span");
 

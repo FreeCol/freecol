@@ -72,9 +72,7 @@ public interface Option<T> extends Cloneable, ObjectWithId {
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException;
 
     /**
-     * Gets a textual representation of this object.
-     *
-     * @return The name of this <code>Option</code>.
+     * {@inheritDoc}
      */
     public String toString();
 }

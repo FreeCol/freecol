@@ -100,7 +100,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
                     if (scope.getType() != null) {
                         FreeColGameObjectType fcgot = getSpecification()
                             .findType(scope.getType());
-                        scopeStrings.add(Messages.message(fcgot.getNameKey()));
+                        scopeStrings.add(Messages.getName(fcgot));
                     }
                 }
                 if (!scopeStrings.isEmpty()) {

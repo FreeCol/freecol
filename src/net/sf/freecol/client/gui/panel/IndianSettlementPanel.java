@@ -88,7 +88,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
             if (skillType == null) {
                 add(localizedLabel("indianSettlement.skillNone"));
             } else {
-                add(new JLabel(Messages.message(skillType.getNameKey()),
+                add(new JLabel(Messages.getName(skillType),
                         getGUI().getImageIcon(skillType, true), JLabel.CENTER));
             }
         } else {
@@ -120,7 +120,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 add(localizedLabel("indianSettlement.wantedGoodsNone"));
             } else {
                 sale = player.getLastSaleString(settlement, wantedGoods[0]);
-                add(new JLabel(Messages.message(wantedGoods[0].getNameKey())
+                add(new JLabel(Messages.getName(wantedGoods[0])
                         + ((sale == null) ? "" : " " + sale),
                         getGUI().getImageIcon(wantedGoods[0], false),
                         JLabel.CENTER));
@@ -136,7 +136,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 add(localizedLabel("indianSettlement.wantedGoodsNone"));
             } else {
                 sale = player.getLastSaleString(settlement, wantedGoods[1]);
-                add(new JLabel(Messages.message(wantedGoods[1].getNameKey())
+                add(new JLabel(Messages.getName(wantedGoods[1])
                         + ((sale == null) ? "" : " " + sale),
                         getGUI().getImageIcon(wantedGoods[1], false),
                         JLabel.CENTER),
@@ -144,7 +144,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 for (int i = 2; i < wantedGoods.length; i++) {
                     if (wantedGoods[i] != null) {
                         sale = player.getLastSaleString(settlement,wantedGoods[i]);
-                        add(new JLabel(Messages.message(wantedGoods[i].getNameKey())
+                        add(new JLabel(Messages.getName(wantedGoods[i])
                                 + ((sale == null) ? "" : " " + sale),
                                 getGUI().getImageIcon(wantedGoods[i], false),
                                 JLabel.CENTER));

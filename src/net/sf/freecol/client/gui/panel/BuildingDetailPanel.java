@@ -90,7 +90,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
         Map<BuildingType, DefaultMutableTreeNode> buildingHash = new HashMap<>();
         for (BuildingType buildingType : getSpecification().getBuildingTypeList()) {
             if (buildingType.getUpgradesFrom() == null) {
-                String name = Messages.message(buildingType.getNameKey());
+                String name = Messages.getName(buildingType);
                 DefaultMutableTreeNode item =
                     new DefaultMutableTreeNode(new ColopediaTreeItem(this, buildingType.getId(),
                                                                      name, buildingIcon));
@@ -106,7 +106,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
                 BuildingType buildingType = iterator.next();
                 DefaultMutableTreeNode node = buildingHash.get(buildingType.getUpgradesFrom());
                 if (node != null) {
-                    String name = Messages.message(buildingType.getNameKey());
+                    String name = Messages.getName(buildingType);
                     DefaultMutableTreeNode item =
                         new DefaultMutableTreeNode(new ColopediaTreeItem(this, buildingType.getId(),
                                                                          name, buildingIcon));

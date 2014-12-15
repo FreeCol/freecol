@@ -2144,7 +2144,7 @@ public final class MapViewer {
                         BuildableType buildable = colony.getCurrentlyBuilding();
                         if (buildable != null) {
                             specs = new TextSpecification[2];
-                            String t = Messages.message(buildable.getNameKey())
+                            String t = Messages.getName(buildable)
                                 + " " + Messages.getTurnsText(colony.getTurnsToComplete(buildable));
                             specs[1] = new TextSpecification(t, productionFont);
                         }
@@ -2308,7 +2308,7 @@ public final class MapViewer {
         switch (freeColClient.getClientOptions().getInteger(ClientOptions.DISPLAY_TILE_TEXT)) {
         case ClientOptions.DISPLAY_TILE_TEXT_NAMES:
             if (tile.getNameKey() != null) {
-                text = Messages.message(tile.getNameKey());
+                text = Messages.getName(tile);
             }
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_OWNERS:

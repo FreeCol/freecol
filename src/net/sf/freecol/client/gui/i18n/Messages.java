@@ -44,6 +44,7 @@ import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Role;
@@ -320,9 +321,15 @@ public class Messages {
         return message(nameKey(id));
     }
 
+    public static String getName(Named named) {
+        return message(named.getNameKey());
+    }
+
+    /*
     public static String getName(ObjectWithId object) {
         return getName(object.getId());
     }
+    */
 
 
     public static String descriptionKey(String id) {

@@ -134,7 +134,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
 
             setLayout(new MigLayout("wrap 2", "", ""));
             setOpaque(false);
-            String goodsName = Messages.message(goodsType.getNameKey());
+            String goodsName = Messages.getName(goodsType);
 
             setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(goodsName),

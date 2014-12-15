@@ -88,10 +88,10 @@ public class ModifierFormat {
             if ("".equals(result)) result = null;
         }
         if (result == null && source instanceof Named) {
-            result = Messages.message(((Named)source).getNameKey());
+            result = Messages.getName((Named)source);
             if ("".equals(result)) result = null;
         }
-        if (result == null) result = Messages.getName(source);
+        if (result == null) result = Messages.getName(source.getId());
         return result;
     }
 
@@ -102,8 +102,7 @@ public class ModifierFormat {
         if (fcgot != null) {
             for (Scope scope : modifier.getScopes()) {
                 if (scope.appliesTo(fcgot)) {
-                    sourceName += " (" + Messages.message(fcgot.getNameKey())
-                        + ")";
+                    sourceName += " (" + Messages.getName(fcgot) + ")";
                 }
             }
         }

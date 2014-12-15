@@ -115,7 +115,7 @@ public class DebugUtils {
 
         List<ChoiceItem<BuildingType>> buildings = new ArrayList<>();
         for (BuildingType b : game.getSpecification().getBuildingTypeList()) {
-            String msg = Messages.message(b.getNameKey());
+            String msg = Messages.getName(b);
             buildings.add(new ChoiceItem<BuildingType>(msg, b));
         }
         Collections.sort(buildings);
@@ -175,7 +175,7 @@ public class DebugUtils {
         List<ChoiceItem<FoundingFather>> fathers = new ArrayList<>();
         for (FoundingFather father : sSpec.getFoundingFathers()) {
             if (!sPlayer.hasFather(father)) {
-                String msg = Messages.message(father.getNameKey());
+                String msg = Messages.getName(father);
                 fathers.add(new ChoiceItem<FoundingFather>(msg, father));
             }
         }
@@ -322,7 +322,7 @@ public class DebugUtils {
 
         List<ChoiceItem<UnitType>> uts = new ArrayList<>();
         for (UnitType t : sSpec.getUnitTypeList()) {
-            String msg = Messages.message(t.getNameKey());
+            String msg = Messages.getName(t);
             uts.add(new ChoiceItem<UnitType>(msg, t));
         }
         Collections.sort(uts);
@@ -376,7 +376,7 @@ public class DebugUtils {
         List<ChoiceItem<GoodsType>> gtl = new ArrayList<>();
         for (GoodsType t : sSpec.getGoodsTypeList()) {
             if (t.isFoodType() && t != sSpec.getPrimaryFoodType()) continue;
-            String msg = Messages.message(t.getNameKey());
+            String msg = Messages.getName(t);
             gtl.add(new ChoiceItem<GoodsType>(msg, t));
         }
         Collections.sort(gtl);
@@ -929,7 +929,7 @@ public class DebugUtils {
         List<ChoiceItem<GoodsType>> gtl = new ArrayList<>();
         for (GoodsType t : spec.getGoodsTypeList()) {
             if (t.isFoodType() && t != spec.getPrimaryFoodType()) continue;
-            String msg = Messages.message(t.getNameKey());
+            String msg = Messages.getName(t);
             gtl.add(new ChoiceItem<GoodsType>(msg, t));
         }
         Collections.sort(gtl);
@@ -1104,7 +1104,7 @@ public class DebugUtils {
         for (GoodsType type : sSpec.getGoodsTypeList()) {
             int prod = sis.getTotalProductionOf(type);
             if (prod > 0) {
-                lb.add(Messages.message(type.getNameKey()), " ", prod, "\n");
+                lb.add(Messages.getName(type), " ", prod, "\n");
             }
         }
 
@@ -1116,7 +1116,7 @@ public class DebugUtils {
             for (i = wanted.length - 1; i >= 0; i--) {
                 if (type == wanted[i]) break;
             }
-            lb.add(Messages.message(type.getNameKey()),
+            lb.add(Messages.getName(type),
                    ": ", sis.getPriceToBuy(type, 1),
                    "/", sis.getPriceToBuy(type, 100),
                    " / ", sis.getPriceToSell(type, 1),

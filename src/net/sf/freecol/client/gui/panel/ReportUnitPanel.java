@@ -106,7 +106,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         // Europe next
         Europe europe = getMyPlayer().getEurope();
         if (europe != null) {
-            handleLocation(europe, Messages.message(europe.getNameKey()), inEurope);
+            handleLocation(europe, Messages.getName(europe), inEurope);
         }
 
         // finally all other locations, sorted alphabetically

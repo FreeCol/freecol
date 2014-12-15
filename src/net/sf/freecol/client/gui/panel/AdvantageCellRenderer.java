@@ -72,11 +72,10 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
         JLabel label;
         switch (advantages) {
         case SELECTABLE:
-            return new JLabel(Messages.message((player == null)
-                    ? nationType.getNameKey()
-                    : player.getNationType().getNameKey()));
+            return new JLabel(Messages.getName((player == null) ? nationType
+                    : player.getNationType()));
         case FIXED:
-            label = new JLabel(Messages.message(nationType.getNameKey()));
+            label = new JLabel(Messages.getName(nationType));
             break;
         case NONE:
         default:

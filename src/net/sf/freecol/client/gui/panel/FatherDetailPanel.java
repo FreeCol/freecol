@@ -133,7 +133,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
     public void buildDetail(FoundingFather father, JPanel panel) {
         panel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
 
-        String name = Messages.message(father.getNameKey());
+        String name = Messages.getName(father);
         String type = Messages.message(father.getTypeKey());
         JLabel header = new JLabel(name + " (" + type + ")");
         header.setFont(GUI.SMALL_HEADER_FONT);
@@ -142,7 +142,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
         JLabel label = new JLabel(new ImageIcon(image));
 
         StringBuilder text = new StringBuilder();
-        text.append(Messages.message(father.getDescriptionKey()));
+        text.append(Messages.getDescription(father));
         text.append("\n\n[");
         text.append(Messages.message(father.getId() + ".birthAndDeath"));
         text.append("] ");

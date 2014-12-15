@@ -246,7 +246,7 @@ public final class ReportColonyPanel extends ReportPanel
                 JLabel buildingLabel =
                     new JLabel(new ImageIcon(getGUI().getImageLibrary().
                                              getBuildingImage(building, 0.66)));
-                buildingLabel.setToolTipText(Messages.message(building.getNameKey()));
+                buildingLabel.setToolTipText(Messages.getName(building));
                 buildingsPanel.add(buildingLabel);
             }
             if(buildableLabel != null && currentType.getSpecification().getBuildingTypeList().contains(currentType)) {

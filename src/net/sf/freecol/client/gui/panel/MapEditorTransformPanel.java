@@ -116,7 +116,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         List<TileType> tileList = spec.getTileTypeList();
         for (TileType type : tileList) {
             listPanel.add(buildButton(getLibrary().getCompoundTerrainImage(type, 0.5),
-                                      Messages.message(type.getNameKey()),
+                                      Messages.getName(type),
                                       new TileTypeTransform(type)));
         }
         listPanel.add(buildButton(getLibrary().getRiverImage("0101", 0.5),
@@ -301,7 +301,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 default:
                     List<ChoiceItem<ResourceType>> choices = new ArrayList<>();
                     for (ResourceType rt : resList) {
-                        String name = Messages.message(rt.getNameKey());
+                        String name = Messages.getName(rt);
                         choices.add(new ChoiceItem<ResourceType>(name, rt));
                     }
                     ResourceType choice = getGUI().getChoice(true, null, 

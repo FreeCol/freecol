@@ -601,8 +601,9 @@ public final class ColonyPanel extends PortPanel
                     .append("/").append(unit.getNeededTurnsOfTraining());
             } else if (workingOnLand != null && goodsType != null) {
                 int producing = workingOnLand.getProductionOf(unit, goodsType);
-                String nominative = Messages.message(StringTemplate.template(
-                    goodsType.getNameKey()).addAmount("%amount%", producing));
+                String nominative = Messages.message(StringTemplate
+                    .template(goodsType.getNameKey())
+                    .addAmount("%amount%", producing));
                 sb.append(unit.getDescription())
                     .append(" ").append(Messages.message("producing.name"))
                     .append(" ").append(producing)

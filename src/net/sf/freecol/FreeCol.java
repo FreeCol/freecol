@@ -835,7 +835,7 @@ public final class FreeCol {
      */
     private static Advantages selectAdvantages(String advantages) {
         for (Advantages a : Advantages.values()) {
-            String msg = Messages.getName(a);
+            String msg = Messages.getName(a.getId());
             if (msg.equals(advantages)) {
                 setAdvantages(a);
                 return a;
@@ -861,7 +861,7 @@ public final class FreeCol {
     private static String getValidAdvantages() {
         String ret = "";
         for (Advantages a : Advantages.values()) {
-            ret += "," + Messages.getName(a);
+            ret += "," + Messages.getName(a.getId());
         }
         return ret.substring(1);
     }

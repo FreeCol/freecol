@@ -407,7 +407,7 @@ public final class CompactLabourReport extends ReportPanel {
         }
         LabourData.LocationData europe = unitData.getUnitsInEurope();
         if (europe.getRowCount() > 0) {
-            JButton button = createButton(Messages.message(getMyPlayer().getEurope().getNameKey()),
+            JButton button = createButton(Messages.getName(getMyPlayer().getEurope()),
                                           new ActionListener() {
                                               public void actionPerformed(ActionEvent e) {
                                                   getGUI().showEuropePanel();

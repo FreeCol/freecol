@@ -49,7 +49,7 @@ public class AbstractGoodsLabel extends JLabel {
     public AbstractGoodsLabel(AbstractGoods goods, GUI gui) {
         super(gui.getImageLibrary().getGoodsImageIcon(goods.getType()));
         this.goods = goods;
-        setToolTipText(Messages.message(goods.getNameKey()));
+        setToolTipText(Messages.getName(goods));
         this.gui = gui;
     }
 

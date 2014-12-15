@@ -75,12 +75,12 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             recruitingPanel.add(new JLabel(none), "wrap 20");
         } else {
             FoundingFather father = player.getCurrentFather();
-            String name = Messages.message(father.getNameKey());
+            String name = Messages.getName(father);
             JButton button = GUI.getLinkButton(name, null, father.getId());
             button.addActionListener(this);
             recruitingPanel.add(button);
             JLabel currentFatherLabel = new JLabel(new ImageIcon(getLibrary().getFoundingFatherImage(father)));
-            currentFatherLabel.setToolTipText(Messages.message(father.getDescriptionKey()));
+            currentFatherLabel.setToolTipText(Messages.getDescription(father));
             recruitingPanel.add(currentFatherLabel);
             GoodsType bellsType = getSpecification().getGoodsType("model.goods.bells");
             FreeColProgressBar progressBar = new FreeColProgressBar(getGUI(), bellsType);
@@ -110,7 +110,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         }
         Map<String, Turn> electionTurns = getMyPlayer().getElectionTurns();
         for (FoundingFather father : getSpecification().getFoundingFathers()) {
-            String name = Messages.message(father.getNameKey());
+            String name = Messages.getName(father);
             JPanel panel = panels.get(father.getType());
             Image image;
             Turn turn = null;

@@ -269,7 +269,7 @@ public final class EuropePanel extends PortPanel {
      */
     public void initialize(Europe europe) {
         this.europe = europe;
-        header.setText(Messages.message(europe.getNameKey()));
+        header.setText(Messages.getName(europe));
 
         // Initialize the subpanels.
         toAmericaPanel.initialize(europe.getGame().getMap());

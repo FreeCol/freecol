@@ -151,7 +151,7 @@ public class GoodsTradeItem extends TradeItem {
         StringBuilder sb = new StringBuilder(16);
         sb.append("[").append(getId())
             .append(" ").append(goods.getAmount()).append(" ")
-            .append(Messages.message(goods.getNameKey())).append("]");
+            .append(Messages.getName(goods)).append("]");
         return sb.toString();
     }
 

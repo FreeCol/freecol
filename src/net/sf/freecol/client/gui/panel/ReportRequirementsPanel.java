@@ -255,8 +255,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
         GoodsType expertGoods = expert.getWorkType();
         GoodsType nonExpertGoods = nonExpert.getWorkType();
         String colonyName = colony.getName();
-        String expertName = Messages.message(expert.getType().getNameKey());
-        String nonExpertName = Messages.message(nonExpert.getType().getNameKey());
+        String expertName = Messages.getName(expert.getType());
+        String nonExpertName = Messages.getName(nonExpert.getType());
         String expertProductionName = Messages.message(expertGoods.getWorkingAsKey());
         String nonExpertProductionName = Messages.message(nonExpertGoods.getWorkingAsKey());
         String newMessage = Messages.message(StringTemplate.template("report.requirements.badAssignment")

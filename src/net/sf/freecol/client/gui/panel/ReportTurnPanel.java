@@ -264,7 +264,7 @@ public final class ReportTurnPanel extends ReportPanel {
                                       .addStringTemplate("%nation%", player.getNationName()));
         } else if (source instanceof Europe) {
             Europe europe = (Europe) source;
-            JButton button = new JButton(Messages.message(europe.getNameKey()));
+            JButton button = new JButton(Messages.getName(europe));
             button.addActionListener(this);
             button.setActionCommand(europe.getId());
             headline = button;
@@ -346,7 +346,7 @@ public final class ReportTurnPanel extends ReportPanel {
                     } else if ("%europe%".equals(var)
                         || ("%market%".equals(var) && player.isColonial())) {
                         insertLinkButton(document, player.getEurope(),
-                            Messages.message(player.getEurope().getNameKey()));
+                            Messages.getName(player.getEurope()));
                     } else if ("%unit%".equals(var)
                         || var.endsWith("Unit%")
                         || "%newName%".equals(var)) {

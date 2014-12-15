@@ -172,7 +172,7 @@ public final class InfoPanel extends FreeColPanel {
                         JLabel goodsLabel = new JLabel(String.valueOf(tile.getPotentialProduction(goods.getType(), null)),
                             getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.50f),
                             JLabel.RIGHT);
-                        goodsLabel.setToolTipText(Messages.message(goods.getType().getNameKey()));
+                        goodsLabel.setToolTipText(Messages.getName(goods.getType()));
                         goodsLabel.setFont(font);
                         add(goodsLabel);
                     }
@@ -266,7 +266,7 @@ public final class InfoPanel extends FreeColPanel {
                 }
 
                 String text = (unit.isInEurope())
-                    ? Messages.message(unit.getOwner().getEurope().getNameKey())
+                    ? Messages.getName(unit.getOwner().getEurope())
                     : Messages.message("moves") +" "+ unit.getMovesAsString();
                 add(new JLabel(text), "span");
 

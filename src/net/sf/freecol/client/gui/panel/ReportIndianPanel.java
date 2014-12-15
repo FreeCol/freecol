@@ -226,7 +226,7 @@ public final class ReportIndianPanel extends ReportPanel {
                         for (int i = 1; i < wantedGoods.length; i++) {
                             if (wantedGoods[i] != null) {
                                 String sale = player.getLastSaleString(settlement, wantedGoods[i]);
-                                goodsLabel = new JLabel(Messages.message(wantedGoods[i].getNameKey())
+                                goodsLabel = new JLabel(Messages.getName(wantedGoods[i])
                                     + ((sale == null) ? "" : " " + sale));
                                 goodsLabel.setIcon(getLibrary()
                                     .getScaledGoodsImageIcon(wantedGoods[i], 0.5));

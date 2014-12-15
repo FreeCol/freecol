@@ -72,7 +72,7 @@ public final class ReportProductionPanel extends ReportPanel {
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             if (!goodsType.isFarmed()) {
                 this.goodsTypes.add(goodsType);
-                goodsNames.add(Messages.message(goodsType.getNameKey()));
+                goodsNames.add(Messages.getName(goodsType));
             }
         }
         String[] model = goodsNames.toArray(new String[0]);

@@ -103,7 +103,7 @@ public final class MarketLabel extends AbstractGoodsLabel
     public void paintComponent(Graphics g) {
         Player player = market.getOwner();
         GoodsType type = getType();
-        String toolTipText = Messages.message(type.getNameKey());
+        String toolTipText = Messages.getName(type);
         if (player == null || player.canTrade(type)) {
             setEnabled(true);
         } else {
