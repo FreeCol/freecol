@@ -718,11 +718,6 @@ public class Player extends FreeColGameObject implements Nameable {
         this.name = newName;
     }
 
-    // FIXME: remove this again
-    public String getNameKey() {
-        return getName();
-    }
-
     /**
      * Is this player the unknown enemy?
      *
