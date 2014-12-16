@@ -57,7 +57,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
 
     private static Logger logger = Logger.getLogger(ListOptionUI.class.getName());
 
-    private JPanel panel = new MigPanel();
+    private JPanel panel;
     private JList<AbstractOption<T>> list;
     private DefaultListModel<AbstractOption<T>> model;
 
@@ -80,21 +80,22 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                         boolean editable) {
         super(gui, option, editable);
 
-        panel.setBorder(BorderFactory
+        this.panel = new JPanel();
+        this.panel.setBorder(BorderFactory
             .createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
                 super.getJLabel().getText()));
-        panel.setLayout(new MigLayout("wrap 2, fill", "[fill, grow]20[fill]"));
+        this.panel.setLayout(new MigLayout("wrap 2, fill", "[fill, grow]20[fill]"));
 
-        model = new DefaultListModel<AbstractOption<T>>();
+        this.model = new DefaultListModel<AbstractOption<T>>();
         for (AbstractOption<T> o : option.getValue()) {
             try {
                 AbstractOption<T> c = o.clone();
-                model.addElement(c);
+                this.model.addElement(c);
             } catch (CloneNotSupportedException e) {
                 logger.log(Level.WARNING, "Can not clone " + o.getId(), e);
             }
         }
-        list = new JList<AbstractOption<T>>(model);
+        list = new JList<AbstractOption<T>>(this.model);
         AbstractOption<T> o = option.getValue().isEmpty()
             ? option.getTemplate()
             : option.getValue().get(0);
@@ -104,12 +105,12 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         }
         list.setVisibleRowCount(4);
         JScrollPane pane = new JScrollPane(list);
-        panel.add(pane, "grow, spany 5");
+        this.panel.add(pane, "grow, spany 5");
 
         for (JButton button : new JButton[] {
                 editButton, addButton, removeButton, upButton, downButton }) {
             button.setEnabled(editable);
-            panel.add(button);
+            this.panel.add(button);
         }
 
         addButton.addActionListener(new ActionListener() {
@@ -206,7 +207,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
      * {@inheritDoc}
      */
     public JPanel getComponent() {
-        return panel;
+        return this.panel;
     }
 
     /**

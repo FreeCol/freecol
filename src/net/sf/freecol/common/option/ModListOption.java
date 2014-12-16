@@ -52,6 +52,7 @@ public class ModListOption extends ListOption<FreeColModFile> {
         setAllowDuplicates(false);
     }
 
+
     /**
      * {@inheritDoc}
      */

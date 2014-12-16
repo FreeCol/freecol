@@ -53,7 +53,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
         }
     }
 
-    private class ModOptionRenderer
+    private static class ModOptionRenderer
         extends FreeColComboBoxRenderer<ModOption> {
 
         /**
@@ -71,13 +71,15 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
     }
 
 
-    private JComboBox<FreeColModFile> box = new JComboBox<FreeColModFile>();
+    /** The selection box for the various mod files. */
+    private final JComboBox<FreeColModFile> box;
 
 
     /**
      * Creates a new <code>ModOptionUI</code> for the given
      * <code>ModOption</code>.
      *
+     * @param gui The <code>GUI</code> to display with.
      * @param option The <code>ModOption</code> to make a user interface for
      * @param editable boolean whether user can modify the setting
      */
@@ -89,10 +91,11 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
         for (FreeColModFile choice : option.getChoices()) {
             model.addElement(choice);
         }
-        box.setModel(model);
-        box.setRenderer(new BoxRenderer());
+        this.box = new JComboBox<FreeColModFile>();
+        this.box.setModel(model);
+        this.box.setRenderer(new BoxRenderer());
         if (option.getValue() != null) {
-            box.setSelectedItem(option.getValue());
+            this.box.setSelectedItem(option.getValue());
         }
         initialize();
     }
@@ -126,20 +129,20 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
      * {@inheritDoc}
      */
     public void updateOption() {
-        getOption().setValue((FreeColModFile)box.getSelectedItem());
+        getOption().setValue((FreeColModFile)this.box.getSelectedItem());
     }
 
     /**
      * {@inheritDoc}
      */
     public JComboBox getComponent() {
-        return box;
+        return this.box;
     }
 
     /**
      * {@inheritDoc}
      */
     public void reset() {
-        box.setSelectedItem(getOption().getValue());
+        this.box.setSelectedItem(getOption().getValue());
     }
 }

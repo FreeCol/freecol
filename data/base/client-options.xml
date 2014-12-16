@@ -312,11 +312,11 @@
     </optionGroup>
 
     <optionGroup id="clientOptions.mods">
-      <!-- Which mods are enabled. -->
+      <!-- Which mods are enabled.  Initially empty. -->
       <modListOption id="clientOptions.mods.userMods">
-        <!-- <template>
+        <template>
           <modOption id="model.option.mod" />
-        </template> -->
+        </template>
       </modListOption>
     </optionGroup>
 </clientOptions>

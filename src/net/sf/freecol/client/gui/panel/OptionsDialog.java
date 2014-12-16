@@ -124,11 +124,11 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * Load the panel.
      */
     private void preparePanel(String header, OptionGroupUI ui) {
-        optionPanel = new MigPanel("ReportPanelUI");
-        optionPanel.setOpaque(true);
-        optionPanel.add(ui);
-        optionPanel.setSize(optionPanel.getPreferredSize());
-        this.scrollPane = new JScrollPane(optionPanel,
+        this.optionPanel = new MigPanel("ReportPanelUI");
+        this.optionPanel.setOpaque(true);
+        this.optionPanel.add(ui);
+        this.optionPanel.setSize(this.optionPanel.getPreferredSize());
+        this.scrollPane = new JScrollPane(this.optionPanel,
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.scrollPane.getVerticalScrollBar().setUnitIncrement(16);
