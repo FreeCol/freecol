@@ -3450,7 +3450,7 @@
           <integerOption id="model.option.foundingFatherFactor" value="56" minimumValue="0" maximumValue="100"/>
           <integerOption id="model.option.arrearsFactor" value="700" minimumValue="100" maximumValue="1000"/>
           <integerOption id="model.option.unitsThatUseNoBells" value="2" minimumValue="0" maximumValue="20"/>
-          <stringOption  id="model.option.tileProduction" value="veryLow">
+          <stringOption id="model.option.tileProduction" value="veryLow">
             <choice value="veryLow" />
             <choice value="low" />
             <choice value="medium" />
