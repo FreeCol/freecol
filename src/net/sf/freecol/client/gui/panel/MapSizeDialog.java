@@ -25,7 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.FreeColInputDialog;
 import net.sf.freecol.client.gui.panel.MigPanel;
 
@@ -55,16 +55,13 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
     public MapSizeDialog(FreeColClient freeColClient) {
         super(freeColClient);
 
-        String widthText = Messages.message("width");
-        JLabel widthLabel = new JLabel(widthText);
+        JLabel widthLabel = GUI.localizedLabel("width");
         widthLabel.setLabelFor(inputWidth);
-        String heightText = Messages.message("height");
-        JLabel heightLabel = new JLabel(heightText);
+        JLabel heightLabel = GUI.localizedLabel("height");
         heightLabel.setLabelFor(inputHeight);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 2"));
-        panel.add(new JLabel(Messages.message("editor.mapSize")),
-                  "span, align center");
+        panel.add(GUI.localizedLabel("editor.mapSize"), "span, align center");
         panel.add(widthLabel, "newline 20");
         panel.add(inputWidth);
         panel.add(heightLabel);

@@ -108,7 +108,7 @@ public final class FindSettlementPanel extends FreeColPanel
         super(freeColClient, new MigLayout("wrap 1", "[align center]",
                                            "[]30[]30[]"));
 
-        JLabel header = new JLabel(Messages.message("findSettlementPanel.name"));
+        JLabel header = GUI.localizedLabel("findSettlementPanel.name");
         header.setFont(GUI.SMALL_HEADER_FONT);
         add(header);
 

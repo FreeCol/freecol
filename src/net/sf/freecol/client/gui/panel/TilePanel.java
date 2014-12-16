@@ -38,6 +38,7 @@ import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.debug.DebugUtils;
@@ -88,7 +89,7 @@ public final class TilePanel extends FreeColPanel {
             .addStringTemplate("%label%", tile.getLabel())
             .addAmount("%x%", tile.getX())
             .addAmount("%y%", tile.getY());
-        add(new JLabel(Messages.message(template)), "span, center");
+        add(GUI.localizedLabel(template), "span, center");
 
         final ImageLibrary lib = getLibrary();
         final Image terrain = lib.getTerrainImage(tileType, tile.getX(), tile.getY());
@@ -102,18 +103,18 @@ public final class TilePanel extends FreeColPanel {
         add(new JLabel(new ImageIcon(image)), "span, center");
 
         if (tile.getRegion() != null) {
-            add(localizedLabel("tilePanel.region"));
-            add(new JLabel(Messages.message(tile.getRegion().getLabel())));
+            add(GUI.localizedLabel("tilePanel.region"));
+            add(GUI.localizedLabel(tile.getRegion().getLabel()));
         }
         if (tile.getOwner() != null) {
             StringTemplate ownerName = tile.getOwner().getNationName();
             if (ownerName != null) {
-                add(localizedLabel("tilePanel.owner"));
-                add(new JLabel(Messages.message(ownerName)));
+                add(GUI.localizedLabel("tilePanel.owner"));
+                add(GUI.localizedLabel(ownerName));
             }
         }
         if (tile.getOwningSettlement() != null) {
-            add(localizedLabel("tilePanel.settlement"));
+            add(GUI.localizedLabel("tilePanel.settlement"));
             add(new JLabel(tile.getOwningSettlement().getName()));
         }
 

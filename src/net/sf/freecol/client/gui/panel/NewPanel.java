@@ -204,7 +204,7 @@ public final class NewPanel extends FreeColPanel
         this.nameBox = new JTextField(name, 20);
 
         this.advantagesLabel
-            = localizedLabel("playerOptions.nationalAdvantages");
+            = GUI.localizedLabel("playerOptions.nationalAdvantages");
         this.advantagesBox = new JComboBox<Advantages>(new Advantages[] {
                 Advantages.SELECTABLE,
                 Advantages.FIXED,
@@ -213,7 +213,7 @@ public final class NewPanel extends FreeColPanel
         this.advantagesBox
             .setRenderer(new FreeColComboBoxRenderer<Advantages>());
 
-        this.serverPortLabel = localizedLabel("startServerOnPort");
+        this.serverPortLabel = GUI.localizedLabel("startServerOnPort");
         this.serverPortField
             = new JTextField(Integer.toString(FreeCol.getServerPort()));
         this.serverPortField.addActionListener(new ActionListener() {
@@ -222,7 +222,7 @@ public final class NewPanel extends FreeColPanel
                 }
             });
 
-        this.rulesLabel = localizedLabel("rules");
+        this.rulesLabel = GUI.localizedLabel("rules");
         this.rulesBox = new JComboBox<FreeColTcFile>();
         if (this.fixedSpecification == null) { // Allow TC selection
             String selectTC = FreeCol.getTC();
@@ -247,7 +247,7 @@ public final class NewPanel extends FreeColPanel
 
         this.publicServer = new JCheckBox(Messages.message("publicServer"));
 
-        this.difficultyLabel = localizedLabel("difficulty");
+        this.difficultyLabel = GUI.localizedLabel("difficulty");
         this.difficultyBox = new JComboBox<OptionGroup>();
         this.difficultyBox
             .setRenderer(new FreeColComboBoxRenderer<OptionGroup>());
@@ -257,9 +257,9 @@ public final class NewPanel extends FreeColPanel
             .setActionCommand(String.valueOf(NewPanelAction.SHOW_DIFFICULTY));
         this.difficultyButton.addActionListener(this);
 
-        this.joinNameLabel = localizedLabel("host");
+        this.joinNameLabel = GUI.localizedLabel("host");
         this.joinNameField = new JTextField("127.0.0.1");
-        this.joinPortLabel = localizedLabel("port");
+        this.joinPortLabel = GUI.localizedLabel("port");
         this.joinPortField
             = new JTextField(Integer.toString(FreeCol.getServerPort()));
         this.joinPortField.addActionListener(new ActionListener() {
@@ -280,7 +280,7 @@ public final class NewPanel extends FreeColPanel
             "span 6, center");
         add(single, "newline, span 3");
         add(new JSeparator(JSeparator.VERTICAL), "spany 7, grow");
-        add(localizedLabel("name"), "span, split 2");
+        add(GUI.localizedLabel("name"), "span, split 2");
         add(this.nameBox, "growx");
         add(start, "newline, span 3");
         add(this.advantagesLabel);

@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -82,30 +83,30 @@ public final class IndianSettlementPanel extends FreeColPanel {
             add(new JLabel(missionaryName, getGUI().getImageIcon(missionary, true), JLabel.CENTER));
         }
 
-        add(localizedLabel("indianSettlement.learnableSkill"), "newline");
+        add(GUI.localizedLabel("indianSettlement.learnableSkill"), "newline");
         UnitType skillType = settlement.getLearnableSkill();
         if (visited) {
             if (skillType == null) {
-                add(localizedLabel("indianSettlement.skillNone"));
+                add(GUI.localizedLabel("indianSettlement.skillNone"));
             } else {
                 add(new JLabel(Messages.getName(skillType),
                         getGUI().getImageIcon(skillType, true), JLabel.CENTER));
             }
         } else {
-            add(localizedLabel("indianSettlement.skillUnknown"));
+            add(GUI.localizedLabel("indianSettlement.skillUnknown"));
         }
 
-        add(localizedLabel("indianSettlement.mostHated"), "newline");
+        add(GUI.localizedLabel("indianSettlement.mostHated"), "newline");
         Player mostHated = settlement.getMostHated();
         if (contacted) {
             if (mostHated == null) {
-                add(localizedLabel("indianSettlement.mostHatedNone"));
+                add(GUI.localizedLabel("indianSettlement.mostHatedNone"));
             } else {
-                add(new JLabel(Messages.message(mostHated.getNationName()),
+                add(GUI.localizedLabel(mostHated.getNationName(),
                         getGUI().getImageIcon(mostHated, true), JLabel.CENTER));
             }
         } else {
-            add(localizedLabel("indianSettlement.mostHatedUnknown"));
+            add(GUI.localizedLabel("indianSettlement.mostHatedUnknown"));
         }
 
         GoodsType[] wantedGoods = settlement.getWantedGoods();
@@ -114,10 +115,10 @@ public final class IndianSettlementPanel extends FreeColPanel {
             if (wantedGoods[i] != null) n++;
         }
         String sale;
-        add(localizedLabel("indianSettlement.highlyWanted"), "newline");
+        add(GUI.localizedLabel("indianSettlement.highlyWanted"), "newline");
         if (visited) {
             if (wantedGoods[0] == null) {
-                add(localizedLabel("indianSettlement.wantedGoodsNone"));
+                add(GUI.localizedLabel("indianSettlement.wantedGoodsNone"));
             } else {
                 sale = player.getLastSaleString(settlement, wantedGoods[0]);
                 add(new JLabel(Messages.getName(wantedGoods[0])
@@ -127,13 +128,13 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 n--;
             }
         } else {
-            add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
+            add(GUI.localizedLabel("indianSettlement.wantedGoodsUnknown"));
         }
 
-        add(localizedLabel("indianSettlement.otherWanted"), "newline");
+        add(GUI.localizedLabel("indianSettlement.otherWanted"), "newline");
         if (visited) {
             if (n == 0) {
-                add(localizedLabel("indianSettlement.wantedGoodsNone"));
+                add(GUI.localizedLabel("indianSettlement.wantedGoodsNone"));
             } else {
                 sale = player.getLastSaleString(settlement, wantedGoods[1]);
                 add(new JLabel(Messages.getName(wantedGoods[1])
@@ -152,7 +153,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 }
             }
         } else {
-            add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
+            add(GUI.localizedLabel("indianSettlement.wantedGoodsUnknown"));
         }
 
         add(okButton, "newline 20, span, tag ok");

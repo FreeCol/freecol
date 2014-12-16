@@ -200,7 +200,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         if (unitList == null || unitList.isEmpty()) {
-            reportPanel.add(localizedLabel("none"), "sg");
+            reportPanel.add(GUI.localizedLabel("none"), "sg");
         } else {
             Collections.sort(unitList, ReportPanel.getUnitTypeComparator());
             for (Unit unit : unitList) {

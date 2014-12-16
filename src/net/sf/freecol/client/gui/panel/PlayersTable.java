@@ -647,7 +647,7 @@ public final class PlayersTable extends JTable {
                 }
             });
 
-        JLabel availabilityLabel = new JLabel(Messages.message("availability"));
+        JLabel availabilityLabel = GUI.localizedLabel("availability");
         JButton advantageButton = new JButton(Messages.message("advantage"));
         advantageButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
@@ -655,8 +655,8 @@ public final class PlayersTable extends JTable {
                 }
             });
 
-        JLabel colorLabel = new JLabel(Messages.message("color"));
-        JLabel playerLabel = new JLabel(Messages.message("player"));
+        JLabel colorLabel = GUI.localizedLabel("color");
+        JLabel playerLabel = GUI.localizedLabel("player");
 
         DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
         dtcr.setOpaque(false);

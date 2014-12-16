@@ -85,11 +85,11 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
         ResourceType type = getSpecification().getResourceType(id);
         panel.setLayout(new MigLayout("wrap 2", "[]20[]"));
 
-        JLabel name = localizedLabel(type.getNameKey());
+        JLabel name = GUI.localizedLabel(type.getNameKey());
         name.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 
-        panel.add(localizedLabel("colopedia.resource.bonusProduction"));
+        panel.add(GUI.localizedLabel("colopedia.resource.bonusProduction"));
         JPanel goodsPanel = new JPanel();
         goodsPanel.setOpaque(false);
         for (Modifier modifier : type.getModifiers()) {
@@ -114,7 +114,8 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
         }
         panel.add(goodsPanel);
 
-        panel.add(localizedLabel("colopedia.resource.description"), "newline 20");
+        panel.add(GUI.localizedLabel("colopedia.resource.description"),
+                  "newline 20");
         panel.add(GUI.getDefaultTextArea(Messages.getDescription(type), 30),
                   "growx");
     }

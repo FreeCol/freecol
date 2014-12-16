@@ -568,7 +568,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             };
 
         // Create the components
-        JLabel header = new JLabel(Messages.message("colonyPanel.buildQueue"));
+        JLabel header = GUI.localizedLabel("colonyPanel.buildQueue");
         header.setFont(GUI.BIG_HEADER_FONT);
 
         DefaultListModel<UnitType> units = new DefaultListModel<UnitType>();
@@ -635,12 +635,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
         // Add all the components
         add(header, "span 3, align center, wrap 40");
-        add(new JLabel(Messages.message("colonyPanel.units")),
-            "align center");
-        add(new JLabel(Messages.message("colonyPanel.buildQueue")),
-            "align center");
-        add(new JLabel(Messages.message("colonyPanel.buildings")),
-            "align center");
+        add(GUI.localizedLabel("colonyPanel.units"), "align center");
+        add(GUI.localizedLabel("colonyPanel.buildQueue"), "align center");
+        add(GUI.localizedLabel("colonyPanel.buildings"), "align center");
         add(new JScrollPane(this.unitList), "grow");
         add(this.constructionPanel, "split 2, flowy");
         add(new JScrollPane(this.buildQueueList), "grow");

@@ -54,7 +54,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
         reportPanel.setLayout(new MigLayout("wrap 3, gapx 30",
                                             "[][][align right]", ""));
         if (prefix != null) {
-            reportPanel.add(localizedLabel(prefix),
+            reportPanel.add(GUI.localizedLabel(prefix),
                             "span, wrap 10");
         }
 
@@ -69,44 +69,44 @@ public final class ReportHighScoresPanel extends ReportPanel {
             StringTemplate template = StringTemplate.template(messageId)
                 .addName("%name%", highScore.getPlayerName())
                 .addName("%nation%", highScore.getNewLandName());
-            JLabel headline = localizedLabel(template);
+            JLabel headline = GUI.localizedLabel(template);
             headline.setFont(GUI.SMALL_HEADER_FONT);
             reportPanel.add(headline,
                             "span, wrap 10");
-            reportPanel.add(localizedLabel("report.highScores.turn"),
+            reportPanel.add(GUI.localizedLabel("report.highScores.turn"),
                             "skip");
             int retirementTurn = highScore.getRetirementTurn();
             reportPanel.add((retirementTurn <= 0)
-                ? localizedLabel("notApplicable.short")
-                : localizedLabel(Turn.getLabel(retirementTurn)));
-            reportPanel.add(localizedLabel("report.highScores.score"),
+                ? GUI.localizedLabel("notApplicable.short")
+                : GUI.localizedLabel(Turn.getLabel(retirementTurn)));
+            reportPanel.add(GUI.localizedLabel("report.highScores.score"),
                             "skip");
             reportPanel.add(new JLabel(String.valueOf(highScore.getScore())));
-            reportPanel.add(localizedLabel("report.highScores.difficulty"),
+            reportPanel.add(GUI.localizedLabel("report.highScores.difficulty"),
                             "skip");
             reportPanel.add(new JLabel(Messages.getName(highScore.getDifficulty())));
-            reportPanel.add(localizedLabel("report.highScores.independence"),
+            reportPanel.add(GUI.localizedLabel("report.highScores.independence"),
                             "skip");
             int independenceTurn = highScore.getIndependenceTurn();
             reportPanel.add((independenceTurn <= 0)
-                ? localizedLabel("no")
-                : localizedLabel(Turn.getLabel(independenceTurn)));
-            reportPanel.add(localizedLabel("report.highScores.nation"),
+                ? GUI.localizedLabel("no")
+                : GUI.localizedLabel(Turn.getLabel(independenceTurn)));
+            reportPanel.add(GUI.localizedLabel("report.highScores.nation"),
                             "skip");
             reportPanel.add(new JLabel((highScore.getIndependenceTurn() > 0)
                     ? highScore.getNationName()
                     : highScore.getOldNationNameKey()));
-            reportPanel.add(localizedLabel("report.highScores.nationType"),
+            reportPanel.add(GUI.localizedLabel("report.highScores.nationType"),
                             "skip");
-            reportPanel.add(localizedLabel(Messages.nameKey(highScore.getNationTypeId())));
-            reportPanel.add(localizedLabel("report.highScores.units"),
+            reportPanel.add(GUI.localizedLabel(Messages.nameKey(highScore.getNationTypeId())));
+            reportPanel.add(GUI.localizedLabel("report.highScores.units"),
                             "skip");
             reportPanel.add(new JLabel(String.valueOf(highScore.getUnits())));
 
-            reportPanel.add(localizedLabel("report.highScores.colonies"),
+            reportPanel.add(GUI.localizedLabel("report.highScores.colonies"),
                             "skip");
             reportPanel.add(new JLabel(String.valueOf(highScore.getColonies())));
-            reportPanel.add(localizedLabel("report.highScores.retired"),
+            reportPanel.add(GUI.localizedLabel("report.highScores.retired"),
                             "skip");
             DateFormat format = DateFormat
                 .getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);

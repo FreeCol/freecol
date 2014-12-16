@@ -71,15 +71,15 @@ public final class AboutPanel extends FreeColPanel {
         }
 
         // version and links
-        add(localizedLabel("aboutPanel.version"), "newline 20");
+        add(GUI.localizedLabel("aboutPanel.version"), "newline 20");
         add(new JLabel(FreeCol.getRevision()));
 
-        add(localizedLabel("aboutPanel.officialSite"));
+        add(GUI.localizedLabel("aboutPanel.officialSite"));
         JButton site = GUI.getLinkButton(SITE_URL, null, SITE_URL);
         site.addActionListener(this);
         add(site);
 
-        add(localizedLabel("aboutPanel.sfProject"));
+        add(GUI.localizedLabel("aboutPanel.sfProject"));
         JButton project = GUI.getLinkButton(PROJECT_URL, null, PROJECT_URL);
         project.addActionListener(this);
         add(project);
@@ -89,7 +89,7 @@ public final class AboutPanel extends FreeColPanel {
             "newline 20, span, growx");
 
         // copyright
-        add(localizedLabel("aboutPanel.copyright"), "span, center");
+        add(GUI.localizedLabel("aboutPanel.copyright"), "span, center");
 
         add(okButton, "newline 20, span, tag ok");
     }

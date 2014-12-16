@@ -70,20 +70,17 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
 
-        JLabel header = new JLabel(Messages.message("LoadingSavegame.title"),
-                                   JLabel.CENTER);
+        JLabel header = GUI.localizedLabel("LoadingSavegame.title", JLabel.CENTER);
         header.setFont(GUI.MEDIUM_HEADER_FONT);
         header.setBorder(new EmptyBorder(20, 0, 0, 0));
 
         JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        p1.add(new JLabel(Messages.message("LoadingSavegame.serverName"),
-                          JLabel.LEFT));
+        p1.add(GUI.localizedLabel("LoadingSavegame.serverName"));
 
         serverNameField = new JTextField();
 
         JPanel p2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        p2.add(new JLabel(Messages.message("LoadingSavegame.port"),
-                          JLabel.LEFT));
+        p2.add(GUI.localizedLabel("LoadingSavegame.port"));
 
         portField = new JSpinner(new SpinnerNumberModel(FreeCol.getServerPort(),
                                                         1, 65536, 1));

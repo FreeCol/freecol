@@ -26,6 +26,7 @@ import java.util.List;
 import javax.swing.JSeparator;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Nation;
@@ -88,7 +89,7 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
         final Specification spec = getSpecification();
         final Nation refNation = getMyPlayer().getNation().getREFNation();
 
-        reportPanel.add(localizedLabel(refNation.getNameKey()),
+        reportPanel.add(GUI.localizedLabel(refNation.getNameKey()),
                         "span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
@@ -113,10 +114,10 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
         // default role is valid because of artillery and disarmed experts
         militaryRoles.add(spec.getDefaultRole());
 
-        StringTemplate t;
-        t = StringTemplate.template("report.military.forces")
-            .addStringTemplate("%nation%", player.getNationName());
-        reportPanel.add(localizedLabel(t), "newline, span, split 2");
+        reportPanel.add(GUI.localizedLabel(StringTemplate
+                .template("report.military.forces")
+                .addStringTemplate("%nation%", player.getNationName())),
+            "newline, span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         List<AbstractUnit> units = new ArrayList<>();

@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import javax.swing.JSeparator;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
@@ -50,10 +51,11 @@ public final class ReportCargoPanel extends ReportUnitPanel {
     protected void addREFUnits() {}
 
     protected void addOwnUnits() {
-        Player player = getMyPlayer();
-        reportPanel.add(localizedLabel(StringTemplate.template("report.military.forces")
-                                       .addStringTemplate("%nation%", player.getNationName())),
-                        "newline, span, split 2");
+        final Player player = getMyPlayer();
+        reportPanel.add(GUI.localizedLabel(StringTemplate
+                .template("report.military.forces")
+                .addStringTemplate("%nation%", player.getNationName())),
+            "newline, span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
         
         for (UnitType unitType : getSpecification().getUnitTypeList()) {

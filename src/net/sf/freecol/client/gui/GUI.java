@@ -61,6 +61,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.JWindow;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.AttributeSet;
@@ -1026,6 +1027,62 @@ public class GUI {
 
         textPane.setText(text);
         return textPane;
+    }
+
+    /**
+     * Get a JLabel with Messages.message(key) as text.
+     *
+     * @param key The key to use.
+     * @return The <code>JLabel</code>.
+     */
+    public static JLabel localizedLabel(String key) {
+        return localizedLabel(Messages.message(key), SwingConstants.LEADING);
+    }
+
+    /**
+     * Get a JLabel with Messages.message(key) as text.
+     *
+     * @param key The key to use.
+     * @param alignment The alignment.
+     * @return The <code>JLabel</code>.
+     */
+    public static JLabel localizedLabel(String key, int alignment) {
+        return localizedLabel(key, null, alignment);
+    }
+
+    /**
+     * Get a JLabel with Messages.message(key) as text.
+     *
+     * @param key The key to use.
+     * @param icon The icon to use.
+     * @param alignment The alignment.
+     * @return The <code>JLabel</code>.
+     */
+    public static JLabel localizedLabel(String key, Icon icon, int alignment) {
+        return localizedLabel(StringTemplate.key(key), icon, alignment);
+    }
+
+    /**
+     * Get a JLabel with Messages.message(template) as text.
+     *
+     * @param template The <code>StringTemplate</code> to use.
+     * @return The <code>JLabel</code>.
+     */
+    public static JLabel localizedLabel(StringTemplate template) {
+        return localizedLabel(template, null, SwingConstants.LEADING);
+    }
+
+    /**
+     * Get a JLabel with Messages.message(template) as text.
+     *
+     * @param template The <code>StringTemplate</code> to use.
+     * @param icon The icon to use.
+     * @param alignment The alignment.
+     * @return The <code>JLabel</code>.
+     */
+    public static JLabel localizedLabel(StringTemplate template, Icon icon,
+                                        int alignment) {
+        return new JLabel(Messages.message(template), icon, alignment);
     }
 
     /**

@@ -111,7 +111,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
      * @param types a List of FreeColGameObjectTypes
      */
     public void addSubTrees(DefaultMutableTreeNode root, String id, List<T> types) {
-        String name = Messages.getName(id);
+        String name = getName();
         DefaultMutableTreeNode node =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, id, name, null));
         int width = 0;

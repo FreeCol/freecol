@@ -151,11 +151,12 @@ public class ConstructionPanel extends MigPanel
                     .getBuildingImage((BuildingType) buildable, colony.getOwner(), 0.75)
                 : gui.getImageLibrary().getImage(buildable, 0.75);
             add(new JLabel(new ImageIcon(image)), "spany");
-            add(new JLabel(Messages.message(StringTemplate.template("colonyPanel.currentlyBuilding")
-                                            .addName("%buildable%", buildable))));
+            add(GUI.localizedLabel(StringTemplate
+                    .template("colonyPanel.currentlyBuilding")
+                    .addName("%buildable%", buildable)));
 
-            add(new JLabel(Messages.message(StringTemplate.template("turnsToComplete.long")
-                                            .addName("%number%", turnsStr))));
+            add(GUI.localizedLabel(StringTemplate.template("turnsToComplete.long")
+                    .addName("%number%", turnsStr)));
 
             for (AbstractGoods ag : buildable.getRequiredGoods()) {
                 int amountNeeded = ag.getAmount();

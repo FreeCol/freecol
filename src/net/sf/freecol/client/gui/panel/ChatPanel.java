@@ -27,7 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -52,7 +52,7 @@ public final class ChatPanel extends FreeColPanel {
     public ChatPanel(FreeColClient freeColClient) {
         super(freeColClient, new BorderLayout(10, 10));
 
-        JLabel label = new JLabel(Messages.message("message") + ": ");
+        JLabel label = GUI.localizedLabel("message");
 
         field = new JTextField("", 40);
         field.setActionCommand(String.valueOf(CHAT));

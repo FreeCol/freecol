@@ -148,23 +148,25 @@ public final class InfoPanel extends FreeColPanel {
                     for (TileImprovement tileImprovement : tile.getCompletedTileImprovements()) {
                         items.add(tileImprovement.getType().getDescriptionKey());
                     }
-                    add(new JLabel(Messages.message(items)), "span, align center");
+                    add(GUI.localizedLabel(items), "span, align center");
 
                     add(new JLabel(new ImageIcon(image)), "spany");
                     if (tile.getOwner() != null) {
-                        JLabel ownerLabel = localizedLabel(tile.getOwner().getNationName());
+                        JLabel ownerLabel = GUI.localizedLabel(tile.getOwner().getNationName());
                         ownerLabel.setFont(font);
                         add(ownerLabel, "span 4");
                     }
 
                     int defenceBonus = (int)tile.getType().applyModifiers(100f,
                         getGame().getTurn(), Modifier.DEFENCE) - 100;
-                    JLabel defenceLabel = new JLabel(Messages.message("colopedia.terrain.defenseBonus") +
-                                                     " " + defenceBonus + "%");
+                    JLabel defenceLabel = GUI.localizedLabel(StringTemplate
+                        .template("colopedia.terrain.defenseBonus")
+                        .addAmount("%bonus%", defenceBonus));
                     defenceLabel.setFont(font);
                     add(defenceLabel, "span 4");
-                    JLabel moveLabel = new JLabel(Messages.message("colopedia.terrain.movementCost") +
-                                                  " " + String.valueOf(tile.getType().getBasicMoveCost()/3));
+                    JLabel moveLabel = GUI.localizedLabel(StringTemplate
+                        .template("colopedia.terrain.movementCost")
+                        .addAmount("%cost%", tile.getType().getBasicMoveCost()/3));
                     moveLabel.setFont(font);
                     add(moveLabel, "span 4");
 
@@ -177,7 +179,7 @@ public final class InfoPanel extends FreeColPanel {
                         add(goodsLabel);
                     }
                 } else {
-                    add(new JLabel(Messages.message("unexplored")), "span, align center");
+                    add(GUI.localizedLabel("unexplored"), "span, align center");
                     add(new JLabel(new ImageIcon(image)), "spany");
                 }
                 revalidate();

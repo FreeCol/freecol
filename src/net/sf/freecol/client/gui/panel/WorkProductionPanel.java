@@ -34,6 +34,7 @@ import javax.swing.border.Border;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
@@ -126,15 +127,13 @@ public class WorkProductionPanel extends FreeColPanel {
 
         result = wl.getPotentialProduction(workType, unitType);
         if (result < 0.0f) {
-            add(new JLabel(Messages.message("model.source.zeroThreshold.name")),
-                           "newline");
+            add(GUI.localizedLabel("model.source.zeroThreshold.name"), "newline");
             add(new JLabel(ModifierFormat.format(-result)), "wrap 30");
             result = 0.0f;
         }
 
         Font bigFont = getFont().deriveFont(Font.BOLD, 16);
-        JLabel finalLabel
-            = new JLabel(Messages.message("model.source.finalResult.name"));
+        JLabel finalLabel = GUI.localizedLabel("model.source.finalResult.name");
         finalLabel.setFont(bigFont);
         add(finalLabel, "newline");
 
@@ -146,7 +145,7 @@ public class WorkProductionPanel extends FreeColPanel {
         if (wl instanceof Building) { // Unattended production also applies.
             result = wl.getBaseProduction(null, workType, null);
             if (result > 0) {
-                add(new JLabel(Messages.message(wl.getLabel())));
+                add(GUI.localizedLabel(wl.getLabel()));
                 add(new JLabel(ModifierFormat.format(result)), "wrap 30");
                 Collections.sort(unattendedModifiers);
                 output(unattendedModifiers, unitType);

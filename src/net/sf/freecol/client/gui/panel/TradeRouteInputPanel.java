@@ -457,7 +457,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
                 Image image = getLibrary()
                     .getCoatOfArmsImage(europe.getOwner().getNation(), 0.5);
                 icon = new JLabel(new ImageIcon(image));
-                name = localizedLabel(europe.getNameKey());
+                name = GUI.localizedLabel(europe.getNameKey());
             } else if (location instanceof Colony) {
                 Colony colony = (Colony) location;
                 icon = new JLabel(new ImageIcon(getLibrary()
@@ -564,11 +564,11 @@ public final class TradeRouteInputPanel extends FreeColPanel
         this.stopList.addListSelectionListener(this);
         JScrollPane tradeRouteView = new JScrollPane(stopList);
 
-        JLabel nameLabel = localizedLabel("tradeRouteInputPanel.nameLabel");
+        JLabel nameLabel = GUI.localizedLabel("tradeRouteInputPanel.nameLabel");
         this.tradeRouteName = new JTextField(tradeRoute.getName());
 
         JLabel destinationLabel
-            = localizedLabel("tradeRouteInputPanel.destinationLabel");
+            = GUI.localizedLabel("tradeRouteInputPanel.destinationLabel");
         this.destinationSelector = new JComboBox<String>();
         this.destinationSelector.setRenderer(new DestinationCellRenderer());
         StringTemplate template = StringTemplate.template("report.allColonies");

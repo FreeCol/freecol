@@ -28,6 +28,7 @@ import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Region;
 
@@ -72,17 +73,17 @@ public final class ReportExplorationPanel extends ReportPanel {
         reportPanel.setLayout(new MigLayout("wrap 5, fillx", "", ""));
 
         // headline
-        reportPanel.add(new JLabel(Messages.message("report.exploration.nameOfRegion")));
-        reportPanel.add(new JLabel(Messages.message("report.exploration.typeOfRegion")));
-        reportPanel.add(new JLabel(Messages.message("report.exploration.discoveredIn")));
-        reportPanel.add(new JLabel(Messages.message("report.exploration.discoveredBy")));
-        reportPanel.add(new JLabel(Messages.message("report.exploration.valueOfRegion")));
+        reportPanel.add(GUI.localizedLabel("report.exploration.nameOfRegion"));
+        reportPanel.add(GUI.localizedLabel("report.exploration.typeOfRegion"));
+        reportPanel.add(GUI.localizedLabel("report.exploration.discoveredIn"));
+        reportPanel.add(GUI.localizedLabel("report.exploration.discoveredBy"));
+        reportPanel.add(GUI.localizedLabel("report.exploration.valueOfRegion"));
 
         for (Region region : regions) {
             reportPanel.add(new JLabel(region.getName()));
-            reportPanel.add(localizedLabel(region.getTypeNameKey()));
-            reportPanel.add(localizedLabel(region.getDiscoveredIn().getLabel()));
-            reportPanel.add(localizedLabel(region.getDiscoveredBy().getNationName()));
+            reportPanel.add(GUI.localizedLabel(region.getTypeNameKey()));
+            reportPanel.add(GUI.localizedLabel(region.getDiscoveredIn().getLabel()));
+            reportPanel.add(GUI.localizedLabel(region.getDiscoveredBy().getNationName()));
             reportPanel.add(new JLabel(String.valueOf(region.getScoreValue())));
         }
     }

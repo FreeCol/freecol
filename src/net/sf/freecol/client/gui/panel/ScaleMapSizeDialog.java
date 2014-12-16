@@ -33,6 +33,7 @@ import java.util.List;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map;
 
@@ -78,9 +79,9 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
         str = Integer.toString(oldMap.getHeight());
         inputHeight = new JTextField(str, COLUMNS);
 
-        JLabel widthLabel = new JLabel(Messages.message("width"));
+        JLabel widthLabel = GUI.localizedLabel("width");
         widthLabel.setLabelFor(inputWidth);
-        JLabel heightLabel = new JLabel(Messages.message("height"));
+        JLabel heightLabel = GUI.localizedLabel("height");
         heightLabel.setLabelFor(inputHeight);
 
         widthPanel.setOpaque(false);

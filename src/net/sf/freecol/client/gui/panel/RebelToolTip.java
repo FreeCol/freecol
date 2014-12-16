@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JToolTip;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
@@ -60,17 +61,15 @@ public class RebelToolTip extends JToolTip {
 
         setLayout(new MigLayout("fillx, wrap 3", "[][right][right]", ""));
 
-        t = StringTemplate.template("colonyPanel.rebelLabel")
-                          .addName("%number%", "");
-        add(new JLabel(Messages.message(t)));
+        add(GUI.localizedLabel(StringTemplate.template("colonyPanel.rebelLabel")
+                .addName("%number%", "")));
 
         add(new JLabel(Integer.toString(rebels)));
 
         add(new JLabel(solPercent + "%"));
 
-        t = StringTemplate.template("colonyPanel.royalistLabel")
-                          .addName("%number%", "");
-        add(new JLabel(Messages.message(t)));
+        add(GUI.localizedLabel(StringTemplate.template("colonyPanel.royalistLabel")
+                .addName("%number%", "")));
 
         add(new JLabel(Integer.toString(population - rebels)));
 
@@ -127,24 +126,24 @@ public class RebelToolTip extends JToolTip {
         }
 
         final String na = Messages.message("notApplicable.short");
-        add(new JLabel(Messages.message("report.nextMember")));
+        add(GUI.localizedLabel("report.nextMember"));
         add(new JLabel((turnsNext < 0) ? na
                 : Integer.toString((int)Math.ceil(turnsNext))), "skip");
 
-        add(new JLabel(Messages.message("report.50percent")));
+        add(GUI.localizedLabel("report.50percent"));
         add(new JLabel((turns50 < 0) ? na
                 : Integer.toString((int)Math.ceil(turns50))), "skip");
 
-        add(new JLabel(Messages.message("report.100percent")));
+        add(GUI.localizedLabel("report.100percent"));
         add(new JLabel((turns100 < 0) ? na
                 : Integer.toString((int)Math.ceil(turns100))), "skip");
 
         final int grow = colony.getPreferredSizeChange();
         if (grow > 0) {
-            add(new JLabel(Messages.message("report.changeMore")));
+            add(GUI.localizedLabel("report.changeMore"));
             add(new JLabel(Integer.toString(grow)), "skip");
         } else if (grow < 0) {
-            add(new JLabel(Messages.message("report.changeLess")));
+            add(GUI.localizedLabel("report.changeLess"));
             add(new JLabel(Integer.toString(-grow)), "skip");
         }
     }

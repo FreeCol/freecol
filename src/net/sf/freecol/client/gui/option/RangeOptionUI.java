@@ -58,7 +58,7 @@ public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {
         int index = 0;
         for (String string : option.getItemValues().values()) {
             if (option.localizeLabels()) {
-                labels.put(index, new JLabel(Messages.message(string)));
+                labels.put(index, GUI.localizedLabel(string));
             } else {
                 labels.put(index, new JLabel(string));
             }

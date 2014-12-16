@@ -89,8 +89,7 @@ public final class ReportProductionPanel extends ReportPanel {
 
     private void update() {
         reportPanel.removeAll();
-        JLabel selectLabel
-            = new JLabel(Messages.message("report.production.selectGoods"));
+        JLabel selectLabel = GUI.localizedLabel("report.production.selectGoods");
         reportPanel.add(selectLabel, "span, split " + (NUMBER_OF_GOODS + 2));
 
         JButton selectButton
@@ -132,17 +131,17 @@ public final class ReportProductionPanel extends ReportPanel {
 
             // labels
             JLabel newLabel;
-            newLabel = new JLabel(Messages.message("Colony"));
+            newLabel = GUI.localizedLabel("Colony");
             newLabel.setBorder(FreeColPanel.TOPLEFTCELLBORDER);
             reportPanel.add(newLabel, "newline 20");
 
             for (int index = 0; index < selectedTypes.size(); index++) {
-                newLabel = localizedLabel(selectedTypes.get(index).getNameKey());
+                newLabel = GUI.localizedLabel(selectedTypes.get(index).getNameKey());
                 newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
                 reportPanel.add(newLabel);
 
                 for (BuildingType buildingType : basicBuildingTypes.get(index)) {
-                    newLabel = localizedLabel(buildingType.getNameKey());
+                    newLabel = GUI.localizedLabel(buildingType.getNameKey());
                     newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
                     reportPanel.add(newLabel);
                 }

@@ -180,7 +180,7 @@ public final class ReportTradePanel extends ReportPanel {
         }
 
         row++;
-        reportPanel.add(new JLabel(Messages.message("report.trade.hasCustomHouse")),
+        reportPanel.add(GUI.localizedLabel("report.trade.hasCustomHouse"),
                         "cell 0 " + row + ", span");
 
         column = 0;
@@ -194,7 +194,7 @@ public final class ReportTradePanel extends ReportPanel {
     }
 
     private JLabel createLeftLabel(String key) {
-        JLabel result = new JLabel(Messages.message(key), JLabel.TRAILING);
+        JLabel result = GUI.localizedLabel(key, JLabel.TRAILING);
         result.setBorder(FreeColPanel.LEFTCELLBORDER);
         return result;
     }

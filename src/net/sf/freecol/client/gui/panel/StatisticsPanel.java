@@ -39,6 +39,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 
@@ -159,8 +160,7 @@ public final class StatisticsPanel extends FreeColPanel {
         // Title
         JPanel header = new JPanel();
         this.add(header, BorderLayout.NORTH);
-        header.add(new JLabel(Messages.message("statistics")),
-                   JPanel.CENTER_ALIGNMENT);
+        header.add(GUI.localizedLabel("statistics"), JPanel.CENTER_ALIGNMENT);
 
         // Actual stats panel
         JPanel statsPanel = new JPanel(new GridLayout(1,2));

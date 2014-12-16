@@ -125,8 +125,8 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             button.addActionListener(this);
             panel.add(button);
             if (turn != null) {
-                panel.add(localizedLabel("report.continentalCongress.elected"));
-                panel.add(localizedLabel(turn.getLabel()));
+                panel.add(GUI.localizedLabel("report.continentalCongress.elected"));
+                panel.add(GUI.localizedLabel(turn.getLabel()));
             }
         }
         panels.clear();

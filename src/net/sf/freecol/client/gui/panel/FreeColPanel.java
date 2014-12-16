@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -209,26 +210,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      */
     protected InGameController igc() {
         return freeColClient.getInGameController();
-    }
-
-    /**
-     * Get a JLabel with Messages.message(key) as text.
-     *
-     * @param key The key to use.
-     * @return The <code>JLabel</code>.
-     */
-    protected JLabel localizedLabel(String key) {
-        return new JLabel(Messages.message(key));
-    }
-
-    /**
-     * Get a JLabel with Messages.message(template) as text.
-     *
-     * @param template The <code>StringTemplate</code> to use.
-     * @return The <code>JLabel</code>.
-     */
-    protected JLabel localizedLabel(StringTemplate template) {
-        return new JLabel(Messages.message(template));
     }
 
     /**

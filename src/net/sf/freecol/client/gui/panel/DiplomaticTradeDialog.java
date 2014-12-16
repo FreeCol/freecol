@@ -132,7 +132,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
-            this.label = new JLabel(Messages.message("tradeItem.colony"));
+            this.label = GUI.localizedLabel("tradeItem.colony");
             this.allColonies = source.getColonies();
 
             setLayout(new MigLayout("wrap 1", "", ""));
@@ -241,7 +241,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             setLayout(new MigLayout("wrap 1", "", ""));
 
-            add(new JLabel(Messages.message("tradeItem.gold")));
+            add(GUI.localizedLabel("tradeItem.gold"));
             add(this.spinner);
             add(clearButton, "split 2");
             add(addButton);
@@ -328,7 +328,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
-            this.label = new JLabel(Messages.message("tradeItem.goods"));
+            this.label = GUI.localizedLabel("tradeItem.goods");
             this.allGoods = allGoods;
 
             setLayout(new MigLayout("wrap 1", "", ""));
@@ -453,7 +453,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
-            this.label = new JLabel(Messages.message("tradeItem.incite"));
+            this.label = GUI.localizedLabel("tradeItem.incite");
 
             setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(Color.BLACK),
@@ -580,7 +580,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             setLayout(new MigLayout("wrap 1", "", ""));
 
-            add(new JLabel(Messages.message("tradeItem.stance")));
+            add(GUI.localizedLabel("tradeItem.stance"));
             add(this.stanceBox);
             add(this.clearButton, "split 2");
             add(this.addButton);
@@ -688,7 +688,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 = new JButton(Messages.message("negotiationDialog.add"));
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
-            this.label = new JLabel(Messages.message("tradeItem.unit"));
+            this.label = GUI.localizedLabel("tradeItem.unit");
             this.allUnits = allUnits;
 
             setLayout(new MigLayout("wrap 1", "", ""));

@@ -150,7 +150,7 @@ public class BuildingToolTip extends JToolTip {
             StringTemplate t = StringTemplate.template("buildingToolTip.breeding")
                 .addAmount("%number%", breedingNumber)
                 .add("%goods%", output.getNameKey());
-            add(new JLabel(Messages.message(t)));
+            add(GUI.localizedLabel(t));
         }
 
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {

@@ -212,8 +212,7 @@ public final class TradeRoutePanel extends FreeColPanel {
             unitLabel.setIcon(getLibrary().getUnitImageIcon(this.unit, 0.5));
             add(unitLabel);
             Location loc = this.unit.getLocation();
-            JLabel locLabel
-                = new JLabel(Messages.message(loc.getLocationLabelFor(player)));
+            JLabel locLabel = GUI.localizedLabel(loc.getLocationLabelFor(player));
             //locLabel.setIcon(getLibrary().getImageIcon(loc, false));
             add(locLabel);
         }

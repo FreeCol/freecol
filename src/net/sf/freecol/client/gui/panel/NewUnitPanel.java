@@ -31,6 +31,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
@@ -111,9 +112,10 @@ public class NewUnitPanel extends FreeColPanel {
             newButton.setLayout(new MigLayout("wrap 2", "[60]", "[30][30]"));
             ImageIcon icon = getLibrary().getUnitImageIcon(ut,
                 Specification.DEFAULT_ROLE_ID, !enable, 0.66);
-            JLabel name = localizedLabel(ut.getNameKey());
+            JLabel name = GUI.localizedLabel(ut.getNameKey());
             name.setEnabled(enable);
-            JLabel gold = localizedLabel(StringTemplate.template("goldAmount")
+            JLabel gold = GUI.localizedLabel(StringTemplate
+                .template("goldAmount")
                 .addAmount("%amount%", price));
             gold.setEnabled(enable);
             newButton.setEnabled(enable);

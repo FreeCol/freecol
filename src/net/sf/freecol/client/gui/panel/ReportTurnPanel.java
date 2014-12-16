@@ -129,7 +129,7 @@ public final class ReportTurnPanel extends ReportPanel {
             case ClientOptions.MESSAGES_GROUP_BY_TYPE:
                 if (message.getMessageType() != type) {
                     type = message.getMessageType();
-                    JLabel headline = localizedLabel(message.getMessageTypeName());
+                    JLabel headline = GUI.localizedLabel(message.getMessageTypeName());
                     headline.setFont(GUI.SMALL_HEADER_FONT);
                     reportPanel.add(headline, "newline 20, skip, span");
                 }
@@ -259,7 +259,7 @@ public final class ReportTurnPanel extends ReportPanel {
             return new JLabel();
         } else if (source instanceof Player) {
             Player player = (Player) source;
-            headline = localizedLabel(StringTemplate.template("playerNation")
+            headline = GUI.localizedLabel(StringTemplate.template("playerNation")
                                       .addName("%player%", player.getName())
                                       .addStringTemplate("%nation%", player.getNationName()));
         } else if (source instanceof Europe) {

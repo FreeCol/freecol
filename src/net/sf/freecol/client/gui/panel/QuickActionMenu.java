@@ -457,14 +457,15 @@ public final class QuickActionMenu extends JPopupMenu {
                 experiencePanel.setLayout(new MigLayout("wrap 3"));
                 experiencePanel.add(new JLabel(imageLibrary.getUnitImageIcon(expertType, 0.5)),
                                     "spany 2");
-                StringTemplate message = StringTemplate.template("menu.unit.experience")
-                    .addName("%job%", jobName);
-                experiencePanel.add(new JLabel(Messages.message(message)));
-                message = StringTemplate.template("fraction")
-                    .addAmount("%numerator%", experience)
-                    .addAmount("%denominator%", maxExperience);
-                experiencePanel.add(new JLabel(Messages.message(message)), "align right");
-                experiencePanel.add(new JLabel(Messages.message("menu.unit.upgrade")));
+                experiencePanel.add(GUI.localizedLabel(StringTemplate
+                        .template("menu.unit.experience")
+                        .addName("%job%", jobName)));
+                experiencePanel.add(GUI.localizedLabel(StringTemplate
+                        .template("fraction")
+                        .addAmount("%numerator%", experience)
+                        .addAmount("%denominator%", maxExperience)),
+                    "align right");
+                experiencePanel.add(GUI.localizedLabel("menu.unit.upgrade"));
                 experiencePanel.add(new JLabel(ModifierFormat.format(probability) + "%"),
                                     "align right");
                 this.add(experiencePanel);

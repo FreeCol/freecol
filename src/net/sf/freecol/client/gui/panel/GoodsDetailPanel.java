@@ -87,7 +87,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
         GoodsType type = getSpecification().getGoodsType(id);
         panel.setLayout(new MigLayout("wrap 4", "[]20[]"));
 
-        JLabel name = localizedLabel(type.getNameKey());
+        JLabel name = GUI.localizedLabel(type.getNameKey());
         name.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 
@@ -103,41 +103,44 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
                 }
             }
 
-            panel.add(localizedLabel("colopedia.goods.improvedBy"), "newline 20, top");
+            panel.add(GUI.localizedLabel("colopedia.goods.improvedBy"),
+                      "newline 20, top");
             if (improvements.isEmpty()) {
-                panel.add(localizedLabel("none"), "span");
+                panel.add(GUI.localizedLabel("none"), "span");
             } else {
                 for (int index = 0; index < improvements.size(); index++) {
                     String constraints = (index == 0) ? "span" : "skip, span";
-                    panel.add(localizedLabel(StringTemplate.template("colopedia.goods.improvement")
-                                             .addName("%name%", improvements.get(index))
-                                             .addName("%amount%", ModifierFormat.getModifierAsString(modifiers.get(index)))),
-                                    constraints);
+                    panel.add(GUI.localizedLabel(StringTemplate
+                            .template("colopedia.goods.improvement")
+                            .addName("%name%", improvements.get(index))
+                            .addName("%amount%", ModifierFormat.getModifierAsString(modifiers.get(index)))),
+                        constraints);
                 }
             }
         } else {
-            panel.add(localizedLabel("colopedia.goods.madeFrom"), "newline 20");
+            panel.add(GUI.localizedLabel("colopedia.goods.madeFrom"), "newline 20");
             if (type.isRefined()) {
                 panel.add(getGoodsButton(type.getInputType()), "span");
             } else {
-                panel.add(localizedLabel("nothing"), "span");
+                panel.add(GUI.localizedLabel("nothing"), "span");
             }
         }
 
-        panel.add(localizedLabel("colopedia.goods.makes"), "newline 20");
+        panel.add(GUI.localizedLabel("colopedia.goods.makes"), "newline 20");
         if (type.isRawMaterial()) {
             panel.add(getGoodsButton(type.getOutputType()), "span");
         } else if (type.getStoredAs() != type) {
             panel.add(getGoodsButton(type.getStoredAs()), "span");
         } else {
-            panel.add(localizedLabel("nothing"), "span");
+            panel.add(GUI.localizedLabel("nothing"), "span");
         }
 
         if (type.isBuildingMaterial()) {
             List<BuildingType> buildingTypes = new ArrayList<>();
             boolean allTypes = filterBuildables(getSpecification().getBuildingTypeList(), buildingTypes, type);
             if (!buildingTypes.isEmpty()) {
-                panel.add(localizedLabel("colopedia.goods.buildings"), "newline 20");
+                panel.add(GUI.localizedLabel("colopedia.goods.buildings"),
+                          "newline 20");
                 if (allTypes) {
                     JButton button = getButton(PanelType.BUILDINGS,
                                                Messages.message("colopedia.goods.allBuildings"),
@@ -159,10 +162,11 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
             List<Role> roles = new ArrayList<>();
             allTypes = filterBuildables(getSpecification().getRoles(), roles, type);
             if (!roles.isEmpty()) {
-                panel.add(localizedLabel("colopedia.goods.equipment"), "newline 20");
+                panel.add(GUI.localizedLabel("colopedia.goods.equipment"),
+                          "newline 20");
                 int count = 0;
                 for (Role role : roles) {
-                    JLabel label = localizedLabel(Messages.getName(role));
+                    JLabel label = GUI.localizedLabel(Messages.getName(role));
                     if (count > 0 && count % 3 == 0) {
                         panel.add(label, "skip");
                     } else {
@@ -174,7 +178,8 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
             List<UnitType> unitTypes = new ArrayList<>();
             allTypes = filterBuildables(getSpecification().getUnitTypeList(), unitTypes, type);
             if (!unitTypes.isEmpty()) {
-                panel.add(localizedLabel("colopedia.goods.units"), "newline 20");
+                panel.add(GUI.localizedLabel("colopedia.goods.units"),
+                          "newline 20");
                 if (allTypes) {
                     JButton button = getButton(PanelType.UNITS,
                                                Messages.message("colopedia.goods.allUnits"),
@@ -196,12 +201,13 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
         }
 
         if (type.getBreedingNumber() < FreeColObject.INFINITY) {
-            panel.add(localizedLabel("colopedia.goods.breedingNumber"),
+            panel.add(GUI.localizedLabel("colopedia.goods.breedingNumber"),
                       "newline 20");
             panel.add(new JLabel(Integer.toString(type.getBreedingNumber())));
         }
 
-        panel.add(localizedLabel("colopedia.goods.description"), "newline 20");
+        panel.add(GUI.localizedLabel("colopedia.goods.description"),
+                  "newline 20");
         panel.add(GUI.getDefaultTextArea(Messages.getDescription(type), 30),
                   "span, growx");
     }

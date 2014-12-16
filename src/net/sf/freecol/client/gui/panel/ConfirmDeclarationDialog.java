@@ -305,32 +305,32 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
         this.stars.setSelectedIndex(this.flag.getStars() - 1);
         this.stars.addItemListener(this);
-        panel.add(new JLabel(Messages.message("flag.stars.label")));
+        panel.add(GUI.localizedLabel("flag.stars.label"));
         panel.add(this.stars);
 
         this.stripes.setSelectedIndex(this.flag.getStripes() - 1);
         this.stripes.addItemListener(this);
-        panel.add(new JLabel(Messages.message("flag.stripes.label")));
+        panel.add(GUI.localizedLabel("flag.stripes.label"));
         panel.add(this.stripes);
 
         this.unionColor.setColor(this.flag.getUnionColor());
         this.unionColor.addActionListener(this);
-        panel.add(new JLabel(Messages.message("flag.unionColor.label")));
+        panel.add(GUI.localizedLabel("flag.unionColor.label"));
         panel.add(this.unionColor, "sg colorButton");
 
         this.decorationColor.setColor(this.flag.getDecorationColor());
         this.decorationColor.addActionListener(this);
-        panel.add(new JLabel(Messages.message("flag.decorationColor.label")));
+        panel.add(GUI.localizedLabel("flag.decorationColor.label"));
         panel.add(this.decorationColor);
 
         this.starColor.setColor(this.flag.getStarColor());
         this.starColor.addActionListener(this);
-        panel.add(new JLabel(Messages.message("flag.starColor.label")));
+        panel.add(GUI.localizedLabel("flag.starColor.label"));
         panel.add(this.starColor);
 
         List<Color> flagColors = this.flag.getBackgroundColors();
         int colors = flagColors.size();
-        panel.add(new JLabel(Messages.message("flag.backgroundColors.label")));
+        panel.add(GUI.localizedLabel("flag.backgroundColors.label"));
         for (int index = 0; index < this.backgroundColors.length; index++) {
             ColorButton button = this.backgroundColors[index];
             if (index < colors) button.setColor(flagColors.get(index));
@@ -364,7 +364,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         box.setRenderer(new EnumRenderer<T>(prefix));
         box.setSelectedItem(value);
         box.addItemListener(this);
-        panel.add(new JLabel(Messages.message(prefix + "label")));
+        panel.add(GUI.localizedLabel(prefix + "label"));
         panel.add(box);
     }
 

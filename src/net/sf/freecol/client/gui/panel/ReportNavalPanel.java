@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -71,9 +72,10 @@ public final class ReportNavalPanel extends ReportUnitPanel {
 
     protected void addOwnUnits() {
         final Player player = getMyPlayer();
-        reportPanel.add(localizedLabel(StringTemplate.template("report.military.forces")
-                                       .addStringTemplate("%nation%", player.getNationName())),
-                        "newline, span, split 2");
+        reportPanel.add(GUI.localizedLabel(StringTemplate
+                .template("report.military.forces")
+                .addStringTemplate("%nation%", player.getNationName())),
+            "newline, span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         for (UnitType unitType : getSpecification().getUnitTypeList()) {

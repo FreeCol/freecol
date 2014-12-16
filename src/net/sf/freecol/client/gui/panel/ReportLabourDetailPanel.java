@@ -81,7 +81,7 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
 
         // summary
         detailPanel.add(new JLabel(getLibrary().getUnitImageIcon(unitType)), "spany");
-        detailPanel.add(localizedLabel(unitType.getNameKey()));
+        detailPanel.add(GUI.localizedLabel(unitType.getNameKey()));
         detailPanel.add(new JLabel(String.valueOf(unitCount.getCount(unitType))), "wrap 10");
         boolean canTrain = false;
         Map<Location, Integer> unitLocations = data.get(unitType);
@@ -115,7 +115,7 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
             }
         }
         if (canTrain) {
-            detailPanel.add(new JLabel(Messages.message("report.labour.canTrain")),
+            detailPanel.add(GUI.localizedLabel("report.labour.canTrain"),
                             "newline 20, span");
         }
         reportPanel.add(detailPanel);

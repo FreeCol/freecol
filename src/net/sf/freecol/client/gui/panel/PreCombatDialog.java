@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.FeatureContainer;
@@ -131,8 +131,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         Font bigFont = getFont().deriveFont(Font.BOLD, 20f);
         float offenceResult
             = FeatureContainer.applyModifiers(0f, turn, attackModifiers);
-        JLabel finalOffenceLabel
-            = new JLabel(Messages.message("model.source.finalResult.name"));
+        JLabel finalOffenceLabel = GUI.localizedLabel("model.source.finalResult.name");
         finalOffenceLabel.setFont(bigFont);
         panel.add(new JSeparator(JSeparator.HORIZONTAL),
                   "newline, span 3, growx");
@@ -145,8 +144,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
 
         float defenceResult
             = FeatureContainer.applyModifiers(0f, turn, defenceModifiers);
-        JLabel finalDefenceLabel
-            = new JLabel(Messages.message("model.source.finalResult.name"));
+        JLabel finalDefenceLabel = GUI.localizedLabel("model.source.finalResult.name");
         finalDefenceLabel.setFont(bigFont);
         panel.add(finalDefenceLabel, "skip");
         JLabel finalDefenceResult

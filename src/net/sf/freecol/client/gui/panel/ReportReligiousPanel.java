@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -50,7 +51,7 @@ public final class ReportReligiousPanel extends ReportPanel {
         super(freeColClient, Messages.message("reportReligionAction.name"));
 
         reportPanel.setLayout(new MigLayout("wrap 5, gap 20 20", "", ""));
-        reportPanel.add(new JLabel(Messages.message("crosses")));
+        reportPanel.add(GUI.localizedLabel("crosses"));
 
         final Player player = getMyPlayer();
         final Specification spec = getSpecification();

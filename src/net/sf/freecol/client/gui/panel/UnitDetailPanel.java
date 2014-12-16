@@ -107,21 +107,21 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         UnitType type = getSpecification().getUnitType(id);
         panel.setLayout(new MigLayout("wrap 4", "[]20[]40[]20[]"));
 
-        JLabel name = localizedLabel(type.getNameKey());
+        JLabel name = GUI.localizedLabel(type.getNameKey());
         name.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 
-        panel.add(localizedLabel("colopedia.unit.offensivePower"));
+        panel.add(GUI.localizedLabel("colopedia.unit.offensivePower"));
         panel.add(new JLabel(Integer.toString((int)type.getOffence())), "right");
 
-        panel.add(localizedLabel("colopedia.unit.defensivePower"));
+        panel.add(GUI.localizedLabel("colopedia.unit.defensivePower"));
         panel.add(new JLabel(Integer.toString((int)type.getDefence())), "right");
 
-        panel.add(localizedLabel("colopedia.unit.movement"));
+        panel.add(GUI.localizedLabel("colopedia.unit.movement"));
         panel.add(new JLabel(String.valueOf(type.getMovement()/3)), "right");
 
         if (type.canCarryGoods() || type.canCarryUnits()) {
-            panel.add(localizedLabel("colopedia.unit.capacity"));
+            panel.add(GUI.localizedLabel("colopedia.unit.capacity"));
             panel.add(new JLabel(Integer.toString(type.getSpace())), "right");
         }
 
@@ -136,13 +136,13 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             price = Integer.toString(type.getPrice());
         }
         if (price != null) {
-            panel.add(localizedLabel("colopedia.unit.price"));
+            panel.add(GUI.localizedLabel("colopedia.unit.price"));
             panel.add(new JLabel(price), "right");
         }
 
 
         if (type.hasSkill()) {
-            panel.add(localizedLabel("colopedia.unit.skill"));
+            panel.add(GUI.localizedLabel("colopedia.unit.skill"));
             panel.add(new JLabel(Integer.toString(type.getSkill())), "right");
 
             List<BuildingType> schools = new ArrayList<>();
@@ -153,7 +153,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             }
 
             if (!schools.isEmpty()) {
-                panel.add(localizedLabel("colopedia.unit.school"), "newline");
+                panel.add(GUI.localizedLabel("colopedia.unit.school"), "newline");
                 int count = 0;
                 for (BuildingType school : schools) {
                     JButton label = getButton(school);
@@ -175,7 +175,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
                 }
             }
             if (!nations.isEmpty()) {
-                panel.add(localizedLabel("colopedia.unit.natives"), "newline");
+                panel.add(GUI.localizedLabel("colopedia.unit.natives"), "newline");
                 int count = 0;
                 for (IndianNationType nation : nations) {
                     JButton label = getButton(nation);
@@ -193,7 +193,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         // Requires - prerequisites to build
         Map<String, Boolean> abilities = type.getRequiredAbilities();
         if (!abilities.isEmpty()) {
-            panel.add(localizedLabel("colopedia.unit.requirements"), "newline, top");
+            panel.add(GUI.localizedLabel("colopedia.unit.requirements"), "newline, top");
             String key = abilities.keySet().iterator().next();
             try {
                 JTextPane textPane = GUI.getDefaultTextPane();
@@ -213,7 +213,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         if (bonusNumber > 0) {
             StringTemplate template = StringTemplate.template("colopedia.unit.productionBonus")
                 .addAmount("%number%", bonusNumber);
-            panel.add(localizedLabel(template), "newline 20, top");
+            panel.add(GUI.localizedLabel(template), "newline 20, top");
             JPanel productionPanel = new JPanel(new GridLayout(0, MODIFIERS_PER_ROW));
             productionPanel.setOpaque(false);
             for (Modifier productionBonus : bonusList) {
@@ -225,7 +225,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         }
 
         if (type.needsGoodsToBuild()) {
-            panel.add(localizedLabel("colopedia.unit.goodsRequired"),
+            panel.add(GUI.localizedLabel("colopedia.unit.goodsRequired"),
                             "newline 20");
             List<AbstractGoods> required = type.getRequiredGoods();
             AbstractGoods goods = required.get(0);
@@ -241,7 +241,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             }
         }
 
-        panel.add(localizedLabel("colopedia.unit.description"),
+        panel.add(GUI.localizedLabel("colopedia.unit.description"),
                   "newline 20");
         panel.add(GUI.getDefaultTextArea(Messages.getDescription(type), 30),
                   "span");
