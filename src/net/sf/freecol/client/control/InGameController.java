@@ -2014,19 +2014,12 @@ public final class InGameController implements NetworkConstants {
             canEstablish, canDenounce);
         if (act == null) return true;
         switch (act) {
-        case ESTABLISH_MISSION:
-            if (askServer().missionary(unit, direction, false)) {
-                if (settlement.hasMissionary(player)) {
-                    gui.playSound("sound.event.missionEstablished");
-                }
+        case ESTABLISH_MISSION: case DENOUNCE_HERESY:
+            if (askServer().missionary(unit, direction,
+                    act == GUI.MissionaryAction.DENOUNCE_HERESY)
+                && settlement.hasMissionary(player)) {
+                gui.playSound("sound.event.missionEstablished");
                 player.invalidateCanSeeTiles();
-            }
-            break;
-        case DENOUNCE_HERESY:
-            if (askServer().missionary(unit, direction, true)) {
-                if (settlement.hasMissionary(player)) {
-                    gui.playSound("sound.event.missionEstablished");
-                }
                 displayModelMessages(false, false);
             }
             break;

@@ -503,6 +503,7 @@ public class ServerIndianSettlement extends IndianSettlement
             missionary.setLocation(null);//-vis(newOwner)
             missionary.setLocationNoUpdate(this);//-vis(newOwner),-til
             missionary.setMovesLeft(0);
+            cs.add(See.only(newOwner), missionary);
             setConvertProgress(0);
             csChangeAlarm(newOwner, ALARM_NEW_MISSIONARY, true, cs);//-til
             tile.updateIndianSettlement(newOwner);
@@ -513,7 +514,7 @@ public class ServerIndianSettlement extends IndianSettlement
                     cs.add(See.only(newOwner), t);
                 }
             }
-            cs.add(See.perhaps(), tile);
+            cs.add(See.perhaps().always(newOwner), tile);
             newOwner.invalidateCanSeeTiles();//+vis(newOwner)
         }
     }
