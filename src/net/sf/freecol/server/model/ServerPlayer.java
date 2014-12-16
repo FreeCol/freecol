@@ -911,6 +911,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
         invalidateCanSeeTiles();//+vis(this)
+        if (!reveal) {
+            for (Settlement s : getSettlements()) exploreForSettlement(s);
+            for (Unit u : getUnits()) exploreForUnit(u);
+        }
         return result;
     }
 
