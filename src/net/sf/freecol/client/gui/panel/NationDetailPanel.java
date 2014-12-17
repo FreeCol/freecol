@@ -97,7 +97,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
         panel.add(artLabel, "spany, gap 40, top");
 
         panel.add(localizedLabel("colopedia.nation.ruler"));
-        panel.add(localizedLabel(nation.getRulerNameKey()));
+        panel.add(new JLabel(nation.getRulerName()));
 
         panel.add(localizedLabel("colopedia.nation.defaultAdvantage"));
         panel.add(getButton(nation.getType()));

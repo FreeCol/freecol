@@ -362,7 +362,7 @@ public final class PlayersTable extends JTable {
                     }
                 }
                 Nation nation = (Nation) table.getValueAt(row, NATION_COLUMN);
-                label.setText(Messages.message(nation.getRulerNameKey()));
+                label.setText(nation.getRulerName());
             } else {
                 label.setText(player.getName());
             }

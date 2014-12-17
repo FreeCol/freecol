@@ -58,7 +58,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         for (Nation n : spec().getNations()) {
             if (n.getType().isEuropean() && !n.getType().isREF()
                 && !n.isUnknownEnemy()) {
-                g.addPlayer(new ServerPlayer(g, n.getType().getNameKey(), false, n, null, null));
+                g.addPlayer(new ServerPlayer(g, false, n, null, null));
             }
         }
 
@@ -80,7 +80,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         MapGenerator gen = new SimpleMapGenerator(g, new Random(1));
         Nation nation = spec().getNation("model.nation.dutch");
 
-        g.addPlayer(new ServerPlayer(g, nation.getType().getNameKey(), false, nation, null, null));
+        g.addPlayer(new ServerPlayer(g, false, nation, null, null));
 
         gen.createMap();
 
@@ -112,8 +112,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         for (Nation n : spec().getNations()) {
             if (n.isUnknownEnemy()) continue;
-            Player p = new ServerPlayer(g, n.getType().getNameKey(), false, n,
-                                        null, null);
+            Player p = new ServerPlayer(g, false, n, null, null);
             p.setAI(!n.getType().isEuropean() || n.getType().isREF());
             g.addPlayer(p);
             players.add(p);
@@ -164,8 +163,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         for (Nation n : spec().getNations()) {
             if (n.isUnknownEnemy()) continue;
-            Player p = new ServerPlayer(g, n.getType().getNameKey(), false, n,
-                                        null, null);
+            Player p = new ServerPlayer(g, false, n, null, null);
             p.setAI(!n.getType().isEuropean() || n.getType().isREF());
             g.addPlayer(p);
             players.add(p);

@@ -27,6 +27,7 @@ import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
@@ -447,8 +448,9 @@ public class MessagesTest extends FreeColTestCase {
         // Messages.getTemplate/getFullTemplate.
         Game game = getStandardGame();
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer dutchREF = new ServerPlayer(game, "dutchREF", false,
-            dutch.getNation().getREFNation(), null, null);
+        Nation refNation = dutch.getNation().getREFNation();
+        ServerPlayer dutchREF = new ServerPlayer(game, false, refNation, 
+                                                 null, null);
         ServerPlayer sioux = (ServerPlayer)game.getPlayer("model.nation.sioux");
         Unit unit;
 

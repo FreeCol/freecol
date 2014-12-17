@@ -36,10 +36,8 @@ public class GameTest extends FreeColTestCase {
         Game game = new ServerGame(spec());
         game.setNationOptions(new NationOptions(spec()));
         game.setMap(getTestMap());
-
-        game.addPlayer(new ServerPlayer(game, "TestPlayer", false,
-                                        spec().getNation("model.nation.dutch"),
-                                        null, null));
+        Nation dutchNation = spec().getNation("model.nation.dutch");
+        game.addPlayer(new ServerPlayer(game, false, dutchNation, null, null));
         // map tiles are null
         // game.newTurn();
     }
@@ -57,8 +55,7 @@ public class GameTest extends FreeColTestCase {
                 == NationOptions.NationState.NOT_AVAILABLE) {
                 counter++;
             } else {
-                Player p = new ServerPlayer(game, n.getType().getNameKey(),
-                                            false, n, null, null);
+                Player p = new ServerPlayer(game, false, n, null, null);
                 p.setAI(!n.getType().isEuropean() || n.getType().isREF());
                 game.addPlayer(p);
                 players.add(p);

@@ -201,10 +201,19 @@ public class Nation extends FreeColGameObjectType {
     /**
      * Get a message key for the ruler of this nation.
      *
-     * @return a <code>String</code> value
+     * @return The name key for the ruler.
      */
     public final String getRulerNameKey() {
         return Messages.rulerKey(getId());
+    }
+
+    /**
+     * Get the name of the nation monarch.
+     *
+     * @return The ruler name.
+     */
+    public String getRulerName() {
+        return Messages.message(getRulerNameKey());
     }
 
     /**

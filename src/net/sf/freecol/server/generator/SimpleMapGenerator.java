@@ -256,9 +256,7 @@ public class SimpleMapGenerator implements MapGenerator {
                         + player.getNationId() + " not found in spec.");
                     continue;
                 }
-                String name = Messages.message(nation.getRulerNameKey());
-                indian = new ServerPlayer(game, name, false, nation, 
-                                          null, null);
+                indian = new ServerPlayer(game, false, nation, null, null);
                 logger.info("Imported new native nation "
                     + player.getNationId() + ": " + indian.getId());
                 game.addPlayer(indian);

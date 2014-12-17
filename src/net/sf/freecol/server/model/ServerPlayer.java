@@ -160,29 +160,24 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Creates a new ServerPlayer.
      *
      * @param game The <code>Game</code> this object belongs to.
-     * @param name The player name.
      * @param admin Whether the player is the game administrator or not.
      * @param nation The nation of the <code>Player</code>.
      * @param socket The socket to the player's client.
      * @param connection The <code>Connection</code> for the socket.
      */
-    public ServerPlayer(Game game, String name, boolean admin, Nation nation,
+    public ServerPlayer(Game game, boolean admin, Nation nation,
                         Socket socket, Connection connection) {
         super(game);
 
+        if (nation == null) throw new IllegalArgumentException("Null nation");
         final Specification spec = getSpecification();
 
-        this.name = (name == null) ? null
-            : (name.startsWith("model.nation.")) ? Messages.message(name)
-            : name;
+        this.name = nation.getRulerName();
         this.admin = admin;
+        this.nationId = nation.getId();
         this.immigration = 0;
-        if (nation == null) {
-            throw new IllegalArgumentException("Null nation");
-        } else if (nation.isUnknownEnemy()) {
-            // virtual "enemy privateer" player
+        if (nation.isUnknownEnemy()) { // virtual "enemy privateer" player
             this.nationType = null;
-            this.nationId = nation.getId();
             this.playerType = PlayerType.COLONIAL;
             this.europe = null;
             this.monarch = null;
@@ -190,7 +185,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
             this.setAI(true);
         } else if (nation.getType() != null) {
             this.nationType = nation.getType();
-            this.nationId = nation.getId();
             try {
                 addFeatures(nationType);
             } catch (Throwable error) {
@@ -209,7 +203,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 this.europe = new ServerEurope(game, this);
                 initializeHighSeas();
                 if (this.playerType == PlayerType.COLONIAL) {
-                    this.monarch = new Monarch(game, this, nation.getRulerNameKey());
+                    this.monarch = new Monarch(game, this,
+                                               nation.getRulerNameKey());
                     // In BR#2615 misiulo reports that Col1 players start
                     // with 2 crosses.  This is surprising, but you could
                     // argue that some level of religious unrest might

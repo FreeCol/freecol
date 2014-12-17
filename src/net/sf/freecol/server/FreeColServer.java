@@ -1076,9 +1076,8 @@ public final class FreeColServer {
     private ServerPlayer establishUnknownEnemy(Game game) {
         final Specification spec = game.getSpecification();
 
-        Nation unknown = spec.getNation(Nation.UNKNOWN_NATION_ID);
-        ServerPlayer enemy = new ServerPlayer(game, Nation.UNKNOWN_NATION_ID,
-                                              false, unknown, null, null);
+        ServerPlayer enemy = new ServerPlayer(game, false,
+            spec.getNation(Nation.UNKNOWN_NATION_ID), null, null);
         game.setUnknownEnemy(enemy);
         return enemy;
     }
@@ -1190,9 +1189,8 @@ public final class FreeColServer {
         DummyConnection theConnection
             = new DummyConnection("Server connection - " + nation.getId(),
                 getInGameInputHandler());
-        ServerPlayer aiPlayer
-            = new ServerPlayer(getGame(), nation.getRulerNameKey(), false,
-                               nation, null, theConnection);
+        ServerPlayer aiPlayer = new ServerPlayer(getGame(), false, nation,
+                                                 null, theConnection);
         aiPlayer.setAI(true);
         DummyConnection aiConnection
             = new DummyConnection("AI connection - " + nation.getId(),
