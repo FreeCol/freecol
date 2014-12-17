@@ -315,8 +315,8 @@ public class Unit extends GoodsLocation
                 // label is required, so fall through into the FULL case.
             } else {
                 return Messages.getUnitLabel(getName(), type.getId(), 1,
-                                             Messages.nameKey(owner.getNation()), 
-                                             role.getId(), null);
+                                             owner.getNationId(), role.getId(),
+                                             null);
             }
             // Fall through
 
@@ -364,8 +364,8 @@ public class Unit extends GoodsLocation
                 }
             }
             return Messages.getUnitLabel(getName(), type.getId(), 1,
-                                         Messages.nameKey(owner.getNation()), 
-                                         role.getId(), extra);
+                                         owner.getNationId(), role.getId(),
+                                         extra);
         default: // Can not happen
             break;
         }
