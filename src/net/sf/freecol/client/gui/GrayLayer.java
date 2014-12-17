@@ -31,8 +31,8 @@ import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.InfoPanel;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 

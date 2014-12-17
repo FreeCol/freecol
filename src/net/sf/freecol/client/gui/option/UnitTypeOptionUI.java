@@ -26,8 +26,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.UnitTypeOption;
 

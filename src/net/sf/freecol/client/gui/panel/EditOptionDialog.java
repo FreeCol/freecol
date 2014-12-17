@@ -24,7 +24,6 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.option.OptionUI;
 import net.sf.freecol.client.gui.panel.MigPanel;
-
 import net.sf.freecol.common.option.Option;
 
 

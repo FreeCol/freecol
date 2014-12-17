@@ -28,7 +28,7 @@ SMALL {
 <P>This package contains the FreeCol support for internationalisation
 (translation).
 
-<P>The {@link net.sf.freecol.client.gui.i18n.Messages} class provides the API to
+<P>The {@link net.sf.freecol.common.i18n.Messages} class provides the API to
 the translations.  Client code might include:
 
 <P class=code>
@@ -70,7 +70,7 @@ new messages are added.
 
 <P class=code>
 ant compile-test<BR>
-java&nbsp;-cp&nbsp;src/classes&nbsp;net.sf.freecol.client.gui.i18n.MessageMerge&nbsp;<FONT color=red>src/net/sf/freecol/client/gui/i18n/FreeColMessages.properties</FONT>&nbsp;src/net/sf/freecol/client/gui/i18n/FreeColMessages_hu.properties
+java&nbsp;-cp&nbsp;src/classes&nbsp;net.sf.freecol.common.i18n.MessageMerge&nbsp;<FONT color=red>data/strings/FreeColMessages.properties</FONT>&nbsp;data/strings/FreeColMessages_hu.properties
 </P>
 
 ..where the red message file is the one to merge from (typically the one shown

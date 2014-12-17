@@ -57,7 +57,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.FreeColAction;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.AboutPanel;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
@@ -145,6 +144,7 @@ import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColFileFilter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -184,7 +184,7 @@ import net.sf.freecol.common.resources.Video;
  * <b>Displaying panels and a dialogs</b> <br>
  * <br>
  * <code>Canvas</code> contains methods to display various panels and dialogs.
- * Most of these methods use {@link net.sf.freecol.client.gui.i18n i18n} to get
+ * Most of these methods use {@link net.sf.freecol.common.i18n i18n} to get
  * localized text.  Dialogs return results, and may be modal or non-modal.
  */
 public final class Canvas extends JDesktopPane {

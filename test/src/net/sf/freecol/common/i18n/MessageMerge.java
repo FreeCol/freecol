@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.i18n;
+package net.sf.freecol.common.i18n;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;

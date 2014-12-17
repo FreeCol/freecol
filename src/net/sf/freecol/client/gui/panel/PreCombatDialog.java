@@ -20,15 +20,16 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
@@ -40,8 +41,6 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**

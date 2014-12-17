@@ -17,11 +17,12 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.i18n;
+package net.sf.freecol.common.i18n;
 
 import java.io.File;
 import java.io.FileInputStream;
-import net.sf.freecol.client.gui.i18n.Number.Category;
+
+import net.sf.freecol.common.i18n.Number.Category;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 

@@ -21,7 +21,7 @@ package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
 
-import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Modifier;
@@ -141,7 +141,7 @@ public abstract class FreeColGameObjectType extends FreeColObject
 
     /**
      * Gets a string suitable for looking up the description of
-     * this object in {@link net.sf.freecol.client.gui.i18n.Messages}.
+     * this object in {@link net.sf.freecol.common.i18n.Messages}.
      *
      * @return A description key.
      */
@@ -188,7 +188,7 @@ public abstract class FreeColGameObjectType extends FreeColObject
 
     /**
      * Gets a string suitable for looking up the name of this
-     * object in {@link net.sf.freecol.client.gui.i18n.Messages}.
+     * object in {@link net.sf.freecol.common.i18n.Messages}.
      *
      * @return A message key.
      */

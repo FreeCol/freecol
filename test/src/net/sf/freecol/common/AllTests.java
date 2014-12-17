@@ -27,6 +27,7 @@ public class AllTests {
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for net.sf.freecol.common");
         //$JUnit-BEGIN$
+        suite.addTest(net.sf.freecol.common.i18n.AllTests.suite());
         suite.addTest(net.sf.freecol.common.io.AllTests.suite());
         suite.addTest(net.sf.freecol.common.option.AllTests.suite());
         suite.addTest(net.sf.freecol.common.model.AllTests.suite());

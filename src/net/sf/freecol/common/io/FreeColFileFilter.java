@@ -24,7 +24,7 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.i18n.Messages;
 
 
 /**

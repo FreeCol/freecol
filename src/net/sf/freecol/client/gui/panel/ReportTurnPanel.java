@@ -38,12 +38,12 @@ import javax.swing.JLabel;
 import javax.swing.JTextPane;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-
 import net.miginfocom.swing.MigLayout;
+
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;

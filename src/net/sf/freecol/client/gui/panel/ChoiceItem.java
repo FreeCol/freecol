@@ -22,7 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import javax.swing.ImageIcon;
 import java.util.Comparator;
 
-import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Player;

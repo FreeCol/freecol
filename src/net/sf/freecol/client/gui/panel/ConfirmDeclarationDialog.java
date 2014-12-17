@@ -37,20 +37,19 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.Flag.Background;
 import net.sf.freecol.client.gui.panel.Flag.Decoration;
 import net.sf.freecol.client.gui.panel.Flag.UnionPosition;
 import net.sf.freecol.client.gui.panel.Flag.UnionShape;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**

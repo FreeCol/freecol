@@ -33,11 +33,11 @@ import javax.swing.JTextPane;
 import javax.swing.JViewport;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-
 import net.miginfocom.swing.MigLayout;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;

@@ -24,7 +24,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.option.SelectOption;
 
 

@@ -23,8 +23,9 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
+
 
 /**
  * Action to load and start the most recent save game of the client.

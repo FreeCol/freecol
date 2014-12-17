@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.i18n;
+package net.sf.freecol.common.i18n;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
-import net.sf.freecol.client.gui.i18n.Number.Category;
+import net.sf.freecol.common.i18n.Number.Category;
 import net.sf.freecol.common.io.FreeColXMLReader;
 
 

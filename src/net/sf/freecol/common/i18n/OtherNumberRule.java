@@ -17,21 +17,17 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.i18n;
+package net.sf.freecol.common.i18n;
 
 
 /**
- * Number optimized for languages that distinguish the categories one
- * and other.
+ * Number optimized for languages that do not distinguish any number
+ * categories. The category returned is always other.
  */
-public class PluralNumberRule extends Number {
+public class OtherNumberRule extends Number {
 
     public Category getCategory(double input) {
-        if (input == 1) {
-            return Category.one;
-        } else {
-            return Category.other;
-        }
+        return Category.other;
     }
 
 }

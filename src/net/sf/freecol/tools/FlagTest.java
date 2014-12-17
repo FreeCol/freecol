@@ -33,8 +33,8 @@ import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-
 import net.miginfocom.swing.MigLayout;
+
 import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
 import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog.ColorButton;
 import net.sf.freecol.client.gui.panel.Flag;

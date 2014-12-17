@@ -34,10 +34,10 @@ import javax.swing.ListCellRenderer;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.ObjectWithId;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.option.LanguageOption.Language;
-import net.sf.freecol.client.gui.i18n.Messages;
 
 
 /**

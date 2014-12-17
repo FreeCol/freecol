@@ -30,8 +30,8 @@ import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
-
 import net.miginfocom.swing.MigLayout;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;

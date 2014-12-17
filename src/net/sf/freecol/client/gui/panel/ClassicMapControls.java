@@ -20,9 +20,9 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
+
 import javax.swing.JButton;
 import javax.swing.JPanel;
-
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;

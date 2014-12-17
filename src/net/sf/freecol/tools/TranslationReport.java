@@ -50,7 +50,7 @@ public class TranslationReport {
     public static void main(String[] args) throws Exception {
         ArrayList<LanguageStatsRecord> statistics = new ArrayList<>();
 
-        //String dirName = "src/net/sf/freecol/client/gui/i18n/";
+        //String dirName = "src/net/sf/freecol.common.i18n/";
         String dirName = args[0];
         File directory = new File(dirName);
         if (!directory.isDirectory()) {

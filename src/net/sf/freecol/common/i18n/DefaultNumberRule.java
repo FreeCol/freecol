@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.i18n;
+package net.sf.freecol.common.i18n;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class DefaultNumberRule extends Number {
      * @param rule a <code>Rule</code> value
      */
     public void addRule(Category number, Rule rule) {
-	rules.put(number, rule);
+        rules.put(number, rule);
     }
 
     /**
@@ -48,7 +48,7 @@ public class DefaultNumberRule extends Number {
      * @param input a <code>String</code> value
      */
     public void addRule(Category number, String input) {
-	rules.put(number, new Rule(input));
+        rules.put(number, new Rule(input));
     }
 
     /**
@@ -74,14 +74,12 @@ public class DefaultNumberRule extends Number {
      * {@inheritDoc}
      */
     public Category getCategory(double input) {
-
-	for (Category number : Category.values()) {
-	    Rule r = rules.get(number);
-	    if (r != null && r.matches(input)) {
-		return number;
-	    }
-	}
-	return Category.other;
+        for (Category number : Category.values()) {
+            Rule r = rules.get(number);
+            if (r != null && r.matches(input)) {
+                return number;
+            }
+        }
+        return Category.other;
     }
-
 }

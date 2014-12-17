@@ -17,19 +17,26 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.i18n;
+package net.sf.freecol.common.i18n;
 
-public interface Selector {
+
+/**
+ * Number optimized for languages that distinguish the categories one,
+ * two and other.
+ */
+public class DualNumberRule extends Number {
 
     /**
-     * Transform the given string selector into a replacement key for
-     * a choice format.
-     *
-     * @param selector a <code>String</code> value
-     * @param template the <code>String</code> template that contains
-     * the selector (only used for error reporting)
-     * @return a <code>String</code> value
+     * {@inheritDoc}
      */
-    public String getKey(String selector, String template);
+    public Category getCategory(double input) {
+        if (input == 1) {
+            return Category.one;
+        } else if (input == 2) {
+            return Category.two;
+        } else {
+            return Category.other;
+        }
+    }
 
 }

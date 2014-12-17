@@ -17,17 +17,19 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.i18n;
+package net.sf.freecol.common.i18n;
 
+public interface Selector {
 
-/**
- * Number optimized for languages that do not distinguish any number
- * categories. The category returned is always other.
- */
-public class OtherNumberRule extends Number {
-
-    public Category getCategory(double input) {
-        return Category.other;
-    }
+    /**
+     * Transform the given string selector into a replacement key for
+     * a choice format.
+     *
+     * @param selector a <code>String</code> value
+     * @param template the <code>String</code> template that contains
+     * the selector (only used for error reporting)
+     * @return a <code>String</code> value
+     */
+    public String getKey(String selector, String template);
 
 }

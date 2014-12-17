@@ -27,6 +27,7 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.Result;
@@ -34,8 +35,9 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.client.gui.i18n.Messages;
 
 
 /**

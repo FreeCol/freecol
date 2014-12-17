@@ -17,20 +17,15 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.i18n;
+package net.sf.freecol.common.i18n;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.List;
 
 
-public class AllTests {
+public final class Merge {
 
-    public static Test suite() {
-        TestSuite suite = new TestSuite("Test for net.sf.freecol.client.gui.i18n");
-        //$JUnit-BEGIN$
-        suite.addTestSuite(CLDRTest.class);
-        suite.addTestSuite(MessagesTest.class);
-        //$JUnit-END$
-        return suite;
-    }
+    List<String> lineFromFile1;
+
+    List<String> lineFromFile2;
+
 }
