@@ -204,8 +204,13 @@ public final class ServerListPanel extends FreeColPanel {
 
 class ServerListTableModel extends AbstractTableModel {
 
-    private static final String[] columnNames = { Messages.message("name"), Messages.message("host"),
-            Messages.message("port"), Messages.message("players"), Messages.message("gameState"), };
+    private static final String[] columnNames = {
+        Messages.message("name"),
+        Messages.message("host"),
+        Messages.message("port"),
+        Messages.message("players"),
+        Messages.message("gameState"),
+    };
 
     private List<ServerInfo> items;
 

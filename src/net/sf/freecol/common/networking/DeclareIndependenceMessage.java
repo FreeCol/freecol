@@ -24,7 +24,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
-import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Element;
 
@@ -90,7 +89,7 @@ public class DeclareIndependenceMessage extends DOMMessage {
         }
         StringTemplate problem = player.checkDeclareIndependence();
         if (problem != null) {
-            return DOMMessage.clientError(Messages.message(problem));
+            return DOMMessage.clientError("Declaration blocked");
         }
 
         // Declare.

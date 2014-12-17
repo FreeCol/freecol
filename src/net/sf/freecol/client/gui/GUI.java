@@ -1395,7 +1395,7 @@ public class GUI {
      */
     public boolean confirmLeaveColony(Unit unit) {
         Colony colony = unit.getColony();
-        String message = colony.getReducePopulationMessage();
+        StringTemplate message = colony.getReducePopulationMessage();
         if (message != null) {
             showInformationMessage(message);
             return false;

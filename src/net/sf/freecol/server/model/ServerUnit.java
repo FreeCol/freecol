@@ -1098,13 +1098,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
         Region region = newTile.getDiscoverableRegion();
         if (serverPlayer.isEuropean() && region != null
             && region.getDiscoverer() == null) {
-            String defaultName = (region.isPacific())
-                ? Messages.message("model.region.pacific")
-                : Messages.getDefaultRegionName(serverPlayer,
-                                                region.getType());
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new NewRegionNameMessage(region, newTile, this,
-                                         defaultName));
+                    Messages.getDefaultRegionName(serverPlayer, region)));
             region.setDiscoverer(getId());
         }
     }

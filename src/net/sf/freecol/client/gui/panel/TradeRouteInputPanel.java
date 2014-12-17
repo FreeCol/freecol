@@ -759,11 +759,10 @@ public final class TradeRouteInputPanel extends FreeColPanel
         for (int index = 0; index < this.stopListModel.getSize(); index++) {
             TradeRouteStop stop = this.stopListModel.get(index);
             if (!TradeRoute.isStopValid(player, stop)) {
-                String badStop = Messages.message(stop.getLocation()
-                    .getLocationLabelFor(player));
-                StringTemplate template
-                    = StringTemplate.template("tradeRoute.invalidStop")
-                        .addName("%name%", badStop);
+                StringTemplate template = StringTemplate
+                    .template("tradeRoute.invalidStop")
+                    .addStringTemplate("%name%",
+                        stop.getLocation().getLocationLabelFor(player));
                 getGUI().showErrorMessage(template);
                 return false;
             }

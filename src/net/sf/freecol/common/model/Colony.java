@@ -1496,12 +1496,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Gets the message to display if the colony can not reduce its
      * population.
      *
-     * @return A string to describing why a colony can not reduce its
-     *     population, or null if it can.
+     * @return A <code>StringTemplate</code> describing why a colony
+     *     can not reduce its population, or null if it can.
      */
-    public String getReducePopulationMessage() {
+    public StringTemplate getReducePopulationMessage() {
         if (canReducePopulation()) return null;
-        String message = "";
         Set<Modifier> modifierSet = getModifiers(Modifier.MINIMUM_COLONY_SIZE);
         for (Modifier modifier : modifierSet) {
             FreeColObject source = modifier.getSource();
@@ -1515,10 +1514,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 // stockade, BR#3522055.
                 source = getBuilding((BuildingType)source).getType();
             }
-            return Messages.message(StringTemplate.template("colonyPanel.minimumColonySize")
-                .addName("%object%", source));
+            return StringTemplate.template("colonyPanel.minimumColonySize")
+                .addName("%object%", source);
         }
-        return message;
+        return null;
     }
 
     /**

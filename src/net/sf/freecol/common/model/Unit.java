@@ -321,11 +321,11 @@ public class Unit extends GoodsLocation
             // Fall through
 
         case FULL:
-            String extra = null;
+            StringTemplate extra = null;
             if (role.isDefaultRole()) {
                 if (canCarryTreasure()) {
-                    extra = Messages.message(StringTemplate.template("goldAmount")
-                        .addAmount("%amount%", getTreasureAmount()));
+                    extra = StringTemplate.template("goldAmount")
+                        .addAmount("%amount%", getTreasureAmount());
                 } else {
                     boolean noEquipment = false;
                     // unequipped expert has no-equipment label
@@ -333,7 +333,7 @@ public class Unit extends GoodsLocation
                     for (Role someRole : expertRoles) {
                         String key = someRole.getId() + ".noequipment";
                         if (Messages.containsKey(key)) {
-                            extra = Messages.message(key);
+                            extra = StringTemplate.key(key);
                             break;
                         }
                     }
@@ -343,24 +343,22 @@ public class Unit extends GoodsLocation
                 if (Messages.containsKey(equipmentKey)) {
                     // Currently only used for missionary which does not
                     // have equipment that directly corresponds to goods.
-                    extra = Messages.message(StringTemplate
-                        .template("model.goods.goodsAmount")
+                    extra = StringTemplate.template("model.goods.goodsAmount")
                         .add("%goods%", equipmentKey)
-                        .addAmount("%amount%", 1));
+                        .addAmount("%amount%", 1);
                 } else {
                     // Other roles can be characterized by their goods.
                     List<AbstractGoods> requiredGoods
                         = role.getRequiredGoods(getRoleCount());
                     boolean first = true;
-                    StringTemplate g = StringTemplate.label("");
+                    extra = StringTemplate.label("");
                     for (AbstractGoods ag : requiredGoods) {
-                        if (first) first = false; else g.addName(" ");
-                        g.addStringTemplate(StringTemplate
+                        if (first) first = false; else extra.addName(" ");
+                        extra.addStringTemplate(StringTemplate
                             .template("model.goods.goodsAmount")
                             .addName("%goods%", ag.getType())
                             .addAmount("%amount%", ag.getAmount()));
                     }
-                    extra = Messages.message(g);
                 }
             }
             return Messages.getUnitLabel(getName(), type.getId(), 1,
@@ -3243,17 +3241,16 @@ public class Unit extends GoodsLocation
 
         return (leavingColony)
             ? StringTemplate.template("abandonEducation.text")
-                            .addStringTemplate("%unit%",
-                                getLabel(UnitLabelType.NATIONAL))
-                            .addName("%colony%", getColony().getName())
-                            .add("%building%", school.getNameKey())
-                            .addName("%action%", (teacher)
-                                ? Messages.message("abandonEducation.action.teaching")
-                                : Messages.message("abandonEducation.action.studying"))
+                .addStringTemplate("%unit%", getLabel(UnitLabelType.NATIONAL))
+                .addName("%colony%", getColony().getName())
+                .add("%building%", school.getNameKey())
+                .addStringTemplate("%action%", (teacher)
+                    ? StringTemplate.key("abandonEducation.action.teaching")
+                    : StringTemplate.key("abandonEducation.action.studying"))
             : (teacher)
             ? StringTemplate.template("abandonTeaching.text")
-                            .addStringTemplate("%unit%", getLabel(UnitLabelType.NATIONAL))
-                            .add("%building%", school.getNameKey())
+                .addStringTemplate("%unit%", getLabel(UnitLabelType.NATIONAL))
+                .add("%building%", school.getNameKey())
             : null;
     }
 

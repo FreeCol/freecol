@@ -46,7 +46,7 @@ import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Region.RegionType;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.StringTemplate.TemplateType;
@@ -437,20 +437,20 @@ public class Messages {
 
     /**
      * Get a label for a collection of units given a name, type,
-     * number, nation, role and extra equipment.
+     * number, nation, role and extra annotation.
      *
      * @param name An optional unit name.
      * @param typeId The unit type identifier.
      * @param number The number of units.
      * @param nationId An optional nation identifier.
      * @param roleId The unit role identifier.
-     * @param equipment An optional equipment annotation.
+     * @param extra An optional extra annotation.
      * @return A <code>StringTemplate</code> to describe the given unit.
      */
     public static StringTemplate getUnitLabel(String name, String typeId,
                                               int number, String nationId,
                                               String roleId,
-                                              String equipment) {
+                                              StringTemplate extra) {
         // Check for special role-specific key, which will not have a
         // %role% argument.  These exist so we can avoid mentioning
         // the role twice, e.g. "Seasoned Scout Scout".
@@ -472,16 +472,16 @@ public class Messages {
         if (name == null) {
             if (nationId == null) {
                 if (roleKey == null) {
-                    if (equipment == null) {
+                    if (extra == null) {
                         ret = StringTemplate.template("unitFormat.null.null.null.null")
                             .addStringTemplate("%type%", type);
                     } else {
                         ret = StringTemplate.template("unitFormat.null.null.null.equip")
                             .addStringTemplate("%type%", type)
-                            .addName("%equipment%", equipment);
+                            .addStringTemplate("%equipment%", extra);
                     }
                 } else {
-                    if (equipment == null) {
+                    if (extra == null) {
                         ret = StringTemplate.template("unitFormat.null.null.role.null")
                             .addStringTemplate("%type%", type)
                             .add("%role%", roleKey);
@@ -489,12 +489,12 @@ public class Messages {
                         ret = StringTemplate.template("unitFormat.null.null.role.equip")
                             .addStringTemplate("%type%", type)
                             .add("%role%", roleKey)
-                            .addName("%equipment%", equipment);
+                            .addStringTemplate("%equipment%", extra);
                     }
                 }
             } else {
                 if (roleKey == null) {
-                    if (equipment == null) {
+                    if (extra == null) {
                         ret = StringTemplate.template("unitFormat.null.nation.null.null")
                             .addStringTemplate("%type%", type)
                             .add("%nation%", nameKey(nationId));
@@ -502,10 +502,10 @@ public class Messages {
                         ret = StringTemplate.template("unitFormat.null.nation.null.equip")
                             .addStringTemplate("%type%", type)
                             .add("%nation%", nameKey(nationId))
-                            .addName("%equipment%", equipment);
+                            .addStringTemplate("%equipment%", extra);
                     }
                 } else {
-                    if (equipment == null) {
+                    if (extra == null) {
                         ret = StringTemplate.template("unitFormat.null.nation.role.null")
                             .addStringTemplate("%type%", type)
                             .add("%nation%", nameKey(nationId))
@@ -515,14 +515,14 @@ public class Messages {
                             .addStringTemplate("%type%", type)
                             .add("%nation%", nameKey(nationId))
                             .add("%role%", roleKey)
-                            .addName("%equipment%", equipment);
+                            .addStringTemplate("%equipment%", extra);
                     }
                 }
             }
         } else {
             if (nationId == null) {
                 if (roleKey == null) {
-                    if (equipment == null) {
+                    if (extra == null) {
                         ret = StringTemplate.template("unitFormat.name.null.null.null")
                             .addName("%name%", name)
                             .addStringTemplate("%type%", type);
@@ -530,10 +530,10 @@ public class Messages {
                         ret = StringTemplate.template("unitFormat.name.null.null.equip")
                             .addName("%name%", name)
                             .addStringTemplate("%type%", type)
-                            .addName("%equipment%", equipment);
+                            .addStringTemplate("%equipment%", extra);
                     }
                 } else {
-                    if (equipment == null) {
+                    if (extra == null) {
                         ret = StringTemplate.template("unitFormat.name.null.role.null")
                             .addName("%name%", name)
                             .addStringTemplate("%type%", type)
@@ -543,12 +543,12 @@ public class Messages {
                             .addName("%name%", name)
                             .addStringTemplate("%type%", type)
                             .add("%role%", roleKey)
-                            .addName("%equipment%", equipment);
+                            .addStringTemplate("%equipment%", extra);
                     }
                 }
             } else {
                 if (roleKey == null) {
-                    if (equipment == null) {
+                    if (extra == null) {
                         ret = StringTemplate.template("unitFormat.name.nation.null.null")
                             .addName("%name%", name)
                             .addStringTemplate("%type%", type)
@@ -558,10 +558,10 @@ public class Messages {
                             .addName("%name%", name)
                             .addStringTemplate("%type%", type)
                             .add("%nation%", nameKey(nationId))
-                            .addName("%equipment%", equipment);
+                            .addStringTemplate("%equipment%", extra);
                     }
                 } else {
-                    if (equipment == null) {
+                    if (extra == null) {
                         ret = StringTemplate.template("unitFormat.name.nation.role.null")
                             .addName("%name%", name)
                             .addStringTemplate("%type%", type)
@@ -573,7 +573,7 @@ public class Messages {
                             .addStringTemplate("%type%", type)
                             .add("%nation%", nameKey(nationId))
                             .add("%role%", roleKey)
-                            .addName("%equipment%", equipment);
+                            .addStringTemplate("%equipment%", extra);
                     }
                 }
             }
@@ -626,31 +626,31 @@ public class Messages {
      * Creates a unique region name by fetching a new default name
      * from the list of default names if possible.
      *
-     * @param player <code>Player</code>
-     * @param regionType a <code>RegionType</code> value
-     * @return a <code>String</code> value
+     * @param player The <code>Player</code> to find a region name for.
+     * @param region The <code>Region</code> to name.
+     * @return A suitable name.
      */
-    public static String getDefaultRegionName(Player player,
-                                              RegionType regionType) {
+    public static String getDefaultRegionName(Player player, Region region) {
+        if (region.isPacific()) return message("model.region.pacific");
         // Try national names first.
         net.sf.freecol.common.model.Map map = player.getGame().getMap();
-        int index = player.getNameIndex(regionType.getNameIndexKey());
+        int index = player.getNameIndex(region.getType().getNameIndexKey());
         if (index < 1) index = 1;
         String prefix = player.getNationId() + ".region."
-            + regionType.toString().toLowerCase(Locale.US) + ".";
+            + region.getType().toString().toLowerCase(Locale.US) + ".";
         String name;
         do {
             name = null;
             if (containsKey(prefix + Integer.toString(index))) {
-                name = Messages.message(prefix + Integer.toString(index));
+                name = message(prefix + Integer.toString(index));
                 index++;
             }
         } while (name != null && map.getRegionByName(name) != null);
-        player.setNameIndex(regionType.getNameIndexKey(), index);
+        player.setNameIndex(region.getType().getNameIndexKey(), index);
 
         // There are a bunch of extra rivers not attached to a specific
         // nation at model.other.region.river.*.
-        if (name == null && regionType == RegionType.RIVER) {
+        if (name == null && region.getType() == Region.RegionType.RIVER) {
             requireOtherRivers();
             while (!otherRivers.isEmpty()) {
                 name = otherRivers.remove(0);
@@ -661,8 +661,8 @@ public class Messages {
 
         // Fall back to generic names.
         if (name == null) {
-            String rtype = "model.region."
-                + regionType.toString().toLowerCase(Locale.US) + NAME_SUFFIX;
+            String rtype = nameKey("model.region."
+                + region.getType().toString().toLowerCase(Locale.US));
             do {
                 name = message(StringTemplate.template("model.region.default")
                     .addStringTemplate("%nation%", player.getNationName())
@@ -715,7 +715,7 @@ public class Messages {
         String name;
         int i = 0;
         while (Messages.containsKey(name = prefix + Integer.toString(i))) {
-            names.add(Messages.message(name));
+            names.add(message(name));
             i++;
         }
     }
