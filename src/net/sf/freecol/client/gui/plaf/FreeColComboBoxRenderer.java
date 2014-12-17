@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.model.Nameable;
+import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -133,6 +134,11 @@ public class FreeColComboBoxRenderer<T>
             } else {
                 c.setText(string);
             }
+        } else if (value instanceof Named) {
+            Named named = (Named)value;
+            String[] nad = Messages.getBestNameAndDescription(named.getNameKey());
+            c.setText(nad[0]);
+            if (nad[1] != null) c.setToolTipText(nad[1]);
         } else if (value instanceof ObjectWithId) {
             String id = ((prefix == null) ? "" : prefix)
                 + ((ObjectWithId)value).getId();

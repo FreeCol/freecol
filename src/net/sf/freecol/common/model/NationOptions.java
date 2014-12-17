@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -40,13 +41,18 @@ public class NationOptions extends FreeColObject {
     private static final Logger logger = Logger.getLogger(NationOptions.class.getName());
 
     /** Type of national advantages for European players. */
-    public static enum Advantages implements ObjectWithId {
+    public static enum Advantages implements Named {
         NONE,
         FIXED,
         SELECTABLE;
 
-        public String getId() {
-            return "playerOptions." + this;
+        // Implement Named
+
+        /**
+         * {@inheritDoc}
+         */
+        public String getNameKey() {
+            return Messages.nameKey("playerOptions." + this);
         }
     };
 

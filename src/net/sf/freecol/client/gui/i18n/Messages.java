@@ -417,6 +417,9 @@ public class Messages {
      * @return A 2-element array of name and description found.
      */
     public static String[] getBestNameAndDescription(String id) {
+        if (id != null && id.endsWith(NAME_SUFFIX)) { // Temporary hack
+            id = id.substring(0, id.length() - NAME_SUFFIX.length());
+        }
         String name = (containsKey(nameKey(id))) ? getName(id) : null;
         String desc = null;
         if (name == null) {

@@ -59,6 +59,7 @@ import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
+import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
@@ -100,12 +101,64 @@ public final class PlayersTable extends JTable {
             this.box.setRenderer(new FreeColComboBoxRenderer<EuropeanNationType>());
         }
 
+
+        // Implement DefaultCellEditor
+
         /**
          * {@inheritDoc}
          */
         @Override
         public Object getCellEditorValue() {
-            return ((JComboBox) getComponent()).getSelectedItem();
+            return ((JComboBox)getComponent()).getSelectedItem();
+        }
+    }
+
+    private class AdvantageCellRenderer implements TableCellRenderer {
+
+        /** The national advantages type. */
+        private Advantages advantages;
+
+ 
+        /**
+         * The default constructor.
+         *
+         * @param advantages The type of national <code>Advantages</code>.
+         */
+        public AdvantageCellRenderer(Advantages advantages) {
+            this.advantages = advantages;
+        }
+
+
+        // Implement TableCellRenderer
+
+        /**
+         * {@inheritDoc}
+         */
+        public Component getTableCellRendererComponent(JTable table,
+            Object value, boolean isSelected, boolean hasFocus,
+            int row, int column) {
+            Player player = (Player)table.getValueAt(row, PlayersTable.PLAYER_COLUMN);
+            NationType nationType = ((Nation)table.getValueAt(row, PlayersTable.NATION_COLUMN)).getType();
+            JLabel label;
+            switch (advantages) {
+            case SELECTABLE:
+                return new JLabel(Messages.getName((player == null) ? nationType
+                        : player.getNationType()));
+            case FIXED:
+                label = new JLabel(Messages.getName(nationType));
+                break;
+            case NONE:
+            default:
+                label = new JLabel(Messages.getName("model.nationType.none"));
+                break;
+            }
+            if (player != null && player.isReady()) {
+                label.setForeground(Color.GRAY);
+            } else {
+                label.setForeground(table.getForeground());
+            }
+            label.setBackground(table.getBackground());
+            return label;
         }
     }
 
@@ -114,20 +167,19 @@ public final class PlayersTable extends JTable {
         private JComboBox<NationState> box
             = new JComboBox<NationState>(NationState.values());
 
+
+        /**
+         * The default constructor.
+         */
         public AvailableCellRenderer() {
             box.setRenderer(new NationStateRenderer());
         }
 
+
+        // Implement TableCellRenderer
+
         /**
-         * Gets the component used to render the cell's value.
-         *
-         * @param table The table whose cell needs to be rendered.
-         * @param value The value of the cell being rendered.
-         * @param hasFocus Indicates whether or not the cell in
-         *     question has focus.
-         * @param row The row index of the cell that is being rendered.
-         * @param column The column index of the cell that is being rendered.
-         * @return The component used to render the cell's value.
+         * {@inheritDoc}
          */
         public Component getTableCellRendererComponent(JTable table,
             Object value, boolean isSelected, boolean hasFocus,
@@ -163,6 +215,9 @@ public final class PlayersTable extends JTable {
             allStateBox.addActionListener(listener);
         }
 
+
+        // Implement AbstractCellEditor
+
         /**
          * {@inheritDoc}
          */
@@ -181,40 +236,12 @@ public final class PlayersTable extends JTable {
         }
     }
 
-    private static class HeaderRenderer implements TableCellRenderer {
-
-        private static final int NO_COLUMN = -1;
-        private int pressedColumn = NO_COLUMN;
-        private Component[] components;
-
-        public HeaderRenderer(Component... components) {
-            this.components = components;
-        }
-
-        public Component getTableCellRendererComponent(JTable table,
-                                                       Object value,
-                                                       boolean isSelected,
-                                                       boolean hasFocus,
-                                                       int row,
-                                                       int column) {
-            if (components[column] instanceof JButton) {
-                boolean isPressed = (column == pressedColumn);
-                ((JButton)components[column]).getModel().setPressed(isPressed);
-                ((JButton)components[column]).getModel().setArmed(isPressed);
-            }
-            return components[column];
-        }
-
-        public void setPressedColumn(int column) {
-            pressedColumn = column;
-        }
-    }
-
     private static class HeaderListener extends MouseAdapter {
 
         private JTableHeader header;
 
         private HeaderRenderer renderer;
+
 
         public HeaderListener(JTableHeader header, HeaderRenderer renderer) {
             this.header = header;
@@ -233,8 +260,42 @@ public final class PlayersTable extends JTable {
         }
     }
 
+    private static class HeaderRenderer implements TableCellRenderer {
+
+        private static final int NO_COLUMN = -1;
+        private int pressedColumn = NO_COLUMN;
+        private Component[] components;
+
+        public HeaderRenderer(Component... components) {
+            this.components = components;
+        }
+
+
+        // Implement TableCellEditor
+
+        /**
+         * {@inheritDoc}
+         */
+        public Component getTableCellRendererComponent(JTable table,
+            Object value, boolean isSelected, boolean hasFocus,
+            int row, int column) {
+            if (components[column] instanceof JButton) {
+                boolean isPressed = (column == pressedColumn);
+                ((JButton)components[column]).getModel().setPressed(isPressed);
+                ((JButton)components[column]).getModel().setArmed(isPressed);
+            }
+            return components[column];
+        }
+
+        public void setPressedColumn(int column) {
+            pressedColumn = column;
+        }
+    }
+
     private class NationCellRenderer extends JLabel
         implements TableCellRenderer {
+
+        // Implement TableCellEditor
 
         /**
          * {@inheritDoc}
@@ -251,6 +312,8 @@ public final class PlayersTable extends JTable {
 
     private static class NationStateRenderer extends JLabel
         implements ListCellRenderer<NationState> {
+
+        // Implement ListCellEditor<NationState>
 
         /**
          * {@inheritDoc}
@@ -273,11 +336,13 @@ public final class PlayersTable extends JTable {
 
         public PlayerCellRenderer() {
             label.setHorizontalAlignment(JLabel.CENTER);
-            button.setBorder(BorderFactory
-                .createCompoundBorder(BorderFactory
+            button.setBorder(BorderFactory.createCompoundBorder(BorderFactory
                     .createEmptyBorder(5, 10, 5, 10),
                     button.getBorder()));
         }
+
+
+        // Implement TableCellRenderer
 
         /**
          * {@inheritDoc}
@@ -318,6 +383,7 @@ public final class PlayersTable extends JTable {
                     }
                 });
         }
+
 
         /**
          * {@inheritDoc}
