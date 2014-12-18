@@ -226,21 +226,22 @@ public abstract class ReportUnitPanel extends ReportPanel {
                                                        unit.getRole().getId());
         JButton button = GUI.getLinkButton("", icon, unit.getLocation().getId());
         button.addActionListener(this);
-        String toolTip = unit.getDescription(Unit.UnitLabelType.NATIONAL);
-        if (unit.getDestination() != null) {
-            String type = unit.isPerson()
-                ? "person"
-                : unit.isNaval()
-                ? "ship"
+        StringTemplate tip;
+        if (unit.getDestination() == null) {
+            tip = unit.getLabel();
+        } else {
+            String type = (unit.isPerson()) ? "person"
+                : (unit.isNaval()) ? "ship"
                 : "other";
-            toolTip += "\n"
-                + Messages.message(StringTemplate.template("goingTo")
-                    .addName("%type%", type)
+            tip = StringTemplate.template("report.unit.goingTo")
+                .addStringTemplate("%unit%", unit.getLabel())
+                .addStringTemplate("%going%", StringTemplate
+                    .template("goingTo")
+                    .add("%type%", type)
                     .addStringTemplate("%location%", unit.getDestination()
                         .getLocationLabelFor(getMyPlayer())));
         }
-        button.setToolTipText(toolTip);
+        GUI.localizeToolTip(button, tip);
         return button;
     }
-
 }

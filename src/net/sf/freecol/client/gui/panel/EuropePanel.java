@@ -502,7 +502,7 @@ public final class EuropePanel extends PortPanel {
             }
 
             StringTemplate t = StringTemplate.template("goingTo")
-                .addName("%type%", "ship")
+                .add("%type%", "ship")
                 .addStringTemplate("%location%",
                     destination.getLocationLabelFor(getMyPlayer()));
             ((TitledBorder) getBorder()).setTitle(Messages.message(t));
