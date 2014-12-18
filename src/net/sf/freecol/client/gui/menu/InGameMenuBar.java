@@ -30,6 +30,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.menu.DebugMenu;
@@ -108,7 +109,7 @@ public class InGameMenuBar extends FreeColMenuBar {
 
     private void buildGameMenu() {
         // --> Game
-        JMenu menu = new JMenu(Messages.message("menuBar.game"));
+        JMenu menu = GUI.localizedMenu("menuBar.game");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_G);
 
@@ -140,8 +141,7 @@ public class InGameMenuBar extends FreeColMenuBar {
 
     private void buildViewMenu() {
         // --> View
-
-        JMenu menu = new JMenu(Messages.message("menuBar.view"));
+        JMenu menu = GUI.localizedMenu("menuBar.view");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_V);
 
@@ -174,7 +174,7 @@ public class InGameMenuBar extends FreeColMenuBar {
 
     private void buildOrdersMenu() {
         // --> Orders
-        JMenu menu = new JMenu(Messages.message("menuBar.orders"));
+        JMenu menu = GUI.localizedMenu("menuBar.orders");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_O);
 
@@ -221,7 +221,7 @@ public class InGameMenuBar extends FreeColMenuBar {
     private void buildReportMenu() {
         // --> Report
 
-        JMenu menu = new JMenu(Messages.message("menuBar.report"));
+        JMenu menu = GUI.localizedMenu("menuBar.report");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_R);
 

@@ -31,23 +31,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.action.ChangeWindowedModeAction;
-import net.sf.freecol.client.gui.action.DetermineHighSeasAction;
-import net.sf.freecol.client.gui.action.DisplayGridAction;
-import net.sf.freecol.client.gui.action.DisplayTileTextAction;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
-import net.sf.freecol.client.gui.action.MapControlsAction;
-import net.sf.freecol.client.gui.action.NewAction;
-import net.sf.freecol.client.gui.action.NewEmptyMapAction;
-import net.sf.freecol.client.gui.action.OpenAction;
-import net.sf.freecol.client.gui.action.PreferencesAction;
-import net.sf.freecol.client.gui.action.SaveAction;
-import net.sf.freecol.client.gui.action.ScaleMapAction;
-import net.sf.freecol.client.gui.action.ShowMainAction;
-import net.sf.freecol.client.gui.action.QuitAction;
-import net.sf.freecol.client.gui.action.ZoomInAction;
-import net.sf.freecol.client.gui.action.ZoomOutAction;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
@@ -101,7 +87,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
     private void buildGameMenu() {
         // --> Game
-        JMenu menu = new JMenu(Messages.message("menuBar.game"));
+        JMenu menu = GUI.localizedMenu("menuBar.game");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_G);
 
@@ -112,7 +98,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
         menu.add(getMenuItem(OpenAction.id));
         menu.add(getMenuItem(SaveAction.id));
-        JMenuItem playItem = new JMenuItem(Messages.message("startGame"));
+        JMenuItem playItem = GUI.localizedMenuItem("startGame");
         playItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     File startFile = FreeColDirectories.getStartMapFile();
@@ -146,8 +132,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
     private void buildViewMenu() {
         // --> View
-
-        JMenu menu = new JMenu(Messages.message("menuBar.view"));
+        JMenu menu = GUI.localizedMenu("menuBar.view");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_V);
 
@@ -158,7 +143,8 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.addSeparator();
         ButtonGroup tileTextGroup = new ButtonGroup();
         for (DisplayText type : DisplayText.values()) {
-            menu.add(getRadioButtonMenuItem(DisplayTileTextAction.id + type, tileTextGroup));
+            menu.add(getRadioButtonMenuItem(DisplayTileTextAction.id + type,
+                                            tileTextGroup));
         }
 
         menu.addSeparator();
@@ -170,8 +156,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
     private void buildToolsMenu() {
         // --> Tools
-
-        JMenu menu = new JMenu(Messages.message("menuBar.tools"));
+        JMenu menu = GUI.localizedMenu("menuBar.tools");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_T);
 

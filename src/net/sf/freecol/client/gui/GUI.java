@@ -57,7 +57,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.JWindow;
@@ -1103,6 +1105,69 @@ public class GUI {
     public static JLabel localizedLabel(StringTemplate template, Icon icon,
                                         int alignment) {
         return new JLabel(Messages.message(template), icon, alignment);
+    }
+
+    /**
+     * Get a JMenu with Messages.message(key) as text.
+     *
+     * @param key The key to use.
+     * @return The <code>JMenu</code>.
+     */
+    public static JMenu localizedMenu(String key) {
+        return new JMenu(Messages.message(key));
+    }
+
+    /**
+     * Get a JMenu with Messages.message(template) as text.
+     *
+     * @param template The <code>StringTemplate</code> to use.
+     * @return The <code>JMenu</code>.
+     */
+    public static JMenu localizedMenu(StringTemplate template) {
+        return new JMenu(Messages.message(template));
+    }
+
+    /**
+     * Get a JMenuItem with Messages.message(key) as text.
+     *
+     * @param key The key to use.
+     * @return The <code>JMenuItem</code>.
+     */
+    public static JMenuItem localizedMenuItem(String key) {
+        return localizedMenuItem(key, null);
+    }
+
+    /**
+     * Get a JMenuItem with Messages.message(key) as text.
+     *
+     * @param key The key to use.
+     * @param icon The icon to use.
+     * @return The <code>JMenuItem</code>.
+     */
+    public static JMenuItem localizedMenuItem(String key, Icon icon) {
+        return new JMenuItem(Messages.message(key), icon);
+    }
+
+    /**
+     * Get a JMenuItem with Messages.message(template) as text.
+     *
+     * @param template The <code>StringTemplate</code> to use.
+     * @return The <code>JMenuItem</code>.
+     */
+    public static JMenuItem localizedMenuItem(StringTemplate template) {
+        return localizedMenuItem(template, null);
+    }
+
+    /**
+     * Get a JMenuItem with Messages.message(template) as text.
+     *
+     * @param template The <code>StringTemplate</code> to use.
+     * @param icon The icon to use.
+     * @return The <code>JMenuItem</code>.
+     */
+    public static JMenuItem localizedMenuItem(StringTemplate template,
+                                              Icon icon) {
+        return new JMenuItem(Messages.message(template), icon);
     }
 
     /**

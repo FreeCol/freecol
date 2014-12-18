@@ -230,7 +230,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
     protected void buildColopediaMenu() {
         // --> Colopedia
 
-        JMenu menu = new JMenu(Messages.message("menuBar.colopedia"));
+        JMenu menu = GUI.localizedMenu("menuBar.colopedia");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_C);
 

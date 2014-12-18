@@ -146,8 +146,7 @@ public class DebugMenu extends JMenu {
                 }
             });
 
-        final JMenu cvpMenu = new JMenu(
-            Messages.message("menuBar.debug.showColonyValue"));
+        final JMenu cvpMenu = GUI.localizedMenu("menuBar.debug.showColonyValue");
         cvpMenu.setOpaque(false);
         ButtonGroup bg = new ButtonGroup();
         final JRadioButtonMenuItem cv1
@@ -184,8 +183,7 @@ public class DebugMenu extends JMenu {
 
         this.addSeparator();
 
-        final JMenuItem skipTurns = new JMenuItem(
-            Messages.message("menuBar.debug.skipTurns"));
+        final JMenuItem skipTurns = GUI.localizedMenuItem("menuBar.debug.skipTurns");
         skipTurns.setOpaque(false);
         skipTurns.setMnemonic(KeyEvent.VK_T);
         this.add(skipTurns);
@@ -197,47 +195,40 @@ public class DebugMenu extends JMenu {
         DebugUtils.addSkipChangeListener(freeColClient, this, skipTurns);
         skipTurns.setEnabled(hasServer);
 
-        final String buildingTitle
-            = Messages.message("menuBar.debug.addBuilding");
-        final JMenuItem addBuilding = new JMenuItem(buildingTitle);
+        final JMenuItem addBuilding = GUI.localizedMenuItem("menuBar.debug.addBuilding");
         addBuilding.setOpaque(false);
         addBuilding.setMnemonic(KeyEvent.VK_B);
         this.add(addBuilding);
         addBuilding.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    DebugUtils.addBuildings(freeColClient, buildingTitle);
+                    DebugUtils.addBuildings(freeColClient, addBuilding.getText());
                 }
             });
         addBuilding.setEnabled(hasServer);
 
-        final String fatherTitle
-            = Messages.message("menuBar.debug.addFoundingFather");
-        final JMenuItem addFather = new JMenuItem(fatherTitle);
+        final JMenuItem addFather = GUI.localizedMenuItem("menuBar.debug.addFoundingFather");
         addFather.setOpaque(false);
         addFather.setMnemonic(KeyEvent.VK_F);
         this.add(addFather);
         addFather.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    DebugUtils.addFathers(freeColClient, fatherTitle);
+                    DebugUtils.addFathers(freeColClient, addFather.getText());
                 }
             });
         addFather.setEnabled(hasServer);
 
-        final String monarchTitle
-            = Messages.message("menuBar.debug.runMonarch");
-        final JMenuItem runMonarch = new JMenuItem(monarchTitle);
+        final JMenuItem runMonarch = GUI.localizedMenuItem("menuBar.debug.runMonarch");
         runMonarch.setOpaque(false);
         runMonarch.setMnemonic(KeyEvent.VK_M);
         this.add(runMonarch);
         runMonarch.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    DebugUtils.setMonarchAction(freeColClient, monarchTitle);
+                    DebugUtils.setMonarchAction(freeColClient, runMonarch.getText());
                 }
             });
         runMonarch.setEnabled(hasServer);
 
-        final String goldTitle = Messages.message("menuBar.debug.addGold");
-        final JMenuItem addGold = new JMenuItem(goldTitle);
+        final JMenuItem addGold = GUI.localizedMenuItem("menuBar.debug.addGold");
         addGold.setOpaque(false);
         addGold.setMnemonic(KeyEvent.VK_G);
         this.add(addGold);
@@ -248,9 +239,7 @@ public class DebugMenu extends JMenu {
             });
         addGold.setEnabled(hasServer);
 
-        final String immigrationTitle
-            = Messages.message("menuBar.debug.addImmigration");
-        final JMenuItem addCrosses = new JMenuItem(immigrationTitle);
+        final JMenuItem addCrosses = GUI.localizedMenuItem("menuBar.debug.addImmigration");
         addCrosses.setOpaque(false);
         addCrosses.setMnemonic(KeyEvent.VK_I);
         this.add(addCrosses);
@@ -261,8 +250,7 @@ public class DebugMenu extends JMenu {
             });
         addCrosses.setEnabled(hasServer);
 
-        final JMenuItem giveBells
-            = new JMenuItem(Messages.message("menuBar.debug.addLiberty"));
+        final JMenuItem giveBells = GUI.localizedMenuItem("menuBar.debug.addLiberty");
         giveBells.setOpaque(false);
         giveBells.setMnemonic(KeyEvent.VK_L);
         this.add(giveBells);
@@ -274,8 +262,7 @@ public class DebugMenu extends JMenu {
         giveBells.setEnabled(hasServer);
 
         // random number generator
-        final JMenuItem rng = new JMenuItem(
-            Messages.message("menuBar.debug.stepRandomNumberGenerator"));
+        final JMenuItem rng = GUI.localizedMenuItem("menuBar.debug.stepRandomNumberGenerator");
         rng.setOpaque(false);
         rng.setMnemonic(KeyEvent.VK_X);
         this.add(rng);
@@ -287,8 +274,7 @@ public class DebugMenu extends JMenu {
         rng.setEnabled(hasServer);
 
         // Unit display
-        final JMenuItem du = new JMenuItem(
-            Messages.message("menuBar.debug.displayUnits"));
+        final JMenuItem du = GUI.localizedMenuItem("menuBar.debug.displayUnits");
         du.setOpaque(false);
         this.add(du);
         du.addActionListener(new ActionListener() {
@@ -300,12 +286,10 @@ public class DebugMenu extends JMenu {
 
         this.addSeparator();
 
-        final JMenu panelMenu
-            = new JMenu(Messages.message("menuBar.debug.displayPanels"));
+        final JMenu panelMenu = GUI.localizedMenu("menuBar.debug.displayPanels");
         panelMenu.setOpaque(false);
 
-        final JMenuItem monarchDialog = new JMenuItem(
-            Messages.message("menuBar.debug.displayMonarchPanel"));
+        final JMenuItem monarchDialog = GUI.localizedMenuItem("menuBar.debug.displayMonarchPanel");
         monarchDialog.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     gui.showMonarchDialog(Monarch.MonarchAction.RAISE_TAX_WAR,
@@ -314,8 +298,7 @@ public class DebugMenu extends JMenu {
             });
         panelMenu.add(monarchDialog);
 
-        final JMenuItem errorMessage = new JMenuItem(
-            Messages.message("menuBar.debug.displayErrorMessage"));
+        final JMenuItem errorMessage = GUI.localizedMenuItem("menuBar.debug.displayErrorMessage");
         errorMessage.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     gui.showErrorMessage(ERROR_MESSAGE);
@@ -325,8 +308,7 @@ public class DebugMenu extends JMenu {
 
         this.add(panelMenu);
 
-        final JMenuItem europeStatus = new JMenuItem(
-            Messages.message("menuBar.debug.displayEuropeStatus"));
+        final JMenuItem europeStatus = GUI.localizedMenuItem("menuBar.debug.displayEuropeStatus");
         europeStatus.setOpaque(false);
         europeStatus.setMnemonic(KeyEvent.VK_E);
         this.add(europeStatus);
@@ -356,8 +338,7 @@ public class DebugMenu extends JMenu {
             });
         dam.setEnabled(true);
 
-        final JMenuItem useAI
-            = new JMenuItem(Messages.message("menuBar.debug.useAI"));
+        final JMenuItem useAI = GUI.localizedMenuItem("menuBar.debug.useAI");
         useAI.setOpaque(false);
         useAI.setMnemonic(KeyEvent.VK_A);
         useAI.setAccelerator(KeyStroke.getKeyStroke('A',
@@ -386,8 +367,7 @@ public class DebugMenu extends JMenu {
 
         this.addSeparator();
 
-        final JMenuItem compareMaps
-            = new JMenuItem(Messages.message("menuBar.debug.compareMaps"));
+        final JMenuItem compareMaps = GUI.localizedMenuItem("menuBar.debug.compareMaps");
         compareMaps.setOpaque(false);
         //compareMaps.setMnemonic(KeyEvent.VK_C);
         compareMaps.setAccelerator(KeyStroke.getKeyStroke('C',
@@ -401,8 +381,7 @@ public class DebugMenu extends JMenu {
             });
         compareMaps.setEnabled(hasServer);
 
-        final JMenuItem showResourceKeys = new JMenuItem(
-            Messages.message("menuBar.debug.showResourceKeys"));
+        final JMenuItem showResourceKeys = GUI.localizedMenuItem("menuBar.debug.showResourceKeys");
         showResourceKeys.setOpaque(false);
         //showResourceKeys.setMnemonic(KeyEvent.VK_R);
         this.add(showResourceKeys);
@@ -430,8 +409,7 @@ public class DebugMenu extends JMenu {
         showResourceKeys.setEnabled(true);
 
         // statistics
-        final JMenuItem statistics
-            = new JMenuItem(Messages.message("statistics"));
+        final JMenuItem statistics = GUI.localizedMenuItem("statistics");
         statistics.setOpaque(false);
         //statistics.setMnemonic(KeyEvent.VK_I);
         this.add(statistics);
@@ -443,8 +421,7 @@ public class DebugMenu extends JMenu {
         statistics.setEnabled(true);
 
         // garbage collector
-        final JMenuItem gc = new JMenuItem(
-            Messages.message("menuBar.debug.memoryManager.gc"));
+        final JMenuItem gc = GUI.localizedMenuItem("menuBar.debug.memoryManager.gc");
         gc.setOpaque(false);
         //gc.setMnemonic(KeyEvent.VK_G);
         this.add(gc);
