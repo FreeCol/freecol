@@ -98,24 +98,21 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         boolean numberEditable = editable
             && (numberOption.getMaximumValue() > numberOption.getMinimumValue());
         numberUI = new IntegerOptionUI(gui, numberOption, numberEditable);
-        numberUI.getComponent()
-            .setToolTipText(Messages.message("report.numberOfUnits"));
+        GUI.localizeToolTip(numberUI.getComponent(), "report.numberOfUnits");
         panel.add(numberUI.getComponent(), "width 30%");
 
         boolean typeEditable = editable
             && typeOption.getChoices().size() > 1;
         typeUI = new UnitTypeOptionUI(gui, typeOption, typeEditable);
 
-        typeUI.getComponent()
-            .setToolTipText(Messages.message("model.unit.type"));
+        GUI.localizeToolTip(typeUI.getComponent(), "model.unit.type");
         typeUI.getComponent().addItemListener(this);
         panel.add(typeUI.getComponent(), "width 35%");
 
         roleEditable = editable
             && roleOption.getChoices().size() > 1;
         roleUI = new StringOptionUI(gui, roleOption, roleEditable);
-        roleUI.getComponent()
-            .setToolTipText(Messages.message("model.unit.role.name"));
+        GUI.localizeToolTip(roleUI.getComponent(), "model.unit.role.name");
         roleUI.getComponent().setRenderer(new RoleRenderer());
         panel.add(roleUI.getComponent(), "width 35%");
 

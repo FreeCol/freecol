@@ -131,8 +131,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         JLabel header = GUI.getDefaultHeader(hdr);
         header.setFont(GUI.MEDIUM_HEADER_FONT);
 
-        String all = Messages.message("All");
-        this.allButton = new JButton(all);
+        this.allButton = GUI.localizedButton("All");
         this.allButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
@@ -145,10 +144,9 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
                 }
             });
         this.allButton.setMnemonic('a');
-        this.allButton.setActionCommand(all);
+        this.allButton.setActionCommand(this.allButton.getText());
  
-        String none = Messages.message("None");
-        this.noneButton = new JButton(none);
+        this.noneButton = GUI.localizedButton("None");
         this.noneButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
@@ -160,7 +158,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
                 }
             });
         this.noneButton.setMnemonic('n');
-        this.noneButton.setActionCommand(none);
+        this.noneButton.setActionCommand(this.noneButton.getText());
 
         GoodsItem[] goods = new GoodsItem[loot.size()];
         for (int i = 0; i < loot.size(); i++) {

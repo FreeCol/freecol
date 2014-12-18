@@ -29,7 +29,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.FileOption;
 
@@ -62,7 +61,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         fileField.setDisabledTextColor(Color.BLACK);
         panel.add(fileField);
 
-        JButton browse = new JButton(Messages.message("file.browse"));
+        JButton browse = GUI.localizedButton("file.browse");
         if (editable) {
             browse.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -79,7 +78,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         }
         panel.add(browse);
 
-        JButton remove = new JButton(Messages.message("option.remove"));
+        JButton remove = GUI.localizedButton("option.remove");
         if (editable) {
             remove.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {

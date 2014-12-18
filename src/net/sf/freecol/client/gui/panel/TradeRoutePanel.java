@@ -134,20 +134,16 @@ public final class TradeRoutePanel extends FreeColPanel {
         // listeners.  The ok, cancel and deassign actions do close
         // the dialog, so they are handled in the class-level action
         // listener below.
-        this.newRouteButton
-            = new JButton(Messages.message("tradeRoutePanel.newRoute"));
-        this.newRouteButton.setToolTipText(Messages
-            .message("tradeRoutePanel.new.tooltip"));
+        this.newRouteButton = GUI.localizedButton("tradeRoutePanel.newRoute");
+        GUI.localizeToolTip(this.newRouteButton, "tradeRoutePanel.new.tooltip");
         this.newRouteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     newRoute();
                 }
             });
 
-        this.editRouteButton
-            = new JButton(Messages.message("tradeRoutePanel.editRoute"));
-        this.editRouteButton.setToolTipText(Messages
-            .message("tradeRoutePanel.edit.tooltip"));
+        this.editRouteButton = GUI.localizedButton("tradeRoutePanel.editRoute");
+        GUI.localizeToolTip(this.editRouteButton, "tradeRoutePanel.edit.tooltip");
         this.editRouteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     final TradeRoute selected
@@ -170,10 +166,8 @@ public final class TradeRoutePanel extends FreeColPanel {
                 }
             });
 
-        this.deleteRouteButton
-            = new JButton(Messages.message("tradeRoutePanel.deleteRoute"));
-        this.deleteRouteButton.setToolTipText(Messages
-            .message("tradeRoutePanel.delete.tooltip"));
+        this.deleteRouteButton = GUI.localizedButton("tradeRoutePanel.deleteRoute");
+        GUI.localizeToolTip(this.deleteRouteButton, "tradeRoutePanel.delete.tooltip");
         this.deleteRouteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     TradeRoute route = getRoute();
@@ -187,14 +181,12 @@ public final class TradeRoutePanel extends FreeColPanel {
                 }
             });
 
-        this.deassignRouteButton
-            = new JButton(Messages.message("tradeRoutePanel.deassignRoute"));
-        this.deassignRouteButton.setToolTipText(Messages
-            .message("tradeRoutePanel.deassign.tooltip"));
+        this.deassignRouteButton = GUI.localizedButton("tradeRoutePanel.deassignRoute");
+        GUI.localizeToolTip(this.deassignRouteButton, "tradeRoutePanel.deassign.tooltip");
         this.deassignRouteButton.setActionCommand(DEASSIGN);
         this.deassignRouteButton.addActionListener(this);
 
-        JButton cancelButton = new JButton(Messages.message("cancel"));
+        JButton cancelButton = GUI.localizedButton("cancel");
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);
         setCancelComponent(cancelButton);

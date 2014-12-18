@@ -28,7 +28,7 @@ import javax.swing.JColorChooser;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -57,7 +57,7 @@ public final class ColorChooserPanel extends FreeColPanel {
         add(okButton, "newline 20, split 2, tag ok");
         okButton.addActionListener(l);
 
-        JButton cancelButton = new JButton(Messages.message("cancel"));
+        JButton cancelButton = GUI.localizedButton("cancel");
         add(cancelButton, "tag cancel");
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(l);

@@ -108,7 +108,7 @@ public final class StartGamePanel extends FreeColPanel {
 
         NationOptions nationOptions = getGame().getNationOptions();
 
-        cancel = new JButton(Messages.message("cancel"));
+        cancel = GUI.localizedButton("cancel");
         setCancelComponent(cancel);
 
         JScrollPane chatScroll = null, tableScroll;
@@ -116,11 +116,11 @@ public final class StartGamePanel extends FreeColPanel {
         table = new PlayersTable(getFreeColClient(), nationOptions,
                                  getMyPlayer());
 
-        start = new JButton(Messages.message("startGame"));
+        start = GUI.localizedButton("startGame");
 
-        gameOptions = new JButton(Messages.message(GameOptions.getXMLElementTagName()));
+        gameOptions = GUI.localizedButton(GameOptions.getXMLElementTagName());
 
-        mapGeneratorOptions = new JButton(Messages.message(MapGeneratorOptions.getXMLElementTagName()));
+        mapGeneratorOptions = GUI.localizedButton(MapGeneratorOptions.getXMLElementTagName());
 
         readyBox = new JCheckBox(Messages.message("iAmReady"));
 

@@ -246,7 +246,6 @@ public final class UnitLabel extends JLabel
      */
     public void setDescriptionLabel(String label) {
         setToolTipText(label);
-
     }
 
     /**

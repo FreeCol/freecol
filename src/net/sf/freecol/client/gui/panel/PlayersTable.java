@@ -331,7 +331,7 @@ public final class PlayersTable extends JTable {
     private static class PlayerCellRenderer implements TableCellRenderer {
 
         private JLabel label = new JLabel();
-        private JButton button = new JButton(Messages.message("select"));
+        private JButton button = GUI.localizedButton("select");
 
 
         public PlayerCellRenderer() {
@@ -373,7 +373,7 @@ public final class PlayersTable extends JTable {
     private final class PlayerCellEditor extends AbstractCellEditor
         implements TableCellEditor {
 
-        private JButton button = new JButton(Messages.message("select"));
+        private JButton button = GUI.localizedButton("select");
 
 
         public PlayerCellEditor() {
@@ -640,7 +640,7 @@ public final class PlayersTable extends JTable {
                  nationOptions, myPlayer));
         setRowHeight(47);
 
-        JButton nationButton = new JButton(Messages.message("nation"));
+        JButton nationButton = GUI.localizedButton("nation");
         nationButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     gui.showColopediaPanel(PanelType.NATIONS.toString());
@@ -648,7 +648,7 @@ public final class PlayersTable extends JTable {
             });
 
         JLabel availabilityLabel = GUI.localizedLabel("availability");
-        JButton advantageButton = new JButton(Messages.message("advantage"));
+        JButton advantageButton = GUI.localizedButton("advantage");
         advantageButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     gui.showColopediaPanel(PanelType.NATION_TYPES.toString());

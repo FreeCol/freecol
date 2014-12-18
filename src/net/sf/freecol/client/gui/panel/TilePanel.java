@@ -75,7 +75,7 @@ public final class TilePanel extends FreeColPanel {
                                            "[right, sg][left, sg]"));
 
         TileType tileType = tile.getType();
-        JButton colopediaButton = new JButton(Messages.message("menuBar.colopedia"));
+        JButton colopediaButton = GUI.localizedButton("menuBar.colopedia");
         colopediaButton.setActionCommand(tile.getType().getId());
         colopediaButton.addActionListener(this);
 

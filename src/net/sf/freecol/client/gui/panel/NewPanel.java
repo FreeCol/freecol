@@ -252,7 +252,7 @@ public final class NewPanel extends FreeColPanel
         this.difficultyBox
             .setRenderer(new FreeColComboBoxRenderer<OptionGroup>());
         this.difficultyBox.addItemListener(this);
-        this.difficultyButton = new JButton(Messages.message("showDifficulty"));
+        this.difficultyButton = GUI.localizedButton("showDifficulty");
         this.difficultyButton
             .setActionCommand(String.valueOf(NewPanelAction.SHOW_DIFFICULTY));
         this.difficultyButton.addActionListener(this);
@@ -270,7 +270,7 @@ public final class NewPanel extends FreeColPanel
 
         okButton.setActionCommand(String.valueOf(NewPanelAction.OK));
 
-        JButton cancel = new JButton(Messages.message("cancel"));
+        JButton cancel = GUI.localizedButton("cancel");
         cancel.setActionCommand(String.valueOf(NewPanelAction.CANCEL));
         cancel.addActionListener(this);
         setCancelComponent(cancel);

@@ -1030,6 +1030,26 @@ public class GUI {
     }
 
     /**
+     * Get a JButton with Messages.message(key) as text.
+     *
+     * @param key The key to use.
+     * @return The <code>JButton</code>.
+     */
+    public static JButton localizedButton(String key) {
+        return new JButton(Messages.message(key));
+    }
+
+    /**
+     * Get a JButton with Messages.message(template) as text.
+     *
+     * @param template The <code>StringTemplate</code> to use.
+     * @return The <code>JButton</code>.
+     */
+    public static JButton localizedButton(StringTemplate template) {
+        return new JButton(Messages.message(template));
+    }
+
+    /**
      * Get a JLabel with Messages.message(key) as text.
      *
      * @param key The key to use.
@@ -1083,6 +1103,31 @@ public class GUI {
     public static JLabel localizedLabel(StringTemplate template, Icon icon,
                                         int alignment) {
         return new JLabel(Messages.message(template), icon, alignment);
+    }
+
+    /**
+     * Localize the tool tip message for a JComponent.
+     *
+     * @param button The <code>JComponent</code> to localize.
+     * @param key The key to use.
+     * @return The original <code>JComponent</code>.
+     */
+    public static JComponent localizeToolTip(JComponent comp, String key) {
+        comp.setToolTipText(Messages.message(key));
+        return comp;
+    }
+
+    /**
+     * Localize the tool tip message for a JComponent.
+     *
+     * @param button The <code>JComponent</code> to localize.
+     * @param template The <code>StringTemplate</code> to use.
+     * @return The original <code>JComponent</code>.
+     */
+    public static JComponent localizeToolTip(JComponent comp,
+                                             StringTemplate template) {
+        comp.setToolTipText(Messages.message(template));
+        return comp;
     }
 
     /**

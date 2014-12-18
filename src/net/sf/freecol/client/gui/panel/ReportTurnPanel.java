@@ -180,8 +180,8 @@ public final class ReportTurnPanel extends ReportPanel {
             switch (message.getMessageType()) {
             case WAREHOUSE_CAPACITY:
                 JButton ignoreButton = new JButton("x");
-                String ign = Messages.message(new StringTemplate("model.message.ignore", message));
-                ignoreButton.setToolTipText(ign);
+                GUI.localizeToolTip(ignoreButton, 
+                    new StringTemplate("model.message.ignore", message));
                 final ModelMessage m = message;
                 ignoreButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
@@ -215,8 +215,9 @@ public final class ReportTurnPanel extends ReportPanel {
             // Message type can be filtered
             if (filterOption != null) {
                 JButton filterButton = new JButton("X");
-                filterButton.setToolTipText(Messages.message(StringTemplate.template("model.message.filter")
-                        .add("%type%", message.getMessageTypeName())));
+                GUI.localizeToolTip(filterButton, StringTemplate
+                    .template("model.message.filter")
+                    .add("%type%", message.getMessageTypeName()));
                 final ModelMessage m = message;
                 filterButton.addActionListener(new ActionListener() {
                         
@@ -270,7 +271,7 @@ public final class ReportTurnPanel extends ReportPanel {
             headline = button;
         } else if (source instanceof Market) {
             Market market = (Market) source;
-            JButton button = new JButton(Messages.message(market.getOwner().getMarketName()));
+            JButton button = GUI.localizedButton(market.getOwner().getMarketName());
             button.addActionListener(this);
             button.setActionCommand(getMyPlayer().getEurope().getId());
             headline = button;
@@ -289,8 +290,7 @@ public final class ReportTurnPanel extends ReportPanel {
             headline = button;
         } else if (source instanceof Tile) {
             final Tile tile = (Tile) source;
-            JButton button = new JButton(Messages
-                .message(tile.getLocationLabelFor(getMyPlayer())));
+            JButton button = GUI.localizedButton(tile.getLocationLabelFor(getMyPlayer()));
             button.addActionListener(this);
             button.setActionCommand(tile.getId());
             headline = button;

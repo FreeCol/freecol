@@ -454,8 +454,9 @@ public final class CompactLabourReport extends ReportPanel {
                 reportPanel.add(createEmptyLabel(), "cell " + UNIT_TYPE_COLUMN + " " + row + " 1 " + rows);
             }
         } else {
-            colonistsLabel.setToolTipText(Messages.message(StringTemplate.template("report.labour.unitTotal.tooltip")
-                                                           .addName("%unit%", data.getUnitData().getUnitName())));
+            GUI.localizeToolTip(colonistsLabel, StringTemplate
+                .template("report.labour.unitTotal.tooltip")
+                .addName("%unit%", data.getUnitData().getUnitName()));
         }
 
         reportPanel.add(colonistsLabel, "cell " + COLONIST_SUMMARY_COLUMN + " " + row + " 1 " + data.getRowCount());
@@ -593,9 +594,7 @@ public final class CompactLabourReport extends ReportPanel {
         JLabel label = new JLabel(String.valueOf(number));
         label.setHorizontalAlignment(SwingConstants.TRAILING);
         label.setBorder(CELLBORDER);
-        if (toolTipKey != null) {
-            label.setToolTipText(Messages.message(toolTipKey));
-        }
+        if (toolTipKey != null) GUI.localizeToolTip(this, toolTipKey);
         return label;
     }
 

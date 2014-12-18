@@ -92,8 +92,7 @@ public final class ReportProductionPanel extends ReportPanel {
         JLabel selectLabel = GUI.localizedLabel("report.production.selectGoods");
         reportPanel.add(selectLabel, "span, split " + (NUMBER_OF_GOODS + 2));
 
-        JButton selectButton
-            = new JButton(Messages.message("report.production.update"));
+        JButton selectButton = GUI.localizedButton("report.production.update");
         selectButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     update();

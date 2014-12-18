@@ -33,6 +33,7 @@ import javax.swing.tree.TreePath;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Specification;
@@ -96,13 +97,13 @@ public final class DifficultyDialog extends OptionsDialog
         if (isEditable()) {
             loadDefaultOptions();
 
-            JButton resetButton = new JButton(Messages.message("reset"));
+            JButton resetButton = GUI.localizedButton("reset");
             addResetAction(resetButton);
             
-            JButton loadButton = new JButton(Messages.message("load"));
+            JButton loadButton = GUI.localizedButton("load");
             addLoadAction(loadButton);
                     
-            JButton saveButton = new JButton(Messages.message("save"));
+            JButton saveButton = GUI.localizedButton("save");
             addSaveAction(saveButton);
 
             this.panel.add(resetButton, "span, split 3");

@@ -173,8 +173,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
     private JButton makeMapButton(File file) {
         String mapName = file.getName().substring(0, file.getName()
                                                          .lastIndexOf('.'));
-        JButton mapButton = new JButton(Messages.message("freecol.map."
-                + mapName));
+        JButton mapButton = GUI.localizedButton("freecol.map." + mapName);
         try {
             FreeColSavegameFile savegame = new FreeColSavegameFile(file);
             Image thumbnail = ImageIO.read(savegame

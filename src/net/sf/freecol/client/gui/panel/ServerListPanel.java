@@ -37,8 +37,9 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
-import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.ServerInfo;
 
 
 /**
@@ -72,12 +73,12 @@ public final class ServerListPanel extends FreeColPanel {
 
         this.connectController = connectController;
 
-        JButton cancel = new JButton(Messages.message("cancel"));
+        JButton cancel = GUI.localizedButton("cancel");
         JScrollPane tableScroll;
 
         setCancelComponent(cancel);
 
-        connect = new JButton(Messages.message("connect"));
+        connect = GUI.localizedButton("connect");
 
         tableModel = new ServerListTableModel(new ArrayList<ServerInfo>());
         table = new JTable(tableModel);

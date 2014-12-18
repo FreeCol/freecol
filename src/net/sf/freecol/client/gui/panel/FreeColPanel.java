@@ -95,7 +95,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
     protected boolean editable = true;
 
-    protected JButton okButton = new JButton(Messages.message("ok"));
+    protected JButton okButton = GUI.localizedButton("ok");
 
 
     /**

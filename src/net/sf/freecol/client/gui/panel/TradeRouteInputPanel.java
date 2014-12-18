@@ -589,16 +589,14 @@ public final class TradeRouteInputPanel extends FreeColPanel
                 }
             });
 
-        this.addStopButton
-            = new JButton(Messages.message("tradeRouteInputPanel.addStop"));
+        this.addStopButton = GUI.localizedButton("tradeRouteInputPanel.addStop");
         this.addStopButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     addSelectedStops();
                 }
             });
 
-        this.removeStopButton
-            = new JButton(Messages.message("tradeRouteInputPanel.removeStop"));
+        this.removeStopButton = GUI.localizedButton("tradeRouteInputPanel.removeStop");
         this.removeStopButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     deleteCurrentlySelectedStops();
@@ -611,7 +609,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         this.cargoPanel = new CargoPanel();
         this.cargoPanel.setTransferHandler(this.cargoHandler);
 
-        JButton cancelButton = new JButton(Messages.message("cancel"));
+        JButton cancelButton = GUI.localizedButton("cancel");
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);
         setCancelComponent(cancelButton);

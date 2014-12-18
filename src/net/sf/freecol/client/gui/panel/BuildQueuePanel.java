@@ -615,8 +615,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             .put(KeyStroke.getKeyStroke("ENTER"), "add");
         this.buildingList.getActionMap().put("add", addAction);
 
-        this.buyBuildable
-            = new JButton(Messages.message("colonyPanel.buyBuilding"));
+        this.buyBuildable = GUI.localizedButton("colonyPanel.buyBuilding");
         this.buyBuildable.setActionCommand(BUY);
         this.buyBuildable.addActionListener(this);
 

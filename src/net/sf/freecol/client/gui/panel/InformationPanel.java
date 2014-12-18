@@ -89,10 +89,12 @@ public class InformationPanel extends FreeColPanel {
             } else {
                 textPanel.add(GUI.getDefaultTextArea(texts[i], 30), "skip");
             }
-            String disp = (fcos == null) ? null : displayLabel(fcos[i]);
+            StringTemplate disp = (fcos == null) ? null
+                : displayLabel(fcos[i]);
             if (disp != null) {
-                JButton button = new JButton(Messages.message("display")
-                    + " " + disp);
+                JButton button = GUI.localizedButton(StringTemplate
+                    .template("informationPanel.display")
+                    .addStringTemplate("%object%", disp));
                 final FreeColObject fco = fcos[i];
                 button.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
@@ -120,33 +122,33 @@ public class InformationPanel extends FreeColPanel {
      * Keep this routine synchronized with {@link #displayFCO}.
      *
      * @param fco The <code>FreeColObject</code> to check.
-     * @return An i18n-compliant label.
+     * @return A <code>StringTemplate</code> label, or null if nothing found.
      */
-    private String displayLabel(FreeColObject fco) {
+    private StringTemplate displayLabel(FreeColObject fco) {
         return (fco instanceof Colony)
             ? ((getMyPlayer().owns((Colony)fco))
-                ? Messages.message(((Colony)fco).getLocationLabel())
+                ? ((Colony)fco).getLocationLabel()
                 : null)
 
             : (fco instanceof Europe)
-            ? Messages.message(((Europe)fco).getLocationLabel())
+            ? ((Europe)fco).getLocationLabel()
 
             : (fco instanceof IndianSettlement)
-            ? Messages.message(((IndianSettlement)fco).getLocationLabel())
+            ? ((IndianSettlement)fco).getLocationLabel()
 
             : (fco instanceof Tile)
             ? ((((Tile)fco).hasSettlement())
                 ? displayLabel(((Tile)fco).getSettlement())
-                : Messages.message(StringTemplate.template("tile")
-                    .addAmount("%x%", ((Tile)fco).getX())
-                    .addAmount("%y%", ((Tile)fco).getY())))
+                : StringTemplate.template("tile")
+                                .addAmount("%x%", ((Tile)fco).getX())
+                                .addAmount("%y%", ((Tile)fco).getY()))
 
             : (fco instanceof Unit)
             ? displayLabel((FreeColObject)((Unit)fco).getLocation())
 
             : (fco instanceof WorkLocation)
-            ? Messages.message(((WorkLocation)fco).getColony()
-                .getLocationLabel())
+            ? ((WorkLocation)fco).getColony().getLocationLabel()
+
             : null;
     }
 

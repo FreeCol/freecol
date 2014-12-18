@@ -173,8 +173,9 @@ public final class ReportColonyPanel extends ReportPanel
             if (currentType != null) {
                 buildableLabel = new JLabel(new ImageIcon(ResourceManager.getImage(currentType.getId()
                                                           + ".image", 0.66)));
-                buildableLabel.setToolTipText(Messages.message(StringTemplate.template("colonyPanel.currentlyBuilding")
-                                                               .add("%buildable%", currentType.getNameKey())));
+                GUI.localizeToolTip(buildableLabel, StringTemplate
+                    .template("colonyPanel.currentlyBuilding")
+                    .add("%buildable%", currentType.getNameKey()));
                 buildableLabel.setIcon(buildableLabel.getDisabledIcon());
             }
 
@@ -770,9 +771,7 @@ public final class ReportColonyPanel extends ReportPanel
         if (h != null) h = Messages.message(h);
         JLabel l = new JLabel(h, i, SwingConstants.CENTER);
         l.setForeground((c == null) ? Color.BLACK : c);
-        if (t != null) {
-            l.setToolTipText(Messages.message(t));
-        }
+        if (t != null) GUI.localizeToolTip(l, t);
         return l;
     }
 
@@ -783,9 +782,7 @@ public final class ReportColonyPanel extends ReportPanel
         }
         JButton b = GUI.getLinkButton(h, i, action);
         b.setForeground((c == null) ? Color.BLACK : c);
-        if (t != null) {
-            b.setToolTipText(Messages.message(t));
-        }
+        if (t != null) GUI.localizeToolTip(b, t);
         b.addActionListener(this);
         return b;
     }

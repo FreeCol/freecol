@@ -171,13 +171,12 @@ public final class ReportIndianPanel extends ReportPanel {
                     Image chip = lib.getMissionChip(missionary.getOwner(),
                                                     expert);
                     missionLabel.setIcon(new ImageIcon(chip));
-                    String text = Messages.message(StringTemplate
+                    GUI.localizeToolTip(missionLabel, StringTemplate
                         .template("model.unit.nationUnit")
-                            .addStringTemplate("%nation%",
-                                missionary.getOwner().getNationName())
-                            .addStringTemplate("%unit%",
-                                missionary.getLabel(Unit.UnitLabelType.NATIONAL)));
-                    missionLabel.setToolTipText(text);
+                        .addStringTemplate("%nation%",
+                            missionary.getOwner().getNationName())
+                        .addStringTemplate("%unit%",
+                            missionary.getLabel(Unit.UnitLabelType.NATIONAL)));
                 }
                 reportPanel.add(missionLabel);
 

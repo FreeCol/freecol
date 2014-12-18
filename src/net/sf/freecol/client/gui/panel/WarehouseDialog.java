@@ -152,23 +152,23 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
             SpinnerNumberModel lowLevelModel
                 = new SpinnerNumberModel(exportData.getLowLevel(), 0, 100, 1);
             lowLevel = new JSpinner(lowLevelModel);
-            str = Messages.message("warehouseDialog.lowLevel.shortDescription");
-            lowLevel.setToolTipText(str);
+            GUI.localizeToolTip(lowLevel,
+                "warehouseDialog.lowLevel.shortDescription");
             add(lowLevel);
 
             // high level settings
             SpinnerNumberModel highLevelModel
                 = new SpinnerNumberModel(exportData.getHighLevel(), 0, 100, 1);
             highLevel = new JSpinner(highLevelModel);
-            str = Messages.message("warehouseDialog.highLevel.shortDescription");
-            highLevel.setToolTipText(str);
+            GUI.localizeToolTip(highLevel,
+                "warehouseDialog.highLevel.shortDescription");
             add(highLevel);
 
             // export checkbox
             export = new JCheckBox(Messages.message("warehouseDialog.export"),
                                    exportData.getExported());
-            str = Messages.message("warehouseDialog.export.shortDescription");
-            export.setToolTipText(str);
+            GUI.localizeToolTip(export,
+                "warehouseDialog.export.shortDescription");
             if (!colony.hasAbility(Ability.EXPORT)) {
                 export.setEnabled(false);
             }
@@ -179,8 +179,8 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
                 = new SpinnerNumberModel(exportData.getExportLevel(), 0,
                                          colony.getWarehouseCapacity(), 1);
             exportLevel = new JSpinner(exportLevelModel);
-            str = Messages.message("warehouseDialog.exportLevel.shortDescription");
-            exportLevel.setToolTipText(str);
+            GUI.localizeToolTip(exportLevel,
+                "warehouseDialog.exportLevel.shortDescription");
             add(exportLevel);
 
             setSize(getPreferredSize());

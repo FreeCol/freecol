@@ -79,7 +79,7 @@ public final class GoodsLabel extends AbstractGoodsLabel
                 && ((Colony) location).hasAbility(Ability.EXPORT))) {
             setToolTipText(Messages.getName(goods));
         } else {
-            setToolTipText(Messages.message(goods.getLabel(false)));
+            GUI.localizeToolTip(this, goods.getLabel(false));
             setIcon(getDisabledIcon());
         }
 

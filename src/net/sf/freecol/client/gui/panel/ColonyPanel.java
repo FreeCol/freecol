@@ -123,20 +123,15 @@ public final class ColonyPanel extends PortPanel
     public static final int SCROLL_SPEED = 40;
 
     // Buttons
-    private JButton unloadButton
-        = new JButton(Messages.message("unload"));
+    private JButton unloadButton = GUI.localizedButton("unload");
 
-    private JButton fillButton
-        = new JButton(Messages.message("fill"));
+    private JButton fillButton = GUI.localizedButton("fill");
 
-    private JButton warehouseButton
-        = new JButton(Messages.message("warehouseDialog.name"));
+    private JButton warehouseButton = GUI.localizedButton("warehouseDialog.name");
 
-    private JButton buildQueueButton
-        = new JButton(Messages.message("colonyPanel.buildQueue"));
+    private JButton buildQueueButton = GUI.localizedButton("colonyPanel.buildQueue");
 
-    private JButton colonyUnitsButton
-        = new JButton(Messages.message("colonyPanel.colonyUnits"));
+    private JButton colonyUnitsButton = GUI.localizedButton("colonyPanel.colonyUnits");
 
     private JButton setGoodsButton = null;
 

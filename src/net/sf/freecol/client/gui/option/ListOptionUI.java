@@ -61,11 +61,11 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     private JList<AbstractOption<T>> list;
     private DefaultListModel<AbstractOption<T>> model;
 
-    private JButton editButton = new JButton(Messages.message("list.edit"));
-    private JButton addButton = new JButton(Messages.message("list.add"));
-    private JButton removeButton = new JButton(Messages.message("list.remove"));
-    private JButton upButton = new JButton(Messages.message("list.up"));
-    private JButton downButton = new JButton(Messages.message("list.down"));
+    private JButton editButton = GUI.localizedButton("list.edit");
+    private JButton addButton = GUI.localizedButton("list.add");
+    private JButton removeButton = GUI.localizedButton("list.remove");
+    private JButton upButton = GUI.localizedButton("list.up");
+    private JButton downButton = GUI.localizedButton("list.down");
 
 
     /**
