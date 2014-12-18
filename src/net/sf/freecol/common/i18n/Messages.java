@@ -464,7 +464,7 @@ public class Messages {
         } else {
             type = StringTemplate.template(nameKey(typeId))
                 .addAmount("%number%", number);
-            roleKey = Role.getRoleKey(roleId);
+            roleKey = (Role.isDefaultRoleId(roleId)) ? null : roleId;
         }
 
         // This is extra brutal, but crash proof.
@@ -484,11 +484,11 @@ public class Messages {
                     if (extra == null) {
                         ret = StringTemplate.template("unitFormat.null.null.role.null")
                             .addStringTemplate("%type%", type)
-                            .add("%role%", roleKey);
+                            .add("%role%", nameKey(roleKey));
                     } else {
                         ret = StringTemplate.template("unitFormat.null.null.role.equip")
                             .addStringTemplate("%type%", type)
-                            .add("%role%", roleKey)
+                            .add("%role%", nameKey(roleKey))
                             .addStringTemplate("%equipment%", extra);
                     }
                 }
@@ -509,12 +509,12 @@ public class Messages {
                         ret = StringTemplate.template("unitFormat.null.nation.role.null")
                             .addStringTemplate("%type%", type)
                             .add("%nation%", nameKey(nationId))
-                            .add("%role%", roleKey);
+                            .add("%role%", nameKey(roleKey));
                     } else {
                         ret = StringTemplate.template("unitFormat.null.nation.role.equip")
                             .addStringTemplate("%type%", type)
                             .add("%nation%", nameKey(nationId))
-                            .add("%role%", roleKey)
+                            .add("%role%", nameKey(roleKey))
                             .addStringTemplate("%equipment%", extra);
                     }
                 }
@@ -537,12 +537,12 @@ public class Messages {
                         ret = StringTemplate.template("unitFormat.name.null.role.null")
                             .addName("%name%", name)
                             .addStringTemplate("%type%", type)
-                            .add("%role%", roleKey);
+                            .add("%role%", nameKey(roleKey));
                     } else {
                         ret = StringTemplate.template("unitFormat.name.null.role.equip")
                             .addName("%name%", name)
                             .addStringTemplate("%type%", type)
-                            .add("%role%", roleKey)
+                            .add("%role%", nameKey(roleKey))
                             .addStringTemplate("%equipment%", extra);
                     }
                 }
@@ -566,13 +566,13 @@ public class Messages {
                             .addName("%name%", name)
                             .addStringTemplate("%type%", type)
                             .add("%nation%", nameKey(nationId))
-                            .add("%role%", roleKey);
+                            .add("%role%", nameKey(roleKey));
                     } else {
                         ret = StringTemplate.template("unitFormat.name.nation.role.equip")
                             .addName("%name%", name)
                             .addStringTemplate("%type%", type)
                             .add("%nation%", nameKey(nationId))
-                            .add("%role%", roleKey)
+                            .add("%role%", nameKey(roleKey))
                             .addStringTemplate("%equipment%", extra);
                     }
                 }

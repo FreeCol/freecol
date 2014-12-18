@@ -56,9 +56,9 @@ import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ResourceType;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.SettlementType;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementStyle;
@@ -1198,8 +1198,8 @@ public final class ImageLibrary {
         }
 
         // try to get an image matching the key
-        String roleQual = (Specification.DEFAULT_ROLE_ID.equals(roleId)) ? ""
-            : "." + lastPart(roleId, ".");
+        String roleQual = (Role.isDefaultRoleId(roleId)) ? ""
+            : "." + Role.getRoleSuffix(roleId);
         String key = unitType.getId() + roleQual
             + ((nativeEthnicity) ? ".native" : "")
             + ".image";

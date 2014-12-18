@@ -112,7 +112,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         roleEditable = editable
             && roleOption.getChoices().size() > 1;
         roleUI = new StringOptionUI(gui, roleOption, roleEditable);
-        GUI.localizeToolTip(roleUI.getComponent(), "model.unit.role.name");
+        GUI.localizeToolTip(roleUI.getComponent(), "model.role.name");
         roleUI.getComponent().setRenderer(new RoleRenderer());
         panel.add(roleUI.getComponent(), "width 35%");
 

@@ -118,7 +118,7 @@ public class NationTypeTest extends FreeColTestCase {
                             assertFalse("Wrong type of pioneer: " + type.toString(),
                                         "model.unit.hardyPioneer".equals(unitTypeId));
                         }
-                    } else if (Specification.DEFAULT_ROLE_ID.equals(au.getRoleId())) {
+                    } else if (Role.isDefaultRoleId(au.getRoleId())) {
                         assertTrue("Ship is not naval: " + type.toString(),
                                    spec().getUnitType(au.getId()).hasAbility(Ability.NAVAL_UNIT));
                         if ("model.nationType.trade".equals(type.getId())

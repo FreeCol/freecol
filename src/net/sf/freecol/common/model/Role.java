@@ -136,19 +136,20 @@ public class Role extends BuildableType {
     /**
      * Is this the default role?
      *
+     * @param roleId The role identifier to test.
      * @return True if this is the default role.
      */
-    public boolean isDefaultRole() {
-        return Specification.DEFAULT_ROLE_ID.equals(getId());
+    public static boolean isDefaultRoleId(String roleId) {
+        return Specification.DEFAULT_ROLE_ID.equals(roleId);
     }
 
     /**
-     * Get a message key for this role.
+     * Is this the default role?
      *
-     * @return A message key, which is null for the default role.
+     * @return True if this is the default role.
      */
-    public String getRoleKey() {
-        return getRoleKey(getId());
+    public boolean isDefaultRole() {
+        return isDefaultRoleId(getId());
     }
 
     /**
@@ -168,17 +169,6 @@ public class Role extends BuildableType {
      */
     public static String getRoleSuffix(String roleId) {
         return lastPart(roleId, ".");
-    }
-
-    /**
-     * Get a message key for a given role identifier.
-     *
-     * @param roleId The role identifier to query.
-     * @return A message key, which is null for the default role.
-     */
-    public static String getRoleKey(String roleId) {
-        return (Specification.DEFAULT_ROLE_ID.equals(roleId)) ? null
-            : "model.unit.role." + getRoleSuffix(roleId);
     }
 
     // @compat 0.10.7
