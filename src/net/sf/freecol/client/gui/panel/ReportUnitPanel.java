@@ -86,7 +86,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
      */
     public ReportUnitPanel(FreeColClient freeColClient, String key,
                            boolean showColonies) {
-        super(freeColClient, Messages.message(key));
+        super(freeColClient, key);
 
         this.showColonies = showColonies;
         reportPanel.setLayout(new MigLayout("fillx, wrap 12", "", ""));

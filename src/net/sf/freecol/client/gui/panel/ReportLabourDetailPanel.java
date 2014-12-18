@@ -41,7 +41,8 @@ import net.sf.freecol.common.model.UnitType;
 /**
  * This panel displays the Labour Report.
  */
-public final class ReportLabourDetailPanel extends ReportPanel implements ActionListener {
+public final class ReportLabourDetailPanel extends ReportPanel
+    implements ActionListener {
     
     private Map<UnitType, Map<Location, Integer>> data;
     private TypeCountMap<UnitType> unitCount;
@@ -63,7 +64,7 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
                                    Map<UnitType, Map<Location, Integer>> data,  
                                    TypeCountMap<UnitType> unitCount,
                                    List<Colony> colonies) {
-        super(freeColClient, Messages.message("report.labour.details"));
+        super(freeColClient, "report.labour.details");
 
         this.unitType = unitType;
         this.data = data;

@@ -82,7 +82,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ReportRequirementsPanel(FreeColClient freeColClient) {
-        super(freeColClient, Messages.message("reportRequirementsAction.name"));
+        super(freeColClient, "reportRequirementsAction");
 
         colonies = freeColClient.getMySortedColonies();
 

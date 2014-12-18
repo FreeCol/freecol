@@ -49,9 +49,6 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class ReportContinentalCongressPanel extends ReportPanel {
 
-    private static final String title
-        = Messages.message("reportCongressAction.name");
-
     private static final String none
         = Messages.message("report.continentalCongress.none");
 
@@ -62,7 +59,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ReportContinentalCongressPanel(FreeColClient freeColClient) {
-        super(freeColClient, title);
+        super(freeColClient, "reportCongressAction");
 
         JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP);
         tabs.setOpaque(false);

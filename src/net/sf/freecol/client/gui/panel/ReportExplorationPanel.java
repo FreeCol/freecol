@@ -34,7 +34,7 @@ import net.sf.freecol.common.model.Region;
 
 
 /**
- * This panel displays the Foreign Affairs Report.
+ * This panel displays the exploration report.
  */
 public final class ReportExplorationPanel extends ReportPanel {
 
@@ -57,7 +57,7 @@ public final class ReportExplorationPanel extends ReportPanel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ReportExplorationPanel(FreeColClient freeColClient) {
-        super(freeColClient, Messages.message("reportExplorationAction.name"));
+        super(freeColClient, "reportExplorationAction");
 
         // Display Panel
         reportPanel.removeAll();

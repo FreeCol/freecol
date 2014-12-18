@@ -42,14 +42,13 @@ import net.sf.freecol.common.model.UnitType;
  */
 public final class ReportNavalPanel extends ReportUnitPanel {
 
-
     /**
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ReportNavalPanel(FreeColClient freeColClient) {
-        super(freeColClient, "reportNavalAction.name", false);
+        super(freeColClient, "reportNavalAction", false);
     }
 
 

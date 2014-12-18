@@ -49,7 +49,7 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ReportMilitaryPanel(FreeColClient freeColClient) {
-        super(freeColClient, "reportMilitaryAction.name", true);
+        super(freeColClient, "reportMilitaryAction", true);
     }
 
 

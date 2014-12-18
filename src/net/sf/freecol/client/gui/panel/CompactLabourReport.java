@@ -98,10 +98,8 @@ public final class CompactLabourReport extends ReportPanel {
      */
     public CompactLabourReport(FreeColClient freeColClient,
                                LabourData.UnitData data) {
-        super(freeColClient,
-            ((data == null)
-                ? Messages.message("reportLabourAction.name")
-                : Messages.message("report.labour.details")));
+        super(freeColClient, ((data == null) ? "reportLabourAction"
+                : "report.labour.details"));
 
         this.unitData = data;
 

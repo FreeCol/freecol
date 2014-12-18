@@ -35,14 +35,13 @@ import net.sf.freecol.common.model.HistoryEvent;
  */
 public final class ReportHistoryPanel extends ReportPanel {
 
-
     /**
      * The constructor that will add the items to this panel.
      * 
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ReportHistoryPanel(FreeColClient freeColClient) {
-        super(freeColClient, Messages.message("reportHistoryAction.name"));
+        super(freeColClient, "reportHistoryAction");
 
         List<HistoryEvent> history = getMyPlayer().getHistory();
 

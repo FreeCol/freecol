@@ -37,14 +37,13 @@ import net.sf.freecol.common.model.UnitType;
  */
 public final class ReportCargoPanel extends ReportUnitPanel {
 
-
     /**
      * Creates a cargo report.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ReportCargoPanel(FreeColClient freeColClient) {
-        super(freeColClient, "reportCargoAction.name", false);
+        super(freeColClient, "reportCargoAction", false);
     }
 
 

@@ -42,7 +42,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ReportForeignAffairPanel(FreeColClient freeColClient) {
-        super(freeColClient, Messages.message("reportForeignAction.name"));
+        super(freeColClient, "reportForeignAction");
 
         // Display Panel
         reportPanel.removeAll();

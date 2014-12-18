@@ -62,7 +62,7 @@ public final class ReportTradePanel extends ReportPanel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ReportTradePanel(FreeColClient freeColClient) {
-        super(freeColClient, Messages.message("reportTradeAction.name"));
+        super(freeColClient, "reportTradeAction");
 
         setSize(getMinimumSize());
         Player player = getMyPlayer();

@@ -79,13 +79,13 @@ public class ReportPanel extends FreeColPanel {
      * Creates the basic FreeCol report panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param title The title to display on the panel.
+     * @param key A key for the title.
      */
-    public ReportPanel(FreeColClient freeColClient, String title) {
+    public ReportPanel(FreeColClient freeColClient, String key) {
         super(freeColClient, new MigLayout("wrap 1", "[fill]",
                                            "[]30[fill]30[]"));
 
-        header = GUI.getDefaultHeader(title);
+        header = GUI.getDefaultHeader(Messages.getName(key));
         add(header, "cell 0 0, align center");
 
         reportPanel = new MigPanel("ReportPanelUI");

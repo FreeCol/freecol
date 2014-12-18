@@ -63,7 +63,7 @@ public final class ReportProductionPanel extends ReportPanel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ReportProductionPanel(FreeColClient freeColClient) {
-        super(freeColClient, Messages.message("reportProductionAction.name"));
+        super(freeColClient, "reportProductionAction");
 
         this.goodsTypes = new ArrayList<>();
 

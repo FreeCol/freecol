@@ -39,14 +39,13 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class ReportEducationPanel extends ReportPanel {
 
-
     /**
      * Creates the education report.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ReportEducationPanel(FreeColClient freeColClient) {
-        super(freeColClient, Messages.message("reportEducationAction.name"));
+        super(freeColClient, "reportEducationAction");
 
         reportPanel.setLayout(new MigLayout("wrap 2, fill",
                                             "[]20[fill, growprio 200]"));

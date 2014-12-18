@@ -85,7 +85,7 @@ public final class ReportTurnPanel extends ReportPanel {
      */
     public ReportTurnPanel(FreeColClient freeColClient,
                            List<ModelMessage> messages) {
-        super(freeColClient, Messages.getName("reportTurnAction"));
+        super(freeColClient, "reportTurnAction");
 
         // Display Panel
         reportPanel.removeAll();

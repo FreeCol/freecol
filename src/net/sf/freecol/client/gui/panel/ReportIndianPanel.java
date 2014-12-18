@@ -65,7 +65,7 @@ public final class ReportIndianPanel extends ReportPanel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ReportIndianPanel(FreeColClient freeColClient) {
-        super(freeColClient, Messages.message("reportIndianAction.name"));
+        super(freeColClient, "reportIndianAction");
 
         Player player = getMyPlayer();
         reportPanel.setLayout(new MigLayout("wrap 6, fillx, insets 0",

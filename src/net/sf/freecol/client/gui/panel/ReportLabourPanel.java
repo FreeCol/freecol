@@ -128,7 +128,7 @@ public final class ReportLabourPanel extends ReportPanel {
      * The constructor that will add the items to this panel.
      */
     public ReportLabourPanel(FreeColClient freeColClient) {
-        super(freeColClient, Messages.message("reportLabourAction.name"));
+        super(freeColClient, "reportLabourAction");
 
         this.data = new HashMap<>();
         this.unitCount = new TypeCountMap<UnitType>();

@@ -47,7 +47,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
      */
     public ReportHighScoresPanel(FreeColClient freeColClient, String prefix,
                                  List<HighScore> highScores) {
-        super(freeColClient, Messages.message("reportHighScoresAction.name"));
+        super(freeColClient, "reportHighScoresAction");
 
         reportPanel.removeAll();
         reportPanel.setLayout(new MigLayout("wrap 3, gapx 30",
