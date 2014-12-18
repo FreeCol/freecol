@@ -2104,7 +2104,7 @@ public final class Canvas extends JDesktopPane {
         // Cortado applet is failing to quit when finished, make sure it
         // eventually gets kicked.  Change the magic number if we
         // change the opening video length.
-        Timer t = new Timer(75000, l);
+        Timer t = new Timer(80000, l);
         l.setTimer(t);
         t.setRepeats(false);
         t.start();
