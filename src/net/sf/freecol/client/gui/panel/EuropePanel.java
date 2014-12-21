@@ -241,7 +241,7 @@ public final class EuropePanel extends PortPanel {
         add(inPortScroll, "sg, height 124:, grow");
         add(docksScroll, "spany 2, grow");
         add(cargoScroll, "height 100:, grow");
-        add(marketScroll, "span, grow");
+        add(marketScroll, "span, height 100:, grow");
 
         add(recruitButton, "span, split 6");
         add(purchaseButton);
