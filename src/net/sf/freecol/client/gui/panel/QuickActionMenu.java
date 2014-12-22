@@ -351,7 +351,7 @@ public final class QuickActionMenu extends JPopupMenu {
                     break;
                 }
             }
-            if (bestOwned != null) {
+            if (bestOwned != null && bestOwnedProd > 0) {
                 JMenuItem ji = makeProductionItem(type, bestOwned,
                     bestOwnedProd, unitLabel, false);
                 if (type == expertGoods) {
@@ -360,7 +360,8 @@ public final class QuickActionMenu extends JPopupMenu {
                     items.put(ji, Integer.valueOf(bestOwnedProd));
                 }
             }
-            if (bestUnowned != null && bestUnownedProd > bestOwnedProd) {
+            if (bestUnowned != null && bestUnownedProd > bestOwnedProd
+                && bestUnownedProd > 0) {
                 JMenuItem ji = makeProductionItem(type, bestUnowned,
                     bestUnownedProd, unitLabel, true);
                 if (type == expertGoods) {
