@@ -457,6 +457,9 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.font"))
                           .hasArg()
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("full-screen")
+                          .withDescription(Messages.message("cli.full-screen"))
+                          .create());
         options.addOption(OptionBuilder.withLongOpt("load-savegame")
                           .withDescription(Messages.message("cli.load-savegame"))
                           .withArgName(Messages.message("cli.arg.file"))
@@ -644,6 +647,10 @@ public final class FreeCol {
 
             if (line.hasOption("font")) {
                 fontName = line.getOptionValue("font");
+            }
+
+            if (line.hasOption("full-screen")) {
+                windowSize = null;
             }
 
             if (line.hasOption("load-savegame")) {

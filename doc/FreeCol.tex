@@ -352,13 +352,6 @@ options:
 \item\verb$--freecol-data DIR$ Specify the directory that contains
 FreeCol's data files. In general, you will only need to use this if
 you have installed a modified copy of FreeCol's data files.
-\item\verb$--load-savegame SAVEGAME_FILE$ Load the given
-savegame. This is particularly useful in combination with the client
-option \hyperlink{show savegame settings}{show savegame settings}.
-\item\verb$--no-intro$ Skip the introductory video.
-\item\verb$--no-sound$ Run FreeCol without sound. Note that the game
-does not yet contain any music, so the only sounds you will hear will
-be special effects.
 \item\verb$--advantages ADVANTAGES$ Set the European nation advantages
   type, which must be one of \texttt{Selected} (each nation may choose
   an advantage), \texttt{Fixed} (the standard advantage types are
@@ -374,11 +367,21 @@ be special effects.
   English, French, Spanish).
 \item\verb$--font FONTSPEC$ Override the default font with a Java
 font specifier (e.g. Arial-BOLD-12).
+\item\verb$--full-screen$ Run FreeCol in full screen mode.
+\item\verb$--load-savegame SAVEGAME_FILE$ Load the given
+  savegame. This is particularly useful in combination with the client
+  option \hyperlink{show savegame settings}{show savegame settings}.
+\item\verb$--log-file FILE$ Override the location of the log file.
 \item\verb$--name NAME$ Specify a player name.
+\item\verb$--no-intro$ Skip the introductory video.
+\item\verb$--no-sound$ Run FreeCol without sound. Note that the game
+does not yet contain any music, so the only sounds you will hear will
+be special effects.
 \item\verb$--server PORT$ Start a stand-alone server on the specified
 port. If you don't know what that means, you will not need the option.
 \item\verb$--server-help$ Display a help screen for the more advanced
 server options.
+\item\verb$--splash FILE$ Specify the location of the splash screen file.
 \item\verb$--timeout TIMEOUT$ Specifies the number of seconds the
   server should wait for a player to answer a question (e.g. demands
   from natives).  This is `infinite' by default in single player mode,
@@ -401,14 +404,13 @@ server options.
   that specifying a save game file on the command line will override
   the save game directory.  If the specified directory does not
   exist FreeCol will exit.
-\item\verb$--windowed[[=]WIDTHxHEIGHT]$ Run FreeCol in windowed mode
-  instead of full screen mode and set the window width and height. You
-  will need this if your window manager or Java Virtual Machine do not
-  (correctly) support FreeCol's full screen mode. If you use Linux,
-  for example, you should set the window width to the width of your
-  screen, but probably set the window height slightly lower than the
-  height of your screen, in order to leave space for the menu bar,
-  dock etc.
+\item\verb$--windowed[[=]WIDTHxHEIGHT]$ Run FreeCol in windowed mode,
+  and optionally explicitly set the window width and height. If the
+  size is not specified FreeCol will attempt to use as much space as
+  possible without overlapping menu bars et al.  Window size
+  determination is not always correct for all combinations of
+  operating systems and window systems, hence the ability to
+  explicitly set the size.
 \end{itemize}
 
 There are several other options that you will probably only be
@@ -416,12 +418,8 @@ interested in if you are a developer or need detailed debugging
 information:
 
 \begin{itemize}
-\item\verb$--no-java-check$ Skip the java version check.
-\item\verb$--no-memory-check$ Skip the memory check.
-\item\verb$--log-level LEVEL$ Set the java log level.
-\item\verb$--check-savegame GAME$ Check the integrity of a saved game,
+\item\verb$--check-savegame SAVEGAME_FILE$ Check the integrity of a saved game,
   exit with status equal to the result of the check.
-\item\verb$--seed SEED$ Seed the random number generator.
 \item\verb$--debug[[=]MODES]$ Start the game in (non-scoring)
   debugging mode.  The optional argument is a comma separated list of
   the debug modes: `menus' (enables the debug menu and extra entries
@@ -433,6 +431,12 @@ information:
 \item\verb$--debug-run[=]TURNS[,SAVENAME]$ Run in debug `menus' mode
   for the specified number of turns, then optionally save the game to
   the specified save name and quit.
+\item\verb$--log-console$ Log all java messages to the system console
+  as well as the log file.
+\item\verb$--log-level LOGLEVEL$ Set the Java log level.
+\item\verb$--no-java-check$ Skip the java version check.
+\item\verb$--no-memory-check$ Skip the memory check.
+\item\verb$--seed SEED$ Seed the random number generator.
 \end{itemize}
 
 
