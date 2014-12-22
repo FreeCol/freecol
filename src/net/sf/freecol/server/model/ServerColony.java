@@ -834,6 +834,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         boolean ret = equipForRole(unit, role, roleCount);
 
         if (ret) {
+            if (unit.isOnCarrier()) unit.setMovesLeft(0);
             Tile tile = getTile();
             tile.cacheUnseen();//+til
             unit.setLocation(tile);
