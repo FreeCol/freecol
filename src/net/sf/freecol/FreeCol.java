@@ -157,8 +157,11 @@ public final class FreeCol {
     /** The time out (seconds) for otherwise blocking commands. */
     private static int timeout = -1;
 
-    /** The size of window to create, defaults to null for full screen. */
-    private static Dimension windowSize = null;
+    /**
+     * The size of window to create, defaults to impossible dimensions
+     * to require windowed mode with best determined screen size.
+     */
+    private static Dimension windowSize = new Dimension(-1, -1);
 
 
 
