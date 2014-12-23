@@ -122,17 +122,11 @@ public final class BuildingType extends BuildableType {
      * @return The reason why adding would fail.
      */
     public NoAddReason getNoAddReason(UnitType unitType) {
-        if (workPlaces == 0) {
-            return NoAddReason.CAPACITY_EXCEEDED;
-        } else if (!unitType.hasSkill()) {
-            return NoAddReason.MISSING_SKILL;
-        } else if (unitType.getSkill() < minSkill) {
-            return NoAddReason.MINIMUM_SKILL;
-        } else if (unitType.getSkill() > maxSkill) {
-            return NoAddReason.MAXIMUM_SKILL;
-        } else {
-            return NoAddReason.NONE;
-        }
+        return (workPlaces == 0) ? NoAddReason.CAPACITY_EXCEEDED
+            : (!unitType.hasSkill()) ? NoAddReason.MISSING_SKILL
+            : (unitType.getSkill() < minSkill) ? NoAddReason.MINIMUM_SKILL
+            : (unitType.getSkill() > maxSkill) ? NoAddReason.MAXIMUM_SKILL
+            : NoAddReason.NONE;
     }
 
     /**

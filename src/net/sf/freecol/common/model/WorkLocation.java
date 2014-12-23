@@ -462,7 +462,7 @@ public abstract class WorkLocation extends UnitLocation
      */
     @Override
     public NoAddReason getNoAddReason(Locatable locatable) {
-        return (locatable instanceof Unit && ((Unit) locatable).isPerson())
+        return (locatable instanceof Unit && ((Unit)locatable).isPerson())
             ? super.getNoAddReason(locatable)
             : NoAddReason.WRONG_TYPE;
     }

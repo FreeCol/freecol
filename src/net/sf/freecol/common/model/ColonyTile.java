@@ -234,9 +234,8 @@ public class ColonyTile extends WorkLocation {
      */
     @Override
     public NoAddReason getNoAddReason(Locatable locatable) {
-        NoAddReason reason = getNoWorkReason();
-        return (reason != NoAddReason.NONE) ? reason
-            : super.getNoAddReason(locatable);
+        NoAddReason reason = super.getNoAddReason(locatable);
+        return (reason != NoAddReason.NONE) ? reason : getNoWorkReason();
     }
 
     /**
