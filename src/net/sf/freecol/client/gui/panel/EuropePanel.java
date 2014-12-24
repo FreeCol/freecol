@@ -540,8 +540,6 @@ public final class EuropePanel extends PortPanel {
     private JButton exitButton, trainButton, purchaseButton,
                     recruitButton, unloadButton, sailButton;
 
-    private final JLabel header = GUI.getDefaultHeader("");
-
     private Europe europe;
 
 
@@ -574,8 +572,9 @@ public final class EuropePanel extends PortPanel {
         cargoPanel = new CargoPanel(freeColClient, true);
         docksPanel = new DocksPanel();
         marketPanel = new MarketPanel(this);
-
         log = new TransactionLog();
+        europe = freeColClient.getMyPlayer().getEurope();
+
         SimpleAttributeSet attributes = new SimpleAttributeSet();
         StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_RIGHT);
         //StyleConstants.setForeground(attributes, Color.WHITE);
@@ -656,8 +655,10 @@ public final class EuropePanel extends PortPanel {
         logScroll.getViewport().setOpaque(false);
         log.setOpaque(false);
 
+        initialize(europe);
+
         if (canvas.getHeight() > 780) {
-            add(header, "span, top, center");
+            add(GUI.localizedHeader(europe.getNameKey()), "span, top, center");
         }
         add(toAmericaScroll, "sg, height 124:, grow");
         add(toEuropeScroll, "sg, height 124:, grow");
@@ -674,14 +675,9 @@ public final class EuropePanel extends PortPanel {
         add(sailButton);
         add(exitButton, "tag ok");
 
-        selectedUnitLabel = null;
-
-        // See the message of Ulf Onnen for more information about the presence
-        // of this fake mouse listener.
-        addMouseListener(new MouseAdapter() {});
+        setSelectedUnitLabel(null);
 
         getGUI().restoreSavedSize(this, 1000, 700);
-        initialize(freeColClient.getMyPlayer().getEurope());
     }
 
     /**
@@ -689,10 +685,7 @@ public final class EuropePanel extends PortPanel {
      *
      * @param europe The <code>Europe</code> this panel should display.
      */
-    public void initialize(Europe europe) {
-        this.europe = europe;
-        header.setText(Messages.getName(europe));
-
+    private void initialize(Europe europe) {
         // Initialize the subpanels.
         toAmericaPanel.initialize(europe.getGame().getMap());
         toEuropePanel.initialize(europe);

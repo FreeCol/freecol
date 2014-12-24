@@ -78,8 +78,8 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
         scrollPane.setBorder(null);
 
         MigPanel panel = new MigPanel(new MigLayout("fill, wrap 1", "", ""));
-        String str = Messages.message("warehouseDialog.name");
-        panel.add(GUI.getDefaultHeader(str), "align center");
+        panel.add(GUI.localizedHeader(Messages.nameKey("warehouseDialog")),
+                  "align center");
         panel.add(scrollPane, "grow");
         panel.setSize(panel.getPreferredSize());
 

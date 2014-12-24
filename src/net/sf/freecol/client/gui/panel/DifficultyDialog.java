@@ -85,7 +85,7 @@ public final class DifficultyDialog extends OptionsDialog
     public DifficultyDialog(FreeColClient freeColClient,
                             Specification specification,
                             OptionGroup level, boolean editable) {
-        super(freeColClient, editable, level, Messages.message("difficulty"),
+        super(freeColClient, editable, level, "difficultyDialog",
               FreeColDirectories.CUSTOM_DIFFICULTY_FILE_NAME,
               "model.difficulty.custom");
 

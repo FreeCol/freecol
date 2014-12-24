@@ -80,6 +80,7 @@ import javax.swing.text.StyleContext;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
@@ -923,19 +924,6 @@ public class GUI {
     }
 
     /**
-     * Gets a default header for panels.
-     *
-     * @param text The text to display.
-     * @return A suitable <code>JLabel</code>.
-     */
-    public static JLabel getDefaultHeader(String text) {
-        JLabel header = new JLabel(text, JLabel.CENTER);
-        header.setFont(FontLibrary.BIG_HEADER_FONT);
-        header.setBorder(blankBorder(20, 0, 20, 0));
-        return header;
-    }
-
-    /**
      * Get a good screen device for starting FreeCol.
      *
      * @return A screen device, or null if none available
@@ -1185,6 +1173,19 @@ public class GUI {
      */
     public static JLabel localizedLabel(Named named) {
         return localizedLabel(named.getNameKey());
+    }
+
+    /**
+     * Gets a default header for panels containing a localized message.
+     *
+     * @param key The message key to use.
+     * @return A suitable <code>JLabel</code>.
+     */
+    public static JLabel localizedHeader(String key) {
+        JLabel header = new JLabel(Messages.message(key), JLabel.CENTER);
+        header.setFont(FontLibrary.BIG_HEADER_FONT);
+        header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        return header;
     }
 
     /**

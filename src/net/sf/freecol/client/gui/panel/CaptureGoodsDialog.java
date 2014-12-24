@@ -124,8 +124,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
         this.maxCargo = winner.getSpaceLeft();
 
-        String hdr = Messages.message("lootCargo.header");
-        JLabel header = GUI.getDefaultHeader(hdr);
+        JLabel header = GUI.localizedHeader("lootCargo.header");
         header.setFont(FontLibrary.MEDIUM_HEADER_FONT);
 
         this.allButton = GUI.localizedButton("All");

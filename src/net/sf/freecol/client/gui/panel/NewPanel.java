@@ -276,8 +276,7 @@ public final class NewPanel extends FreeColPanel
         setCancelComponent(cancel);
 
         // Add all the components
-        add(GUI.getDefaultHeader(Messages.message("newGamePanel")),
-            "span 6, center");
+        add(GUI.localizedHeader("newGamePanel"), "span 6, center");
         add(single, "newline, span 3");
         add(new JSeparator(JSeparator.VERTICAL), "spany 7, grow");
         add(GUI.localizedLabel("name"), "span, split 2");

@@ -61,7 +61,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @param editable Whether the dialog is editable.
      */
     public OptionsDialog(FreeColClient freeColClient, boolean editable,
-                         OptionGroup group, String header,
+                         OptionGroup group, String headerKey,
                          String defaultFileName, String optionGroupId) {
         super(freeColClient);
 
@@ -70,7 +70,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
         this.ui = new OptionGroupUI(getGUI(), this.group, this.editable);
         this.defaultFileName = defaultFileName;
         this.optionGroupId = optionGroupId;
-        preparePanel(header, this.ui);
+        preparePanel(headerKey, this.ui);
     }
 
 
@@ -122,7 +122,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
     /**
      * Load the panel.
      */
-    private void preparePanel(String header, OptionGroupUI ui) {
+    private void preparePanel(String headerKey, OptionGroupUI ui) {
         this.optionPanel = new MigPanel("ReportPanelUI");
         this.optionPanel.setOpaque(true);
         this.optionPanel.add(ui);
@@ -133,7 +133,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
         this.scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         
         this.panel = new MigPanel(new MigLayout("wrap 1, fill"));
-        this.panel.add(GUI.getDefaultHeader(header), "center");
+        this.panel.add(GUI.localizedHeader(Messages.nameKey(headerKey)),
+                       "span, center");
     }
 
     /**

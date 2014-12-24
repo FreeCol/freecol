@@ -68,9 +68,7 @@ public final class ChooseFoundingFatherDialog
         this.possibleFathers = possibleFoundingFathers;
         this.tb = new JTabbedPane(JTabbedPane.TOP);
 
-        String nominate = Messages.message("foundingFatherDialog.nominate");
-        JLabel header = GUI.getDefaultHeader(nominate);
-
+        JLabel header = GUI.localizedHeader("foundingFatherDialog.nominate");
         JButton helpButton = new JButton(freeColClient.getActionManager()
             .getFreeColAction("colopediaAction.FATHERS"));
         helpButton.setText(Messages.message("help"));

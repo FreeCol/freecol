@@ -53,8 +53,6 @@ public final class ColopediaPanel extends FreeColPanel
 
     private static final Logger logger = Logger.getLogger(ColopediaPanel.class.getName());
 
-    private JLabel header;
-
     private JPanel listPanel;
 
     private JPanel detailPanel;
@@ -74,8 +72,7 @@ public final class ColopediaPanel extends FreeColPanel
         super(freeColClient, new MigLayout("fill", 
                 "[200:]unrelated[550:, grow, fill]", "[][grow, fill][]"));
 
-        header = GUI.getDefaultHeader(Messages.message("menuBar.colopedia"));
-        add(header, "span, align center");
+        add(GUI.localizedHeader("menuBar.colopedia"), "span, align center");
 
         listPanel = new MigPanel("ColopediaPanelUI");
         listPanel.setOpaque(true);
@@ -236,7 +233,6 @@ public final class ColopediaPanel extends FreeColPanel
 
         removeAll();
         detailPanel = null;
-        header = null;
         listPanel = null;
         tree = null;
         nodeMap = null;

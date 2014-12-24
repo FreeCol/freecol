@@ -797,9 +797,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         this.agreement = agreement;
         this.comment = comment;
 
-        JLabel header
-            = GUI.getDefaultHeader(Messages.message("negotiationDialog.title."
-                    + agreement.getContext().getKey()));
+        JLabel header = GUI.localizedHeader("negotiationDialog.title."
+            + agreement.getContext().getKey());
         StringTemplate nation = player.getNationName(),
             otherNation = otherPlayer.getNationName();
         t = StringTemplate.template("negotiationDialog.demand")

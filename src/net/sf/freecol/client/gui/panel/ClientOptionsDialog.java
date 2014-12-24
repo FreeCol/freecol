@@ -37,7 +37,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
      */
     public ClientOptionsDialog(FreeColClient freeColClient) {
         super(freeColClient, true, freeColClient.getClientOptions(),
-              freeColClient.getClientOptions().getName(),
+              freeColClient.getClientOptions().getId(),
               FreeColDirectories.CLIENT_OPTIONS_FILE_NAME,
               ClientOptions.getXMLElementTagName());
 
