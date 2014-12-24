@@ -61,6 +61,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.JWindow;
@@ -1181,6 +1182,18 @@ public class GUI {
     public static JMenuItem localizedMenuItem(StringTemplate template,
                                               Icon icon) {
         return new JMenuItem(Messages.message(template), icon);
+    }
+
+    /**
+     * Get a JRadioButtonMenuItem with Messages.message(template) as text.
+     *
+     * @param template The <code>StringTemplate</code> to generate the text.
+     * @param value The initial value.
+     * @return The <code>JRadioButtonMenuItem</code>.
+     */
+    public static JRadioButtonMenuItem localizedRadioButtonMenuItem(StringTemplate template,
+                                                                    boolean value) {
+        return new JRadioButtonMenuItem(Messages.message(template), value);
     }
 
     /**
