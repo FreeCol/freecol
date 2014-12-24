@@ -92,9 +92,9 @@ public class DebugMenu extends JMenu {
         this.setMnemonic(KeyEvent.VK_D);
         add(this);
 
-        final JCheckBoxMenuItem sc = new JCheckBoxMenuItem(
-            Messages.message("menuBar.debug.showCoordinates"),
-            FreeColDebugger.debugDisplayCoordinates());
+        final JCheckBoxMenuItem sc
+            = GUI.localizedCheckBoxMenuItem("menuBar.debug.showCoordinates",
+                FreeColDebugger.debugDisplayCoordinates());
         sc.setOpaque(false);
         sc.setMnemonic(KeyEvent.VK_S);
         this.add(sc);
@@ -107,8 +107,9 @@ public class DebugMenu extends JMenu {
             });
         sc.setEnabled(true);
 
-        final JMenuItem reveal = new JCheckBoxMenuItem(
-            Messages.message("menuBar.debug.revealEntireMap"));
+        final JMenuItem reveal
+            = GUI.localizedCheckBoxMenuItem("menuBar.debug.revealEntireMap",
+                                            false);
         reveal.setOpaque(false);
         reveal.setMnemonic(KeyEvent.VK_R);
         this.add(reveal);
@@ -120,8 +121,9 @@ public class DebugMenu extends JMenu {
             });
         reveal.setEnabled(hasServer);
 
-        final JMenuItem hide = new JCheckBoxMenuItem(
-            Messages.message("menuBar.debug.hideEntireMap"));
+        final JMenuItem hide
+            = GUI.localizedCheckBoxMenuItem("menuBar.debug.hideEntireMap",
+                                            false);
         hide.setOpaque(false);
         //hide.setMnemonic(KeyEvent.VK_R);
         this.add(hide);
@@ -134,9 +136,9 @@ public class DebugMenu extends JMenu {
         hide.setEnabled(hasServer);
 
         // Search tracing
-        final JCheckBoxMenuItem searchTrace = new JCheckBoxMenuItem(
-            Messages.message("menuBar.debug.searchTrace"),
-            game.getMap().getSearchTrace());
+        final JCheckBoxMenuItem searchTrace
+            = GUI.localizedCheckBoxMenuItem("menuBar.debug.searchTrace",
+                game.getMap().getSearchTrace());
         searchTrace.setOpaque(false);
         this.add(searchTrace);
         searchTrace.addActionListener(new ActionListener() {
@@ -146,7 +148,8 @@ public class DebugMenu extends JMenu {
                 }
             });
 
-        final JMenu cvpMenu = GUI.localizedMenu("menuBar.debug.showColonyValue");
+        final JMenu cvpMenu
+            = GUI.localizedMenu("menuBar.debug.showColonyValue");
         cvpMenu.setOpaque(false);
         ButtonGroup bg = new ButtonGroup();
         final JRadioButtonMenuItem cv1

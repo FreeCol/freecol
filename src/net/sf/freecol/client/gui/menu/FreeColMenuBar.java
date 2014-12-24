@@ -173,7 +173,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
             rtn.setAction(action);
             rtn.setOpaque(false);
 
-            rtn.setSelected(((SelectableAction) am.getFreeColAction(actionId)).isSelected());
+            rtn.setSelected(((SelectableAction)am.getFreeColAction(actionId)).isSelected());
         } else
             logger.finest("Could not create menu item. [" + actionId
                 + "] not found.");

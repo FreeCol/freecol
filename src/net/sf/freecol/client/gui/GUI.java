@@ -55,6 +55,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -1049,6 +1050,18 @@ public class GUI {
      */
     public static JButton localizedButton(StringTemplate template) {
         return new JButton(Messages.message(template));
+    }
+
+    /**
+     * Get a JCheckBoxMenuItem with Messages.message(key) as text.
+     *
+     * @param key The key to use.
+     * @param value The initial value.
+     * @return The <code>JCheckBoxMenuItem</code>.
+     */
+    public static JCheckBoxMenuItem localizedCheckBoxMenuItem(String key,
+                                                              boolean value) {
+        return new JCheckBoxMenuItem(Messages.message(key), value);
     }
 
     /**
