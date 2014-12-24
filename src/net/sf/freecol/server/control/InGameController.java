@@ -639,8 +639,11 @@ public final class InGameController extends Controller {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csVisit(ServerPlayer serverPlayer, IndianSettlement is,
-                         int scout, ChangeSet cs) {
-        serverPlayer.csContact((ServerPlayer)is.getOwner(), cs);
+                            int scout, ChangeSet cs) {
+        final ServerPlayer owner = (ServerPlayer)is.getOwner();
+        if (serverPlayer.csContact(owner, cs)) {
+            serverPlayer.csNativeFirstContact(owner, null, cs);
+        }
         is.setVisited(serverPlayer);
         if (scout > 0 || (scout == 0 && getGame().getSpecification()
                 .getBoolean(GameOptions.SETTLEMENT_ACTIONS_CONTACT_CHIEF))) {
