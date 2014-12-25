@@ -549,6 +549,7 @@ public final class NewPanel extends FreeColPanel
         case SHOW_DIFFICULTY:
             this.difficulty = getGUI().showDifficultyDialog(this.specification,
                                                             this.difficulty);
+            updateDifficulty();
             break;
         case SINGLE: case JOIN: case START: case META_SERVER:
             enableComponents();

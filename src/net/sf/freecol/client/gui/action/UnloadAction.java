@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -72,11 +73,12 @@ public class UnloadAction extends MapboardAction {
     @Override
     protected boolean shouldBeEnabled() {
         final Unit carrier = getUnit();
+        final Player player = freeColClient.getMyPlayer();
         return super.shouldBeEnabled()
             && carrier != null
             && carrier.isCarrier()
             && carrier.getCargoSpaceTaken() > 0
-            && freeColClient.getMyPlayer().owns(carrier);
+            && player != null && player.owns(carrier);
     }
 
 
