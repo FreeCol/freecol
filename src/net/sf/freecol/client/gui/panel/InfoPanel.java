@@ -409,7 +409,7 @@ public final class InfoPanel extends FreeColPanel {
             : (unitInfoPanel.hasUnit())
             ? InfoPanelMode.UNIT
             : ((player = getFreeColClient().getMyPlayer()) != null
-                && player.hasNextActiveUnit())
+                && !player.hasNextActiveUnit())
             ? InfoPanelMode.END
             : InfoPanelMode.NONE;
     }
