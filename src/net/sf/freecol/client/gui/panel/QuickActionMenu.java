@@ -537,6 +537,7 @@ public final class QuickActionMenu extends JPopupMenu {
                             .checkCashInTreasureTrain(tempUnit);
                     }
                 });
+            menuItem.setEnabled(true);
             this.add(menuItem);
         }
 

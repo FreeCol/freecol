@@ -195,6 +195,19 @@ public final class TilePopup extends JPopupMenu {
                     add(ji);
                     hasAnItem = true;
                 }
+                if (activeUnit.canCarryTreasure()
+                    && activeUnit.canCashInTreasureTrain()) {
+                    ji = GUI.localizedMenuItem("cashInTreasureTrain.order");
+                    ji.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                igc.checkCashInTreasureTrain(activeUnit);
+                            }
+                        });
+                    ji.setEnabled(true);
+                    add(ji);
+                    hasAnItem = true;
+                }
+
                 if (activeUnit.getDestination() != null) {
                     ji = GUI.localizedMenuItem("clearUnitOrders");
                     ji.addActionListener(new ActionListener() {
