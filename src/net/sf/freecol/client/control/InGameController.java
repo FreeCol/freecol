@@ -3172,6 +3172,8 @@ public final class InGameController implements NetworkConstants {
         ColonyWas colonyWas = (colony != null) ? new ColonyWas(colony) : null;
         final Europe europe = player.getEurope();
         EuropeWas europeWas = (europe != null) ? new EuropeWas(europe) : null;
+        final Market market = (europe != null) ? player.getMarket() : null;
+        int price = -1;
 
         List<AbstractGoods> req = unit.getGoodsDifference(role, roleCount);
         if (unit.isInEurope()) {
@@ -3181,7 +3183,7 @@ public final class InGameController implements NetworkConstants {
                     return false; // payment failed
                 }
             }
-            int price = player.getEurope().priceGoods(req);
+            price = player.getEurope().priceGoods(req);
             if (price < 0 || !player.checkGold(price)) return false;
         } else if (colony != null) {
             for (AbstractGoods ag : req) {
@@ -3206,6 +3208,20 @@ public final class InGameController implements NetworkConstants {
         if (colonyWas != null) colonyWas.fireChanges();
         if (europeWas != null) europeWas.fireChanges();
         unitWas.fireChanges();
+        if (market != null) {
+            for (AbstractGoods ag : req) {
+                GoodsType type = ag.getType();
+                for (TransactionListener l : market.getTransactionListener()) {
+                    if (ag.getAmount() > 0) {
+                        l.logPurchase(type, ag.getAmount(),
+                                      market.getCostToBuy(type));
+                    } else {
+                        l.logSale(type, -ag.getAmount(),
+                                  market.getPaidForSale(type), player.getTax());
+                    }
+                }
+            }
+        }
         updateControls();
         return ret;
     }

@@ -814,6 +814,21 @@ public final class EuropePanel extends PortPanel {
             getMyPlayer().getMarket().removeTransactionListener(this);
         }
 
+        private void add(String text) {
+            StyledDocument doc = getStyledDocument();
+            try {
+                if (doc.getLength() > 0) text = "\n\n" + text;
+                doc.insertString(doc.getLength(), text, null);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Transaction log update failure", e);
+            }
+        }
+
+        // Implement TransactionListener
+
+        /**
+         * {@inheritDoc}
+         */
         public void logPurchase(GoodsType goodsType, int amount, int price) {
             int total = amount * price;
             StringTemplate t1 = StringTemplate.template("transaction.purchase")
@@ -825,6 +840,9 @@ public final class EuropePanel extends PortPanel {
             add(Messages.message(t1) + "\n" + Messages.message(t2));
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void logSale(GoodsType goodsType, int amount,
                             int price, int tax) {
             int totalBeforeTax = amount * price;
@@ -832,7 +850,6 @@ public final class EuropePanel extends PortPanel {
             int totalAfterTax = totalBeforeTax - totalTax;
 
             StringTemplate t1 = StringTemplate.template("transaction.sale")
-
                 .add("%goods%", goodsType.getNameKey())
                 .addAmount("%amount%", amount)
                 .addAmount("%gold%", price);
@@ -845,16 +862,6 @@ public final class EuropePanel extends PortPanel {
                 .addAmount("%gold%", totalAfterTax);
             add(Messages.message(t1) + "\n" + Messages.message(t2)
                 + "\n" + Messages.message(t3) + "\n" + Messages.message(t4));
-        }
-
-        private void add(String text) {
-            StyledDocument doc = getStyledDocument();
-            try {
-                if (doc.getLength() > 0) text = "\n\n" + text;
-                doc.insertString(doc.getLength(), text, null);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Transaction log update failure", e);
-            }
         }
     }
 }
