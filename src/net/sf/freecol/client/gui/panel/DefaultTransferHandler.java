@@ -94,8 +94,11 @@ public final class DefaultTransferHandler extends TransferHandler {
 
 
     /**
-     * Returns the action that can be done to an ImageSelection on the given component.
-     * @return The action that can be done to an ImageSelection on the given component.
+     * Get the action that can be done to an ImageSelection on the
+     * given component.
+     *
+     * @return The action that can be done to an ImageSelection on the
+     *     given component.
      */
     public int getSourceActions(JComponent comp) {
         return COPY_OR_MOVE;
@@ -103,12 +106,15 @@ public final class DefaultTransferHandler extends TransferHandler {
 
 
     /**
-     * Returns 'true' if the given component can import a selection of the
-     * flavor that is indicated by the second parameter, 'false' otherwise.
+     * Returns 'true' if the given component can import a selection of
+     * the flavor that is indicated by the second parameter, 'false'
+     * otherwise.
+     *
      * @param comp The component that needs to be checked.
      * @param flavor The flavor that needs to be checked for.
-     * @return 'true' if the given component can import a selection of the
-     * flavor that is indicated by the second parameter, 'false' otherwise.
+     * @return 'true' if the given component can import a selection of
+     *     the flavor that is indicated by the second parameter,
+     *     'false' otherwise.
      */
     public boolean canImport(JComponent comp, DataFlavor[] flavor) {
         if (comp instanceof JPanel || comp instanceof JLabel) {
@@ -125,6 +131,7 @@ public final class DefaultTransferHandler extends TransferHandler {
      * Creates a Transferable (an ImageSelection to be precise) of the
      * data that is represented by the given component and returns that
      * object.
+     *
      * @param comp The component to create a Transferable of.
      * @return The resulting Transferable (an ImageSelection object).
      */
@@ -196,7 +203,6 @@ public final class DefaultTransferHandler extends TransferHandler {
             } else if (comp instanceof AbstractGoodsLabel) {
                 comp = getDropTarget(comp);
             }
-
             // Ignore if data is already in comp.
             if (data.getParent() == comp) return false;
 
@@ -309,7 +315,7 @@ public final class DefaultTransferHandler extends TransferHandler {
         if (component instanceof DropTarget) {
             return component;
         } else if (component.getParent() instanceof JComponent) {
-            return getDropTarget((JComponent) component.getParent());
+            return getDropTarget((JComponent)component.getParent());
         } else {
             return null;
         }
@@ -325,7 +331,13 @@ public final class DefaultTransferHandler extends TransferHandler {
     private boolean equipUnitIfPossible(UnitLabel unitLabel,
                                         AbstractGoods goods) {
         final Unit unit = unitLabel.getUnit();
-        if (!unit.hasAbility(Ability.CAN_BE_EQUIPPED)) return false;
+        if (!unit.hasAbility(Ability.CAN_BE_EQUIPPED)
+            || unit.getRole().hasAbility(Ability.ESTABLISH_MISSION)) {
+            // Do not equip missionaries.  The test below will succeed
+            // when dragging incompatible goods (anything:-) because
+            // there is no actual missionary equipment.
+            return false;
+        }
 
         for (Role role : unit.getAvailableRoles(null)) {
             if (role.isDefaultRole()) continue;
