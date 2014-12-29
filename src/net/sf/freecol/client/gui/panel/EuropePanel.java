@@ -128,7 +128,7 @@ public final class EuropePanel extends PortPanel {
      * @param canvas The enclosing <code>Canvas</code>.
      */
     public EuropePanel(FreeColClient freeColClient, Canvas canvas) {
-        super(freeColClient, new MigLayout("wrap 3, insets 20, fill",
+        super(freeColClient, new MigLayout("wrap 3, fill",
                                            "[380:][380:][150:200:]"));
 
         exitButton = new EuropeButton(Messages.message("close"),
@@ -232,8 +232,8 @@ public final class EuropePanel extends PortPanel {
         logScroll.getViewport().setOpaque(false);
         log.setOpaque(false);
 
-        if (canvas.getHeight() > 750) {
-            add(header, "span, center");
+        if (canvas.getHeight() > 780) {
+            add(header, "span, top, center");
         }
         add(toAmericaScroll, "sg, height 124:, grow");
         add(toEuropeScroll, "sg, height 124:, grow");
