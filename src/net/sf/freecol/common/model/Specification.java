@@ -312,6 +312,7 @@ public final class Specification {
         initialized = true;
     }
 
+
     /**
      * Load a specification or fragment from a stream.
      *
@@ -378,7 +379,10 @@ public final class Specification {
         if (advantages == Advantages.NONE) {
             clearEuropeanNationalAdvantages();
         }
-        if (difficulty != null) applyDifficultyLevel(difficulty);
+        if (difficulty != null) {
+            allOptionGroups.put(difficulty.getId(), difficulty);
+            applyDifficultyLevel(difficulty);
+        }
     }
 
     /**

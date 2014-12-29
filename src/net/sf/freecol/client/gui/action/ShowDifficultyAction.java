@@ -48,6 +48,6 @@ public class ShowDifficultyAction extends FreeColAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getGUI().showDifficultyDialog(false);
+        getGUI().showDifficultyDialog();
     }
 }

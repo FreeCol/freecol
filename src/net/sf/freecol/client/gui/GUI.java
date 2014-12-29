@@ -2138,9 +2138,9 @@ public class GUI {
         canvas.showDeclarationPanel();
     }
 
-    public OptionGroup showDifficultyDialog(boolean editable) {
+    public OptionGroup showDifficultyDialog() {
         if (canvas == null) return null;
-        return canvas.showDifficultyDialog(editable);
+        return canvas.showDifficultyDialog();
     }
 
     public OptionGroup showDifficultyDialog(Specification spec,

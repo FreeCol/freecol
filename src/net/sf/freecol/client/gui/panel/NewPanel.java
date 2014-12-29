@@ -503,6 +503,7 @@ public final class NewPanel extends FreeColPanel
      */
     public void actionPerformed(ActionEvent event) {
         final ConnectController cc = getFreeColClient().getConnectController();
+        final GUI gui = getGUI();
         final String command = event.getActionCommand();
 
         int port;
@@ -536,19 +537,19 @@ public final class NewPanel extends FreeColPanel
                 break;
             case META_SERVER:
                 List<ServerInfo> servers = cc.getServerList();
-                if (servers != null) getGUI().showServerListPanel(servers);
+                if (servers != null) gui.showServerListPanel(servers);
                 break;
             default:
                 break;
             }
             break;
         case CANCEL:
-            getGUI().removeFromCanvas(this);
-            getGUI().showMainPanel(null);
+            gui.removeFromCanvas(this);
+            gui.showMainPanel(null);
             break;
         case SHOW_DIFFICULTY:
-            this.difficulty = getGUI().showDifficultyDialog(this.specification,
-                                                            this.difficulty);
+            this.difficulty = gui.showDifficultyDialog(this.specification,
+                                                       this.difficulty);
             updateDifficulty();
             break;
         case SINGLE: case JOIN: case START: case META_SERVER:
