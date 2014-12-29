@@ -160,12 +160,12 @@ public final class InfoPanel extends FreeColPanel {
                     int defenceBonus = (int)tile.getType().applyModifiers(100f,
                         getGame().getTurn(), Modifier.DEFENCE) - 100;
                     JLabel defenceLabel = GUI.localizedLabel(StringTemplate
-                        .template("colopedia.terrain.defenseBonus")
+                        .template("infoPanel.defenseBonus")
                         .addAmount("%bonus%", defenceBonus));
                     defenceLabel.setFont(font);
                     add(defenceLabel, "span 4");
                     JLabel moveLabel = GUI.localizedLabel(StringTemplate
-                        .template("colopedia.terrain.movementCost")
+                        .template("infoPanel.movementCost")
                         .addAmount("%cost%", tile.getType().getBasicMoveCost()/3));
                     moveLabel.setFont(font);
                     add(moveLabel, "span 4");
