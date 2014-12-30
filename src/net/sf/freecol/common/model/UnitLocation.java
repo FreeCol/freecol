@@ -233,6 +233,19 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         return shipList;
     }
 
+    /**
+     * Gets a carrier for the supplied unit, if one exists.
+     *
+     * @param unit The <code>Unit</code> to carry.
+     * @return A suitable carrier or null if none found.
+     */
+    public Unit getCarrierForUnit(Unit unit) {
+        for (Unit u : getUnitList()) {
+            if (u.couldCarry(unit)) return u;
+        }
+        return null;
+    }
+
 
     // Override FreeColGameObject
 

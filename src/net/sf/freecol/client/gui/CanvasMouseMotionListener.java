@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
@@ -99,23 +100,18 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
         performDragScrollIfActive(e);
 
         Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
-        if (tile != null &&
-            (e.getModifiers() & MouseEvent.BUTTON1_MASK) == MouseEvent.BUTTON1_MASK) {
+        if (tile != null
+            && ((e.getModifiers() & MouseEvent.BUTTON1_MASK)
+                == MouseEvent.BUTTON1_MASK)) {
             // only perform the goto for the left mouse button
             if (mapViewer.isGotoStarted()) {
                 Unit active = mapViewer.getActiveUnit();
                 if (active == null) {
                     mapViewer.stopGoto();
-                } else {
-                    if (lastTile != tile) {
-                        lastTile = tile;
-                        if (active.getTile() != tile) {
-                            PathNode dragPath = active.findPath(tile);
-                            mapViewer.setGotoPath(dragPath);
-                        } else {
-                            mapViewer.setGotoPath(null);
-                        }
-                    }
+                } else if (lastTile != tile) {
+                    lastTile = tile;
+                    PathNode dragPath = active.findPath(tile);
+                    mapViewer.setGotoPath(dragPath);
                 }
             } else {
                 // Only start a goto if the drag is 16 pixels or more

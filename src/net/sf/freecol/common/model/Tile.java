@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -562,6 +563,20 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean isConnectedTo(Tile other) {
         return getContiguity() == other.getContiguity();
+    }
+
+    /**
+     * Get the adjacent tiles that have a given contiguity.
+     *
+     * @param contiguity The contiguity to search for.
+     * @return A set of <code>Tile</code>s with the required contiguity.
+     */
+    public Set<Tile> getContiguityAdjacent(int contiguity) {
+        Set<Tile> ret = new HashSet<Tile>();
+        for (Tile t : getSurroundingTiles(1)) {
+            if (t.getContiguity() == contiguity) ret.add(t);
+        }
+        return ret;
     }
 
     /**

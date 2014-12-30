@@ -26,11 +26,13 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1055,6 +1057,7 @@ public class Map extends FreeColGameObject implements Location {
             : null;
         final GoalDecider gd = GoalDeciders.getLocationGoalDecider(end);
         final SearchHeuristic sh = getManhattenHeuristic(end);
+        Unit embarkTo;
 
         PathNode path;
         if (start.getContiguity() == end.getContiguity()) {
@@ -1083,16 +1086,21 @@ public class Map extends FreeColGameObject implements Location {
             path = searchMap(unit, start, gd, costDecider,
                              INFINITY, carrier, sh, lb);
 
-        } else if (start.isCoastland() && !end.isLand()
-            && end.isAdjacent(start) && end.getFirstUnit() != null
-            && unit != null && unit.getOwner().owns(end.getFirstUnit())) {
-            // Special case where a land unit on the coast is trying to
-            // move to an adjacent ship.
-            Unit ship = end.getFirstUnit();
-            path = new PathNode(start, 0, 0, false, null, null);
-            path.next = new PathNode(end, unit.getMoveCost(start, end, 0), 1,
-                                     true, path, null);
-
+        } else if (start.isLand() && !end.isLand()
+            && end.getFirstUnit() != null
+            && !end.getContiguityAdjacent(start.getContiguity()).isEmpty()
+            && unit != null && unit.getOwner().owns(end.getFirstUnit())
+            && (embarkTo = end.getCarrierForUnit(unit)) != null) {
+            // Special case where a land unit is trying to move to a
+            // ship that is adjacent to the land the unit is on.
+            path = searchMap(unit, start,
+                GoalDeciders.getAdjacentLocationGoalDecider(end), null,
+                INFINITY, null, null, lb);
+            if (path != null) {
+                PathNode last = path.getLastNode();
+                last.next = new PathNode(embarkTo, 0, last.getTurns()+1, true,
+                                         last, null);
+            }
         } else { // Otherwise, there is a connectivity failure.
             path = null;
         }
@@ -1723,7 +1731,7 @@ public class Map extends FreeColGameObject implements Location {
                             // can not reach the goal, except if there is
                             // a carrier involved that might still succeed.
                             if (lb != null) lb.add(" fail-at-GOAL(", umt, ")");
-                            return null;
+                            continue;
                         }
                     }
                     // Special case where the carrier is adjacent to

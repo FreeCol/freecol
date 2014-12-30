@@ -1109,6 +1109,9 @@ public final class InGameController implements NetworkConstants {
                         return false;
                     }
                 }
+            } else if (path.getLocation() instanceof Unit) {
+                return moveEmbark(unit, path.getDirection());
+
             } else {
                 logger.warning("Bad path: " + path.fullPathToString());
             }
