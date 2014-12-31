@@ -116,10 +116,18 @@ public class Map extends FreeColGameObject implements Location {
             = makeUnmodifiableList(Direction.N, Direction.E,
                                    Direction.S, Direction.W);
         
-
+        /** The direction increments. */
         private int oddDX, oddDY, evenDX, evenDY;
 
 
+        /**
+         * Create a new direction with the given increments.
+         *
+         * @param oddDX Delta X/odd.
+         * @param oddDY Delta y/odd.
+         * @param evenDX Delta X/even.
+         * @param evenDY Delta y/even.
+         */
         Direction(int oddDX, int oddDY, int evenDX, int evenDY) {
             this.oddDX = oddDX;
             this.oddDY = oddDY;
@@ -127,6 +135,15 @@ public class Map extends FreeColGameObject implements Location {
             this.evenDY = evenDY;
         }
 
+
+        /**
+         * Get the name key for this direction.
+         *
+         * @return The name key.
+         */
+        public String getNameKey() {
+            return "direction." + this;
+        }
 
         /**
          * Step an x coordinate in this direction.
@@ -187,10 +204,6 @@ public class Map extends FreeColGameObject implements Location {
          */
         public Direction getReverseDirection() {
             return rotate(NUMBER_OF_DIRECTIONS/2);
-        }
-
-        public String getNameKey() {
-            return "direction." + this;
         }
 
         /**

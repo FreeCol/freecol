@@ -208,7 +208,7 @@ public class ColonyTile extends WorkLocation {
         String name = getColony().getName();
         return (isColonyCenterTile()) ? StringTemplate.name(name)
             : StringTemplate.template("nearLocation")
-                .add("%direction%", "direction." + getTile().getDirection(workTile))
+                .add("%direction%", getTile().getDirection(workTile).getNameKey())
                 .addName("%location%", name);
     }
 
@@ -372,8 +372,7 @@ public class ColonyTile extends WorkLocation {
     public StringTemplate getClaimTemplate() {
         return (isColonyCenterTile()) ? super.getClaimTemplate()
             : StringTemplate.template("workClaimColonyTile")
-                .add("%direction%", "direction."
-                    + getTile().getDirection(workTile));
+                .add("%direction%", getTile().getDirection(workTile).getNameKey());
     }
 
 

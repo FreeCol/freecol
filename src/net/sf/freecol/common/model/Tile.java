@@ -2047,7 +2047,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 String name = nearSettlement.getName();
                 Direction d = Map.getRoughDirection(tile, this);
                 StringTemplate l = StringTemplate.template("nearLocation")
-                    .add("%direction%", "direction." + d)
+                    .add("%direction%", d.getNameKey())
                     .addName("%location%", name);
                 return StringTemplate.template("nameLocation")
                     .add("%name%", ((type == null) ? "unexplored"
@@ -2078,7 +2078,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                     = nearSettlement.getLocationLabelFor(player);
                 Direction d = Map.getRoughDirection(tile, this);
                 StringTemplate l = StringTemplate.template("nearLocation")
-                    .add("%direction%", "direction." + d)
+                    .add("%direction%", d.getNameKey())
                     .addStringTemplate("%location%", name);
                 return StringTemplate.template("nameLocation")
                     .add("%name%", ((type == null) ? "unexplored"
