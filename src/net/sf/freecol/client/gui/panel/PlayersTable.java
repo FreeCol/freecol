@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractCellEditor;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -336,9 +335,7 @@ public final class PlayersTable extends JTable {
 
         public PlayerCellRenderer() {
             label.setHorizontalAlignment(JLabel.CENTER);
-            button.setBorder(BorderFactory.createCompoundBorder(BorderFactory
-                    .createEmptyBorder(5, 10, 5, 10),
-                    button.getBorder()));
+            GUI.padBorder(button, 5, 10, 5, 10);
         }
 
 

@@ -93,7 +93,7 @@ public final class ReportTradePanel extends ReportPanel {
         goodsHeader.setOpaque(true);
 
         JLabel emptyLabel = new JLabel();
-        emptyLabel.setBorder(FreeColPanel.TOPLEFTCELLBORDER);
+        emptyLabel.setBorder(GUI.TOPLEFTCELLBORDER);
         goodsHeader.add(emptyLabel, "cell 0 0");
 
         reportPanel.add(createLeftLabel("report.trade.unitsSold"), "cell 0 0");
@@ -124,7 +124,7 @@ public final class ReportTradePanel extends ReportPanel {
             int beforeTaxes = player.getIncomeBeforeTaxes(goodsType);
             int afterTaxes = player.getIncomeAfterTaxes(goodsType);
             MarketLabel marketLabel = new MarketLabel(goodsType, market, getGUI());
-            marketLabel.setBorder(FreeColPanel.TOPCELLBORDER);
+            marketLabel.setBorder(GUI.TOPCELLBORDER);
             marketLabel.setVerticalTextPosition(JLabel.BOTTOM);
             marketLabel.setHorizontalTextPosition(JLabel.CENTER);
 
@@ -154,7 +154,8 @@ public final class ReportTradePanel extends ReportPanel {
                 column++;
                 int amount = colony.getGoodsCount(goodsType);
                 JLabel goodsLabel = new JLabel(String.valueOf(amount), JLabel.TRAILING);
-                goodsLabel.setBorder(colonyIndex == 0 ? FreeColPanel.TOPCELLBORDER : FreeColPanel.CELLBORDER);
+                goodsLabel.setBorder(colonyIndex == 0 ? GUI.TOPCELLBORDER
+                    : GUI.CELLBORDER);
                 if (colony.getExportData(goodsType).getExported()) {
                     goodsLabel.setText("*" + String.valueOf(amount));
                 }
@@ -195,7 +196,7 @@ public final class ReportTradePanel extends ReportPanel {
 
     private JLabel createLeftLabel(String key) {
         JLabel result = GUI.localizedLabel(key, JLabel.TRAILING);
-        result.setBorder(FreeColPanel.LEFTCELLBORDER);
+        result.setBorder(GUI.LEFTCELLBORDER);
         return result;
     }
 
@@ -205,7 +206,7 @@ public final class ReportTradePanel extends ReportPanel {
 
     private JLabel createNumberLabel(int value, boolean alwaysAddSign) {
         JLabel result = new JLabel(String.valueOf(value), JLabel.TRAILING);
-        result.setBorder(FreeColPanel.CELLBORDER);
+        result.setBorder(GUI.CELLBORDER);
         if (value < 0) {
             result.setForeground(Color.RED);
         } else if (alwaysAddSign && value > 0) {
@@ -227,11 +228,8 @@ public final class ReportTradePanel extends ReportPanel {
         button.setForeground(GUI.LINK_COLOR);
         button.setHorizontalAlignment(SwingConstants.LEADING);
         button.setAlignmentY(0.8f);
-        if (index == 0) {
-            button.setBorder(FreeColPanel.TOPLEFTCELLBORDER);
-        } else {
-            button.setBorder(FreeColPanel.LEFTCELLBORDER);
-        }
+            button.setBorder((index == 0) ? GUI.TOPLEFTCELLBORDER
+                : GUI.LEFTCELLBORDER);
 
         button.setActionCommand(colony.getId());
         button.addActionListener(this);

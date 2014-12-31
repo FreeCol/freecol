@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.FlowLayout;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
@@ -31,7 +30,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.EmptyBorder;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
@@ -66,13 +64,13 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         super(freeColClient);
 
         JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.setBorder(GUI.blankBorder(10, 10, 10, 10));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
 
         JLabel header = GUI.localizedLabel("LoadingSavegame.title", JLabel.CENTER);
         header.setFont(GUI.MEDIUM_HEADER_FONT);
-        header.setBorder(new EmptyBorder(20, 0, 0, 0));
+        header.setBorder(GUI.blankBorder(20, 0, 0, 0));
 
         JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p1.add(GUI.localizedLabel("LoadingSavegame.serverName"));

@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -117,8 +116,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             super();
 
             setOpaque(false);
-            setBorder(BorderFactory
-                .createTitledBorder(Messages.message("cargoOnCarrier")));
+            setBorder(GUI.localizedBorder("cargoOnCarrier"));
             addMouseListener(TradeRouteInputPanel.this.dropListener);
         }
 
@@ -277,8 +275,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
                 }
             }
             setOpaque(false);
-            setBorder(BorderFactory
-                .createTitledBorder(Messages.message("goods")));
+            setBorder(GUI.localizedBorder("goods"));
             addMouseListener(TradeRouteInputPanel.this.dropListener);
         }
 

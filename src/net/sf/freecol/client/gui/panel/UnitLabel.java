@@ -30,7 +30,6 @@ import java.awt.event.ActionListener;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -199,7 +198,7 @@ public final class UnitLabel extends JLabel
                                            (imageIcon.getIconHeight() / 3) * 2,
                                            Image.SCALE_SMOOTH)));
             }
-            setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
+            setBorder(GUI.blankBorder(0, 2, 0, 0));
             this.isSmall = true;
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
@@ -215,11 +214,9 @@ public final class UnitLabel extends JLabel
 
             setIcon(imageIcon);
             setDisabledIcon(disabledImageIcon);
-            if (unit.getLocation() instanceof ColonyTile) {
-                setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
-            } else {
-                setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-            }
+            setBorder((unit.getLocation() instanceof ColonyTile)
+                ? GUI.blankBorder(0, 15, 0, 15)
+                : GUI.blankBorder(0, 5, 0, 5));
             this.isSmall = false;
         }
     }

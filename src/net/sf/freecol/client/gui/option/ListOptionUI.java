@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -81,9 +80,8 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         super(gui, option, editable);
 
         this.panel = new JPanel();
-        this.panel.setBorder(BorderFactory
-            .createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
-                super.getJLabel().getText()));
+        this.panel.setBorder(GUI.localizedBorder(super.getJLabel().getText(),
+                                                 GUI.BORDER_COLOR));
         this.panel.setLayout(new MigLayout("wrap 2, fill", "[fill, grow]20[fill]"));
 
         this.model = new DefaultListModel<AbstractOption<T>>();

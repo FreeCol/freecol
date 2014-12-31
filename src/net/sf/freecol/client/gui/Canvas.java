@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
@@ -347,10 +346,10 @@ public final class Canvas extends JDesktopPane {
 
         if (comp.getBorder() != null) {
             if (comp.getBorder() instanceof EmptyBorder) {
-                f.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+                f.setBorder(GUI.blankBorder(10, 10, 10, 10));
             } else {
                 f.setBorder(comp.getBorder());
-                comp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                comp.setBorder(GUI.blankBorder(5, 5, 5, 5));
             }
         } else {
             f.setBorder(null);

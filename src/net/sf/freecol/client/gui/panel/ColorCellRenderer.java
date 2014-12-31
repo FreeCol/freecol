@@ -22,12 +22,12 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Component;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -44,13 +44,7 @@ public class ColorCellRenderer extends JLabel implements TableCellRenderer {
      * @param useBorder Indicated whether or not a border should be drawn.
      */
     public ColorCellRenderer(boolean useBorder) {
-        if (useBorder) {
-            ImageIcon background
-                = ResourceManager.getImageIcon("background.ColorCellRenderer");
-            setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(5, 10, 5, 10, background),
-                BorderFactory.createLineBorder(Color.BLACK)));
-        }
+        if (useBorder) setBorder(GUI.COLOR_CELL_BORDER);
         // This must be done because the background displays the actual color:
         setOpaque(true);
     }

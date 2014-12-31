@@ -23,15 +23,15 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Unit;
+
+import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -76,16 +76,12 @@ public final class ReportEducationPanel extends ReportPanel {
                 }
             }
         }
-
-
     }
 
-
-    private JPanel getPanel(String title) {
+    private JPanel getPanel(String key) {
         JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT));
         result.setOpaque(false);
-        result.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY, 1),
-                                                          Messages.message(title)));
+        result.setBorder(GUI.localizedBorder(key, Color.GRAY));
         return result;
     }
 }

@@ -30,7 +30,6 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -303,7 +302,7 @@ public final class ReportTurnPanel extends ReportPanel {
         headline.setFont(GUI.SMALL_HEADER_FONT);
         headline.setOpaque(false);
         headline.setForeground(GUI.LINK_COLOR);
-        headline.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
+        headline.setBorder(GUI.blankBorder(5, 0, 0, 0));
         return headline;
     }
 

@@ -30,7 +30,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -192,7 +191,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
             super(getHumanKeyStrokeText(keyStroke), JLabel.CENTER);
 
             setOpaque(false);
-            setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            setBorder(GUI.TRIVIAL_LINE_BORDER);
             addKeyListener(this);
             addMouseListener(this);
         }

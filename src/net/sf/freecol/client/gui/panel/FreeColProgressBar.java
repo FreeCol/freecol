@@ -26,7 +26,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
@@ -44,8 +43,6 @@ import net.sf.freecol.common.model.StringTemplate;
  * Used in the colony panel for the building progress.
  */
 public class FreeColProgressBar extends JPanel {
-
-    private static final Color PRIMARY_1 = new Color(122, 109, 82);
 
     // The minimum value of the progress bar
     private int min = 0;
@@ -113,7 +110,7 @@ public class FreeColProgressBar extends JPanel {
         this.value = value;
         this.step = step;
 
-        setBorder(BorderFactory.createLineBorder(PRIMARY_1));
+        setBorder(GUI.PROGRESS_BORDER);
         if (goodsType != null) {
             ImageIcon icon = gui.getImageLibrary().getGoodsImageIcon(goodsType);
             // scale to a height of 16px, preserving aspect ratio

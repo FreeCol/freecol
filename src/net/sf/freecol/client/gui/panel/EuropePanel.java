@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.ComponentInputMap;
 import javax.swing.InputMap;
 import javax.swing.JButton;
@@ -210,12 +209,12 @@ public final class EuropePanel extends PortPanel {
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         logScroll.getVerticalScrollBar().setUnitIncrement(16);
 
-        GUI.setTitledBorder(toAmericaPanel, "goingToAmerica");
-        GUI.setTitledBorder(toEuropePanel, "goingToEurope");
-        GUI.setTitledBorder(docksPanel, "docks");
-        GUI.setTitledBorder(inPortPanel, "inPort");
-        marketPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        GUI.setTitledBorder(log, "sales");
+        toAmericaPanel.setBorder(GUI.localizedBorder("goingToAmerica"));
+        toEuropePanel.setBorder(GUI.localizedBorder("goingToEurope"));
+        docksPanel.setBorder(GUI.localizedBorder("docks"));
+        inPortPanel.setBorder(GUI.localizedBorder("inPort"));
+        marketPanel.setBorder(GUI.blankBorder(10, 10, 10, 10));
+        log.setBorder(GUI.localizedBorder("sales"));
 
         toAmericaScroll.getViewport().setOpaque(false);
         toAmericaPanel.setOpaque(false);
@@ -501,11 +500,10 @@ public final class EuropePanel extends PortPanel {
                 }
             }
 
-            StringTemplate t = StringTemplate.template("goingTo")
+            GUI.localizeBorder(this, StringTemplate.template("goingTo")
                 .add("%type%", "ship")
                 .addStringTemplate("%location%",
-                    destination.getLocationLabelFor(getMyPlayer()));
-            ((TitledBorder) getBorder()).setTitle(Messages.message(t));
+                    destination.getLocationLabelFor(getMyPlayer())));
             revalidate();
         }
 

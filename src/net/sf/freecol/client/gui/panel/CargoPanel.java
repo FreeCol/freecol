@@ -26,9 +26,6 @@ import java.beans.PropertyChangeListener;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import javax.swing.border.TitledBorder;
-import net.miginfocom.swing.MigLayout;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
@@ -36,6 +33,8 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
+
+import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -52,8 +51,6 @@ public class CargoPanel extends FreeColPanel
 
     private DefaultTransferHandler defaultTransferHandler = null;
 
-    private final TitledBorder border;
-
 
     /**
      * Creates this CargoPanel.
@@ -64,13 +61,11 @@ public class CargoPanel extends FreeColPanel
     public CargoPanel(FreeColClient freeColClient, boolean withTitle) {
         super(freeColClient, new MigLayout("wrap 6, fill, insets 0"));
 
-        this.border = (withTitle) ? GUI.setTitledBorder(this, "cargoOnCarrier")
-            : null;
-
         this.carrier = null;
-
         this.defaultTransferHandler
             = new DefaultTransferHandler(getFreeColClient(), this);
+
+        if (withTitle) setBorder(GUI.localizedBorder("cargoOnCarrier"));
     }
 
 
@@ -176,17 +171,12 @@ public class CargoPanel extends FreeColPanel
      * Update the title of this CargoPanel.
      */
     private void updateTitle() {
-        if (border == null) return;
-
-        if (carrier == null) {
-            border.setTitle(Messages.message("cargoOnCarrier"));
-        } else {
-            StringTemplate t = StringTemplate.template("cargoOnCarrierLong")
+        GUI.localizeBorder(this, (carrier == null)
+            ? StringTemplate.key("cargoOnCarrier")
+            : StringTemplate.template("cargoOnCarrierLong")
                 .addStringTemplate("%name%",
                     carrier.getLabel(Unit.UnitLabelType.NATIONAL))
-                .addAmount("%space%", carrier.getSpaceLeft());
-            border.setTitle(Messages.message(t));
-        }
+                .addAmount("%space%", carrier.getSpaceLeft()));
     }
 
 

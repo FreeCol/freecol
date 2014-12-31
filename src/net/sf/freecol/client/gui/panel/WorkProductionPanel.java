@@ -27,7 +27,6 @@ import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.border.Border;
@@ -56,11 +55,6 @@ import net.sf.freecol.common.model.WorkLocation;
 public class WorkProductionPanel extends FreeColPanel {
 
     private final Turn turn = getGame().getTurn();
-
-    private static final Border border = BorderFactory
-        .createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 0,
-                                                              Color.BLACK),
-                              BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
 
     /**
@@ -139,7 +133,7 @@ public class WorkProductionPanel extends FreeColPanel {
 
         JLabel finalResult = new JLabel(ModifierFormat.format(result));
         finalResult.setFont(bigFont);
-        finalResult.setBorder(border);
+        finalResult.setBorder(GUI.PRODUCTION_BORDER);
         add(finalResult, "wrap 30");
 
         if (wl instanceof Building) { // Unattended production also applies.

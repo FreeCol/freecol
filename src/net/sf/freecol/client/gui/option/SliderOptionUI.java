@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.option;
 import java.awt.Color;
 import java.awt.Dimension;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 
@@ -50,9 +49,8 @@ public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
     public SliderOptionUI(GUI gui, final T option, boolean editable) {
         super(gui, option, editable);
 
-        slider.setBorder(BorderFactory
-            .createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),
-                                super.getJLabel().getText()));
+        slider.setBorder(GUI.localizedBorder(super.getJLabel().getText(),
+                                             Color.BLACK));
         slider.setOrientation(JSlider.HORIZONTAL);
         slider.setPreferredSize(new Dimension(500, 50));
         slider.setPaintLabels(true);

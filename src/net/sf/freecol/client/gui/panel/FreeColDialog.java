@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -71,11 +70,6 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         PLAIN,
         QUESTION,
     };
-
-    private static final Border dialogBorder
-        = BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.BLACK),
-                BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
     /** The enclosing client. */
     protected FreeColClient freeColClient;
@@ -182,7 +176,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         ChoiceItem<T> ci = (def >= 0) ? options.get(def) : null;
         this.pane = new JOptionPane(obj, paneType, JOptionPane.DEFAULT_OPTION,
                                     icon, selectOptions(), ci);
-        this.pane.setBorder(dialogBorder);
+        this.pane.setBorder(GUI.DIALOG_BORDER);
         this.pane.setName("FreeColDialog");
         this.pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
         this.pane.addPropertyChangeListener(this);

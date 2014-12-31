@@ -66,6 +66,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.JWindow;
 import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.AttributeSet;
@@ -230,6 +232,58 @@ public class GUI {
     /** The color to use for things the player probably should not do. */
     public static final Color WARNING_COLOR
         = ResourceManager.getColor("lookAndFeel.warning.color");
+
+
+    /** Useful static borders. */
+    public static final Border TRIVIAL_LINE_BORDER
+        = BorderFactory.createLineBorder(BORDER_COLOR);
+
+    public static final Border BEVEL_BORDER
+        = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
+
+    public static final Border COLOR_CELL_BORDER = BorderFactory
+        .createCompoundBorder(BorderFactory.createMatteBorder(5, 10, 5, 10,
+                ResourceManager.getImageIcon("background.ColorCellRenderer")),
+                              BorderFactory.createLineBorder(BORDER_COLOR));
+
+    public static final Border DIALOG_BORDER = BorderFactory
+        .createCompoundBorder(TRIVIAL_LINE_BORDER, blankBorder(10, 20, 10, 20));
+
+    public static final Border ETCHED_BORDER
+        = BorderFactory.createEtchedBorder();
+
+    public static final Border PRODUCTION_BORDER = BorderFactory
+        .createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 0,
+                                                              BORDER_COLOR),
+                              blankBorder(2, 2, 2, 2));
+
+    public static final Border PROGRESS_BORDER = BorderFactory
+        .createLineBorder(new Color(122, 109, 82));
+
+    public static final Border SIMPLE_LINE_BORDER = BorderFactory
+        .createCompoundBorder(TRIVIAL_LINE_BORDER, blankBorder(5, 5, 5, 5));
+
+    // The borders to use for table cells
+    public static final Border TOPCELLBORDER
+        = BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 0, 1, 1, BORDER_COLOR),
+            BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
+    public static final Border CELLBORDER
+        = BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 1, 1, BORDER_COLOR),
+            BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
+    public static final Border LEFTCELLBORDER
+        = BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 1, 1, 1, BORDER_COLOR),
+            BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
+    public static final Border TOPLEFTCELLBORDER
+        = BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 1, 1, 1, BORDER_COLOR),
+            BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
 
     /** Font to use for text areas. */
     public static final Font DEFAULT_FONT
@@ -887,7 +941,7 @@ public class GUI {
     public static JLabel getDefaultHeader(String text) {
         JLabel header = new JLabel(text, JLabel.CENTER);
         header.setFont(BIG_HEADER_FONT);
-        header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        header.setBorder(blankBorder(20, 0, 20, 0));
         return header;
     }
 
@@ -926,7 +980,7 @@ public class GUI {
         button.setOpaque(false);
         button.setForeground(LINK_COLOR);
         button.setAlignmentY(0.8f);
-        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setBorder(blankBorder(0, 0, 0, 0));
         button.setActionCommand(action);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return button;
@@ -1031,6 +1085,63 @@ public class GUI {
 
         textPane.setText(text);
         return textPane;
+    }
+
+
+    /**
+     * Get a border consisting of empty space.
+     *
+     * @param top Top spacing.
+     * @param left left spacing.
+     * @param bottom Bottom spacing.
+     * @param right Right spacing.
+     * @return A blank border.
+     */
+    public static Border blankBorder(int top, int left, int bottom, int right) {
+        return BorderFactory.createEmptyBorder(top, left, bottom, right);
+    }
+
+    public static void padBorder(JComponent component, int top, int left,
+                                 int bottom, int right) {
+        component.setBorder(BorderFactory.createCompoundBorder(
+                blankBorder(top, left, bottom, right),
+                component.getBorder()));
+    }
+
+    /**
+     * Localize the a titled border.
+     *
+     * @param component The <code>JComponent</code> to localize.
+     * @param template The <code>StringTemplate</code> to use.
+     */
+    public static void localizeBorder(JComponent component,
+                                      StringTemplate template) {
+        TitledBorder tb = (TitledBorder)component.getBorder();
+        tb.setTitle(Messages.message(template));
+    }
+
+    /**
+     * Get a titled border with Messages.message(key) as text.
+     *
+     * @param key The key to use.
+     * @return The <code>TitledBorder</code>.
+     */
+    public static TitledBorder localizedBorder(String key) {
+        return BorderFactory.createTitledBorder(BorderFactory
+            .createEmptyBorder(), Messages.message(key));
+    }
+
+    /**
+     * Get a titled border with Messages.message(key) as text and a given
+     * colored line border.
+     *
+     * @param key The key to use.
+     * @param color The color to use.
+     * @return The <code>TitledBorder</code>.
+     */
+    public static TitledBorder localizedBorder(String key, Color color) {
+        return BorderFactory.createTitledBorder(BorderFactory
+            .createLineBorder(color, 1), Messages.message(key));
     }
 
     /**
@@ -1219,20 +1330,6 @@ public class GUI {
                                              StringTemplate template) {
         comp.setToolTipText(Messages.message(template));
         return comp;
-    }
-
-    /**
-     * Put a titled border on a component.
-     *
-     * @param component The <code>JComponent</code> to put the border on.
-     * @param key A message key to use to look up the title.
-     */
-    public static TitledBorder setTitledBorder(JComponent component,
-                                               String key) {
-        TitledBorder border = BorderFactory.createTitledBorder(BorderFactory
-            .createEmptyBorder(), Messages.message(key));
-        component.setBorder(border);
-        return border;
     }
 
 

@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -184,7 +183,7 @@ public final class StatisticsPanel extends FreeColPanel {
     private JPanel displayStatsMessage(String title,
                                        Map<String, String> stats) {
         JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(title));
+        panel.setBorder(GUI.localizedBorder(title));
         Box b = new Box(BoxLayout.Y_AXIS);
         panel.add(b);
         Map<String, String> memory = new HashMap<>();

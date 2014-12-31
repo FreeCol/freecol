@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Component;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -134,9 +133,8 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
             setOpaque(false);
             String goodsName = Messages.getName(goodsType);
 
-            setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder(goodsName),
-                    BorderFactory.createEmptyBorder(6, 6, 6, 6)));
+            setBorder(GUI.localizedBorder(goodsType.getNameKey()));
+            GUI.padBorder(this, 6,6,6,6);
 
             ExportData exportData = colony.getExportData(goodsType);
 

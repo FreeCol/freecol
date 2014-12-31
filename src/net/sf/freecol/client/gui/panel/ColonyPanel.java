@@ -41,7 +41,6 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.ComponentInputMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
@@ -57,8 +56,6 @@ import javax.swing.JToolTip;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.border.BevelBorder;
-import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -92,6 +89,8 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+
+import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -286,28 +285,28 @@ public final class ColonyPanel extends PortPanel
         buildingsScroll.getVerticalScrollBar().setUnitIncrement(16);
         buildingsScroll.getViewport().setOpaque(false);
         buildingsPanel.setOpaque(false);
-        buildingsScroll.setBorder(BorderFactory.createEtchedBorder());
+        buildingsScroll.setBorder(GUI.ETCHED_BORDER);
 
         cargoPanel = new ColonyCargoPanel(freeColClient);
         cargoScroll = new JScrollPane(cargoPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        cargoScroll.setBorder(BorderFactory.createEtchedBorder());
+        cargoScroll.setBorder(GUI.ETCHED_BORDER);
 
         constructionPanel = new ConstructionPanel(freeColClient, colony, true);
 
         inPortPanel = new ColonyInPortPanel();
-        GUI.setTitledBorder(inPortPanel, "inPort");
+        inPortPanel.setBorder(GUI.localizedBorder("inPort"));
         inPortScroll = new JScrollPane(inPortPanel);
         inPortScroll.getVerticalScrollBar().setUnitIncrement(16);
-        inPortScroll.setBorder(BorderFactory.createEtchedBorder());
+        inPortScroll.setBorder(GUI.ETCHED_BORDER);
 
         outsideColonyPanel = new OutsideColonyPanel();
         outsideColonyScroll = new JScrollPane(outsideColonyPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         outsideColonyScroll.getVerticalScrollBar().setUnitIncrement(16);
-        outsideColonyScroll.setBorder(BorderFactory.createEtchedBorder());
+        outsideColonyScroll.setBorder(GUI.ETCHED_BORDER);
 
         populationPanel = new PopulationPanel();
 
@@ -315,13 +314,13 @@ public final class ColonyPanel extends PortPanel
         tilesScroll = new JScrollPane(tilesPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        tilesScroll.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        tilesScroll.setBorder(GUI.BEVEL_BORDER);
 
         warehousePanel = new WarehousePanel();
         warehouseScroll = new JScrollPane(warehousePanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        warehouseScroll.setBorder(BorderFactory.createEtchedBorder());
+        warehouseScroll.setBorder(GUI.ETCHED_BORDER);
 
         InputMap nameIM = new ComponentInputMap(this.nameBox);
         nameIM.put(KeyStroke.getKeyStroke("LEFT"), "selectPrevious2");
@@ -1250,7 +1249,7 @@ public final class ColonyPanel extends PortPanel
             super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
 
             setLayout(new MigLayout("wrap 3, fill, insets 0"));
-            GUI.setTitledBorder(this, "outsideColony");
+            setBorder(GUI.localizedBorder("outsideColony"));
         }
 
 

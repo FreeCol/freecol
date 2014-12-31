@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -133,9 +132,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.allColonies = source.getColonies();
 
             setLayout(new MigLayout("wrap 1", "", ""));
-            setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(Color.BLACK),
-                    BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+            setBorder(GUI.SIMPLE_LINE_BORDER);
 
             add(this.label);
             add(this.colonyBox);
@@ -231,9 +228,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             ((JSpinner.DefaultEditor)this.spinner.getEditor())
                 .getTextField().setColumns(5);
 
-            setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(Color.BLACK),
-                    BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+            setBorder(GUI.SIMPLE_LINE_BORDER);
             setLayout(new MigLayout("wrap 1", "", ""));
 
             add(GUI.localizedLabel("tradeItem.gold"));
@@ -325,9 +320,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.allGoods = allGoods;
 
             setLayout(new MigLayout("wrap 1", "", ""));
-            setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(Color.BLACK),
-                    BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+            setBorder(GUI.SIMPLE_LINE_BORDER);
 
             add(this.label);
             add(this.goodsBox);
@@ -446,9 +439,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.addButton.setActionCommand(ADD);
             this.label = GUI.localizedLabel("tradeItem.incite");
 
-            setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(Color.BLACK),
-                    BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+            setBorder(GUI.SIMPLE_LINE_BORDER);
             setLayout(new MigLayout("wrap 1", "", ""));
 
             available.clear();
@@ -564,9 +555,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
 
-            setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(Color.BLACK),
-                    BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+            setBorder(GUI.SIMPLE_LINE_BORDER);
             setLayout(new MigLayout("wrap 1", "", ""));
 
             add(GUI.localizedLabel("tradeItem.stance"));
@@ -679,9 +668,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.allUnits = allUnits;
 
             setLayout(new MigLayout("wrap 1", "", ""));
-            setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(Color.BLACK),
-                    BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+            setBorder(GUI.SIMPLE_LINE_BORDER);
 
             add(this.label);
             add(this.unitBox);
@@ -1059,7 +1046,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         button.setMargin(GUI.EMPTY_MARGIN);
         button.setOpaque(false);
         button.setForeground(GUI.LINK_COLOR);
-        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setBorder(GUI.blankBorder(0, 0, 0, 0));
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return button;
     }

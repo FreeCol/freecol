@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
@@ -68,28 +67,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
     // The margin to use.
     protected static final int MARGIN = 3;
-
-    // The borders to use for table cells
-    public static final Border TOPCELLBORDER
-        = BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 0, 1, 1, GUI.BORDER_COLOR),
-            BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
-    public static final Border CELLBORDER
-        = BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 1, GUI.BORDER_COLOR),
-            BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
-    public static final Border LEFTCELLBORDER
-        = BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 1, 1, 1, GUI.BORDER_COLOR),
-            BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
-    public static final Border TOPLEFTCELLBORDER
-        = BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 1, 1, 1, GUI.BORDER_COLOR),
-            BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
 
     private FreeColClient freeColClient;
 
