@@ -1099,15 +1099,23 @@ public class Map extends FreeColGameObject implements Location {
             path = searchMap(unit, start, gd, costDecider,
                              INFINITY, carrier, sh, lb);
 
+        } else if (unit != null && unit.isOnCarrier()
+            && !start.isLand() && end.isLand()
+            && !start.getContiguityAdjacent(end.getContiguity()).isEmpty()) {
+            // Special case where a land unit is trying to move off a
+            // ship to adjacent land.
+            path = searchMap(unit, start, gd, costDecider, INFINITY,
+                             carrier, sh, lb);
+
         } else if (start.isLand() && !end.isLand()
             && end.getFirstUnit() != null
             && !end.getContiguityAdjacent(start.getContiguity()).isEmpty()
             && unit != null && unit.getOwner().owns(end.getFirstUnit())
             && (embarkTo = end.getCarrierForUnit(unit)) != null) {
-            // Special case where a land unit is trying to move to a
-            // ship that is adjacent to the land the unit is on.
+            // Special case where a land unit is trying to move from
+            // land to an adjacent ship.
             path = searchMap(unit, start,
-                GoalDeciders.getAdjacentLocationGoalDecider(end), null,
+                GoalDeciders.getAdjacentLocationGoalDecider(end), costDecider,
                 INFINITY, null, null, lb);
             if (path != null) {
                 PathNode last = path.getLastNode();
