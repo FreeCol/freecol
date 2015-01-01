@@ -2224,10 +2224,12 @@ public final class MapViewer {
         ======
         Display goto path
         */
-        if (currentPath != null)
+        if (currentPath != null) {
             displayPath(g, currentPath);
-        if (gotoPath != null)
+        }
+        if (gotoPath != null) {
             displayPath(g, gotoPath);
+        }
 
         /*
         PART 5

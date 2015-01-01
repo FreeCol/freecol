@@ -320,6 +320,7 @@ public final class InGameController implements NetworkConstants {
 
         if (unit.getDestination() == null) return true;
 
+        gui.clearGotoPath();
         return askSetDestination(unit, null);
     }
 
@@ -1063,7 +1064,9 @@ public final class InGameController implements NetworkConstants {
             result = false;
             break;
         }
-        if (clearDestination && !unit.isDisposed()) askClearGotoOrders(unit);
+        if (clearDestination && !unit.isDisposed()) {
+            askClearGotoOrders(unit);
+        }
         return result;
     }
 

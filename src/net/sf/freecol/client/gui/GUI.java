@@ -465,6 +465,18 @@ public class GUI {
     }
 
     /**
+     * Stop the goto path display.
+     */
+    public void clearGotoPath() {
+        Unit unit = getActiveUnit();
+
+        // Action should be disabled if there is no active unit, but make sure
+        if (unit == null || mapViewer == null) return;
+        mapViewer.stopGoto();
+        refresh();
+    }
+
+    /**
      * Change the windowed mode.
      *
      * @param windowed Use <code>true</code> for windowed mode
