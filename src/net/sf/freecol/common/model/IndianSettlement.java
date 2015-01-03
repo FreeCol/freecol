@@ -1260,13 +1260,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         return capacity - present;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public int getNetProductionOf(GoodsType goodsType) {
-        return 0;
-    }
-
 
     // Override FreeColGameObject
 

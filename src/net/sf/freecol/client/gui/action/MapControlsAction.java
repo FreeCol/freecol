@@ -46,8 +46,7 @@ public class MapControlsAction extends SelectableAction {
 
 
     /**
-     * Updates the "enabled"-status and calls
-     * {@link net.sf.freecol.client.gui.GUI#showMapControls(boolean)}.
+     * Updates the "enabled"-status and map controls.
      */
     @Override
     public void update() {

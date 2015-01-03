@@ -1322,7 +1322,7 @@ public class GUI {
     /**
      * Localize the tool tip message for a JComponent.
      *
-     * @param button The <code>JComponent</code> to localize.
+     * @param comp The <code>JComponent</code> to localize.
      * @param key The key to use.
      * @return The original <code>JComponent</code>.
      */
@@ -1334,7 +1334,7 @@ public class GUI {
     /**
      * Localize the tool tip message for a JComponent.
      *
-     * @param button The <code>JComponent</code> to localize.
+     * @param comp The <code>JComponent</code> to localize.
      * @param template The <code>StringTemplate</code> to use.
      * @return The original <code>JComponent</code>.
      */

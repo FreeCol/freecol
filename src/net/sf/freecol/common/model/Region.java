@@ -418,7 +418,7 @@ public class Region extends FreeColGameObject implements Nameable {
     /**
      * Discover this region.
      *
-     * @param player The discovering <code>Player</code>.
+     * @param unit The discovering <code>Unit</code>.
      * @param turn The discovery <code>Turn</code>.
      * @param newName The name of the region.
      * @return A <code>HistoryEvent</code> documenting the discovery.

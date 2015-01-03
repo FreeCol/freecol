@@ -282,7 +282,6 @@ public class Connection implements Closeable {
      *
      * @param element The <code>Element</code> (root element in a
      *     DOM-parsed XML tree) that holds all the information
-     * @param logOK Log the send if true.
      * @exception IOException If an error occur while sending the message.
      */
     private void sendInternal(Element element) throws IOException {

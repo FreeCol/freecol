@@ -812,9 +812,9 @@ public class Map extends FreeColGameObject implements Location {
      * @param dst The destination <code>Tile</code>.
      * @return The approximate direction from source to direction.
      */
-    public static Direction getRoughDirection(Tile t1, Tile t2) {
-        int x = t2.getX() - t1.getX();
-        int y = t2.getY() - t1.getY();
+    public static Direction getRoughDirection(Tile src, Tile dst) {
+        int x = dst.getX() - src.getX();
+        int y = dst.getY() - src.getY();
         double theta = Math.atan2(y, x) + Math.PI/2 + Math.PI/8;
         if (theta < 0) theta += 2 * Math.PI;
         return Direction.angleToDirection(theta);
