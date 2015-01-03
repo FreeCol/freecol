@@ -269,19 +269,6 @@ some panels will look a bit cramped. You can play the game with an
 even smaller screen, but we do not support that, and some things might
 not work.
 
-%% This should no longer be relevant, now that we are using 1.6:
-
-%% \hypertarget{FreeCol on OSX}{\subsection{FreeCol on OSX}}
-
-%% Some users report that they can not start FreeCol on their 64-bit
-%% Intel Macs. It seems that these Macs use a 32-bit version of Java 1.5
-%% by default. In order to solve this problem, you can either edit the
-%% file "Info.plist" within the application package to select 1.6+, or
-%% you can change the default Java version under
-%% "/Applications/Utilities/Java/Java Preferences".  Just drag "1.5
-%% 64-bit" or "1.6 64-bit" to the top of the list and FreeCol should run
-%% without any changes in "Info.plist".
-
 \hypertarget{FreeCol on Windows}{\subsection{FreeCol on Windows}}
 
 FreeCol uses context menus in several places. On most platforms,
@@ -1648,9 +1635,9 @@ identify the font. For this reason, you must obey the usual quoting
 rules. In particular, you must use the string {\tt \%20} instead of a
 space character in the font name.
 
-If you are using Java 1.6 or higher, you can also use fonts that are
-not known to the JVM. You can copy it to the fonts directory mentioned
-above and add it to the configuration file by adding a line like this:
+Alternately you can also use fonts that are not known to the JVM. You
+can copy it to the fonts directory mentioned above and add it to the
+configuration file by adding a line like this:
 
 \begin{quote}
 {\tt MyFavouriteFont=resources/fonts/Chancery.ttf}
