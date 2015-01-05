@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -911,6 +912,80 @@ public class ServerPlayer extends Player implements ServerModelObject {
             for (Unit u : getUnits()) exploreForUnit(u);
         }
         return result;
+    }
+
+    /**
+     * Try to reassign the ownership of a collection of tiles.
+     *
+     * Do it in two passes so the first successful claim does not give
+     * a large advantage.
+     *
+     * @param tiles The collection of <code>Tile</code>s to reassign.
+     * @param prefer An optional <code>Player</code> to prefer to reassign to.
+     * @param avoid An optional <code>Settlement</code> to consider last
+     *     when making claims.
+     */
+    private static void reassignTiles(Collection<Tile> tiles,
+                                      Player prefer,
+                                      Settlement avoid) {
+        HashMap<Settlement, Integer> votes = new HashMap<>();
+        HashMap<Tile, Settlement> claims = new HashMap<>();
+        Settlement claimant;
+        for (Tile tile : tiles) {
+            votes.clear();
+            for (Tile t : tile.getSurroundingTiles(1)) {
+                claimant = t.getOwningSettlement();
+                if (claimant != null
+                    // BR#3375773 found a case where tiles were
+                    // still owned by a settlement that had been
+                    // previously destroyed.  These should be gone, but...
+                    && !claimant.isDisposed()
+                    && claimant.getOwner() != null
+                    && claimant.getOwner().canOwnTile(tile)
+                    && (claimant.getOwner().isIndian()
+                        || claimant.getTile().getDistanceTo(tile)
+                        <= claimant.getRadius())) {
+                    // Weight claimant settlements:
+                    //   settlements owned by the same player
+                    //     > settlements owned by same type of player
+                    //     > other settlements
+                    int value = (prefer == null) ? 1
+                        : (claimant.getOwner() == prefer) ? 3
+                        : (claimant.getOwner().isEuropean()
+                            == prefer.isEuropean()) ? 2
+                        : 1;
+                    if (votes.get(claimant) != null) {
+                        value += votes.get(claimant).intValue();
+                    }
+                    votes.put(claimant, Integer.valueOf(value));
+                }
+            }
+            boolean lastResort = false;
+            int bestValue = 0;
+            claimant = null;
+            for (Entry<Settlement, Integer> entry : votes.entrySet()) {
+                if (avoid == entry.getKey()) {
+                    lastResort = true;
+                    continue;
+                }
+                int value = entry.getValue();
+                if (bestValue < value) {
+                    bestValue = value;
+                    claimant = entry.getKey();
+                }
+            }
+            if (claimant == null && lastResort) claimant = avoid;
+            claims.put(tile, claimant);
+        }
+        for (Entry<Tile, Settlement> e : claims.entrySet()) {
+            Tile t = e.getKey();
+            if ((claimant = e.getValue()) == null) {
+                t.changeOwnership(null, null);//-til
+            } else {
+                ServerPlayer newOwner = (ServerPlayer)claimant.getOwner();
+                t.changeOwnership(newOwner, claimant);//-til
+            }
+        }
     }
 
     /**
@@ -2326,7 +2401,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     && colony != null
                     && isEuropean() && defenderPlayer.isEuropean();
                 if (ok) {
-                    csCaptureColony(attackerUnit, colony, random, cs);
+                    csCaptureColony(attackerUnit, (ServerColony)colony,
+                                    random, cs);
                     attackerTileDirty = defenderTileDirty = false;
                     moveAttacker = true;
                     defenderTension += Tension.TENSION_ADD_MAJOR;
@@ -2752,12 +2828,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Captures a colony.
      *
      * @param attacker The attacking <code>Unit</code>.
-     * @param colony The <code>Colony</code> to capture.
+     * @param colony The <code>ServerColony</code> to capture.
      * @param random A pseudo-random number source.
      * @param cs The <code>ChangeSet</code> to update.
      */
-    private void csCaptureColony(Unit attacker, Colony colony, Random random,
-                                 ChangeSet cs) {
+    private void csCaptureColony(Unit attacker, ServerColony colony,
+                                 Random random, ChangeSet cs) {
         Game game = attacker.getGame();
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attackerPlayer.getNationName();
@@ -2782,14 +2858,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                       .addName("%colony%", colony.getName()));
         cs.addMessage(See.only(attackerPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       "model.unit.colonyCaptured",
-                                       colony)
+                                       "model.unit.colonyCaptured", colony)
                       .addName("%colony%", colony.getName())
                       .addAmount("%amount%", plunder));
         cs.addMessage(See.only(colonyPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                       "model.unit.colonyCapturedBy",
-                                       colony.getTile())
+                                       "model.unit.colonyCapturedBy", tile)
                       .addName("%colony%", colony.getName())
                       .addAmount("%amount%", plunder)
                       .addStringTemplate("%player%", attackerNation));
@@ -2809,20 +2883,31 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
 
-        // Hand over the colony.  Inform former owner of loss of owned
-        // tiles, and process possible increase in line of sight.  Do
-        // not include the colony tile, which is updated in
-        // csCombat().
-        Set<Tile> explored = attackerPlayer.exploreForSettlement(colony);
+        // The colony is falling, so allow other neighbours a chance
+        // to claim its tiles.  Make sure units are ejected when a tile
+        // is claimed.
         Set<Tile> tiles = colony.getOwnedTiles();
+        tile.cacheUnseen();
+        tiles.remove(tile);
         for (Tile t : tiles) {
-            t.cacheUnseen(attackerPlayer);//+til
-            if (!explored.contains(t)) explored.add(t);
+            t.cacheUnseen();
+            t.changeOwnership(null, null);//-til
         }
+        reassignTiles(tiles, colonyPlayer, colony);//-til
+        for (Tile t : tiles) {
+            if (t.getOwningSettlement() != colony) {
+                ColonyTile ct = colony.getColonyTile(t);
+                colony.ejectUnits(ct, ct.getUnitList());
+            }
+        }
+        tiles.add(tile);
+
+        // Hand over the colony.  Inform former owner of loss of owned
+        // tiles, and process possible increase in line of sight.
         ((ServerColony)colony)//-til
             .csChangeOwner(attackerPlayer, cs);//-vis(attackerPlayer,colonyPlayer)
-        tiles.remove(tile);
-        explored.remove(tile);
+        Set<Tile> explored = attackerPlayer.exploreForSettlement(colony);
+        explored.addAll(tiles);
         cs.add(See.only(attackerPlayer), explored);
         cs.add(See.perhaps().always(colonyPlayer).except(attackerPlayer),
                tiles);
@@ -3312,62 +3397,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 + settlement);
         }
 
-        // Try to reassign the tiles.  Do it in two passes so the first
-        // successful claim does not give a large advantage.
-        Settlement centerClaimant = null;
-        HashMap<Settlement, Integer> votes = new HashMap<>();
-        HashMap<Tile, Settlement> claims = new HashMap<>();
-        Settlement claimant;
-        for (Tile tile : owned) {
-            votes.clear();
-            for (Tile t : tile.getSurroundingTiles(1)) {
-                claimant = t.getOwningSettlement();
-                if (claimant != null
-                    // BR#3375773 found a case where tiles were
-                    // still owned by a settlement that had been
-                    // previously destroyed.  These should be gone, but...
-                    && !claimant.isDisposed()
-                    && claimant.getOwner() != null
-                    && claimant.getOwner().canOwnTile(tile)
-                    && (claimant.getOwner().isIndian()
-                        || claimant.getTile().getDistanceTo(tile)
-                        <= claimant.getRadius())) {
-                    // Weight claimant settlements:
-                    //   settlements owned by the same player
-                    //     > settlements owned by same type of player
-                    //     > other settlements
-                    int value = (claimant.getOwner() == owner) ? 3
-                        : (claimant.getOwner().isEuropean()
-                            == owner.isEuropean()) ? 2
-                        : 1;
-                    if (votes.get(claimant) != null) {
-                        value += votes.get(claimant).intValue();
-                    }
-                    votes.put(claimant, Integer.valueOf(value));
-                }
-            }
-            claimant = null;
-            if (!votes.isEmpty()) {
-                int bestValue = 0;
-                for (Entry<Settlement, Integer> entry : votes.entrySet()) {
-                    int value = entry.getValue();
-                    if (bestValue < value) {
-                        bestValue = value;
-                        claimant = entry.getKey();
-                    }
-                }
-            }
-            claims.put(tile, claimant);
-        }
-        for (Entry<Tile, Settlement> e : claims.entrySet()) {
-            Tile t = e.getKey();
-            if ((claimant = e.getValue()) == null) {
-                t.changeOwnership(null, null);//-til
-            } else {
-                ServerPlayer newOwner = (ServerPlayer)claimant.getOwner();
-                t.changeOwnership(newOwner, claimant);//-til
-            }
-        }
+        // Reassign the tiles owned by the settlement, if possible
+        reassignTiles(owned, owner, null);
 
         See vis = See.perhaps().always(owner);
         if (missionaryOwner != null) vis.except(missionaryOwner);

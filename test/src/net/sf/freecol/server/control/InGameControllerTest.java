@@ -718,7 +718,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals("Colony should be owned by the attacker",
                      attacker.getOwner(), colony.getOwner());
         assertEquals("Colony colonist should be demoted",
-                     colonist.getType(), veteranType);
+                     veteranType, colonist.getType());
     }
 
     public void testAttackColonyWithBrave() {
