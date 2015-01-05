@@ -449,7 +449,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         } else if (europe != null
             && player.canMoveToEurope()
             && unit.getType().canMoveToHighSeas()
-            && (turns = unit.getTurnsToReach(europe)) != FreeColObject.INFINITY) {
+            && (turns = unit.getTurnsToReach(europe)) < Unit.MANY_TURNS) {
             this.destinations.add(new Destination(europe, turns, 
                                                   unit, goodsTypes));
         }
@@ -462,7 +462,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 if (!Map.isSameContiguity(unit.getLocation(),
                         s.getTile())) continue;
             }
-            if ((turns = unit.getTurnsToReach(s)) != FreeColObject.INFINITY) {
+            if ((turns = unit.getTurnsToReach(s)) < Unit.MANY_TURNS) {
                 this.destinations.add(new Destination(s, turns,
                                                       unit, goodsTypes));
             }
