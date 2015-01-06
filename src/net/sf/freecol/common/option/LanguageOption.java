@@ -46,8 +46,6 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
 
     private static final Logger logger = Logger.getLogger(LanguageOption.class.getName());
 
-    public static final String AUTO = "automatic";
-
     /** Extra languages with alternate names. */
     private static final Map<String, String> languageNames = new HashMap<>();
     static { // Add non-standard language names here.
@@ -148,7 +146,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
          */
         @Override
         public String toString() {
-            if (AUTO.equals(getKey())) {
+            if (Messages.AUTOMATIC.equals(getKey())) {
                 return Messages.message("clientOptions.gui.languageOption.autoDetectLanguage");
             }
 
@@ -169,7 +167,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
 
     /** The default language. */
     private static final Language DEFAULT_LANGUAGE
-        = new Language(AUTO, Locale.getDefault());
+        = new Language(Messages.AUTOMATIC, Locale.getDefault());
 
     /** The value of this option. */
     private Language value = DEFAULT_LANGUAGE;
@@ -286,7 +284,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             l = getLanguage(defaultValueString);
         }
         if (l == null) {
-            l = getLanguage(AUTO);
+            l = getLanguage(Messages.AUTOMATIC);
         }
         setValue(l);
     }

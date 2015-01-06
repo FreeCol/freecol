@@ -274,14 +274,14 @@ public final class FreeCol {
         // If the user has selected automatic language selection, do
         // nothing, since we have already set up the default locale.
         String clientLanguage = ClientOptions.getLanguageOption();
-        if (!(clientLanguage == null
-                || ClientOptions.AUTOMATIC.equalsIgnoreCase(clientLanguage))) {
-            locale = Messages.getLocale(clientLanguage);
-            if (!Locale.getDefault().equals(locale)) {
-                Messages.setMessageBundle(locale);
-                logger.info("Loaded message for " + locale);
-            }
+        Locale clientLocale;
+        if (clientLanguage != null
+            && !Messages.AUTOMATIC.equalsIgnoreCase(clientLanguage)
+            && (clientLocale = Messages.getLocale(clientLanguage)) != locale) {
+            locale = clientLocale;
+            Messages.setMessageBundle(locale);
         }
+        logger.info("Loaded messages for " + locale);
 
         // Now we have the user mods directory and the locale is now
         // stable, load the mods and their messages.

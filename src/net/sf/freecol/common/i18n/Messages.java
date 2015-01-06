@@ -106,6 +106,9 @@ public class Messages {
         DESCRIPTION_SUFFIX, SHORT_DESCRIPTION_SUFFIX, NAME_SUFFIX
     };
 
+    /** Automatic language choice from default locale. */
+    public static final String AUTOMATIC = "automatic";
+
     /**
      * The mapping from language-independent key to localized message
      * for the established locale.
@@ -194,9 +197,10 @@ public class Messages {
             }
         }
 
-        if (!ClientOptions.AUTOMATIC.equalsIgnoreCase(locale.getLanguage())) {
-            setGrammaticalNumber(NumberRules.getNumberForLanguage(locale.getLanguage()));
-        }
+        Locale loc = (AUTOMATIC.equalsIgnoreCase(locale.getLanguage()))
+            ? Locale.getDefault() : locale;
+        setGrammaticalNumber(NumberRules.getNumberForLanguage(loc.getLanguage()));
+
         for (String name : getMessageFileNames(locale)) {
             File file = new File(i18nDirectory, name);
             if (!file.exists()) continue; // Expected
