@@ -2261,8 +2261,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         + " to " + defenderTile
                         + "\n" + FreeColDebugger.stackTraceToString());
                 } else {
-                    cs.addAttack(vis, attackerUnit, defenderUnit,
-                                 attackerTile, defenderTile, true);
+                    cs.addAttack(vis, attackerUnit, defenderUnit, true);
                 }
             }
             break;
@@ -2276,8 +2275,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         + " to " + defenderTile
                         + "\n" + FreeColDebugger.stackTraceToString());
                 } else {
-                    cs.addAttack(vis, attackerUnit, defenderUnit,
-                                 attackerTile, defenderTile, false);
+                    cs.addAttack(vis, attackerUnit, defenderUnit, false);
                 }
             }
             break;

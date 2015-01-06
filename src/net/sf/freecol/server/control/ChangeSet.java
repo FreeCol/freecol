@@ -319,34 +319,38 @@ public class ChangeSet {
      * Encapsulate an attack.
      */
     private static class AttackChange extends Change {
+
         private Unit attacker;
         private Unit defender;
-        private Tile attackerTile;
-        private Tile defenderTile;
         private boolean success;
 
         /**
          * Build a new AttackChange.
          *
-         * Note that we must record attacker and defender tiles
-         * now, because a successful attacker can move, and an unsuccessful
-         * participant can die.
+         * Note that we must copy attackers and defenders because a
+         * successful attacker can move, any an unsuccessful
+         * participant can die, and unsuccessful defenders can be
+         * captured.  Furthermore for defenders, insufficient
+         * information is serialized when a unit is inside a
+         * settlement, but if unscoped too much is disclosed.  So we
+         * make a copy and neuter it.
+         *
+         * We just have to accept that combat animation is an
+         * exception to the normal visibility rules.
          *
          * @param see The visibility of this change.
          * @param attacker The <code>Unit</code> that is attacking.
          * @param defender The <code>Unit</code> that is defending.
-         * @param attackerTile The <code>Tile</code> the attack comes from.
-         * @param defenderTile The <code>Tile</code> the attack goes to.
          * @param success Did the attack succeed.
          */
         public AttackChange(See see, Unit attacker, Unit defender,
-                            Tile attackerTile, Tile defenderTile,
                             boolean success) {
             super(see);
-            this.attacker = attacker;
-            this.defender = defender;
-            this.attackerTile = attackerTile;
-            this.defenderTile = defenderTile;
+            Game game = attacker.getGame();
+            this.attacker = attacker.copy(game, Unit.class);
+            this.attacker.setLocationNoUpdate(this.attacker.getTile());
+            this.defender = defender.copy(game, Unit.class);
+            this.defender.setLocationNoUpdate(this.defender.getTile());
             this.success = success;
         }
 
@@ -371,8 +375,8 @@ public class ChangeSet {
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
             return serverPlayer == attacker.getOwner()
                 || serverPlayer == defender.getOwner()
-                || (serverPlayer.canSee(attackerTile)
-                    && serverPlayer.canSee(defenderTile));
+                || (serverPlayer.canSee(attacker.getTile())
+                    && serverPlayer.canSee(defender.getTile()));
         }
 
         /**
@@ -388,39 +392,19 @@ public class ChangeSet {
             Element element = doc.createElement("animateAttack");
             element.setAttribute("attacker", attacker.getId());
             element.setAttribute("defender", defender.getId());
-            element.setAttribute("attackerTile", attackerTile.getId());
-            element.setAttribute("defenderTile", defenderTile.getId());
+            element.setAttribute("attackerTile", attacker.getTile().getId());
+            element.setAttribute("defenderTile", defender.getTile().getId());
             element.setAttribute("success", Boolean.toString(success));
-            // If scoped to serverPlayer insufficient information is
-            // serialized when a unit is inside a settlement, but if
-            // unscoped too much is disclosed.  So we make a copy
-            // and neuter it.
-            //
-            // We just have to accept that combat animation is an
-            // exception to the normal visibility rules.
             if (!canSeeUnit(serverPlayer, attacker)) {
-                Unit copy = attacker.copy(game, Unit.class);
-                if (attackerTile.hasSettlement()) {
-                    copy.setLocationNoUpdate(attackerTile.getSettlement());
-                } else {
-                    copy.setLocationNoUpdate(attackerTile);
-                }
-                copy.setWorkType(null);
-                element.appendChild(copy.toXMLElement(doc));
+                element.appendChild(attacker.toXMLElement(doc));
                 if (attacker.getLocation() instanceof Unit) {
                     Unit loc = (Unit)attacker.getLocation();
                     element.appendChild(loc.toXMLElement(doc, serverPlayer));
                 }
             }
             if (!canSeeUnit(serverPlayer, defender)) {
-                Unit copy = defender.copy(game, Unit.class);
-                if (defenderTile.hasSettlement()) {
-                    copy.setLocationNoUpdate(defenderTile.getSettlement());
-                } else { // The settlement might be falling!
-                    copy.setLocationNoUpdate(defenderTile);
-                }
-                copy.setWorkType(null);
-                element.appendChild(copy.toXMLElement(doc));
+                defender.setWorkType(null);
+                element.appendChild(defender.toXMLElement(doc));
             }
             return element;
         }
@@ -440,10 +424,10 @@ public class ChangeSet {
                 .append(" ").append(see)
                 .append(" #").append(getPriority())
                 .append(" ").append(attacker.getId())
-                .append("@").append(attackerTile.getId())
+                .append("@").append(attacker.getTile().getId())
                 .append(" ").append(success)
                 .append(" ").append(defender.getId())
-                .append("@").append(defenderTile.getId())
+                .append("@").append(defender.getTile().getId())
                 .append("]");
             return sb.toString();
         }
@@ -1391,16 +1375,12 @@ public class ChangeSet {
      * @param see The visibility of this change.
      * @param attacker The <code>Unit</code> that is attacking.
      * @param defender The <code>Unit</code> that is defending.
-     * @param attackerTile The <code>Tile</code> the attack comes from.
-     * @param defenderTile The <code>Tile</code> the attack goes to.
      * @param success Did the attack succeed?
      * @return The updated <code>ChangeSet</code>.
      */
     public ChangeSet addAttack(See see, Unit attacker, Unit defender,
-                               Tile attackerTile, Tile defenderTile,
                                boolean success) {
-        changes.add(new AttackChange(see, attacker, defender,
-                                     attackerTile, defenderTile, success));
+        changes.add(new AttackChange(see, attacker, defender, success));
         return this;
     }
 
