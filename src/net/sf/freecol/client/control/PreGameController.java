@@ -28,6 +28,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -152,19 +153,19 @@ public final class PreGameController {
      *     a debug run and should be skipping turns.
      */
     public boolean startGame() {
-        Player myPlayer = freeColClient.getMyPlayer();
+        final Player player = freeColClient.getMyPlayer();
         if (!freeColClient.isHeadless()) {
             gui.closeMainPanel();
             gui.closeMenus();
             gui.closeStatusPanel();
             gui.playSound(null); // Stop the long introduction sound
-            gui.playSound("sound.intro." + myPlayer.getNationId());
+            gui.playSound("sound.intro." + player.getNationId());
         }
         freeColClient.askServer()
             .registerMessageHandler(freeColClient.getInGameInputHandler());
 
         freeColClient.setInGame(true);
-        gui.initializeInGame((Tile)myPlayer.getEntryLocation());
+        gui.initializeInGame((Tile)player.getEntryLocation());
 
         InGameController igc = freeColClient.getInGameController();
         if (freeColClient.currentPlayerIsMyPlayer()) igc.nextActiveUnit();
@@ -178,14 +179,12 @@ public final class PreGameController {
         }
 
         if (freeColClient.getGame().getTurn().getNumber() == 1) {
-            ModelMessage message
-                = new ModelMessage(ModelMessage.MessageType.TUTORIAL,
-                                   "tutorial.startGame", myPlayer);
-            String direction = myPlayer.getNation().startsOnEastCoast()
-                ? "west" : "east";
-            message.add("%direction%", direction);
-            myPlayer.addModelMessage(message);
             // force view of tutorial message
+            Direction sailDirection = (player.getNation().startsOnEastCoast())
+                ? Direction.W : Direction.E;
+            player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
+                                     "tutorial.startGame", player)
+                .add("%direction%", sailDirection.getNameKey()));
             igc.nextModelMessage();
         }
         return true;
