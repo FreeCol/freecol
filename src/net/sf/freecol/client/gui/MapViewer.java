@@ -2322,7 +2322,7 @@ public final class MapViewer {
             if (tile.getRegion() != null) {
                 if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
                     && tile.getRegion().getName() == null) {
-                    text = lastPart(tile.getRegion().getNameKey(), ".");
+                    text = tile.getRegion().getSuffix();
                 } else {
                     text = Messages.message(tile.getRegion().getLabel());
                 }

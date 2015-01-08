@@ -150,31 +150,6 @@ public abstract class FreeColGameObjectType extends FreeColObject
     }
 
     /**
-     * Gets the identifier of this object with the given prefix
-     * removed if the id of the object starts with the prefix, and the
-     * entire id otherwise.
-     *
-     * @param prefix The prefix to test.
-     * @return An identifier.
-     */
-    public final String getSuffix(String prefix) {
-        return (getId().startsWith(prefix))
-            ? getId().substring(prefix.length())
-            : getId();
-    }
-
-    /**
-     * Gets the usual suffix of this object's identifier, that is
-     * everything after the last '.'.
-     *
-     * @return The usual identifier suffix.
-     */
-    public final String getSuffix() {
-        String id = getId();
-        return (id == null) ? null : id.substring(id.lastIndexOf('.') + 1);
-    }
-
-    /**
      * Is this an abstract type?
      *
      * @return True if this is an abstract game object type.

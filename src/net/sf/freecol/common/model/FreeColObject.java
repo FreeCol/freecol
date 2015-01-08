@@ -53,6 +53,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.util.Introspector;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Document;
@@ -111,6 +112,31 @@ public abstract class FreeColObject
      */
     public void internId(final String newId) {
         setId(newId);
+    }
+
+    /**
+     * Gets the identifier of this object with the given prefix
+     * removed if the id of the object starts with the prefix, and the
+     * entire id otherwise.
+     *
+     * @param prefix The prefix to test.
+     * @return An identifier.
+     */
+    public final String getSuffix(String prefix) {
+        return (getId().startsWith(prefix))
+            ? getId().substring(prefix.length())
+            : getId();
+    }
+
+    /**
+     * Gets the usual suffix of this object's identifier, that is
+     * everything after the last '.'.
+     *
+     * @return The usual identifier suffix.
+     */
+    public final String getSuffix() {
+        String id = getId();
+        return (id == null) ? null : lastPart(id, ".");
     }
 
     /**

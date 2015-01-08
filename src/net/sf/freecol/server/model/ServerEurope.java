@@ -252,9 +252,8 @@ if (unitType == null) logger.info("MIGRANTRANDOM " + recruits.size());
     public void increasePrice(UnitType unitType, int price) {
         final Specification spec = getSpecification();
         String baseOption = GameOptions.PRICE_INCREASE_PER_TYPE;
-        String name = unitType.getId().substring(unitType.getId().lastIndexOf('.'));
         String option = (spec.getBoolean(baseOption))
-            ? "model.option.priceIncrease" + name
+            ? "model.option.priceIncrease." + unitType.getSuffix()
             : "model.option.priceIncrease";
         int increase = (spec.hasOption(option)) ? spec.getInteger(option) : 0;
         if (increase != 0) {
