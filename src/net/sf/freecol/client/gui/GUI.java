@@ -1934,11 +1934,12 @@ public class GUI {
      * Get the user choice for what to do at a native settlement.
      *
      * @param settlement The <code>IndianSettlement</code> to be scouted.
-     * @param number The number of settlements in the settlement owner nation.
+     * @param numberString The number of settlements in the settlement
+     *     owner nation.
      * @return The chosen action, speak, tribute, attack or cancel.
      */
     public ScoutIndianSettlementAction getScoutIndianSettlementChoice(IndianSettlement settlement,
-        String number) {
+        String numberString) {
         final Player player = freeColClient.getMyPlayer();
         final Player owner = settlement.getOwner();
 
@@ -1951,7 +1952,7 @@ public class GUI {
                 .template("scoutSettlement.greetings")
                     .addStringTemplate("%nation%", owner.getNationName())
                     .addName("%settlement%", settlement.getName())
-                    .add("%number%", number)
+                    .addName("%number%", numberString)
                     .add("%settlementType%", key)))
             .append(" ");
         if (settlement.getLearnableSkill() != null) {
