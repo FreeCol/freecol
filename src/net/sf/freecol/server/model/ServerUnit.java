@@ -723,7 +723,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                         "lostCityRumour.mayans", serverPlayer, this)
-                    .add("%years%", Integer.toString(years)));
+                    .addAmount("%years%", years));
                 break;
             } else if (mounds) {
                 cs.addMessage(See.only(serverPlayer),
@@ -780,8 +780,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     "lostCityRumour.colonist", serverPlayer, newUnit));
             break;
         case CIBOLA:
-            String cityKey = game.nextCityOfCibola();
-            if (cityKey != null) {
+            String cityName = game.nextCityOfCibola();
+            if (cityName != null) {
                 int treasureAmount = randomInt(logger,
                     "Base treasure amount", random, dx * 600) + dx * 300;
                 unitType = getRandomMember(logger, "Choose train",
@@ -792,13 +792,13 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                         "lostCityRumour.cibola", serverPlayer, newUnit)
-                    .add("%city%", cityKey)
+                    .addName("%city%", cityName)
                     .addAmount("%money%", treasureAmount));
                 cs.addGlobalHistory(game,
                     new HistoryEvent(game.getTurn(),
                         HistoryEvent.EventType.CITY_OF_GOLD, serverPlayer)
                     .addStringTemplate("%nation%", serverPlayer.getNationName())
-                    .add("%city%", cityKey)
+                    .addName("%city%", cityName)
                     .addAmount("%treasure%", treasureAmount));
                 break;
             }
