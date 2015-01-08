@@ -665,12 +665,10 @@ public class Messages {
 
         // Fall back to generic names.
         if (name == null) {
-            String rtype = nameKey("model.region."
-                + region.getType().toString().toLowerCase(Locale.US));
             do {
                 name = message(StringTemplate.template("model.region.default")
                     .addStringTemplate("%nation%", player.getNationName())
-                    .add("%type%", rtype)
+                    .add("%type%", region.getType().getNameKey())
                     .addAmount("%index%", index));
                 index++;
             } while (map.getRegionByName(name) != null);

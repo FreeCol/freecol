@@ -41,7 +41,7 @@ public class Region extends FreeColGameObject implements Nameable {
 
     public static final String PACIFIC_NAME_KEY = "model.region.pacific";
 
-    public static enum RegionType {
+    public static enum RegionType implements Named {
         OCEAN,
         COAST,
         LAKE,
@@ -57,6 +57,26 @@ public class Region extends FreeColGameObject implements Nameable {
          */
         public String getNameIndexKey() {
             return "index." + toString().toLowerCase(Locale.US);
+        }
+
+        /**
+         * Gets a message key for an unknown region of this type.
+         *
+         * @return A message key.
+         */
+        public String getUnknownKey() {
+            return "model.region." + toString().toLowerCase(Locale.US)
+                + ".unknown";
+        }
+
+        // Interface Named
+
+        /**
+         * {@inheritDoc}
+         */
+        public String getNameKey() {
+            return Messages.nameKey("model.region."
+                + toString().toLowerCase(Locale.US));
         }
     }
 
@@ -191,14 +211,9 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return The i18n-ready name for the region.
      */
     public StringTemplate getLabel() {
-        if (prediscovered || isPacific()) {
-            return StringTemplate.key(nameKey);
-        } else if (name == null) {
-            return StringTemplate.key("model.region."
-                + type.toString().toLowerCase(Locale.US) + ".unknown");
-        } else {
-            return StringTemplate.name(name);
-        }
+        return (prediscovered || isPacific()) ? StringTemplate.key(nameKey)
+            : (name == null) ? StringTemplate.key(type.getUnknownKey())
+            : StringTemplate.name(name);
     }
 
     /**
@@ -217,16 +232,6 @@ public class Region extends FreeColGameObject implements Nameable {
      */
     public final void setType(final RegionType newType) {
         this.type = newType;
-    }
-
-    /**
-     * Get a name key for the region type.
-     *
-     * @return A region type key.
-     */
-    public String getTypeNameKey() {
-        return Messages.nameKey("model.region."
-            + type.toString().toLowerCase(Locale.US));
     }
 
     /**
