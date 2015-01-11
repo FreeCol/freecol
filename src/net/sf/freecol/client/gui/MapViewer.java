@@ -436,445 +436,61 @@ public final class MapViewer {
         // of the Tile that was on focus (= the Tile that should have
         // been drawn at the center of the screen if possible).
 
-        // The difference in rows/columns between the selected tile
-        // (x, y) and the current center Tile.  These values are
-        // positive if (x, y) is located NW of the current center Tile.
-        int diffUp = (topOffset - y) / (tileHeight / 4),
-            diffLeft = (leftOffset - x) / (tileWidth / 4);
-
-        // The following values are used when the user clicked
-        // somewhere near the crosspoint of 4 Tiles.
-        int orDiffUp = diffUp,
-            orDiffLeft = diffLeft,
-            remainderUp = (topOffset - y) % (tileHeight / 4),
-            remainderLeft = (leftOffset - x) % (tileWidth / 4);
-
-        if ((diffUp & 1) == 0) {
-            diffUp = diffUp / 2;
-        } else {
-            if (diffUp < 0) {
-                diffUp = (diffUp / 2) - 1;
-            } else {
-                diffUp = (diffUp / 2) + 1;
-            }
-        }
-
-        if ((diffLeft & 1) == 0) {
-            diffLeft = diffLeft / 2;
-        } else {
-            if (diffLeft < 0) {
-                diffLeft = (diffLeft / 2) - 1;
-            } else {
-                diffLeft = (diffLeft / 2) + 1;
-            }
-        }
-
-        boolean done = false;
-        while (!done) {
-            if ((diffUp & 1) == 0) {
-                if ((diffLeft & 1) == 0) {
-                    diffLeft = diffLeft / 2;
-                    done = true;
-                } else {
-                    // Crosspoint
-                    if (((orDiffLeft & 1) == 0) && ((orDiffUp & 1) == 0)) {
-                        if ((orDiffLeft > 0) && (orDiffUp > 0)) {
-                            // Upper-Left
-                            if ((remainderUp * 2) > remainderLeft) {
-                                diffUp++;
-                            } else {
-                                diffLeft++;
-                            }
-                        } else if (orDiffUp > 0) {
-                            // Upper-Right
-                            if ((remainderUp * 2) > -remainderLeft) {
-                                diffUp++;
-                            } else {
-                                diffLeft--;
-                            }
-                        } else if ((orDiffLeft > 0) && (orDiffUp == 0)) {
-                            if (remainderUp > 0) {
-                                // Upper-Left
-                                if ((remainderUp * 2) > remainderLeft) {
-                                    diffUp++;
-                                } else {
-                                    diffLeft++;
-                                }
-                            } else {
-                                // Lower-Left
-                                if ((-remainderUp * 2) > remainderLeft) {
-                                    diffUp--;
-                                } else {
-                                    diffLeft++;
-                                }
-                            }
-                        } else if (orDiffUp == 0) {
-                            if (remainderUp > 0) {
-                                // Upper-Right
-                                if ((remainderUp * 2) > -remainderLeft) {
-                                    diffUp++;
-                                } else {
-                                    diffLeft--;
-                                }
-                            } else {
-                                // Lower-Right
-                                if ((-remainderUp * 2) > -remainderLeft) {
-                                    diffUp--;
-                                } else {
-                                    diffLeft--;
-                                }
-                            }
-                        } else if (orDiffLeft > 0) {
-                            // Lower-Left
-                            if ((-remainderUp * 2) > remainderLeft) {
-                                diffUp--;
-                            } else {
-                                diffLeft++;
-                            }
-                        } else {
-                            // Lower-Right
-                            if ((-remainderUp * 2) > -remainderLeft) {
-                                diffUp--;
-                            } else {
-                                diffLeft--;
-                            }
-                        }
-                    } else if ((orDiffLeft & 1) == 0) {
-                        if ((orDiffLeft > 0) && (orDiffUp > 0)) {
-                            // Lower-Left
-                            if ((remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
-                                diffLeft++;
-                            } else {
-                                diffUp--;
-                            }
-                        } else if (orDiffUp > 0) {
-                            // Lower-Right
-                            if ((remainderUp * 2 - remainderLeft) > (tileWidth / 4)) {
-                                diffLeft--;
-                            } else {
-                                diffUp--;
-                            }
-                        } else if (orDiffLeft > 0) {
-                            // Upper-Left
-                            if ((-remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
-                                diffLeft++;
-                            } else {
-                                diffUp++;
-                            }
-                        } else {
-                            // Upper-Right
-                            if ((-remainderUp * 2 - remainderLeft) > (tileWidth / 4)) {
-                                diffLeft--;
-                            } else {
-                                diffUp++;
-                            }
-                        }
-                    } else if ((orDiffUp & 1) == 0) {
-                        if ((orDiffLeft > 0) && (orDiffUp > 0)) {
-                            // Upper-Right
-                            if ((remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
-                                diffUp++;
-                            } else {
-                                diffLeft--;
-                            }
-                        } else if (orDiffUp > 0) {
-                            // Upper-Left
-                            if ((remainderUp * 2 - remainderLeft) > (tileWidth / 4)) {
-                                diffUp++;
-                            } else {
-                                diffLeft++;
-                            }
-                        } else if ((orDiffLeft > 0) && (orDiffUp == 0)) {
-                            if (remainderUp > 0) {
-                                // Upper-Right
-                                if ((remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
-                                    diffUp++;
-                                } else {
-                                    diffLeft--;
-                                }
-                            } else {
-                                // Lower-Right
-                                if ((-remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
-                                    diffUp--;
-                                } else {
-                                    diffLeft--;
-                                }
-                            }
-                        } else if (orDiffUp == 0) {
-                            if (remainderUp > 0) {
-                                // Upper-Left
-                                if ((remainderUp * 2 - remainderLeft) > (tileWidth / 4)) {
-                                    diffUp++;
-                                } else {
-                                    diffLeft++;
-                                }
-                            } else {
-                                // Lower-Left
-                                if ((-remainderUp * 2 - remainderLeft) > (tileWidth / 4)) {
-                                    diffUp--;
-                                } else {
-                                    diffLeft++;
-                                }
-                            }
-                        } else if (orDiffLeft > 0) {
-                            // Lower-Right
-                            if ((-remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
-                                diffUp--;
-                            } else {
-                                diffLeft--;
-                            }
-                        } else {
-                            // Lower-Left
-                            if ((-remainderUp * 2 - remainderLeft) > (tileWidth / 4)) {
-                                diffUp--;
-                            } else {
-                                diffLeft++;
-                            }
-                        }
-                    } else {
-                        if ((orDiffLeft > 0) && (orDiffUp > 0)) {
-                            // Lower-Right
-                            if ((remainderUp * 2) > remainderLeft) {
-                                diffLeft--;
-                            } else {
-                                diffUp--;
-                            }
-                        } else if (orDiffUp > 0) {
-                            // Lower-Left
-                            if ((remainderUp * 2) > -remainderLeft) {
-                                diffLeft++;
-                            } else {
-                                diffUp--;
-                            }
-                        } else if (orDiffLeft > 0) {
-                            // Upper-Right
-                            if ((-remainderUp * 2) > remainderLeft) {
-                                diffLeft--;
-                            } else {
-                                diffUp++;
-                            }
-                        } else {
-                            // Upper-Left
-                            if ((-remainderUp * 2) > -remainderLeft) {
-                                diffLeft++;
-                            } else {
-                                diffUp++;
-                            }
-                        }
-                    }
+        // Next, we can calculate the center pixel of the tile-sized
+        // rectangle that was clicked. First, we calculate the
+        // difference in units of rows and columns.
+        int dcol = (x - leftOffset + (x > leftOffset ? halfWidth : -halfWidth))
+            / tileWidth;
+        int drow = (y - topOffset + (y > topOffset ? halfHeight : -halfHeight))
+            / tileHeight;
+        int px = leftOffset + dcol * tileWidth;
+        int py = topOffset + drow * tileHeight;
+        // Since rows are shifted, we need to correct.
+        int newCol = focus.getX() + dcol;
+        int newRow = focus.getY() + drow * 2;
+        logger.finest("Old focus was " + focus.getX() + ", " + focus.getY()
+                      + ". Preliminary focus is " + newCol + ", " + newRow + ".");
+        // Now, we check whether the central diamond of the calculated
+        // rectangle was clicked, and adjust rows and columns
+        // accordingly. See Map.Direction.
+        Direction direction = null;
+        if (x > px) {
+            // right half of the rectangle
+            if (y > py) {
+                // bottom right
+                if ((y - py) > halfHeight - (x - px)/2) {
+                    direction = Direction.SE;
                 }
             } else {
-                if ((diffLeft & 1) == 0) {
-                    // Crosspoint
-                    if (((orDiffLeft & 1) == 0) && ((orDiffUp & 1) == 0)) {
-                        if ((orDiffLeft > 0) && (orDiffUp > 0)) {
-                            // Upper-Left
-                            if ((remainderUp * 2) > remainderLeft) {
-                                diffUp++;
-                            } else {
-                                diffLeft++;
-                            }
-                        } else if (orDiffLeft > 0) {
-                            // Lower-Left
-                            if ((-remainderUp * 2) > remainderLeft) {
-                                diffUp--;
-                            } else {
-                                diffLeft++;
-                            }
-                        } else if ((orDiffUp > 0) && (orDiffLeft == 0)) {
-                            if (remainderLeft > 0) {
-                                // Upper-Left
-                                if ((remainderUp * 2) > remainderLeft) {
-                                    diffUp++;
-                                } else {
-                                    diffLeft++;
-                                }
-                            } else {
-                                // Upper-Right
-                                if ((remainderUp * 2) > -remainderLeft) {
-                                    diffUp++;
-                                } else {
-                                    diffLeft--;
-                                }
-                            }
-                        } else if (orDiffLeft == 0) {
-                            if (remainderLeft > 0) {
-                                // Lower-Left
-                                if ((-remainderUp * 2) > remainderLeft) {
-                                    diffUp--;
-                                } else {
-                                    diffLeft++;
-                                }
-                            } else {
-                                // Lower-Right
-                                if ((-remainderUp * 2) > -remainderLeft) {
-                                    diffUp--;
-                                } else {
-                                    diffLeft--;
-                                }
-                            }
-                        } else if (orDiffUp > 0) {
-                            // Upper-Right
-                            if ((remainderUp * 2) > -remainderLeft) {
-                                diffUp++;
-                            } else {
-                                diffLeft--;
-                            }
-                        } else {
-                            // Lower-Right
-                            if ((-remainderUp * 2) > -remainderLeft) {
-                                diffUp--;
-                            } else {
-                                diffLeft--;
-                            }
-                        }
-                    } else if ((orDiffLeft & 1) == 0) {
-                        if ((orDiffLeft > 0) && (orDiffUp > 0)) {
-                            // Lower-Left
-                            if ((remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
-                                diffLeft++;
-                            } else {
-                                diffUp--;
-                            }
-                        } else if (orDiffLeft > 0) {
-                            // Upper-Left
-                            if ((-remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
-                                diffLeft++;
-                            } else {
-                                diffUp++;
-                            }
-                        } else if ((orDiffUp > 0) && (orDiffLeft == 0)) {
-                            if (remainderLeft > 0) {
-                                // Lower-Left
-                                if ((remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
-                                    diffLeft++;
-                                } else {
-                                    diffUp--;
-                                }
-                            } else {
-                                // Lower-Right
-                                if ((remainderUp * 2 - remainderLeft) > (tileWidth / 4)) {
-                                    diffLeft--;
-                                } else {
-                                    diffUp--;
-                                }
-                            }
-                        } else if (orDiffLeft == 0) {
-                            if (remainderLeft > 0) {
-                                // Upper-Left
-                                if ((-remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
-                                    diffLeft++;
-                                } else {
-                                    diffUp++;
-                                }
-                            } else {
-                                // Upper-Right
-                                if ((-remainderUp * 2 - remainderLeft) > (tileWidth / 4)) {
-                                    diffLeft--;
-                                } else {
-                                    diffUp++;
-                                }
-                            }
-                        } else if (orDiffUp > 0) {
-                            // Lower-Right
-                            if ((remainderUp * 2 - remainderLeft) > (tileWidth / 4)) {
-                                diffLeft--;
-                            } else {
-                                diffUp--;
-                            }
-                        } else {
-                            // Upper-Right
-                            if ((-remainderUp * 2 - remainderLeft) > (tileWidth / 4)) {
-                                diffLeft--;
-                            } else {
-                                diffUp++;
-                            }
-                        }
-                    } else if ((orDiffUp & 1) == 0) {
-                        if ((orDiffLeft > 0) && (orDiffUp > 0)) {
-                            // Upper-Right
-                            if ((remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
-                                diffUp++;
-                            } else {
-                                diffLeft--;
-                            }
-                        } else if (orDiffUp > 0) {
-                            // Upper-Left
-                            if ((remainderUp * 2 - remainderLeft) > (tileWidth / 4)) {
-                                diffUp++;
-                            } else {
-                                diffLeft++;
-                            }
-                        } else if (orDiffLeft > 0) {
-                            // Lower-Right
-                            if ((-remainderUp * 2 + remainderLeft) > (tileWidth / 4)) {
-                                diffUp--;
-                            } else {
-                                diffLeft--;
-                            }
-                        } else {
-                            // Lower-Left
-                            if ((-remainderUp * 2 - remainderLeft) > (tileWidth / 4)) {
-                                diffUp--;
-                            } else {
-                                diffLeft++;
-                            }
-                        }
-                    } else {
-                        if ((orDiffLeft > 0) && (orDiffUp > 0)) {
-                            // Lower-Right
-                            if ((remainderUp * 2) > remainderLeft) {
-                                diffLeft--;
-                            } else {
-                                diffUp--;
-                            }
-                        } else if (orDiffUp > 0) {
-                            // Lower-Left
-                            if ((remainderUp * 2) > -remainderLeft) {
-                                diffLeft++;
-                            } else {
-                                diffUp--;
-                            }
-                        } else if (orDiffLeft > 0) {
-                            // Upper-Right
-                            if ((-remainderUp * 2) > remainderLeft) {
-                                diffLeft--;
-                            } else {
-                                diffUp++;
-                            }
-                        } else {
-                            // Upper-Left
-                            if ((-remainderUp * 2) > -remainderLeft) {
-                                diffLeft++;
-                            } else {
-                                diffUp++;
-                            }
-                        }
-                    }
-                } else {
-                    if ((focus.getY() & 1) == 0) {
-                        if (diffLeft < 0) {
-                            diffLeft = diffLeft / 2;
-                        } else {
-                            diffLeft = (diffLeft / 2) + 1;
-                        }
-                    } else {
-                        if (diffLeft < 0) {
-                            diffLeft = (diffLeft / 2) - 1;
-                        } else {
-                            diffLeft = diffLeft / 2;
-                        }
-                    }
-                    done = true;
+                // top right
+                if ((y - py) < (x - px)/2 - halfHeight) {
+                    direction = Direction.NE;
+                }
+
+            }
+        } else {
+            // left half of the rectangle
+            if (y > py) {
+                // bottom left
+                if ((y - py) > (x - px)/2 + halfHeight) {
+                    direction = Direction.SW;
+                }
+            } else {
+                // top left
+                if ((y - py) < (px - x)/2 - halfHeight) {
+                    direction = Direction.NW;
                 }
             }
         }
-        Position position = new Map.Position(focus.getX() - diffLeft, focus.getY() - diffUp);
-
-        if (!freeColClient.getGame().getMap().isValid(position))
-            return null;
-
-        return freeColClient.getGame().getMap().getTile(position);
+        int col = newCol;
+        int row = newRow;
+        if (direction != null) {
+            col = direction.stepX(newCol, newRow);
+            row = direction.stepY(newCol, newRow);
+        }
+        logger.finest("Direction is " + direction
+                      + ", new focus is " + col + ", " + row);
+        return freeColClient.getGame().getMap().getTile(col, row);
 
     }
 
