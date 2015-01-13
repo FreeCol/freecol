@@ -256,7 +256,7 @@ public final class InfoPanel extends FreeColPanel {
             if (unit != null) {
                 add(new JLabel(lib.getUnitImageIcon(unit)),
                     "spany, gapafter 5px");
-                String name = unit.getDescription(Unit.UnitLabelType.NATIONAL);
+                String name = unit.getDescription(Unit.UnitLabelType.FULL);
 
                 // FIXME: this is too brittle!
                 int index = name.indexOf(" (");
