@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -384,56 +385,51 @@ public class Game extends FreeColGameObject {
      * Gets an <code>Iterator</code> over every registered
      * <code>FreeColGameObject</code>.
      *
-     * This <code>Iterator</code> should be iterated at least once in
-     * a while since it cleans the <code>FreeColGameObject</code>
-     * cache.  Very few routines call this any more, so there is a
-     * thresholded call in removeFreeColGameObject to ensure the cache
-     * is still cleaned.  Reconsider this if the situation changes.
+     * This <code>Iterator</code> should be iterated once in a while
+     * since it cleans the <code>FreeColGameObject</code> cache.  Very
+     * few routines call this any more, so there is a thresholded call
+     * in removeFreeColGameObject to ensure the cache is still
+     * cleaned.  Reconsider this if the situation changes.
      *
      * @return An <code>Iterator</code> containing every registered
      *     <code>FreeColGameObject</code>.
-     * @see #setFreeColGameObject
      */
     public Iterator<FreeColGameObject> getFreeColGameObjectIterator() {
         return new Iterator<FreeColGameObject>() {
 
-            final Iterator<Entry<String, WeakReference<FreeColGameObject>>> it
+            /** An iterator over the freeColGameObjects map. */
+            private final Iterator<Entry<String,
+                                         WeakReference<FreeColGameObject>>> it
                 = freeColGameObjects.entrySet().iterator();
-            FreeColGameObject nextValue = null;
-            String lastId = null;
+
+            /** The current entry. */
+            private Entry<String, WeakReference<FreeColGameObject>> current
+                = null;
+
 
             public boolean hasNext() {
-                while (nextValue == null) {
-                    if (!it.hasNext()) return false;
-
-                    final Entry<String, WeakReference<FreeColGameObject>> entry
-                        = it.next();
-                    final WeakReference<FreeColGameObject> wr
-                        = entry.getValue();
-                    final FreeColGameObject o = wr.get();
-                    if (o == null) {
-                        lastId = entry.getKey();
-                        remove();
-                    } else {
-                        lastId = o.getId();
-                        nextValue = o;
-                    }
-                }
-                return true;
+                return this.it.hasNext();
             }
 
             public FreeColGameObject next() {
-                hasNext();
-                final FreeColGameObject o = nextValue;
-                nextValue = null;
-                return o;
+                while (this.it.hasNext()) {
+                    this.current = this.it.next();
+                    FreeColGameObject fcgo = this.current.getValue().get();
+                    if (fcgo != null) return fcgo;
+                    remove();
+                }
+                throw new NoSuchElementException();
             }
 
             public void remove() {
-                if (lastId != null) notifyRemoveFreeColGameObject(lastId);
-                it.remove();
-                logger.finest("Expiring FCO: " + lastId);
-                lastId = null;
+                if (this.current == null) {
+                    throw new IllegalStateException("No current entry");
+                }
+                final String key = this.current.getKey();
+                this.current = null;
+                logger.finest("removeFCGO/expire: " + key);
+                this.it.remove();
+                notifyRemoveFreeColGameObject(key);
             }
         };
     }
