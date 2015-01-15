@@ -2436,7 +2436,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     } else {
                         csCaptureUnit(defenderUnit, attackerUnit, cs);
                     }
-                    attackerTileDirty = defenderTileDirty = true;
+                    attackerTileDirty = true;
+                    defenderTileDirty = false; // Added in csCaptureUnit
                 }
                 break;
             case DAMAGE_COLONY_SHIPS:
