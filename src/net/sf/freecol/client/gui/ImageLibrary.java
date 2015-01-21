@@ -343,17 +343,19 @@ public final class ImageLibrary {
      * @return An alarm chip, or null if none suitable.
      */
     public Image getAlarmChip(IndianSettlement is, Player player) {
-        Player enemy;
-        if (player == null || !is.hasContacted(player)
-            || (enemy = is.getMostHated()) == null) return null;
+        if (player == null || !is.hasContacted(player)) return null;
         Color ownerColor = is.getOwner().getNationColor();
-        Color enemyColor = enemy.getNationColor();
+        Player enemy = is.getMostHated();
+        Color enemyColor = (enemy == null) ? Nation.UNKNOWN_NATION_COLOR
+            : enemy.getNationColor();
         // Set amount to [0-4] corresponding to HAPPY, CONTENT,
         // DISPLEASED, ANGRY, HATEFUL but only if the player is the
         // most hated, because other nation alarm is not nor should be
         // serialized to the client.
         int amount = 4;
-        if (player == enemy) {
+        if (enemy == null) {
+            amount = 0;
+        } else if (player == enemy) {
             Tension alarm = is.getAlarm(enemy);
             amount = (alarm == null) ? 4 : alarm.getLevel().ordinal();
             if (amount == 0) amount = 1; // Show *something*!

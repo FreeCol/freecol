@@ -2030,7 +2030,7 @@ public final class MapViewer {
                 if (background == null) background = Color.WHITE;
                 float xOffset = STATE_OFFSET_X * lib.getScalingFactor();
                 float yOffset = STATE_OFFSET_Y * lib.getScalingFactor();
-                int colonyLabels = freeColClient.getClientOptions()
+                final int colonyLabels = freeColClient.getClientOptions()
                     .getInteger(ClientOptions.COLONY_LABELS);
                 if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
                     // Draw the settlement chip
