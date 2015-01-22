@@ -1493,14 +1493,16 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     @Override
     public void dispose() {
-        List<AIObject> disposeList = new ArrayList<>();
+        List<AIObject> objects = new ArrayList<>();
         for (AIGoods ag : exportGoods) {
             if (ag.isDisposed() || ag.getGoods() == null) continue;
-            if (ag.getGoods().getLocation() == colony) disposeList.add(ag);
+            if (ag.getGoods().getLocation() == colony) objects.add(ag);
         }
-        disposeList.addAll(wishes);
-        disposeList.addAll(tileImprovementPlans);
-        for (AIObject o : disposeList) o.dispose();
+        objects.addAll(wishes);
+        wishes.clear();
+        objects.addAll(tileImprovementPlans);
+        tileImprovementPlans.clear();
+        for (AIObject o : objects) o.dispose();
         colonyPlan = null;
         // Do not clear this.colony, the identifier is still required.
         super.dispose();

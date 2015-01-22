@@ -2215,16 +2215,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
-    public void dispose() {
+    public void disposeResources() {
         if (settlement != null) {
-            settlement.dispose();
+            settlement.disposeResources();
             settlement = null;
         }
         if (tileItemContainer != null) {
-            tileItemContainer.dispose();
+            tileItemContainer.disposeResources();
             tileItemContainer = null;
         }
-        super.dispose();
+        super.disposeResources();
     }
 
     /**

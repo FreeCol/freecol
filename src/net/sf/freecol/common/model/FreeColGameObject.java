@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +29,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -119,52 +121,71 @@ public abstract class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Has this object been disposed?
-     *
-     * @return True if this object has been disposed.
-     * @see #dispose
-     */
-    public boolean isDisposed() {
-        return disposed;
-    }
-
-    /**
      * Has this object not yet been initialized?
      *
      * @return True if this object is not initialized.
      */
     public boolean isUninitialized() {
-        return uninitialized;
+        return this.uninitialized;
     }
 
     /**
-     * Low level base dispose.
+     * Has this object been disposed?
+     *
+     * @return True if this object has been disposed.
+     * @see #dispose
      */
-    public void fundamentalDispose() {
-        disposed = true;
-        getGame().removeFreeColGameObject(getId());
+    public final boolean isDisposed() {
+        return this.disposed;
     }
 
     /**
-     * Removes all references to this object.
+     * Collect a list of this object and all its subparts that should be
+     * disposed of when this object goes away.  Arrange that the object
+     * itself is last.
      *
      * To be overridden in subclasses, but reference this routine.
      *
-     * @return A list of disposed objects.
+     * @return A list of <code>FreeColGameObject</code>s to dispose of.
      */
-    public List<FreeColGameObject> disposeList() {
-        fundamentalDispose();
-
-        List<FreeColGameObject> objects = new ArrayList<>();
-        objects.add(this);
-        return objects;
+    public List<FreeColGameObject> getDisposeList() {
+        List<FreeColGameObject> fcgos = new ArrayList<>();
+        fcgos.add(this);
+        return fcgos;
     }
 
     /**
-     * Removes all references to this object.
+     * Low level base dispose, removing the object from the game.
      */
-    public void dispose() {
-        disposeList();
+    public final void fundamentalDispose() {
+        getGame().removeFreeColGameObject(getId());
+        this.disposed = true;
+    }
+
+    /**
+     * Dispose of the resources of this object, and finally remove it from the
+     * game.
+     *
+     * To be extended by subclasses, but they must tail call up
+     * towards this.
+     */
+    public void disposeResources() {
+        fundamentalDispose();
+    }
+
+    /**
+     * Destroy this object and all its parts, releasing resources and
+     * removing references.
+     */
+    public final void dispose() {
+        if (this.disposed) return;
+        LogBuilder lb = new LogBuilder(64);
+        lb.add("Destroying:");
+        for (FreeColGameObject fcgo : getDisposeList()) {
+            lb.add(" ", fcgo.getId());
+            fcgo.disposeResources();
+        }
+        lb.log(logger, Level.INFO);
     }
 
     /**

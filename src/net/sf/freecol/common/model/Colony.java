@@ -2472,17 +2472,15 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     // Override FreeColGameObject
 
     /**
-     * Dispose of this colony.
-     *
-     * @return A list of disposed objects.
+     * {@inheritDoc}
      */
     @Override
-    public List<FreeColGameObject> disposeList() {
+    public List<FreeColGameObject> getDisposeList() {
         List<FreeColGameObject> objects = new ArrayList<>();
         for (WorkLocation workLocation : getAllWorkLocations()) {
-            objects.addAll(workLocation.disposeList());
+            objects.addAll(workLocation.getDisposeList());
         }
-        objects.addAll(super.disposeList());
+        objects.addAll(super.getDisposeList());
         return objects;
     }
 

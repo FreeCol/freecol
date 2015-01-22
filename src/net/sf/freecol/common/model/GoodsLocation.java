@@ -309,19 +309,15 @@ public abstract class GoodsLocation extends UnitLocation {
     // Override FreeColObject
 
     /**
-     * Removes all references to this object.
-     *
-     * @return A list of disposed objects.
+     * {@inheritDoc}
      */
     @Override
-    public List<FreeColGameObject> disposeList() {
+    public List<FreeColGameObject> getDisposeList() {
         List<FreeColGameObject> objects = new ArrayList<>();
         if (goodsContainer != null) {
-            objects.addAll(goodsContainer.disposeList());
-            goodsContainer = null;
+            objects.addAll(goodsContainer.getDisposeList());
         }
-        objects.addAll(super.disposeList());
-
+        objects.addAll(super.getDisposeList());
         return objects;
     }
 

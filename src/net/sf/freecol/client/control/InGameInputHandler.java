@@ -1060,7 +1060,7 @@ public final class InGameInputHandler extends InputHandler {
             // Do just the low level dispose that removes
             // reference to this object in the client.  The other
             // updates should have done the rest.
-            fcgo.fundamentalDispose();
+            fcgo.disposeResources();
         }
         if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
 

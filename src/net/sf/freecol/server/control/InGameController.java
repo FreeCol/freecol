@@ -1255,7 +1255,8 @@ public final class InGameController extends Controller {
 
         // Dispose of the unit, only visible to the owner.
         cs.add(See.only(serverPlayer), (FreeColGameObject)unit.getLocation());
-        cs.addDispose(See.only(serverPlayer), null, unit);//-vis: safe in colony
+        cs.addRemove(See.only(serverPlayer), null, unit);//-vis: safe in colony
+        unit.dispose();
 
         // Others can see the cash in message.
         sendToOthers(serverPlayer, cs);
@@ -1373,9 +1374,8 @@ public final class InGameController extends Controller {
                       .addAmount("%number%", spec.getInteger(GameOptions.INTERVENTION_BELLS)));
 
         // Now the REF is ready, we can dispose of the European connection.
-        serverPlayer.getHighSeas().removeDestination(europe);
-        cs.addDispose(See.only(serverPlayer), null, europe);//-vis: not on map
-        serverPlayer.setEurope(null);
+        cs.addRemove(See.only(serverPlayer), null, europe);//-vis: not on map
+        europe.dispose();
         // Do not clean up the Monarch, it contains the intervention force
 
         // Pity to have to update such a heavy object as the player,
@@ -2010,8 +2010,9 @@ public final class InGameController extends Controller {
         case HATEFUL: // Killed, might be visible to other players.
             cs.add(See.perhaps().always(serverPlayer),
                    (FreeColGameObject)unit.getLocation());
-            cs.addDispose(See.perhaps().always(serverPlayer),
-                          unit.getLocation(), unit);//-vis(serverPlayer)
+            cs.addRemove(See.perhaps().always(serverPlayer),
+                         unit.getLocation(), unit);//-vis(serverPlayer)
+            unit.dispose();
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
         case ANGRY: // Learn nothing, not even a pet update
@@ -2154,8 +2155,9 @@ public final class InGameController extends Controller {
         if (tension.getLevel() == Tension.Level.HATEFUL) {
             cs.add(See.perhaps().always(serverPlayer),
                    (FreeColGameObject)unit.getLocation());
-            cs.addDispose(See.perhaps().always(serverPlayer),
-                          unit.getLocation(), unit);//-vis(serverPlayer)
+            cs.addRemove(See.perhaps().always(serverPlayer),
+                         unit.getLocation(), unit);//-vis(serverPlayer)
+            unit.dispose();
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             result = "die";
         } else {
@@ -2288,8 +2290,9 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%nation%", owner.getNationName()));
         cs.add(See.perhaps().always(serverPlayer),
                (FreeColGameObject)unit.getLocation());
-        cs.addDispose(See.perhaps().always(serverPlayer),
-                      unit.getLocation(), unit);//-vis(serverPlayer)
+        cs.addRemove(See.perhaps().always(serverPlayer),
+                     unit.getLocation(), unit);//-vis(serverPlayer)
+        unit.dispose();
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Others can see missionary disappear
@@ -2318,8 +2321,9 @@ public final class InGameController extends Controller {
         case HATEFUL: case ANGRY:
             cs.add(See.perhaps().always(serverPlayer),
                    (FreeColGameObject)unit.getLocation());
-            cs.addDispose(See.perhaps().always(serverPlayer),
-                          unit.getLocation(), unit);//-vis(serverPlayer)
+            cs.addRemove(See.perhaps().always(serverPlayer),
+                         unit.getLocation(), unit);//-vis(serverPlayer)
+            unit.dispose();
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
 
@@ -2772,8 +2776,9 @@ public final class InGameController extends Controller {
         // Dispose of the unit.
         cs.add(See.perhaps().always(serverPlayer),
                (FreeColGameObject)unit.getLocation());
-        cs.addDispose(See.perhaps().always(serverPlayer),
-                      unit.getLocation(), unit);//-vis(serverPlayer)
+        cs.addRemove(See.perhaps().always(serverPlayer),
+                     unit.getLocation(), unit);//-vis(serverPlayer)
+        unit.dispose();
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Others can see the unit removal and the space it leaves.

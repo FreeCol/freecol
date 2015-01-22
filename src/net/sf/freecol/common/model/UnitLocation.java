@@ -253,15 +253,24 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * {@inheritDoc}
      */
     @Override
-    public List<FreeColGameObject> disposeList() {
+    public List<FreeColGameObject> getDisposeList() {
         List<FreeColGameObject> objects = new ArrayList<>();
         synchronized (units) {
-            while (!units.isEmpty()) {
-                objects.addAll(units.remove(0).disposeList());
-            }
+            for (Unit u : units) objects.addAll(u.getDisposeList());
         }
-        objects.addAll(super.disposeList());
+        objects.addAll(super.getDisposeList());
         return objects;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void disposeResources() {
+        synchronized (units) {
+            units.clear();
+        }
+        super.disposeResources();
     }
 
 

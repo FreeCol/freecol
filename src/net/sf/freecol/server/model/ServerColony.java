@@ -256,8 +256,9 @@ public class ServerColony extends Colony implements ServerModelObject {
                     if (getUnitCount() > 1) {
                         Unit victim = getRandomMember(logger, "Starver",
                                                       getUnitList(), random);
-                        cs.addDispose(See.only(owner), null,
-                                      victim);//-vis: safe, all within colony
+                        cs.addRemove(See.only(owner), null,
+                                     victim);//-vis: safe, all within colony
+                        victim.dispose();
                         cs.addMessage(See.only(owner),
                             new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
                                              "model.colony.colonistStarved",

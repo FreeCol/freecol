@@ -492,12 +492,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    public List<FreeColGameObject> disposeList() {
+    public void disposeResources() {
         clearContainers();
-
-        List<FreeColGameObject> objects = new ArrayList<>();
-        objects.addAll(super.disposeList());
-        return objects;
+        super.disposeResources();
     }
 
 

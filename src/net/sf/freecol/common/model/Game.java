@@ -237,7 +237,7 @@ public class Game extends FreeColGameObject {
             if (ro != null) {
                 final FreeColGameObject o = ro.get();
                 if (o != null) return o;
-                freeColGameObjects.remove(id);
+                removeFreeColGameObject(id);
             }
         }
         return null;
@@ -305,6 +305,7 @@ public class Game extends FreeColGameObject {
 
         freeColGameObjects.remove(id);
         notifyRemoveFreeColGameObject(id);
+        logger.finest("Removed FCO: " + id);
 
         // Garbage collect the FCGOs if enough have been removed.
         if (++removeCount > REMOVE_GC_THRESHOLD) {
@@ -409,9 +410,8 @@ public class Game extends FreeColGameObject {
                         = entry.getValue();
                     final FreeColGameObject o = wr.get();
                     if (o == null) {
-                        lastId = null;
-                        notifyRemoveFreeColGameObject(entry.getKey());
-                        it.remove();
+                        lastId = entry.getKey();
+                        remove();
                     } else {
                         lastId = o.getId();
                         nextValue = o;
@@ -430,6 +430,8 @@ public class Game extends FreeColGameObject {
             public void remove() {
                 if (lastId != null) notifyRemoveFreeColGameObject(lastId);
                 it.remove();
+                logger.finest("Expiring FCO: " + lastId);
+                lastId = null;
             }
         };
     }

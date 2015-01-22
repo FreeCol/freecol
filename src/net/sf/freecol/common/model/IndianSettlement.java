@@ -1039,12 +1039,12 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public List<FreeColGameObject> disposeList() {
+    public void disposeResources() {
         // Orphan the units whose home settlement this is.
         while (!ownedUnits.isEmpty()) {
             ownedUnits.remove(0).setHomeIndianSettlement(null);
         }
-        return super.disposeList();
+        super.disposeResources();
     }
 
 

@@ -3906,9 +3906,7 @@ public class Unit extends GoodsLocation
      * -vis: This routine can change player visibility.
      */
     @Override
-    public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<>();
-
+    public void disposeResources() {
         if (location != null) {
             location.remove(this);
             // Do not set location to null, units that are slaughtered in
@@ -3929,8 +3927,7 @@ public class Unit extends GoodsLocation
 
         getOwner().removeUnit(this);
 
-        objects.addAll(super.disposeList());
-        return objects;
+        super.disposeResources();
     }
 
     /**

@@ -1411,22 +1411,6 @@ public class ChangeSet {
     }
 
     /**
-     * Helper function to add a removal for a disposal list to a ChangeSet.
-     *
-     * -vis: If disposing of units or colonies, this routine changes
-     * player visibility.
-     *
-     * @param see The visibility of this change.
-     * @param loc The <code>Location</code> where the object was.
-     * @param obj The <code>FreeColGameObject</code> to remove.
-     * @return The updated <code>ChangeSet</code>.
-     */
-    public ChangeSet addDispose(See see, Location loc, FreeColGameObject obj) {
-        changes.add(new RemoveChange(see, loc, obj.disposeList()));//-vis
-        return this;
-    }
-
-    /**
      * Helper function to add a removal for an object that disappears
      * (that is, moves where it can not be seen) to a ChangeSet.
      *
@@ -1591,6 +1575,38 @@ public class ChangeSet {
     }
 
     /**
+     * Helper function to add a removal to a ChangeSet.
+     *
+     * -vis: If disposing of units or colonies, this routine changes
+     * player visibility.
+     *
+     * @param see The visibility of this change.
+     * @param loc The <code>Location</code> where the object was.
+     * @param obj The <code>FreeColGameObject</code> to remove.
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet addRemove(See see, Location loc, FreeColGameObject obj) {
+        changes.add(new RemoveChange(see, loc, obj.getDisposeList()));//-vis
+        return this;
+    }
+
+    /**
+     * Helper function to add removals for several objects to a ChangeSet.
+     *
+     * @param see The visibility of this change.
+     * @param loc The <code>Location</code> where the object was.
+     * @param objects A list of <code>FreeColGameObject</code>s to remove.
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet addRemoves(See see, Location loc,
+                                List<? extends FreeColGameObject> objects) {
+        for (FreeColGameObject fcgo : objects) {
+            changes.add(new RemoveChange(see, loc, fcgo.getDisposeList()));
+        }
+        return this;
+    }
+
+    /**
      * Helper function to add a sale change to a ChangeSet.
      *
      * @param serverPlayer The <code>ServerPlayer</code> making the sale.
@@ -1605,24 +1621,6 @@ public class ChangeSet {
         LastSale sale = new LastSale(settlement, type, game.getTurn(), price);
         changes.add(new OwnedChange(See.only(serverPlayer), sale));
         serverPlayer.addLastSale(sale);
-        return this;
-    }
-
-    /**
-     * Helper function to add removals for several objects to a ChangeSet.
-     *
-     * @param see The visibility of this change.
-     * @param loc The <code>Location</code> where the object was.
-     * @param objects A list of <code>FreeColGameObject</code>s to remove.
-     * @return The updated <code>ChangeSet</code>.
-     */
-    public ChangeSet addRemoves(See see, Location loc,
-                                List<? extends FreeColGameObject> objects) {
-        List<FreeColGameObject> fcgos = new ArrayList<>();
-        for (FreeColGameObject fcgo : objects) {
-            fcgos.clear(); fcgos.add(fcgo);
-            changes.add(new RemoveChange(see, loc, fcgos));
-        }
         return this;
     }
 

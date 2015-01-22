@@ -452,8 +452,7 @@ public abstract class Settlement extends GoodsLocation
      * -vis: Visibility changes when the settlement is removed.
      */
     @Override
-    public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<>();
+    public void disposeResources() {
         if (owner != null) {
             owner.removeSettlement(this);
             // It is not safe to setOwner(null).  When a settlement is
@@ -461,9 +460,7 @@ public abstract class Settlement extends GoodsLocation
             // display routines that still need to know who owned the
             // dead settlement.
         }
-
-        objects.addAll(super.disposeList());
-        return objects;
+        super.disposeResources();
     }
 
 

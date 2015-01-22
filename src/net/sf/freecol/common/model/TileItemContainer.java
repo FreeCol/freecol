@@ -534,9 +534,9 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Removes all references to this object.
      */
-    public void dispose() {
+    public void disposeResources() {
         tileItems.clear();
-        super.dispose();
+        super.disposeResources();
     }
 
 

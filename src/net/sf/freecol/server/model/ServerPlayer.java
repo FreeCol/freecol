@@ -606,8 +606,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         while (!units.isEmpty()) {
             Unit u = units.remove(0);
             if (u.hasTile()) cs.add(See.perhaps(), u.getTile());
-            cs.addDispose(See.perhaps().always(this),
-                          u.getLocation(), u);//-vis(this)
+            cs.addRemove(See.perhaps().always(this),
+                         u.getLocation(), u);//-vis(this)
+            u.dispose();
         }
 
         // Remove European stuff
@@ -1426,7 +1427,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         // no use for left over units
                         logger.warning("Disposing of left over unit " + unit);
                         unit.setLocationNoUpdate(null);//-vis: safe, off map
-                        unit.disposeList();//-vis: safe, never sighted
+                        unit.dispose();//-vis: safe, never sighted
                     }
                     Set<Tile> tiles = exploreForUnit(navalUnits.get(0));
                     if (!tiles.contains(entry)) tiles.add(entry);
@@ -1650,7 +1651,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                 effect.getId(), colony)
                             .addStringTemplate("%unit%", unit.getLabel()));
-                        cs.addDispose(See.only(this), null, unit);//-vis: Safe, entirely within colony
+                        cs.addRemove(See.only(this), null, unit);
+                        unit.dispose();//-vis: Safe, entirely within colony
                         colonyDirty = true;
                     }
                 } else if (Effect.DAMAGED_UNIT.equals(effect.getId())) {
@@ -3173,7 +3175,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         for (Unit u : ship.getUnitList()) {
             ship.remove(u);
-            cs.addDispose(See.only(player), null, u);//-vis: safe, within unit
+            cs.addRemove(See.only(player), null, u);//-vis: safe, within unit
+            u.dispose();
         }
 
         // Damage the ship and send it off for repair
@@ -3404,7 +3407,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         See vis = See.perhaps().always(owner);
         if (missionaryOwner != null) vis.except(missionaryOwner);
         cs.add(vis, owned);
-        cs.addDispose(vis, centerTile, settlement);//-vis(owner)
+        cs.addRemove(vis, centerTile, settlement);//-vis(owner)
+        settlement.dispose();
         owner.invalidateCanSeeTiles();//+vis(owner)
 
         // Former missionary owner knows that the settlement fell.
@@ -3415,7 +3419,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
             cs.add(See.only(missionaryOwner), owned);
             cs.add(See.only(missionaryOwner), surrounding);
-            cs.addDispose(See.only(missionaryOwner), centerTile, settlement);
+            cs.addRemove(See.only(missionaryOwner), centerTile, settlement);
             missionaryOwner.invalidateCanSeeTiles();//+vis(missionaryOwner)
             for (Tile t : surrounding) t.cacheUnseen(missionaryOwner);
         }
@@ -3709,8 +3713,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             changed = colony.ejectUnits(building, building.getUnitList());//-til
             colony.removeBuilding(building);//-til
             changed |= building.getType().isDefenceType();
-            cs.addDispose(See.only((ServerPlayer)colony.getOwner()), colony, 
-                          building);//-vis: safe, buildings are ok
+            cs.addRemove(See.only((ServerPlayer)colony.getOwner()), colony, 
+                         building);//-vis: safe, buildings are ok
+            building.dispose();
             // Have any abilities been removed that gate other production,
             // e.g. removing docks should shut down fishing.
             for (WorkLocation wl : colony.getAllWorkLocations()) {
@@ -3851,8 +3856,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
     private void csSinkShip(Unit ship, ServerPlayer attackerPlayer,
                             ChangeSet cs) {
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
-        cs.addDispose(See.perhaps().always(shipPlayer),
-                      ship.getLocation(), ship);//-vis(shipPlayer)
+        cs.addRemove(See.perhaps().always(shipPlayer), ship.getLocation(),
+                     ship);//-vis(shipPlayer)
+        ship.dispose();
         shipPlayer.invalidateCanSeeTiles();//+vis(shipPlayer)
         if (attackerPlayer != null) {
             cs.addAttribute(See.only(attackerPlayer), "sound",
@@ -3914,10 +3920,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // See.perhaps was used there, the settlement will be gone
         // when perhaps() is processed, which would erroneously make
         // the unit visible.
-        cs.addDispose((loserLoc.getSettlement() != null)
+        cs.addRemove((loserLoc.getSettlement() != null)
             ? See.only(loserPlayer)
             : See.perhaps().always(loserPlayer),
             loserLoc, loser);//-vis(loserPlayer)
+        loser.dispose();
         loserPlayer.invalidateCanSeeTiles();//+vis(loserPlayer)
     }
 
@@ -4173,7 +4180,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         UnitType mainType = unit.getTypeChange(change, newOwner);
         if (mainType == null) mainType = unit.getType(); // No change needed.
         if (!mainType.isAvailableTo(newOwner)) { // Can not have this unit.
-            cs.addDispose(See.perhaps().always(this), oldTile, unit);
+            cs.addRemove(See.perhaps().always(this), oldTile, unit);
+            unit.dispose();
             return false;
         }
 
@@ -4181,7 +4189,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             UnitType type = u.getTypeChange(change, newOwner);
             if (type == null) type = u.getType();
             if (!type.isAvailableTo(newOwner)) {
-                cs.addDispose(See.only(this), unit, u);
+                cs.addRemove(See.only(this), unit, u);
+                u.dispose();
             } else {
                 if (!u.changeType(type)) {
                     throw new IllegalStateException("Type change failure: "

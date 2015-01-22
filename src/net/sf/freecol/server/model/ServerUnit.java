@@ -237,8 +237,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     .addStringTemplate("%location%",
                         loc.getLocationLabelFor(owner)));
                 cs.add(See.perhaps(), (Tile)loc);
-                cs.addDispose(See.perhaps().always(owner), loc,
-                              this);//-vis(owner)
+                cs.addRemove(See.perhaps().always(owner), loc, 
+                             this);//-vis(owner)
+                this.dispose();
                 owner.invalidateCanSeeTiles();//+vis(owner)
                 lb.add(", ");
                 return;
@@ -938,8 +939,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
         setLocation(newTile);//-vis(serverPlayer),-til if in colony
         if (newTile.hasLostCityRumour() && serverPlayer.isEuropean()
             && !csExploreLostCityRumour(random, cs)) {
-            cs.addDispose(See.perhaps().always(serverPlayer), oldLocation,
-                          this);//-vis(serverPlayer)
+            cs.addRemove(See.perhaps().always(serverPlayer), oldLocation,
+                         this);//-vis(serverPlayer)
+            this.dispose();
         }
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 

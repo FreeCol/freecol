@@ -263,7 +263,8 @@ public class ServerIndianSettlement extends IndianSettlement
         if (storedFood <= 0 && getUnitCount() > 0) {
             Unit victim = getRandomMember(logger, "Choose starver",
                                           getUnitList(), random);
-            cs.addDispose(See.only(owner), this, victim);//-vis(owner)
+            cs.addRemove(See.only(owner), this, victim);//-vis(owner)
+            victim.dispose();
             lb.add(" FAMINE");
         }
         if (getUnitCount() <= 0) {
@@ -490,7 +491,8 @@ public class ServerIndianSettlement extends IndianSettlement
             final ServerPlayer oldOwner = (ServerPlayer)old.getOwner(); 
             setMissionary(null);//-vis(oldOwner),-til
             tile.updateIndianSettlement(oldOwner);
-            cs.addDispose(See.only(oldOwner), null, old);//-vis(oldOwner)
+            cs.addRemove(See.only(oldOwner), null, old);//-vis(oldOwner)
+            old.dispose();
             cs.add(See.only(oldOwner), tile);
             oldOwner.invalidateCanSeeTiles();//+vis(oldOwner)
         }
