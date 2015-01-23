@@ -2369,7 +2369,7 @@ public final class Specification {
                         ((AbstractOption)op).setGroup(og.getId());
                     }
                     og.add(op);
-                    lb.add(" + ", id);
+                    //lb.add(" + ", id);
                     ret = true;
                 }
             }
