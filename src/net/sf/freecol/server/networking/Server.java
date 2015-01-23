@@ -70,6 +70,9 @@ public final class Server extends Thread {
     /** The owner of this <code>Server</code>. */
     private FreeColServer freeColServer;
 
+    /** The name of the host for the public socket. */
+    private String host;
+
     /** The TCP port that is beeing used for the public socket. */
     private int port;
 
@@ -82,22 +85,34 @@ public final class Server extends Thread {
      * listening for new connections.
      *
      * @param freeColServer The owner of this <code>Server</code>.
+     * @param host The name of the host for the public socket.
      * @param port The TCP port to use for the public socket.
      * @throws IOException if the public socket cannot be created.
      */
-    public Server(FreeColServer freeColServer, int port) throws IOException {
-        super(FreeCol.SERVER_THREAD+"Server");
+    public Server(FreeColServer freeColServer, String host,
+                  int port) throws IOException {
+        super(FreeCol.SERVER_THREAD + "Server");
 
         this.freeColServer = freeColServer;
+        this.host = host;
         this.port = port;
         this.serverSocket = new ServerSocket(port, BACKLOG_DEFAULT,
-            InetAddress.getByName(FreeColServer.LOCALHOST));
+                                             InetAddress.getByName(host));
         this.serverSocket.setReuseAddress(true);
     }
 
 
     /**
-     * Gets the TCP port that is beeing used for the public socket.
+     * Gets the host that is being used for the public socket.
+     *
+     * @return The name of the host.
+     */
+    public String getHost() {
+        return this.host;
+    }
+
+    /**
+     * Gets the TCP port that is being used for the public socket.
      *
      * @return The TCP port.
      */

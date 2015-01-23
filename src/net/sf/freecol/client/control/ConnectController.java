@@ -377,7 +377,8 @@ public final class ConnectController {
         if (freeColServer == null) return false;
 
         freeColClient.setFreeColServer(freeColServer);
-        return joinMultiplayerGame(FreeColServer.LOCALHOST, port);
+        return joinMultiplayerGame(freeColServer.getHost(),
+                                   freeColServer.getPort());
     }
 
     /**
@@ -465,8 +466,8 @@ public final class ConnectController {
 
         freeColClient.setFreeColServer(freeColServer);
         freeColClient.setSinglePlayer(true);
-        if (!login(FreeCol.getName(), FreeColServer.LOCALHOST, 
-                freeColServer.getPort())) return false;
+        if (!login(FreeCol.getName(), freeColServer.getHost(),
+                   freeColServer.getPort())) return false;
 
         final ClientOptions co = freeColClient.getClientOptions();
         if (co.getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
@@ -593,11 +594,10 @@ public final class ConnectController {
                         (Specification)null, port, name);
                     freeColClient.setFreeColServer(freeColServer);
                     // Server might have bounced to another port.
-                    final int serverPort = freeColServer.getPort();
                     freeColClient.setSinglePlayer(singlePlayer);
                     freeColClient.getInGameController().setGameConnected();
-                    if (login(FreeCol.getName(), FreeColServer.LOCALHOST, 
-                            serverPort)) {
+                    if (login(FreeCol.getName(), freeColServer.getHost(), 
+                              freeColServer.getPort())) {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 ResourceManager.setScenarioMapping(saveGame.getResourceMapping());

@@ -258,7 +258,7 @@ public final class NewPanel extends FreeColPanel
         this.difficultyButton.addActionListener(this);
 
         this.joinNameLabel = GUI.localizedLabel("host");
-        this.joinNameField = new JTextField("127.0.0.1");
+        this.joinNameField = new JTextField(FreeCol.getServerHost());
         this.joinPortLabel = GUI.localizedLabel("port");
         this.joinPortField
             = new JTextField(Integer.toString(FreeCol.getServerPort()));

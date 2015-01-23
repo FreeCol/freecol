@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.BindException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -104,9 +105,6 @@ public final class FreeColServer {
 
     private static final Logger logger = Logger.getLogger(FreeColServer.class.getName());
 
-    /** Default host to use for connections. */
-    public static final String LOCALHOST = "localhost";
-
     public static final String ACTIVE_UNIT_TAG = "activeUnit";
     public static final String DEBUG_TAG = "debug";
     public static final String RANDOM_STATE_TAG = "randomState";
@@ -157,9 +155,6 @@ public final class FreeColServer {
 
     /** Should this game be listed on the meta-server? */
     private boolean publicServer = false;
-
-    /** The port the server is available at. */
-    private int port;
 
     /** The name of this server. */
     private String name;
@@ -217,7 +212,6 @@ public final class FreeColServer {
         throws IOException, NoRouteToServerException {
         this.publicServer = publicServer;
         this.singlePlayer = singlePlayer;
-        this.port = port;
         this.name = name;
 
         this.server = serverStart(port); // Throws IOException
@@ -262,7 +256,6 @@ public final class FreeColServer {
                XMLStreamException {
         // publicServer will be read from the saved game
         // singlePlayer will be read from the saved game
-        this.port = port;
         this.name = name;
 
         this.server = serverStart(port); // Throws IOException
@@ -319,15 +312,6 @@ public final class FreeColServer {
     }
 
     /**
-     * Gets the port this server was started on.
-     *
-     * @return The port.
-     */
-    public int getPort() {
-        return this.port;
-    }
-
-    /**
      * Gets the name of this server.
      *
      * @return The name.
@@ -345,6 +329,24 @@ public final class FreeColServer {
         this.name = name;
     }
 
+    /**
+     * Gets the host this server was started on.
+     *
+     * @return The host.
+     */
+    public String getHost() {
+        return (this.server == null) ? null : this.server.getHost();
+    }
+
+    /**
+     * Gets the port this server was started on.
+     *
+     * @return The port.
+     */
+    public int getPort() {
+        return (this.server == null) ? -1 : this.server.getPort();
+    }
+
 
     /**
      * Start a Server at port.
@@ -358,6 +360,8 @@ public final class FreeColServer {
      * @exception IOException on failure to open the port.
      */
     private Server serverStart(int firstPort) throws IOException {
+        String host = (this.publicServer) ? "0.0.0.0"
+            : InetAddress.getLoopbackAddress().getHostAddress();
         int port, tries;
         if (firstPort < 0) {
             port = FreeCol.getServerPort();
@@ -370,8 +374,7 @@ public final class FreeColServer {
             + " x " + tries);
         for (int i = tries; i > 0; i--) {
             try {
-                server = new Server(this, port);
-                this.port = port;
+                server = new Server(this, host, port);
                 server.start();
                 break;
             } catch (BindException be) {
@@ -613,9 +616,9 @@ public final class FreeColServer {
         }
 
         String tag = (firstTime) ? "register" : "update";
+        int port = mc.getSocket().getPort();
         String addr = (name != null) ? name
-            : (mc.getSocket().getLocalAddress().getHostAddress() + ":"
-                + Integer.toString(port));
+            : (mc.getSocket().getLocalAddress().getHostAddress() + ":" + port);
         int nPlayers = getNumberOfLivingHumanPlayers();
         boolean started = gameState != GameState.STARTING_GAME;
         try {
@@ -667,7 +670,7 @@ public final class FreeColServer {
                 null, FreeCol.SERVER_THREAD);
         ) {
             mc.send(DOMMessage.createMessage("remove",
-                    "port", Integer.toString(port)));
+                    "port", Integer.toString(mc.getSocket().getPort())));
         } catch (IOException e) {
             logger.log(Level.WARNING, "Network error with meta-server.", e);
         }

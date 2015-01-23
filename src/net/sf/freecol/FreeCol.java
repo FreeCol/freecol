@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.InetAddress;
 import java.net.URL;
 import java.net.JarURLConnection;
 import java.util.Locale;
@@ -1008,6 +1009,15 @@ public final class FreeCol {
      */
     public static String getRevision() {
         return FREECOL_REVISION;
+    }
+
+    /**
+     * Get the default server host name.
+     *
+     * @return The host name.
+     */
+    public static String getServerHost() {
+        return InetAddress.getLoopbackAddress().getHostAddress();
     }
 
     /**
