@@ -348,6 +348,8 @@ final class ReceivingThread extends Thread {
         } finally {
             askToStop();
         }
+        // Do not send disconnect again
+        connection.reallyClose();
         logger.info("Finished: " + getName());
     }
 }

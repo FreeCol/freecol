@@ -167,10 +167,15 @@ public final class Server extends Thread {
     public void sendToAll(Element element, Connection exceptConnection) {
         for (Connection c : new ArrayList<>(connections.values())) {
             if (c == exceptConnection) continue;
-            try {
-                c.sendAndWait(element);
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Unable to send to: " + c, e);
+            if (c.isAlive()) {
+                try {
+                    c.sendAndWait(element);
+                } catch (IOException e) {
+                    logger.log(Level.WARNING, "Unable to send to: " + c, e);
+                }
+            } else {
+                logger.log(Level.INFO, "Reap dead connection: " + c);
+                removeConnection(c);
             }
         }
     }
@@ -212,13 +217,13 @@ public final class Server extends Thread {
                     clientSocket = serverSocket.accept();
 
                     logger.info("Got client connection from "
-                                + clientSocket.getInetAddress());
-                    Connection connection = new Connection(clientSocket,
-                        freeColServer.getUserConnectionHandler(),
-                        FreeCol.SERVER_THREAD);
-                    if (connection != null) {
-                        connections.put(clientSocket, connection);
-                    }
+                        + clientSocket.getInetAddress()
+                        + ":" + clientSocket.getPort());
+                    Connection connection =
+                        new Connection(clientSocket,
+                            freeColServer.getUserConnectionHandler(),
+                            FreeCol.SERVER_THREAD);
+                    addConnection(connection);
                 } catch (IOException e) {
                     if (running) {
                         logger.log(Level.WARNING, "Connection failed: ", e);
@@ -246,7 +251,9 @@ public final class Server extends Thread {
             logger.fine("Wait for Server.run to complete.");
         }
 
-        for (Connection c : connections.values()) c.close();
+        for (Connection c : connections.values()) {
+            if (c.isAlive()) c.close();
+        }
         connections.clear();
 
         freeColServer.removeFromMetaServer();

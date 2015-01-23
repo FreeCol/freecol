@@ -163,6 +163,15 @@ public class Connection implements Closeable {
     }
 
     /**
+     * Is this connection alive?
+     *
+     * @return True if the connection is alive.
+     */
+    public boolean isAlive() {
+        return this.socket != null;
+    }
+
+    /**
      * Gets the socket.
      *
      * @return The <code>Socket</code> used while communicating with
