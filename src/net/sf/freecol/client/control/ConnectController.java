@@ -392,13 +392,12 @@ public final class ConnectController {
 
         if (freeColClient.isLoggedIn()) logout(true);
 
-        final Game game = freeColClient.getGame();
         GameState state = getGameState(host, port);
         if (state == null) return false;
         switch (state) {
         case STARTING_GAME:
             if (!login(FreeCol.getName(), host, port)) return false;
-            gui.showStartGamePanel(game, freeColClient.getMyPlayer(), false);
+            gui.showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false);
             freeColClient.setSinglePlayer(false);
             break;
 
