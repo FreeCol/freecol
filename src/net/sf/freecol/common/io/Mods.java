@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.util.LogBuilder;
+
 
 /**
  * Contains methods for getting a list of available mods.
@@ -68,16 +70,19 @@ public class Mods {
      */
     private static void loadModDirectory(File directory) {
         if (directory != null && directory.isDirectory()) {
+            LogBuilder lb = new LogBuilder(64);
+            lb.add("In ", directory.getPath(), " found mod:");
+            lb.mark();
             for (File f : directory.listFiles(MOD_FILTER)) {
                 try {
                     FreeColModFile fcmf = new FreeColModFile(f);
                     allMods.put(fcmf.getId(), fcmf);
-                    logger.info("Found mod " + fcmf.getId()
-                        + " in " + f.getPath());
+                    lb.add(" ", fcmf.getId());
                 } catch (IOException e) {
                     logger.log(Level.WARNING, "Bad mod in " + f.getPath(), e);
                 }
             }
+            if (lb.grew()) lb.log(logger, Level.INFO);
         }
     }
 

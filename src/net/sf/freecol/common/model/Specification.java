@@ -2346,9 +2346,7 @@ public final class Specification {
     }
 
     private boolean checkDifficultyOptionGroup(String gr, String... ids) {
-        LogBuilder lb = new LogBuilder(64);
-        lb.add("Check group ", gr);
-        lb.mark();
+        logger.info("Check group " + gr.toString());
         boolean ret = false;
         for (OptionGroup level : getDifficultyLevels()) {
             Option op = level.getOption(gr);
@@ -2360,7 +2358,6 @@ public final class Specification {
                 level.add(og);
                 og.setGroup(level.getId());
                 ret = true;
-                lb.add(", added to ", level.getId());
             }
             for (String id : ids) {
                 op = level.remove(id);
@@ -2369,12 +2366,10 @@ public final class Specification {
                         ((AbstractOption)op).setGroup(og.getId());
                     }
                     og.add(op);
-                    //lb.add(" + ", id);
                     ret = true;
                 }
             }
         }
-        if (lb.grew()) lb.log(logger, Level.INFO);
         return ret;
     }
 
@@ -2695,7 +2690,6 @@ public final class Specification {
 
         while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = xr.getLocalName();
-            logger.finest("Found child named " + childName);
             // @compat 0.10.x
             // Ideally we would handle role backward compatibility in
             // the type reader triggered by the "roles" section of the

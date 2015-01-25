@@ -44,6 +44,7 @@ import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceMapping;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -231,16 +232,17 @@ public class FreeColDataFile {
      */
     public ResourceMapping getResourceMapping() {
         final Properties properties = new Properties();
+        LogBuilder lb = new LogBuilder(64);
+        lb.add("Resource mapping");
+        lb.mark();
         for (String fileName : getResourceFileNames()) {
             try (
                 final InputStream is = getInputStream(fileName);
             ) {
                 properties.load(is);
-                logger.info("ResourceMapping loaded: " + file
-                    + "/" + fileName);
+                lb.add(", ", file, "/", fileName, " loaded");
             } catch (FileNotFoundException e) { // Expected failure
-                logger.finest("ResourceMapping not found: " + file
-                    + "/" + fileName);
+                lb.add(", ", file, "/", fileName, " not found");
             } catch (IOException e) {
                 logger.log(Level.WARNING, "ResourceMapping read exception: "
                     + file + "/" + fileName, e);
@@ -283,9 +285,10 @@ public class FreeColDataFile {
             todo.addAll(miss);
         }
         if (!todo.isEmpty()) {
-            logger.warning("Could not resolve virtual resource/s: "
-                           + join(" ", todo));
+            lb.add(", could not resolve virtual resource/s: ",
+                   join(" ", todo));
         }
+        if (lb.grew()) lb.log(logger, Level.INFO);
         return rc;
     }
 

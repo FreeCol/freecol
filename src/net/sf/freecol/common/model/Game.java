@@ -1246,7 +1246,7 @@ public class Game extends FreeColGameObject {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Game game = getGame();
         final String tag = xr.getLocalName();
-        logger.finest("Found game tag " + tag + " id=" + xr.readId());
+        //logger.finest("Found game tag " + tag + " id=" + xr.readId());
 
         if (CIBOLA_TAG.equals(tag)) {
             citiesOfCibola.add(xr.readId());
