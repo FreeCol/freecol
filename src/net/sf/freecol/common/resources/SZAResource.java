@@ -35,7 +35,7 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
  * @see Resource
  * @see SimpleZippedAnimation
  */
-public class SZAResource extends Resource {
+public class SZAResource extends Resource implements Resource.Preloadable {
     private static final Logger logger = Logger.getLogger(SZAResource.class.getName());
 
     private Map<Double, SimpleZippedAnimation> scaledSzAnimations
@@ -70,7 +70,7 @@ public class SZAResource extends Resource {
             }
         }
     }
-    
+
     /**
      * Gets the <code>SimpleZippedAnimation</code> represented by this
      * resource.
@@ -81,7 +81,7 @@ public class SZAResource extends Resource {
         if (szAnimation == null) preload();
         return szAnimation;
     }
-    
+
     /**
      * Get the <code>SimpleZippedAnimation</code> using the specified
      * scale.

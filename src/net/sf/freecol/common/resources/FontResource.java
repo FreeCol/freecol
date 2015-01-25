@@ -73,10 +73,6 @@ public class FontResource extends Resource {
                     + " from: " + resourceLocator);
     }
 
-    /**
-     * Preloading is a noop for this resource type.
-     */
-    public void preload() {}
 
     /**
      * Gets the <code>Font</code> represented by this resource.  As

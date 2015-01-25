@@ -33,6 +33,20 @@ import java.net.URI;
 public abstract class Resource {
 
     /**
+     * Implement the Preloadable interface if a Resource has a use for
+     * calls to a preload method.
+     */
+    public interface Preloadable {
+
+        /**
+         * Preload the resource.
+         */
+        public void preload();
+
+    }
+
+
+    /**
      * The <code>URI</code> used when loading this resource.
      */
     private final URI resourceLocator;
@@ -54,11 +68,6 @@ public abstract class Resource {
         this.resourceLocator = resourceLocator;
     }
 
-
-    /**
-     * Preload the resource.  Often implemented as a noop.
-     */
-    public abstract void preload();
 
     /**
      * Returns the <code>URI</code> used for loading the resource.

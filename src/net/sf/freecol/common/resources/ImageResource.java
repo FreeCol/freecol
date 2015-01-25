@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  * A <code>Resource</code> wrapping an <code>Image</code>.
  * @see Resource
  */
-public class ImageResource extends Resource {
+public class ImageResource extends Resource implements Resource.Preloadable {
 
     private static final Logger logger = Logger.getLogger(ImageResource.class.getName());
 
@@ -49,7 +49,7 @@ public class ImageResource extends Resource {
     private Image image = null;
     private final Object loadingLock = new Object();
     private static final Component _c = new Component() {};
-    
+
 
     /**
      * Do not use directly.
@@ -73,7 +73,7 @@ public class ImageResource extends Resource {
         this.image = image;
     }
 
-    
+
     /**
      * Preload the image.
      */
@@ -112,7 +112,7 @@ public class ImageResource extends Resource {
         if (image == null) preload();
         return image;
     }
-    
+
     /**
      * Gets the image using the specified scale.
      * 
@@ -126,7 +126,7 @@ public class ImageResource extends Resource {
             : getImage(new Dimension((int)(im.getWidth(null) * scale),
                                      (int)(im.getHeight(null) * scale)));    
     }
-    
+
     /**
      * Gets the image using the specified dimension.
      * 
@@ -168,7 +168,7 @@ public class ImageResource extends Resource {
         }
         return null;
     }
-    
+
     /**
      * Gets a grayscale version of the image of the given size.
      * 
@@ -193,7 +193,7 @@ public class ImageResource extends Resource {
             return grayscaleImage;
         }
     }
-    
+
     /**
      * Returns the image using the specified scale.
      * 

@@ -61,7 +61,6 @@ public class ColorResource extends Resource {
     }
 
 
-    
     /**
      * Gets the <code>Color</code> represented by this resource.
      *
@@ -70,11 +69,6 @@ public class ColorResource extends Resource {
     public Color getColor() {
         return this.color;
     }
-
-    /**
-     * Preloading is a noop for this resource type.
-     */
-    public void preload() {}
 
     private static boolean isHexString(String str) {
         if (str == null

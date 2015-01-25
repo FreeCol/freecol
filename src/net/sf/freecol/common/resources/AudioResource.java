@@ -52,10 +52,6 @@ public class AudioResource extends Resource {
         if (SoundPlayer.getAudioInputStream(f) != null) this.file = f;
     }
 
-    /**
-     * Preloading is a noop for this resource type.
-     */
-    public void preload() {}
 
     /**
      * Gets the file represented by this resource.

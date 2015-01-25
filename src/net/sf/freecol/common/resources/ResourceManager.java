@@ -184,7 +184,9 @@ public class ResourceManager {
                     int n = 0;
                     for (Resource r : resources) {
                         if (preloadThread != this) return; // Cancelled!
-                        r.preload();
+                        // TODO: Filter list before running thread?
+                        if (r instanceof Resource.Preloadable)
+                            ((Resource.Preloadable)r).preload();
                         n++;
                     }
                     logger.info("Background thread preloaded " + n

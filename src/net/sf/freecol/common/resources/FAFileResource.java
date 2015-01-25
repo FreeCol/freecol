@@ -54,11 +54,6 @@ public class FAFileResource extends Resource {
 
 
     /**
-     * Preloading is a noop for this resource type.
-     */
-    public void preload() {}
-
-    /**
      * Gets the <code>FAFile</code> represented by this resource.
      *
      * @return The <code>FAFile</code> for this resource, or the default

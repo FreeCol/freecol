@@ -45,12 +45,8 @@ public class VideoResource extends Resource {
         
         this.video = new Video(resourceLocator.toURL());
     }
-    
-    /**
-     * Preloading is a noop for this resource type.
-     */
-    public void preload() {}
-    
+
+
     /**
      * Gets the <code>Video</code> represented by this resource.
      *
