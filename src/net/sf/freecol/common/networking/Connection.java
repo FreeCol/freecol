@@ -20,10 +20,13 @@
 package net.sf.freecol.common.networking;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -62,6 +65,8 @@ public class Connection implements Closeable {
     public static final String NETWORK_REPLY_ID_TAG = "networkReplyId";
     public static final String QUESTION_TAG = "question";
     public static final String REPLY_TAG = "reply";
+    public static final String SEND_SUFFIX = "-send\n";
+    public static final String REPLY_SUFFIX = "-reply\n";
 
     private static final int TIMEOUT = 5000; // 5s
 
@@ -79,8 +84,9 @@ public class Connection implements Closeable {
 
     private String name;
 
-    protected static final boolean dump
-        = FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS);
+    // Logging variables.
+    private final StreamResult logResult;
+    private final Writer logWriter;
 
 
     /**
@@ -92,10 +98,26 @@ public class Connection implements Closeable {
         this.in = null;
         this.socket = null;
         this.out = null;
-        this.xmlTransformer = null;
+        Transformer myTransformer = null;
+        try {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            myTransformer = factory.newTransformer();
+            myTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
+                                            "yes");
+        } catch (TransformerException e) {
+            logger.log(Level.WARNING, "Failed to install transformer!", e);
+        }
+        this.xmlTransformer = myTransformer;
         this.thread = null;
         this.messageHandler = null;
         this.name = name;
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
+            this.logWriter = new BufferedWriter(new OutputStreamWriter(System.err));
+            this.logResult = new StreamResult(this.logWriter);
+        } else {
+            this.logWriter = null;
+            this.logResult = null;
+        }
     }
 
     /**
@@ -129,16 +151,6 @@ public class Connection implements Closeable {
         this.socket = socket;
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
-        Transformer myTransformer = null;
-        try {
-            TransformerFactory factory = TransformerFactory.newInstance();
-            myTransformer = factory.newTransformer();
-            myTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
-                                            "yes");
-        } catch (TransformerException e) {
-            logger.log(Level.WARNING, "Failed to install transformer!", e);
-        }
-        this.xmlTransformer = myTransformer;
         this.thread = new ReceivingThread(this, in, name);
         this.messageHandler = messageHandler;
         this.name = name;
@@ -264,6 +276,40 @@ public class Connection implements Closeable {
     }
 
     /**
+     * Log transfer of an element.
+     *
+     * @param e The <code>Element</code> to log.
+     * @param send True if sending (else replying).
+     */
+    protected void log(Element e, boolean send) {
+        log(new DOMSource(e), send);
+    }
+
+    /**
+     * Log transfer of a DOMSource.
+     *
+     * @param source The <code>DOMSource</code> to log.
+     * @param send True if sending (else replying).
+     */
+    protected void log(DOMSource source, boolean send) {
+        if (this.logResult != null) {
+            try {
+                this.logWriter.write(name, 0, name.length());
+                if (send) {
+                    this.logWriter.write(SEND_SUFFIX, 0, SEND_SUFFIX.length());
+                } else {
+                    this.logWriter.write(REPLY_SUFFIX, 0, REPLY_SUFFIX.length());
+                }
+                this.xmlTransformer.transform(source, this.logResult);
+                this.logWriter.write('\n');
+                this.logWriter.flush();
+            } catch (IOException|TransformerException e) {
+                ; // Ignore logging failure
+            }
+        }
+    }
+
+    /**
      * Transform a DOMsource to output.  Duplicate to System.err if required.
      *
      * @param source The <code>DOMSource</code> to log.
@@ -271,19 +317,15 @@ public class Connection implements Closeable {
      * @exception IOException If an error occur while sending the message.
      */
     private void transform(DOMSource source, OutputStream out) throws IOException {
-        try {
-            xmlTransformer.transform(source, new StreamResult(out));
-            out.write('\n');
-        } catch (TransformerException te) {
-            logger.log(Level.WARNING, "Failed to transform", te);
-        }
-        if (dump) {
+        if (out != null) {
             try {
-                System.err.println(getName());
-                xmlTransformer.transform(source, new StreamResult(System.err));
-                System.err.write('\n');
-            } catch (TransformerException te) {}
+                xmlTransformer.transform(source, new StreamResult(out));
+                out.write('\n');
+            } catch (TransformerException te) {
+                logger.log(Level.WARNING, "Failed to transform", te);
+            }
         }
+        log(source, out != null);
     }
 
     /**
@@ -329,6 +371,7 @@ public class Connection implements Closeable {
         DOMMessage response = (DOMMessage)nro.getResponse();
         Element reply = (response == null) ? null
             : response.getDocument().getDocumentElement();
+        log(reply, false);
 
         Element child = (reply==null) ? null : (Element)reply.getFirstChild();
         return child;

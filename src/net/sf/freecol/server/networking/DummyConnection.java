@@ -42,14 +42,42 @@ public final class DummyConnection extends Connection {
     /**
      * Sets up a dummy connection using the specified {@link MessageHandler}s.
      *
-     * @param incomingMessageHandler The MessageHandler to call for each message
-     *            received.
+     * @param incomingMessageHandler The <code>MessageHandler</code>
+     *     to call for each message received.
      */
     public DummyConnection(String name, MessageHandler incomingMessageHandler) {
         super(name);
         setMessageHandler(incomingMessageHandler);
     }
 
+
+    /**
+     * Sets the outgoing MessageHandler for this Connection.
+     *
+     * @param mh The new MessageHandler for this Connection.
+     */
+    private void setOutgoingMessageHandler(MessageHandler mh) {
+        this.outgoingMessageHandler = mh;
+    }
+
+    /**
+     * Sets the other connection for this dummy connection.
+     *
+     * @param dc The <code>DummyConnection</code> to connect to.
+     */
+    public void setConnection(DummyConnection dc) {
+        this.otherConnection = dc;
+        setOutgoingMessageHandler(dc.getMessageHandler());
+    }
+
+    /**
+     * Gets the <code>DummyConnection</code> this object is connected to.
+     *
+     * @return The <code>DummyConnection</code> .
+     */
+    public DummyConnection getOtherConnection() {
+        return otherConnection;
+    }
 
     /**
      * Closes this connection.
@@ -70,8 +98,23 @@ public final class DummyConnection extends Connection {
     public void send(Element element) throws IOException {
         try {
             outgoingMessageHandler.handle(getOtherConnection(), element);
+            log(element, true);
         } catch (FreeColException e) {
         }
+    }
+
+    /**
+     * Sends the given message over this <code>Connection</code> and waits for
+     * confirmation of receival before returning.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information
+     * @throws IOException If an error occur while sending the message.
+     * @see #send(Element)
+     * @see #ask(Element)
+     */
+    public void sendAndWait(Element element) throws IOException {
+        send(element);
     }
 
     /**
@@ -86,54 +129,14 @@ public final class DummyConnection extends Connection {
     public Element ask(Element request) throws IOException {
         Element reply;
         try {
+            log(request, true);
             reply = outgoingMessageHandler.handle(getOtherConnection(),
-                request);
+                                                  request);
+            log(reply, false);            
         } catch (FreeColException e) {
             reply = null;
         }
         return reply;
-    }
-
-    /**
-     * Sends the given message over this <code>Connection</code> and waits for
-     * confirmation of receival before returning.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information
-     * @throws IOException If an error occur while sending the message.
-     * @see #send(Element)
-     * @see #ask(Element)
-     */
-    public void sendAndWait(Element element) throws IOException {
-        ask(element);
-    }
-
-    /**
-     * Sets the outgoing MessageHandler for this Connection.
-     *
-     * @param mh The new MessageHandler for this Connection.
-     */
-    private void setOutgoingMessageHandler(MessageHandler mh) {
-        outgoingMessageHandler = mh;
-    }
-
-    /**
-     * Sets the outgoing MessageHandler for this Connection.
-     *
-     * @param c The connectio to get the messagehandler from.
-     */
-    public void setOutgoingMessageHandler(DummyConnection c) {
-        otherConnection = c;
-        setOutgoingMessageHandler(c.getMessageHandler());
-    }
-
-    /**
-     * Gets the <code>DummyConnection</code> this object is connected to.
-     *
-     * @return The <code>DummyConnection</code> .
-     */
-    public DummyConnection getOtherConnection() {
-        return otherConnection;
     }
 
     /**

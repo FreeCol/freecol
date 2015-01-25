@@ -1053,8 +1053,8 @@ public final class FreeColServer {
                 DummyConnection aiConnection
                     = new DummyConnection("Server-AI-" + player.getName(),
                         new AIInGameInputHandler(this, serverPlayer, aiMain));
-                aiConnection.setOutgoingMessageHandler(theConnection);
-                theConnection.setOutgoingMessageHandler(aiConnection);
+                aiConnection.setConnection(theConnection);
+                theConnection.setConnection(aiConnection);
                 server.addDummyConnection(theConnection);
                 serverPlayer.setConnection(theConnection);
                 serverPlayer.setConnected(true);
@@ -1199,8 +1199,8 @@ public final class FreeColServer {
             = new DummyConnection("AI connection - " + nation.getId(),
                 new AIInGameInputHandler(this, aiPlayer, getAIMain()));
 
-        aiConnection.setOutgoingMessageHandler(theConnection);
-        theConnection.setOutgoingMessageHandler(aiConnection);
+        aiConnection.setConnection(theConnection);
+        theConnection.setConnection(aiConnection);
 
         getServer().addDummyConnection(theConnection);
 
