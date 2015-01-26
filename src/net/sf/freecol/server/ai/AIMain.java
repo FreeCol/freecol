@@ -166,10 +166,8 @@ public class AIMain extends FreeColObject
      *     should be overwritten or not.
      */
     public void findNewObjects(boolean overwrite) {
-        Iterator<FreeColGameObject> i
-            = freeColServer.getGame().getFreeColGameObjectIterator();
-        while (i.hasNext()) {
-            FreeColGameObject fcgo = i.next();
+        for (FreeColGameObject fcgo : freeColServer.getGame()
+                 .getFreeColGameObjects()) {
             if (!shouldHaveAIObject(fcgo)) continue;
             if (overwrite || getAIObject(fcgo) == null) {
                 setFreeColGameObject(fcgo.getId(), fcgo);
@@ -345,17 +343,15 @@ public class AIMain extends FreeColObject
             result = Math.min(result, integ);
         }
 
-        Iterator<FreeColGameObject> fit
-            = getGame().getFreeColGameObjectIterator();
-        while (fit.hasNext()) {
-            FreeColGameObject f = fit.next();
-            if (shouldHaveAIObject(f) && getAIObject(f.getId()) == null) {
+        for (FreeColGameObject fcgo : getGame().getFreeColGameObjects()) {
+            if (shouldHaveAIObject(fcgo)
+                && getAIObject(fcgo.getId()) == null) {
                 if (fix) {
-                    logger.warning("Added missing AIObject for: " + f.getId());
-                    setFreeColGameObject(f.getId(), f);
+                    logger.warning("Added missing AIObject for: " + fcgo.getId());
+                    setFreeColGameObject(fcgo.getId(), fcgo);
                     result = 0;
                 } else {
-                    logger.warning("Missing AIObject for: " + f.getId());
+                    logger.warning("Missing AIObject for: " + fcgo.getId());
                     result = -1;
                 }
             }

@@ -388,9 +388,7 @@ public class ServerGame extends Game implements ServerModelObject {
         strongest.invalidateCanSeeTiles();//+vis(strongest)
 
         // Trace fail where not all units are transferred
-        Iterator<FreeColGameObject> it = getFreeColGameObjectIterator();
-        while (it.hasNext()) {
-            FreeColGameObject fcgo = it.next();
+        for (FreeColGameObject fcgo : getFreeColGameObjects()) {
             if (fcgo instanceof Ownable
                 && ((Ownable)fcgo).getOwner() == weakest) {
                 throw new RuntimeException("Lurking " + weakest.getId()
@@ -406,9 +404,9 @@ public class ServerGame extends Game implements ServerModelObject {
      */
     public List<ServerModelObject> getServerModelObjects() {
         List<ServerModelObject> objs = new ArrayList<>();
-        for (WeakReference<FreeColGameObject> wr :freeColGameObjects.values()) {
-            if (wr.get() instanceof ServerModelObject) {
-                objs.add((ServerModelObject) wr.get());
+        for (FreeColGameObject fcgo : getFreeColGameObjects()) {
+            if (fcgo instanceof ServerModelObject) {
+                objs.add((ServerModelObject)fcgo);
             }
         }
         return objs;

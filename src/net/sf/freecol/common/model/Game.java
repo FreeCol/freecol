@@ -302,9 +302,8 @@ public class Game extends FreeColGameObject {
      * @exception IllegalArgumentException If the identifier is null or empty.
      */
     public void removeFreeColGameObject(String id, String reason) {
-        if (id == null || id.isEmpty()) {
-            throw new IllegalArgumentException("Null/empty identifier.");
-        }
+        if (id == null) throw new IllegalArgumentException("Null identifier.");
+        if (id.isEmpty()) throw new IllegalArgumentException("Empty identifier.");
 
         logger.finest("removeFCGO/" + reason + ": " + id);
         freeColGameObjects.remove(id);
@@ -312,8 +311,7 @@ public class Game extends FreeColGameObject {
 
         // Garbage collect the FCGOs if enough have been removed.
         if (++removeCount > REMOVE_GC_THRESHOLD) {
-            Iterator<FreeColGameObject> i = getFreeColGameObjectIterator();
-            while (i.hasNext()) i.next();
+            for (FreeColGameObject fcgo : getFreeColGameObjects());
             removeCount = 0;
             System.gc(); // Probably a good opportunity.
         }
@@ -398,6 +396,7 @@ public class Game extends FreeColGameObject {
      */
     public Iterator<FreeColGameObject> getFreeColGameObjectIterator() {
         return new Iterator<FreeColGameObject>() {
+
             final Iterator<Entry<String, WeakReference<FreeColGameObject>>> it
                 = freeColGameObjects.entrySet().iterator();
             FreeColGameObject nextValue = null;
@@ -435,6 +434,19 @@ public class Game extends FreeColGameObject {
                 it.remove();
                 logger.finest("Expiring FCO: " + lastId);
                 lastId = null;
+            }
+        };
+    }
+
+    /**
+     * Get an <code>Iterable</code> over the <code>FreeColGameObjects</code>.
+     *
+     * @return A suitable <code>Iterable</code>.
+     */
+    public Iterable<FreeColGameObject> getFreeColGameObjects() {
+        return new Iterable<FreeColGameObject>() {
+            public Iterator<FreeColGameObject> iterator() {
+                return getFreeColGameObjectIterator();
             }
         };
     }
@@ -994,10 +1006,8 @@ public class Game extends FreeColGameObject {
         // Game objects
         java.util.Map<String, Long> objStats = new HashMap<>();
         long disposed = 0;
-        Iterator<FreeColGameObject> iter = getFreeColGameObjectIterator();
-        while (iter.hasNext()) {
-            FreeColGameObject obj = iter.next();
-            String className = obj.getClass().getSimpleName();
+        for (FreeColGameObject fcgo : getFreeColGameObjects()) {
+            String className = fcgo.getClass().getSimpleName();
             if (objStats.containsKey(className)) {
                 Long count = objStats.get(className);
                 count++;
@@ -1006,7 +1016,7 @@ public class Game extends FreeColGameObject {
                 Long count = new Long(1);
                 objStats.put(className, count);
             }
-            if (obj.isDisposed()) disposed++;
+            if (fcgo.isDisposed()) disposed++;
         }
         stats.put("disposed", Long.toString(disposed));
         for (Entry<String, Long> entry : objStats.entrySet()) {
