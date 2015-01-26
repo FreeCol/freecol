@@ -231,16 +231,15 @@ public class Game extends FreeColGameObject {
      * @return The game object, or null if not found.
      */
     public FreeColGameObject getFreeColGameObject(String id) {
-        if (id != null && !id.isEmpty()) {
-            final WeakReference<FreeColGameObject> ro
-                = freeColGameObjects.get(id);
-            if (ro != null) {
-                final FreeColGameObject o = ro.get();
-                if (o != null) return o;
-                removeFreeColGameObject(id);
-            }
+        if (id == null || id.isEmpty()) return null;
+        final WeakReference<FreeColGameObject> ro = freeColGameObjects.get(id);
+        if (ro == null) return null;
+        final FreeColGameObject o = ro.get();
+        if (o == null) {
+            removeFreeColGameObject(id, "missed");
+            return null;
         }
-        return null;
+        return o;
     }
 
     /**
@@ -278,16 +277,17 @@ public class Game extends FreeColGameObject {
             throw new IllegalArgumentException("Null FreeColGameObject.");
         }
 
-        final WeakReference<FreeColGameObject> wr
-            = new WeakReference<FreeColGameObject>(fcgo);
         final FreeColGameObject old = getFreeColGameObject(id);
         if (old != null) {
-            throw new IllegalArgumentException("Replacing FreeColGameObject "
+            throw new IllegalArgumentException("Tried to replace FCGO "
                 + id + " : " + old.getClass()
                 + " with " + fcgo.getId() + " : " + fcgo.getClass());
         }
-        freeColGameObjects.put(id, wr);
 
+        //logger.finest("Added FCGO: " + id);
+        final WeakReference<FreeColGameObject> wr
+            = new WeakReference<FreeColGameObject>(fcgo);
+        freeColGameObjects.put(id, wr);
         notifySetFreeColGameObject(id, fcgo);
     }
 
@@ -296,16 +296,17 @@ public class Game extends FreeColGameObject {
      * identifier.
      *
      * @param id The object identifier.
+     * @param reason A reason to remove the object.
      * @exception IllegalArgumentException If the identifier is null or empty.
      */
-    public void removeFreeColGameObject(String id) {
+    public void removeFreeColGameObject(String id, String reason) {
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Null/empty identifier.");
         }
 
+        logger.finest("removeFCGO/" + reason + ": " + id);
         freeColGameObjects.remove(id);
         notifyRemoveFreeColGameObject(id);
-        logger.finest("Removed FCO: " + id);
 
         // Garbage collect the FCGOs if enough have been removed.
         if (++removeCount > REMOVE_GC_THRESHOLD) {

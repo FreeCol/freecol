@@ -158,7 +158,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      * Low level base dispose, removing the object from the game.
      */
     public final void fundamentalDispose() {
-        getGame().removeFreeColGameObject(getId());
+        getGame().removeFreeColGameObject(getId(), "dispose");
         this.disposed = true;
     }
 
@@ -244,7 +244,7 @@ public abstract class FreeColGameObject extends FreeColObject {
             if (!newId.equals(getId())) {
                 FreeColObject ret = null;
                 if (getId() != null) {
-                    game.removeFreeColGameObject(getId());
+                    game.removeFreeColGameObject(getId(), "override");
                 }
 
                 setId(newId);
