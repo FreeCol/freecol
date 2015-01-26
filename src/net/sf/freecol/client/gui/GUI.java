@@ -134,6 +134,7 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -1405,8 +1406,8 @@ public class GUI {
             String className = freeColClient.getClientOptions()
                 .getString(ClientOptions.MAP_CONTROLS);
             try {
-                String panelName = "net.sf.freecol.client.gui.panel."
-                    + className;
+                final String panelName = "net.sf.freecol.client.gui.panel."
+                    + lastPart(className, ".");
                 Class<?> controls = Class.forName(panelName);
                 mapControls = (MapControls)controls
                     .getConstructor(FreeColClient.class)
