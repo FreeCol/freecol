@@ -972,6 +972,12 @@ public final class FreeColServer {
         ServerGame game = readGame(fis, specification, this);
         gameState = GameState.IN_GAME;
         integrity = game.checkIntegrity(true);
+        if (integrity < 0) {
+            logger.warning("Game integrity test failed.");
+        } else {
+            logger.info("Game integrity test "
+                + ((integrity > 0) ? "succeeded" : "failed, but fixed") + ".");
+        }
 
         int savegameVersion = fis.getSavegameVersion();
         // @compat 0.10.x
