@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -38,6 +39,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -1067,23 +1069,26 @@ public class Game extends FreeColGameObject {
     @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
+        LogBuilder lb = new LogBuilder(512);
+        lb.add("Uninitialized game ids: ");
+        lb.mark();
         Iterator<FreeColGameObject> iterator = getFreeColGameObjectIterator();
         while (iterator.hasNext()) {
             FreeColGameObject fcgo = iterator.next();
             if (fcgo.isUninitialized()) {
+                lb.add(" ", fcgo.getId(),
+                    "(", lastPart(fcgo.getClass().getName(), "."), ")");
                 if (fix) {
-                    logger.warning("Uninitialized object: " + fcgo.getId()
-                        + " (" + lastPart(fcgo.getClass().getName(), ".")
-                        + "), dropping.");
                     iterator.remove();
-                    result = 0;
+                    result = Math.min(result, 0);
                 } else {
-                    logger.warning("Uninitialized object: " + fcgo.getId()
-                        + " (" + lastPart(fcgo.getClass().getName(), ".")
-                        + ").");
                     result = -1;
                 }
             }
+        }
+        if (lb.grew()) {
+            if (fix) lb.add(" (dropped)");
+            lb.log(logger, Level.WARNING);
         }
 
         Map map = getMap();
