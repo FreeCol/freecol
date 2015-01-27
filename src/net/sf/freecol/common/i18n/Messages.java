@@ -93,6 +93,48 @@ public class Messages {
 
     private static final Logger logger = Logger.getLogger(Messages.class.getName());
 
+    public static class Key {
+        
+        private String key;
+
+        public Key(String prefix, String suffix) {
+            this.key = prefix + suffix;
+        }
+
+        public String toString() {
+            return this.key;
+        }
+    };
+
+    public static class NameKey extends Key {
+
+        public NameKey(String key) {
+            super(key, NAME_SUFFIX);
+        }
+    };
+
+    public static class DescriptionKey extends Key {
+
+        public DescriptionKey(String key) {
+            super(key, DESCRIPTION_SUFFIX);
+        }
+    };
+
+    public static class ShortDescriptionKey extends Key {
+
+        public ShortDescriptionKey(String key) {
+            super(key, SHORT_DESCRIPTION_SUFFIX);
+        }
+    };
+
+    public static class RulerKey extends Key {
+
+        public RulerKey(String key) {
+            super(key, RULER_SUFFIX);
+        }
+    };
+
+
     public static final String MESSAGE_FILE_PREFIX = "FreeColMessages";
 
     public static final String MESSAGE_FILE_SUFFIX = ".properties";
@@ -325,16 +367,15 @@ public class Messages {
         return message(nameKey(id));
     }
 
-    public static String getName(Named named) {
-        return message(named.getNameKey());
-    }
-
     /*
     public static String getName(ObjectWithId object) {
         return getName(object.getId());
     }
     */
 
+    public static String getName(Named named) {
+        return message(named.getNameKey());
+    }
 
     public static String descriptionKey(String id) {
         return id + DESCRIPTION_SUFFIX;
