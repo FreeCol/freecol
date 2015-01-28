@@ -168,6 +168,15 @@ public class TradeRoute extends FreeColGameObject
     }
 
     /**
+     * Remove a <code>TradeRouteStop</code> from this trade route.
+     *
+     * @param stop The <code>TradeRouteStop</code> to remove.
+     */
+    public void removeStop(TradeRouteStop stop) {
+        stops.remove(stop);
+    }
+
+    /**
      * Clear the stops in this trade route.
      */
     public void clearStops() {

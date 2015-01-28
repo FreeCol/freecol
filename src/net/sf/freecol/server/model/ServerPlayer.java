@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -61,6 +62,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
@@ -74,6 +76,8 @@ import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -2870,6 +2874,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                       .addName("%colony%", colony.getName())
                       .addAmount("%amount%", plunder)
                       .addStringTemplate("%player%", attackerNation));
+        colonyPlayer.csLoseLocation(colony, cs);
 
         // Allocate some plunder
         if (plunder > 0) {
@@ -3277,6 +3282,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .addName("%colony%", colony.getName())
             .addStringTemplate("%nation%", colonyNation)
             .addStringTemplate("%attackerNation%", attackerNation));
+        colonyPlayer.csLoseLocation(colony, cs);
 
         // Allocate some plunder.
         if (plunder > 0) {
@@ -3614,6 +3620,39 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .addStringTemplate("%enemyNation%", winnerNation)
             .addStringTemplate("%enemyUnit%", winner.getLabel())
             .addStringTemplate("%location%", loserLocation));
+    }
+
+    /**
+     * Hook for when a player loses access to a location for whatever
+     * reason.  Useful for disabling trade routes.
+     *
+     * @param loc The <code>Location</code> that was lost.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csLoseLocation(Location loc, ChangeSet cs) {
+        for (TradeRoute tr : getTradeRoutes()) {
+            boolean suspend = false;
+            Iterator<TradeRouteStop> trsi = tr.getStops().iterator();
+            while (trsi.hasNext()) {
+                TradeRouteStop trs = trsi.next();
+                if (Map.isSameLocation(trs.getLocation(), loc)) {
+                    suspend = true;
+                    trsi.remove();
+                }
+            }
+            if (suspend) {
+                for (Unit u : tr.getAssignedUnits()) {
+                    u.setTradeRoute(null);
+                    cs.add(See.only(this), u);
+                }
+                cs.addMessage(See.only(this),
+                        new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
+                            "model.unit.tradeRouteSuspended", this)
+                    .addName("%route%", tr.getName())
+                    .addStringTemplate("%stop%", loc.getLocationLabel()));
+                cs.add(See.only(this), tr);
+            }
+        }
     }
 
     /**

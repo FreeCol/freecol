@@ -1296,11 +1296,20 @@ public final class InGameController extends Controller {
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                 "warOfIndependence.independenceDeclared", serverPlayer));
 
-        // Dispose of units in Europe.
+        // Dispose of units in or heading to Europe.
         Europe europe = serverPlayer.getEurope();
         StringTemplate seized = StringTemplate.label(", ");
         for (Unit u : europe.getUnitList()) {
             seized.addStringTemplate(u.getLabel());
+            cs.addRemoves(See.only(serverPlayer), null, u.getDisposeList());
+            u.dispose();
+        }
+        for (Unit u : serverPlayer.getHighSeas().getUnitList()) {
+            if (u.getDestination() == europe) {
+                seized.addStringTemplate(u.getLabel());
+                cs.addRemoves(See.only(serverPlayer), null, u.getDisposeList());
+                u.dispose();
+            }
         }
         if (!seized.getReplacements().isEmpty()) {
             cs.addMessage(See.only(serverPlayer),
@@ -1309,6 +1318,7 @@ public final class InGameController extends Controller {
                                  serverPlayer)
                     .addStringTemplate("%units%", seized));
         }
+        serverPlayer.csLoseLocation(europe, cs);
 
         // Generalized continental army muster.
         // Do not use UnitType.getTargetType.
@@ -2927,8 +2937,9 @@ public final class InGameController extends Controller {
                                      Settlement settlement) {
         ChangeSet cs = new ChangeSet();
 
-        // Create history event before disposing.
+        // Drop trade routes and create history event before disposing.
         if (settlement instanceof Colony) {
+            serverPlayer.csLoseLocation(settlement, cs);
             cs.addHistory(serverPlayer,
                 new HistoryEvent(getGame().getTurn(),
                     HistoryEvent.EventType.ABANDON_COLONY, serverPlayer)
