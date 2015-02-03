@@ -3805,7 +3805,9 @@ public final class InGameController implements NetworkConstants {
             logger.warning("Bad turn in newTurn: " + turn);
             return false;
         }
-        game.setTurn(new Turn(turn));
+        Turn newTurn = new Turn(turn);
+        game.setTurn(newTurn);
+        logger.info("New turn: " + newTurn + "/" + turn);
 
         final boolean alert = freeColClient.getClientOptions()
             .getBoolean(ClientOptions.AUDIO_ALERTS);

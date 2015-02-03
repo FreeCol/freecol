@@ -687,7 +687,7 @@ public class Game extends FreeColGameObject {
      * @return The current player.
      */
     public Player getCurrentPlayer() {
-        return currentPlayer;
+        return this.currentPlayer;
     }
 
     /**
@@ -696,10 +696,7 @@ public class Game extends FreeColGameObject {
      * @param newCurrentPlayer The new current <code>Player</code>.
      */
     public void setCurrentPlayer(Player newCurrentPlayer) {
-        if (newCurrentPlayer == null) {
-            logger.info("Current player set to 'null'.");
-        }
-        currentPlayer = newCurrentPlayer;
+        this.currentPlayer = newCurrentPlayer;
     }
 
     /**
