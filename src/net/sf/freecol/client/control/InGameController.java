@@ -678,7 +678,6 @@ public final class InGameController implements NetworkConstants {
             gui.setActiveUnit((stillActive != null) ? stillActive : active);
             return false;
         }
-        stillActive = null;
 
         // The active unit might also be a going-to unit.  Make sure it
         // gets processed first.  setNextGoingToUnit will fail harmlessly
@@ -689,15 +688,16 @@ public final class InGameController implements NetworkConstants {
         while (player.hasNextGoingToUnit()) {
             Unit unit = player.getNextGoingToUnit();
             gui.setActiveUnit(unit);
-
             // Move the unit as much as possible
             if (moveToDestination(unit, null)) stillActive = unit;
+
+            // Might have LCR messages to display
+            displayModelMessages(false, false);
 
             // Give the player a chance to deal with any problems
             // shown in a popup before pressing on with more moves.
             if (gui.isShowingSubPanel()) {
                 gui.requestFocusForSubPanel();
-                stillActive = unit;
                 break;
             }
         }
@@ -820,8 +820,8 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> to move.
      * @param messages An optional list in which to retain any
      *     trade route <code>ModelMessage</code>s generated.
-     * @return True if the unit reached its destination and has more moves
-     *     to make.
+     * @return True if the unit reached its destination, is still alive,
+     *     and has more moves to make.
      */
     private boolean moveToDestination(Unit unit, List<ModelMessage> messages) {
         Location destination;
@@ -861,6 +861,7 @@ public final class InGameController implements NetworkConstants {
             // not set to SKIPPED by moveDirection, then return true
             // to show that this unit could continue.
             if (!checkCashInTreasureTrain(unit)
+                && !unit.isDisposed()
                 && unit.getMovesLeft() > 0
                 && unit.getState() != UnitState.SKIPPED) {
                 return true;

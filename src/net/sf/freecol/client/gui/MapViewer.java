@@ -905,6 +905,7 @@ public final class MapViewer {
         }
 
         if (activeUnit == null || tile == null) {
+            stopGoto();
             freeColClient.updateActions();
         } else {
             updateCurrentPathForActiveUnit();
