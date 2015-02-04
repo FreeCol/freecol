@@ -110,9 +110,11 @@ public class ExportData extends FreeColObject {
      * Set the high water mark for this data.
      *
      * @param newHighLevel The new high water mark value.
+     * @return This export data.
      */
-    public final void setHighLevel(final int newHighLevel) {
+    public final ExportData setHighLevel(final int newHighLevel) {
         this.highLevel = newHighLevel;
+        return this;
     }
 
     /**
@@ -128,9 +130,11 @@ public class ExportData extends FreeColObject {
      * Set the low water mark for this data.
      *
      * @param newLowLevel The new low water mark value.
+     * @return This export data.
      */
-    public final void setLowLevel(final int newLowLevel) {
+    public final ExportData setLowLevel(final int newLowLevel) {
         this.lowLevel = newLowLevel;
+        return this;
     }
 
     /**
@@ -146,9 +150,11 @@ public class ExportData extends FreeColObject {
      * Set the export level.
      *
      * @param newExportLevel The new export level value.
+     * @return This export data.
      */
-    public final void setExportLevel(final int newExportLevel) {
+    public final ExportData setExportLevel(final int newExportLevel) {
         this.exportLevel = newExportLevel;
+        return this;
     }
 
     /**
@@ -164,9 +170,11 @@ public class ExportData extends FreeColObject {
      * Set the export state.
      *
      * @param exportState The new <code>ExportState</code>.
+     * @return This export data.
      */
-    public final void setExportState(final ExportState exportState) {
+    public final ExportData setExportState(final ExportState exportState) {
         this.exportState = exportState;
+        return this;
     }
 
     /**

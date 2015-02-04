@@ -102,9 +102,12 @@ public class TradeRouteTest extends FreeColTestCase {
         assertEquals(0, colony1.getGoodsCount(fursGoodsType));
         assertEquals(0, colony2.getGoodsCount(fursGoodsType));
         assertEquals(0, colony3.getGoodsCount(fursGoodsType));
-        colony1.getExportData(fursGoodsType).setExportLevel(ex);
-        colony2.getExportData(fursGoodsType).setExportLevel(ex);
-        colony3.getExportData(fursGoodsType).setExportLevel(ex);
+        colony1.getExportData(fursGoodsType).setExportLevel(ex)
+            .setExportState(ExportData.ExportState.EXPORT);
+        colony2.getExportData(fursGoodsType).setExportLevel(ex)
+            .setExportState(ExportData.ExportState.EXPORT);
+        colony3.getExportData(fursGoodsType).setExportLevel(ex)
+            .setExportState(ExportData.ExportState.EXPORT);
         assertEquals(0, colony1.getExportAmount(fursGoodsType, 0));
         assertEquals(0, colony2.getExportAmount(fursGoodsType, 0));
         assertEquals(0, colony3.getExportAmount(fursGoodsType, 0));

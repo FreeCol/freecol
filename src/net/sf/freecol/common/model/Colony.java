@@ -2797,8 +2797,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         final int present = Math.max(0, getGoodsCount(goodsType)
             + turns * getNetProductionOf(goodsType));
         final ExportData ed = getExportData(goodsType);
-        int wanted = ed.getExportLevel();
-        return Math.max(0, present - wanted);
+        if (!ed.isExported()) return 0;
+        return Math.max(0, present - ed.getExportLevel());
     }
 
     /**
