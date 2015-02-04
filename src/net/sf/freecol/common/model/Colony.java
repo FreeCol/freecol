@@ -2808,7 +2808,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         if (goodsType.limitIgnored()) return GoodsContainer.HUGE_CARGO_SIZE;
 
         final int present = Math.max(0, getGoodsCount(goodsType)
-            - turns * getNetProductionOf(goodsType));
+            + turns * getNetProductionOf(goodsType));
         int capacity = getWarehouseCapacity();
         final ExportData ed = getExportData(goodsType);
         if (ed.isMaintained()) {
