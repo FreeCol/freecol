@@ -113,7 +113,8 @@ public final class ColonyPanel extends PortPanel
         WAREHOUSE = 4,
         FILL = 5,
         COLONY_UNITS = 6,
-        SETGOODS = 7;
+        SETGOODS = 7,
+        OCCUPATION = 8;
 
     /** The height of the area in which autoscrolling should happen. */
     public static final int SCROLL_AREA_HEIGHT = 40;
@@ -122,17 +123,24 @@ public final class ColonyPanel extends PortPanel
     public static final int SCROLL_SPEED = 40;
 
     // Buttons
-    private JButton unloadButton = GUI.localizedButton("unload");
+    private JButton unloadButton
+        = GUI.localizedButton("unload");
 
-    private JButton fillButton = GUI.localizedButton("fill");
+    private JButton fillButton
+        = GUI.localizedButton("fill");
 
-    private JButton warehouseButton = GUI.localizedButton("warehouseDialog.name");
+    private JButton warehouseButton
+        = GUI.localizedButton("colonyPanel.warehouse");
 
-    private JButton buildQueueButton = GUI.localizedButton("colonyPanel.buildQueue");
+    private JButton buildQueueButton
+        = GUI.localizedButton("colonyPanel.buildQueue");
 
-    private JButton colonyUnitsButton = GUI.localizedButton("colonyPanel.colonyUnits");
+    private JButton colonyUnitsButton
+        = GUI.localizedButton("colonyPanel.colonyUnits");
 
+    // Only present in debug mode
     private JButton setGoodsButton = null;
+    private JButton traceOccupationButton = null;
 
     /** The <code>Colony</code> this panel is displaying. */
     private Colony colony = null;
@@ -192,7 +200,8 @@ public final class ColonyPanel extends PortPanel
         // Only enable the set goods button in debug mode when not spying
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && editable) {
-            setGoodsButton = new JButton("Set Goods");
+            setGoodsButton = GUI.localizedButton("colonyPanel.setGoods");
+            traceOccupationButton = new JButton("Occupation Trace");
         }
 
         // Use ESCAPE for closing the ColonyPanel:
@@ -252,6 +261,9 @@ public final class ColonyPanel extends PortPanel
 
         if (setGoodsButton != null) {
             setGoodsButton.setActionCommand(String.valueOf(SETGOODS));
+        }
+        if (traceOccupationButton != null) {
+            traceOccupationButton.setActionCommand(String.valueOf(OCCUPATION));
         }
 
         defaultTransferHandler
@@ -374,6 +386,9 @@ public final class ColonyPanel extends PortPanel
         if (setGoodsButton != null) {
             setGoodsButton.addActionListener(this);
         }
+        if (traceOccupationButton != null) {
+            traceOccupationButton.addActionListener(this);
+        }
 
         unloadButton.setEnabled(isEditable());
         fillButton.setEnabled(isEditable());
@@ -382,6 +397,9 @@ public final class ColonyPanel extends PortPanel
         colonyUnitsButton.setEnabled(isEditable());
         if (setGoodsButton != null) {
             setGoodsButton.setEnabled(isEditable());
+        }
+        if (traceOccupationButton != null) {
+            traceOccupationButton.setEnabled(isEditable());
         }
 
         final GUI gui = getGUI();
@@ -414,14 +432,17 @@ public final class ColonyPanel extends PortPanel
         add(cargoScroll, "grow, sg, height 60:121:");
         add(outsideColonyScroll, "grow, sg, height 60:121:");
         add(warehouseScroll, "span, height 40:60:, growx");
-        add(unloadButton, "span, split "
-            + Integer.toString((setGoodsButton == null) ? 6 : 7)
+        int buttonFields = 6;
+        if (setGoodsButton != null) buttonFields++;
+        if (traceOccupationButton != null) buttonFields++;
+        add(unloadButton, "span, split " + Integer.toString(buttonFields)
             + ", align center");
         add(fillButton);
         add(warehouseButton);
         add(buildQueueButton);
         add(colonyUnitsButton);
         if (setGoodsButton != null) add(setGoodsButton);
+        if (traceOccupationButton != null) add(traceOccupationButton);
         add(okButton, "tag ok");
 
         update();
@@ -436,7 +457,12 @@ public final class ColonyPanel extends PortPanel
         warehouseButton.removeActionListener(this);
         buildQueueButton.removeActionListener(this);
         colonyUnitsButton.removeActionListener(this);
-        if (setGoodsButton != null) setGoodsButton.removeActionListener(this);
+        if (setGoodsButton != null) {
+            setGoodsButton.removeActionListener(this);
+        }
+        if (traceOccupationButton != null) {
+            traceOccupationButton.removeActionListener(this);
+        }
 
         removePropertyChangeListeners();
         if (getSelectedUnit() != null) {
@@ -978,6 +1004,9 @@ public final class ColonyPanel extends PortPanel
                 updateWarehousePanel();
                 updateProduction();
                 break;
+            case OCCUPATION:
+                colony.setOccupationTrace(!colony.getOccupationTrace());
+                break;
             default:
                 super.actionPerformed(event);
             }
@@ -1051,6 +1080,7 @@ public final class ColonyPanel extends PortPanel
     @Override
     public void removeNotify() {
         if (colony == null) return; // Been here already
+        colony.setOccupationTrace(false);
         colony = null; // Now Canvas.getColonyPanel will no longer find this
 
         super.removeNotify();
@@ -1062,6 +1092,7 @@ public final class ColonyPanel extends PortPanel
         buildQueueButton = null;
         colonyUnitsButton = null;
         setGoodsButton = null;
+        traceOccupationButton = null;
         netProductionPanel = null;
         buildingsPanel = null;
         buildingsScroll = null;

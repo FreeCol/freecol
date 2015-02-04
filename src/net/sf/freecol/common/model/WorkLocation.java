@@ -21,6 +21,8 @@ package net.sf.freecol.common.model;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -41,6 +43,8 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  */
 public abstract class WorkLocation extends UnitLocation
     implements Ownable {
+
+    private static final Logger logger = Logger.getLogger(WorkLocation.class.getName());
 
     public static final List<AbstractGoods> EMPTY_LIST
         = Collections.<AbstractGoods>emptyList();
@@ -102,6 +106,8 @@ public abstract class WorkLocation extends UnitLocation
         if (newProductionType != productionType) {
             productionType = newProductionType;
             colony.invalidateCache();
+            logger.fine("Production type at " + this
+                + " is now: " + newProductionType);
         }
     }
 
