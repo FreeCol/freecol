@@ -519,6 +519,22 @@ public final class ColonyPanel extends PortPanel
      * construction displays.
      */
     private void updateProduction() {
+        final Colony colony = getColony();
+
+        // Check for non-producing locations that can now produce.
+        for (WorkLocation wl : colony.getCurrentWorkLocations()) {
+            boolean change = false, check = wl.getProductionInfo() == null;
+            for (Unit u : wl.getUnitList()) {
+                if (check || u.getWorkType() == null) {
+                    GoodsType workType = colony.getWorkTypeFor(u, wl);
+                    if (workType != null && workType != u.getWorkType()) {
+                        change |= igc().changeWorkType(u, workType);
+                    }
+                }
+            }
+            if (change) wl.updateProductionType();
+        }
+
         updateTilesPanel();
         updateBuildingsPanel();
         updateNetProductionPanel();
@@ -1741,26 +1757,11 @@ public final class ColonyPanel extends PortPanel
             public void update() {
                 super.update();
 
-                boolean recheck = getBuilding().getProductionType() == null;
                 if (ColonyPanel.this.isEditable()) {
                     for (UnitLabel unitLabel : getUnitLabels()) {
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
-                        if (recheck) fixWorkType(unitLabel.getUnit());
                     }
-                }
-            }
-
-            /**
-             * Fix the work type of this unit in this building.
-             *
-             * @param unit The <code>Unit</code> to check.
-             */
-            private void fixWorkType(Unit unit) {
-                Building building = getBuilding();
-                GoodsType workType = colony.getWorkTypeFor(unit, building);
-                if (workType != null && workType != unit.getWorkType()) {
-                    igc().changeWorkType(unit, workType);
                 }
             }
 
