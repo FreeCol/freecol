@@ -437,7 +437,7 @@ public abstract class WorkLocation extends UnitLocation
         unit.setState(Unit.UnitState.IN_COLONY);
         unit.setMovesLeft(0);
 
-        // Choose a sensible work type.
+        // Choose a sensible work type, which should update production type.
         getColony().setOccupationAt(unit, this, false);
 
         getColony().invalidateCache();
@@ -458,6 +458,10 @@ public abstract class WorkLocation extends UnitLocation
 
         unit.setState(Unit.UnitState.ACTIVE);
         unit.setMovesLeft(0);
+
+        // Switch to unattended production if possible.
+        if (isEmpty()) updateProductionType();
+
         getColony().invalidateCache();
         return true;
     }
