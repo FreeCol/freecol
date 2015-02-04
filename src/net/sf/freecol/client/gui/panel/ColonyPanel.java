@@ -549,13 +549,14 @@ public final class ColonyPanel extends PortPanel
 
         // Check for non-producing locations that can now produce.
         for (WorkLocation wl : colony.getCurrentWorkLocations()) {
-            boolean change = false, check = wl.getProductionInfo() == null;
+            boolean change = false, check = wl.getProductionType() == null;
             for (Unit u : wl.getUnitList()) {
-                if (check || u.getWorkType() == null) {
+                if (check || !wl.produces(u.getWorkType())) {
                     GoodsType workType = colony.getWorkTypeFor(u, wl);
                     if (workType != null && workType != u.getWorkType()) {
-                        change |= igc().changeWorkType(u, workType);
+                        igc().changeWorkType(u, workType);
                     }
+                    change = true;
                 }
             }
             if (change) wl.updateProductionType();
