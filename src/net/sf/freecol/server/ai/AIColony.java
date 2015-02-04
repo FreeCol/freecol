@@ -42,6 +42,8 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.ExportData;
+import net.sf.freecol.common.model.ExportData.ExportState;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -559,19 +561,19 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (colony.getOwner().getMarket() == null) {
             // Do not export when there is no market!
             for (GoodsType g : spec.getGoodsTypeList()) {
-                colony.getExportData(g).setExported(false);
+                colony.getExportData(g).clearExportState();
             }
         } else {
             int exportLevel = 4 * colony.getWarehouseCapacity() / 5;
             for (GoodsType g : spec.getGoodsTypeList()) {
                 if (fullExport.contains(g)) {
                     colony.getExportData(g).setExportLevel(0);
-                    colony.getExportData(g).setExported(true);
+                    colony.getExportData(g).setExportState(ExportState.EXPORT);
                 } else if (partExport.contains(g)) {
                     colony.getExportData(g).setExportLevel(exportLevel);
-                    colony.getExportData(g).setExported(true);
+                    colony.getExportData(g).setExportState(ExportState.EXPORT);
                 } else {
-                    colony.getExportData(g).setExported(false);
+                    colony.getExportData(g).clearExportState();
                 }
             }
         }

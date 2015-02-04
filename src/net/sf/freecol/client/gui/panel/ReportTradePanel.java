@@ -156,7 +156,7 @@ public final class ReportTradePanel extends ReportPanel {
                 JLabel goodsLabel = new JLabel(String.valueOf(amount), JLabel.TRAILING);
                 goodsLabel.setBorder(colonyIndex == 0 ? GUI.TOPCELLBORDER
                     : GUI.CELLBORDER);
-                if (colony.getExportData(goodsType).getExported()) {
+                if (colony.getExportData(goodsType).isExported()) {
                     goodsLabel.setText("*" + String.valueOf(amount));
                 }
                 reportPanel.add(goodsLabel, "cell " + column + " " + row);

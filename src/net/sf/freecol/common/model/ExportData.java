@@ -24,6 +24,8 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
+import net.sf.freecol.common.i18n.Messages;
+
 import org.w3c.dom.Element;
 
 
@@ -32,6 +34,22 @@ import org.w3c.dom.Element;
  * goods.
  */
 public class ExportData extends FreeColObject {
+
+    /** The import/export state for this goods type. */
+    public static enum ExportState implements Named {
+        IMPORT,
+        EXPORT,
+        MAINTAIN;
+
+        // Implement Named
+
+        /**
+         * {@inheritDoc}
+         */
+        public String getNameKey() {
+            return Messages.nameKey("exportState." + this);
+        }
+    };
 
     private static final int HIGH_LEVEL_DEFAULT = 90;
     private static final int LOW_LEVEL_DEFAULT = 10;
@@ -46,8 +64,8 @@ public class ExportData extends FreeColObject {
     /** The amount of goods to retain, goods beyond this amount are exported. */
     private int exportLevel = EXPORT_LEVEL_DEFAULT;
 
-    /** Whether to export or not. */
-    private boolean exported = false;
+    /** Export status. */
+    private ExportState exportState = ExportState.IMPORT;
 
 
     /**
@@ -134,31 +152,61 @@ public class ExportData extends FreeColObject {
     }
 
     /**
-     * Is the goods type of this export data to be exported?
+     * Get the export state for these goods.
      *
-     * @return True if this goods type is to be exported.
+     * @return The <code>ExportState</code> for these goods.
      */
-    public final boolean getExported() {
-        return exported;
+    public final ExportState getExportState() {
+        return this.exportState;
     }
 
     /**
-     * Set the export value.
+     * Set the export state.
      *
-     * @param newExport The new export value.
+     * @param exportState The new <code>ExportState</code>.
      */
-    public final void setExported(final boolean newExport) {
-        this.exported = newExport;
+    public final void setExportState(final ExportState exportState) {
+        this.exportState = exportState;
+    }
+
+    /**
+     * Clear the export state to the default (unconstrained) state.
+     */
+    public final void clearExportState() {
+        setExportState(ExportState.IMPORT);
+    }
+
+    /**
+     * Is the export state one in which the goods are exported when over
+     * the export level?
+     *
+     * @return True if the goods can be exported when in surplus.
+     */
+    public final boolean isExported() {
+        return this.exportState != ExportState.IMPORT;
+    }
+
+    /**
+     * Is the export state one in which the goods level is maintained
+     * at the export level?
+     *
+     * @return True if the goods are maintained.
+     */
+    public final boolean isMaintained() {
+        return this.exportState == ExportState.MAINTAIN;
     }
 
 
     // Serialization
 
-    private static final String EXPORTED_TAG = "exported";
     private static final String EXPORT_LEVEL_TAG = "exportLevel";
+    private static final String EXPORT_STATE_TAG = "exportState";
     private static final String HIGH_LEVEL_TAG = "highLevel";
     private static final String LOW_LEVEL_TAG = "lowLevel";
-
+    private static final String MAINTAIN_STOCK_TAG = "maintainStock";
+    // @compat 0.11.2
+    private static final String EXPORTED_TAG = "exported";
+    // end @compat 0.11.2
 
     /**
      * {@inheritDoc}
@@ -167,7 +215,7 @@ public class ExportData extends FreeColObject {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(EXPORTED_TAG, exported);
+        xw.writeAttribute(EXPORT_STATE_TAG, exportState);
 
         xw.writeAttribute(HIGH_LEVEL_TAG, highLevel);
 
@@ -183,7 +231,14 @@ public class ExportData extends FreeColObject {
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        exported = xr.getAttribute(EXPORTED_TAG, false);
+        // @compat 0.11.2
+        if (xr.hasAttribute(EXPORTED_TAG)) {
+            boolean exported = xr.getAttribute(EXPORTED_TAG, false);
+            exportState = (exported) ? ExportState.EXPORT
+                : ExportState.IMPORT;
+        } else // end @compat 0.11.2
+            exportState = xr.getAttribute(EXPORT_STATE_TAG, ExportState.class,
+                                          ExportState.IMPORT);
 
         highLevel = xr.getAttribute(HIGH_LEVEL_TAG, HIGH_LEVEL_DEFAULT);
 

@@ -28,7 +28,18 @@
   <xs:element name="exportData">
     <xs:complexType>
       <xs:attribute name="id" type="GoodsTypeId" use="required" />
-      <xs:attribute name="exported" type="xs:boolean" use="required" />
+      <xs:attribute name="exportState" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="import" />
+            <xs:enumeration value="export" />
+            <xs:enumeration value="maintain" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <!-- @compat 0.11.2 -->
+      <xs:attribute name="exported" type="xs:boolean" use="optional" />
+      <!-- end @compat 0.11.2 -->
       <xs:attribute name="highLevel" type="xs:int" use="required" />
       <xs:attribute name="lowLevel" type="xs:int" use="required" />
       <xs:attribute name="exportLevel" type="xs:int" use="required" />
