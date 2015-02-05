@@ -119,9 +119,22 @@ public abstract class WorkLocation extends UnitLocation
     public void updateProductionType() {
         Unit unit = getFirstUnit();
         GoodsType workType = (unit == null) ? null : unit.getWorkType();
+        setProductionType(getBestProductionType(unit == null, workType));
+    }
+
+    /**
+     * Get the best available production type at this work location.
+     *
+     * @param unattended Whether to require unattended production.
+     * @param workType An optional work type to require.
+     * @return The best available <code>ProductionType</code> given the
+     *     argument constraints.
+     */
+    public ProductionType getBestProductionType(boolean unattended,
+                                                GoodsType workType) {
         ProductionType best = null;
         int amount = -1;
-        for (ProductionType pt : getAvailableProductionTypes(unit == null)) {
+        for (ProductionType pt : getAvailableProductionTypes(unattended)) {
             for (AbstractGoods output : pt.getOutputs()) {
                 if (workType != null && workType != output.getType()) continue;
                 if (amount < output.getAmount()) {
@@ -130,7 +143,7 @@ public abstract class WorkLocation extends UnitLocation
                 }
             }
         }
-        setProductionType(best);
+        return best;
     }
 
     /**
@@ -264,9 +277,12 @@ public abstract class WorkLocation extends UnitLocation
      */
     public UnitType getExpertUnitType() {
         final Specification spec = getSpecification();
-        for (AbstractGoods goods : getOutputs()) {
-            UnitType expert = spec.getExpertForProducing(goods.getType());
-            if (expert != null) return expert;
+        ProductionType pt = getBestProductionType(false, null);
+        if (pt != null) {
+            for (AbstractGoods goods : pt.getOutputs()) {
+                UnitType expert = spec.getExpertForProducing(goods.getType());
+                if (expert != null) return expert;
+            }
         }
         return null;
     }
