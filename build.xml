@@ -584,7 +584,7 @@
              the short answer depends.
              if you have Ant 1.7, the junit.jar can exist on the classpath.
              upgrading to 1.7 may be the best solution.  Later ant
-             should be fine.             
+             should be fine.
 
              if you have Ant 1.6:
              ant -lib test/lib/junit.jar testall
@@ -824,7 +824,7 @@
     <!-- This is a shortcut for NetBeans, and possibly other IDEs. -->
     <target name="run" depends="package" description="Runs the game">
         <java jar="FreeCol.jar" fork="true">
-            <jvmarg value="-Xmx128m" />
+            <jvmarg value="-Xmx256M" />
         </java>
     </target>
 
