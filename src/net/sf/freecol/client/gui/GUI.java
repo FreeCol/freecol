@@ -215,8 +215,8 @@ public class GUI {
     /** The space not being used in windowed mode. */
     private static final int DEFAULT_SCREEN_INSET_WIDTH  = 0;
     private static final int DEFAULT_SCREEN_INSET_HEIGHT = 32;
-    private static final int DEFAULT_WINDOW_INSET_WIDTH  = 6;
-    private static final int DEFAULT_WINDOW_INSET_HEIGHT = 30;
+    private static final int DEFAULT_WINDOW_INSET_WIDTH  = 16;
+    private static final int DEFAULT_WINDOW_INSET_HEIGHT = 39;
 
     /** View modes. */
     public static final int MOVE_UNITS_MODE = 0;
