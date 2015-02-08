@@ -172,11 +172,17 @@ public class ResourceManager {
                         = new LinkedList<Resource>(getResources().values());
                     int n = 0;
                     for (Resource r : resources) {
-                        if (preloadThread != this) return; // Cancelled!
+                        if (preloadThread != this) {
+                            logger.info(
+                                "Background thread cancelled after it preloaded "
+                                + n + " resources.");
+                            return;
+                        }
                         // TODO: Filter list before running thread?
-                        if (r instanceof Resource.Preloadable)
+                        if (r instanceof Resource.Preloadable) {
                             ((Resource.Preloadable)r).preload();
-                        n++;
+                            n++;
+                        }
                     }
                     logger.info("Background thread preloaded " + n
                         + " resources.");
