@@ -90,7 +90,6 @@ public final class ConnectController {
      */
     private void finish() {
         ResourceManager.setScenarioMapping(null);
-        ResourceManager.setCampaignMapping(null);
 
         if (!freeColClient.isHeadless()) {
             freeColClient.setInGame(false);

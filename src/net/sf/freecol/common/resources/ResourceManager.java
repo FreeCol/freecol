@@ -52,7 +52,6 @@ public class ResourceManager {
     // priority value that could be added on to each key/value pair.
     private static ResourceMapping baseMapping;
     private static ResourceMapping tcMapping;
-    private static ResourceMapping campaignMapping;
     private static ResourceMapping scenarioMapping;
     // TODO: Check if game and mod resources are always added in a predetermined fixed order.
     private static ResourceMapping gameMapping;
@@ -97,16 +96,6 @@ public class ResourceManager {
      */
     public static void setModMappings(final List<ResourceMapping> mappings) {
         modMappings = mappings;
-        dirty = true;
-    }
-
-    /**
-     * Sets the mappings specified in a campaign.
-     *
-     * @param mapping The mapping between IDs and files.
-     */
-    public static void setCampaignMapping(final ResourceMapping mapping) {
-        campaignMapping = mapping;
         dirty = true;
     }
 
@@ -239,7 +228,6 @@ public class ResourceManager {
         ResourceMapping mc = new ResourceMapping();
         mc.addAll(baseMapping);
         mc.addAll(tcMapping);
-        mc.addAll(campaignMapping);
         mc.addAll(scenarioMapping);
         for (ResourceMapping rm : modMappings) mc.addAll(rm);
         mc.addAll(gameMapping);
