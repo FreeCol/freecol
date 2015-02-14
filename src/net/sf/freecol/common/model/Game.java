@@ -54,6 +54,14 @@ public class Game extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
+    /** State for the FCGO iterator, out here because it has to be static. */
+    private static enum FcgoState {
+        INVALID,
+        VALID,
+        CONSUMED,
+    };
+
+
     /**
      * The next available identifier that can be given to a new
      * <code>FreeColGameObject</code>.
@@ -402,33 +410,43 @@ public class Game extends FreeColGameObject {
                                          WeakReference<FreeColGameObject>>> it
                 = freeColGameObjects.entrySet().iterator();
 
-            /** The current entry. */
-            private Entry<String, WeakReference<FreeColGameObject>> current
+            /** Read ahead to this next entry. */
+            private Entry<String, WeakReference<FreeColGameObject>> readAhead
                 = null;
+
+            /** State of the readahead value. */
+            private FcgoState fcgoState = FcgoState.INVALID;
 
 
             public boolean hasNext() {
-                return this.it.hasNext();
+                if (this.fcgoState == FcgoState.VALID) return true;
+                while (this.it.hasNext()) {
+                    this.readAhead = this.it.next();
+                    if (this.readAhead.getValue().get() != null) {
+                        this.fcgoState = FcgoState.VALID;
+                        return true;
+                    }
+                    this.fcgoState = FcgoState.CONSUMED;
+                    remove();
+                }
+                return false;
             }
 
             public FreeColGameObject next() {
-                while (this.it.hasNext()) {
-                    this.current = this.it.next();
-                    FreeColGameObject fcgo = this.current.getValue().get();
-                    if (fcgo != null) return fcgo;
-                    remove();
-                }
-                throw new NoSuchElementException();
+                if (!hasNext()) throw new NoSuchElementException();
+                FreeColGameObject fcgo = this.readAhead.getValue().get();
+                this.fcgoState = FcgoState.CONSUMED;
+                return fcgo;
             }
 
             public void remove() {
-                if (this.current == null) {
+                if (this.fcgoState == FcgoState.INVALID) {
                     throw new IllegalStateException("No current entry");
                 }
-                final String key = this.current.getKey();
-                this.current = null;
-                logger.finest("removeFCGO/expire: " + key);
+                final String key = this.readAhead.getKey();
+                this.fcgoState = FcgoState.INVALID;
                 this.it.remove();
+                logger.finest("removeFCGO/expire: " + key);
                 notifyRemoveFreeColGameObject(key);
             }
         };
