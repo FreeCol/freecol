@@ -1453,17 +1453,18 @@ public final class Specification {
      * Get the military roles in this specification, in decreasing order
      * of effectiveness.
      *
-     * @return A list of military <code>Role</code>s.
+     * @return An unmodifiable list of military <code>Role</code>s.
      */
     public List<Role> getMilitaryRoles() {
-        if (militaryRoles == null) {
-            militaryRoles = new ArrayList<Role>();
+        if (this.militaryRoles == null) {
+            List<Role> mr = new ArrayList<Role>();
             for (Role role : roles) {
-                if (role.isOffensive()) militaryRoles.add(role);
+                if (role.isOffensive()) mr.add(role);
             }
-            Collections.sort(militaryRoles, Role.militaryComparator);
+            Collections.sort(mr, Role.militaryComparator);
+            this.militaryRoles = Collections.<Role>unmodifiableList(mr);
         }
-        return militaryRoles;
+        return this.militaryRoles;
     }
 
     /**

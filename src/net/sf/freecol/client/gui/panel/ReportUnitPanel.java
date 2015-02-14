@@ -82,7 +82,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param key the report name key
-     * @param showColonies whether to show colonies with no selected units
+     * @param showColonies Whether to show colonies with no selected units.
      */
     public ReportUnitPanel(FreeColClient freeColClient, String key,
                            boolean showColonies) {
@@ -95,9 +95,10 @@ public abstract class ReportUnitPanel extends ReportPanel {
         addREFUnits();
         addOwnUnits();
 
-        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "newline, span, growx, wrap 40");
+        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL),
+                        "newline, span, growx, wrap 40");
 
-        // colonies first, sorted according to user preferences
+        // Colonies first, sorted according to user preferences
         for (Colony colony : freeColClient.getMySortedColonies()) {
             handleLocation(colony, colony.getName(), inColonies.get(colony));
         }
@@ -108,7 +109,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
             handleLocation(europe, Messages.getName(europe), inEurope);
         }
 
-        // finally all other locations, sorted alphabetically
+        // Finally all other locations, sorted alphabetically.
         List<String> otherNames = new ArrayList<>(inLocations.keySet());
         Collections.sort(otherNames);
         for (String locationName : otherNames) {
@@ -119,23 +120,10 @@ public abstract class ReportUnitPanel extends ReportPanel {
         repaint();
     }
 
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(750, 600);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return getMinimumSize();
-    }
 
     protected int getCount(String key, UnitType type) {
         TypeCountMap<UnitType> map = units.get(key);
-        if (map == null) {
-            return 0;
-        } else {
-            return map.getCount(type);
-        }
+        return (map == null) ? 0 : map.getCount(type);
     }
 
     protected void incrementCount(String key, UnitType type, int number) {
@@ -149,8 +137,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
 
     protected void addUnit(Unit unit, String key) {
         if (unit.getLocation() == null) {
-            // this should never happen
-            return;
+            return; // Can not happen.
         } else if (unit.isInEurope()) {
             inEurope.add(unit);
         } else {
@@ -175,13 +162,8 @@ public abstract class ReportUnitPanel extends ReportPanel {
         incrementCount(key, unit.getType(), 1);
     }
 
-    protected abstract void gatherData();
-
-    protected abstract void addREFUnits();
-
-    protected abstract void addOwnUnits();
-
-    protected void handleLocation(Location location, String locationName, List<Unit> unitList) {
+    protected void handleLocation(Location location, String locationName,
+                                  List<Unit> unitList) {
         if ((unitList == null || unitList.isEmpty()) && !showColonies) {
             return;
         }
@@ -244,4 +226,32 @@ public abstract class ReportUnitPanel extends ReportPanel {
         GUI.localizeToolTip(button, tip);
         return button;
     }
+
+   
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(750, 600);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
+    }
+
+    // To be implemented by specific unit panels.
+    
+    /**
+     * Gather the overall unit data, mostly by calling addUnit() above.
+     */
+    protected abstract void gatherData();
+
+    /**
+     * Add a section for the REF.
+     */
+    protected abstract void addREFUnits();
+
+    /**
+     * Add a section for specific unit types owned by the player.
+     */
+    protected abstract void addOwnUnits();
 }

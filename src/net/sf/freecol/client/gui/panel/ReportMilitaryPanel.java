@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.UnitType;
  */
 public final class ReportMilitaryPanel extends ReportUnitPanel {
 
+
     /**
      * The constructor that will add the items to this panel.
      *
@@ -53,14 +54,25 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
     }
 
 
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(750, 600);
+    private boolean reportable(UnitType unitType) {
+        return !unitType.isNaval()
+            && unitType.isAvailableTo(getMyPlayer())
+            && (unitType.hasAbility(Ability.EXPERT_SOLDIER)
+                || unitType.isOffensive());
     }
 
-    @Override
-    public Dimension getPreferredSize() {
-        return getMinimumSize();
+    private boolean reportable(Unit unit) {
+        return !unit.isNaval()
+            && (unit.hasAbility(Ability.EXPERT_SOLDIER)
+                || unit.isOffensiveUnit());
+    }
+
+    private void tryUnitRole(UnitType unitType, String roleId) {
+        int count = getCount(roleId, unitType);
+        if (count > 0) {
+            AbstractUnit au = new AbstractUnit(unitType, roleId, count);
+            reportPanel.add(createUnitTypeLabel(au), "sg");
+        }
     }
 
 
@@ -70,14 +82,9 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
      * {@inheritDoc}
      */
     protected void gatherData() {
-        final List<Role> militaryRoles = getSpecification().getMilitaryRoles();
         for (Unit unit : getMyPlayer().getUnits()) {
-            if (unit.isNaval()) continue;
-            Role role = unit.getRole();
-            if (militaryRoles.contains(role)
-                || unit.hasAbility(Ability.EXPERT_SOLDIER)
-                || unit.isOffensiveUnit()) {
-                addUnit(unit, role.getId());
+            if (reportable(unit)) {
+                addUnit(unit, unit.getRole().getId());
             }
         }
     }
@@ -110,9 +117,6 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
         final Specification spec = getSpecification();
         final Player player = getMyPlayer();
         final UnitType defaultType = spec.getDefaultUnitType();
-        List<Role> militaryRoles = spec.getMilitaryRoles();
-        // default role is valid because of artillery and disarmed experts
-        militaryRoles.add(spec.getDefaultRole());
 
         reportPanel.add(GUI.localizedLabel(StringTemplate
                 .template("report.military.forces")
@@ -120,22 +124,16 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
             "newline, span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
-        List<AbstractUnit> units = new ArrayList<>();
-        for (Role r : militaryRoles) {
-            for (UnitType unitType : spec.getUnitTypeList()) {
-                if (unitType.isAvailableTo(player)
-                    && !unitType.isNaval()
-                    && (unitType.hasAbility(Ability.EXPERT_SOLDIER)
-                        || unitType.isOffensive())) {
-                    int count = getCount(r.getId(), unitType);
-                    if (count > 0) {
-                        units.add(new AbstractUnit(unitType, r.getId(), count));
-                    }
-                }
+        // Report unit types that are inherently reportable, and units
+        // with military roles.
+        List<Role> militaryRoles = getSpecification().getMilitaryRoles();
+        for (UnitType unitType : getSpecification().getUnitTypeList()) {
+            if (reportable(unitType)) {
+                tryUnitRole(unitType, Specification.DEFAULT_ROLE_ID);
             }
-        }
-        for (AbstractUnit au : units) {
-            reportPanel.add(createUnitTypeLabel(au), "sg");
+            for (Role r : militaryRoles) {
+                tryUnitRole(unitType, r.getId());
+            }
         }
     }
 }

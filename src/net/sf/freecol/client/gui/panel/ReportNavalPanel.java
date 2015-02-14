@@ -30,6 +30,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -42,6 +43,7 @@ import net.sf.freecol.common.model.UnitType;
  */
 public final class ReportNavalPanel extends ReportUnitPanel {
 
+
     /**
      * The constructor that will add the items to this panel.
      *
@@ -52,25 +54,56 @@ public final class ReportNavalPanel extends ReportUnitPanel {
     }
 
 
+    private boolean reportable(UnitType unitType) {
+        return unitType.isNaval()
+            && unitType.isAvailableTo(getMyPlayer());
+    }
+
+    private boolean reportable(Unit unit) {
+        return unit.isNaval();
+    }
+
+    // Implement ReportUnitPanel
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void gatherData() {
+        for (Unit unit : getMyPlayer().getUnits()) {
+            if (reportable(unit)) {
+                addUnit(unit, "naval");
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected void addREFUnits() {
-        final Player player = getMyPlayer();
         final Specification spec = getSpecification();
-        reportPanel.add(new JLabel(Messages.getName(player.getNation().getREFNation())),
+        final Nation refNation = getMyPlayer().getNation().getREFNation();
+
+        reportPanel.add(new JLabel(Messages.getName(refNation)),
                         "span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         List<AbstractUnit> refUnits = igc().getREFUnits();
         if (refUnits != null) {
-            for (AbstractUnit unit : refUnits) {
-                if (unit.getType(spec).hasAbility(Ability.NAVAL_UNIT)) {
-                    reportPanel.add(createUnitTypeLabel(unit), "sg");
+            for (AbstractUnit au : refUnits) {
+                if (au.getType(spec).isNaval()) {
+                    reportPanel.add(createUnitTypeLabel(au), "sg");
                 }
             }
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void addOwnUnits() {
+        final Specification spec = getSpecification();
         final Player player = getMyPlayer();
+
         reportPanel.add(GUI.localizedLabel(StringTemplate
                 .template("report.military.forces")
                 .addStringTemplate("%nation%", player.getNationName())),
@@ -78,33 +111,11 @@ public final class ReportNavalPanel extends ReportUnitPanel {
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
-            if (unitType.isAvailableTo(player)
-                && unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                AbstractUnit unit = new AbstractUnit(unitType,
-                    Specification.DEFAULT_ROLE_ID,
-                    getCount("naval", unitType));
-                reportPanel.add(createUnitTypeLabel(unit), "sg");
-            }
+            if (!reportable(unitType)) continue;
+            AbstractUnit au = new AbstractUnit(unitType,
+                                               Specification.DEFAULT_ROLE_ID,
+                                               getCount("naval", unitType));
+            reportPanel.add(createUnitTypeLabel(au), "sg");
         }
     }
-
-    protected void gatherData() {
-        for (Unit unit : getMyPlayer().getUnits()) {
-            if (unit.isNaval()) {
-                addUnit(unit, "naval");
-            }
-        }
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(750, 600);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return getMinimumSize();
-    }
-
 }
-
