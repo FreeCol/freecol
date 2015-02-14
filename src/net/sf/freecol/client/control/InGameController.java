@@ -2312,18 +2312,13 @@ public final class InGameController implements NetworkConstants {
         int more;
 
         if (demand < export) {
-            // Loaded %amount% %goods% lacking space for %more% more
             key = "tradeRoute.loadStopImport";
             more = export - demand;
         } else if (present > export && demand > export) {
-            key = (amount == 0)
-                // Loaded no %goods% with %more% more retained...
-                ? "tradeRoute.loadStopNoExport"
-                // Loaded %amount% %goods% with %more% more retained...
+            key = (amount == 0) ? "tradeRoute.loadStopNoExport"
                 : "tradeRoute.loadStopExport";
             more = present - export;
         } else {
-            // Loaded %amount% %goods%
             key = "tradeRoute.loadStop";
             more = -1; // not displayed
         }
@@ -2349,30 +2344,25 @@ public final class InGameController implements NetworkConstants {
         boolean ret = false;
 
         // Unload everything that is on the carrier but not listed to
-        // be loaded at this stop.  However maintain stock if required.
+        // be loaded at this stop.
         Game game = freeColClient.getGame();
         for (Goods goods : unit.getCompactGoodsList()) {
             GoodsType type = goods.getType();
-            boolean maintain = stop.isMaintained(type);
-            if (goodsTypesToLoad.contains(type) && !maintain) {
-                continue; // Do not unload anything
-            }
+            if (goodsTypesToLoad.contains(type)) continue; // Keep this cargo.
 
             int present = goods.getAmount();
             int toUnload = present;
-            int atStop = Math.max(0, stop.getImportAmount(type, 0));
+            int atStop = trl.getImportAmount(type, 0);
             int amount = toUnload;
             if (amount > atStop) {
                 StringTemplate locName = ((Location)trl).getLocationLabel();
                 String overflow = Integer.toString(toUnload - atStop);
-                int option = (maintain)
-                    ? ClientOptions.UNLOAD_OVERFLOW_RESPONSE_NEVER
-                    : freeColClient.getClientOptions()
-                        .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);
+                int option = freeColClient.getClientOptions()
+                    .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);
                 switch (option) {
                 case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_ASK:
-                    StringTemplate template = StringTemplate
-                        .template("traderoute.warehouseCapacity")
+                    StringTemplate template
+                        = StringTemplate.template("traderoute.warehouseCapacity")
                         .addStringTemplate("%unit%",
                             unit.getLabel(Unit.UnitLabelType.NATIONAL))
                         .addStringTemplate("%colony%", locName)
@@ -2407,12 +2397,6 @@ public final class InGameController implements NetworkConstants {
     /**
      * Gets a message describing a goods unloading.
      *
-     * Normally just state that a certain amount of goods was
-     * unloaded.  Make special mention if the actual unloaded amount
-     * was short (unloaded &lt; amount), or an overflow is happening
-     * (amount &gt; atStop) in which case distinguish dumping (amount
-     * == toUnload) from retaining on board).
-     *
      * @param unit The <code>Unit</code> that is unloading.
      * @param type The <code>GoodsType</code> the type of goods being unloaded.
      * @param amount The amount of goods requested to be unloaded.
@@ -2431,22 +2415,18 @@ public final class InGameController implements NetworkConstants {
         int more = 0;
 
         if (unloaded < amount) {
-            // Tried to unload %amount% %goods%, but %more% was unloaded
             key = "tradeRoute.unloadStopFail";
             more = unloaded;
         } else if (amount > atStop) {
             if (amount == toUnload) {
-                // Unloaded %amount% %goods% and dumped %more%.
                 key = "tradeRoute.unloadStopImport";
                 more = toUnload - atStop;
             } else {
-                // Unloaded %amount% %goods% with %more% more retained...
                 key = (amount == 0) ? "tradeRoute.unloadStopNoExport"
                     : "tradeRoute.unloadStopExport";
                 more = onBoard;
             }
         } else {
-            // Unloaded %amount% %goods%
             key = "tradeRoute.unloadStop";
         }
 

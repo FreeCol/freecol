@@ -2817,13 +2817,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         return Math.max(0, capacity - present);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isMaintained(GoodsType goodsType) {
-        return getExportData(goodsType).isMaintained();
-    }
-
 
     //
     // Miscellaneous low level

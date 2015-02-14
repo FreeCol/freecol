@@ -56,12 +56,4 @@ public interface TradeLocation {
      * @return The amount of goods to import.
      */
     public int getImportAmount(GoodsType goodsType, int turns);
-
-    /**
-     * Check whether to maintain stock for a goods type.
-     *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @return True if the stock should be maintained.
-     */
-    public boolean isMaintained(GoodsType goodsType);
 }

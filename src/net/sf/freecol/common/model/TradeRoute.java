@@ -246,7 +246,7 @@ public class TradeRoute extends FreeColGameObject
         // Check:
         // - all stops are valid
         // - there is at least one non-empty stop
-        // - there is no goods that is present unmaintained at all stops
+        // - there is no goods that is present at all stops
         Set<GoodsType> always = new HashSet<GoodsType>(stops.get(0).getCargo());
         boolean empty = true;
         for (TradeRouteStop stop : stops) {
@@ -257,11 +257,6 @@ public class TradeRoute extends FreeColGameObject
             }
             if (!stop.getCargo().isEmpty()) empty = false;
             always.retainAll(stop.getCargo());
-            for (GoodsType gt : stop.getCargo()) {
-                if (stop.isMaintained(gt) && always.contains(gt)) {
-                    always.remove(gt);
-                }
-            }
         }
         if (empty) return StringTemplate.template("tradeRoute.allEmpty");
         if (!always.isEmpty()) {
