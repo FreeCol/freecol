@@ -2312,13 +2312,18 @@ public final class InGameController implements NetworkConstants {
         int more;
 
         if (demand < export) {
+            // Loaded %amount% %goods% lacking space for %more% more
             key = "tradeRoute.loadStopImport";
             more = export - demand;
         } else if (present > export && demand > export) {
-            key = (amount == 0) ? "tradeRoute.loadStopNoExport"
+            key = (amount == 0)
+                // Loaded no %goods% with %more% more retained...
+                ? "tradeRoute.loadStopNoExport"
+                // Loaded %amount% %goods% with %more% more retained...
                 : "tradeRoute.loadStopExport";
             more = present - export;
         } else {
+            // Loaded %amount% %goods%
             key = "tradeRoute.loadStop";
             more = -1; // not displayed
         }
@@ -2397,6 +2402,12 @@ public final class InGameController implements NetworkConstants {
     /**
      * Gets a message describing a goods unloading.
      *
+     * Normally just state that a certain amount of goods was
+     * unloaded.  Make special mention if the actual unloaded amount
+     * was short (unloaded &lt; amount), or an overflow is happening
+     * (amount &gt; atStop) in which case distinguish dumping (amount
+     * == toUnload) from retaining on board).
+     *
      * @param unit The <code>Unit</code> that is unloading.
      * @param type The <code>GoodsType</code> the type of goods being unloaded.
      * @param amount The amount of goods requested to be unloaded.
@@ -2415,18 +2426,22 @@ public final class InGameController implements NetworkConstants {
         int more = 0;
 
         if (unloaded < amount) {
+            // Tried to unload %amount% %goods%, but %more% was unloaded
             key = "tradeRoute.unloadStopFail";
             more = unloaded;
         } else if (amount > atStop) {
             if (amount == toUnload) {
+                // Unloaded %amount% %goods% and dumped %more%.
                 key = "tradeRoute.unloadStopImport";
                 more = toUnload - atStop;
             } else {
+                // Unloaded %amount% %goods% with %more% more retained...
                 key = (amount == 0) ? "tradeRoute.unloadStopNoExport"
                     : "tradeRoute.unloadStopExport";
                 more = onBoard;
             }
         } else {
+            // Unloaded %amount% %goods%
             key = "tradeRoute.unloadStop";
         }
 
