@@ -140,7 +140,7 @@ public final class ColonyPanel extends PortPanel
 
     // Only present in debug mode
     private JButton setGoodsButton = null;
-    private JButton traceOccupationButton = null;
+    private JButton traceWorkButton = null;
 
     /** The <code>Colony</code> this panel is displaying. */
     private Colony colony = null;
@@ -201,7 +201,7 @@ public final class ColonyPanel extends PortPanel
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && editable) {
             setGoodsButton = GUI.localizedButton("colonyPanel.setGoods");
-            traceOccupationButton = new JButton("colonyPanel.traceWork");
+            traceWorkButton = GUI.localizedButton("colonyPanel.traceWork");
         }
 
         // Use ESCAPE for closing the ColonyPanel:
@@ -262,8 +262,8 @@ public final class ColonyPanel extends PortPanel
         if (setGoodsButton != null) {
             setGoodsButton.setActionCommand(String.valueOf(SETGOODS));
         }
-        if (traceOccupationButton != null) {
-            traceOccupationButton.setActionCommand(String.valueOf(OCCUPATION));
+        if (traceWorkButton != null) {
+            traceWorkButton.setActionCommand(String.valueOf(OCCUPATION));
         }
 
         defaultTransferHandler
@@ -386,8 +386,8 @@ public final class ColonyPanel extends PortPanel
         if (setGoodsButton != null) {
             setGoodsButton.addActionListener(this);
         }
-        if (traceOccupationButton != null) {
-            traceOccupationButton.addActionListener(this);
+        if (traceWorkButton != null) {
+            traceWorkButton.addActionListener(this);
         }
 
         unloadButton.setEnabled(isEditable());
@@ -398,8 +398,8 @@ public final class ColonyPanel extends PortPanel
         if (setGoodsButton != null) {
             setGoodsButton.setEnabled(isEditable());
         }
-        if (traceOccupationButton != null) {
-            traceOccupationButton.setEnabled(isEditable());
+        if (traceWorkButton != null) {
+            traceWorkButton.setEnabled(isEditable());
         }
 
         final GUI gui = getGUI();
@@ -434,7 +434,7 @@ public final class ColonyPanel extends PortPanel
         add(warehouseScroll, "span, height 40:60:, growx");
         int buttonFields = 6;
         if (setGoodsButton != null) buttonFields++;
-        if (traceOccupationButton != null) buttonFields++;
+        if (traceWorkButton != null) buttonFields++;
         add(unloadButton, "span, split " + Integer.toString(buttonFields)
             + ", align center");
         add(fillButton);
@@ -442,7 +442,7 @@ public final class ColonyPanel extends PortPanel
         add(buildQueueButton);
         add(colonyUnitsButton);
         if (setGoodsButton != null) add(setGoodsButton);
-        if (traceOccupationButton != null) add(traceOccupationButton);
+        if (traceWorkButton != null) add(traceWorkButton);
         add(okButton, "tag ok");
 
         update();
@@ -460,8 +460,8 @@ public final class ColonyPanel extends PortPanel
         if (setGoodsButton != null) {
             setGoodsButton.removeActionListener(this);
         }
-        if (traceOccupationButton != null) {
-            traceOccupationButton.removeActionListener(this);
+        if (traceWorkButton != null) {
+            traceWorkButton.removeActionListener(this);
         }
 
         removePropertyChangeListeners();
@@ -1094,7 +1094,7 @@ public final class ColonyPanel extends PortPanel
         buildQueueButton = null;
         colonyUnitsButton = null;
         setGoodsButton = null;
-        traceOccupationButton = null;
+        traceWorkButton = null;
         netProductionPanel = null;
         buildingsPanel = null;
         buildingsScroll = null;
