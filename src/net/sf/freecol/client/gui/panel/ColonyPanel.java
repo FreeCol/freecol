@@ -201,7 +201,7 @@ public final class ColonyPanel extends PortPanel
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && editable) {
             setGoodsButton = GUI.localizedButton("colonyPanel.setGoods");
-            traceOccupationButton = new JButton("Occupation Trace");
+            traceOccupationButton = new JButton("colonyPanel.traceWork");
         }
 
         // Use ESCAPE for closing the ColonyPanel:
