@@ -1050,6 +1050,7 @@ public final class ColonyPanel extends PortPanel
             UnitType newType = (UnitType) event.getNewValue();
             getGUI().showInformationMessage(object,
                 StringTemplate.template("model.colony.unitChange")
+                    .addName("%colony%", colony.getName())
                     .add("%oldType%", oldType.getNameKey())
                     .add("%newType%", newType.getNameKey()));
             updateTilesPanel();
