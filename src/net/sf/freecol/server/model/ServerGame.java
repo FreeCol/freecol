@@ -94,41 +94,17 @@ public class ServerGame extends Game implements ServerModelObject {
      * @param freeColGameObjectListener A listener that should be monitoring
      *     this <code>Game</code>.
      * @param xr The input stream containing the XML.
-     * @param serverStrings A list of server object type,identifier
-     *     pairs to create.  in this <code>Game</code>.
      * @param specification The <code>Specification</code> to use in this game.
      * @exception XMLStreamException if an error occurred during parsing.
      * @see net.sf.freecol.server.FreeColServer#loadGame
      */
     public ServerGame(FreeColGameObjectListener freeColGameObjectListener,
-                      FreeColXMLReader xr, List<String> serverStrings,
-                      Specification specification)
+                      FreeColXMLReader xr, Specification specification)
         throws XMLStreamException {
         this(specification);
 
         this.freeColGameObjectListener = freeColGameObjectListener;
         this.setGame(this);
-
-        // Need a container to hold a reference to all the server
-        // objects until the rest of the game is read.  Without this,
-        // because the server objects are just placeholders with no
-        // real references to them, the WeakReferences in the Game are
-        // insufficient to preserve them across garbage collections.
-        List<Object> serverObjects = new ArrayList<>();
-
-        // Create trivial instantiations of all the server objects.
-        while (!serverStrings.isEmpty()) {
-            String type = serverStrings.remove(0);
-            String id = serverStrings.remove(0);
-            try {
-                Object o = makeServerObject(type, id);
-                serverObjects.add(o);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Build " + type + " failed", e);
-            }
-        }
-        logger.info("Read " + serverObjects.size() + " server objects.");
-
         readFromXML(xr);
     }
 

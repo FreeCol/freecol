@@ -167,12 +167,21 @@ public abstract class FreeColObject
      *
      * @return The type part of the identifier, or null on error.
      */
-    public String getIdType() {
+    public static String getIdType(String id) {
         if (id != null) {
             int col = id.indexOf(':');
             return (col >= 0) ? id.substring(0, col) : id;
         }
         return null;
+    }
+
+    /**
+     * Get the type part of the identifier of this object.
+     *
+     * @return The type part of the identifier, or null on error.
+     */
+    public String getIdType() {
+        return getIdType(getId());
     }
 
     /**

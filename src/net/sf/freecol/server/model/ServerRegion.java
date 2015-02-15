@@ -39,6 +39,15 @@ public class ServerRegion extends Region {
 
 
     /**
+     * Trivial constructor for serialization.
+     *
+     * @param game The <code>Game</code> to create in.
+     */
+    public ServerRegion(Game game, String id) {
+        super(game, id);
+    }
+
+    /**
      * Constructor for copying in a new region from an imported game.
      */
     public ServerRegion(Game game, Region region) {

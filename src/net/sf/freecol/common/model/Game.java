@@ -60,6 +60,58 @@ public class Game extends FreeColGameObject {
         CONSUMED,
     };
 
+    /** Map of all classes with corresponding server classes. */
+    private static final java.util.Map<Class<? extends FreeColObject>,
+                                       Class<? extends FreeColObject>>
+        serverClasses = new HashMap<>();
+    static {
+        serverClasses.put(net.sf.freecol.common.model.Building.class,
+                          net.sf.freecol.server.model.ServerBuilding.class);
+        serverClasses.put(net.sf.freecol.common.model.Colony.class,
+                          net.sf.freecol.server.model.ServerColony.class);
+        serverClasses.put(net.sf.freecol.common.model.ColonyTile.class,
+                          net.sf.freecol.server.model.ServerColonyTile.class);
+        serverClasses.put(net.sf.freecol.common.model.Europe.class,
+                          net.sf.freecol.server.model.ServerEurope.class);
+        serverClasses.put(net.sf.freecol.common.model.Game.class,
+                          net.sf.freecol.server.model.ServerGame.class);
+        serverClasses.put(net.sf.freecol.common.model.IndianSettlement.class,
+                          net.sf.freecol.server.model.ServerIndianSettlement.class);
+        serverClasses.put(net.sf.freecol.common.model.Region.class,
+                          net.sf.freecol.server.model.ServerRegion.class);
+        serverClasses.put(net.sf.freecol.common.model.Player.class,
+                          net.sf.freecol.server.model.ServerPlayer.class);
+        serverClasses.put(net.sf.freecol.common.model.Unit.class,
+                          net.sf.freecol.server.model.ServerUnit.class);
+    };
+
+    /**
+     * Map of class name to class for the location classes, to speed
+     * up game loading.
+     */
+    private static final java.util.Map<String, Class<? extends FreeColGameObject>>
+        locationClasses = new HashMap<>();
+    static {
+        locationClasses.put("Building",
+                            net.sf.freecol.common.model.Building.class);
+        locationClasses.put("Colony",
+                            net.sf.freecol.common.model.Colony.class);
+        locationClasses.put("ColonyTile",
+                            net.sf.freecol.common.model.ColonyTile.class);
+        locationClasses.put("Europe",
+                            net.sf.freecol.common.model.Europe.class);
+        locationClasses.put("HighSeas",
+                            net.sf.freecol.common.model.HighSeas.class);
+        locationClasses.put("IndianSettlement",
+                            net.sf.freecol.common.model.IndianSettlement.class);
+        locationClasses.put("Map",
+                            net.sf.freecol.common.model.Map.class);
+        locationClasses.put("Tile",
+                            net.sf.freecol.common.model.Tile.class);
+        locationClasses.put("Unit",
+                            net.sf.freecol.common.model.Unit.class);
+    };
+
 
     /**
      * The next available identifier that can be given to a new
@@ -338,54 +390,6 @@ public class Game extends FreeColGameObject {
     public Location findFreeColLocation(String id) {
         FreeColGameObject fcgo = getFreeColGameObject(id);
         return (fcgo instanceof Location) ? (Location)fcgo : null;
-    }
-
-    /**
-     * Convenience wrapper to find or make a location (which is an
-     * interface, precluding using the typed version of
-     * getFreeColGameObject()) by identifier.
-     *
-     * Use this routine when the object may not necessarily already be
-     * present in the game, but is expected to be defined eventually.
-     *
-     * @param id The object identifier.
-     * @return The <code>Location</code> if any.
-     */
-    public Location makeFreeColLocation(String id) {
-        FreeColGameObject fcgo = getFreeColGameObject(id);
-        if (fcgo != null) {
-            if (fcgo instanceof Location) return (Location)fcgo;
-            logger.warning("Not a location: " + id);
-            return null;
-        }
-
-        int idx = id.indexOf(':');
-        final String tag = (idx >= 0) ? id.substring(0, id.indexOf(':'))
-            : id;
-        if ("newWorld".equals(tag)) {
-            // do nothing
-        } else if (Building.getXMLElementTagName().equals(tag)) {
-            return new Building(this, id);
-        } else if (Colony.getXMLElementTagName().equals(tag)) {
-            return new Colony(this, id);
-        } else if (ColonyTile.getXMLElementTagName().equals(tag)) {
-            return new ColonyTile(this, id);
-        } else if (Europe.getXMLElementTagName().equals(tag)) {
-            return new Europe(this, id);
-        } else if (HighSeas.getXMLElementTagName().equals(tag)) {
-            return new HighSeas(this, id);
-        } else if (IndianSettlement.getXMLElementTagName().equals(tag)) {
-            return new IndianSettlement(this, id);
-        } else if (Map.getXMLElementTagName().equals(tag)) {
-            return new Map(this, id);
-        } else if (Tile.getXMLElementTagName().equals(tag)) {
-            return new Tile(this, id);
-        } else if (Unit.getXMLElementTagName().equals(tag)) {
-            return new Unit(this, id);
-        } else {
-            throw new IllegalArgumentException("Not a FCGO: " + id);
-        }
-        return null;
     }
 
     /**
@@ -1036,18 +1040,43 @@ public class Game extends FreeColGameObject {
         return stats;
     }
 
+    /**
+     * Get a location class from an identifier.
+     *
+     * @param id The identifier to dissect.
+     */
+    public static Class<? extends FreeColGameObject> getLocationClass(String id) {
+        String tag = FreeColObject.getIdType(id);
+        tag = Character.toUpperCase(tag.charAt(0)) + tag.substring(1);
+        return locationClasses.get(tag);
+    }
 
     /**
-     * Instantiate an uninitialized FreeColObject class within this game.
+     * Get the equivalent server class to the given class.
+     *
+     * @param c The class to look up.
+     * @return The corresponding server class, or the original class
+     *     if none found.
+     */
+    private static <T extends FreeColObject> Class<T> serverClass(Class<T> c) {
+        @SuppressWarnings("unchecked")
+        Class<T> rc = (Class<T>)serverClasses.get(c);
+        return (rc == null) ? c : rc;
+    }
+
+    /**
+     * Instantiate an uninitialized FreeColGameObject class within this game.
      *
      * @param returnClass The required FreeColObject class.
+     * @param server Create a server object if possible.
      * @return The new uninitialized object, or null on error.
      * @exception IOException on error.
      */
-    public <T extends FreeColObject> T newInstance(Class<T> returnClass) throws IOException {
+    public <T extends FreeColObject> T newInstance(Class<T> returnClass,
+        boolean server) throws IOException {
+        Class<T> rc = (server) ? serverClass(returnClass) : returnClass;
         try {
-            Constructor<T> c = returnClass.getConstructor(Game.class,
-                                                          String.class);
+            Constructor<T> c = rc.getConstructor(Game.class, String.class);
             return c.newInstance(this, (String)null);
 
         } catch (NoSuchMethodException nsme) { // Specific to getConstructor
@@ -1071,7 +1100,7 @@ public class Game extends FreeColGameObject {
         try {
             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
             xr.nextTag();
-            T ret = newInstance(returnClass);
+            T ret = newInstance(returnClass, false);
             ret.readFromXML(xr);
             return ret;
 

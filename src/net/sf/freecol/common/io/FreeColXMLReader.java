@@ -61,6 +61,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
     private static final Logger logger = Logger.getLogger(FreeColXMLReader.class.getName());
 
     public static enum ReadScope {
+        SERVER,     // Loading the game in the server
         NORMAL,     // Normal interning read
         NOINTERN,   // Do not intern any object that are read
     }
@@ -464,18 +465,16 @@ public class FreeColXMLReader extends StreamReaderDelegate
 
         if (attrib != null) {
             FreeColObject fco = lookup(game, attrib);
-            if (fco == null) {
-                if (make) {
-                    try {
-                        return game.makeFreeColLocation(attrib);
-                    } catch (IllegalArgumentException iae) {
-                        throw new XMLStreamException(iae);
-                    }
+            if (fco == null && make) {
+                Class<? extends FreeColGameObject> c
+                    = game.getLocationClass(attrib);
+                if (c != null) {
+                    fco = makeFreeColGameObject(game, attributeName, c,
+                        getReadScope() == ReadScope.SERVER);
                 }
-            } else {
-                if (fco instanceof Location) return (Location)fco;
-                logger.warning("Not a location: " + attrib);
             }
+            if (fco instanceof Location) return (Location)fco;
+            logger.warning("Not a location: " + attrib);
         }
         return null;
     }
@@ -599,7 +598,6 @@ public class FreeColXMLReader extends StreamReaderDelegate
     public <T extends FreeColGameObject> T makeFreeColGameObject(Game game,
         String attributeName, Class<T> returnClass,
         boolean required) throws XMLStreamException {
-
         final String id =
             // @compat 0.10.7
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
@@ -615,7 +613,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
             FreeColObject fco = lookup(game, id);
             if (fco == null) {
                 try {
-                    T ret = game.newInstance(returnClass);
+                    T ret = game.newInstance(returnClass,
+                        getReadScope() == ReadScope.SERVER);
                     if (shouldIntern()) {
                         ret.internId(id);
                     } else {
@@ -673,7 +672,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
 
         T ret;
         try {
-            ret = game.newInstance(returnClass);
+            ret = game.newInstance(returnClass, false);
         } catch (IOException e) {
             throw new XMLStreamException(e);
         }
@@ -735,7 +734,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
 
     /**
-     * Either get an existing <code>FreeColGameObject</code> from a stream
+     * Either get an existing <code>AIObject</code> from a stream
      * attribute or create it if it does not exist.
      *
      * Use this routine when the object may not necessarily already be

@@ -894,11 +894,13 @@ public final class FreeColServer {
         }
         logger.info("Found savegame version " + savegameVersion);
 
-        List<String> serverStrings = null;
         ServerGame game = null;
         try (
             FreeColXMLReader xr = fis.getFreeColXMLReader();
         ) {
+            // Switch to the read scope that creates server objects.
+            xr.setReadScope(FreeColXMLReader.ReadScope.SERVER);
+            
             String active = null;
             xr.nextTag();
 
@@ -920,18 +922,14 @@ public final class FreeColServer {
 
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 final String tag = xr.getLocalName();
-                if (SERVER_OBJECTS_TAG.equals(tag)) {
-                    serverStrings = new ArrayList<>();
+                if (SERVER_OBJECTS_TAG.equals(tag)) { // No longer used
                     while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        serverStrings.add(xr.getLocalName());
-                        serverStrings.add(xr.readId());
                         xr.nextTag();
                     }
 
                 } else if (Game.getXMLElementTagName().equals(tag)) {
                     // Read the game
-                    game = new ServerGame(null, xr, serverStrings,
-                                          specification);
+                    game = new ServerGame(null, xr, specification);
                     game.setCurrentPlayer(null);
                     if (server != null) server.setGame(game);
 
