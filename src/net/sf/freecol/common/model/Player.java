@@ -1535,6 +1535,27 @@ public class Player extends FreeColGameObject implements Nameable {
             : false;
     }
 
+    /**
+     * Get the total immigration production for this player.
+     *
+     * @return The total immigration production.
+     */
+    public int getTotalImmigrationProduction() {
+        if (!isColonial()) return 0;
+        
+        final List<GoodsType> immigrationGoodsTypes = getSpecification()
+            .getImmigrationGoodsTypeList();
+        int production = 0;
+        for (Colony colony : getColonies()) {
+            for (GoodsType goodsType : immigrationGoodsTypes) {
+                production += colony.getTotalProductionOf(goodsType);
+            }
+        }
+        Europe europe = getEurope();
+        if (europe != null) production += europe.getImmigration(production);
+        return production;
+    }
+
 
     //
     // Liberty and founding fathers

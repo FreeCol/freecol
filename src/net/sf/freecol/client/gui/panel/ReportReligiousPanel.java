@@ -38,6 +38,8 @@ import net.sf.freecol.common.model.WorkLocation;
 
 /**
  * This panel displays the Religious Report.
+ *
+ * TODO: remove hardcoded "crosses".
  */
 public final class ReportReligiousPanel extends ReportPanel {
 
@@ -61,7 +63,6 @@ public final class ReportReligiousPanel extends ReportPanel {
         reportPanel.add(progressBar, "span");
 
         List<Colony> colonies = freeColClient.getMySortedColonies();
-        int production = 0;
         for (Colony colony : colonies) {
             WorkLocation wl = colony.getWorkLocationForProducing(crosses);
             if (wl == null
@@ -73,13 +74,11 @@ public final class ReportReligiousPanel extends ReportPanel {
             BuildingPanel bp = new BuildingPanel(getFreeColClient(), building);
             bp.initialize();
             reportPanel.add(bp);
-            production += colony.getNetProductionOf(crosses);
         }
-        Europe europe = player.getEurope();
-        if (europe != null) production += europe.getImmigration(production);
 
         progressBar.update(0, player.getImmigrationRequired(),
-                           player.getImmigration(), production);
+                           player.getImmigration(),
+                           player.getTotalImmigrationProduction());
     }
 }
 

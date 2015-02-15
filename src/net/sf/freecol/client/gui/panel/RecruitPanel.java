@@ -84,11 +84,7 @@ public final class RecruitPanel extends FreeColPanel {
         final Player player = getMyPlayer();
         final Europe europe = player.getEurope();
 
-        int production = 0;
-        for (Colony colony : player.getColonies()) {
-            production += colony.getTotalProductionOf(getSpecification()
-                .getGoodsType("model.goods.crosses"));
-        }
+        int production = player.getTotalImmigrationProduction();
         int turns = 100;
         if (production > 0) {
             int immigrationRequired = player.getImmigrationRequired()
