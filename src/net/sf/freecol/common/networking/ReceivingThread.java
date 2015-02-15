@@ -244,16 +244,18 @@ final class ReceivingThread extends Thread {
      * Checks if this thread should run.
      */
     private synchronized boolean shouldRun() {
-        return shouldRun;
+        return this.shouldRun;
     }
 
     /**
      * Tells this thread that it does not need to do any more work.
      */
     public synchronized void askToStop() {
-        if (shouldRun) {
-            shouldRun = false;
-            for (NetworkReplyObject o : waitingThreads.values()) o.interrupt();
+        if (this.shouldRun) {
+            this.shouldRun = false;
+            for (NetworkReplyObject o : this.waitingThreads.values()) {
+                o.interrupt();
+            }
         }
     }
 
@@ -261,6 +263,7 @@ final class ReceivingThread extends Thread {
      * Disconnects this thread.
      */
     private void disconnect(String reason) {
+        askToStop();
         if (connection.getMessageHandler() != null) {
             try {
                 connection.getMessageHandler().handle(connection,
@@ -270,7 +273,6 @@ final class ReceivingThread extends Thread {
                 logger.log(Level.WARNING, "Rx disconnect", e);
             }
         }
-        askToStop();
     }
 
     /**
@@ -282,7 +284,6 @@ final class ReceivingThread extends Thread {
      * @throws XMLStreamException if a problem occured during parsing.
      */
     private void listen() throws IOException, SAXException, XMLStreamException {
-        if (!shouldRun()) return;
         in.enable();
 
         final int LOOK_AHEAD = 8192;
@@ -290,8 +291,14 @@ final class ReceivingThread extends Thread {
         bis.mark(LOOK_AHEAD);
 
         FreeColXMLReader xr = new FreeColXMLReader(bis);
-        xr.nextTag();
-        final String tag = xr.getLocalName();
+        String tag;
+        try {
+            xr.nextTag();
+            tag = xr.getLocalName();
+        } catch (XMLStreamException xse) {
+            // EOS can occur when the other end disconnects
+            tag = Connection.DISCONNECT_TAG;
+        }
 
         if (Connection.DISCONNECT_TAG.equals(tag)) {
             askToStop();

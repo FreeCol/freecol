@@ -242,7 +242,7 @@ public class Connection implements Closeable {
      * Really closes this connection.
      */
     public void reallyClose() {
-        if (thread != null) thread.askToStop();
+        if (this.thread != null) thread.askToStop();
 
         if (this.out != null) {
             try {

@@ -157,7 +157,6 @@ public final class Server extends Thread {
      * @param connection The connection that should be removed.
      */
     public void removeConnection(Connection connection) {
-        if (!running) return;
         connections.remove(connection.getSocket());
     }
 
