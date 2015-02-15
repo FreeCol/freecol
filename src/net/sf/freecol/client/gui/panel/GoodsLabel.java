@@ -89,7 +89,7 @@ public final class GoodsLabel extends AbstractGoodsLabel
             setForeground(ResourceManager.getColor("goodsLabel.capacityExceeded.color"));
         } else if (location instanceof Colony
                    && goods.getType().isStorable()
-                   && ((Colony)location).getExportData(goods.getType()).isExported()) {
+                   && ((Colony)location).getExportData(goods.getType()).getExported()) {
             setForeground(ResourceManager.getColor("goodsLabel.exported.color"));
         } else if (goods.getAmount() == 0) {
             setForeground(ResourceManager.getColor("goodsLabel.zeroAmount.color"));

@@ -23,7 +23,7 @@ import java.awt.Component;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -31,7 +31,6 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import net.miginfocom.swing.MigLayout;
 
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MigPanel;
@@ -39,7 +38,6 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ExportData;
-import net.sf.freecol.common.model.ExportData.ExportState;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 
@@ -50,116 +48,6 @@ import net.sf.freecol.common.model.GoodsType;
 public final class WarehouseDialog extends FreeColConfirmDialog {
 
     private static final Logger logger = Logger.getLogger(WarehouseDialog.class.getName());
-
-    private class WarehouseGoodsPanel extends MigPanel {
-
-        private final Colony colony;
-
-        private final GoodsType goodsType;
-
-        private final JComboBox<ExportState> exportBox;
-
-        private final JSpinner lowLevel;
-
-        private final JSpinner highLevel;
-
-        private final JSpinner exportLevel;
-
-
-        public WarehouseGoodsPanel(FreeColClient freeColClient, Colony colony,
-                                   GoodsType goodsType) {
-            super("WarehouseGoodsPanelUI");
-
-            this.colony = colony;
-            this.goodsType = goodsType;
-
-            setLayout(new MigLayout("wrap 2", "", ""));
-            setOpaque(false);
-            setBorder(GUI.localizedBorder(goodsType.getNameKey()));
-            GUI.padBorder(this, 6,6,6,6);
-
-            final boolean enhanced = false;
-            // Placeholder for:
-            //   freeColClient.getClientOptions()
-            //       .getBoolean(ClientOptions.ENHANCED_TRADE_ROUTES);
-            final ExportData exportData = colony.getExportData(goodsType);
-
-            // goods label
-            Goods goods = new Goods(colony.getGame(), colony, goodsType,
-                                    colony.getGoodsCount(goodsType));
-            GoodsLabel goodsLabel = new GoodsLabel(goods, getGUI());
-            goodsLabel.setHorizontalAlignment(JLabel.LEADING);
-            add(goodsLabel, "span 1 2");
-
-            // low level settings
-            SpinnerNumberModel lowLevelModel
-                = new SpinnerNumberModel(exportData.getLowLevel(), 0, 100, 1);
-            this.lowLevel = new JSpinner(lowLevelModel);
-            GUI.localizeToolTip(this.lowLevel,
-                "warehouseDialog.lowLevel.shortDescription");
-            add(this.lowLevel);
-
-            // high level settings
-            SpinnerNumberModel highLevelModel
-                = new SpinnerNumberModel(exportData.getHighLevel(), 0, 100, 1);
-            this.highLevel = new JSpinner(highLevelModel);
-            GUI.localizeToolTip(this.highLevel,
-                "warehouseDialog.highLevel.shortDescription");
-            add(this.highLevel);
-
-            // export status
-            this.exportBox = new JComboBox<ExportState>();
-            GUI.localizeToolTip(this.exportBox,
-                "warehouseDialog.export.shortDescription");
-            this.exportBox.addItem(ExportState.IMPORT);
-            if (colony.hasAbility(Ability.EXPORT)) {
-                this.exportBox.addItem(ExportState.EXPORT);
-                if (enhanced) {
-                    this.exportBox.addItem(ExportState.MAINTAIN);
-                }
-            }
-            this.exportBox.setSelectedItem(exportData.getExportState());
-            GUI.localizeToolTip(this.exportBox,
-                "warehouseDialog.export.shortDescription");
-            add(this.exportBox);
-
-            // export level settings
-            SpinnerNumberModel exportLevelModel
-                = new SpinnerNumberModel(exportData.getExportLevel(), 0,
-                                         colony.getWarehouseCapacity(), 1);
-            this.exportLevel = new JSpinner(exportLevelModel);
-            this.exportLevel.setToolTipText(Messages
-                .getShortDescription("warehouseDialog.exportLevel"));
-            add(this.exportLevel);
-
-            setSize(getPreferredSize());
-        }
-
-        public void saveSettings() {
-            final ExportData exportData
-                = this.colony.getExportData(this.goodsType);
-            int lowLevelValue = ((SpinnerNumberModel)this.lowLevel.getModel())
-                .getNumber().intValue();
-            int highLevelValue = ((SpinnerNumberModel)this.highLevel.getModel())
-                .getNumber().intValue();
-            int exportLevelValue = ((SpinnerNumberModel)this.exportLevel.getModel())
-                .getNumber().intValue();
-            ExportState state = (ExportState)this.exportBox.getSelectedItem();
-            boolean changed = (state != exportData.getExportState())
-                || (lowLevelValue != exportData.getLowLevel())
-                || (highLevelValue != exportData.getHighLevel())
-                || (exportLevelValue != exportData.getExportLevel());
-
-            exportData.setExportState(state);
-            exportData.setLowLevel(lowLevelValue);
-            exportData.setHighLevel(highLevelValue);
-            exportData.setExportLevel(exportLevelValue);
-            if (changed) {
-                freeColClient.getInGameController()
-                    .setGoodsLevels(colony, goodsType);
-            }
-        }
-    }
 
     private JPanel warehousePanel;
 
@@ -216,5 +104,107 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
         }
         warehousePanel = null;
         return result;
+    }
+
+
+    private class WarehouseGoodsPanel extends MigPanel {
+
+        private final Colony colony;
+
+        private final GoodsType goodsType;
+
+        private final JCheckBox export;
+
+        private final JSpinner lowLevel;
+
+        private final JSpinner highLevel;
+
+        private final JSpinner exportLevel;
+
+
+        public WarehouseGoodsPanel(FreeColClient freeColClient, Colony colony,
+                                   GoodsType goodsType) {
+            super("WarehouseGoodsPanelUI");
+
+            this.colony = colony;
+            this.goodsType = goodsType;
+
+            setLayout(new MigLayout("wrap 2", "", ""));
+            setOpaque(false);
+            String goodsName = Messages.getName(goodsType);
+
+            setBorder(GUI.localizedBorder(goodsType.getNameKey()));
+            GUI.padBorder(this, 6,6,6,6);
+
+            ExportData exportData = colony.getExportData(goodsType);
+
+            // goods label
+            Goods goods = new Goods(colony.getGame(), colony, goodsType,
+                                    colony.getGoodsCount(goodsType));
+            GoodsLabel goodsLabel = new GoodsLabel(goods, getGUI());
+            goodsLabel.setHorizontalAlignment(JLabel.LEADING);
+            add(goodsLabel, "span 1 2");
+
+            // low level settings
+            String str;
+            SpinnerNumberModel lowLevelModel
+                = new SpinnerNumberModel(exportData.getLowLevel(), 0, 100, 1);
+            lowLevel = new JSpinner(lowLevelModel);
+            GUI.localizeToolTip(lowLevel,
+                "warehouseDialog.lowLevel.shortDescription");
+            add(lowLevel);
+
+            // high level settings
+            SpinnerNumberModel highLevelModel
+                = new SpinnerNumberModel(exportData.getHighLevel(), 0, 100, 1);
+            highLevel = new JSpinner(highLevelModel);
+            GUI.localizeToolTip(highLevel,
+                "warehouseDialog.highLevel.shortDescription");
+            add(highLevel);
+
+            // export checkbox
+            export = new JCheckBox(Messages.message("warehouseDialog.export"),
+                                   exportData.getExported());
+            GUI.localizeToolTip(export,
+                "warehouseDialog.export.shortDescription");
+            if (!colony.hasAbility(Ability.EXPORT)) {
+                export.setEnabled(false);
+            }
+            add(export);
+
+            // export level settings
+            SpinnerNumberModel exportLevelModel
+                = new SpinnerNumberModel(exportData.getExportLevel(), 0,
+                                         colony.getWarehouseCapacity(), 1);
+            exportLevel = new JSpinner(exportLevelModel);
+            GUI.localizeToolTip(exportLevel,
+                "warehouseDialog.exportLevel.shortDescription");
+            add(exportLevel);
+
+            setSize(getPreferredSize());
+        }
+
+        public void saveSettings() {
+            int lowLevelValue = ((SpinnerNumberModel)lowLevel.getModel())
+                .getNumber().intValue();
+            int highLevelValue = ((SpinnerNumberModel)highLevel.getModel())
+                .getNumber().intValue();
+            int exportLevelValue = ((SpinnerNumberModel)exportLevel.getModel())
+                .getNumber().intValue();
+            ExportData exportData = colony.getExportData(goodsType);
+            boolean changed = (export.isSelected() != exportData.getExported())
+                || (lowLevelValue != exportData.getLowLevel())
+                || (highLevelValue != exportData.getHighLevel())
+                || (exportLevelValue != exportData.getExportLevel());
+
+            exportData.setExported(export.isSelected());
+            exportData.setLowLevel(lowLevelValue);
+            exportData.setHighLevel(highLevelValue);
+            exportData.setExportLevel(exportLevelValue);
+            if (changed) {
+                freeColClient.getInGameController()
+                    .setGoodsLevels(colony, goodsType);
+            }
+        }
     }
 }

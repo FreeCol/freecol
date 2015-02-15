@@ -2296,28 +2296,27 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * Determine if there is a problem with the production of the
-     * specified goods type.
+     * determine if there is a problem with the production of the specified good
      *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @param amount The amount in the warehouse.
-     * @param production The production per turn.
-     * @return A collection of warning messages.
+     * @param goodsType  for this good
+     * @param amount     warehouse amount
+     * @param production production per turn
+     * @return all warnings
      */
     public Collection<StringTemplate> getWarnings(GoodsType goodsType, int amount, int production) {
+
         List<StringTemplate> result = new LinkedList<StringTemplate>();
-        
+
         if (goodsType.isFoodType() && goodsType.isStorable()) {
-            // Food is never wasted -> new settler is produced
             if (amount + production < 0) {
                 result.add(StringTemplate.template("model.colony.famineFeared")
                            .addName("%colony%", getName())
                            .addAmount("%number%", 0));
             }
         } else {
+            //food is never wasted -> new settler is produced
             int waste = (amount + production - getWarehouseCapacity());
-            if (waste > 0
-                && !getExportData(goodsType).isExported()
+            if (waste > 0 && !getExportData(goodsType).getExported()
                 && !goodsType.limitIgnored()) {
                 result.add(StringTemplate.template("model.building.warehouseSoonFull")
                            .add("%goods%", goodsType.getNameKey())
@@ -2809,10 +2808,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         final int present = Math.max(0, getGoodsCount(goodsType)
             + turns * getNetProductionOf(goodsType));
         int capacity = getWarehouseCapacity();
-        final ExportData ed = getExportData(goodsType);
-        if (ed.isMaintained()) {
-            capacity = Math.min(capacity, ed.getExportLevel());
-        }
         return Math.max(0, capacity - present);
     }
 

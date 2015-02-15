@@ -328,7 +328,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             for (Goods goods : getCompactGoods()) {
                 GoodsType type = goods.getType();
                 ExportData data = getExportData(type);
-                if (!data.isExported()
+                if (!data.getExported()
                     || !owner.canTrade(goods.getType(), Market.Access.CUSTOM_HOUSE)) continue;
                 int amount = goods.getAmount() - data.getExportLevel();
                 if (amount <= 0) continue;
@@ -406,7 +406,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
 
             // No problem this turn, but what about the next?
-            if (!(exportData.isExported()
+            if (!(exportData.getExported()
                   && hasAbility(Ability.EXPORT)
                   && owner.canTrade(type, Market.Access.CUSTOM_HOUSE))
                 && amount <= limit) {
@@ -781,7 +781,7 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         // Disable all exports
         for (ExportData exportDatum : exportData.values()) {
-            exportDatum.clearExportState();
+            exportDatum.setExported(false);
         }
 
         // Clear the build queue
