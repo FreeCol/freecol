@@ -1044,6 +1044,8 @@ public final class ColonyPanel extends PortPanel
                 }
             }
             updatePopulationPanel();
+        } else if (ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString().equals(property)) {
+            updateProduction();
         } else if (ColonyChangeEvent.UNIT_TYPE_CHANGE.toString().equals(property)) {
             FreeColGameObject object = (FreeColGameObject)event.getSource();
             UnitType oldType = (UnitType) event.getOldValue();
@@ -1612,10 +1614,12 @@ public final class ColonyPanel extends PortPanel
          */
         public void propertyChange(PropertyChangeEvent event) {
             final Colony colony = getColony();
-            logger.finest(colony.getName() + "-warehouse change "
-                          + event.getPropertyName()
-                          + ": " + event.getOldValue()
-                          + " -> " + event.getNewValue());
+            if (colony != null && event != null) {
+                logger.finest(colony.getName() + "-warehouse change "
+                    + event.getPropertyName()
+                    + ": " + event.getOldValue()
+                    + " -> " + event.getNewValue());
+            }
             update();
         }
 
