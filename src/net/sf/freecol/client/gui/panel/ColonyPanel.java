@@ -546,6 +546,7 @@ public final class ColonyPanel extends PortPanel
      */
     private void updateProduction() {
         final Colony colony = getColony();
+        if (colony == null) return;
 
         // Check for non-producing locations that can now produce.
         for (WorkLocation wl : colony.getCurrentWorkLocations()) {
