@@ -140,7 +140,7 @@ import org.w3c.dom.Element;
  */
 public final class InGameController extends Controller {
 
-    private static Logger logger = Logger.getLogger(InGameController.class.getName());
+    private static final Logger logger = Logger.getLogger(InGameController.class.getName());
 
     /**
      * Score bonus on declaring independence = (1780, Spring) - turn
@@ -424,10 +424,10 @@ public final class InGameController extends Controller {
 
     private static class DOMMessageCallable implements Callable<DOMMessage> {
 
-        private Connection connection;
-        private Game game;
-        private DOMMessage message;
-        private DOMMessageHandler handler;
+        private final Connection connection;
+        private final Game game;
+        private final DOMMessage message;
+        private final DOMMessageHandler handler;
 
 
         public DOMMessageCallable(Connection connection, Game game,
@@ -727,8 +727,8 @@ public final class InGameController extends Controller {
                 }
                 break;
             default: // Need to autorecruit a unit to keep alive.
-                ((ServerPlayer)player).csEmigrate(0, MigrationType.SURVIVAL,
-                                                  random, cs);
+                player.csEmigrate(0, MigrationType.SURVIVAL,
+                        random, cs);
                 break;
             }
             // Are there humans left?
@@ -759,7 +759,7 @@ public final class InGameController extends Controller {
             if (winner == player
                 && !(freeColServer.isSinglePlayer() && winner.isAI())) {
                 boolean highScore = !winner.isAI()
-                    && HighScore.newHighScore((ServerPlayer)winner);
+                    && HighScore.newHighScore(winner);
                 cs.addTrivial(See.all(), "gameEnded",
                               ChangePriority.CHANGE_NORMAL,
                               "highScore", String.valueOf(highScore),
@@ -851,7 +851,7 @@ public final class InGameController extends Controller {
         }
 
         if (teleport) { // Teleport in the units.
-            Set<Tile> seen = new HashSet<Tile>();
+            Set<Tile> seen = new HashSet<>();
             for (Unit u : serverPlayer.getUnits()) {
                 if (!u.isNaval()) continue;
                 Tile entry = u.getEntryLocation().getTile();
@@ -1189,7 +1189,7 @@ public final class InGameController extends Controller {
      * @return Null.
      */
     public Element continuePlaying(ServerPlayer serverPlayer) {
-        final ServerGame game = (ServerGame)getGame();
+        final ServerGame game = getGame();
         Element reply = null;
         if (!getFreeColServer().isSinglePlayer()) {
             logger.warning("Can not continue playing in multiplayer!");
@@ -2585,7 +2585,7 @@ public final class InGameController extends Controller {
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.setSell();
         cs.addSale(serverPlayer, settlement, goods.getType(),
-                   (int) Math.round((float) amount / goods.getAmount()));
+                Math.round((float) amount / goods.getAmount()));
         logger.finest(serverPlayer.getName() + " " + unit + " sells " + goods
                       + " at " + settlement.getName() + " for " + amount);
 
@@ -2871,7 +2871,7 @@ public final class InGameController extends Controller {
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(true);//-vis(serverPlayer),-til
             for (Player p : getGame().getLivePlayers(serverPlayer)) {
-                if ((ServerPlayer)p == serverPlayer) continue;
+                if (p == serverPlayer) continue;
                 ((IndianSettlement)settlement).setAlarm(p, (p.isIndian())
                     ? new Tension(Tension.Level.CONTENT.getLimit())
                     : serverPlayer.getTension(p));//-til
@@ -3052,7 +3052,7 @@ public final class InGameController extends Controller {
                     logger.warning("Trade with invalid source owner: " + loc);
                     fail = true;
                 } else if (!(loc instanceof GoodsLocation
-                        && ((GoodsLocation)loc).contains(goods))) {
+                        && loc.contains(goods))) {
                     logger.warning("Trade of unavailable goods " + goods
                         + " at " + loc);
                     fail = true;

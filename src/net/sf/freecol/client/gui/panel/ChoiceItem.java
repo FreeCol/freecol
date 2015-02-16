@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import javax.swing.ImageIcon;
-import java.util.Comparator;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -35,9 +34,9 @@ import net.sf.freecol.common.model.Player;
 public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
 
     private String text;
-    private T object;
+    private final T object;
     private ImageIcon icon;
-    private boolean enabled;
+    private final boolean enabled;
     private boolean optionOK = false;
     private boolean optionCancel = false;
     private boolean optionDefault = false;

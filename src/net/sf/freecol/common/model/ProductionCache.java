@@ -42,17 +42,17 @@ public class ProductionCache {
      * in the colony may need to be considered in order to prevent
      * excess production.
      */
-    private Colony colony;
+    private final Colony colony;
 
     /** A map of net production by goods type. */
-    private TypeCountMap<GoodsType> netProduction
-        = new TypeCountMap<GoodsType>();
+    private final TypeCountMap<GoodsType> netProduction
+        = new TypeCountMap<>();
 
     /** A map of production info for various producers and consumers. */
-    private Map<Object, ProductionInfo> productionAndConsumption = new HashMap<>();
+    private final Map<Object, ProductionInfo> productionAndConsumption = new HashMap<>();
 
     /** A set of the goods used by the colony. */
-    private Set<GoodsType> goodsUsed = new HashSet<GoodsType>();
+    private final Set<GoodsType> goodsUsed = new HashSet<>();
 
     /**
      * Flag to indicate whether the cache is up to date, or not and
@@ -243,7 +243,7 @@ public class ProductionCache {
      */
     public TypeCountMap<GoodsType> getProductionMap() {
         update();
-        TypeCountMap<GoodsType> result = new TypeCountMap<GoodsType>();
+        TypeCountMap<GoodsType> result = new TypeCountMap<>();
         result.putAll(netProduction);
         return result;
     }

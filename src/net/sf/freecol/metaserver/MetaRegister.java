@@ -37,9 +37,9 @@ import org.w3c.dom.Element;
  */
 public final class MetaRegister {
 
-    private static Logger logger = Logger.getLogger(MetaRegister.class.getName());
+    private static final Logger logger = Logger.getLogger(MetaRegister.class.getName());
 
-    private ArrayList<MetaItem> items = new ArrayList<>();
+    private final ArrayList<MetaItem> items = new ArrayList<>();
     
     
     /**
@@ -180,8 +180,8 @@ public final class MetaRegister {
      */
     public synchronized Element createServerList() {
         Element element = DOMMessage.createMessage("serverList");
-        for (int i = 0; i < items.size(); i++) {
-            element.appendChild(items.get(i).toXMLElement(element.getOwnerDocument()));
+        for (MetaItem item : items) {
+            element.appendChild(item.toXMLElement(element.getOwnerDocument()));
         }
         return element;
     }

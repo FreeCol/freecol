@@ -92,8 +92,8 @@ public final class ChooseFoundingFatherDialog
         panel.setPreferredSize(panel.getPreferredSize());
 
         List<ChoiceItem<FoundingFather>> c = choices();
-        c.add(new ChoiceItem<FoundingFather>(Messages.message("ok"),
-                (FoundingFather)null).okOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message("ok"), (FoundingFather)null)
+            .okOption().defaultOption());
         initializeDialog(DialogType.QUESTION, false, panel, null, c);
     }
 

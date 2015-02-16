@@ -63,11 +63,6 @@ import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.server.ai.AIObject;
-import net.sf.freecol.server.ai.AIGoods;
-import net.sf.freecol.server.ai.GoodsWish;
-import net.sf.freecol.server.ai.TileImprovementPlan;
-import net.sf.freecol.server.ai.WorkerWish;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
@@ -123,8 +118,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Goods that should be completely exported and only exported to
      * prevent the warehouse filling.
      */
-    private static final Set<GoodsType> fullExport = new HashSet<GoodsType>();
-    private static final Set<GoodsType> partExport = new HashSet<GoodsType>();
+    private static final Set<GoodsType> fullExport = new HashSet<>();
+    private static final Set<GoodsType> partExport = new HashSet<>();
 
     /**
      * Comparator to favour expert pioneers, then units in that role,
@@ -275,7 +270,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public Collection<AIUnit> rearrangeWorkers(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
-        Set<AIUnit> result = new HashSet<AIUnit>();
+        Set<AIUnit> result = new HashSet<>();
 
         // First check if it is collapsing.
         if (colony.getUnitCount() <= 0) {
@@ -1142,7 +1137,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                         - colony.getAdjustedNetProductionOf(g2);
                 }
             });
-        TypeCountMap<UnitType> experts = new TypeCountMap<UnitType>();
+        TypeCountMap<UnitType> experts = new TypeCountMap<>();
         for (Unit unit : colony.getUnitList()) {
             GoodsType goods = unit.getWorkType();
             UnitType expert = (goods == null
@@ -1205,7 +1200,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Request goods.
         // FIXME: improve heuristics
-        TypeCountMap<GoodsType> required = new TypeCountMap<GoodsType>();
+        TypeCountMap<GoodsType> required = new TypeCountMap<>();
 
         // Add building materials.
         if (colony.getCurrentlyBuilding() != null) {

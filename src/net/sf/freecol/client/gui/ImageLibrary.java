@@ -67,7 +67,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
-import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -126,7 +125,7 @@ public final class ImageLibrary {
      */
     private final float scalingFactor;
 
-    private Map<String, Integer> imageCounts = new HashMap<>();
+    private final Map<String, Integer> imageCounts = new HashMap<>();
 
 
     /**

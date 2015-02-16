@@ -32,7 +32,7 @@ import net.sf.freecol.common.option.BooleanOption;
  */
 public final class BooleanOptionUI extends OptionUI<BooleanOption>  {
 
-    private JCheckBox box = new JCheckBox();
+    private final JCheckBox box = new JCheckBox();
 
 
     /**

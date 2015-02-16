@@ -30,7 +30,7 @@ import net.sf.freecol.client.FreeColClient;
  */
 public final class WindowedFrameListener implements WindowListener {
 
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
     /**
      * Constructs this WindowListener.

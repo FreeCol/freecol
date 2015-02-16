@@ -38,10 +38,10 @@ import org.w3c.dom.Element;
 public class SpySettlementMessage extends DOMMessage {
 
     /** The identifier of the object doing the spying. */
-    private String unitId;
+    private final String unitId;
 
     /** The direction the spy is looking. */
-    private String directionString;
+    private final String directionString;
 
 
     /**

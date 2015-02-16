@@ -34,7 +34,7 @@ import java.util.Map;
 public class ResourceMapping {
 
     /** Mappings between an object identifier and a resource. */
-    protected Map<String, Resource> resources;
+    protected final Map<String, Resource> resources;
 
 
     /**

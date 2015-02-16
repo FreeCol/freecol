@@ -38,7 +38,7 @@ import net.sf.freecol.common.option.UnitTypeOption.TypeSelector;
  */
 public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
 
-    private static Logger logger = Logger.getLogger(AbstractUnitOption.class.getName());
+    private static final Logger logger = Logger.getLogger(AbstractUnitOption.class.getName());
 
     private static final TypeSelector DEFAULT_SELECTOR = TypeSelector.UNITS;
 

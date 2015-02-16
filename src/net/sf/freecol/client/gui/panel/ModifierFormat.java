@@ -85,11 +85,11 @@ public class ModifierFormat {
         String result = null;
         if (result == null && source instanceof Nameable) {
             result = ((Nameable)source).getName();
-            if ("".equals(result)) result = null;
+            if (result != null && result.isEmpty()) result = null;
         }
         if (result == null && source instanceof Named) {
             result = Messages.getName((Named)source);
-            if ("".equals(result)) result = null;
+            if (result != null && result.isEmpty()) result = null;
         }
         if (result == null) result = Messages.getName(source.getId());
         return result;

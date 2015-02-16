@@ -34,7 +34,7 @@ import net.sf.freecol.common.model.Specification;
 public class FileOption extends AbstractOption<File> {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(FileOption.class.getName());
+    private static final Logger logger = Logger.getLogger(FileOption.class.getName());
 
     /** The value of this option. */
     private File value = null;

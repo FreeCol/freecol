@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Unit.UnitState;
 
 
@@ -135,10 +134,10 @@ public class Europe extends UnitLocation
      * This list represents the types of the units that can be
      * recruited in Europe.
      */
-    protected List<UnitType> recruitables = new ArrayList<>();
+    protected final List<UnitType> recruitables = new ArrayList<>();
 
     /** Prices for trainable or purchasable units. */
-    protected java.util.Map<UnitType, Integer> unitPrices = new HashMap<>();
+    protected final java.util.Map<UnitType, Integer> unitPrices = new HashMap<>();
 
     /** Current price to recruit a unit. */
     protected int recruitPrice;
@@ -187,7 +186,7 @@ public class Europe extends UnitLocation
      * @return A list of recruitable <code>UnitType</code>s.
      */
     public List<UnitType> getRecruitables() {
-        return new ArrayList<UnitType>(recruitables);
+        return new ArrayList<>(recruitables);
     }
 
     /**

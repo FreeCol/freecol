@@ -74,7 +74,6 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
@@ -106,8 +105,8 @@ public final class MapViewer {
 
     private static class TextSpecification {
 
-        public String text;
-        public Font font;
+        public final String text;
+        public final Font font;
 
         public TextSpecification(String newText, Font newFont) {
             text = newText;
@@ -117,8 +116,8 @@ public final class MapViewer {
 
     private static class SortableImage implements Comparable<SortableImage> {
 
-        public Image image;
-        public int index;
+        public final Image image;
+        public final int index;
 
         public SortableImage(Image image, int index) {
             this.image = image;
@@ -157,14 +156,14 @@ public final class MapViewer {
 
     private final FreeColClient freeColClient;
 
-    private GUI gui;
+    private final GUI gui;
 
     private Dimension size;
 
     /** Scaled ImageLibrary only used for map painting. */
     private ImageLibrary lib;
 
-    private TerrainCursor cursor;
+    private final TerrainCursor cursor;
     private final Vector<GUIMessage> messages;
 
     private Tile selectedTile;
@@ -233,28 +232,28 @@ public final class MapViewer {
     public static final int FOREST_INDEX = 200;
 
     private GeneralPath gridPath = null;
-    private GeneralPath fog = new GeneralPath();
+    private final GeneralPath fog = new GeneralPath();
 
     private volatile boolean blinkingMarqueeEnabled;
 
     private Image cursorImage;
     private GrayLayer greyLayer;
 
-    private java.util.Map<Unit, Integer> unitsOutForAnimation;
-    private java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
+    private final java.util.Map<Unit, Integer> unitsOutForAnimation;
+    private final java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
 
     // roads
-    private EnumMap<Direction, Point2D.Float> corners =
-        new EnumMap<Direction, Point2D.Float>(Direction.class);
-    private EnumMap<Direction, List<Direction>> prohibitedRoads =
-        new EnumMap<Direction, List<Direction>>(Direction.class);
+    private final EnumMap<Direction, Point2D.Float> corners =
+        new EnumMap<>(Direction.class);
+    private final EnumMap<Direction, List<Direction>> prohibitedRoads =
+        new EnumMap<>(Direction.class);
     private Stroke roadStroke = new BasicStroke(2);
     // borders
-    private EnumMap<Direction, Point2D.Float> borderPoints =
-        new EnumMap<Direction, Point2D.Float>(Direction.class);
+    private final EnumMap<Direction, Point2D.Float> borderPoints =
+        new EnumMap<>(Direction.class);
 
-    private EnumMap<Direction, Point2D.Float> controlPoints =
-        new EnumMap<Direction, Point2D.Float>(Direction.class);
+    private final EnumMap<Direction, Point2D.Float> controlPoints =
+        new EnumMap<>(Direction.class);
 
     private Stroke borderStroke = new BasicStroke(4);
 
@@ -282,7 +281,7 @@ public final class MapViewer {
         unitsOutForAnimationLabels = new HashMap<>();
 
         logger.info("GUI created.");
-        messages = new Vector<GUIMessage>(MESSAGE_COUNT);
+        messages = new Vector<>(MESSAGE_COUNT);
         logger.info("Starting in Move Units View Mode");
         blinkingMarqueeEnabled = true;
 
@@ -1204,7 +1203,7 @@ public final class MapViewer {
                                      Color backgroundColor) {
         String key = "dynamic.label.nativeCapital"
             + "." + Integer.toHexString(backgroundColor.getRGB());
-        Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+        Image image = ResourceManager.getImage(key, lib.getScalingFactor());
         if (image != null) {
             return image;
         }
@@ -1236,7 +1235,7 @@ public final class MapViewer {
         g.setColor(Color.WHITE);
         g.fill(path);
         ResourceManager.addGameMapping(key, new ImageResource(bi));
-        return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+        return ResourceManager.getImage(key, lib.getScalingFactor());
     }
 
 
@@ -1321,7 +1320,7 @@ public final class MapViewer {
         String key = "dynamic.label.religiousMission"
             + (expertMissionary ? ".expert" : "")
             + "." + Integer.toHexString(backgroundColor.getRGB());
-        Image image = (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+        Image image = ResourceManager.getImage(key, lib.getScalingFactor());
         if (image != null) {
             return image;
         }
@@ -1366,7 +1365,7 @@ public final class MapViewer {
         }
         g.draw(cross);
         ResourceManager.addGameMapping(key, new ImageResource(bi));
-        return (Image) ResourceManager.getImage(key, lib.getScalingFactor());
+        return ResourceManager.getImage(key, lib.getScalingFactor());
     }
 
     /**

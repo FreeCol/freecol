@@ -38,7 +38,7 @@ import java.util.StringTokenizer;
 public class FAFile {
 
     // FIXME: Use two hashes, to be safer?
-    private HashMap<Object, Object> letters = new HashMap<>();
+    private final HashMap<Object, Object> letters = new HashMap<>();
     private int maxHeight = 0;
 
 

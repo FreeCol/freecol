@@ -52,7 +52,7 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
         }
     }
 
-    private JComboBox<UnitType> box = new JComboBox<UnitType>();
+    private final JComboBox<UnitType> box = new JComboBox<>();
 
 
     /**
@@ -68,7 +68,7 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
         super(gui, option, editable);
 
         List<UnitType> choices = option.getChoices();
-        box.setModel(new DefaultComboBoxModel<UnitType>(choices
+        box.setModel(new DefaultComboBoxModel<>(choices
                 .toArray(new UnitType[choices.size()])));
         box.setSelectedItem(option.getValue());
         box.setRenderer(new ChoiceRenderer());

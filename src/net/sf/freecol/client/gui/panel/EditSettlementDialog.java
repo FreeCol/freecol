@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -94,11 +93,11 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         this.name = new JTextField(settlement.getName(), 30);
 
         DefaultComboBoxModel<Nation> nationModel
-            = new DefaultComboBoxModel<Nation>();
+            = new DefaultComboBoxModel<>();
         for (Nation n : getSpecification().getIndianNations()) {
             nationModel.addElement(n);
         }
-        this.owner = new JComboBox<Nation>(nationModel);
+        this.owner = new JComboBox<>(nationModel);
         this.owner.setSelectedItem(settlement.getOwner().getNation());
         this.owner.addItemListener(this);
         this.owner.setRenderer(new FreeColComboBoxRenderer<Nation>());
@@ -106,7 +105,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         this.capital = new JCheckBox();
         this.capital.setSelected(settlement.isCapital());
 
-        this.skill = new JComboBox<UnitType>(getSkillModel());
+        this.skill = new JComboBox<>(getSkillModel());
         this.skill.setSelectedItem(settlement.getLearnableSkill());
         this.skill.setRenderer(new FreeColComboBoxRenderer<UnitType>());
 
@@ -130,12 +129,10 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
 
         final IndianSettlement fake = null;
         List<ChoiceItem<IndianSettlement>> c = choices();
-        c.add(new ChoiceItem<IndianSettlement>(Messages.message("ok"), 
-                settlement).okOption());
-        c.add(new ChoiceItem<IndianSettlement>(Messages.message("editor.removeSettlement"),
-                fake));
-        c.add(new ChoiceItem<IndianSettlement>(Messages.message("cancel"),
-                fake).cancelOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message("ok"), settlement).okOption());
+        c.add(new ChoiceItem<>(Messages.message("editor.removeSettlement"), fake));
+        c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
+            .cancelOption().defaultOption());
         initializeDialog(DialogType.QUESTION, true, panel,
             getGUI().getImageLibrary().getImageIcon(settlement, true), c);
     }
@@ -169,7 +166,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     private DefaultComboBoxModel<UnitType> getSkillModel() {
         IndianNationType ownerType = getOwnerNationType();
         DefaultComboBoxModel<UnitType> skillModel
-            = new DefaultComboBoxModel<UnitType>();
+            = new DefaultComboBoxModel<>();
         for (RandomChoice<UnitType> skill : ownerType.getSkills()) {
             skillModel.addElement(skill.getObject());
         }

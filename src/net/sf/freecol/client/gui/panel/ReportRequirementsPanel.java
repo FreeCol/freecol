@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JTextPane;
-import javax.swing.JViewport;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import net.miginfocom.swing.MigLayout;
@@ -63,17 +62,17 @@ public final class ReportRequirementsPanel extends ReportPanel {
     /**
      * A list of all the player's colonies.
      */
-    private List<Colony> colonies;
+    private final List<Colony> colonies;
 
     /**
      * Records the number of units indexed by colony and unit type.
      */
-    private Map<Colony, TypeCountMap<UnitType>> unitCount = new HashMap<>();
+    private final Map<Colony, TypeCountMap<UnitType>> unitCount = new HashMap<>();
 
     /**
      * Records whether a colony can train a type of unit.
      */
-    private Map<Colony, Set<UnitType>> canTrain = new HashMap<>();
+    private final Map<Colony, Set<UnitType>> canTrain = new HashMap<>();
 
 
     /**
@@ -94,8 +93,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
         // check which colonies can train which units
         for (Colony colony : colonies) {
-            TypeCountMap<UnitType> newUnitCount = new TypeCountMap<UnitType>();
-            Set<UnitType> newCanTrain = new HashSet<UnitType>();
+            TypeCountMap<UnitType> newUnitCount = new TypeCountMap<>();
+            Set<UnitType> newCanTrain = new HashSet<>();
             for (Unit unit : colony.getUnitList()) {
                 newUnitCount.incrementCount(unit.getType(), 1);
                 if (colony.canTrain(unit.getType())) {
@@ -110,7 +109,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
             checkColony(colony, doc);
         }
         // text area
-        int width = ((JViewport) reportPanel.getParent()).getWidth();
+        int width = reportPanel.getParent().getWidth();
         reportPanel.setLayout(new MigLayout("width " + width + "!"));
         reportPanel.add(textPane);
         textPane.setCaretPosition(0);
@@ -131,9 +130,9 @@ public final class ReportRequirementsPanel extends ReportPanel {
             logger.log(Level.WARNING, "Colony check fail", e);
         }
 
-        Set<UnitType> missingExpertWarning = new HashSet<UnitType>();
-        Set<UnitType> badAssignmentWarning = new HashSet<UnitType>();
-        Set<GoodsType> productionWarning = new HashSet<GoodsType>();
+        Set<UnitType> missingExpertWarning = new HashSet<>();
+        Set<UnitType> badAssignmentWarning = new HashSet<>();
+        Set<GoodsType> productionWarning = new HashSet<>();
 
         // Check if all unit requirements are met.
         for (Unit expert : colony.getUnitList()) {

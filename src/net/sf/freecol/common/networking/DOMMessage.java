@@ -162,8 +162,8 @@ public class DOMMessage {
         tag = "net.sf.freecol.common.networking."
             + tag.substring(0, 1).toUpperCase() + tag.substring(1)
             + "Message";
-        Class[] types = new Class[] { Game.class, Element.class };
-        Object[] params = new Object[] { game, element };
+        Class[] types = { Game.class, Element.class };
+        Object[] params = { game, element };
         DOMMessage message;
         try {
             message = (DOMMessage)Introspector.instantiate(tag, types, params);
@@ -368,10 +368,10 @@ public class DOMMessage {
      */
     public static Element createError(String messageID, String message) {
         Element errorElement = createMessage("error");
-        if (messageID != null && !"".equals(messageID)) {
+        if (messageID != null && !messageID.isEmpty()) {
             errorElement.setAttribute("messageID", messageID);
         }
-        if (message != null && !"".equals(message)) {
+        if (message != null && !message.isEmpty()) {
             errorElement.setAttribute("message", message);
         }
         return errorElement;
@@ -390,11 +390,11 @@ public class DOMMessage {
         try {
             xw.writeStartElement("error");
 
-            if (messageID != null && !"".equals(messageID)) {
+            if (messageID != null && !messageID.isEmpty()) {
                 xw.writeAttribute("messageID", messageID);
             }
 
-            if (message != null && !"".equals(message)) {
+            if (message != null && !message.isEmpty()) {
                 xw.writeAttribute("message", message);
             }
             xw.writeEndElement();

@@ -167,8 +167,8 @@ public class LostCityRumour extends TileItem {
         if (unit != null) {
             float mod = unit.applyModifiers(1.0f, getGame().getTurn(),
                                             Modifier.EXPLORE_LOST_CITY_RUMOUR);
-            percentBad = (int)Math.round(percentBad * mod);
-            percentGood = (int)Math.round(percentGood * mod);
+            percentBad = Math.round(percentBad * mod);
+            percentGood = Math.round(percentGood * mod);
         }
 
         // DeSoto forces all good results.
@@ -186,44 +186,44 @@ public class LostCityRumour extends TileItem {
 
         // The GOOD
         if (allowLearn) {
-            c.add(new RandomChoice<RumourType>(RumourType.LEARN,
+            c.add(new RandomChoice<>(RumourType.LEARN,
                     30 * percentGood));
-            c.add(new RandomChoice<RumourType>(RumourType.TRIBAL_CHIEF,
+            c.add(new RandomChoice<>(RumourType.TRIBAL_CHIEF,
                     30 * percentGood));
-            c.add(new RandomChoice<RumourType>(RumourType.COLONIST,
+            c.add(new RandomChoice<>(RumourType.COLONIST,
                     20 * percentGood));
         } else {
-            c.add(new RandomChoice<RumourType>(RumourType.TRIBAL_CHIEF,
+            c.add(new RandomChoice<>(RumourType.TRIBAL_CHIEF,
                     50 * percentGood));
-            c.add(new RandomChoice<RumourType>(RumourType.COLONIST,
+            c.add(new RandomChoice<>(RumourType.COLONIST,
                     30 * percentGood));
         }
         if (unit == null
             || unit.getOwner().getPlayerType() == Player.PlayerType.COLONIAL) {
-            c.add(new RandomChoice<RumourType>(RumourType.FOUNTAIN_OF_YOUTH,
+            c.add(new RandomChoice<>(RumourType.FOUNTAIN_OF_YOUTH,
                         2 * percentGood));
         }
-        c.add(new RandomChoice<RumourType>(RumourType.MOUNDS,
+        c.add(new RandomChoice<>(RumourType.MOUNDS,
                 8 * percentGood));
-        c.add(new RandomChoice<RumourType>(RumourType.RUINS,
+        c.add(new RandomChoice<>(RumourType.RUINS,
                 6 * percentGood));
-        c.add(new RandomChoice<RumourType>(RumourType.CIBOLA, 
+        c.add(new RandomChoice<>(RumourType.CIBOLA,
                 4 * percentGood));
 
         // The BAD
         if (tile.getOwner() != null && tile.getOwner().isIndian()) {
             // If the tile is native-owned, allow burial grounds rumour.
-            c.add(new RandomChoice<RumourType>(RumourType.BURIAL_GROUND,
+            c.add(new RandomChoice<>(RumourType.BURIAL_GROUND,
                     25 * percentBad));
-            c.add(new RandomChoice<RumourType>(RumourType.EXPEDITION_VANISHES, 
+            c.add(new RandomChoice<>(RumourType.EXPEDITION_VANISHES,
                     75 * percentBad));
         } else {
-            c.add(new RandomChoice<RumourType>(RumourType.EXPEDITION_VANISHES,
+            c.add(new RandomChoice<>(RumourType.EXPEDITION_VANISHES,
                     100 * percentBad));
         }
 
         // The NEUTRAL
-        c.add(new RandomChoice<RumourType>(RumourType.NOTHING,
+        c.add(new RandomChoice<>(RumourType.NOTHING,
                 100 * percentNeutral));
 
         return RandomChoice.getWeightedRandom(logger, "Choose rumour", c,

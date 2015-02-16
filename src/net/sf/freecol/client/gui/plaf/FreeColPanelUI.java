@@ -31,7 +31,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
  */
 public class FreeColPanelUI extends BasicPanelUI {
 
-    private static FreeColPanelUI sharedInstance = new FreeColPanelUI();
+    private static final FreeColPanelUI sharedInstance = new FreeColPanelUI();
 
 
     private FreeColPanelUI() {}

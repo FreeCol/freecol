@@ -66,9 +66,9 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
      */
     private static class UnitWrapper {
 
-        public Unit unit;
-        public String name;
-        public String location;
+        public final Unit unit;
+        public final String name;
+        public final String location;
 
 
         public UnitWrapper(Unit unit) {
@@ -89,11 +89,11 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
 
     private class UnitCellRenderer implements ListCellRenderer<UnitWrapper> {
 
-        private JPanel itemPanel = new MigPanel();
-        private JPanel selectedPanel = new MigPanel();
-        private JLabel imageLabel = new JLabel();
-        private JLabel nameLabel = new JLabel();
-        private JLabel locationLabel = new JLabel();
+        private final JPanel itemPanel = new MigPanel();
+        private final JPanel selectedPanel = new MigPanel();
+        private final JLabel imageLabel = new JLabel();
+        private final JLabel nameLabel = new JLabel();
+        private final JLabel locationLabel = new JLabel();
 
 
         public UnitCellRenderer() {
@@ -131,7 +131,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
 
 
     /** The list of units to display. */
-    private JList<UnitWrapper> unitList;
+    private final JList<UnitWrapper> unitList;
 
 
     /**
@@ -151,12 +151,12 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
                 .addAmount("%number%", units.size());
         JTextArea text = GUI.getDefaultTextArea(template);
 
-        DefaultListModel<UnitWrapper> model = new DefaultListModel<UnitWrapper>();
+        DefaultListModel<UnitWrapper> model = new DefaultListModel<>();
         for (Unit unit : units) {
             model.addElement(new UnitWrapper(unit));
         }
 
-        this.unitList = new JList<UnitWrapper>(model);
+        this.unitList = new JList<>(model);
         this.unitList.setCellRenderer(new UnitCellRenderer());
         this.unitList.setFixedCellHeight(48);
         this.unitList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"),

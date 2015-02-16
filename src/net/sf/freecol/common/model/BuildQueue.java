@@ -67,7 +67,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     private int priority = COLONY_PRIORITY;
 
     /** The colony to queue buildables for. */
-    private Colony colony;
+    private final Colony colony;
 
 
     /**

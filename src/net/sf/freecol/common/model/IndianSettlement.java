@@ -35,10 +35,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsContainer;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Settlement;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
 
@@ -129,7 +125,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     protected UnitType learnableSkill = null;
 
     /** The goods this settlement wants. */
-    protected GoodsType[] wantedGoods = new GoodsType[] { null, null, null };
+    protected GoodsType[] wantedGoods = { null, null, null };
 
     /**
      * A map that tells if a player has spoken to the chief of this settlement.
@@ -140,7 +136,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     protected final java.util.Map<Player, ContactLevel> contactLevels = new HashMap<>();
 
     /** Units that belong to this settlement. */
-    protected List<Unit> ownedUnits = new ArrayList<>();
+    protected final List<Unit> ownedUnits = new ArrayList<>();
 
     /** The missionary at this settlement. */
     protected Unit missionary = null;
@@ -850,7 +846,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                 amount = GoodsContainer.CARGO_SIZE;
             }
             if (unit != null) {
-                amount = (int)Math.round(applyModifiers((float)amount,
+                amount = Math.round(applyModifiers((float)amount,
                         getGame().getTurn(),
                         unit.getModifiers(Modifier.TRADE_VOLUME_PENALTY)));
             }

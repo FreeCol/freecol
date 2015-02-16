@@ -44,7 +44,6 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.ColonyPanel.TilesPanel.ASingleTilePanel;
-import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.panel.UnitLabel.UnitAction;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -80,7 +79,7 @@ public final class QuickActionMenu extends JPopupMenu {
 
     private static final Logger logger = Logger.getLogger(QuickActionMenu.class.getName());
 
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
     private final GUI gui;
 

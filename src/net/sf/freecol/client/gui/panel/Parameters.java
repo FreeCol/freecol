@@ -21,9 +21,9 @@ package net.sf.freecol.client.gui.panel;
 
 public class Parameters {
 
-    public int distToLandFromHighSeas;
+    public final int distToLandFromHighSeas;
 
-    public int maxDistanceToEdge;
+    public final int maxDistanceToEdge;
 
 
     Parameters(int distToLandFromHighSeas, int maxDistanceToEdge) {

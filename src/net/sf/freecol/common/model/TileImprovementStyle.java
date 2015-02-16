@@ -137,7 +137,7 @@ public class TileImprovementStyle {
      * @return The corresponding <code>TileImprovementStyle</code>.
      */
     public static TileImprovementStyle getInstance(String key) {
-        if (key == null || "".equals(key) || "0".equals(key)) return null;
+        if (key == null || key.isEmpty() || "0".equals(key)) return null;
 
         TileImprovementStyle result = cache.get(key);
         if (result == null) {

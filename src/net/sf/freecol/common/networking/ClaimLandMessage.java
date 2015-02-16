@@ -38,13 +38,13 @@ import org.w3c.dom.Element;
 public class ClaimLandMessage extends DOMMessage {
 
     /** The tile to claim. */
-    private String tileId;
+    private final String tileId;
 
     /** The unit or settlement claiming the land. */
-    private String claimantId;
+    private final String claimantId;
 
     /** The price to pay for the tile. */
-    private String priceString;
+    private final String priceString;
 
 
     /**

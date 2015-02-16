@@ -56,7 +56,7 @@ import net.sf.freecol.common.model.UnitType;
 public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectType>
     extends FreeColPanel implements ColopediaDetailPanel<T> {
 
-    private String id;
+    private final String id;
     private double scale = 1;
     private ColopediaPanel colopediaPanel;
 

@@ -666,7 +666,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     && unitType.hasPrice()
                     && unitType.isOffensive()) {
                     int weight = 100000 / europe.getUnitPrice(unitType);
-                    rc.add(new RandomChoice<UnitType>(unitType, weight));
+                    rc.add(new RandomChoice<>(unitType, weight));
                 }
             }
             cheatUnit(rc, "offensive-naval", lb);
@@ -682,7 +682,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     && unitType.hasPrice()
                     && unitType.getSpace() > 0) {
                     int weight = 100000 / europe.getUnitPrice(unitType);
-                    rc.add(new RandomChoice<UnitType>(unitType, weight));
+                    rc.add(new RandomChoice<>(unitType, weight));
                 }
             }
             cheatUnit(rc, "transport-naval", lb);
@@ -1140,7 +1140,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A collection of <code>AIUnit</code>s that need work.
      */
     private Collection<AIUnit> rearrangeColonies(LogBuilder lb) {
-        Set<AIUnit> workers = new HashSet<AIUnit>();
+        Set<AIUnit> workers = new HashSet<>();
         for (AIColony aic : getAIColonies()) {
             workers.addAll(aic.rearrangeWorkers(lb));
         }
@@ -1652,7 +1652,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                         result += evaluateGoods(ag);
                     }
                 } else if (wl instanceof ColonyTile) {
-                    for (AbstractGoods ag : ((ColonyTile)wl)
+                    for (AbstractGoods ag : wl
                              .getProductionInfo().getProduction()) {
                         result += evaluateGoods(ag);
                     }
@@ -2324,7 +2324,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     public void removeAIColony(AIColony aic) {
         final Colony colony = aic.getColony();
         
-        Set<TileImprovementPlan> tips = new HashSet<TileImprovementPlan>();
+        Set<TileImprovementPlan> tips = new HashSet<>();
         for (Tile t : colony.getOwnedTiles()) {
             TileImprovementPlan tip = tipMap.remove(t);
             if (tip != null) tips.add(tip);
@@ -2339,7 +2339,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         transportDemand.remove(colony);
 
-        Set<Wish> wishes = new HashSet<Wish>(aic.getWishes());
+        Set<Wish> wishes = new HashSet<>(aic.getWishes());
         for (AIUnit aiu : getAIUnits()) {
             PioneeringMission pm = aiu.getMission(PioneeringMission.class);
             if (pm != null) {
@@ -2565,7 +2565,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             int value;
             if (item instanceof GoldTradeItem) {
                 cash = item;
-                int gold = ((GoldTradeItem)item).getGold();
+                int gold = item.getGold();
                 if (item.getSource() == player) {
                     value = (player.checkGold(gold)) ? -gold
                         : Integer.MIN_VALUE;
@@ -2592,7 +2592,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
             } else if (item instanceof GoodsTradeItem) {
                 // FIXME: Unchecked!
-                Goods goods = ((GoodsTradeItem)item).getGoods();
+                Goods goods = item.getGoods();
                 if (item.getSource() == player) {
                     value = -market.getBidPrice(goods.getType(),
                                                 goods.getAmount());
@@ -2623,7 +2623,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             } else if (item instanceof StanceTradeItem) {
                 double ratio = getStrengthRatio(other);
                 // FIXME: evaluate whether we want this stance change
-                Stance stance = ((StanceTradeItem)item).getStance();
+                Stance stance = item.getStance();
                 switch (stance) {
                 case WAR:
                     if (ratio < 0.33) {

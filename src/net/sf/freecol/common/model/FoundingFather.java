@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Turn;
 
 
 /**
@@ -55,7 +54,7 @@ public class FoundingFather extends FreeColGameObjectType {
      * The probability of this FoundingFather being offered for selection,
      * across the game ages.
      */
-    private int[] weight = new int[Turn.NUMBER_OF_AGES];
+    private final int[] weight = new int[Turn.NUMBER_OF_AGES];
 
     /**
      * Players that want to elect this founding father must match one
@@ -341,7 +340,7 @@ public class FoundingFather extends FreeColGameObjectType {
         super.readAttributes(xr);
 
         type = xr.getAttribute(TYPE_TAG, FoundingFatherType.class,
-                               (FoundingFatherType)null);
+                null);
 
         for (int i = 0; i < weight.length; i++) {
             weight[i] = xr.getAttribute(WEIGHT_TAG + (i + 1), 0);

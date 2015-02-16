@@ -491,7 +491,7 @@ public class TerrainGenerator {
      */
     private int fillOcean(Map map, Tile tile, ServerRegion region,
                           Rectangle bounds) {
-        Queue<Tile> q = new LinkedList<Tile>();
+        Queue<Tile> q = new LinkedList<>();
         int n = 0;
         boolean[][] visited = new boolean[map.getWidth()][map.getHeight()];
         visited[tile.getX()][tile.getY()] = true;
@@ -1190,7 +1190,7 @@ public class TerrainGenerator {
      */
     public static void encodeStyle(Tile tile) {
         EnumMap<Direction, Boolean> connections
-            = new EnumMap<Direction, Boolean>(Direction.class);
+            = new EnumMap<>(Direction.class);
 
         // corners
         for (Direction d : Direction.corners) {

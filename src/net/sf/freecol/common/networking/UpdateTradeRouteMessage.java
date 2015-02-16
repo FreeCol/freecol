@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 public class UpdateTradeRouteMessage extends DOMMessage {
 
     /** The trade route to update. */
-    private TradeRoute tradeRoute;
+    private final TradeRoute tradeRoute;
 
 
     /**

@@ -90,7 +90,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
  */
 public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
-    private static Logger logger = Logger.getLogger(BuildQueuePanel.class.getName());
+    private static final Logger logger = Logger.getLogger(BuildQueuePanel.class.getName());
 
     private static final DataFlavor BUILD_LIST_FLAVOR
         = new DataFlavor(List.class, "BuildListFlavor");
@@ -107,9 +107,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
          */
         public class BuildablesTransferable implements Transferable {
 
-            private List<? extends BuildableType> buildables;
+            private final List<? extends BuildableType> buildables;
 
-            private final DataFlavor[] supportedFlavors = new DataFlavor[] {
+            private final DataFlavor[] supportedFlavors = {
                 BUILD_LIST_FLAVOR
             };
 
@@ -415,15 +415,15 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     private class DefaultBuildQueueCellRenderer
         implements ListCellRenderer<BuildableType> {
 
-        private JPanel itemPanel = new JPanel();
-        private JPanel selectedPanel = new JPanel();
-        private JLabel imageLabel = new JLabel(new ImageIcon());
-        private JLabel nameLabel = new JLabel();
+        private final JPanel itemPanel = new JPanel();
+        private final JPanel selectedPanel = new JPanel();
+        private final JLabel imageLabel = new JLabel(new ImageIcon());
+        private final JLabel nameLabel = new JLabel();
 
-        private JLabel lockLabel
+        private final JLabel lockLabel
             = new JLabel(new ImageIcon(ResourceManager.getImage("lock.image", 0.5)));
 
-        private Dimension buildingDimension = new Dimension(-1, 48);
+        private final Dimension buildingDimension = new Dimension(-1, 48);
 
 
         public DefaultBuildQueueCellRenderer() {
@@ -493,7 +493,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     private final Colony colony;
 
     /** A feature container for potential features from queued buildables. */
-    private FeatureContainer featureContainer;
+    private final FeatureContainer featureContainer;
 
     /** A transfer handler for the build queue lists. */
     private final BuildQueueTransferHandler buildQueueHandler
@@ -520,9 +520,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     /** The check box to enable showing all buildables. */
     private final JCheckBox showAllBox;
 
-    private Map<BuildableType, String> lockReasons = new HashMap<>();
-    private Set<BuildableType> unbuildableTypes
-        = new HashSet<BuildableType>();
+    private final Map<BuildableType, String> lockReasons = new HashMap<>();
+    private final Set<BuildableType> unbuildableTypes
+        = new HashSet<>();
 
 
     /**
@@ -539,7 +539,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         this.featureContainer = new FeatureContainer();
 
         DefaultListModel<BuildableType> current
-            = new DefaultListModel<BuildableType>();
+            = new DefaultListModel<>();
         for (BuildableType type : this.colony.getBuildQueue()) {
             current.addElement(type);
             this.featureContainer.addFeatures(type);
@@ -571,8 +571,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         JLabel header = GUI.localizedLabel("colonyPanel.buildQueue");
         header.setFont(GUI.BIG_HEADER_FONT);
 
-        DefaultListModel<UnitType> units = new DefaultListModel<UnitType>();
-        this.unitList = new JList<UnitType>(units);
+        DefaultListModel<UnitType> units = new DefaultListModel<>();
+        this.unitList = new JList<>(units);
         this.unitList.setTransferHandler(buildQueueHandler);
         this.unitList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         this.unitList.setDragEnabled(true);
@@ -586,7 +586,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             .template("colonyPanel.currentlyBuilding")
             .add("%buildable%", "nothing"));
 
-        this.buildQueueList = new JList<BuildableType>(current);
+        this.buildQueueList = new JList<>(current);
         this.buildQueueList.setTransferHandler(buildQueueHandler);
         this.buildQueueList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.buildQueueList.setDragEnabled(true);
@@ -605,8 +605,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             });
 
         DefaultListModel<BuildingType> buildings
-            = new DefaultListModel<BuildingType>();
-        this.buildingList = new JList<BuildingType>(buildings);
+            = new DefaultListModel<>();
+        this.buildingList = new JList<>(buildings);
         this.buildingList.setTransferHandler(buildQueueHandler);
         this.buildingList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         this.buildingList.setDragEnabled(true);

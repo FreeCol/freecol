@@ -30,10 +30,10 @@ import org.w3c.dom.Element;
 class TrivialMessage extends DOMMessage {
 
     /** The tag for the trivial message. */
-    private String tag;
+    private final String tag;
 
     /** An array of (attribute,value) pairs. */
-    private String[] attributes;
+    private final String[] attributes;
 
 
     public TrivialMessage(String tag, String... attributes) {

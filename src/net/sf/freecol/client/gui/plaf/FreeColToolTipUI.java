@@ -43,16 +43,16 @@ import net.sf.freecol.client.gui.ImageLibrary;
  */
 public class FreeColToolTipUI extends BasicToolTipUI {
 
-    private static FreeColToolTipUI sharedInstance = new FreeColToolTipUI();
+    private static final FreeColToolTipUI sharedInstance = new FreeColToolTipUI();
 
     // FIXME: find out why we can't use the FontRenderContext of the
     // component.  And should we use fractional metrics?
-    private static FontRenderContext frc
+    private static final FontRenderContext frc
         = new FontRenderContext(null, true, false);
 
-    private static int margin = 5;
+    private static final int margin = 5;
     private static int maximumWidth = 300;
-    private static int LEADING = 5;
+    private static final int LEADING = 5;
 
     private static final Pattern lineBreak = Pattern.compile("\n");
 

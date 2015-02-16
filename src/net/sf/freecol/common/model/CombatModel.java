@@ -68,7 +68,7 @@ public abstract class CombatModel {
     public static class CombatOdds {
         public static final float UNKNOWN_ODDS = -1.0f;
 
-        public float win;
+        public final float win;
 
         public CombatOdds(float win) {
             this.win = win;

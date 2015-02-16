@@ -43,7 +43,7 @@ import net.sf.freecol.common.model.StringTemplate;
  */
 public final class ProductionLabel extends AbstractGoodsLabel {
 
-    private static Logger logger = Logger.getLogger(ProductionLabel.class.getName());
+    private static final Logger logger = Logger.getLogger(ProductionLabel.class.getName());
 
     /**
      * The maximum number of goodsIcons to display.

@@ -191,12 +191,12 @@ if (unitType == null) logger.info("MIGRANTRANDOM " + recruits.size());
      * @return A weighted list of recruitable unit types.
      */
     public List<RandomChoice<UnitType>> generateRecruitablesList() {
-        final Player owner = (Player)getOwner();
+        final Player owner = getOwner();
         List<RandomChoice<UnitType>> recruits = new ArrayList<>();
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isRecruitable()
                 && owner.hasAbility(Ability.CAN_RECRUIT_UNIT, unitType)) {
-                recruits.add(new RandomChoice<UnitType>(unitType,
+                recruits.add(new RandomChoice<>(unitType,
                         unitType.getRecruitProbability()));
             }
         }

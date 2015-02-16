@@ -1161,9 +1161,9 @@ public abstract class FreeColObject
 
             xw.writeAttribute(PARTIAL_ATTRIBUTE_TAG, true);
 
-            for (int i = 0; i < fields.length; i++) {
-                Introspector intro = new Introspector(theClass, fields[i]);
-                xw.writeAttribute(fields[i], intro.getter(this));
+            for (String field : fields) {
+                Introspector intro = new Introspector(theClass, field);
+                xw.writeAttribute(field, intro.getter(this));
             }
 
             xw.writeEndElement();

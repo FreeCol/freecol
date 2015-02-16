@@ -213,8 +213,8 @@ public final class StartGamePanel extends FreeColPanel {
         super.setEnabled(enabled);
 
         Component[] components = getComponents();
-        for (int i = 0; i < components.length; i++) {
-            components[i].setEnabled(enabled);
+        for (Component component : components) {
+            component.setEnabled(enabled);
         }
 
         if (singlePlayerGame && enabled) {

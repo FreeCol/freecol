@@ -34,7 +34,7 @@ import javax.swing.plaf.basic.BasicPanelUI;
  */
 public class FreeColTransparentPanelUI extends BasicPanelUI {
 
-    private static FreeColTransparentPanelUI sharedInstance = new FreeColTransparentPanelUI();
+    private static final FreeColTransparentPanelUI sharedInstance = new FreeColTransparentPanelUI();
 
 
     public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {

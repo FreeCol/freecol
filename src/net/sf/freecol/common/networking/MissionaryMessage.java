@@ -39,13 +39,13 @@ import org.w3c.dom.Element;
 public class MissionaryMessage extends DOMMessage {
 
     /** The identifier of the missionary. */
-    private String unitId;
+    private final String unitId;
 
     /** The direction to the settlement. */
-    private String directionString;
+    private final String directionString;
 
     /** Is this a denunciation? */
-    private boolean denounce;
+    private final boolean denounce;
 
 
     /**

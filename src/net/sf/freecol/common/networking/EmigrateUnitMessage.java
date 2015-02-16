@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 public class EmigrateUnitMessage extends DOMMessage {
 
     /** The slot from which to select the unit. */
-    private String slotString;
+    private final String slotString;
 
 
     /**

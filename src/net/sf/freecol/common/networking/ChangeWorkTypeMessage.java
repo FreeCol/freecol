@@ -35,10 +35,10 @@ import org.w3c.dom.Element;
 public class ChangeWorkTypeMessage extends DOMMessage {
 
     /** The identifier of the unit that is working. */
-    private String unitId;
+    private final String unitId;
 
     /** The goods type to produce. */
-    private String workTypeId;
+    private final String workTypeId;
 
 
     /**

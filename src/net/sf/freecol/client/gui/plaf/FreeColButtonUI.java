@@ -43,7 +43,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
  */
 public class FreeColButtonUI extends MetalButtonUI {
 
-    private static FreeColButtonUI sharedInstance = new FreeColButtonUI();
+    private static final FreeColButtonUI sharedInstance = new FreeColButtonUI();
 
 
     public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {

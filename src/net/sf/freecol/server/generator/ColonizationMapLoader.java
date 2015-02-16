@@ -70,7 +70,7 @@ public class ColonizationMapLoader implements MapLoader {
     public static final int OCEAN = 25;
     public static final int HIGH_SEAS = 26;
 
-    private static final String[] tiletypes = new String[] {
+    private static final String[] tiletypes = {
         "tundra",
         "desert",
         "plains",
@@ -101,7 +101,7 @@ public class ColonizationMapLoader implements MapLoader {
     };
 
 
-    private static final byte[] header = new byte[] {
+    private static final byte[] header = {
         58, 0, 72, 0, 4, 0
     };
     private static byte[] layer1;

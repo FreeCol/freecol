@@ -38,7 +38,7 @@ import net.sf.freecol.common.util.Utils;
 public class ModOption extends AbstractOption<FreeColModFile> {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(ModOption.class.getName());
+    private static final Logger logger = Logger.getLogger(ModOption.class.getName());
 
     /** The value of this option. */
     private FreeColModFile value = null;

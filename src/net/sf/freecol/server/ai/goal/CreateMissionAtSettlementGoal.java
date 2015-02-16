@@ -52,7 +52,7 @@ public class CreateMissionAtSettlementGoal extends Goal {
     private static final Logger logger = Logger.getLogger(CreateMissionAtSettlementGoal.class.getName());
 
     //the settlement to build a mission at
-    private IndianSettlement target;
+    private final IndianSettlement target;
 
     //our only possible subgoal, a GoToAdjacentGoal
     private GotoAdjacentGoal gotoSubGoal;
@@ -139,13 +139,13 @@ public class CreateMissionAtSettlementGoal extends Goal {
                         hasFoundMissionary = true;
                         if (u.getUnit().getTile().isAdjacent(target.getTile())) {
                             //Missionary is adjacent, use it to finish the goal.
-                            if (((IndianSettlement)target).hasMissionary(player.getPlayer())) {
+                            if (target.hasMissionary(player.getPlayer())) {
                                 PathNode pathNode = u.getUnit().findPath(target.getTile());
                                 u.getUnit().setMovesLeft(0);
 
                                 AIMessage.askEstablishMission(u,
                                     pathNode.getDirection(),
-                                    ((IndianSettlement)target).hasMissionary());
+                                    target.hasMissionary());
                             } else {
                                 //we can't establish a mission here
                                 addUnitToParent(u);

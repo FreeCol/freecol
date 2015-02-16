@@ -33,11 +33,11 @@ import javax.swing.JLabel;
 public final class ImageSelection implements Transferable {
     
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(ImageSelection.class.getName());
+    private static final Logger logger = Logger.getLogger(ImageSelection.class.getName());
 
     //private static final DataFlavor[] flavors = {DataFlavor.imageFlavor};
 
-    private JLabel label;
+    private final JLabel label;
 
     /**
      * The constructor to use.

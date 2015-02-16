@@ -204,7 +204,7 @@ public class Operand extends Scope {
         case OPTION:
             return game.getSpecification().getInteger(getType());
         default:
-            List<FreeColObject> list = new LinkedList<FreeColObject>();
+            List<FreeColObject> list = new LinkedList<>();
             for (Player player : game.getLivePlayers(null)) {
                 switch (operandType) {
                 case UNITS:
@@ -238,7 +238,7 @@ public class Operand extends Scope {
     public Integer getValue(Player player) {
         if (value == null) {
             if (scopeLevel == ScopeLevel.PLAYER) {
-                List<FreeColObject> list = new LinkedList<FreeColObject>();
+                List<FreeColObject> list = new LinkedList<>();
                 switch(operandType) {
                 case UNITS:
                     list.addAll(player.getUnits());
@@ -293,7 +293,7 @@ public class Operand extends Scope {
             if (scopeLevel == ScopeLevel.SETTLEMENT
                 && settlement instanceof Colony) {
                 Colony colony = (Colony) settlement;
-                List<FreeColObject> list = new LinkedList<FreeColObject>();
+                List<FreeColObject> list = new LinkedList<>();
                 switch(operandType) {
                 case UNITS:
                     list.addAll(colony.getUnitList());

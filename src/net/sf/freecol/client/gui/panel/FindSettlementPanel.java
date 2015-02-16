@@ -111,7 +111,7 @@ public final class FindSettlementPanel extends FreeColPanel
         header.setFont(GUI.SMALL_HEADER_FONT);
         add(header);
 
-        this.settlementList = new JList<Settlement>();
+        this.settlementList = new JList<>();
         this.settlementList.setCellRenderer(new SettlementRenderer());
         this.settlementList.setFixedCellHeight(48);
         this.settlementList.addListSelectionListener(this);
@@ -148,7 +148,7 @@ public final class FindSettlementPanel extends FreeColPanel
         listScroller.setPreferredSize(new Dimension(250, 250));
         add(listScroller, "width max(300, 100%), height max(300, 100%)");
 
-        this.displayOptionBox = new JComboBox<String>(new String[] {
+        this.displayOptionBox = new JComboBox<>(new String[] {
                 Messages.message("findSettlementPanel.displayAll"),
                 Messages.message("findSettlementPanel.displayOnlyNatives"),
                 Messages.message("findSettlementPanel.displayOnlyEuropean"),
@@ -165,7 +165,7 @@ public final class FindSettlementPanel extends FreeColPanel
 
     private void updateSearch(DisplayListOption displayListOption) {
         DefaultListModel<Settlement> model
-            = new DefaultListModel<Settlement>();
+            = new DefaultListModel<>();
         Object selected = this.settlementList.getSelectedValue();
 
         for (Player player : getGame().getLivePlayers(null)) {

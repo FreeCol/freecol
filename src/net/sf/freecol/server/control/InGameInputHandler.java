@@ -106,7 +106,7 @@ import org.w3c.dom.NodeList;
 public final class InGameInputHandler extends InputHandler
     implements NetworkConstants {
 
-    private static Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
 
 
     /**

@@ -90,12 +90,12 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      */
     private class Destination {
 
-        public Unit unit;
-        public Location location;
-        public int turns;
-        public String extras;
-        public String text;
-        public int score;
+        public final Unit unit;
+        public final Location location;
+        public final int turns;
+        public final String extras;
+        public final String text;
+        public final int score;
         public ImageIcon icon;
 
 
@@ -207,7 +207,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 if (!goodsTypes.isEmpty()) {
                     // Show goods prices if relevant
                     for (GoodsType g : goodsTypes) {
-                        String sale = owner.getLastSaleString((Settlement)loc, g);
+                        String sale = owner.getLastSaleString(loc, g);
                         String more = null;
                         if (loc instanceof IndianSettlement) {
                             GoodsType[] wanted
@@ -245,7 +245,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
     private class DestinationComparator implements Comparator<Destination> {
 
-        protected Player owner;
+        protected final Player owner;
 
         public DestinationComparator(Player player) {
             this.owner = player;
@@ -362,8 +362,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         header.setFont(GUI.SMALL_HEADER_FONT);
 
         DefaultListModel<Destination> model
-            = new DefaultListModel<Destination>();
-        this.destinationList = new JList<Destination>(model);
+            = new DefaultListModel<>();
+        this.destinationList = new JList<>(model);
         this.destinationList.setCellRenderer(new LocationRenderer());
         this.destinationList.setFixedCellHeight(CELL_HEIGHT);
         this.destinationList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -389,7 +389,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 }
             });
 
-        this.comparatorBox = new JComboBox<String>(new String[] {
+        this.comparatorBox = new JComboBox<>(new String[] {
                 Messages.message("selectDestination.sortByOwner"),
                 Messages.message("selectDestination.sortByName"),
                 Messages.message("selectDestination.sortByDistance")
@@ -416,10 +416,10 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         panel.setSize(panel.getPreferredSize());
 
         List<ChoiceItem<Location>> c = choices();
-        c.add(new ChoiceItem<Location>(Messages.message("ok"),
-                (Location)null).okOption());
-        c.add(new ChoiceItem<Location>(Messages.message("cancel"),
-                (Location)null).cancelOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message("ok"), (Location)null)
+            .okOption());
+        c.add(new ChoiceItem<>(Messages.message("cancel"), (Location)null)
+            .cancelOption().defaultOption());
         initializeDialog(DialogType.QUESTION, true, panel,
                          getImageLibrary().getImageIcon(unit, true), c);
     }
@@ -511,7 +511,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         final Player player = getMyPlayer();
         Destination selected = this.destinationList.getSelectedValue();
         DefaultListModel<Destination> model
-            = new DefaultListModel<Destination>();
+            = new DefaultListModel<>();
         for (Destination d : this.destinations) {
             if (showOnlyMyColonies) {
                 if (d.location instanceof Europe

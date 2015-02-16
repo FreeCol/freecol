@@ -39,7 +39,7 @@ import net.sf.freecol.common.model.Specification;
  */
 public class OptionGroup extends AbstractOption<OptionGroup> {
 
-    private static Logger logger = Logger.getLogger(OptionGroup.class.getName());
+    private static final Logger logger = Logger.getLogger(OptionGroup.class.getName());
 
     /** The options in this group. */
     private final List<Option> options = new ArrayList<>();

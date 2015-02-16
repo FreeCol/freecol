@@ -44,12 +44,13 @@ import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
  */
 public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
 
-    private JPanel panel = new JPanel();
-    private JComboBox<MixerWrapper> cbox;
-    private JButton button1, button2;
-    private JLabel currentMixerLabel;
+    private final JPanel panel = new JPanel();
+    private final JComboBox<MixerWrapper> cbox;
+    private final JButton button1;
+    private final JButton button2;
+    private final JLabel currentMixerLabel;
 
-    private ActionListener aHandler = new ActionListener () {
+    private final ActionListener aHandler = new ActionListener () {
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == button1) {
                     gui.playSound("sound.event.buildingComplete");
@@ -82,7 +83,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
         layout.setHgap(15);
         panel.setLayout(layout);
 
-        cbox = new JComboBox<MixerWrapper>();
+        cbox = new JComboBox<>();
         panel.add(cbox, BorderLayout.WEST);
 
         currentMixerLabel = new JLabel();
@@ -98,8 +99,8 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
         button2.addActionListener(aHandler);
 
         cbox.add(super.getJLabel());
-        cbox.setModel(new DefaultComboBoxModel<MixerWrapper>(getOption()
-                .getChoices().toArray(new MixerWrapper[0])));
+        cbox.setModel(new DefaultComboBoxModel<>(getOption().getChoices()
+                .toArray(new MixerWrapper[0])));
         reset();
 
         cbox.setEnabled(editable);

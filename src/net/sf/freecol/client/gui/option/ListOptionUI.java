@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -39,8 +38,6 @@ import javax.swing.event.ListSelectionListener;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.MigPanel;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.Option;
@@ -54,17 +51,17 @@ import net.sf.freecol.common.option.Option;
 public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     implements ListSelectionListener {
 
-    private static Logger logger = Logger.getLogger(ListOptionUI.class.getName());
+    private static final Logger logger = Logger.getLogger(ListOptionUI.class.getName());
 
-    private JPanel panel;
-    private JList<AbstractOption<T>> list;
-    private DefaultListModel<AbstractOption<T>> model;
+    private final JPanel panel;
+    private final JList<AbstractOption<T>> list;
+    private final DefaultListModel<AbstractOption<T>> model;
 
-    private JButton editButton = GUI.localizedButton("list.edit");
-    private JButton addButton = GUI.localizedButton("list.add");
-    private JButton removeButton = GUI.localizedButton("list.remove");
-    private JButton upButton = GUI.localizedButton("list.up");
-    private JButton downButton = GUI.localizedButton("list.down");
+    private final JButton editButton = GUI.localizedButton("list.edit");
+    private final JButton addButton = GUI.localizedButton("list.add");
+    private final JButton removeButton = GUI.localizedButton("list.remove");
+    private final JButton upButton = GUI.localizedButton("list.up");
+    private final JButton downButton = GUI.localizedButton("list.down");
 
 
     /**
@@ -84,7 +81,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                                                  GUI.BORDER_COLOR));
         this.panel.setLayout(new MigLayout("wrap 2, fill", "[fill, grow]20[fill]"));
 
-        this.model = new DefaultListModel<AbstractOption<T>>();
+        this.model = new DefaultListModel<>();
         for (AbstractOption<T> o : option.getValue()) {
             try {
                 AbstractOption<T> c = o.clone();
@@ -93,7 +90,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 logger.log(Level.WARNING, "Can not clone " + o.getId(), e);
             }
         }
-        list = new JList<AbstractOption<T>>(this.model);
+        list = new JList<>(this.model);
         AbstractOption<T> o = option.getValue().isEmpty()
             ? option.getTemplate()
             : option.getValue().get(0);
@@ -114,7 +111,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         addButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     AbstractOption<T> oldValue
-                        = (AbstractOption<T>)list.getSelectedValue();
+                        = list.getSelectedValue();
                     if (oldValue == null) oldValue = option.getTemplate();
                     try {
                         AbstractOption<T> newValue = (oldValue == null) ? null

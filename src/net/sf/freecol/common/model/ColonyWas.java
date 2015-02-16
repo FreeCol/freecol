@@ -34,10 +34,10 @@ public class ColonyWas {
 
     private static final Logger logger = Logger.getLogger(ColonyWas.class.getName());
 
-    private Colony colony;
-    private int population;
-    private int productionBonus;
-    private List<BuildableType> buildQueue;
+    private final Colony colony;
+    private final int population;
+    private final int productionBonus;
+    private final List<BuildableType> buildQueue;
 
 
     /**

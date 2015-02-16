@@ -30,7 +30,6 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
-import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Specification;
@@ -45,11 +44,11 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
 
     private static final Logger logger = Logger.getLogger(OptionsDialog.class.getName());
 
-    private boolean editable;
+    private final boolean editable;
     private OptionGroup group;
     private OptionGroupUI ui;
-    private String defaultFileName;
-    private String optionGroupId;
+    private final String defaultFileName;
+    private final String optionGroupId;
     private JScrollPane scrollPane;
     private MigPanel optionPanel;
     protected MigPanel panel;
@@ -146,10 +145,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
         this.panel.setSize(this.panel.getPreferredSize());
 
         List<ChoiceItem<OptionGroup>> c = choices();
-        c.add(new ChoiceItem<OptionGroup>(Messages.message("ok"),
-                this.group).okOption());
-        c.add(new ChoiceItem<OptionGroup>(Messages.message("cancel"),
-                (OptionGroup)null,
+        c.add(new ChoiceItem<>(Messages.message("ok"), this.group).okOption());
+        c.add(new ChoiceItem<>(Messages.message("cancel"), (OptionGroup)null,
                 isEditable()).cancelOption().defaultOption());
         initializeDialog(DialogType.PLAIN, true, this.panel, null, c);
     }

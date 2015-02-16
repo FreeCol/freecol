@@ -33,7 +33,7 @@ public class MoveAction extends MapboardAction {
 
     public static final String id = "moveAction.";
 
-    private Direction direction;
+    private final Direction direction;
 
 
     /**

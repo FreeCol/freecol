@@ -106,7 +106,7 @@ public class TranslationReport {
                         if (current == '%') {
                             if (inVariable) {
                                 String var = masterValue.substring(lastIndex, index + 1);
-                                if (value.indexOf(var) == -1) {
+                                if (!value.contains(var)) {
                                     missingVariables.add(key);
                                 }
                                 inVariable = false;
@@ -173,7 +173,7 @@ public class TranslationReport {
                         if (current == '%') {
                             if (inVariable) {
                                 String var = propertiesValue.substring(lastIndex, index + 1);
-                                if (value.indexOf(var) == -1) {
+                                if (!value.contains(var)) {
                                     superfluousVariables.add(key);
                                 }
                                 inVariable = false;
@@ -265,7 +265,7 @@ public class TranslationReport {
     }
 
     private static TreeSet<String> sort(ArrayList<String> missingKeys) {
-        TreeSet<String> sorted = new TreeSet<String>();
+        TreeSet<String> sorted = new TreeSet<>();
         sorted.addAll(missingKeys);
         return sorted;
     }

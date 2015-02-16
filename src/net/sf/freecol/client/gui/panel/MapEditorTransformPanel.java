@@ -75,7 +75,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
     private final JPanel listPanel;
     private JToggleButton settlementButton;
-    private ButtonGroup group;
+    private final ButtonGroup group;
 
     /**
      * A native nation to use for native settlement type and skill.
@@ -230,7 +230,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     }
 
     public class TileTypeTransform extends MapTransform {
-        private TileType tileType;
+        private final TileType tileType;
 
         private TileTypeTransform(TileType tileType) {
             this.tileType = tileType;
@@ -247,7 +247,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     }
 
     private class RiverTransform extends MapTransform {
-        private int magnitude;
+        private final int magnitude;
 
         private RiverTransform(int magnitude) {
             this.magnitude = magnitude;
@@ -302,7 +302,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     List<ChoiceItem<ResourceType>> choices = new ArrayList<>();
                     for (ResourceType rt : resList) {
                         String name = Messages.getName(rt);
-                        choices.add(new ChoiceItem<ResourceType>(name, rt));
+                        choices.add(new ChoiceItem<>(name, rt));
                     }
                     ResourceType choice = getGUI().getChoice(true, null, 
                         Messages.message("editor.chooseResource"), null,

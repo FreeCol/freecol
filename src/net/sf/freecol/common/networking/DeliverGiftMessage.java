@@ -36,13 +36,13 @@ import org.w3c.dom.Element;
 public class DeliverGiftMessage extends DOMMessage {
 
     /** The object identifier of the unit that is delivering the gift. */
-    private String unitId;
+    private final String unitId;
 
     /** The object identifier of the settlement the gift is going to. */
-    private String settlementId;
+    private final String settlementId;
 
     /** The goods to be delivered. */
-    private Goods goods;
+    private final Goods goods;
 
 
     /**

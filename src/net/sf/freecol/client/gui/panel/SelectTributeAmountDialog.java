@@ -26,7 +26,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.StringTemplate;
 
 
@@ -37,12 +36,12 @@ public final class SelectTributeAmountDialog
     extends FreeColInputDialog<Integer> {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(SelectTributeAmountDialog.class.getName());
+    private static final Logger logger = Logger.getLogger(SelectTributeAmountDialog.class.getName());
 
     private static final int COLUMNS = 5;
 
     /** The field to contain the input. */
-    private JTextField input;
+    private final JTextField input;
 
     /** The maxumum amount allowed. */
     private final int maximum;

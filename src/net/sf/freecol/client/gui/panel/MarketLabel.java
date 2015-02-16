@@ -38,7 +38,7 @@ import net.sf.freecol.common.model.Player;
 public final class MarketLabel extends AbstractGoodsLabel
     implements Draggable {
 
-    private static Logger logger = Logger.getLogger(MarketLabel.class.getName());
+    private static final Logger logger = Logger.getLogger(MarketLabel.class.getName());
 
     /** The enclosing market. */
     private final Market market;

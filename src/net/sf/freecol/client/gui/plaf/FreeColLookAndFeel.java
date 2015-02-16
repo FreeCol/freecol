@@ -24,6 +24,7 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +46,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
 
     private static final Logger logger = Logger.getLogger(FreeColLookAndFeel.class.getName());
 
-    private static final Class uiClasses[] = new Class[] {
+    private static final Class uiClasses[] = {
         FreeColButtonUI.class,
         FreeColCheckBoxUI.class,
         FreeColComboBoxUI.class,
@@ -194,9 +195,9 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
 
         // Set the default font in all UI elements.
         UIDefaults u = UIManager.getDefaults();
-        java.util.Enumeration<Object> keys = u.keys();
-        while (keys.hasMoreElements()) {
-            Object key = keys.nextElement();
+        Iterator<Object> iterator = u.keySet().iterator();
+        while (iterator.hasNext()) {
+            Object key = iterator.next();
             if (u.get(key) instanceof javax.swing.plaf.FontUIResource) {
                 u.put(key, defaultFont);
             }

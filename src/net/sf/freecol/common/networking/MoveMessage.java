@@ -38,10 +38,10 @@ import org.w3c.dom.Element;
 public class MoveMessage extends DOMMessage {
 
     /** The identifier of the object to be moved. */
-    private String unitId;
+    private final String unitId;
 
     /** The direction to move. */
-    private String directionString;
+    private final String directionString;
 
 
     /**

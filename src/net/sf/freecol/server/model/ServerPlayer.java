@@ -148,7 +148,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     private int remainingEmigrants = 0;
 
     /** Players with respect to which stance has changed. */
-    private List<ServerPlayer> stanceDirty = new ArrayList<>();
+    private final List<ServerPlayer> stanceDirty = new ArrayList<>();
 
     /** Accumulate extra trades here.  Do not serialize. */
     private final List<AbstractGoods> extraTrades = new ArrayList<>();
@@ -724,15 +724,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Specification spec = getGame().getSpecification();
         int age = getGame().getTurn().getAge();
         EnumMap<FoundingFatherType, List<RandomChoice<FoundingFather>>> choices
-            = new EnumMap<FoundingFatherType,
-                List<RandomChoice<FoundingFather>>>(FoundingFatherType.class);
+            = new EnumMap<>(FoundingFatherType.class);
         for (FoundingFather father : spec.getFoundingFathers()) {
             if (!hasFather(father) && father.isAvailableTo(this)) {
                 FoundingFatherType type = father.getType();
                 List<RandomChoice<FoundingFather>> rc = choices.get(type);
                 if (rc == null) rc = new ArrayList<>();
                 int weight = father.getWeight(age);
-                rc.add(new RandomChoice<FoundingFather>(father, weight));
+                rc.add(new RandomChoice<>(father, weight));
                 choices.put(father.getType(), rc);
             }
         }
@@ -1233,7 +1232,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public boolean csChangeStance(Stance stance, ServerPlayer otherPlayer,
                                   boolean symmetric, ChangeSet cs) {
-        ServerPlayer other = (ServerPlayer) otherPlayer;
+        ServerPlayer other = otherPlayer;
         boolean change = false;
         Stance old = getStance(otherPlayer);
 
@@ -1904,7 +1903,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             game.getTurn(), Modifier.NATIVE_ALARM_MODIFIER);
                         ServerIndianSettlement sis
                             = (ServerIndianSettlement)settlement;
-                        sis.csModifyAlarm((ServerPlayer)player, change,
+                        sis.csModifyAlarm(player, change,
                                           true, cs);//+til
                     }
                 }
@@ -2755,7 +2754,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Settlement settlement = loser.getSettlement();
         if (settlement != null) {
             if (settlement instanceof IndianSettlement) {
-                return (((IndianSettlement)settlement).isCapital())
+                return (settlement.isCapital())
                     ? Tension.TENSION_ADD_CAPITAL_ATTACKED
                     : Tension.TENSION_ADD_SETTLEMENT_ATTACKED;
             } else {
@@ -2912,7 +2911,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Hand over the colony.  Inform former owner of loss of owned
         // tiles, and process possible increase in line of sight.
-        ((ServerColony)colony)//-til
+        colony//-til
             .csChangeOwner(attackerPlayer, cs);//-vis(attackerPlayer,colonyPlayer)
         Set<Tile> explored = attackerPlayer.exploreForSettlement(colony);
         explored.addAll(tiles);
@@ -3836,7 +3835,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     private void csSinkShipAttack(Unit attacker, Unit ship, ChangeSet cs) {
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
         StringTemplate shipNation = ship.getApparentOwnerName();
-        Unit attackerUnit = (Unit) attacker;
+        Unit attackerUnit = attacker;
         ServerPlayer attackerPlayer = (ServerPlayer) attackerUnit.getOwner();
         StringTemplate attackerNation = attackerUnit.getApparentOwnerName();
 

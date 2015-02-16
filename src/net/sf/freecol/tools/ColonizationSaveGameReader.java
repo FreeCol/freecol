@@ -27,16 +27,16 @@ public class ColonizationSaveGameReader {
 
     private final static int PLAYER_DATA = 0x9e;
     private final static int COLONY_DATA = 0x186;
-    private final static String[] NATIONS = new String[] {
+    private final static String[] NATIONS = {
         "English", "French", "Spanish", "Dutch"
     };
 
     private class GameData {
 
-        private int mapWidth;
-        private int mapHeight;
-        private int numberOfColonies;
-        private int difficulty;
+        private final int mapWidth;
+        private final int mapHeight;
+        private final int numberOfColonies;
+        private final int difficulty;
 
         public GameData(byte[] data) {
             mapWidth = data[0xc];
@@ -60,9 +60,9 @@ public class ColonizationSaveGameReader {
 
         public static final int LENGTH = 52;
 
-        private String newLandName;
-        private String playerName;
-        private boolean humanPlayer;
+        private final String newLandName;
+        private final String playerName;
+        private final boolean humanPlayer;
 
         public PlayerData(byte[] data, int offset) {
             playerName = getString(data, offset, 23);
@@ -85,9 +85,11 @@ public class ColonizationSaveGameReader {
         public static final int COLONIST_SPECIALITY = 0x40;
         public static final int TILES = 0x70;
 
-        private int x, y, numberOfColonists;
-        private String name;
-        private Colonist[] colonists;
+        private final int x;
+        private final int y;
+        private final int numberOfColonists;
+        private final String name;
+        private final Colonist[] colonists;
 
         public ColonyData(byte[] data, int offset) {
             x = data[offset];
@@ -122,7 +124,7 @@ public class ColonizationSaveGameReader {
 
     public class Colonist {
 
-        public final String[] OCCUPATION = new String[] {
+        public final String[] OCCUPATION = {
             "Farmer",
             "Sugar planter",
             "Tobacco planter",
@@ -156,13 +158,13 @@ public class ColonizationSaveGameReader {
             "Mounted brave"
         };
 
-        public String[] TILES = new String[] {
+        public final String[] TILES = {
             "N", "E", "S", "W", "NW", "NE", "SE", "SW"
         };
 
-        int occupation;
-        int speciality;
-        int tile;
+        final int occupation;
+        final int speciality;
+        final int tile;
 
         public Colonist(int occupation, int speciality, int tile) {
             this.occupation = occupation;

@@ -34,7 +34,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
  */
 public class FreeColPopupMenuUI extends BasicPopupMenuUI {
 
-    private static FreeColPopupMenuUI sharedInstance = new FreeColPopupMenuUI();
+    private static final FreeColPopupMenuUI sharedInstance = new FreeColPopupMenuUI();
 
 
     public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {

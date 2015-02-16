@@ -52,7 +52,7 @@ public class PrivateerMission extends Mission {
     private static final Logger logger = Logger.getLogger(PrivateerMission.class.getName());
 
     /** The tag for this mission. */
-    private static String tag = "AI privateer";
+    private static final String tag = "AI privateer";
 
     /**
      * The target for this mission.

@@ -35,10 +35,10 @@ import org.w3c.dom.Element;
 public class ChangeStateMessage extends DOMMessage {
 
     /** The identifier of the unit to change. */
-    private String unitId;
+    private final String unitId;
 
     /** The state as a string. */
-    private String stateString;
+    private final String stateString;
 
 
     /**

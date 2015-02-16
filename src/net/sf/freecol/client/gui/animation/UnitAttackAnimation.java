@@ -37,7 +37,7 @@ final class UnitAttackAnimation {
     private final Tile attackerTile;
     private final Tile defenderTile;
     private final boolean success;
-    private GUI gui;
+    private final GUI gui;
 
 
     /**

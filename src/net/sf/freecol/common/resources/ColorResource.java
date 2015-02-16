@@ -38,7 +38,7 @@ public class ColorResource extends Resource {
 
     public static final String SCHEME = "color:";
 
-    private Color color;
+    private final Color color;
 
 
     public ColorResource(Color color) {
@@ -75,7 +75,7 @@ public class ColorResource extends Resource {
             || !(str.startsWith("0x") || str.startsWith("0X"))
             || str.length() <= 2) return false;
         for (int i = 2; i < str.length(); i++) {
-            if ("0123456789ABCDEFabcdef".indexOf(str.substring(i, i+1)) < 0) {
+            if (!"0123456789ABCDEFabcdef".contains(str.substring(i, i + 1))) {
                 return false;
             }
         }

@@ -37,7 +37,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -572,7 +571,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A set of <code>Tile</code>s with the required contiguity.
      */
     public Set<Tile> getContiguityAdjacent(int contiguity) {
-        Set<Tile> ret = new HashSet<Tile>();
+        Set<Tile> ret = new HashSet<>();
         for (Tile t : getSurroundingTiles(1)) {
             if (t.getContiguity() == contiguity) ret.add(t);
         }
@@ -2124,7 +2123,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public boolean remove(Locatable locatable) {
         if (locatable instanceof TileItem) {
             return removeTileItem((TileItem)locatable)
-                == (TileItem)locatable;//-til
+                == locatable;//-til
 
         } else {
             return super.remove(locatable);
@@ -2464,7 +2463,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         style = xr.getAttribute(STYLE_TAG, 0);
 
         String str = xr.getAttribute(CONNECTED_TAG, (String)null);
-        if (str == null || "".equals(str)) {
+        if (str == null || str.isEmpty()) {
             highSeasCount = -1;
             // @compat 0.10.5
             // High seas should have connected==0.  If it does not, this

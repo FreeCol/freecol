@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.GoodsType;
-
 
 /**
  * A wrapper interface for a location that can be on a trade route.

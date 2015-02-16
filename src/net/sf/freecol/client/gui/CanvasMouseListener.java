@@ -45,13 +45,13 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
 
     private static final int doubleClickDelay = 200; // Milliseconds
 
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
     private final Canvas canvas;
 
     private final MapViewer mapViewer;
 
-    private Timer doubleClickTimer = new Timer(doubleClickDelay,this);
+    private final Timer doubleClickTimer = new Timer(doubleClickDelay,this);
 
     private int centerX, centerY;
 

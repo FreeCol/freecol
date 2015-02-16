@@ -34,13 +34,13 @@ import org.w3c.dom.Element;
 public class EquipForRoleMessage extends DOMMessage {
 
     /** The identifier of the unit to equip. */
-    private String unitId;
+    private final String unitId;
 
     /** The Role identifier. */
-    private String roleId;
+    private final String roleId;
 
     /** The role count. */
-    private String roleCount;
+    private final String roleCount;
 
 
     /**

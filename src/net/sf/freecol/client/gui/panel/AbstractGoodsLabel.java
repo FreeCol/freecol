@@ -36,7 +36,7 @@ public class AbstractGoodsLabel extends JLabel {
 
     private boolean partialChosen = false;
 
-    private GUI gui;
+    private final GUI gui;
 
 
     /**

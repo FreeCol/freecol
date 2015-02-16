@@ -35,7 +35,7 @@ import net.sf.freecol.common.model.Location;
 public class LogBuilder {
 
     /** The string builder to use. */
-    private StringBuilder sb;
+    private final StringBuilder sb;
 
     /** The remembered buffer index. */
     private final List<Integer> points = new ArrayList<>();

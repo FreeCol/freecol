@@ -56,7 +56,7 @@ public class ResourceManager {
     // TODO: Check if game and mod resources are always added in a predetermined fixed order.
     private static ResourceMapping gameMapping;
     private static List<ResourceMapping> modMappings
-        = new LinkedList<ResourceMapping>();
+        = new LinkedList<>();
 
     /**
      * All the mappings above merged into this single ResourceMapping
@@ -169,7 +169,7 @@ public class ResourceManager {
                     // Could lead to a race condition in case a Resource class
                     // is not completely thread safe, as references are shared.
                     List<Resource> resources
-                        = new LinkedList<Resource>(getResources().values());
+                        = new LinkedList<>(getResources().values());
                     int n = 0;
                     for (Resource r : resources) {
                         if (preloadThread != this) {

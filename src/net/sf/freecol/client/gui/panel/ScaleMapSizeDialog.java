@@ -104,10 +104,9 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
 
         final Dimension fake = null;
         List<ChoiceItem<Dimension>> c = choices();
-        c.add(new ChoiceItem<Dimension>(Messages.message("ok"),
-                fake).okOption());
-        c.add(new ChoiceItem<Dimension>(Messages.message("cancel"),
-                fake).cancelOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message("ok"), fake).okOption());
+        c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
+            .cancelOption().defaultOption());
         initializeDialog(DialogType.QUESTION, true, panel, null, c);
     }
 

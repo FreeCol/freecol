@@ -113,7 +113,7 @@ public final class ReportColonyPanel extends ReportPanel
     private static final String BUILDQUEUE = "buildQueue.";
     private boolean useCompact = false;
 
-    private List<Colony> colonies;
+    private final List<Colony> colonies;
     private List<GoodsType> goodsTypes;
 
     // Customized colours.
@@ -291,10 +291,10 @@ public final class ReportColonyPanel extends ReportPanel
 
     private static class Suggestion {
 
-        public UnitType oldType;
-        public UnitType newType;
-        public GoodsType goodsType;
-        public int amount;
+        public final UnitType oldType;
+        public final UnitType newType;
+        public final GoodsType goodsType;
+        public final int amount;
 
         /**
          * Suggest that work done by (optional) oldType would be
@@ -348,7 +348,7 @@ public final class ReportColonyPanel extends ReportPanel
         List<Tile> roadTiles = new ArrayList<>();
         colony.getColonyTileTodo(exploreTiles, clearTiles, plowTiles,
             roadTiles);
-        boolean plowMe = plowTiles.size() > 0
+        boolean plowMe = !plowTiles.isEmpty()
             && plowTiles.get(0) == colony.getTile();
         int newColonist;
         boolean famine;

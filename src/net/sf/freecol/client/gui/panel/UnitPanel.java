@@ -24,7 +24,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
-import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 
@@ -36,13 +35,13 @@ import net.sf.freecol.common.model.Unit;
 public abstract class UnitPanel extends MigPanel
     implements PropertyChangeListener {
 
-    private static Logger logger = Logger.getLogger(UnitPanel.class.getName());
+    private static final Logger logger = Logger.getLogger(UnitPanel.class.getName());
 
     /** The panel containing the units to display. */
     private PortPanel portPanel;
 
     /** Whether this panel is editable. */
-    private boolean editable;
+    private final boolean editable;
 
 
     /**

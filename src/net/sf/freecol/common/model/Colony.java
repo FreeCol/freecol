@@ -33,12 +33,8 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -174,14 +170,14 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     protected Turn established = new Turn(0);
 
     /** A list of items to be built. */
-    protected BuildQueue<BuildableType> buildQueue
-        = new BuildQueue<BuildableType>(this,
+    protected final BuildQueue<BuildableType> buildQueue
+        = new BuildQueue<>(this,
             BuildQueue.CompletionAction.REMOVE_EXCEPT_LAST,
             Consumer.COLONY_PRIORITY);
 
     /** The colonists that may be born. */
-    protected BuildQueue<UnitType> populationQueue
-        = new BuildQueue<UnitType>(this,
+    protected final BuildQueue<UnitType> populationQueue
+        = new BuildQueue<>(this,
             BuildQueue.CompletionAction.SHUFFLE,
             Consumer.POPULATION_PRIORITY);
 
@@ -191,7 +187,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     // Do not serialize below.
 
     /** Contains information about production and consumption. */
-    private ProductionCache productionCache = new ProductionCache(this);
+    private final ProductionCache productionCache = new ProductionCache(this);
 
     /** The occupation tracing status.  Do not serialize. */
     private boolean traceOccupation = false;
@@ -452,11 +448,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                                                           boolean userMode) {
         final Specification spec = getSpecification();
         List<Collection<GoodsType>> result = new ArrayList<>();
-        Set<GoodsType> tried = new HashSet<GoodsType>();
+        Set<GoodsType> tried = new HashSet<>();
 
         // Find the food and non-food goods types required by the unit.
-        Set<GoodsType> food = new HashSet<GoodsType>();
-        Set<GoodsType> nonFood = new HashSet<GoodsType>();
+        Set<GoodsType> food = new HashSet<>();
+        Set<GoodsType> nonFood = new HashSet<>();
         for (AbstractGoods ag : unit.getType().getConsumedGoods()) {
             if (productionCache.getNetProductionOf(ag.getType())
                 < ag.getAmount()) {
@@ -2296,25 +2292,25 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * determine if there is a problem with the production of the specified good
+     * Determine if there is a problem with the production of the
+     * specified goods type.
      *
-     * @param goodsType  for this good
-     * @param amount     warehouse amount
-     * @param production production per turn
-     * @return all warnings
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @param amount The amount in the warehouse.
+     * @param production The production per turn.
+     * @return A collection of warning messages.
      */
     public Collection<StringTemplate> getWarnings(GoodsType goodsType, int amount, int production) {
-
-        List<StringTemplate> result = new LinkedList<StringTemplate>();
-
+        List<StringTemplate> result = new LinkedList<>();
+        
         if (goodsType.isFoodType() && goodsType.isStorable()) {
+            // Food is never wasted -> new settler is produced
             if (amount + production < 0) {
                 result.add(StringTemplate.template("model.colony.famineFeared")
                            .addName("%colony%", getName())
                            .addAmount("%number%", 0));
             }
         } else {
-            //food is never wasted -> new settler is produced
             int waste = (amount + production - getWarehouseCapacity());
             if (waste > 0 && !getExportData(goodsType).getExported()
                 && !goodsType.limitIgnored()) {
@@ -2522,7 +2518,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     @Override
     public boolean remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            Location loc = ((Unit)locatable).getLocation();
+            Location loc = locatable.getLocation();
             if (loc instanceof WorkLocation) {
                 WorkLocation wl = (WorkLocation)loc;
                 if (wl.getColony() == this) {

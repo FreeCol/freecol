@@ -41,7 +41,7 @@ public class DisplayTileTextAction extends SelectableAction {
         EMPTY, NAMES, OWNERS, REGIONS
     };
 
-    private static final int[] accelerators = new int[] {
+    private static final int[] accelerators = {
         KeyEvent.VK_E,
         KeyEvent.VK_N,
         KeyEvent.VK_O,

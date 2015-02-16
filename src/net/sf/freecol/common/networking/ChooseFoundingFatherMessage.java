@@ -75,7 +75,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
         this.fathers = new ArrayList<>();
         for (FoundingFatherType type : FoundingFatherType.values()) {
             String id = element.getAttribute(type.toString());
-            if (id == null || "".equals(id)) continue;
+            if (id == null || id.isEmpty()) continue;
             FoundingFather ff = spec.getFoundingFather(id);
             this.fathers.add(ff);
         }

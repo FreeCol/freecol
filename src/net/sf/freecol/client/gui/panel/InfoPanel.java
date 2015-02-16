@@ -43,7 +43,6 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
-import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
@@ -108,7 +107,7 @@ public final class InfoPanel extends FreeColPanel {
     public class TileInfoPanel extends MigPanel {
 
         private Tile tile;
-        private Font font = new JLabel().getFont().deriveFont(9f);
+        private final Font font = new JLabel().getFont().deriveFont(9f);
 
 
         /**
@@ -325,7 +324,7 @@ public final class InfoPanel extends FreeColPanel {
 
     private final UnitInfoPanel unitInfoPanel;
 
-    private Image skin;
+    private final Image skin;
 
 
     /**

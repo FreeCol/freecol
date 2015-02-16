@@ -39,7 +39,7 @@ import net.sf.freecol.common.model.Specification;
 public abstract class AbstractOption<T> extends FreeColObject
     implements Option<T> {
 
-    private static Logger logger = Logger.getLogger(AbstractOption.class.getName());
+    private static final Logger logger = Logger.getLogger(AbstractOption.class.getName());
 
     /** The option group prefix. */
     private String optionGroup = "";

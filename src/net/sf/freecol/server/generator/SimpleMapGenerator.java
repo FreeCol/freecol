@@ -97,7 +97,7 @@ public class SimpleMapGenerator implements MapGenerator {
     private static class Territory {
         public ServerRegion region;
         public Tile tile;
-        public Player player;
+        public final Player player;
         public int numberOfSettlements;
 
         public Territory(Player player, Tile tile) {
@@ -347,7 +347,7 @@ public class SimpleMapGenerator implements MapGenerator {
         HashMap<String, Territory> territoryMap = new HashMap<>();
 
         for (Player player : game.getLiveNativePlayers(null)) {
-            switch (((IndianNationType)player.getNationType())
+            switch (player.getNationType()
                     .getNumberOfSettlements()) {
             case HIGH:
                 shares += 4;
@@ -444,7 +444,7 @@ public class SimpleMapGenerator implements MapGenerator {
             = new ArrayList<>(territoryMap.values());
         int settlementsPlaced = 0;
         for (Territory territory : territories) {
-            switch (((IndianNationType) territory.player.getNationType())
+            switch (territory.player.getNationType()
                     .getNumberOfSettlements()) {
             case HIGH:
                 territory.numberOfSettlements = Math.round(4 * share);
@@ -579,12 +579,12 @@ public class SimpleMapGenerator implements MapGenerator {
                 RandomChoice<IndianSettlement> rc = null;
                 for (RandomChoice<UnitType> c : nation.generateSkillsForTile(is.getTile())) {
                     if (c.getObject() == neededSkill) {
-                        rc = new RandomChoice<IndianSettlement>(is, c.getProbability() * cm);
+                        rc = new RandomChoice<>(is, c.getProbability() * cm);
                         break;
                     }
                 }
                 choices.add((rc != null) ? rc
-                            : new RandomChoice<IndianSettlement>(is, 1));
+                            : new RandomChoice<>(is, 1));
             }
             if (!choices.isEmpty()) {
                 // ...and pick one that could do the missing job.
@@ -764,7 +764,7 @@ public class SimpleMapGenerator implements MapGenerator {
         for (RandomChoice<UnitType> skill : skills) {
             UnitType unitType = skill.getObject();
             int scaleValue = scale.get(unitType.getExpertProduction()).intValue();
-            scaledSkills.add(new RandomChoice<UnitType>(unitType,
+            scaledSkills.add(new RandomChoice<>(unitType,
                     skill.getProbability() * scaleValue));
         }
         UnitType skill = RandomChoice.getWeightedRandom(null, null,

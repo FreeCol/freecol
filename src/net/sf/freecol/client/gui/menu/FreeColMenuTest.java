@@ -46,7 +46,7 @@ import net.sf.freecol.client.gui.FullScreenFrame;
 public class FreeColMenuTest implements ActionListener, ItemListener {
     JTextArea output;
     JScrollPane scrollPane;
-    String newline = "\n";
+    final String newline = "\n";
 
     public JMenuBar createMenuBar() {
         JMenuBar menuBar = null;

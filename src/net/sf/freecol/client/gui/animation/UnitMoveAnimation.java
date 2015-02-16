@@ -45,7 +45,7 @@ final class UnitMoveAnimation {
     private final Tile sourceTile;
     private final Tile destinationTile;
 
-    private GUI gui;
+    private final GUI gui;
 
     /**
      * Constructor

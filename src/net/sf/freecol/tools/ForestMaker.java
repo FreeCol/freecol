@@ -40,38 +40,39 @@ import javax.imageio.ImageIO;
  */
 public class ForestMaker {
 
-    private static String DESTDIR = "data/rules/classic/resources/images/forest";
+    private static final String DESTDIR = "data/rules/classic/resources/images/forest";
 
-    private static int BASE_WIDTH = 128;
-    private static int BASE_HEIGHT = 64;
-    private static int MARGIN = 20;
-    private static int TREES = 60;
-    private static int RIVER_HEIGHT = 8;
-    private static int RIVER_WIDTH = 2 * RIVER_HEIGHT;
+    private static final int BASE_WIDTH = 128;
+    private static final int BASE_HEIGHT = 64;
+    private static final int MARGIN = 20;
+    private static final int TREES = 60;
+    private static final int RIVER_HEIGHT = 8;
+    private static final int RIVER_WIDTH = 2 * RIVER_HEIGHT;
 
-    private static int HALF_WIDTH = BASE_WIDTH / 2;
-    private static int HALF_HEIGHT = BASE_HEIGHT / 2;
+    private static final int HALF_WIDTH = BASE_WIDTH / 2;
+    private static final int HALF_HEIGHT = BASE_HEIGHT / 2;
 
-    private static int[] LIMIT = new int[] {
+    private static final int[] LIMIT = {
         HALF_WIDTH, HALF_WIDTH, -HALF_WIDTH, -HALF_WIDTH
     };
 
-    private static double[] SLOPE = new double[] {
+    private static final double[] SLOPE = {
         -0.5, 0.5, -0.5, 0.5
     };
 
     private static final int[] POWERS_OF_TWO
-        = new int[] { 1, 2, 4, 8 };
+        = { 1, 2, 4, 8 };
 
 
-    private static boolean drawBorders = true;
-    private static boolean drawTrees = true;
+    private static final boolean drawBorders = true;
+    private static final boolean drawTrees = true;
 
 
     private static class ImageLocation implements Comparable<ImageLocation> {
 
-        BufferedImage image;
-        int x, y;
+        final BufferedImage image;
+        final int x;
+        final int y;
 
 
         public ImageLocation(BufferedImage image, int x, int y) {

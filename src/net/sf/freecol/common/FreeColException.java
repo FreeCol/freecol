@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common;
 
-import java.lang.Throwable;
-
 
 /**
  * The Exception thrown by the FreeCol application.

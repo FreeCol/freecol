@@ -35,7 +35,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
@@ -53,7 +52,7 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class ReportTradePanel extends ReportPanel {
 
-    private List<Colony> colonies;
+    private final List<Colony> colonies;
 
 
     /**
@@ -103,9 +102,9 @@ public final class ReportTradePanel extends ReportPanel {
         reportPanel.add(createLeftLabel("report.trade.totalUnits"), "cell 0 4");
         reportPanel.add(createLeftLabel("report.trade.totalDelta"), "cell 0 5");
 
-        TypeCountMap<GoodsType> totalUnits = new TypeCountMap<GoodsType>();
-        TypeCountMap<GoodsType> deltaUnits = new TypeCountMap<GoodsType>();
-        TypeCountMap<GoodsType> cargoUnits = new TypeCountMap<GoodsType>();
+        TypeCountMap<GoodsType> totalUnits = new TypeCountMap<>();
+        TypeCountMap<GoodsType> deltaUnits = new TypeCountMap<>();
+        TypeCountMap<GoodsType> cargoUnits = new TypeCountMap<>();
 
         for (Iterator<Unit> iterator = player.getUnitIterator(); iterator.hasNext();) {
             Unit unit = iterator.next();

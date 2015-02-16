@@ -41,7 +41,7 @@ import net.sf.freecol.common.model.Specification;
 public class RangeOption extends SelectOption {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(RangeOption.class.getName());
+    private static final Logger logger = Logger.getLogger(RangeOption.class.getName());
 
 
     /**

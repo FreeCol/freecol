@@ -38,7 +38,7 @@ import net.sf.freecol.client.gui.GUI;
 public final class ColorChooserPanel extends FreeColPanel {
 
     private JButton cancelButton = null;
-    private JColorChooser colorChooser;
+    private final JColorChooser colorChooser;
 
 
     /**

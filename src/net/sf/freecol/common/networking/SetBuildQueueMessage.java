@@ -39,10 +39,10 @@ import org.w3c.dom.Element;
 public class SetBuildQueueMessage extends DOMMessage {
 
     /** The identifier of the colony containing the queue. */
-    private String colonyId;
+    private final String colonyId;
 
     /** The items in the build queue. */
-    private String[] queue;
+    private final String[] queue;
 
 
     /**

@@ -39,7 +39,7 @@ import net.sf.freecol.common.util.Utils;
  */
 public final class DefaultHandler extends Handler {
 
-    private Writer writer;
+    private final Writer writer;
 
     private final boolean consoleLogging;
 

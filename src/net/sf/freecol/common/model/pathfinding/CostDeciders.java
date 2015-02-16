@@ -220,7 +220,7 @@ public final class CostDeciders {
 
         return new CostDecider() {
 
-            private CostDecider[] costDeciders = cds;
+            private final CostDecider[] costDeciders = cds;
             private int ret = -1;
             private int index = -1;
 

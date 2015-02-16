@@ -36,9 +36,9 @@ public class TerrainCursor implements ActionListener  {
 
     private int canvasX;
     private int canvasY;
-    private Timer blinkTimer;
+    private final Timer blinkTimer;
     private boolean active;
-    private EventListenerList listenerList;
+    private final EventListenerList listenerList;
     
 
     /**

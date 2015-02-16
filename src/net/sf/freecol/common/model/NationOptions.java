@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -63,7 +62,7 @@ public class NationOptions extends FreeColObject {
     public static enum NationState { AVAILABLE, AI_ONLY, NOT_AVAILABLE }
 
     /** The specification to refer to. */
-    private Specification specification;
+    private final Specification specification;
 
     /** The type of European national advantages. */
     private Advantages nationalAdvantages;

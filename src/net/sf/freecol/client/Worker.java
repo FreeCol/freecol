@@ -41,7 +41,7 @@ public final class Worker extends Thread {
     
     public Worker() {
         super(FreeCol.CLIENT_THREAD+"Worker");
-        jobList = new LinkedBlockingQueue<Runnable>();
+        jobList = new LinkedBlockingQueue<>();
         stopRunning = false;
     }
 

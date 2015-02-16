@@ -36,10 +36,10 @@ public class ChatMessage extends DOMMessage {
     private String sender;
 
     /** The text of the message. */
-    private String message;
+    private final String message;
 
     /** Whether this is a private message or not. */
-    private boolean privateChat;
+    private final boolean privateChat;
 
 
     /**

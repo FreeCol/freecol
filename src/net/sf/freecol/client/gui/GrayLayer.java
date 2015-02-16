@@ -58,9 +58,9 @@ public class GrayLayer extends Component {
     private static final int MAX_TEXT_WIDTH = 640;
 
     /** The client for this FreeCol game */
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
     /** Image library for icon lookup */
-    private ImageLibrary imageLibrary;
+    private final ImageLibrary imageLibrary;
     /** Player object or <code>null</code> */
     private Player player;
 

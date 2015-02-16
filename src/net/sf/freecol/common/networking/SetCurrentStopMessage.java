@@ -35,10 +35,10 @@ import org.w3c.dom.Element;
 public class SetCurrentStopMessage extends DOMMessage {
 
     /** The identifier of the unit whose stop is to be set. */
-    private String unitId;
+    private final String unitId;
 
     /** The index of the new stop. */
-    private String index;
+    private final String index;
 
 
     /**

@@ -58,19 +58,19 @@ public class OggVorbisDecoderFactory {
         // Internal buffer size.
         private static final int BUFSIZ = 4096;
 
-        private Packet oggPacket = new Packet();
-        private Page oggPage = new Page();
-        private StreamState oggStreamState = new StreamState();
-        private SyncState oggSyncState = new SyncState();
-        private DspState orbisDspState = new DspState();
-        private Block orbisBlock = new Block(orbisDspState);
-        private Comment orbisComment = new Comment();
-        private Info orbisInfo = new Info();
+        private final Packet oggPacket = new Packet();
+        private final Page oggPage = new Page();
+        private final StreamState oggStreamState = new StreamState();
+        private final SyncState oggSyncState = new SyncState();
+        private final DspState orbisDspState = new DspState();
+        private final Block orbisBlock = new Block(orbisDspState);
+        private final Comment orbisComment = new Comment();
+        private final Info orbisInfo = new Info();
 
-        private AudioFormat audioFormat;
+        private final AudioFormat audioFormat;
 
         // The buffer to convert into.
-        private byte[] convBuf = new byte[BUFSIZ];
+        private final byte[] convBuf = new byte[BUFSIZ];
         // The amount of data waiting in the buffer.
         private int bufCount = 0;
         // The position in the buffer of the data.

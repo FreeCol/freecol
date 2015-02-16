@@ -30,8 +30,8 @@ public class EuropeWas {
 
     private static final Logger logger = Logger.getLogger(EuropeWas.class.getName());
 
-    private Europe europe;
-    private int unitCount;
+    private final Europe europe;
+    private final int unitCount;
 
 
     public EuropeWas(Europe europe) {

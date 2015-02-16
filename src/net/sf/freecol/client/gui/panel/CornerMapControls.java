@@ -71,7 +71,7 @@ public final class CornerMapControls extends MapControls {
 
     private final MiniMapPanel miniMapPanel;
 
-    private Image miniMapSkin;
+    private final Image miniMapSkin;
 
 
     /**

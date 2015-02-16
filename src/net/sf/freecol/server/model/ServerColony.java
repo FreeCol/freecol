@@ -449,7 +449,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                         && !g.isRawMaterial()
                         && getAdjustedNetProductionOf(g) > 0
                         && neededForBuildableType(g)) {
-                        cs.addMessage(See.only((ServerPlayer) owner),
+                        cs.addMessage(See.only(owner),
                             new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
                                              "model.colony.notBuildingAnything",
                                              this)

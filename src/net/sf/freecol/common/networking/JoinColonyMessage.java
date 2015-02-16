@@ -35,10 +35,10 @@ import org.w3c.dom.Element;
 public class JoinColonyMessage extends DOMMessage {
 
     /** The identifier of the colony. */
-    private String colonyId;
+    private final String colonyId;
 
     /** The identifier of the unit that is building the colony. */
-    private String builderId;
+    private final String builderId;
 
 
     /**

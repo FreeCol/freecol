@@ -351,7 +351,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     public boolean contains(Locatable locatable) {
         if (!(locatable instanceof Unit)) return false;
         synchronized (units) {
-            return units.contains((Unit)locatable);
+            return units.contains(locatable);
         }
     }
 

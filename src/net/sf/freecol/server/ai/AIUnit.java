@@ -44,7 +44,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.goal.Goal;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;

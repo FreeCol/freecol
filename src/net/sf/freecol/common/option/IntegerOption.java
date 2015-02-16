@@ -34,7 +34,7 @@ import net.sf.freecol.common.model.Specification;
  */
 public class IntegerOption extends AbstractOption<Integer> {
 
-    private static Logger logger = Logger.getLogger(IntegerOption.class.getName());
+    private static final Logger logger = Logger.getLogger(IntegerOption.class.getName());
 
     /** The value of this option. */
     private int value;
@@ -131,7 +131,7 @@ public class IntegerOption extends AbstractOption<Integer> {
         this.value = value;
 
         if (value != oldValue && isDefined) {
-            firePropertyChange(VALUE_TAG, (int)oldValue, (int)value);
+            firePropertyChange(VALUE_TAG, oldValue, (int)value);
         }
         isDefined = true;
     }

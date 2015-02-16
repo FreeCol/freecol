@@ -93,7 +93,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
     public Map<String, Boolean> getRequiredAbilities() {
         return (requiredAbilities == null)
             ? Collections.<String, Boolean>emptyMap()
-            : new HashMap<String, Boolean>(requiredAbilities);
+            : new HashMap<>(requiredAbilities);
     }
 
     public boolean requiresAbility(String key) {
@@ -119,7 +119,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
      */
     private void addRequiredAbility(String tag, boolean value) {
         if (requiredAbilities == null) {
-            requiredAbilities = new HashMap<String, Boolean>();
+            requiredAbilities = new HashMap<>();
         }
         requiredAbilities.put(tag, value);
     }
@@ -135,8 +135,8 @@ public abstract class BuildableType extends FreeColGameObjectType {
             FreeColObject[] objects = fco;
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
                 boolean found = false;
-                for (int i = 0; i < objects.length; i++) {
-                    found = objects[i].hasAbility(entry.getKey());
+                for (FreeColObject object : objects) {
+                    found = object.hasAbility(entry.getKey());
                     if (found) break;
                 }
                 if (found != entry.getValue()) return false;

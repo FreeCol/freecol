@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.i18n.Messages;
 
 
@@ -82,11 +80,10 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
                                                ImageIcon icon, String okKey,
                                                String cancelKey) {
         List<ChoiceItem<T>> c = choices();
-        c.add(new ChoiceItem<T>(Messages.message(okKey),
-                (T)null).okOption());
+        c.add(new ChoiceItem<>(Messages.message(okKey), (T)null).okOption());
         if (cancelKey != null) {
-            c.add(new ChoiceItem<T>(Messages.message(cancelKey),
-                    (T)null).cancelOption().defaultOption());
+            c.add(new ChoiceItem<>(Messages.message(cancelKey), (T)null)
+                .cancelOption().defaultOption());
         }
         initializeDialog(DialogType.QUESTION, modal, obj, icon, c);
     }
@@ -100,7 +97,7 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
             Object value = getValue();
             if (value == this.options.get(0)) return getInputValue();
         }
-        return (T)null;
+        return null;
     }
 
 

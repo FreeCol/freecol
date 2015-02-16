@@ -33,11 +33,11 @@ import org.w3c.dom.Element;
  * Handles all network messages beeing sent to the metaserver.
  */
 public final class NetworkHandler implements MessageHandler {
-    private static Logger logger = Logger.getLogger(NetworkHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(NetworkHandler.class.getName());
 
 
-    private MetaServer metaServer;
-    private MetaRegister metaRegister;
+    private final MetaServer metaServer;
+    private final MetaRegister metaRegister;
 
 
 
@@ -70,18 +70,25 @@ public final class NetworkHandler implements MessageHandler {
 
         String type = element.getTagName();
 
-        if (type.equals("register")) {
-            reply = register(connection, element);
-        } else if (type.equals("update")) {
-            reply = update(connection, element);
-        } else if (type.equals("getServerList")) {
-            reply = getServerList(connection, element);
-        } else if (type.equals("remove")) {
-            reply = remove(connection, element);
-        } else if (type.equals("disconnect")) {
-            reply = disconnect(connection, element);
-        } else {
-            logger.warning("Unkown request: " + type);
+        switch (type) {
+            case "register":
+                reply = register(connection, element);
+                break;
+            case "update":
+                reply = update(connection, element);
+                break;
+            case "getServerList":
+                reply = getServerList(connection, element);
+                break;
+            case "remove":
+                reply = remove(connection, element);
+                break;
+            case "disconnect":
+                reply = disconnect(connection, element);
+                break;
+            default:
+                logger.warning("Unkown request: " + type);
+                break;
         }
 
         return reply;

@@ -26,8 +26,6 @@ import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
-import net.sf.freecol.common.model.BuildableType;
-
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
@@ -464,7 +462,7 @@ public final class GoodsType extends FreeColGameObjectType {
      *     must include this one.
      */
     public Set<GoodsType> getEquivalentTypes() {
-        Set<GoodsType> result = new HashSet<GoodsType>();
+        Set<GoodsType> result = new HashSet<>();
         for (GoodsType type : getSpecification().getGoodsTypeList()) {
             if (type == this
                 || type.getStoredAs() == this) result.add(type);

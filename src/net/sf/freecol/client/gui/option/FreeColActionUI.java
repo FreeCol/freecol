@@ -50,10 +50,10 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
 
     private OptionGroupUI optionGroupUI;
     private KeyStroke keyStroke;
-    private JButton recordButton;
-    private JButton removeButton;
-    private BlinkingLabel bl;
-    private JPanel panel = new JPanel();
+    private final JButton recordButton;
+    private final JButton removeButton;
+    private final BlinkingLabel bl;
+    private final JPanel panel = new JPanel();
 
 
     /**
@@ -135,7 +135,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
         }
 
         String s = KeyEvent.getKeyModifiersText(keyStroke.getModifiers());
-        if (!"".equals(s)) s += "+";
+        if (!s.isEmpty()) s += "+";
         return s + KeyEvent.getKeyText(keyStroke.getKeyCode());
     }
 
@@ -184,7 +184,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
      */
     class BlinkingLabel extends JLabel implements ActionListener, KeyListener, MouseListener {
 
-        private Timer blinkingTimer = new Timer(500, this);
+        private final Timer blinkingTimer = new Timer(500, this);
         private boolean blinkOn = false;
 
         BlinkingLabel() {

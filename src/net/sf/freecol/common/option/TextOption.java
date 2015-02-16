@@ -34,7 +34,7 @@ import net.sf.freecol.common.model.Specification;
 public class TextOption extends AbstractOption<String> {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(TextOption.class.getName());
+    private static final Logger logger = Logger.getLogger(TextOption.class.getName());
 
     /** The value of this option. */
     private String value;

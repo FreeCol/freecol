@@ -27,10 +27,8 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.TradeRouteStop;
 
 import org.w3c.dom.Element;
 
@@ -246,8 +244,8 @@ public class TradeRoute extends FreeColGameObject
         // Check:
         // - all stops are valid
         // - there is at least one non-empty stop
-        // - there is no goods that is present at all stops
-        Set<GoodsType> always = new HashSet<GoodsType>(stops.get(0).getCargo());
+        // - there is no goods that is present unmaintained at all stops
+        Set<GoodsType> always = new HashSet<>(stops.get(0).getCargo());
         boolean empty = true;
         for (TradeRouteStop stop : stops) {
             if (!TradeRoute.isStopValid(owner, stop)) {

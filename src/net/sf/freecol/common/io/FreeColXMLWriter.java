@@ -65,7 +65,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     private static final Logger logger = Logger.getLogger(FreeColXMLWriter.class.getName());
 
     /** Magic properties to indent files if supported. */
-    private static final String[] indentProps = new String[] {
+    private static final String[] indentProps = {
         OutputKeys.INDENT, "yes",
         "{http://xml.apache.org/xslt}indent-amount", "2"
     };
@@ -115,7 +115,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
 
 
     /** The stream to write to. */
-    private XMLStreamWriter xmlStreamWriter;
+    private final XMLStreamWriter xmlStreamWriter;
 
     /** Internal writer to accumulate into when pretty printing. */
     private StringWriter stringWriter = null;

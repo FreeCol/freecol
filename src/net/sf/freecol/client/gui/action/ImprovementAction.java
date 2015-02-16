@@ -35,7 +35,7 @@ import net.sf.freecol.common.model.Unit;
  */
 public class ImprovementAction extends UnitAction {
 
-    private TileImprovementType improvement;
+    private final TileImprovementType improvement;
 
 
     /**

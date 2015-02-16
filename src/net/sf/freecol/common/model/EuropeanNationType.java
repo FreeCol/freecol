@@ -43,7 +43,7 @@ public class EuropeanNationType extends NationType {
      * Stores the starting units of this Nation at various
      * difficulties.
      */
-    private Map<String, Map<String, AbstractUnit>> startingUnitMap = new HashMap<>();
+    private final Map<String, Map<String, AbstractUnit>> startingUnitMap = new HashMap<>();
 
 
     /**

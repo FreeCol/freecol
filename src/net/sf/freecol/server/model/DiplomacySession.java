@@ -39,13 +39,13 @@ public class DiplomacySession extends TransactionSession {
     private DiplomaticTrade agreement;
 
     /** The initiating unit. */
-    private Unit unit;
+    private final Unit unit;
 
     /** The other player's settlement. */
-    private Settlement settlement;
+    private final Settlement settlement;
 
     /** The other player's unit (only non-null in first contact cases). */
-    private Unit otherUnit;
+    private final Unit otherUnit;
 
 
     public DiplomacySession(Unit unit, Settlement settlement) {

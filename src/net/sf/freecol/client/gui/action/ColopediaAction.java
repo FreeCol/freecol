@@ -38,7 +38,7 @@ public class ColopediaAction extends FreeColAction {
         NATION_TYPES, CONCEPTS
     }
 
-    private static final int[] mnemonics = new int[] {
+    private static final int[] mnemonics = {
         KeyEvent.VK_T,
         KeyEvent.VK_R,
         KeyEvent.VK_U,

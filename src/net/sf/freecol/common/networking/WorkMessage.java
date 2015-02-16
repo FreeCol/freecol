@@ -35,10 +35,10 @@ import org.w3c.dom.Element;
 public class WorkMessage extends DOMMessage {
 
     /** The identifier of the unit. */
-    private String unitId;
+    private final String unitId;
 
     /** The identifier of the work location.  */
-    private String workLocationId;
+    private final String workLocationId;
 
 
     /**

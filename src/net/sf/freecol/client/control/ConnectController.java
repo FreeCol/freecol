@@ -416,7 +416,7 @@ public final class ConnectController {
 
             List<ChoiceItem<String>> choices = new ArrayList<>();
             for (String n : names) {
-                choices.add(new ChoiceItem<String>(Messages.getName(n), n));
+                choices.add(new ChoiceItem<>(Messages.getName(n), n));
             }
             String choice = gui.getChoice(true, null,
                 Messages.message("connectController.choicePlayer"), null,

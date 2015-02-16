@@ -37,16 +37,16 @@ import org.w3c.dom.Element;
 public class NewRegionNameMessage extends DOMMessage {
 
     /** The object identifier of the region being discovered. */
-    private String regionId;
+    private final String regionId;
 
     /** The tile where the region is discovered. */
-    private String tileId;
+    private final String tileId;
 
     /** The unit making the discovery. */
-    private String unitId;
+    private final String unitId;
 
     /** The new name. */
-    private String newRegionName;
+    private final String newRegionName;
 
 
     /**

@@ -73,7 +73,7 @@ public class RearrangeColonyMessage extends DOMMessage {
                                String roleId, String roleCount) {
             this.unit = game.getFreeColGameObject(unitId, Unit.class);
             this.loc = game.findFreeColLocation(locId);
-            this.work = (workId == null || "".equals(workId)) ? null
+            this.work = (workId == null || workId.isEmpty()) ? null
                 : game.getSpecification().getGoodsType(workId);
             this.role = game.getSpecification().getRole(roleId);
             try {
@@ -141,7 +141,7 @@ public class RearrangeColonyMessage extends DOMMessage {
         };
 
     /** The id of the colony requesting the rearrangement. */
-    private String colonyId;
+    private final String colonyId;
 
     /** A list of unitChanges to make. */
     private List<UnitChange> unitChanges = null;

@@ -38,7 +38,7 @@ import javax.swing.TransferHandler;
 public final class DropListener extends MouseAdapter {
     
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(DropListener.class.getName());
+    private static final Logger logger = Logger.getLogger(DropListener.class.getName());
 
     /**
      * Gets called when the mouse was released on a Swing component

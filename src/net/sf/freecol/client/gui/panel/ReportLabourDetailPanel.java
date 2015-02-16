@@ -44,10 +44,10 @@ import net.sf.freecol.common.model.UnitType;
 public final class ReportLabourDetailPanel extends ReportPanel
     implements ActionListener {
     
-    private Map<UnitType, Map<Location, Integer>> data;
-    private TypeCountMap<UnitType> unitCount;
-    private List<Colony> colonies;
-    private UnitType unitType;
+    private final Map<UnitType, Map<Location, Integer>> data;
+    private final TypeCountMap<UnitType> unitCount;
+    private final List<Colony> colonies;
+    private final UnitType unitType;
 
     
     /**

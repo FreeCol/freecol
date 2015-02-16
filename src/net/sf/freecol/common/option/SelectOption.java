@@ -45,14 +45,14 @@ import net.sf.freecol.common.model.Specification;
 public class SelectOption extends IntegerOption {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(SelectOption.class.getName());
+    private static final Logger logger = Logger.getLogger(SelectOption.class.getName());
 
     /** Use localized labels? */
     protected boolean localizedLabels = false;
 
     /** A map of the valid values. */
     private final Map<Integer, String> itemValues
-        = new LinkedHashMap<Integer, String>();
+        = new LinkedHashMap<>();
 
 
     /**

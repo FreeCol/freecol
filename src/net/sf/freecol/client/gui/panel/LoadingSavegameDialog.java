@@ -44,15 +44,15 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
 
     private static final Logger logger = Logger.getLogger(LoadingSavegameDialog.class.getName());
 
-    private JRadioButton singlePlayer;
+    private final JRadioButton singlePlayer;
 
-    private JRadioButton privateMultiplayer;
+    private final JRadioButton privateMultiplayer;
 
-    private JRadioButton publicMultiplayer;
+    private final JRadioButton publicMultiplayer;
 
-    private JTextField serverNameField;
+    private final JTextField serverNameField;
 
-    private JSpinner portField;
+    private final JSpinner portField;
 
 
     /**

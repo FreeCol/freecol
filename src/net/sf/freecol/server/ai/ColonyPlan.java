@@ -49,7 +49,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.server.ai.EuropeanAIPlayer;
 
 
 /**
@@ -109,15 +108,15 @@ public class ColonyPlan {
     private ProfileType profileType;
 
     /** Private copy of the AIMain. */
-    private AIMain aiMain;
+    private final AIMain aiMain;
 
     /** The colony this AIColony manages. */
-    private Colony colony;
+    private final Colony colony;
 
     /** The things to build, and their priority. */
     private static class BuildPlan {
 
-        public BuildableType type;
+        public final BuildableType type;
         public double weight;
         public double support;
         public double difficulty;
@@ -1230,7 +1229,7 @@ public class ColonyPlan {
 
         // Move outdoor experts outside if possible.
         // Prefer scouts in early game if there are very few.
-        Role[] outdoorRoles = new Role[] {
+        Role[] outdoorRoles = {
             spec().getRoleWithAbility(Ability.IMPROVE_TERRAIN, null),
             null,
             spec().getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null)
@@ -1240,18 +1239,18 @@ public class ColonyPlan {
             outdoorRoles[1] = outdoorRoles[2];
             outdoorRoles[2] = tmp;
         }
-        for (int j = 0; j < outdoorRoles.length; j++) {
+        for (Role outdoorRole : outdoorRoles) {
             for (Unit u : new ArrayList<>(workers)) {
                 if (workers.size() <= 1) break;
-                Role role = outdoorRoles[j];
+                Role role = outdoorRole;
                 if (role == null) {
                     if ((role = u.getMilitaryRole()) == null) continue;
                 }
                 if (u.getType() == role.getExpertUnit()
-                    && fullEquipUnit(spec(), u, role, col)) {
+                        && fullEquipUnit(spec(), u, role, col)) {
                     workers.remove(u);
                     lb.add(u.getId(), "(", u.getType().getSuffix(),
-                        ") -> ", role.getSuffix(), "\n");
+                            ") -> ", role.getSuffix(), "\n");
                 }
             }
         }

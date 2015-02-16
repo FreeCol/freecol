@@ -40,7 +40,7 @@ public class ResourceFactory {
      * <code>Resource</code> is created given the same
      * <code>URI</code>.
      */
-    private static Map<URI, WeakReference<Resource>> resources = new WeakHashMap<URI, WeakReference<Resource>>();
+    private static final Map<URI, WeakReference<Resource>> resources = new WeakHashMap<>();
 
 
     /**
@@ -101,7 +101,7 @@ public class ResourceFactory {
                 } else {
                     r = new ImageResource(uri);
                 }
-                resources.put(uri, new WeakReference<Resource>(r));
+                resources.put(uri, new WeakReference<>(r));
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Failed to create resource with URI: " + uri, e);
             }

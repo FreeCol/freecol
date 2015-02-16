@@ -81,7 +81,7 @@ public class HighScore extends FreeColObject {
         INFECTIOUS_DISEASE(200),
         PARASITIC_WORM(0);
 
-        private int minimumScore;
+        private final int minimumScore;
 
 
         ScoreLevel(int minimumScore) {

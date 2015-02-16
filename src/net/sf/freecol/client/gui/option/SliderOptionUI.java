@@ -36,7 +36,7 @@ import net.sf.freecol.common.option.Option;
  */
 public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
 
-    private JSlider slider = new JSlider();
+    private final JSlider slider = new JSlider();
 
     /**
      * Creates a new <code>SliderOptionUI</code> for the given

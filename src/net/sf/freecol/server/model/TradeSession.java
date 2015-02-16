@@ -34,7 +34,7 @@ public class TradeSession extends TransactionSession {
     private static final Logger logger = Logger.getLogger(TradeSession.class.getName());
 
     /** The moves the trading unit has left at start of session. */
-    private int movesLeft;
+    private final int movesLeft;
 
     /** Whether any action has been taken in this session. */
     private boolean actionTaken;

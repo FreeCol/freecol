@@ -30,7 +30,7 @@ import net.sf.freecol.common.model.Specification;
 public class PercentageOption extends IntegerOption {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(PercentageOption.class.getName());
+    private static final Logger logger = Logger.getLogger(PercentageOption.class.getName());
 
 
     /**

@@ -35,13 +35,13 @@ import org.w3c.dom.Element;
 public class UnloadGoodsMessage extends DOMMessage {
 
     /** The identifier of the type of goods to unload.  */
-    private String goodsTypeId;
+    private final String goodsTypeId;
 
     /** The amount of goods to unload. */
-    private String amountString;
+    private final String amountString;
 
     /** The identifier of the carrier to unload to goods from. */
-    private String carrierId;
+    private final String carrierId;
 
 
     /**

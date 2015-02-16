@@ -1214,7 +1214,7 @@ public final class InGameInputHandler extends InputHandler {
             } else {
                 fcgo.readFromXMLElement(e);
             }
-            if ((fcgo instanceof Player && ((Player)fcgo == player))
+            if ((fcgo instanceof Player && (fcgo == player))
                 || ((fcgo instanceof Settlement || fcgo instanceof Unit)
                     && player.owns((Ownable)fcgo))) {
                 visibilityChange = true;//-vis(player)

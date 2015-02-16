@@ -69,11 +69,11 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         }
     }
 
-    private JPanel panel;
-    private IntegerOptionUI numberUI;
-    private UnitTypeOptionUI typeUI;
-    private StringOptionUI roleUI;
-    private boolean roleEditable;
+    private final JPanel panel;
+    private final IntegerOptionUI numberUI;
+    private final UnitTypeOptionUI typeUI;
+    private final StringOptionUI roleUI;
+    private final boolean roleEditable;
 
 
     /**
@@ -126,11 +126,11 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         boolean enable = false;
         UnitType type = (UnitType)typeUI.getComponent().getSelectedItem();
         if (type.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-            model = new DefaultComboBoxModel<String>(roleUI.getOption()
+            model = new DefaultComboBoxModel<>(roleUI.getOption()
                 .getChoices().toArray(new String[0]));
             enable = roleEditable;
         } else {
-            model = new DefaultComboBoxModel<String>(new String[] {
+            model = new DefaultComboBoxModel<>(new String[] {
                     Specification.DEFAULT_ROLE_ID });
         }
         box.setModel(model);

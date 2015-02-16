@@ -35,12 +35,12 @@ import javax.imageio.ImageIO;
 
 public class RiverMaker {
 
-    private static int BASE_WIDTH = 128;
-    private static int BASE_HEIGHT = 64;
-    private static int HALF_WIDTH = BASE_WIDTH / 2;
-    private static int HALF_HEIGHT = BASE_HEIGHT / 2;
+    private static final int BASE_WIDTH = 128;
+    private static final int BASE_HEIGHT = 64;
+    private static final int HALF_WIDTH = BASE_WIDTH / 2;
+    private static final int HALF_HEIGHT = BASE_HEIGHT / 2;
 
-    private static float EDGE_LENGTH = (float) Math.sqrt(HALF_WIDTH * HALF_WIDTH + HALF_HEIGHT * HALF_HEIGHT);
+    private static final float EDGE_LENGTH = (float) Math.sqrt(HALF_WIDTH * HALF_WIDTH + HALF_HEIGHT * HALF_HEIGHT);
 
     private static final int DY = 4;
     private static final int DX = 2 * DY;
@@ -57,7 +57,7 @@ public class RiverMaker {
         = new Point2D.Float(HALF_WIDTH, 2 * DY);
 
     private static final Point2D.Float[] POINTS
-        = new Point2D.Float[] { NE, SE, SW, NW };
+        = { NE, SE, SW, NW };
 
 
     public static void main(String[] args) throws Exception {
@@ -87,7 +87,7 @@ public class RiverMaker {
         // bend.quadTo(EDGE_LENGTH, 0, EDGE_LENGTH, seg);
         // bend.lineTo(EDGE_LENGTH, EDGE_LENGTH);
 
-        int[] branches = new int[] { 1, 0, 0, 0 };
+        int[] branches = { 1, 0, 0, 0 };
         for (int index = 1; index < 81; index++) {
             BufferedImage result = new BufferedImage(128, 64,
                                                      BufferedImage.TYPE_INT_ARGB);
@@ -163,8 +163,8 @@ public class RiverMaker {
 
     private static int branchCount(int[] branches) {
         int result = 0;
-        for (int index = 0; index < branches.length; index++) {
-            if (branches[index] > 0) {
+        for (int branche : branches) {
+            if (branche > 0) {
                 result++;
             }
         }
@@ -173,8 +173,8 @@ public class RiverMaker {
 
     private static String getName(int[] branches) {
         String name = "";
-        for (int index = 0; index < branches.length; index++) {
-            name += Integer.toString(branches[index]);
+        for (int branche : branches) {
+            name += Integer.toString(branche);
         }
         return name;
     }

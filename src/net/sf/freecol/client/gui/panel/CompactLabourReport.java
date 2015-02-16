@@ -37,7 +37,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
@@ -53,22 +52,22 @@ import net.sf.freecol.common.model.WorkLocation;
  */
 public final class CompactLabourReport extends ReportPanel {
 
-    private int COLONY_COLUMN = 0;
-    private int UNIT_TYPE_COLUMN = 1;
-    private int WORKING_COLUMN = 2;
-    private int BUILDING_COLUMN = 3;
-    private int COLONIST_COLUMN = 4;
-    private int COLONIST_SUMMARY_COLUMN = 5;
-    private int PRODUCTION_SYMBOL_COLUMN = 6;
-    private int PRODUCTION_COLUMN = 7;
-    private int PRODUCTION_SUMMARY_COLUMN = 8;
-    private int NETPRODUCTION_SUMMARY_COLUMN = 9;
+    private final int COLONY_COLUMN = 0;
+    private final int UNIT_TYPE_COLUMN = 1;
+    private final int WORKING_COLUMN = 2;
+    private final int BUILDING_COLUMN = 3;
+    private final int COLONIST_COLUMN = 4;
+    private final int COLONIST_SUMMARY_COLUMN = 5;
+    private final int PRODUCTION_SYMBOL_COLUMN = 6;
+    private final int PRODUCTION_COLUMN = 7;
+    private final int PRODUCTION_SUMMARY_COLUMN = 8;
+    private final int NETPRODUCTION_SUMMARY_COLUMN = 9;
 
     private static final int COLUMNS = 10;
 
     private LabourData labourData;
 
-    private LabourData.UnitData unitData;
+    private final LabourData.UnitData unitData;
 
     private boolean showProduction;
     private boolean showNetProduction;
@@ -344,7 +343,7 @@ public final class CompactLabourReport extends ReportPanel {
             if (allColonists) {
                 addRow(data, null, Messages.message("report.labour.sutdent"), createNonCountedLabel(studentCount), 0, row);
             } else {
-                Set<UnitType> resultOfTraining = new LinkedHashSet<UnitType>();
+                Set<UnitType> resultOfTraining = new LinkedHashSet<>();
                 if (colony != null) {
                     for (Unit teacher : colony.getTeachers()) {
                         Unit student = teacher.getStudent();

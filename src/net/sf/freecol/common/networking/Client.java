@@ -43,10 +43,10 @@ public final class Client {
     private final Connection c;
 
     /** The host to connect to. */
-    private String host;
+    private final String host;
 
     /** The port to connect to. */
-    private int port;
+    private final int port;
 
 
     /**

@@ -171,7 +171,7 @@ public abstract class Wish extends ValuedAIObject {
         int result = super.checkIntegrity(fix);
         if (transportable != null) {
             result = Math.min(result, 
-                              ((AIObject)transportable).checkIntegrity(fix));
+                              transportable.checkIntegrity(fix));
         }
         if (destination == null
             || ((FreeColGameObject)destination).isDisposed()) {

@@ -43,17 +43,17 @@ import net.sf.freecol.common.networking.Connection;
  */
 public final class MetaServer extends Thread {
 
-    private static Logger logger = Logger.getLogger(MetaServer.class.getName());
+    private static final Logger logger = Logger.getLogger(MetaServer.class.getName());
 
     private static final int REMOVE_DEAD_SERVERS_INTERVAL = 120000;
 
     public static final int REMOVE_OLDER_THAN = 90000;
 
     /** The public "well-known" socket to which clients may connect. */
-    private ServerSocket serverSocket;
+    private final ServerSocket serverSocket;
 
     /** A hash of Connection objects, keyed by the Socket they relate to. */
-    private HashMap<Socket, Connection> connections = new HashMap<>();
+    private final HashMap<Socket, Connection> connections = new HashMap<>();
 
     /**
      * Whether to keep running the main loop that is awaiting new client
@@ -62,9 +62,9 @@ public final class MetaServer extends Thread {
     private boolean running = true;
 
     /** The TCP port that is beeing used for the public socket. */
-    private int port;
+    private final int port;
 
-    private NetworkHandler networkHandler;
+    private final NetworkHandler networkHandler;
 
 
     /**

@@ -42,9 +42,9 @@ import net.sf.freecol.client.gui.action.ActionManager;
  */
 public final class ClassicMapControls extends MapControls {
 
-    private JPanel panel;
-    private Font arrowFont;
-    private ActionManager am;
+    private final JPanel panel;
+    private final Font arrowFont;
+    private final ActionManager am;
 
 
     /**

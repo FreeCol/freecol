@@ -102,7 +102,7 @@ public class Disaster extends FreeColGameObjectType {
      */
     private void addEffect(Effect effect) {
         if (effects == null) effects = new ArrayList<>();
-        effects.add(new RandomChoice<Effect>(effect,
+        effects.add(new RandomChoice<>(effect,
                                              effect.getProbability()));
     }
 

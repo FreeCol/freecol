@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class DefaultNumberRule extends Number {
 
-    Map<Category, Rule> rules = new EnumMap<Category, Rule>(Category.class);
+    final Map<Category, Rule> rules = new EnumMap<>(Category.class);
 
 
     /**

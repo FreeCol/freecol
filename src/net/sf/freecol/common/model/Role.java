@@ -30,8 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.Specification;
+
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -43,8 +42,8 @@ public class Role extends BuildableType {
     /** Container for valid role changes. */
     public static class RoleChange {
 
-        public String from;
-        public String capture;
+        public final String from;
+        public final String capture;
 
         RoleChange(String from, String capture) {
             this.from = from;

@@ -31,7 +31,7 @@ import net.sf.freecol.client.FreeColClient;
  */
 public final class FullScreenFrameListener implements WindowListener {
 
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
     /**
      * Constructs this WindowListener.

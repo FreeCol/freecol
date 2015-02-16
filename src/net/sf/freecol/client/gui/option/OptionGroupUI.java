@@ -57,15 +57,15 @@ public final class OptionGroupUI extends MigPanel
     private final HashMap<String, OptionUI> optionUIs = new HashMap<>();
 
 
-    private JPanel detailPanel;
+    private final JPanel detailPanel;
 
-    private JTree tree;
+    private final JTree tree;
 
-    private GUI gui;
+    private final GUI gui;
 
-    private OptionGroup group;
+    private final OptionGroup group;
 
-    private boolean editable;
+    private final boolean editable;
 
 
     /**
@@ -203,7 +203,7 @@ public final class OptionGroupUI extends MigPanel
             detailPanel.add(ui.getComponent());
         }
         if (group.isEditable()) {
-            optionUpdaters.add((OptionUpdater)ui);
+            optionUpdaters.add(ui);
         }
     }
 

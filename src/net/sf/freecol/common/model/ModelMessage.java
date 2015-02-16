@@ -56,7 +56,7 @@ public class ModelMessage extends StringTemplate {
         DEMANDS("model.option.guiShowDemands"),
         GOODS_MOVEMENT("model.option.guiShowGoodsMovement");
 
-        private String optionName;
+        private final String optionName;
 
         MessageType(String optionName) {
             this.optionName = optionName;

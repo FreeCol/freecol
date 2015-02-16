@@ -41,8 +41,6 @@ import net.sf.freecol.common.option.SelectOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.TextOption;
 import net.sf.freecol.common.option.UnitListOption;
-import net.sf.freecol.common.io.FreeColModFile;
-import net.sf.freecol.common.model.AbstractUnit;
 
 
 /**
@@ -162,9 +160,9 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
         } else if (option instanceof ModOption) {
             return new ModOptionUI(gui, (ModOption)option, editable);
         } else if (option instanceof UnitListOption) {
-            return new ListOptionUI<AbstractUnit>(gui, (UnitListOption)option, editable);
+            return new ListOptionUI<>(gui, (UnitListOption)option, editable);
         } else if (option instanceof ModListOption) {
-            return new ListOptionUI<FreeColModFile>(gui, (ModListOption)option, editable);
+            return new ListOptionUI<>(gui, (ModListOption)option, editable);
         } else if (option instanceof TextOption) {
             return new TextOptionUI(gui, (TextOption)option, editable);
         } else {

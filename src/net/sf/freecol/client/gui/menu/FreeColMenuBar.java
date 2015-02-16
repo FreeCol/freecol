@@ -41,7 +41,6 @@ import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.action.SelectableAction;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
-import net.sf.freecol.common.i18n.Messages;
 
 
 /**
@@ -54,7 +53,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
     protected final FreeColClient freeColClient;
 
-    protected ActionManager am;
+    protected final ActionManager am;
 
     protected GUI gui;
 

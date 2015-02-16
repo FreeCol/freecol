@@ -143,7 +143,7 @@ public class FreeColDebugger {
      */
     public static boolean setDebugModes(String optionValue) {
         if (optionValue == null) return false;
-        if ("".equals(optionValue)) return true;
+        if (optionValue.isEmpty()) return true;
         // @compat 0.10.x
         try {
             int i = Integer.parseInt(optionValue);

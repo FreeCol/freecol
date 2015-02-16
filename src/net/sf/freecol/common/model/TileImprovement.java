@@ -31,7 +31,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Specification;
 
 
 /**
@@ -39,7 +38,7 @@ import net.sf.freecol.common.model.Specification;
  */
 public class TileImprovement extends TileItem implements Named {
 
-    private static Logger logger = Logger.getLogger(TileImprovement.class.getName());
+    private static final Logger logger = Logger.getLogger(TileImprovement.class.getName());
 
     /** River magnitudes */
     public static final int NO_RIVER = 0;
@@ -308,7 +307,7 @@ public class TileImprovement extends TileItem implements Named {
         List<Direction> dirns = getConnectionDirections();
         if (dirns == null) return Collections.<Direction, Integer>emptyMap();
         Map<Direction, Integer> result
-            = new EnumMap<Direction, Integer>(Direction.class);
+            = new EnumMap<>(Direction.class);
         for (Direction d : dirns) {
             if (isConnectedTo(d)) result.put(d, magnitude);
         }
@@ -619,7 +618,7 @@ public class TileImprovement extends TileItem implements Named {
 
         String str = xr.getAttribute(STYLE_TAG, (String)null);
         List<Direction> dirns = getConnectionDirections();
-        if (dirns == null || str == null || "".equals(str)) {
+        if (dirns == null || str == null || str.isEmpty()) {
             style = null;
         // @compat 0.10.5
         } else if (str.length() < 4) {

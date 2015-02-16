@@ -35,7 +35,7 @@ import net.sf.freecol.common.option.LanguageOption.Language;
  */
 public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
 
-    private JComboBox<Language> box = new JComboBox<Language>();
+    private final JComboBox<Language> box = new JComboBox<>();
 
 
     /**
@@ -51,7 +51,7 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
         super(gui, option, editable);
 
         Language[] languages = option.getChoices().toArray(new Language[0]);
-        box.setModel(new DefaultComboBoxModel<Language>(languages));
+        box.setModel(new DefaultComboBoxModel<>(languages));
         box.setSelectedItem(option.getValue());
         box.setRenderer(new FreeColComboBoxRenderer<Language>("", false));
 

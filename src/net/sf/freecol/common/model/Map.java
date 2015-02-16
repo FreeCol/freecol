@@ -26,13 +26,11 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -117,7 +115,10 @@ public class Map extends FreeColGameObject implements Location {
                                    Direction.S, Direction.W);
         
         /** The direction increments. */
-        private int oddDX, oddDY, evenDX, evenDY;
+        private final int oddDX;
+        private final int oddDY;
+        private final int evenDX;
+        private final int evenDY;
 
 
         /**
@@ -958,15 +959,15 @@ public class Map extends FreeColGameObject implements Location {
             Location unitLoc = ((Unit)start).getLocation();
             if (unitLoc == null) {
                 throw new IllegalArgumentException("Null on-carrier start: "
-                    + unit + "/" + ((Unit)start));
+                    + unit + "/" + start);
             } else if (unitLoc instanceof HighSeas) {
                 if (carrier == null) {
                     throw new IllegalArgumentException("Null carrier when"
                         + " starting on high seas: " + unit);
-                } else if (carrier != (Unit)start) {
+                } else if (carrier != start) {
                     throw new IllegalArgumentException("Wrong carrier when"
                         + " starting on high seas: " + unit
-                        + "/" + carrier + " != " + ((Unit)start));
+                        + "/" + carrier + " != " + start);
                 }
                 entry = carrier.resolveDestination();
             } else {
@@ -1221,7 +1222,7 @@ public class Map extends FreeColGameObject implements Location {
                 if (!((Tile)realEnd).isOnRiver()) {
                     LogBuilder l2 = new LogBuilder(512);
                     l2.add("Fail in findPath(", unit, ", ", tile,
-                        ", ", ((Tile)realEnd), ", ", carrier, ")\n");
+                        ", ", realEnd, ", ", carrier, ")\n");
                     l2.addStackTrace();
                     l2.add(p.fullPathToString());
                     findMapPath(unit, tile, (Tile)realEnd,
@@ -1389,12 +1390,12 @@ public class Map extends FreeColGameObject implements Location {
     private class MoveCandidate {
 
         private Unit unit;
-        private PathNode current;
-        private Location dst;
+        private final PathNode current;
+        private final Location dst;
         private int movesLeft;
         private int turns;
-        private boolean onCarrier;
-        private CostDecider decider;
+        private final boolean onCarrier;
+        private final CostDecider decider;
         private int cost;
         private PathNode path;
 
@@ -1538,7 +1539,7 @@ public class Map extends FreeColGameObject implements Location {
         public String toString() {
             StringBuilder sb = new StringBuilder(128);
             sb.append("[candidate unit=").append(unit)
-                .append(" dst=").append((FreeColGameObject)dst)
+                .append(" dst=").append(dst)
                 .append(" movesLeft=").append(movesLeft)
                 .append(" turns=").append(turns)
                 .append(" onCarrier=").append(onCarrier)
@@ -1901,7 +1902,7 @@ public class Map extends FreeColGameObject implements Location {
     private final class CircleIterator implements Iterator<Tile> {
 
         /** The maximum radius. */
-        private int radius;
+        private final int radius;
         /** The current radius of the iteration. */
         private int currentRadius;
         /** The current index in the circle with the current radius: */
@@ -2181,7 +2182,7 @@ public class Map extends FreeColGameObject implements Location {
     public static boolean[][] floodFill(boolean[][] boolmap, int x, int y,
                                         int limit) {
         Position p = new Position(x, y);
-        Queue<Position> q = new LinkedList<Position>();
+        Queue<Position> q = new LinkedList<>();
         boolean[][] visited = new boolean[boolmap.length][boolmap[0].length];
         visited[p.getX()][p.getY()] = true;
         limit--;
@@ -2492,7 +2493,7 @@ public class Map extends FreeColGameObject implements Location {
      */
     public boolean remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            Tile tile = ((Unit)locatable).getTile();
+            Tile tile = locatable.getTile();
             if (tile != null) return tile.remove(locatable);
         }
         return false;

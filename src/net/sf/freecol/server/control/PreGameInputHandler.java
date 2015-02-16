@@ -48,7 +48,7 @@ import org.w3c.dom.Element;
  */
 public final class PreGameInputHandler extends InputHandler {
 
-    private static Logger logger = Logger.getLogger(PreGameInputHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(PreGameInputHandler.class.getName());
 
     /** Is the game launching yet. */
     private boolean launching = false;

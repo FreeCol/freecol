@@ -34,7 +34,7 @@ import net.sf.freecol.common.model.Specification;
 public class BooleanOption extends AbstractOption<Boolean> {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(BooleanOption.class.getName());
+    private static final Logger logger = Logger.getLogger(BooleanOption.class.getName());
 
     /** The value of this option. */
     private boolean value;
@@ -86,7 +86,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
         this.value = value;
 
         if (value != oldValue && isDefined) {
-            firePropertyChange(VALUE_TAG, (boolean)oldValue, (boolean)value);
+            firePropertyChange(VALUE_TAG, oldValue, (boolean)value);
         }
         isDefined = true;
     }

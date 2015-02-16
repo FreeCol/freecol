@@ -121,7 +121,7 @@ public class RandomUtils {
                                         List<T> list, Random random) {
         switch (list.size()) {
         case 0:
-            return (T)null;
+            return null;
         case 1:
             return list.get(0);
         default:

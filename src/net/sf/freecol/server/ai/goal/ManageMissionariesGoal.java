@@ -55,7 +55,7 @@ public class ManageMissionariesGoal extends Goal {
     private static final Logger logger = Logger.getLogger(ManageMissionariesGoal.class.getName());
 
     //Since all our subgoals are the same, we're keeping them on a simple list
-    private List<Goal> subGoalList;
+    private final List<Goal> subGoalList;
 
     public ManageMissionariesGoal(AIPlayer p, Goal g, float w) {
         super(p,g,w);

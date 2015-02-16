@@ -26,7 +26,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.Player;
@@ -40,10 +39,10 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class FirstContactDialog extends FreeColConfirmDialog {
 
-    private static String BASE_KEY = "event.meeting.";
-    private static String IMAGE_BASE_KEY = "EventImage.meeting.";
-    private static String NATIVES_KEY = "natives";
-    private static String TUTORIAL_KEY = BASE_KEY + NATIVES_KEY + ".tutorial";
+    private static final String BASE_KEY = "event.meeting.";
+    private static final String IMAGE_BASE_KEY = "EventImage.meeting.";
+    private static final String NATIVES_KEY = "natives";
+    private static final String TUTORIAL_KEY = BASE_KEY + NATIVES_KEY + ".tutorial";
 
 
     /**

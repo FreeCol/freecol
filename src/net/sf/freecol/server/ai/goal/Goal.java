@@ -36,8 +36,6 @@ import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
-import net.sf.freecol.server.ai.goal.GoalConstants;
-
 
 /**
  * A Goal is used to encapsulate a specific part of the
@@ -62,10 +60,10 @@ public abstract class Goal extends AIObject implements GoalConstants {
     private float relativeWeight;
     protected boolean needsPlanning;
     protected boolean isFinished;
-    protected List<AIUnit> availableUnitsList;
+    protected final List<AIUnit> availableUnitsList;
 
-    protected AIPlayer player;
-    private Goal parentGoal;
+    protected final AIPlayer player;
+    private final Goal parentGoal;
 
     /**
      * Standard constructor

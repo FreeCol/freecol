@@ -631,7 +631,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     private void addIfValid(List<RandomChoice<MonarchAction>> choices,
                             MonarchAction action, int weight) {
         if (actionIsValid(action)) {
-            choices.add(new RandomChoice<MonarchAction>(action, weight));
+            choices.add(new RandomChoice<>(action, weight));
         }
     }
 

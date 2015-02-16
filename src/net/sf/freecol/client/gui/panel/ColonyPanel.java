@@ -105,7 +105,7 @@ import net.miginfocom.swing.MigLayout;
 public final class ColonyPanel extends PortPanel
     implements ActionListener, PropertyChangeListener {
 
-    private static Logger logger = Logger.getLogger(ColonyPanel.class.getName());
+    private static final Logger logger = Logger.getLogger(ColonyPanel.class.getName());
 
     private static final int EXIT = 0,
         BUILDQUEUE = 1,
@@ -152,7 +152,7 @@ public final class ColonyPanel extends PortPanel
     private MouseListener releaseListener = null;
 
     // Subparts
-    private final JComboBox<Colony> nameBox = new JComboBox<Colony>();
+    private final JComboBox<Colony> nameBox = new JComboBox<>();
 
     private JPanel netProductionPanel = null;
 
@@ -1741,7 +1741,7 @@ public final class ColonyPanel extends PortPanel
         public final class ASingleBuildingPanel extends BuildingPanel
             implements DropTarget  {
 
-            private MouseAdapter buildQueueListener = new MouseAdapter() {
+            private final MouseAdapter buildQueueListener = new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
                         getGUI().showBuildQueuePanel(getColony());
                     }
@@ -1876,7 +1876,7 @@ public final class ColonyPanel extends PortPanel
     public final class TilesPanel extends JPanel {
 
         /** The tiles around the colony. */
-        private Tile[][] tiles = new Tile[3][3];
+        private final Tile[][] tiles = new Tile[3][3];
 
 
         /**
@@ -1988,7 +1988,7 @@ public final class ColonyPanel extends PortPanel
             implements DropTarget, PropertyChangeListener {
 
             /** The colony tile to monitor. */
-            private ColonyTile colonyTile;
+            private final ColonyTile colonyTile;
 
 
             /**

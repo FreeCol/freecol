@@ -68,15 +68,15 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class DefaultTransferHandler extends TransferHandler {
 
-    private static Logger logger = Logger.getLogger(DefaultTransferHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(DefaultTransferHandler.class.getName());
 
     public static final DataFlavor flavor = new DataFlavor(ImageSelection.class, "ImageSelection");
 
     private final FreeColPanel parentPanel;
 
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
-    private GUI gui;
+    private final GUI gui;
 
 
     /**
@@ -118,8 +118,8 @@ public final class DefaultTransferHandler extends TransferHandler {
      */
     public boolean canImport(JComponent comp, DataFlavor[] flavor) {
         if (comp instanceof JPanel || comp instanceof JLabel) {
-            for (int i = 0; i < flavor.length; i++) {
-                if (flavor[i].equals(DefaultTransferHandler.flavor)) {
+            for (DataFlavor aFlavor : flavor) {
+                if (aFlavor.equals(DefaultTransferHandler.flavor)) {
                     return true;
                 }
             }

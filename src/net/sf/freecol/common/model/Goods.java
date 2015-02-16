@@ -39,10 +39,10 @@ import org.w3c.dom.Element;
  */
 public class Goods extends AbstractGoods implements Locatable, Ownable {
 
-    private static Logger logger = Logger.getLogger(Goods.class.getName());
+    private static final Logger logger = Logger.getLogger(Goods.class.getName());
 
     /** The game containing these goods. */
-    private Game game;
+    private final Game game;
 
     /**
      * Where the goods are.  This should always be non-null except for the

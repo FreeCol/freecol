@@ -35,7 +35,7 @@ import javax.swing.plaf.basic.BasicPanelUI;
  */
 public class FreeColSelectedPanelUI extends BasicPanelUI {
 
-    private static FreeColSelectedPanelUI sharedInstance = new FreeColSelectedPanelUI();
+    private static final FreeColSelectedPanelUI sharedInstance = new FreeColSelectedPanelUI();
 
 
     public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {

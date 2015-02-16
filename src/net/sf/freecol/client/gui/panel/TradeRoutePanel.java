@@ -74,7 +74,7 @@ public final class TradeRoutePanel extends FreeColPanel {
 
     /** The list model describing the players trade routes. */
     private final DefaultListModel<TradeRoute> listModel
-        = new DefaultListModel<TradeRoute>();
+        = new DefaultListModel<>();
 
     /** The list of trade routes to display. */
     private JList<TradeRoute> tradeRoutes;
@@ -104,7 +104,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         final Player player = getMyPlayer();
 
         this.unit = unit;
-        this.tradeRoutes = new JList<TradeRoute>(listModel);
+        this.tradeRoutes = new JList<>(listModel);
         this.tradeRoutes.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     updateButtons();
@@ -147,7 +147,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         this.editRouteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     final TradeRoute selected
-                        = (TradeRoute)tradeRoutes.getSelectedValue();
+                        = tradeRoutes.getSelectedValue();
                     final String name = selected.getName();
                     getGUI().showTradeRouteInputPanel(selected,
                         new Runnable() {
@@ -223,7 +223,7 @@ public final class TradeRoutePanel extends FreeColPanel {
      * Gets the currently selected route.
      */
     private TradeRoute getRoute() {
-        return (TradeRoute)this.tradeRoutes.getSelectedValue();
+        return this.tradeRoutes.getSelectedValue();
     }
 
     /**
@@ -336,7 +336,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         } else if (OK.equals(command)) {
             List<TradeRoute> routes = new ArrayList<>();
             for (int index = 0; index < listModel.getSize(); index++) {
-                routes.add((TradeRoute)listModel.getElementAt(index));
+                routes.add(listModel.getElementAt(index));
             }
             igc().setTradeRoutes(routes);
             if (unit != null && route != null) {

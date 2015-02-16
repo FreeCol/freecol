@@ -73,7 +73,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
 
         EnumMap<FoundingFatherType, List<FoundingFather>> fathersByType =
-            new EnumMap<FoundingFatherType, List<FoundingFather>>(FoundingFatherType.class);
+            new EnumMap<>(FoundingFatherType.class);
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
             fathersByType.put(fatherType, new ArrayList<FoundingFather>());
         }

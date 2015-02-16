@@ -43,7 +43,7 @@ public class FreeColDirectories {
     private static final String CLASSIC_DIRECTORY = "classic";
 
     private static final String[] CONFIG_DIRS
-        = new String[] { "classic", "freecol" };
+        = { "classic", "freecol" };
 
     private static final String DATA_DIRECTORY = "data";
 

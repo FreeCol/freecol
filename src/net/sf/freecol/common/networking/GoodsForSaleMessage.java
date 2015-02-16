@@ -41,13 +41,13 @@ import org.w3c.dom.NodeList;
 public class GoodsForSaleMessage extends DOMMessage {
 
     /** The identifier of the unit that is trading. */
-    private String unitId;
+    private final String unitId;
 
     /** The identifier of the settlement that is trading. */
-    private String settlementId;
+    private final String settlementId;
 
     /** The list of goods for sale. */
-    private List<Goods> sellGoods;
+    private final List<Goods> sellGoods;
 
 
     /**

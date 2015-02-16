@@ -33,7 +33,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
@@ -94,7 +93,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
                     recruitingPanel, null);
 
         Map<FoundingFatherType, JPanel> panels
-            = new EnumMap<FoundingFatherType, JPanel>(FoundingFatherType.class);
+            = new EnumMap<>(FoundingFatherType.class);
         for (FoundingFatherType type : FoundingFatherType.values()) {
             JPanel panel = new MigPanel();
             panel.setLayout(new MigLayout("flowy", "[center]"));

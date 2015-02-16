@@ -23,7 +23,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -61,7 +60,7 @@ public final class UnitLabel extends JLabel
     implements ActionListener, Draggable {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
+    private static final Logger logger = Logger.getLogger(UnitLabel.class.getName());
 
     public static enum UnitAction {
         ASSIGN,
@@ -202,7 +201,7 @@ public final class UnitLabel extends JLabel
             this.isSmall = true;
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
-                final Tile tile = ((ColonyTile) unit.getLocation()).getTile();
+                final Tile tile = unit.getLocation().getTile();
                 final TileType tileType = tile.getType();
                 final Image image = lib.getTerrainImage(tileType, tile.getX(),
                                                         tile.getY());
@@ -291,8 +290,8 @@ public final class UnitLabel extends JLabel
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
                 Font font = GUI.LESS_TINY_DEFAULT_FONT;
-                Image repairImage1 = lib.getStringImage((Graphics2D)g, underRepair1, Color.RED, font);
-                Image repairImage2 = lib.getStringImage((Graphics2D)g, underRepair2, Color.RED, font);
+                Image repairImage1 = lib.getStringImage(g, underRepair1, Color.RED, font);
+                Image repairImage2 = lib.getStringImage(g, underRepair2, Color.RED, font);
                 int textHeight = repairImage1.getHeight(null) + repairImage2.getHeight(null);
                 int leftIndent = Math.min(5, Math.min(getWidth() - repairImage1.getWidth(null),
                                                       getWidth() - repairImage2.getWidth(null)));

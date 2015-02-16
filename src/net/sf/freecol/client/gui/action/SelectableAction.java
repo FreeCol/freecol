@@ -31,7 +31,7 @@ public abstract class SelectableAction extends MapboardAction {
 
     public static final String id = "selectableAction";
 
-    private String optionId;
+    private final String optionId;
 
     protected boolean selected = false;
 

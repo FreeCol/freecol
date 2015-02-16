@@ -38,7 +38,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.option.OptionGroup;
@@ -95,7 +94,7 @@ public class Player extends FreeColGameObject implements Nameable {
      
         private static final int MAX = values().length;
 
-        private int value;
+        private final int value;
 
 
         NoValueType(int value) { this.value = value; }
@@ -180,9 +179,9 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public static class UnitIterator implements Iterator<Unit> {
 
-        private Player owner;
+        private final Player owner;
 
-        private UnitPredicate predicate;
+        private final UnitPredicate predicate;
 
         private final List<Unit> units = new ArrayList<>();
 
@@ -569,7 +568,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /** The founding fathers in this Player's congress. */
     protected final Set<FoundingFather> foundingFathers
-        = new HashSet<FoundingFather>();
+        = new HashSet<>();
     /** Current founding father being recruited. */
     protected FoundingFather currentFather;
     /** The offered founding fathers. */
@@ -579,7 +578,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * The tension levels, 0-1000, with 1000 being maximum hostility.
      * Only used by AI.  FIXME: move this to AIPlayer
      */
-    protected java.util.Map<Player, Tension> tension = new HashMap<>();
+    protected final java.util.Map<Player, Tension> tension = new HashMap<>();
 
     /** A list of players who can not establish missions to this player. */
     protected Set<Player> bannedMissions = null;
@@ -588,7 +587,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Stores the stance towards the other players. One of: WAR, CEASE_FIRE,
      * PEACE and ALLIANCE.
      */
-    protected java.util.Map<String, Stance> stance = new HashMap<>();
+    protected final java.util.Map<String, Stance> stance = new HashMap<>();
 
     /** The trade routes defined by this player. */
     protected final List<TradeRoute> tradeRoutes = new ArrayList<>();
@@ -1517,7 +1516,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // If the religious unrest bonus is present, immigrationRequired
         // has already been reduced.  We want to apply the bonus to the
         // sum of the *unreduced* immigration target and the increment.
-        int unreduced = (int)Math.round(current
+        int unreduced = Math.round(current
             / applyModifiers(1f, turn, Modifier.RELIGIOUS_UNREST_BONUS));
         immigrationRequired = (int)applyModifiers(unreduced + base, turn,
             Modifier.RELIGIOUS_UNREST_BONUS);;
@@ -3052,7 +3051,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param player The <code>Player</code> to ban.
      */
     public void addMissionBan(Player player) {
-        if (bannedMissions == null) bannedMissions = new HashSet<Player>();
+        if (bannedMissions == null) bannedMissions = new HashSet<>();
         bannedMissions.add(player);
     }
 
@@ -3634,7 +3633,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         // Set up maps for all foods and building materials
         final Specification spec = getSpecification();
-        TypeCountMap<GoodsType> production = new TypeCountMap<GoodsType>();
+        TypeCountMap<GoodsType> production = new TypeCountMap<>();
 
         // Initialize tile value with food production.
         int initialFood = 0;
@@ -3685,8 +3684,8 @@ public class Player extends FreeColGameObject implements Nameable {
         values.set(ColonyValueCategory.A_RESOURCE.ordinal(),
                    (tile.hasResource()) ? MOD_HAS_RESOURCE : 1.0);
 
-        Set<GoodsType> highProduction = new HashSet<GoodsType>();
-        Set<GoodsType> goodProduction = new HashSet<GoodsType>();
+        Set<GoodsType> highProduction = new HashSet<>();
+        Set<GoodsType> goodProduction = new HashSet<>();
         for (Tile t : tile.getSurroundingTiles(1)) {
             if (t.getType() == null) continue; // Unexplored!?!
             if (t.getSettlement() != null) { // Should not happen, tested above

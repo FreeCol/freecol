@@ -205,7 +205,7 @@ public class GUI {
     }
 
     /** Warning levels. */
-    private static final String levels[] = new String[] {
+    private static final String levels[] = {
         "low", "normal", "high"
     };
 
@@ -333,7 +333,7 @@ public class GUI {
 
 
     /** The client for the game. */
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
     /** The canvas that implements much of the functionality. */
     private Canvas canvas;
@@ -349,7 +349,7 @@ public class GUI {
     private FreeColFrame frame;
 
     /** An image library to use. */
-    private ImageLibrary imageLibrary;
+    private final ImageLibrary imageLibrary;
 
     /**
      * The MapViewer instance used to paint the main map.
@@ -1721,11 +1721,9 @@ public class GUI {
         final Player player = freeColClient.getMyPlayer();
 
         List<ChoiceItem<ArmedUnitSettlementAction>> choices = new ArrayList<>();
-        choices.add(new ChoiceItem<ArmedUnitSettlementAction>(
-                Messages.message("armedUnitSettlement.tribute"),
+        choices.add(new ChoiceItem<>(Messages.message("armedUnitSettlement.tribute"),
                 ArmedUnitSettlementAction.SETTLEMENT_TRIBUTE));
-        choices.add(new ChoiceItem<ArmedUnitSettlementAction>(
-                Messages.message("armedUnitSettlement.attack"),
+        choices.add(new ChoiceItem<>(Messages.message("armedUnitSettlement.attack"),
                 ArmedUnitSettlementAction.SETTLEMENT_ATTACK));
 
         return getChoice(true, settlement.getTile(),
@@ -1750,11 +1748,9 @@ public class GUI {
             .addAmount("%amount%", arrears);
 
         List<ChoiceItem<BoycottAction>> choices = new ArrayList<>();
-        choices.add(new ChoiceItem<BoycottAction>(
-                Messages.message("boycottedGoods.payArrears"),
+        choices.add(new ChoiceItem<>(Messages.message("boycottedGoods.payArrears"),
                 BoycottAction.PAY_ARREARS));
-        choices.add(new ChoiceItem<BoycottAction>(
-                Messages.message("boycottedGoods.dumpGoods"),
+        choices.add(new ChoiceItem<>(Messages.message("boycottedGoods.dumpGoods"),
                 BoycottAction.DUMP_CARGO));
 
         return getChoice(true, null, getDefaultTextArea(template),
@@ -1779,10 +1775,10 @@ public class GUI {
             .addAmount("%gold%", gold);
 
         List<ChoiceItem<BuyAction>> choices = new ArrayList<>();
-        choices.add(new ChoiceItem<BuyAction>(Messages.message("buy.takeOffer"),
-                                              BuyAction.BUY, canBuy));
-        choices.add(new ChoiceItem<BuyAction>(Messages.message("buy.moreGold"),
-                                              BuyAction.HAGGLE));
+        choices.add(new ChoiceItem<>(Messages.message("buy.takeOffer"),
+                                     BuyAction.BUY, canBuy));
+        choices.add(new ChoiceItem<>(Messages.message("buy.moreGold"),
+                                     BuyAction.HAGGLE));
 
         return getChoice(true, unit.getTile(), getDefaultTextArea(template),
                          goods, "buyProposition.cancel", choices);
@@ -1806,15 +1802,15 @@ public class GUI {
                 .addStringTemplate("%player%", owner.getNationName());
             StringTemplate pay = StringTemplate.template("indianLand.pay")
                 .addAmount("%amount%", price);
-            choices.add(new ChoiceItem<ClaimAction>(Messages.message(pay),
-                                                    ClaimAction.ACCEPT,
-                                                    player.checkGold(price)));
+            choices.add(new ChoiceItem<>(Messages.message(pay),
+                                         ClaimAction.ACCEPT,
+                                         player.checkGold(price)));
         } else {
             template = StringTemplate.template("indianLand.unknown");
         }
 
-        choices.add(new ChoiceItem<ClaimAction>(Messages.message("indianLand.take"),
-                                                ClaimAction.STEAL));
+        choices.add(new ChoiceItem<>(Messages.message("indianLand.take"),
+                                     ClaimAction.STEAL));
 
         return getChoice(true, tile, getDefaultTextArea(template),
                          owner, "indianLand.cancel", choices);
@@ -1839,19 +1835,16 @@ public class GUI {
 
         ArrayList<ChoiceItem<TradeAction>> choices = new ArrayList<>();
         if (canBuy) {
-            choices.add(new ChoiceItem<TradeAction>(
-                    Messages.message("tradeProposition.toBuy"),
-                    TradeAction.BUY, canBuy));
+            choices.add(new ChoiceItem<>(Messages.message("tradeProposition.toBuy"),
+                                         TradeAction.BUY, canBuy));
         }
         if (canSell) {
-            choices.add(new ChoiceItem<TradeAction>(
-                    Messages.message("tradeProposition.toSell"),
-                    TradeAction.SELL, canSell));
+            choices.add(new ChoiceItem<>(Messages.message("tradeProposition.toSell"),
+                                         TradeAction.SELL, canSell));
         }
         if (canGift) {
-            choices.add(new ChoiceItem<TradeAction>(
-                    Messages.message("tradeProposition.toGift"),
-                    TradeAction.GIFT, canGift));
+            choices.add(new ChoiceItem<>(Messages.message("tradeProposition.toGift"),
+                                         TradeAction.GIFT, canGift));
         }
         if (choices.isEmpty()) return null;
 
@@ -1884,18 +1877,17 @@ public class GUI {
 
         List<ChoiceItem<MissionaryAction>> choices = new ArrayList<>();
         if (canEstablish) {
-            choices.add(new ChoiceItem<MissionaryAction>(
-                    Messages.message("missionarySettlement.establish"),
-                    MissionaryAction.ESTABLISH_MISSION, canEstablish));
+            choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.establish"),
+                                         MissionaryAction.ESTABLISH_MISSION,
+                                         canEstablish));
         }
         if (canDenounce) {
-            choices.add(new ChoiceItem<MissionaryAction>(
-                    Messages.message("missionarySettlement.heresy"),
-                    MissionaryAction.DENOUNCE_HERESY, canDenounce));
+            choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.heresy"),
+                                         MissionaryAction.DENOUNCE_HERESY,
+                                         canDenounce));
         }
-        choices.add(new ChoiceItem<MissionaryAction>(
-                Messages.message("missionarySettlement.incite"),
-                MissionaryAction.INCITE_INDIANS));
+        choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.incite"),
+                                     MissionaryAction.INCITE_INDIANS));
 
         return getChoice(true, unit.getTile(), getDefaultTextArea(sb.toString()),
                          settlement, "cancel", choices);
@@ -1917,15 +1909,13 @@ public class GUI {
             .addName("%colony%", colony.getName());
 
         List<ChoiceItem<ScoutColonyAction>> choices = new ArrayList<>();
-        choices.add(new ChoiceItem<ScoutColonyAction>(
-                Messages.message("scoutColony.negotiate"),
-                ScoutColonyAction.FOREIGN_COLONY_NEGOTIATE, neg));
-        choices.add(new ChoiceItem<ScoutColonyAction>(
-                Messages.message("scoutColony.spy"),
-                ScoutColonyAction.FOREIGN_COLONY_SPY));
-        choices.add(new ChoiceItem<ScoutColonyAction>(
-                Messages.message("scoutColony.attack"),
-                ScoutColonyAction.FOREIGN_COLONY_ATTACK));
+        choices.add(new ChoiceItem<>(Messages.message("scoutColony.negotiate"),
+                                     ScoutColonyAction.FOREIGN_COLONY_NEGOTIATE,
+                                     neg));
+        choices.add(new ChoiceItem<>(Messages.message("scoutColony.spy"),
+                                     ScoutColonyAction.FOREIGN_COLONY_SPY));
+        choices.add(new ChoiceItem<>(Messages.message("scoutColony.attack"),
+                                     ScoutColonyAction.FOREIGN_COLONY_ATTACK));
 
         return getChoice(true, unit.getTile(), getDefaultTextArea(template),
                          colony, "cancel", choices);
@@ -1980,15 +1970,12 @@ public class GUI {
 
         List<ChoiceItem<ScoutIndianSettlementAction>> choices
             = new ArrayList<>();
-        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
-                Messages.message("scoutSettlement.speak"),
-                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_SPEAK));
-        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
-                Messages.message("scoutSettlement.tribute"),
-                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_TRIBUTE));
-        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
-                Messages.message("scoutSettlement.attack"),
-                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
+        choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.speak"),
+                                     ScoutIndianSettlementAction.INDIAN_SETTLEMENT_SPEAK));
+        choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.tribute"),
+                                     ScoutIndianSettlementAction.INDIAN_SETTLEMENT_TRIBUTE));
+        choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.attack"),
+                                     ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
 
         return getChoice(true, settlement.getTile(),
                          getDefaultTextArea(sb.toString()),
@@ -2013,16 +2000,13 @@ public class GUI {
             .addAmount("%gold%", gold);
 
         List<ChoiceItem<SellAction>> choices = new ArrayList<>();
-        choices.add(new ChoiceItem<SellAction>(
-                Messages.message("sell.takeOffer"),
-                SellAction.SELL));
-        choices.add(new ChoiceItem<SellAction>(
-                Messages.message("sell.moreGold"),
-                SellAction.HAGGLE));
-        choices.add(new ChoiceItem<SellAction>(
-                Messages.message(StringTemplate.template("sell.gift")
-                                 .addStringTemplate("%goods%", goodsTemplate)),
-                SellAction.GIFT));
+        choices.add(new ChoiceItem<>(Messages.message("sell.takeOffer"),
+                                     SellAction.SELL));
+        choices.add(new ChoiceItem<>(Messages.message("sell.moreGold"),
+                                     SellAction.HAGGLE));
+        choices.add(new ChoiceItem<>(Messages.message(StringTemplate.template("sell.gift")
+                    .addStringTemplate("%goods%", goodsTemplate)),
+                                     SellAction.GIFT));
 
         return getChoice(true, unit.getTile(), getDefaultTextArea(template),
                          goods, "sellProposition.cancel", choices);

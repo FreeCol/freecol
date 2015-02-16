@@ -53,7 +53,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
     private static class GoodsItem extends JCheckBox {
 
-        private Goods goods;
+        private final Goods goods;
 
 
         public GoodsItem(Goods goods) {
@@ -164,7 +164,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         for (int i = 0; i < loot.size(); i++) {
             goods[i] = new GoodsItem(loot.get(i));
         }
-        this.goodsList = new JList<GoodsItem>();
+        this.goodsList = new JList<>();
         this.goodsList.setListData(goods);
         this.goodsList.setCellRenderer(new CheckBoxRenderer());
         this.goodsList.addMouseListener(new MouseAdapter() {
@@ -189,7 +189,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
         List<Goods> fake = null;
         List<ChoiceItem<List<Goods>>> c = choices();
-        c.add(new ChoiceItem<List<Goods>>(Messages.message("ok"), fake)
+        c.add(new ChoiceItem<>(Messages.message("ok"), fake)
             .okOption().defaultOption());
         initializeDialog(DialogType.QUESTION, false, panel,
             getGUI().getImageLibrary().getImageIcon(winner, false), c);

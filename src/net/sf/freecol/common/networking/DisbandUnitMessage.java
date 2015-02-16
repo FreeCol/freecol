@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 public class DisbandUnitMessage extends DOMMessage {
 
     /** The identifier of the unit to be disbanded. */
-    private String unitId;
+    private final String unitId;
 
 
     /**

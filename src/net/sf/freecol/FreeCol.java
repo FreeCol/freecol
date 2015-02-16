@@ -72,7 +72,7 @@ public final class FreeCol {
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
     /** The difficulty levels. */
-    public static final String[] DIFFICULTIES = new String[] {
+    public static final String[] DIFFICULTIES = {
         "veryEasy", "easy", "medium", "hard", "veryHard"
     };
 
@@ -250,8 +250,8 @@ public final class FreeCol {
         // Now we have the log file path, start logging.
         final Logger baseLogger = Logger.getLogger("");
         final Handler[] handlers = baseLogger.getHandlers();
-        for (int i = 0; i < handlers.length; i++) {
-            baseLogger.removeHandler(handlers[i]);
+        for (Handler handler : handlers) {
+            baseLogger.removeHandler(handler);
         }
         String logFile = FreeColDirectories.getLogFilePath();
         try {
@@ -354,7 +354,7 @@ public final class FreeCol {
      * @param err The error message to print.
      */
     public static void fatal(String err) {
-        if (err == null || "".equals(err)) {
+        if (err == null || err.isEmpty()) {
             err = "Bogus null fatal error message";
             Thread.dumpStack();
         }
@@ -606,7 +606,7 @@ public final class FreeCol {
             if (line.hasOption("debug")) {
                 // If the optional argument is supplied use limited mode.
                 String arg = line.getOptionValue("debug");
-                if (arg == null || "".equals(arg)) {
+                if (arg == null || arg.isEmpty()) {
                     // Let empty argument default to menus functionality.
                     arg = FreeColDebugger.DebugMode.MENUS.toString();
                 }

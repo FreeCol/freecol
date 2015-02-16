@@ -205,7 +205,7 @@ public final class NewPanel extends FreeColPanel
 
         this.advantagesLabel
             = GUI.localizedLabel("playerOptions.nationalAdvantages");
-        this.advantagesBox = new JComboBox<Advantages>(new Advantages[] {
+        this.advantagesBox = new JComboBox<>(new Advantages[] {
                 Advantages.SELECTABLE,
                 Advantages.FIXED,
                 Advantages.NONE
@@ -223,7 +223,7 @@ public final class NewPanel extends FreeColPanel
             });
 
         this.rulesLabel = GUI.localizedLabel("rules");
-        this.rulesBox = new JComboBox<FreeColTcFile>();
+        this.rulesBox = new JComboBox<>();
         if (this.fixedSpecification == null) { // Allow TC selection
             String selectTC = FreeCol.getTC();
             for (FreeColTcFile tc : Mods.getRuleSets()) {
@@ -248,7 +248,7 @@ public final class NewPanel extends FreeColPanel
         this.publicServer = new JCheckBox(Messages.message("publicServer"));
 
         this.difficultyLabel = GUI.localizedLabel("difficulty");
-        this.difficultyBox = new JComboBox<OptionGroup>();
+        this.difficultyBox = new JComboBox<>();
         this.difficultyBox
             .setRenderer(new FreeColComboBoxRenderer<OptionGroup>());
         this.difficultyBox.addItemListener(this);

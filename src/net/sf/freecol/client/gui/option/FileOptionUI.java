@@ -40,7 +40,7 @@ import net.sf.freecol.common.option.FileOption;
  */
 public final class FileOptionUI extends OptionUI<FileOption>  {
 
-    private JPanel panel = new JPanel();
+    private final JPanel panel = new JPanel();
     private final JTextField fileField;
 
     /**
@@ -132,7 +132,8 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
      * {@inheritDoc}
      */
     public void updateOption() {
-        File f = ("".equals(fileField.getText())) ? null
+        File f = (fileField.getText() == null
+            || fileField.getText().isEmpty()) ? null
             : new File(fileField.getText());
         getOption().setValue(f);
     }

@@ -47,8 +47,8 @@ public class TileItemContainer extends FreeColGameObject {
             public int compare(TileItem tileItem1, TileItem tileItem2) {
                 int cmp = tileItem1.getZIndex() - tileItem2.getZIndex();
                 if (cmp == 0) {
-                    cmp = compareIds((FreeColObject)tileItem1,
-                                     (FreeColObject)tileItem2);
+                    cmp = compareIds(tileItem1,
+                            tileItem2);
                 }
                 return cmp;
             }

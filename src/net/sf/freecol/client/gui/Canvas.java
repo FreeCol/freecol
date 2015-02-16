@@ -251,7 +251,7 @@ public final class Canvas extends JDesktopPane {
     private final FreeColClient freeColClient;
 
     /** The parent GUI. */
-    private GUI gui;
+    private final GUI gui;
 
     private MainPanel mainPanel;
 
@@ -1059,18 +1059,18 @@ public final class Canvas extends JDesktopPane {
     public void removeInGameComponents() {
         // remove listeners, they will be added when launching the new game...
         KeyListener[] keyListeners = getKeyListeners();
-        for (int i = 0; i < keyListeners.length; ++i) {
-            removeKeyListener(keyListeners[i]);
+        for (KeyListener keyListener : keyListeners) {
+            removeKeyListener(keyListener);
         }
 
         MouseListener[] mouseListeners = getMouseListeners();
-        for (int i = 0; i < mouseListeners.length; ++i) {
-            removeMouseListener(mouseListeners[i]);
+        for (MouseListener mouseListener : mouseListeners) {
+            removeMouseListener(mouseListener);
         }
 
         MouseMotionListener[] mouseMotionListeners = getMouseMotionListeners();
-        for (int i = 0; i < mouseMotionListeners.length; ++i) {
-            removeMouseMotionListener(mouseMotionListeners[i]);
+        for (MouseMotionListener mouseMotionListener : mouseMotionListeners) {
+            removeMouseMotionListener(mouseMotionListener);
         }
 
         for (Component c : getComponents()) {
@@ -1240,7 +1240,7 @@ public final class Canvas extends JDesktopPane {
                                   ImageIcon icon, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
         FreeColChoiceDialog<T> fcd
-            = new FreeColChoiceDialog<T>(freeColClient, modal, obj, icon,
+            = new FreeColChoiceDialog<>(freeColClient, modal, obj, icon,
                                          cancelKey, choices);
         return showFreeColDialog(fcd, tile);
     }
@@ -1358,7 +1358,7 @@ public final class Canvas extends JDesktopPane {
     public void showCaptureGoodsDialog(Unit unit, List<Goods> gl,
                                        DialogHandler<List<Goods>> handler) {
         SwingUtilities.invokeLater(
-            new DialogCallback<List<Goods>>(
+            new DialogCallback<>(
                 new CaptureGoodsDialog(freeColClient, unit, gl),
                 null, handler));
     }
@@ -1383,7 +1383,7 @@ public final class Canvas extends JDesktopPane {
     public void showChooseFoundingFatherDialog(List<FoundingFather> ffs,
                                                DialogHandler<FoundingFather> handler) {
         SwingUtilities.invokeLater(
-            new DialogCallback<FoundingFather>(
+            new DialogCallback<>(
                 new ChooseFoundingFatherDialog(freeColClient, ffs),
                 null, handler));
     }
@@ -1533,7 +1533,7 @@ public final class Canvas extends JDesktopPane {
     public void showDumpCargoDialog(Unit unit,
                                     DialogHandler<List<Goods>> handler) {
         SwingUtilities.invokeLater(
-            new DialogCallback<List<Goods>>(
+            new DialogCallback<>(
                 new DumpCargoDialog(freeColClient, unit),
                 unit.getTile(), handler));
     }
@@ -1570,7 +1570,7 @@ public final class Canvas extends JDesktopPane {
     public void showEmigrationDialog(Player player, boolean fountainOfYouth,
                                      DialogHandler<Integer> handler) {
         SwingUtilities.invokeLater(
-            new DialogCallback<Integer>(
+            new DialogCallback<>(
                 new EmigrationDialog(freeColClient, player.getEurope(),
                                      fountainOfYouth),
                 null, handler));
@@ -1585,7 +1585,7 @@ public final class Canvas extends JDesktopPane {
     public void showEndTurnDialog(List<Unit> units,
                                   DialogHandler<Boolean> handler) {
         SwingUtilities.invokeLater(
-            new DialogCallback<Boolean>(
+            new DialogCallback<>(
                 new EndTurnDialog(freeColClient, units),
                 null, handler));
     }
@@ -1612,7 +1612,7 @@ public final class Canvas extends JDesktopPane {
         if (messageId != null) {
             display = Messages.message(messageId);
         }
-        if (display == null || "".equals(display)) display = message;
+        if (display == null || display.isEmpty()) display = message;
         ErrorPanel errorPanel = new ErrorPanel(freeColClient, display);
         showSubPanel(errorPanel, true);
     }
@@ -1675,7 +1675,7 @@ public final class Canvas extends JDesktopPane {
                                        Tile tile, int settlementCount,
                                        DialogHandler<Boolean> handler) {
         SwingUtilities.invokeLater(
-            new DialogCallback<Boolean>(
+            new DialogCallback<>(
                 new FirstContactDialog(freeColClient, player, other, tile,
                                        settlementCount),
                 tile, handler));
@@ -1942,7 +1942,7 @@ public final class Canvas extends JDesktopPane {
                                   StringTemplate template, String monarchKey,
                                   DialogHandler<Boolean> handler) {
         SwingUtilities.invokeLater(
-            new DialogCallback<Boolean>(
+            new DialogCallback<>(
                 new MonarchDialog(freeColClient, action, template, monarchKey),
                 null, handler));
     }
@@ -1959,7 +1959,7 @@ public final class Canvas extends JDesktopPane {
                                       Unit unit,
                                       DialogHandler<String> handler) {
         SwingUtilities.invokeLater(
-            new DialogCallback<String>(
+            new DialogCallback<>(
                 new FreeColStringInputDialog(freeColClient, false,
                                              Messages.message(key),
                                              defaultName, "ok", null),
@@ -1979,7 +1979,7 @@ public final class Canvas extends JDesktopPane {
                                         String defaultName, Unit unit,
                                         DialogHandler<String> handler) {
         SwingUtilities.invokeLater(
-            new DialogCallback<String>(
+            new DialogCallback<>(
                 new FreeColStringInputDialog(freeColClient, false,
                                              Messages.message(template),
                                              defaultName, "ok", null),
@@ -2435,7 +2435,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showVictoryDialog(DialogHandler<Boolean> handler) {
         SwingUtilities.invokeLater(
-            new DialogCallback<Boolean>(new VictoryDialog(freeColClient),
+            new DialogCallback<>(new VictoryDialog(freeColClient),
                                         null, handler));
     }
 
@@ -2465,13 +2465,13 @@ public final class Canvas extends JDesktopPane {
      */
     public void updateEuropeanSubpanels() {
         RecruitPanel rp
-            = (RecruitPanel)getExistingFreeColPanel(RecruitPanel.class);
+            = getExistingFreeColPanel(RecruitPanel.class);
         if (rp != null) rp.update();
         PurchasePanel pp
-            = (PurchasePanel)getExistingFreeColPanel(PurchasePanel.class);
+            = getExistingFreeColPanel(PurchasePanel.class);
         if (pp != null) pp.update();
         TrainPanel tp
-            = (TrainPanel)getExistingFreeColPanel(TrainPanel.class);
+            = getExistingFreeColPanel(TrainPanel.class);
         if (tp != null) tp.update();
     }
 

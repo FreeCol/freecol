@@ -34,7 +34,7 @@ import net.sf.freecol.common.option.IntegerOption;
  */
 public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
 
-    private JSpinner spinner = new JSpinner();
+    private final JSpinner spinner = new JSpinner();
 
     /**
      * Creates a new <code>IntegerOptionUI</code> for the given <code>IntegerOption</code>.

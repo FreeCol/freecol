@@ -34,10 +34,10 @@ import org.w3c.dom.Element;
 public class AssignTeacherMessage extends DOMMessage {
 
     /** The identifier of the student. */
-    private String studentId;
+    private final String studentId;
 
     /** The identifier of the teacher. */
-    private String teacherId;
+    private final String teacherId;
 
 
     /**

@@ -37,16 +37,16 @@ import org.w3c.dom.Element;
 public class BuyMessage extends DOMMessage {
 
     /** The object identifier of the unit that is buying. */
-    private String unitId;
+    private final String unitId;
 
     /** The object identifier of the settlement that is selling. */
-    private String settlementId;
+    private final String settlementId;
 
     /** The goods to be bought. */
-    private Goods goods;
+    private final Goods goods;
 
     /** The price to pay. */
-    private String goldString;
+    private final String goldString;
 
 
     /**

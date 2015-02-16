@@ -102,17 +102,17 @@ public class LabourData {
         /**
          * associated unit data
          */
-        private UnitData unitData;
+        private final UnitData unitData;
 
         /**
          * if this is the total for the unit data
          */
-        private boolean isTotal;
+        private final boolean isTotal;
 
         /**
          * experts working in their expert field
          */
-        private ProductionData workingProfessionals = new ProductionData();
+        private final ProductionData workingProfessionals = new ProductionData();
 
         /**
          * lumberjacks working as something else
@@ -122,7 +122,7 @@ public class LabourData {
         /**
          * others working as lumberjacks
          */
-        private ProductionData otherWorkingAmateurs = new ProductionData();
+        private final ProductionData otherWorkingAmateurs = new ProductionData();
 
         /**
          * net production of goods
@@ -266,19 +266,19 @@ public class LabourData {
 
     public static class UnitData {
 
-        private UnitType unitType;
+        private final UnitType unitType;
 
         private boolean summary = false;
 
         /**
          * Map[Colony, colony details]]
          */
-        private Map<Colony, LocationData> details = new LinkedHashMap<Colony, LocationData>();
+        private final Map<Colony, LocationData> details = new LinkedHashMap<>();
 
-        private LocationData total = new LocationData(this, true);
-        private LocationData unitsAtSea = new LocationData(this);
-        private LocationData unitsOnLand = new LocationData(this);
-        private LocationData unitsInEurope = new LocationData(this);
+        private final LocationData total = new LocationData(this, true);
+        private final LocationData unitsAtSea = new LocationData(this);
+        private final LocationData unitsOnLand = new LocationData(this);
+        private final LocationData unitsInEurope = new LocationData(this);
 
         public UnitData(UnitType unitType) {
             this.unitType = unitType;
@@ -360,11 +360,11 @@ public class LabourData {
         }
     }
 
-    private Map<GoodsType, UnitData> experts = new LinkedHashMap<GoodsType, UnitData>();
+    private final Map<GoodsType, UnitData> experts = new LinkedHashMap<>();
 
-    private Map<String, UnitData> unitDataMap = new LinkedHashMap<String, UnitData>();
+    private final Map<String, UnitData> unitDataMap = new LinkedHashMap<>();
 
-    private UnitData summary = new UnitData(null);
+    private final UnitData summary = new UnitData(null);
 
     private UnitData missionary;
 
@@ -419,7 +419,7 @@ public class LabourData {
                 incrementOutsideWorker(data, unit, UNITS_IN_EUROPE_GETTER);
             } else if (location instanceof Tile
                 && ((Tile)location).hasSettlement()) {
-                incrementColonyCount((Colony)((Tile)location).getSettlement(),
+                incrementColonyCount((Colony) location.getSettlement(),
                                      unit, data);
             } else if (location instanceof Unit) {
                 incrementOutsideWorker(data, unit, UNITS_AT_SEA_GETTER);

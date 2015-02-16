@@ -62,7 +62,7 @@ public final class ReportLabourPanel extends ReportPanel {
     private class LabourUnitPanel extends JPanel {
 
         public boolean selected;
-        public UnitType unitType;
+        public final UnitType unitType;
 
 
         public LabourUnitPanel(UnitType unitType, String roleId, int count) {
@@ -131,7 +131,7 @@ public final class ReportLabourPanel extends ReportPanel {
         super(freeColClient, "reportLabourAction");
 
         this.data = new HashMap<>();
-        this.unitCount = new TypeCountMap<UnitType>();
+        this.unitCount = new TypeCountMap<>();
         for (Unit unit : getMyPlayer().getUnits()) {
             UnitType type = unit.getType();
             this.unitCount.incrementCount(type, 1);
@@ -162,7 +162,7 @@ public final class ReportLabourPanel extends ReportPanel {
         this.colonies = freeColClient.getMySortedColonies();
 
         DefaultListModel<LabourUnitPanel> model
-            = new DefaultListModel<LabourUnitPanel>();
+            = new DefaultListModel<>();
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isPerson() && unitType.isAvailableTo(getMyPlayer())) {
                 int count = this.unitCount.getCount(unitType);
@@ -182,7 +182,7 @@ public final class ReportLabourPanel extends ReportPanel {
             };
 
         // Add all the components
-        this.panelList = new JList<LabourUnitPanel>(model);
+        this.panelList = new JList<>(model);
         this.panelList.getInputMap()
             .put(KeyStroke.getKeyStroke("ENTER"), "select");
         this.panelList.getActionMap().put("select", selectAction);
@@ -206,7 +206,7 @@ public final class ReportLabourPanel extends ReportPanel {
     }
 
     private void showDetails() {
-        UnitType unitType = ((LabourUnitPanel)panelList.getSelectedValue())
+        UnitType unitType = panelList.getSelectedValue()
             .unitType;
         getGUI().showReportLabourDetailPanel(unitType, this.data,
                                              this.unitCount, this.colonies);

@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.MapGeneratorOptions;
@@ -42,10 +40,10 @@ public class LandMap {
     private static final Logger logger = Logger.getLogger(LandMap.class.getName());
 
     /** The map width. */
-    private int width;
+    private final int width;
 
     /** The map height. */
-    private int height;
+    private final int height;
 
     /** The land map.  True means land. */
     private boolean[][] map;

@@ -74,7 +74,7 @@ public class ChangeSet {
         CHANGE_NORMAL(15),
         CHANGE_LATE(90);
 
-        private int level;
+        private final int level;
 
         ChangePriority(int level) {
             this.level = level;
@@ -85,9 +85,9 @@ public class ChangeSet {
         }
     }
 
-    private ArrayList<Change> changes;
+    private final ArrayList<Change> changes;
 
-    private static Comparator<Change> changeComparator
+    private static final Comparator<Change> changeComparator
         = new Comparator<Change>() {
             public int compare(final Change c1, final Change c2) {
                 return c1.getPriority() - c2.getPriority();
@@ -104,7 +104,7 @@ public class ChangeSet {
         private ServerPlayer seeAlways;
         private ServerPlayer seePerhaps;
         private ServerPlayer seeNever;
-        private int type;
+        private final int type;
 
         private See(int type) {
             this.seeAlways = this.seePerhaps = this.seeNever = null;
@@ -224,7 +224,7 @@ public class ChangeSet {
         /**
          * The visibility of the change.
          */
-        protected See see;
+        protected final See see;
 
 
         /**
@@ -320,9 +320,9 @@ public class ChangeSet {
      */
     private static class AttackChange extends Change {
 
-        private Unit attacker;
-        private Unit defender;
-        private boolean success;
+        private final Unit attacker;
+        private final Unit defender;
+        private final boolean success;
 
         /**
          * Build a new AttackChange.
@@ -437,8 +437,8 @@ public class ChangeSet {
      * Encapsulate an attribute change.
      */
     private static class AttributeChange extends Change {
-        private String key;
-        private String value;
+        private final String key;
+        private final String value;
 
         /**
          * Build a new AttributeChange.
@@ -514,8 +514,8 @@ public class ChangeSet {
      * Encapsulate a Message.
      */
     private static class MessageChange extends Change {
-        private ChangePriority priority;
-        private DOMMessage message;
+        private final ChangePriority priority;
+        private final DOMMessage message;
 
         /**
          * Build a new MessageChange.
@@ -576,9 +576,9 @@ public class ChangeSet {
      * Encapsulate a move.
      */
     private static class MoveChange extends Change {
-        private Unit unit;
-        private Location oldLocation;
-        private Tile newTile;
+        private final Unit unit;
+        private final Location oldLocation;
+        private final Tile newTile;
 
         private boolean seeOld(ServerPlayer serverPlayer) {
             Tile oldTile = oldLocation.getTile();
@@ -701,7 +701,7 @@ public class ChangeSet {
      * Encapsulate a FreeColGameObject update.
      */
     private static class ObjectChange extends Change {
-        protected FreeColGameObject fcgo;
+        protected final FreeColGameObject fcgo;
 
         /**
          * Build a new ObjectChange for a single object.
@@ -803,7 +803,7 @@ public class ChangeSet {
      * Encapsulate a partial update of a FreeColGameObject.
      */
     private static class PartialObjectChange extends ObjectChange {
-        private String[] fields;
+        private final String[] fields;
 
         /**
          * Build a new PartialObjectChange for a single object.
@@ -866,9 +866,9 @@ public class ChangeSet {
      * -vis: If removing settlements or units, visibility changes.
      */
     private static class RemoveChange extends Change {
-        private Tile tile;
-        private FreeColGameObject fcgo;
-        private List<? extends FreeColGameObject> contents;
+        private final Tile tile;
+        private final FreeColGameObject fcgo;
+        private final List<? extends FreeColGameObject> contents;
 
         /**
          * Build a new RemoveChange for an object that is disposed.
@@ -961,7 +961,7 @@ public class ChangeSet {
      * Encapsulate an owned object change.
      */
     private static class OwnedChange extends Change {
-        private FreeColObject fco;
+        private final FreeColObject fco;
 
         /**
          * Build a new OwnedChange.
@@ -1023,9 +1023,9 @@ public class ChangeSet {
      * Encapsulate a feature change.
      */
     private static class FeatureChange extends Change {
-        private FreeColGameObject object;
-        private Feature feature;
-        private boolean add;
+        private final FreeColGameObject object;
+        private final Feature feature;
+        private final boolean add;
 
         /**
          * Build a new FeatureChange.
@@ -1096,7 +1096,7 @@ public class ChangeSet {
      * Encapsulates a spying action.
      */
     private static class SpyChange extends Change {
-        private Tile tile;
+        private final Tile tile;
 
         /**
          * Build a new SpyChange.
@@ -1160,9 +1160,9 @@ public class ChangeSet {
      * Encapsulate a stance change.
      */
     private static class StanceChange extends Change {
-        private Player first;
-        private Stance stance;
-        private Player second;
+        private final Player first;
+        private final Stance stance;
+        private final Player second;
 
         /**
          * Build a new StanceChange.
@@ -1232,9 +1232,9 @@ public class ChangeSet {
      * from its name.
      */
     private static class TrivialChange extends Change {
-        private int priority;
-        private String name;
-        private String[] attributes;
+        private final int priority;
+        private final String name;
+        private final String[] attributes;
 
         /**
          * Build a new TrivialChange.
@@ -1406,7 +1406,7 @@ public class ChangeSet {
      */
     public ChangeSet addDead(ServerPlayer serverPlayer) {
         addTrivial(See.all(), "setDead", ChangePriority.CHANGE_EARLY,
-                   "player", serverPlayer.getId());
+                "player", serverPlayer.getId());
         return this;
     }
 

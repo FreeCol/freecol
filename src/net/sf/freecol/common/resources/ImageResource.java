@@ -44,10 +44,10 @@ public class ImageResource extends Resource implements Resource.Preloadable {
 
     private static final Logger logger = Logger.getLogger(ImageResource.class.getName());
 
-    private Map<Dimension, Image> grayscaleImages = new HashMap<>();
-    private Map<Dimension, Image> scaledImages = new HashMap<>();
+    private final Map<Dimension, Image> grayscaleImages = new HashMap<>();
+    private final Map<Dimension, Image> scaledImages = new HashMap<>();
     private Image image = null;
-    private volatile Object loadingLock = new Object();
+    private final Object loadingLock = new Object();
     private static final Component _c = new Component() {};
 
 

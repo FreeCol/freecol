@@ -90,7 +90,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
          * arbitrary stream).
          */
         final Map<String, BufferedImage> loadingImages = new HashMap<>();
-        final List<String> loadingDescriptor = new LinkedList<String>();
+        final List<String> loadingDescriptor = new LinkedList<>();
         try {
             ZipEntry entry;
             while ((entry = zipStream.getNextEntry()) != null) {

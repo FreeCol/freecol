@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.GoodsLocation;
 
 
 /**
@@ -57,7 +56,7 @@ public abstract class Settlement extends GoodsLocation
     private SettlementType type = null;
 
     /** The tiles this settlement owns. */
-    private final Set<Tile> ownedTiles = new HashSet<Tile>();
+    private final Set<Tile> ownedTiles = new HashSet<>();
 
     /** Contains the abilities and modifiers of this Settlement. */
     private final FeatureContainer featureContainer = new FeatureContainer();
@@ -158,7 +157,7 @@ public abstract class Settlement extends GoodsLocation
      * @return A list of tiles.
      */
     public Set<Tile> getOwnedTiles() {
-        return new HashSet<Tile>(ownedTiles);
+        return new HashSet<>(ownedTiles);
     }
 
     /**

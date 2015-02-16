@@ -37,10 +37,10 @@ import org.w3c.dom.Element;
 public class AttackMessage extends DOMMessage {
 
     /** The identifier of the attacker. */
-    private String unitId;
+    private final String unitId;
 
     /** The direction to attack. */
-    private String directionString;
+    private final String directionString;
 
 
     /**

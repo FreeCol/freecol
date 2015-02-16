@@ -35,13 +35,13 @@ import org.w3c.dom.Element;
 public class GetTransactionMessage extends DOMMessage {
 
     /** The object identifier of the unit performing the transaction. */
-    private String unitId;
+    private final String unitId;
 
     /**
      * The object identifier of the settlement at which the
      * transaction occurs.
      */
-    private String settlementId;
+    private final String settlementId;
 
 
     /**

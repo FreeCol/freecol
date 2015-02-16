@@ -32,7 +32,6 @@ import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.FreeColServerHolder;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.Server;
 
@@ -48,7 +47,7 @@ import org.w3c.dom.Element;
 public final class UserConnectionHandler extends FreeColServerHolder
     implements MessageHandler {
 
-    private static Logger logger = Logger.getLogger(UserConnectionHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(UserConnectionHandler.class.getName());
 
 
     /**
@@ -163,9 +162,9 @@ public final class UserConnectionHandler extends FreeColServerHolder
         final String userName = element.getAttribute("userName");
         final String version = element.getAttribute("version");
 
-        if (userName == null || "".equals(userName)) {
+        if (userName == null || userName.isEmpty()) {
             return DOMMessage.createError("server.missingUserName", null);
-        } else if (version == null || "".equals(version)) {
+        } else if (version == null || version.isEmpty()) {
             return DOMMessage.createError("server.missingVersion", null);
         } else if (!version.equals(FreeCol.getVersion())) {
             return DOMMessage.createError("server.wrongFreeColVersion",

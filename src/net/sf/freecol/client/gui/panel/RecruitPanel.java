@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 import net.miginfocom.swing.MigLayout;
@@ -42,7 +41,7 @@ import net.sf.freecol.common.model.UnitType;
  */
 public final class RecruitPanel extends FreeColPanel {
 
-    private static Logger logger = Logger.getLogger(RecruitPanel.class.getName());
+    private static final Logger logger = Logger.getLogger(RecruitPanel.class.getName());
 
     /** The main text area. */
     private final JTextArea question;

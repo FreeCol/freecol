@@ -39,10 +39,10 @@ import org.w3c.dom.Element;
 public class ScoutSpeakToChiefMessage extends DOMMessage {
 
     /** The identifier of the unit that is speaking. */
-    private String unitId;
+    private final String unitId;
 
     /** The direction of the settlement from the unit. */
-    private String directionString;
+    private final String directionString;
 
 
     /**

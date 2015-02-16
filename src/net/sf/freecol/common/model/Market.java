@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
  */
 public final class Market extends FreeColGameObject implements Ownable {
 
-    private static Logger logger = Logger.getLogger(Market.class.getName());
+    private static final Logger logger = Logger.getLogger(Market.class.getName());
 
     /**
      * European markets are bottomless.  Goods present never decrease
@@ -63,7 +63,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     private Player owner;
 
     /** Watching listeners.  Do not serialize. */
-    private ArrayList<TransactionListener> transactionListeners = new ArrayList<>();
+    private final ArrayList<TransactionListener> transactionListeners = new ArrayList<>();
 
 
     /**

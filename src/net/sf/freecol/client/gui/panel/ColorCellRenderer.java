@@ -22,13 +22,11 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Component;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**

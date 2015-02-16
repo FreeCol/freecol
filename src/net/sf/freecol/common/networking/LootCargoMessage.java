@@ -39,13 +39,13 @@ import org.w3c.dom.NodeList;
 public class LootCargoMessage extends DOMMessage {
 
     /** The object identifier of the unit that is looting. */
-    private String winnerId;
+    private final String winnerId;
 
     /** The object identifier of the unit that is looted. */
-    private String loserId;
+    private final String loserId;
 
     /** The goods to be looted. */
-    private List<Goods> goods;
+    private final List<Goods> goods;
 
 
     /**

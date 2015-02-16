@@ -71,27 +71,27 @@ public final class FreeColClient {
 
     private static final Logger logger = Logger.getLogger(FreeColClient.class.getName());
 
-    private ConnectController connectController;
+    private final ConnectController connectController;
 
-    private PreGameController preGameController;
+    private final PreGameController preGameController;
 
-    private PreGameInputHandler preGameInputHandler;
+    private final PreGameInputHandler preGameInputHandler;
 
-    private InGameController inGameController;
+    private final InGameController inGameController;
 
-    private InGameInputHandler inGameInputHandler;
+    private final InGameInputHandler inGameInputHandler;
 
-    private MapEditorController mapEditorController;
+    private final MapEditorController mapEditorController;
 
     /** The server that has been started from the client-GUI. */
     private FreeColServer freeColServer = null;
 
     /** Encapsulation of the server API. */
-    private ServerAPI serverAPI;
+    private final ServerAPI serverAPI;
 
 
     /** The GUI encapsulation. */
-    private GUI gui;
+    private final GUI gui;
 
     /** The encapsulation of the actions. */
     private final ActionManager actionManager;
@@ -129,7 +129,7 @@ public final class FreeColClient {
     private boolean loggedIn = false;
 
     /** Run in headless mode. */
-    private boolean headless;
+    private final boolean headless;
 
 
     /**

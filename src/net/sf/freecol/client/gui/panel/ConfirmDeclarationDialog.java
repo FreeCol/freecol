@@ -45,7 +45,6 @@ import net.sf.freecol.client.gui.panel.Flag.Background;
 import net.sf.freecol.client.gui.panel.Flag.Decoration;
 import net.sf.freecol.client.gui.panel.Flag.UnionPosition;
 import net.sf.freecol.client.gui.panel.Flag.UnionShape;
-import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Player;
@@ -208,39 +207,39 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
     /** A box to select the flag background from. */
     private final JComboBox<Background> background
-        = new JComboBox<Background>(Background.values());
+        = new JComboBox<>(Background.values());
 
     /** A box to select the flag decoration from. */
     private final JComboBox<Decoration> decoration
-        = new JComboBox<Decoration>(Decoration.values());
+        = new JComboBox<>(Decoration.values());
 
     /** A box to select the union position with. */
     private final JComboBox<UnionPosition> unionPosition
-        = new JComboBox<UnionPosition>(UnionPosition.values());
+        = new JComboBox<>(UnionPosition.values());
 
     /** A box to select the union shap with. */
     private final JComboBox<UnionShape> unionShape
-        = new JComboBox<UnionShape>(UnionShape.values());
+        = new JComboBox<>(UnionShape.values());
 
     /** A box to select the number of stars with. */
     private final JComboBox<String> stars
-        = new JComboBox<String>(getNumbers(50));
+        = new JComboBox<>(getNumbers(50));
 
     /** A box to select the number of stripes with. */
     private final JComboBox<String> stripes
-        = new JComboBox<String>(getNumbers(13));
+        = new JComboBox<>(getNumbers(13));
 
     /** The selected decoration colour. */
-    private ColorButton decorationColor = new ColorButton(Color.WHITE);
+    private final ColorButton decorationColor = new ColorButton(Color.WHITE);
 
     /** The selected union colour. */
-    private ColorButton unionColor = new ColorButton(Color.BLUE);
+    private final ColorButton unionColor = new ColorButton(Color.BLUE);
 
     /** The selected star colour. */
-    private ColorButton starColor = new ColorButton(Color.WHITE);
+    private final ColorButton starColor = new ColorButton(Color.WHITE);
 
     /** The selected background colours. */
-    private ColorButton[] backgroundColors = new ColorButton[] {
+    private final ColorButton[] backgroundColors = {
         new ColorButton(null), new ColorButton(null), new ColorButton(null),
         new ColorButton(null), new ColorButton(null), new ColorButton(null)
     };
@@ -350,9 +349,9 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
         final List<String> fake = null;
         List<ChoiceItem<List<String>>> c = choices();
-        c.add(new ChoiceItem<List<String>>(Messages.message("declareIndependence.areYouSure.yes"),
+        c.add(new ChoiceItem<>(Messages.message("declareIndependence.areYouSure.yes"),
                 fake).okOption());
-        c.add(new ChoiceItem<List<String>>(Messages.message("declareIndependence.areYouSure.no"),
+        c.add(new ChoiceItem<>(Messages.message("declareIndependence.areYouSure.no"),
                 fake).cancelOption().defaultOption());
         initializeDialog(DialogType.QUESTION, true, panel, icon, c);
     }

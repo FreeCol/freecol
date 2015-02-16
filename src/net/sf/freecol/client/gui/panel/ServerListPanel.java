@@ -57,7 +57,7 @@ public final class ServerListPanel extends FreeColPanel {
 
     private final ServerListTableModel tableModel;
 
-    private JButton connect;
+    private final JButton connect;
 
     
     /**
@@ -161,8 +161,8 @@ public final class ServerListPanel extends FreeColPanel {
         super.setEnabled(enabled);
 
         Component[] components = getComponents();
-        for (int i = 0; i < components.length; i++) {
-            components[i].setEnabled(enabled);
+        for (Component component : components) {
+            component.setEnabled(enabled);
         }
 
         table.setEnabled(enabled);

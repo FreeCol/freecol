@@ -20,10 +20,7 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -40,7 +37,7 @@ public class PathNode {
     private static final int TURN_FACTOR = 100;
 
     /** The location this node refers to.  Usually a Tile. */
-    private Location location;
+    private final Location location;
 
     /**
      * The number of moves left at this node for the unit traversing

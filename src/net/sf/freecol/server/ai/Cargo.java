@@ -40,12 +40,6 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.server.ai.AIGoods;
-import net.sf.freecol.server.ai.AIMain;
-import net.sf.freecol.server.ai.AIObject;
-import net.sf.freecol.server.ai.AIUnit;
-import net.sf.freecol.server.ai.Cargo;
-import net.sf.freecol.server.ai.TransportableAIObject;
 
 
 /**
@@ -569,7 +563,7 @@ public class Cargo {
         }
             
         Location tLoc = l.getLocation();
-        if (tLoc instanceof Unit && (Unit)tLoc != carrier) {
+        if (tLoc instanceof Unit && tLoc != carrier) {
             return "carrier usurped"; // On another carrier!
         }
         return null;

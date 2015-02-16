@@ -47,7 +47,7 @@ public class ConceptDetailPanel extends FreeColPanel
 
     private static final String id = "colopediaAction." + PanelType.CONCEPTS;
 
-    private static final String[] concepts = new String[] {
+    private static final String[] concepts = {
         "taxes",
         "efficiency",
         "education",

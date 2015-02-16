@@ -41,7 +41,7 @@ public class River {
 
     private static final Logger logger = Logger.getLogger(SimpleMapGenerator.class.getName());
 
-    private TileImprovementType riverType;
+    private final TileImprovementType riverType;
 
     /**
      * Possible direction changes for a river.
@@ -95,7 +95,7 @@ public class River {
     /**
      * The map on which the river flows.
      */
-    private Map map;
+    private final Map map;
 
     /**
      * A list of river sections.
@@ -120,7 +120,7 @@ public class River {
     /**
      * A hashtable of position-river pairs.
      */
-    private java.util.Map<Tile, River> riverMap;
+    private final java.util.Map<Tile, River> riverMap;
 
     /**
      * Whether the river is connected to the high seas.

@@ -66,11 +66,11 @@ public final class TileType extends FreeColGameObjectType {
     private int basicWorkTurns;
 
     /** The humidity range for this tile type. */
-    private int[] humidity = new int[2];
+    private final int[] humidity = new int[2];
     /** The temperature range for this tile type. */
-    private int[] temperature = new int[2];
+    private final int[] temperature = new int[2];
     /** The altitude range for this tile type. */
-    private int[] altitude = new int[2];
+    private final int[] altitude = new int[2];
 
     /** The resource types that are valid for this tile type. */
     private List<RandomChoice<ResourceType>> resourceTypes = null;
@@ -243,7 +243,7 @@ public final class TileType extends FreeColGameObjectType {
      */
     private void addResourceType(ResourceType type, int prob) {
         if (resourceTypes == null) resourceTypes = new ArrayList<>();
-        resourceTypes.add(new RandomChoice<ResourceType>(type, prob));
+        resourceTypes.add(new RandomChoice<>(type, prob));
     }
 
     /**
@@ -275,7 +275,7 @@ public final class TileType extends FreeColGameObjectType {
      */
     private void addDisaster(Disaster disaster, int probability) {
         if (disasters == null) disasters = new ArrayList<>();
-        disasters.add(new RandomChoice<Disaster>(disaster, probability));
+        disasters.add(new RandomChoice<>(disaster, probability));
     }
 
     /**

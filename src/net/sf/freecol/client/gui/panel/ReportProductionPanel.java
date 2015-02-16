@@ -77,7 +77,7 @@ public final class ReportProductionPanel extends ReportPanel {
         }
         String[] model = goodsNames.toArray(new String[0]);
         for (int index = 0; index < NUMBER_OF_GOODS; index++) {
-            JComboBox<String> newBox = new JComboBox<String>(model);
+            JComboBox<String> newBox = new JComboBox<>(model);
             newBox.setSelectedIndex(0);
             this.boxes.add(newBox);
         }
@@ -111,7 +111,7 @@ public final class ReportProductionPanel extends ReportPanel {
         }
         if (!selectedTypes.isEmpty()) {
             TypeCountMap<BuildingType> buildingCount
-                = new TypeCountMap<BuildingType>();
+                = new TypeCountMap<>();
             List<List<BuildingType>> basicBuildingTypes = new ArrayList<>();
             for (GoodsType goodsType : selectedTypes) {
                 List<BuildingType> buildingTypes = new ArrayList<>();

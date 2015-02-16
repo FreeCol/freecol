@@ -35,10 +35,10 @@ import org.w3c.dom.Element;
 public class SetGoodsLevelsMessage extends DOMMessage {
 
     /** The identifier of the colony where the goods levels are set. */
-    private String colonyId;
+    private final String colonyId;
 
     /** The new ExportData. */
-    private ExportData data;
+    private final ExportData data;
 
 
     /**

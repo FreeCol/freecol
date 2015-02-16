@@ -43,9 +43,6 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.FreeColGameObjectType;
-import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
@@ -57,7 +54,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.UnitListOption;
-import net.sf.freecol.common.util.LogBuilder;
+
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -262,35 +259,35 @@ public final class Specification {
         }
 
         readerMap.put(BUILDING_TYPES_TAG,
-                      new TypeReader<BuildingType>(BuildingType.class, buildingTypeList));
+                      new TypeReader<>(BuildingType.class, buildingTypeList));
         readerMap.put(DISASTERS_TAG,
-                      new TypeReader<Disaster>(Disaster.class, disasters));
+                      new TypeReader<>(Disaster.class, disasters));
         // @compat 0.10.x
         readerMap.put(EQUIPMENT_TYPES_TAG,
-                      new TypeReader<EquipmentType>(EquipmentType.class, equipmentTypes));
+                      new TypeReader<>(EquipmentType.class, equipmentTypes));
         // end @compat 0.10.x
         readerMap.put(EUROPEAN_NATION_TYPES_TAG,
-                      new TypeReader<EuropeanNationType>(EuropeanNationType.class, europeanNationTypes));
+                      new TypeReader<>(EuropeanNationType.class, europeanNationTypes));
         readerMap.put(EVENTS_TAG,
-                      new TypeReader<Event>(Event.class, events));
+                      new TypeReader<>(Event.class, events));
         readerMap.put(FOUNDING_FATHERS_TAG,
-                      new TypeReader<FoundingFather>(FoundingFather.class, foundingFathers));
+                      new TypeReader<>(FoundingFather.class, foundingFathers));
         readerMap.put(GOODS_TYPES_TAG,
-                      new TypeReader<GoodsType>(GoodsType.class, goodsTypeList));
+                      new TypeReader<>(GoodsType.class, goodsTypeList));
         readerMap.put(INDIAN_NATION_TYPES_TAG,
-                      new TypeReader<IndianNationType>(IndianNationType.class, indianNationTypes));
+                      new TypeReader<>(IndianNationType.class, indianNationTypes));
         readerMap.put(NATIONS_TAG,
-                      new TypeReader<Nation>(Nation.class, nations));
+                      new TypeReader<>(Nation.class, nations));
         readerMap.put(RESOURCE_TYPES_TAG,
-                      new TypeReader<ResourceType>(ResourceType.class, resourceTypeList));
+                      new TypeReader<>(ResourceType.class, resourceTypeList));
         readerMap.put(ROLES_TAG,
-                      new TypeReader<Role>(Role.class, roles));
+                      new TypeReader<>(Role.class, roles));
         readerMap.put(TILE_TYPES_TAG,
-                      new TypeReader<TileType>(TileType.class, tileTypeList));
+                      new TypeReader<>(TileType.class, tileTypeList));
         readerMap.put(TILEIMPROVEMENT_TYPES_TAG,
-                      new TypeReader<TileImprovementType>(TileImprovementType.class, tileImprovementTypeList));
+                      new TypeReader<>(TileImprovementType.class, tileImprovementTypeList));
         readerMap.put(UNIT_TYPES_TAG,
-                      new TypeReader<UnitType>(UnitType.class, unitTypeList));
+                      new TypeReader<>(UnitType.class, unitTypeList));
 
         readerMap.put(MODIFIERS_TAG, new ModifierReader());
         readerMap.put(OPTIONS_TAG, new OptionReader());
@@ -745,8 +742,8 @@ public final class Specification {
 
     private class TypeReader<T extends FreeColGameObjectType> implements ChildReader {
 
-        private Class<T> type;
-        private List<T> result;
+        private final Class<T> type;
+        private final List<T> result;
         private int index = 0;
 
         // Is there really no easy way to capture T?
@@ -1456,15 +1453,15 @@ public final class Specification {
      * @return An unmodifiable list of military <code>Role</code>s.
      */
     public List<Role> getMilitaryRoles() {
-        if (this.militaryRoles == null) {
-            List<Role> mr = new ArrayList<Role>();
+        if (militaryRoles == null) {
+            List<Role> mr = new ArrayList<>();
             for (Role role : roles) {
                 if (role.isOffensive()) mr.add(role);
             }
             Collections.sort(mr, Role.militaryComparator);
             this.militaryRoles = Collections.<Role>unmodifiableList(mr);
         }
-        return this.militaryRoles;
+        return militaryRoles;
     }
 
     /**
@@ -1915,7 +1912,7 @@ public final class Specification {
             Option o = todo.remove(0);
             if (o instanceof OptionGroup) {
                 List<Option> next = ((OptionGroup)o).getOptions();
-                todo.addAll(new ArrayList<Option>(next));
+                todo.addAll(new ArrayList<>(next));
             } else if (o instanceof UnitListOption) {
                 for (AbstractUnit au : ((UnitListOption)o).getOptionValues()) {
                     String roleId = au.getRoleId();
@@ -2347,7 +2344,7 @@ public final class Specification {
     }
 
     private boolean checkDifficultyOptionGroup(String gr, String... ids) {
-        logger.info("Check group " + gr.toString());
+        logger.info("Check group " + gr);
         boolean ret = false;
         for (OptionGroup level : getDifficultyLevels()) {
             Option op = level.getOption(gr);
@@ -2427,14 +2424,14 @@ public final class Specification {
 
         // @compat 0.10.0
         ret |= checkOptionGroup(GameOptions.GAMEOPTIONS_YEAR);
-        String[] years = new String[] {
+        String[] years = {
             GameOptions.STARTING_YEAR,
             GameOptions.SEASON_YEAR,
             GameOptions.MANDATORY_COLONY_YEAR,
             GameOptions.LAST_YEAR,
             GameOptions.LAST_COLONIAL_YEAR,
         };
-        int[] values = new int[] { 1492, 1600, 1600, 1850, 1800 };
+        int[] values = { 1492, 1600, 1600, 1850, 1800 };
         for (int index = 0; index < years.length; index++) {
             ret |= checkIntegerOption(years[index],
                                       GameOptions.GAMEOPTIONS_YEAR,
@@ -2635,9 +2632,7 @@ public final class Specification {
         // option tree has been flattened
         xw.writeStartElement(OPTIONS_TAG);
         for (OptionGroup item : allOptionGroups.values()) {
-            if ("".equals(item.getGroup())) {
-                item.toXML(xw);
-            }
+            if (item.getGroup().isEmpty()) item.toXML(xw);
         }
         xw.writeEndElement();
 

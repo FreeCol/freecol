@@ -54,22 +54,22 @@ public abstract class ReportUnitPanel extends ReportPanel {
     /**
      * Units in Europe.
      */
-    private List<Unit> inEurope = new ArrayList<>();
+    private final List<Unit> inEurope = new ArrayList<>();
 
     /**
      * Units in colonies.
      */
-    private Map<Colony, List<Unit>> inColonies = new HashMap<>();
+    private final Map<Colony, List<Unit>> inColonies = new HashMap<>();
 
     /**
      * Units in other locations.
      */
-    private Map<String, List<Unit>> inLocations = new HashMap<>();
+    private final Map<String, List<Unit>> inLocations = new HashMap<>();
 
     /**
      * Records the number of units of each type.
      */
-    private Map<String, TypeCountMap<UnitType>> units = new HashMap<>();
+    private final Map<String, TypeCountMap<UnitType>> units = new HashMap<>();
 
     /**
      * Whether to show colonies even if no selected units are present.
@@ -129,7 +129,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
     protected void incrementCount(String key, UnitType type, int number) {
         TypeCountMap<UnitType> map = units.get(key);
         if (map == null) {
-            map = new TypeCountMap<UnitType>();
+            map = new TypeCountMap<>();
             units.put(key, map);
         }
         map.incrementCount(type, number);

@@ -37,7 +37,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
@@ -72,7 +71,7 @@ public class Game extends FreeColGameObject {
     private UUID uuid = UUID.randomUUID();
 
     /** The client player name, null in the server. */
-    private String clientUserName;
+    private final String clientUserName;
 
     /** All the players in the game. */
     protected final List<Player> players = new ArrayList<>();
@@ -111,7 +110,7 @@ public class Game extends FreeColGameObject {
      * Serialization is not needed directly as these must be completely
      * within { players, unknownEnemy, map } which are directly serialized.
      */
-    protected HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects
+    protected final HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects
         = new HashMap<>(10000);
 
     /**
@@ -297,7 +296,7 @@ public class Game extends FreeColGameObject {
 
         //logger.finest("Added FCGO: " + id);
         final WeakReference<FreeColGameObject> wr
-            = new WeakReference<FreeColGameObject>(fcgo);
+            = new WeakReference<>(fcgo);
         freeColGameObjects.put(id, wr);
         notifySetFreeColGameObject(id, fcgo);
     }

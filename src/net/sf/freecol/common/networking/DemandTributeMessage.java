@@ -39,10 +39,10 @@ import org.w3c.dom.Element;
 public class DemandTributeMessage extends DOMMessage {
 
     /** The identifier of the object demanding tribute. */
-    private String unitId;
+    private final String unitId;
 
     /** The direction the demand is made. */
-    private String directionString;
+    private final String directionString;
 
 
     /**

@@ -35,10 +35,10 @@ import org.w3c.dom.Element;
 public class NewLandNameMessage extends DOMMessage {
 
     /** The unit that has come ashore. */
-    private String unitId;
+    private final String unitId;
 
     /** The name to use. */
-    private String newLandName;
+    private final String newLandName;
 
 
     /**

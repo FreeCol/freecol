@@ -48,8 +48,8 @@ public final class FeatureContainer {
     private static final Logger logger = Logger.getLogger(FeatureContainer.class.getName());
 
     /** Lock variables. */
-    private Object abilitiesLock = new Object();
-    private Object modifiersLock = new Object();
+    private final Object abilitiesLock = new Object();
+    private final Object modifiersLock = new Object();
 
     /** The abilities in the container. */
     private Map<String, Set<Ability>> abilities = null;
@@ -150,7 +150,7 @@ public final class FeatureContainer {
      */
     public Set<Ability> getAbilities(String id, FreeColGameObjectType fcgot,
                                      Turn turn) {
-        Set<Ability> result = new HashSet<Ability>();
+        Set<Ability> result = new HashSet<>();
         if (abilitiesPresent()) {
             synchronized (abilitiesLock) {
                 if (id == null) {
@@ -184,7 +184,7 @@ public final class FeatureContainer {
         synchronized (abilitiesLock) {
             Set<Ability> abilitySet = abilities.get(ability.getId());
             if (abilitySet == null) {
-                abilitySet = new HashSet<Ability>();
+                abilitySet = new HashSet<>();
                 abilities.put(ability.getId(), abilitySet);
             }
             return abilitySet.add(ability);
@@ -234,7 +234,7 @@ public final class FeatureContainer {
      */
     public Set<Modifier> getModifiers(String id, FreeColGameObjectType fcgot,
                                       Turn turn) {
-        Set<Modifier> result = new HashSet<Modifier>();
+        Set<Modifier> result = new HashSet<>();
         if (modifiersPresent()) {
             synchronized (modifiersLock) {
                 if (id == null) {
@@ -306,7 +306,7 @@ public final class FeatureContainer {
         synchronized (modifiersLock) {
             Set<Modifier> modifierSet = modifiers.get(modifier.getId());
             if (modifierSet == null) {
-                modifierSet = new HashSet<Modifier>();
+                modifierSet = new HashSet<>();
                 modifiers.put(modifier.getId(), modifierSet);
             }
             return modifierSet.add(modifier);
@@ -362,7 +362,7 @@ public final class FeatureContainer {
                 for (Entry<String, Set<Ability>> e : ca.entrySet()) {
                     Set<Ability> abilitySet = abilities.get(e.getKey());
                     if (abilitySet == null) {
-                        abilitySet = new HashSet<Ability>();
+                        abilitySet = new HashSet<>();
                         abilities.put(e.getKey(), abilitySet);
                     }
                     abilitySet.addAll(e.getValue());
@@ -380,7 +380,7 @@ public final class FeatureContainer {
                 for (Entry<String, Set<Modifier>> e : cm.entrySet()) {
                     Set<Modifier> modifierSet = modifiers.get(e.getKey());
                     if (modifierSet == null) {
-                        modifierSet = new HashSet<Modifier>();
+                        modifierSet = new HashSet<>();
                         modifiers.put(e.getKey(), modifierSet);
                     }
                     modifierSet.addAll(e.getValue());
@@ -400,7 +400,7 @@ public final class FeatureContainer {
         if (c == null) return;
 
         if (abilitiesPresent() && c.abilitiesPresent()) {
-            Set<String> ca = new HashSet<String>();
+            Set<String> ca = new HashSet<>();
             synchronized (c.abilitiesLock) {
                 ca.addAll(c.abilities.keySet());
             }
@@ -408,7 +408,7 @@ public final class FeatureContainer {
                 for (String key : ca) {
                     Set<Ability> abilitySet = abilities.get(key);
                     if (abilitySet == null) continue;
-                    for (Ability a : new HashSet<Ability>(abilitySet)) {
+                    for (Ability a : new HashSet<>(abilitySet)) {
                         if (a.getSource() == fco) abilitySet.remove(a);
                     }
                 }
@@ -416,7 +416,7 @@ public final class FeatureContainer {
         }
 
         if (modifiersPresent() && c.modifiersPresent()) {
-            Set<String> cm = new HashSet<String>();
+            Set<String> cm = new HashSet<>();
             synchronized (c.modifiersLock) {
                 cm.addAll(c.modifiers.keySet());
             }
@@ -424,7 +424,7 @@ public final class FeatureContainer {
                 for (String key : cm) {
                     Set<Modifier> modifierSet = modifiers.get(key);
                     if (modifierSet == null) continue;
-                    for (Modifier m : new HashSet<Modifier>(modifierSet)) {
+                    for (Modifier m : new HashSet<>(modifierSet)) {
                         if (m.getSource() == fco) modifierSet.remove(m);
                     }
                 }

@@ -30,7 +30,7 @@ import net.sf.freecol.common.ServerInfo;
 public class MetaItem extends ServerInfo {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(MetaItem.class.getName());
+    private static final Logger logger = Logger.getLogger(MetaItem.class.getName());
 
     private long lastUpdated;
 

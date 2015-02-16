@@ -34,10 +34,10 @@ import org.w3c.dom.Element;
 public class AssignTradeRouteMessage extends DOMMessage {
 
     /** The identifier of the unit. */
-    private String unitId;
+    private final String unitId;
 
     /** The identifier of the trade route. */
-    private String tradeRouteId;
+    private final String tradeRouteId;
 
 
     /**

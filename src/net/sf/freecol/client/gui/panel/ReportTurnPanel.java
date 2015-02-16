@@ -70,10 +70,10 @@ public final class ReportTurnPanel extends ReportPanel {
     /** The messages to display. */
     private List<ModelMessage> messages;
 
-    private Hashtable<String, Vector<JComponent>> textPanesByMessage
-        = new Hashtable<String, Vector<JComponent>>();
-    private Hashtable<String, Vector<JComponent>> labelsByMessage
-        = new Hashtable<String, Vector<JComponent>>();
+    private final Hashtable<String, Vector<JComponent>> textPanesByMessage
+        = new Hashtable<>();
+    private final Hashtable<String, Vector<JComponent>> labelsByMessage
+        = new Hashtable<>();
 
 
     /**

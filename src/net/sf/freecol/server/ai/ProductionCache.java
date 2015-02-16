@@ -108,14 +108,14 @@ public class ProductionCache {
     /**
      * The number of Units in various buildings.
      */
-    private TypeCountMap<BuildingType> unitCounts = new TypeCountMap<BuildingType>();
+    private final TypeCountMap<BuildingType> unitCounts = new TypeCountMap<>();
 
 
     public ProductionCache(Colony colony) {
         this.colony = colony;
-        this.units = new HashSet<Unit>(colony.getUnitList());
+        this.units = new HashSet<>(colony.getUnitList());
         this.unitCount = units.size();
-        this.colonyTiles = new HashSet<ColonyTile>();
+        this.colonyTiles = new HashSet<>();
         // this assumes all colonists can be added to any tile
         Unit someUnit = colony.getUnitList().get(0);
         for (ColonyTile colonyTile : colony.getColonyTiles()) {
@@ -414,7 +414,7 @@ public class ProductionCache {
             String result = "Cache entry: " + unit;
             if (workLocation instanceof ColonyTile) {
                 return result
-                    + ((ColonyTile) workLocation).getTile().getNameKey()
+                    + workLocation.getTile().getNameKey()
                     + "(" + workLocation.getId() + ") " + goodsType.getNameKey();
             } else if (workLocation instanceof Building) {
                 return result

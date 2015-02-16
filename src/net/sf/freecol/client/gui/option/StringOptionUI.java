@@ -36,7 +36,7 @@ import net.sf.freecol.common.option.StringOption;
  */
 public final class StringOptionUI extends OptionUI<StringOption>  {
 
-    private JComboBox<String> box = new JComboBox<String>();
+    private final JComboBox<String> box = new JComboBox<>();
 
 
     /**
@@ -52,7 +52,7 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
         super(gui, option, editable);
 
         List<String> choices = option.getChoices();
-        box.setModel(new DefaultComboBoxModel<String>(choices
+        box.setModel(new DefaultComboBoxModel<>(choices
                 .toArray(new String[choices.size()])));
         box.setSelectedItem(option.getValue());
         box.setRenderer(new FreeColComboBoxRenderer<String>("", true));

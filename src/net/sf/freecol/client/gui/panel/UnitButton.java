@@ -41,8 +41,8 @@ import net.sf.freecol.client.gui.action.FreeColAction;
  */
 public final class UnitButton extends JButton {
 
-    private String actionId;
-    private ActionManager am;
+    private final String actionId;
+    private final ActionManager am;
 
     /**
      * The basic constructor.
@@ -94,7 +94,7 @@ public final class UnitButton extends JButton {
     }
 
     private static class UnitButtonActionPropertyChangeListener implements PropertyChangeListener {
-        private AbstractButton button;
+        private final AbstractButton button;
 
         UnitButtonActionPropertyChangeListener(AbstractButton button) {
             this.button = button;

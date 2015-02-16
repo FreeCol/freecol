@@ -214,7 +214,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
      */
     private void addDisaster(Disaster disaster, int probability) {
         if (disasters == null) disasters = new ArrayList<>();
-        disasters.add(new RandomChoice<Disaster>(disaster, probability));
+        disasters.add(new RandomChoice<>(disaster, probability));
     }
 
     /**
@@ -242,7 +242,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
      */
     private void addAllowedWorker(String id) {
         if (allowedWorkers == null) {
-            allowedWorkers = new HashSet<String>();
+            allowedWorkers = new HashSet<>();
         }
         allowedWorkers.add(id);
     }

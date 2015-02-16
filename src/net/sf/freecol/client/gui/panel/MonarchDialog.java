@@ -30,7 +30,6 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.StringTemplate;
@@ -99,10 +98,10 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
 
         List<ChoiceItem<Boolean>> c = choices();
         if (yesId != null) {
-            c.add(new ChoiceItem<Boolean>(Messages.message(yesId), Boolean.TRUE)
+            c.add(new ChoiceItem<>(Messages.message(yesId), Boolean.TRUE)
                 .okOption());
         }
-        c.add(new ChoiceItem<Boolean>(Messages.message(noId), Boolean.FALSE)
+        c.add(new ChoiceItem<>(Messages.message(noId), Boolean.FALSE)
             .cancelOption().defaultOption());
 
         initializeDialog(DialogType.QUESTION, false, panel,

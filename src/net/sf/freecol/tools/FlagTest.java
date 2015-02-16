@@ -47,7 +47,7 @@ import net.sf.freecol.client.gui.panel.Flag.UnionShape;
 public class FlagTest extends JFrame implements ActionListener, ItemListener {
 
 
-    private final Flag[] FLAGS = new Flag[] {
+    private final Flag[] FLAGS = {
         ConfirmDeclarationDialog.ENGLISH_FLAG,
         ConfirmDeclarationDialog.SPANISH_FLAG,
         ConfirmDeclarationDialog.FRENCH_FLAG,
@@ -59,37 +59,37 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         null // custom
     };
 
-    private static final String[] FLAG_NAMES = new String[] {
+    private static final String[] FLAG_NAMES = {
         "England", "Spain", "France", "Netherlands",
         "Portugal", "Sweden", "Denmark", "Russia", "Custom"
     };
 
     private Flag flag;
 
-    private JComboBox<String> flags
-        = new JComboBox<String>(FLAG_NAMES);
-    private JComboBox<Decoration> decoration
-        = new JComboBox<Decoration>(Decoration.values());
-    private JComboBox<Background> background
-        = new JComboBox<Background>(Background.values());
-    private JComboBox<UnionPosition> union
-        = new JComboBox<UnionPosition>(UnionPosition.values());
-    private JComboBox<UnionShape> unionShape
-        = new JComboBox<UnionShape>(UnionShape.values());
-    private JComboBox<String> stars
-        = new JComboBox<String>(getNumbers(50));
-    private JComboBox<String> stripes
-        = new JComboBox<String>(getNumbers(13));
+    private final JComboBox<String> flags
+        = new JComboBox<>(FLAG_NAMES);
+    private final JComboBox<Decoration> decoration
+        = new JComboBox<>(Decoration.values());
+    private final JComboBox<Background> background
+        = new JComboBox<>(Background.values());
+    private final JComboBox<UnionPosition> union
+        = new JComboBox<>(UnionPosition.values());
+    private final JComboBox<UnionShape> unionShape
+        = new JComboBox<>(UnionShape.values());
+    private final JComboBox<String> stars
+        = new JComboBox<>(getNumbers(50));
+    private final JComboBox<String> stripes
+        = new JComboBox<>(getNumbers(13));
 
-    private ColorButton unionColor = new ColorButton(Color.BLUE);
-    private ColorButton starColor = new ColorButton(Color.WHITE);
-    private ColorButton decorationColor = new ColorButton(Color.WHITE);
-    private ColorButton[] backgroundColors = new ColorButton[] {
+    private final ColorButton unionColor = new ColorButton(Color.BLUE);
+    private final ColorButton starColor = new ColorButton(Color.WHITE);
+    private final ColorButton decorationColor = new ColorButton(Color.WHITE);
+    private final ColorButton[] backgroundColors = {
         new ColorButton(null), new ColorButton(null), new ColorButton(null),
         new ColorButton(null), new ColorButton(null), new ColorButton(null)
     };
 
-    private Component[] customComponents = new Component[] {
+    private final Component[] customComponents = {
         background, decoration, union, unionShape,
         stripes, unionColor, starColor, decorationColor,
         backgroundColors[0], backgroundColors[1],

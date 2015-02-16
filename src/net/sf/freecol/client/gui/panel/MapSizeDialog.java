@@ -27,8 +27,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.FreeColInputDialog;
-import net.sf.freecol.client.gui.panel.MigPanel;
 
 
 /**
@@ -40,9 +38,9 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
     private static final int DEFAULT_HEIGHT = 100;
     private static final int DEFAULT_WIDTH = 40;
 
-    private JTextField inputWidth
+    private final JTextField inputWidth
         = new JTextField(Integer.toString(DEFAULT_WIDTH), COLUMNS);
-    private JTextField inputHeight
+    private final JTextField inputHeight
         = new JTextField(Integer.toString(DEFAULT_HEIGHT), COLUMNS);
 
 

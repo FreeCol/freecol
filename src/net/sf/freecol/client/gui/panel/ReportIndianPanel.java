@@ -49,7 +49,7 @@ import net.sf.freecol.common.model.UnitType;
  */
 public final class ReportIndianPanel extends ReportPanel {
 
-    private static final String[] headlines = new String[] {
+    private static final String[] headlines = {
         "Settlement",
         "mission",
         "report.indian.tension",

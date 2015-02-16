@@ -33,10 +33,10 @@ import java.lang.reflect.Modifier;
 public class Introspector {
 
     /** The class whose field we are to operate on. */
-    private Class<?> theClass;
+    private final Class<?> theClass;
 
     /** The field whose get/set methods we wish to invoke. */
-    private String field;
+    private final String field;
 
 
     /**
@@ -299,7 +299,7 @@ public class Introspector {
             constructor = messageClass.getDeclaredConstructor(types);
         } catch (Exception e) {
             String p = "Unable to find constructor " + tag + "(";
-            for (int i = 0; i < types.length; i++) p += " " + types[i];
+            for (Class type : types) p += " " + type;
             p += " )";
             throw new IllegalArgumentException(p, e);
         }

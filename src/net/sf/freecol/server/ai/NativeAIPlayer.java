@@ -90,7 +90,7 @@ public class NativeAIPlayer extends AIPlayer {
      * Stores temporary information for sessions (trading with another
      * player etc).
      */
-    private HashMap<String, Integer> sessionRegister = new HashMap<>();
+    private final HashMap<String, Integer> sessionRegister = new HashMap<>();
 
     /**
      * Debug helper to keep track of why/what the units are doing.
@@ -445,7 +445,7 @@ public class NativeAIPlayer extends AIPlayer {
                 + settlement.getTile().getUnitCount() <= 1) {
                 // First see to local settlement defence
                 if (!(m instanceof DefendSettlementMission)
-                    || ((DefendSettlementMission)m).getTarget() != settlement) {
+                    || m.getTarget() != settlement) {
                     m = getDefendSettlementMission(aiUnit, settlement);
                     if (m == null) continue;
                     lb.add(m, ", ");
@@ -456,7 +456,7 @@ public class NativeAIPlayer extends AIPlayer {
                 && is.canImproveUnitMilitaryRole(unit) != null) {
                 // Go home for new equipment if the home settlement has it
                 if (!(m instanceof DefendSettlementMission)
-                    || ((DefendSettlementMission)m).getTarget() != is) {
+                    || m.getTarget() != is) {
                     m = getDefendSettlementMission(aiUnit, is);
                     if (m == null) continue;
                     lb.add(m, ", ");
@@ -564,7 +564,7 @@ public class NativeAIPlayer extends AIPlayer {
                     || (path = unit.findPath(home, c.getTile(),
                                              null, cd)) == null) continue;
                 int alarm = Math.max(1, is.getAlarm(c.getOwner()).getValue());
-                nearbyColonies.add(new RandomChoice<Colony>(c,
+                nearbyColonies.add(new RandomChoice<>(c,
                         1000000 / alarm / path.getTotalTurns()));
             }
 
@@ -663,7 +663,7 @@ public class NativeAIPlayer extends AIPlayer {
                     : (c.getStockade().getLevel() * 10));
                 int weight = 1 + alarm * (1000000 / defence
                                                   / path.getTotalTurns());
-                nearbyColonies.add(new RandomChoice<Colony>(c, weight));
+                nearbyColonies.add(new RandomChoice<>(c, weight));
             }
             // If there are any suitable colonies, pick one to demand from.
             // Sometimes a random one, sometimes the weakest, sometimes the
@@ -696,7 +696,7 @@ public class NativeAIPlayer extends AIPlayer {
     private Set<Modifier> getShipTradePenalties(boolean sense) {
         final Specification spec = getSpecification();
         int penalty = spec.getInteger(GameOptions.SHIP_TRADE_PENALTY);
-        Set<Modifier> result = new HashSet<Modifier>();
+        Set<Modifier> result = new HashSet<>();
         for (Modifier m : spec.getModifiers(Modifier.SHIP_TRADE_PENALTY)) {
             Modifier n = new Modifier(m);
             n.setValue((sense) ? penalty : -penalty);
@@ -833,7 +833,7 @@ public class NativeAIPlayer extends AIPlayer {
             default:
                 return NetworkConstants.NO_TRADE_HOSTILE;
             }
-            Set<Modifier> modifiers = new HashSet<Modifier>();
+            Set<Modifier> modifiers = new HashSet<>();
             if (is.hasMissionary(buyer)
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
                 Unit u = is.getMissionary();
@@ -899,7 +899,7 @@ public class NativeAIPlayer extends AIPlayer {
             default:
                 return NetworkConstants.NO_TRADE_HOSTILE;
             }
-            Set<Modifier> modifiers = new HashSet<Modifier>();
+            Set<Modifier> modifiers = new HashSet<>();
             if (is.hasMissionary(seller)
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
                 Unit u = is.getMissionary();

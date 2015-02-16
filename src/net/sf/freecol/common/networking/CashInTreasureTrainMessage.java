@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 public class CashInTreasureTrainMessage extends DOMMessage {
 
     /** The identifier of the treasure train unit. */
-    private String unitId;
+    private final String unitId;
 
 
     /**

@@ -32,26 +32,20 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
 import javax.swing.Action;
-import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.KeyStroke;
-import javax.swing.border.Border;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.panel.MigPanel;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -68,7 +62,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     // The margin to use.
     protected static final int MARGIN = 3;
 
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
     protected boolean editable = true;
 

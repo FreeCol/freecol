@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.io.FreeColXMLReader;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 

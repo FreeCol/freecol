@@ -34,7 +34,7 @@ import javax.swing.SwingUtilities;
  */
 public class FrameMotionListener extends MouseAdapter implements MouseMotionListener {
 
-    private JInternalFrame f;
+    private final JInternalFrame f;
 
     private Point loc = null;
 

@@ -35,7 +35,6 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
@@ -49,7 +48,7 @@ import net.sf.freecol.common.model.Unit;
  */
 public class BuildingPanel extends MigPanel implements PropertyChangeListener {
 
-    private static Logger logger = Logger.getLogger(BuildingPanel.class.getName());
+    private static final Logger logger = Logger.getLogger(BuildingPanel.class.getName());
 
     /** The enclosing client. */
     private final FreeColClient freeColClient;
@@ -61,7 +60,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     private ProductionLabel productionOutput = null;
 
     /** Labels for any units present. */
-    private List<UnitLabel> unitLabels = new ArrayList<>();
+    private final List<UnitLabel> unitLabels = new ArrayList<>();
 
 
     /**

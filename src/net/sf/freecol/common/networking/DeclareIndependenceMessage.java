@@ -34,10 +34,10 @@ import org.w3c.dom.Element;
 public class DeclareIndependenceMessage extends DOMMessage {
 
     /** The new name for the rebelling nation. */
-    private String nationName;
+    private final String nationName;
 
     /** The new name for the rebelling country */
-    private String countryName;
+    private final String countryName;
 
 
     /**

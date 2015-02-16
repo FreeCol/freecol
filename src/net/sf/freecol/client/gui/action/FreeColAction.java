@@ -338,7 +338,7 @@ public abstract class FreeColAction extends AbstractAction
      */
     public class InnerMenuKeyListener implements MenuKeyListener {
 
-        int mnemonic;
+        final int mnemonic;
 
 
         public InnerMenuKeyListener() {
@@ -400,7 +400,7 @@ public abstract class FreeColAction extends AbstractAction
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
         // id is hard-wired
         String acc = xr.getAttribute(ACCELERATOR_TAG, "");
-        putValue(ACCELERATOR_KEY, ("".equals(acc)) ? null
+        putValue(ACCELERATOR_KEY, (acc == null || acc.isEmpty()) ? null
             : KeyStroke.getKeyStroke(acc));
         xr.closeTag(getXMLElementTagName());
     }

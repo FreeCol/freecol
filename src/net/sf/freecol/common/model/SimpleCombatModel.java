@@ -28,9 +28,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -227,7 +225,7 @@ public class SimpleCombatModel extends CombatModel {
      */
     public Set<Modifier> getOffensiveModifiers(FreeColGameObject attacker,
                                                FreeColGameObject defender) {
-        Set<Modifier> result = new HashSet<Modifier>();
+        Set<Modifier> result = new HashSet<>();
         Modifier m;
         if (attacker == null) {
             throw new IllegalStateException("Null attacker");
@@ -423,7 +421,7 @@ public class SimpleCombatModel extends CombatModel {
      */
     public Set<Modifier> getDefensiveModifiers(FreeColGameObject attacker,
                                                FreeColGameObject defender) {
-        Set<Modifier> result = new HashSet<Modifier>();
+        Set<Modifier> result = new HashSet<>();
         if (combatIsDefenceMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)
             || combatIsBombard(attacker, defender)) {

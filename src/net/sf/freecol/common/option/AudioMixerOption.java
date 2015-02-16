@@ -48,10 +48,10 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     public static class MixerWrapper implements Comparable<MixerWrapper> {
 
         /** The name for this wrapper. */
-        private String name;
+        private final String name;
 
         /** The mixer info for a mixer. */
-        private Mixer.Info mixerInfo;
+        private final Mixer.Info mixerInfo;
 
 
         public MixerWrapper(String name, Mixer.Info mixerInfo) {

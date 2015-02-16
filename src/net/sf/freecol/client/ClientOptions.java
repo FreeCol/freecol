@@ -429,7 +429,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * Comparators for sorting colonies.
      */
-    private static Comparator<Colony> colonyAgeComparator
+    private static final Comparator<Colony> colonyAgeComparator
         = new Comparator<Colony>() {
             public int compare(Colony s1, Colony s2) {
                 return s1.getEstablished().getNumber()
@@ -437,14 +437,14 @@ public class ClientOptions extends OptionGroup {
             }
         };
 
-    private static Comparator<Colony> colonyNameComparator
+    private static final Comparator<Colony> colonyNameComparator
         = new Comparator<Colony>() {
             public int compare(Colony s1, Colony s2) {
                 return s1.getName().compareTo(s2.getName());
             }
         };
 
-    private static Comparator<Colony> colonySizeComparator
+    private static final Comparator<Colony> colonySizeComparator
         = new Comparator<Colony>() {
             public int compare(Colony s1, Colony s2) {
                 // sort size descending, then SoL descending
@@ -457,7 +457,7 @@ public class ClientOptions extends OptionGroup {
             }
         };
 
-    private static Comparator<Colony> colonySoLComparator
+    private static final Comparator<Colony> colonySoLComparator
         = new Comparator<Colony>() {
             public int compare(Colony s1, Colony s2) {
                 // sort SoL descending, then size descending
@@ -470,7 +470,7 @@ public class ClientOptions extends OptionGroup {
             }
         };
 
-    private static Comparator<Colony> colonyPositionComparator
+    private static final Comparator<Colony> colonyPositionComparator
         = new Comparator<Colony>() {
             public int compare(Colony s1, Colony s2) {
                 // sort north to south, then west to east
@@ -485,7 +485,7 @@ public class ClientOptions extends OptionGroup {
 
 
     private class MessageSourceComparator implements Comparator<ModelMessage> {
-        private Game game;
+        private final Game game;
 
         // sort according to message source
 
@@ -528,7 +528,7 @@ public class ClientOptions extends OptionGroup {
     }
 
 
-    private Comparator<ModelMessage> messageTypeComparator
+    private final Comparator<ModelMessage> messageTypeComparator
         = new Comparator<ModelMessage>() {
             // sort according to message type
             public int compare(ModelMessage message1, ModelMessage message2) {
@@ -671,7 +671,7 @@ public class ClientOptions extends OptionGroup {
                      type != XMLEvent.END_DOCUMENT; type = xr.getEventType()) {
                     if (type == XMLEvent.START_ELEMENT
                         && LANGUAGE.equals(xr.readId())) {
-                        return xr.getAttribute("value", (String)null);
+                        return xr.getAttribute("value", null);
                     }
                     xr.nextTag();
                 }

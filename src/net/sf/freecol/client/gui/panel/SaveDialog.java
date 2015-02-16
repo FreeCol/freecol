@@ -30,9 +30,6 @@ import java.io.File;
 import java.util.List;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
-
 
 
 /**

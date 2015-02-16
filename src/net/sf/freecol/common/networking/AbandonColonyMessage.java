@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 public class AbandonColonyMessage extends DOMMessage {
 
     /** The identifier of the colony to abandon. */
-    private String colonyId;
+    private final String colonyId;
 
 
     /**

@@ -37,16 +37,16 @@ import org.w3c.dom.Element;
 public class IndianDemandMessage extends DOMMessage {
 
     /** The identifier of the unit that is demanding. */
-    private String unitId;
+    private final String unitId;
 
     /** The identifier of the colony being demanded of. */
-    private String colonyId;
+    private final String colonyId;
 
     /** The type of goods being demanded, null implies gold. */
-    private String typeId;
+    private final String typeId;
 
     /** The amount of goods being demanded. */
-    private String amount;
+    private final String amount;
 
     /** The result of this demand: null implies not decided yet. */
     private String result;

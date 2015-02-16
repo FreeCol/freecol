@@ -38,7 +38,7 @@ import static net.sf.freecol.common.util.RandomUtils.*;
  */
 public class RandomRange {
 
-    private static Logger logger = Logger.getLogger(RandomRange.class.getName());
+    private static final Logger logger = Logger.getLogger(RandomRange.class.getName());
 
     /** Percentage probability that the result is not zero. */
     private int probability = 0;

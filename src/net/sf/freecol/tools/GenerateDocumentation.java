@@ -53,9 +53,9 @@ public class GenerateDocumentation {
     private static final File DESTINATION_DIRECTORY =
         new File("doc");
 
-    private static Map<String, String> resources = new HashMap<>();
+    private static final Map<String, String> resources = new HashMap<>();
 
-    private static String[] sourceFiles = STRING_DIRECTORY.list(new FilenameFilter() {
+    private static final String[] sourceFiles = STRING_DIRECTORY.list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.matches("FreeColMessages.*\\.properties");
             }

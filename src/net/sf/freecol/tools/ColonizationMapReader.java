@@ -61,7 +61,7 @@ public class ColonizationMapReader {
     public static final int WIDTH = 0;
     public static final int HEIGHT = 2;
 
-    private static final char[] tiletypes = new char[] {
+    private static final char[] tiletypes = {
         't', // 0x00 tundra
         'd', // 0x01 desert
         'p', // 0x02 plains
@@ -100,7 +100,7 @@ public class ColonizationMapReader {
     };
 
 
-    private static final byte[] header = new byte[] {
+    private static final byte[] header = {
         58, 0, 72, 0, 4, 0
     };
     private static byte[] layer1;

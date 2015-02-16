@@ -40,7 +40,7 @@ import net.sf.freecol.common.model.Player;
 public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(SelectAmountDialog.class.getName());
+    private static final Logger logger = Logger.getLogger(SelectAmountDialog.class.getName());
 
     private static final int SELECT_CANCEL = -1;
 
@@ -95,7 +95,7 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
                 }
             }
         }
-        this.comboBox = new JComboBox<Integer>(values.toArray(new Integer[0]));
+        this.comboBox = new JComboBox<>(values.toArray(new Integer[0]));
         this.comboBox.setEditable(true);
         if (defaultIndex >= 0) this.comboBox.setSelectedIndex(defaultIndex);
 

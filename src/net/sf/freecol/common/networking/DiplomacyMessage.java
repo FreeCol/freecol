@@ -45,13 +45,13 @@ public class DiplomacyMessage extends DOMMessage {
      * The identifier of our entity that is conducting diplomacy
      * (either a unit or a settlement).
      */
-    private String ourId;
+    private final String ourId;
 
     /**
      * The identifier of the other entity to negotiate with (unit or
      * settlement).
      */
-    private String otherId;
+    private final String otherId;
 
     /** The agreement being negotiated. */
     private DiplomaticTrade agreement;

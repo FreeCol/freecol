@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
@@ -44,7 +43,7 @@ import net.miginfocom.swing.MigLayout;
 public class CargoPanel extends FreeColPanel
     implements DropTarget, PropertyChangeListener {
 
-    private static Logger logger = Logger.getLogger(CargoPanel.class.getName());
+    private static final Logger logger = Logger.getLogger(CargoPanel.class.getName());
 
     /** The carrier that contains cargo. */
     private Unit carrier;

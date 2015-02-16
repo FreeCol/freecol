@@ -34,7 +34,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
  */
 public class FreeColTextFieldUI extends BasicTextFieldUI {
 
-    private JComponent c;
+    private final JComponent c;
 
 
     public FreeColTextFieldUI(JComponent c) {

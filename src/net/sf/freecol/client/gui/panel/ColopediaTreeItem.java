@@ -28,10 +28,10 @@ import javax.swing.ImageIcon;
  */
 class ColopediaTreeItem {
 
-    private ColopediaDetailPanel panelType;
-    private String id;
-    private String text;
-    private ImageIcon icon;
+    private final ColopediaDetailPanel panelType;
+    private final String id;
+    private final String text;
+    private final ImageIcon icon;
 
     /**
      * The default constructor for a ColopediaTreeItem that

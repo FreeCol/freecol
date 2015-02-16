@@ -42,7 +42,6 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.border.TitledBorder;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -54,7 +53,6 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighSeas;
@@ -72,7 +70,7 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class EuropePanel extends PortPanel {
 
-    private static Logger logger = Logger.getLogger(EuropePanel.class.getName());
+    private static final Logger logger = Logger.getLogger(EuropePanel.class.getName());
 
     private static final class EuropeButton extends JButton {
 
@@ -486,7 +484,7 @@ public final class EuropePanel extends PortPanel {
                                 == destination);
                     } else {
                         logger.warning("Bogus DestinationPanel location: "
-                            + ((FreeColGameObject) destination)
+                            + destination
                             + " for unit: " + unit);
                         belongs = false;
                     }

@@ -31,7 +31,7 @@ import java.net.URL;
  */
 public class FAFileResource extends Resource {
 
-    private FAFile FAFile;
+    private final FAFile FAFile;
 
 
     public FAFileResource(FAFile FAFile) {

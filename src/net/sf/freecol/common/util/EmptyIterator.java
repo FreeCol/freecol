@@ -35,7 +35,7 @@ public final class EmptyIterator<T> implements Iterator<T> {
      * @return an EmptyIterator of the given type.
      */
     public static <T> EmptyIterator<T> getInstance() {
-        return new EmptyIterator<T>();
+        return new EmptyIterator<>();
     }
 
     // ----------------------------------------------------------- constructors

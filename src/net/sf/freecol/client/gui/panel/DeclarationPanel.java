@@ -143,9 +143,9 @@ public final class DeclarationPanel extends FreeColPanel {
      */
     private class SignaturePanel extends JPanel {
 
-        private FAFile faFile;
+        private final FAFile faFile;
 
-        private ArrayList<ActionListener> actionListeners = new ArrayList<>();
+        private final ArrayList<ActionListener> actionListeners = new ArrayList<>();
 
         private Point[] points = null;
 
@@ -153,7 +153,7 @@ public final class DeclarationPanel extends FreeColPanel {
 
 
         SignaturePanel() {
-            faFile = (FAFile) ResourceManager.getFAFile("AnimatedFont");
+            faFile = ResourceManager.getFAFile("AnimatedFont");
             setOpaque(false);
         }
 
@@ -238,8 +238,8 @@ public final class DeclarationPanel extends FreeColPanel {
         }
 
         private void notifyStopped() {
-            for (int i = 0; i < actionListeners.size(); i++) {
-                actionListeners.get(i).actionPerformed(new ActionEvent(this,
+            for (ActionListener actionListener : actionListeners) {
+                actionListener.actionPerformed(new ActionEvent(this,
                         ActionEvent.ACTION_PERFORMED, ANIMATION_STOPPED));
             }
         }

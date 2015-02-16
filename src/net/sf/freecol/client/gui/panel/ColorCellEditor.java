@@ -33,7 +33,6 @@ import javax.swing.table.TableCellEditor;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 
 
 /**

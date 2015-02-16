@@ -65,7 +65,7 @@ public class NumberRules {
     public static final Number ZERO_ONE_NUMBER_RULE = new ZeroOneNumberRule();
 
 
-    private static Map<String, Number> numberMap = new HashMap<>();
+    private static final Map<String, Number> numberMap = new HashMap<>();
 
 
     /**

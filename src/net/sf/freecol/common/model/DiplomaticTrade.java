@@ -28,10 +28,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.StringTemplate;
 
 import org.w3c.dom.Element;
 
@@ -311,7 +308,7 @@ public class DiplomaticTrade extends FreeColObject {
     public Stance getStance() {
         for (TradeItem ti : items) {
             if (ti instanceof StanceTradeItem) {
-                return ((StanceTradeItem)ti).getStance();
+                return ti.getStance();
             }
         }
         return null;
@@ -326,7 +323,7 @@ public class DiplomaticTrade extends FreeColObject {
         List<Colony> colonyList = new ArrayList<>();
         for (TradeItem ti : items) {
             if (ti instanceof ColonyTradeItem && player == ti.getSource()) {
-                colonyList.add(((ColonyTradeItem)ti).getColony(player.getGame()));
+                colonyList.add(ti.getColony(player.getGame()));
             }
         }
         return colonyList;
@@ -341,7 +338,7 @@ public class DiplomaticTrade extends FreeColObject {
     public int getGoldGivenBy(Player player) {
         for (TradeItem ti : items) {
             if (ti instanceof GoldTradeItem && player == ti.getSource()) {
-                return ((GoldTradeItem)ti).getGold();
+                return ti.getGold();
             }
         }
         return -1;
@@ -356,7 +353,7 @@ public class DiplomaticTrade extends FreeColObject {
         List<Goods> goodsList = new ArrayList<>();
         for (TradeItem ti : items) {
             if (ti instanceof GoodsTradeItem && player == ti.getSource()) {
-                goodsList.add(((GoodsTradeItem)ti).getGoods());
+                goodsList.add(ti.getGoods());
             }
         }
         return goodsList;
@@ -370,7 +367,7 @@ public class DiplomaticTrade extends FreeColObject {
     public Player getVictim() {
         for (TradeItem ti : items) {
             if (ti instanceof InciteTradeItem) {
-                return ((InciteTradeItem)ti).getVictim();
+                return ti.getVictim();
             }
         }
         return null;
@@ -385,7 +382,7 @@ public class DiplomaticTrade extends FreeColObject {
         List<Unit> unitList = new ArrayList<>();
         for (TradeItem ti : items) {
             if (ti instanceof UnitTradeItem && player == ti.getSource()) {
-                unitList.add(((UnitTradeItem)ti).getUnit());
+                unitList.add(ti.getUnit());
             }
         }
         return unitList;

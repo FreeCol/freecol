@@ -41,7 +41,7 @@ public class GotoAdjacentGoal extends Goal {
     private static final Logger logger = Logger.getLogger(GotoAdjacentGoal.class.getName());
 
     //the destination tile
-    private Tile target;
+    private final Tile target;
 
     public GotoAdjacentGoal(AIPlayer p, Goal g, float w, AIUnit u, Tile t) {
         super(p,g,w,u);

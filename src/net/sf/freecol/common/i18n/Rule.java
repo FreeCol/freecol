@@ -32,7 +32,7 @@ import java.util.StringTokenizer;
  */
 public class Rule {
 
-    private List<List<Relation>> conditions = new ArrayList<>();
+    private final List<List<Relation>> conditions = new ArrayList<>();
 
 
     public Rule(String input) {

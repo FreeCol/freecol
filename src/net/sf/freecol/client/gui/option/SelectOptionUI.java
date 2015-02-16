@@ -35,7 +35,7 @@ import net.sf.freecol.common.option.SelectOption;
  */
 public final class SelectOptionUI extends OptionUI<SelectOption> {
 
-    private JComboBox<String> box = new JComboBox<String>();
+    private final JComboBox<String> box = new JComboBox<>();
 
 
     /**
@@ -50,7 +50,7 @@ public final class SelectOptionUI extends OptionUI<SelectOption> {
                           boolean editable) {
         super(gui, option, editable);
 
-        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
         for (String string : option.getItemValues().values()) {
             model.addElement(option.localizeLabels() ? Messages.message(string)
                 : string);

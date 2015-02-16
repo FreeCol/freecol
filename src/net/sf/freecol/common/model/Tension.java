@@ -73,7 +73,7 @@ public class Tension {
         ANGRY(800), 
         HATEFUL(1000);
 
-        private int limit;
+        private final int limit;
 
         Level(int limit) {
             this.limit = limit;

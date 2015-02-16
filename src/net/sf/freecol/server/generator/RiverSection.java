@@ -41,7 +41,7 @@ public class RiverSection {
 
 //    private static final Logger logger = Logger.getLogger(RiverImprovementBuilder.class.getName());
 
-    private static final char[] template = new char[] {
+    private static final char[] template = {
         '0', '1', '2', '3'
     };
 
@@ -49,7 +49,7 @@ public class RiverSection {
      * River magnitude (size) for each direction toward the edges of the tile
      */
     private java.util.Map<Direction, Integer> branches =
-        new EnumMap<Direction, Integer>(Direction.class);
+        new EnumMap<>(Direction.class);
 
     /**
      * River magnitude (size) at the center of the tile

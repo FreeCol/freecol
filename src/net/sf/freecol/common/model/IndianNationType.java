@@ -167,7 +167,7 @@ public class IndianNationType extends NationType {
      */
     private void addSkill(UnitType unitType, int probability) {
         if (skills == null) skills = new ArrayList<>();
-        skills.add(new RandomChoice<UnitType>(unitType, probability));
+        skills.add(new RandomChoice<>(unitType, probability));
     }
 
     /**
@@ -197,7 +197,7 @@ public class IndianNationType extends NationType {
         for (RandomChoice<UnitType> skill : skills) {
             UnitType unitType = skill.getObject();
             int scaleValue = scale.get(unitType.getExpertProduction()).intValue();
-            scaledSkills.add(new RandomChoice<UnitType>(unitType,
+            scaledSkills.add(new RandomChoice<>(unitType,
                     skill.getProbability() * scaleValue));
         }
 

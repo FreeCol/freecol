@@ -21,7 +21,6 @@ package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -57,7 +56,7 @@ public class AIMain extends FreeColObject
     private static final Logger logger = Logger.getLogger(AIMain.class.getName());
 
     /** The server that this AI is operating within. */
-    private FreeColServer freeColServer;
+    private final FreeColServer freeColServer;
 
     /** The next AI identifier index. */
     private int nextId = 1;

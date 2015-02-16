@@ -35,10 +35,10 @@ import org.w3c.dom.Element;
 public class BuildColonyMessage extends DOMMessage {
 
     /** The name of the new colony. */
-    private String colonyName;
+    private final String colonyName;
 
     /** The unit that is building the colony. */
-    private String builderId;
+    private final String builderId;
 
 
     /**

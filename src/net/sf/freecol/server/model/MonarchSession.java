@@ -38,13 +38,13 @@ public class MonarchSession extends TransactionSession {
     private static final Logger logger = Logger.getLogger(MonarchSession.class.getName());
 
     /** The player whose monarch is active. */
-    private ServerPlayer serverPlayer;
+    private final ServerPlayer serverPlayer;
 
     /** The action to be considered. */
-    private MonarchAction action;
+    private final MonarchAction action;
 
     /** The amount of tax to raise. */
-    private int tax;
+    private final int tax;
 
     /** The goods for the goods party. */
     private Goods goods = null;
@@ -53,7 +53,7 @@ public class MonarchSession extends TransactionSession {
     private List<AbstractUnit> mercenaries = null;
 
     /** Mercenary price. */
-    private int price;
+    private final int price;
 
 
     public MonarchSession(ServerPlayer serverPlayer, MonarchAction action,

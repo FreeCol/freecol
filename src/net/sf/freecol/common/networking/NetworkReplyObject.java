@@ -29,7 +29,7 @@ public class NetworkReplyObject {
 
     private Object response = null;
     private boolean responseGiven = false;
-    private int networkReplyId;
+    private final int networkReplyId;
 
 
     /**

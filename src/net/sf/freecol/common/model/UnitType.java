@@ -617,7 +617,7 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     private void addConsumption(GoodsType type, int amount) {
         if (consumption == null) {
-            consumption = new TypeCountMap<GoodsType>();
+            consumption = new TypeCountMap<>();
         }
         consumption.incrementCount(type, amount);
     }
@@ -867,7 +867,7 @@ public final class UnitType extends BuildableType implements Consumer {
 
             if (parent.consumption != null) {
                 if (consumption == null) {
-                    consumption = new TypeCountMap<GoodsType>();
+                    consumption = new TypeCountMap<>();
                 }
                 consumption.putAll(parent.consumption);
             }

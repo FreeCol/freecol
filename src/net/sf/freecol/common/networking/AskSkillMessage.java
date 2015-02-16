@@ -38,10 +38,10 @@ import org.w3c.dom.Element;
 public class AskSkillMessage extends DOMMessage {
 
     /** The identifier of the unit that is asking. */
-    private String unitId;
+    private final String unitId;
 
     /** The direction the unit is asking in. */
-    private String directionString;
+    private final String directionString;
 
 
     /**

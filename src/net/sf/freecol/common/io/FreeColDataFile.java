@@ -146,15 +146,9 @@ public class FreeColDataFile {
 
         List<String> result = new ArrayList<>(4);
 
-        if (!"".equals(language)) {
-            language = "_" + language;
-        }
-        if (!"".equals(country)) {
-            country = "_" + country;
-        }
-        if (!"".equals(variant)) {
-            variant = "_" + variant;
-        }
+        if (!language.isEmpty()) language = "_" + language;
+        if (!country.isEmpty()) country = "_" + country;
+        if (!variant.isEmpty()) variant = "_" + variant;
 
         result.add(prefix + suffix);
         String filename = prefix + language + suffix;

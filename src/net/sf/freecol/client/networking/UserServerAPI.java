@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
  */
 public class UserServerAPI extends ServerAPI {
 
-    private GUI gui;
+    private final GUI gui;
 
     public UserServerAPI(GUI gui) {
         super();

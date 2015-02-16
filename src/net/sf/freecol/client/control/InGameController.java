@@ -64,7 +64,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -141,13 +140,13 @@ public final class InGameController implements NetworkConstants {
     private final FreeColClient freeColClient;
 
     /** A cache reference to the gui. */
-    private GUI gui;
+    private final GUI gui;
 
     /** Current mode for moving units. */
     private MoveMode moveMode = MoveMode.NEXT_ACTIVE_UNIT;
 
     /** A map of messages to be ignored. */
-    private HashMap<String, Integer> messagesToIgnore = new HashMap<>();
+    private final HashMap<String, Integer> messagesToIgnore = new HashMap<>();
 
     /** The messages in the last turn report. */
     private final List<ModelMessage> turnReportMessages = new ArrayList<>();
@@ -713,7 +712,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean doEndTurn(boolean showDialog) {
         if (showDialog) {
-            List<Unit> units = new ArrayList<Unit>();
+            List<Unit> units = new ArrayList<>();
             for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
                 if (unit.couldMove()) units.add(unit);
             }
@@ -1302,11 +1301,11 @@ public final class InGameController implements NetworkConstants {
             }
             List<ChoiceItem<Unit>> choices = new ArrayList<>();
             for (Unit dUnit : disembarkable) {
-                choices.add(new ChoiceItem<Unit>(dUnit.getDescription(Unit.UnitLabelType.NATIONAL),
-                        dUnit));
+                choices.add(new ChoiceItem<>(dUnit.getDescription(Unit.UnitLabelType.NATIONAL),
+                                             dUnit));
             }
             if (disembarkable.size() > 1) {
-                choices.add(new ChoiceItem<Unit>(Messages.message("all"), unit));
+                choices.add(new ChoiceItem<>(Messages.message("all"), unit));
             }
 
             // Use moveDirection() to disembark units as while the
@@ -1355,7 +1354,7 @@ public final class InGameController implements NetworkConstants {
         for (Unit u : destinationTile.getUnitList()) {
             if (u.canAdd(unit)) {
                 String m = u.getDescription(Unit.UnitLabelType.NATIONAL);
-                choices.add(new ChoiceItem<Unit>(m, u));
+                choices.add(new ChoiceItem<>(m, u));
                 carrier = u; // Save a default
             }
         }
@@ -1842,7 +1841,7 @@ public final class InGameController implements NetworkConstants {
             List<ChoiceItem<Goods>> choices = new ArrayList<>();
             for (Goods g : forSale) {
                 String label = Messages.message(g.getLabel(true));
-                choices.add(new ChoiceItem<Goods>(label, g));
+                choices.add(new ChoiceItem<>(label, g));
             }
             goods = gui.getChoice(true, unit.getTile(),
                                   Messages.message("buyProposition.text"),
@@ -1899,7 +1898,7 @@ public final class InGameController implements NetworkConstants {
             List<ChoiceItem<Goods>> choices = new ArrayList<>();
             for (Goods g : unit.getGoodsList()) {
                 String label = Messages.message(g.getLabel(true));
-                choices.add(new ChoiceItem<Goods>(label, g));
+                choices.add(new ChoiceItem<>(label, g));
             }
             goods = gui.getChoice(true, unit.getTile(),
                                   Messages.message("sellProposition.text"),
@@ -1955,7 +1954,7 @@ public final class InGameController implements NetworkConstants {
         List<ChoiceItem<Goods>> choices = new ArrayList<>();
         for (Goods g : unit.getGoodsList()) {
             String label = Messages.message(g.getLabel(true));
-            choices.add(new ChoiceItem<Goods>(label, g));
+            choices.add(new ChoiceItem<>(label, g));
         }
         Goods goods = gui.getChoice(true, unit.getTile(),
                                     Messages.message("gift.text"), settlement,
@@ -2034,7 +2033,7 @@ public final class InGameController implements NetworkConstants {
             List<ChoiceItem<Player>> choices = new ArrayList<>();
             for (Player p : freeColClient.getGame().getLiveEuropeanPlayers(player)) {
                 String label = Messages.message(p.getNationName());
-                choices.add(new ChoiceItem<Player>(label, p));
+                choices.add(new ChoiceItem<>(label, p));
             }
             Player enemy = gui.getChoice(true, unit.getTile(),
                 Messages.message("missionarySettlement.inciteQuestion"), unit,

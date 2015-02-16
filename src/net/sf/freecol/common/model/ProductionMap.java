@@ -144,7 +144,7 @@ public class ProductionMap {
     }
 
 
-    private Map<GoodsType, Object> cache = new HashMap<>();
+    private final Map<GoodsType, Object> cache = new HashMap<>();
 
 
     public AbstractGoods get(GoodsType type) {

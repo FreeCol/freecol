@@ -43,7 +43,7 @@ public class InstallerTranslations {
         new File(DESTINATION_DIRECTORY, "iso-639-2.txt");
 
     // it seems IzPack doesn't use ISO codes at all
-    private static final String[][] IZPACK_CODES = new String[][] {
+    private static final String[][] IZPACK_CODES = {
         { "ca", "cat", "Catalunyan" },
         { "zh", "chn", "Chinese" },
         { "cs", "cze", "Czech" },

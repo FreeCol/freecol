@@ -35,7 +35,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
@@ -68,9 +67,9 @@ public class ReportPanel extends FreeColPanel {
             }
         };
 
-    protected JPanel reportPanel;
+    protected final JPanel reportPanel;
 
-    protected JLabel header;
+    protected final JLabel header;
 
     protected JScrollPane scrollPane;
 

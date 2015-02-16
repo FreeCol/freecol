@@ -60,7 +60,7 @@ final class ReceivingThread extends Thread {
 
         private final InputStream in;
 
-        private byte[] buffer = new byte[BUFFER_SIZE];
+        private final byte[] buffer = new byte[BUFFER_SIZE];
 
         private int bStart = 0;
 

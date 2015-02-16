@@ -75,8 +75,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     /** Container class for REF target colony information. */
     private static class TargetTuple implements Comparable<TargetTuple> {
 
-        public Colony colony;
-        public PathNode path;
+        public final Colony colony;
+        public final PathNode path;
         public double score;
         public Tile disembarkTile;
         public Tile entry;

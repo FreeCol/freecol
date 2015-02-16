@@ -83,10 +83,10 @@ public abstract class AIPlayer extends AIObject {
                     : (a2.getUnit() == null) ? null
                     : a2.getUnit().getLocation();
                 FreeColObject f1 = (l1 instanceof WorkLocation)
-                    ? ((WorkLocation)l1).getColony()
+                    ? l1.getColony()
                     : (FreeColObject)l1;
                 FreeColObject f2 = (l2 instanceof WorkLocation)
-                    ? ((WorkLocation)l2).getColony()
+                    ? l2.getColony()
                     : (FreeColObject)l2;
                 return FreeColObject.compareIds(f1, f2);
             }
@@ -110,7 +110,7 @@ public abstract class AIPlayer extends AIObject {
      * this list is invalidated as necessary, using clearAIUnits(), so
      * that getAIUnitIterator() will create a new list.
      */
-    private List<AIUnit> aiUnits = new ArrayList<>();
+    private final List<AIUnit> aiUnits = new ArrayList<>();
 
 
     /**

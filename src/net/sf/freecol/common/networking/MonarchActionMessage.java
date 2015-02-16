@@ -36,13 +36,13 @@ import org.w3c.dom.NodeList;
 public class MonarchActionMessage extends DOMMessage {
 
     /** The monarch action. */
-    private MonarchAction action;
+    private final MonarchAction action;
 
     /** A template describing the action. */
-    private StringTemplate template;
+    private final StringTemplate template;
 
     /** The monarch image key. */
-    private String monarchKey;
+    private final String monarchKey;
 
     /** The tax rate, if appropriate. */
     private String tax;

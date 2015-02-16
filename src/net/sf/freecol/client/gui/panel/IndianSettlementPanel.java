@@ -111,8 +111,8 @@ public final class IndianSettlementPanel extends FreeColPanel {
 
         GoodsType[] wantedGoods = settlement.getWantedGoods();
         int n = 0;
-        for (int i = 0; i < wantedGoods.length; i++) {
-            if (wantedGoods[i] != null) n++;
+        for (GoodsType wantedGood : wantedGoods) {
+            if (wantedGood != null) n++;
         }
         String sale;
         add(GUI.localizedLabel("indianSettlement.highlyWanted"), "newline");

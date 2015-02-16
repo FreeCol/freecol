@@ -38,7 +38,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  */
 public class Resource extends TileItem {
 
-    private static Logger logger = Logger.getLogger(Resource.class.getName());
+    private static final Logger logger = Logger.getLogger(Resource.class.getName());
 
     /** Some resources are unlimited. */
     private static final int UNLIMITED = -1;

@@ -38,7 +38,7 @@ import net.sf.freecol.common.model.Specification;
  */
 public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
 
-    private static Logger logger = Logger.getLogger(ListOption.class.getName());
+    private static final Logger logger = Logger.getLogger(ListOption.class.getName());
 
     /** The AbstractOption used to generate new values. */
     private AbstractOption<T> template;

@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -46,7 +45,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -78,7 +76,7 @@ import net.sf.freecol.common.model.UnitTradeItem;
  */
 public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> {
 
-    private static Logger logger = Logger.getLogger(DiplomaticTradeDialog.class.getName());
+    private static final Logger logger = Logger.getLogger(DiplomaticTradeDialog.class.getName());
 
     private static final int HUGE_DEMAND = 100000;
 
@@ -87,7 +85,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
 
     private class RemoveAction extends AbstractAction {
-        private TradeItem item;
+        private final TradeItem item;
 
         public RemoveAction(TradeItem item) {
             this.item = item;
@@ -108,9 +106,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         implements ActionListener {
 
         private final Player source;
-        private JComboBox<Colony> colonyBox;
-        private JButton clearButton, addButton;
-        private JLabel label;
+        private final JComboBox<Colony> colonyBox;
+        private final JButton clearButton;
+        private final JButton addButton;
+        private final JLabel label;
         private final List<Colony> allColonies;
 
 
@@ -121,7 +120,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          */
         public ColonyTradeItemPanel(Player source) {
             this.source = source;
-            this.colonyBox = new JComboBox<Colony>();
+            this.colonyBox = new JComboBox<>();
             this.clearButton = GUI.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);
             this.clearButton.setActionCommand(CLEAR);
@@ -206,7 +205,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         implements ActionListener {
 
         private final Player source;
-        private JSpinner spinner;
+        private final JSpinner spinner;
 
 
         /**
@@ -293,9 +292,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         }
 
         private final Player source;
-        private JComboBox<Goods> goodsBox;
-        private JButton clearButton, addButton;
-        private JLabel label;
+        private final JComboBox<Goods> goodsBox;
+        private final JButton clearButton;
+        private final JButton addButton;
+        private final JLabel label;
         private final List<Goods> allGoods;
 
 
@@ -308,7 +308,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          */
         public GoodsTradeItemPanel(Player source, List<Goods> allGoods) {
             this.source = source;
-            this.goodsBox = new JComboBox<Goods>(new DefaultComboBoxModel<Goods>());
+            this.goodsBox = new JComboBox<>(new DefaultComboBoxModel<Goods>());
             this.goodsBox.setRenderer(new GoodsBoxRenderer());
             this.clearButton = GUI.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);
@@ -414,9 +414,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         private final Player source;
         private final Player other;
-        private JComboBox<Player> victimBox;
-        private JLabel label;
-        private JButton clearButton, addButton;
+        private final JComboBox<Player> victimBox;
+        private final JLabel label;
+        private final JButton clearButton;
+        private final JButton addButton;
         private final List<Player> available = new ArrayList<>();
 
 
@@ -429,7 +430,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         public InciteTradeItemPanel(Player source, Player other) {
             this.source = source;
             this.other = other;
-            this.victimBox = new JComboBox<Player>(new DefaultComboBoxModel<Player>());
+            this.victimBox = new JComboBox<>(new DefaultComboBoxModel<Player>());
             this.victimBox.setRenderer(new InciteBoxRenderer());
             this.clearButton = GUI.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);
@@ -531,10 +532,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             }
         }
 
-        private Player source;
-        private Player target;
-        private JComboBox<Stance> stanceBox;
-        private JButton clearButton, addButton;
+        private final Player source;
+        private final Player target;
+        private final JComboBox<Stance> stanceBox;
+        private final JButton clearButton;
+        private final JButton addButton;
 
 
         /**
@@ -546,7 +548,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         public StanceTradeItemPanel(Player source, Player target) {
             this.source = source;
             this.target = target;
-            this.stanceBox = new JComboBox<Stance>(new DefaultComboBoxModel<Stance>());
+            this.stanceBox = new JComboBox<>(new DefaultComboBoxModel<Stance>());
             this.stanceBox.setRenderer(new StanceBoxRenderer());
             this.clearButton = GUI.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);
@@ -641,9 +643,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         }
 
         private final Player source;
-        private JComboBox<Unit> unitBox;
-        private JButton clearButton, addButton;
-        private JLabel label;
+        private final JComboBox<Unit> unitBox;
+        private final JButton clearButton;
+        private final JButton addButton;
+        private final JLabel label;
         private final List<Unit> allUnits;
 
 
@@ -656,7 +659,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
          */
         public UnitTradeItemPanel(Player source, List<Unit> allUnits) {
             this.source = source;
-            this.unitBox = new JComboBox<Unit>(new DefaultComboBoxModel<Unit>());
+            this.unitBox = new JComboBox<>(new DefaultComboBoxModel<Unit>());
             this.unitBox.setRenderer(new UnitBoxRenderer());
             this.clearButton = GUI.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);
@@ -737,13 +740,13 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
 
     /** The other player in the negotiation (!= getMyPlayer()). */
-    private Player otherPlayer;
+    private final Player otherPlayer;
 
     /** The agreement under negotiation. */
-    private DiplomaticTrade agreement;
+    private final DiplomaticTrade agreement;
 
     /** A comment message. */
-    private StringTemplate comment;
+    private final StringTemplate comment;
 
     /** The panels for various negotiable data. */
     private StanceTradeItemPanel stancePanel;
@@ -921,15 +924,13 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         List<ChoiceItem<DiplomaticTrade>> c = choices();
         if (agreement.getVersion() > 0) { // A new offer can not be accepted
             str = Messages.message("negotiationDialog.accept");
-            c.add(this.accept = new ChoiceItem<DiplomaticTrade>(str, bogus));
+            c.add(this.accept = new ChoiceItem<>(str, bogus));
         }
         str = Messages.message("negotiationDialog.send");
-        c.add(this.send = new ChoiceItem<DiplomaticTrade>(str, bogus)
-            .okOption());
+        c.add(this.send = new ChoiceItem<>(str, bogus).okOption());
         if (agreement.getVersion() > 0 || context != TradeContext.CONTACT) {
             str = Messages.message("negotiationDialog.cancel");
-            c.add(new ChoiceItem<DiplomaticTrade>(str, bogus)
-                .cancelOption().defaultOption());
+            c.add(new ChoiceItem<>(str, bogus).cancelOption().defaultOption());
         }
         ImageIcon icon = getImageLibrary()
             .getImageIcon((otherColony != null) ? otherColony : otherUnit,

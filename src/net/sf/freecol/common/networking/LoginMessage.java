@@ -34,31 +34,31 @@ import org.w3c.dom.NodeList;
 public class LoginMessage extends DOMMessage {
 
     /** The Player that is logging in. */
-    private Player player;
+    private final Player player;
 
     /** The user name. */
-    private String userName;
+    private final String userName;
 
     /** The client FreeCol version. */
-    private String version;
+    private final String version;
 
     /** Is the player an admin. */
-    private boolean admin;
+    private final boolean admin;
 
     /** Whether to start the game. */
-    private boolean startGame;
+    private final boolean startGame;
 
     /** Is this a single player game. */
-    private boolean singlePlayer;
+    private final boolean singlePlayer;
 
     /** Is the client the current player. */
-    private boolean currentPlayer;
+    private final boolean currentPlayer;
 
     /** The optional identifier of the active unit. */
-    private String activeUnitId;
+    private final String activeUnitId;
 
     /** The game. */
-    private Game game;
+    private final Game game;
 
         
     /**

@@ -29,7 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import java.util.Set;
 
 import net.sf.freecol.common.ObjectWithId;
-import net.sf.freecol.common.io.FreeColXMLReader;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 

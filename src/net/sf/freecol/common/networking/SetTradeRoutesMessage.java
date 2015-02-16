@@ -41,7 +41,7 @@ public class SetTradeRoutesMessage extends DOMMessage {
     private static final String idPrefix = "shadow-";
 
     /** The trade routes to set. */
-    private List<TradeRoute> tradeRoutes;
+    private final List<TradeRoute> tradeRoutes;
 
 
     /**
@@ -142,7 +142,7 @@ public class SetTradeRoutesMessage extends DOMMessage {
                 continue;
             }
         }
-        if (!"".equals(errors)) return DOMMessage.clientError(errors);
+        if (errors != null && !errors.isEmpty()) return DOMMessage.clientError(errors);
         
         List<TradeRoute> newRoutes = new ArrayList<>();
         for (TradeRoute tradeRoute : tradeRoutes) {

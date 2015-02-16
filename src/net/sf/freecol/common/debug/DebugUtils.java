@@ -116,7 +116,7 @@ public class DebugUtils {
         List<ChoiceItem<BuildingType>> buildings = new ArrayList<>();
         for (BuildingType b : game.getSpecification().getBuildingTypeList()) {
             String msg = Messages.getName(b);
-            buildings.add(new ChoiceItem<BuildingType>(msg, b));
+            buildings.add(new ChoiceItem<>(msg, b));
         }
         Collections.sort(buildings);
 
@@ -176,7 +176,7 @@ public class DebugUtils {
         for (FoundingFather father : sSpec.getFoundingFathers()) {
             if (!sPlayer.hasFather(father)) {
                 String msg = Messages.getName(father);
-                fathers.add(new ChoiceItem<FoundingFather>(msg, father));
+                fathers.add(new ChoiceItem<>(msg, father));
             }
         }
         Collections.sort(fathers);
@@ -323,7 +323,7 @@ public class DebugUtils {
         List<ChoiceItem<UnitType>> uts = new ArrayList<>();
         for (UnitType t : sSpec.getUnitTypeList()) {
             String msg = Messages.getName(t);
-            uts.add(new ChoiceItem<UnitType>(msg, t));
+            uts.add(new ChoiceItem<>(msg, t));
         }
         Collections.sort(uts);
         UnitType unitChoice = gui.getChoice(true, null, "Select Unit Type",
@@ -377,7 +377,7 @@ public class DebugUtils {
         for (GoodsType t : sSpec.getGoodsTypeList()) {
             if (t.isFoodType() && t != sSpec.getPrimaryFoodType()) continue;
             String msg = Messages.getName(t);
-            gtl.add(new ChoiceItem<GoodsType>(msg, t));
+            gtl.add(new ChoiceItem<>(msg, t));
         }
         Collections.sort(gtl);
         GoodsType goodsType = gui.getChoice(true, null, "Select Goods Type",
@@ -424,7 +424,7 @@ public class DebugUtils {
         for (RandomChoice<Disaster> rc : disasters) {
             String label = Messages.getName(rc.getObject())
                 + " " + Integer.toString(rc.getProbability());
-            choices.add(new ChoiceItem<Disaster>(label, rc.getObject()));
+            choices.add(new ChoiceItem<>(label, rc.getObject()));
         }
         Collections.sort(choices);
         Disaster disaster = gui.getChoice(true, null, "Select disaster",
@@ -465,7 +465,7 @@ public class DebugUtils {
         List<ChoiceItem<Player>> pcs = new ArrayList<>();
         for (Player p : game.getLiveEuropeanPlayers(colony.getOwner())) {
             String msg = Messages.message(p.getNationName());
-            pcs.add(new ChoiceItem<Player>(msg, p));
+            pcs.add(new ChoiceItem<>(msg, p));
         }
         Collections.sort(pcs);
         Player player = gui.getChoice(true, null, "Select owner", null,
@@ -503,7 +503,7 @@ public class DebugUtils {
         for (Player p : game.getLivePlayers(null)) {
             if (unit.getType().isAvailableTo(p)) {
                 String msg = Messages.message(p.getNationName());
-                pcs.add(new ChoiceItem<Player>(msg, p));
+                pcs.add(new ChoiceItem<>(msg, p));
             }
         }
         Collections.sort(pcs);
@@ -545,7 +545,7 @@ public class DebugUtils {
 
         List<ChoiceItem<Role>> rcs = new ArrayList<>();
         for (Role role : sGame.getSpecification().getRoles()) {
-            rcs.add(new ChoiceItem<Role>(role.getId(), role));
+            rcs.add(new ChoiceItem<>(role.getId(), role));
         }
         Collections.sort(rcs);
         Role roleChoice = gui.getChoice(true, null, "Select role", null,
@@ -930,7 +930,7 @@ public class DebugUtils {
         for (GoodsType t : spec.getGoodsTypeList()) {
             if (t.isFoodType() && t != spec.getPrimaryFoodType()) continue;
             String msg = Messages.getName(t);
-            gtl.add(new ChoiceItem<GoodsType>(msg, t));
+            gtl.add(new ChoiceItem<>(msg, t));
         }
         Collections.sort(gtl);
         GoodsType goodsType = freeColClient.getGUI().getChoice(true, null,
@@ -979,7 +979,7 @@ public class DebugUtils {
 
         List<ChoiceItem<MonarchAction>> actions = new ArrayList<>();
         for (MonarchAction action : MonarchAction.values()) {
-            actions.add(new ChoiceItem<MonarchAction>(action));
+            actions.add(new ChoiceItem<>(action));
         }
         Collections.sort(actions);
         MonarchAction action = gui.getChoice(true, null, monarchTitle, null,
@@ -1005,7 +1005,7 @@ public class DebugUtils {
         List<ChoiceItem<RumourType>> rumours = new ArrayList<>();
         for (RumourType rumour : RumourType.values()) {
             if (rumour == RumourType.NO_SUCH_RUMOUR) continue;
-            rumours.add(new ChoiceItem<RumourType>(rumour.toString(), rumour));
+            rumours.add(new ChoiceItem<>(rumour.toString(), rumour));
         }
         Collections.sort(rumours);
         RumourType rumourChoice = freeColClient.getGUI().getChoice(true, null,

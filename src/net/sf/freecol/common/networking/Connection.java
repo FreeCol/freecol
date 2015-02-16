@@ -76,7 +76,7 @@ public class Connection implements Closeable {
 
     private OutputStream out;
 
-    private Transformer xmlTransformer;
+    private final Transformer xmlTransformer;
 
     private ReceivingThread thread;
 

@@ -34,23 +34,15 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
-import net.sf.freecol.common.model.TradeRouteStop;
-import net.sf.freecol.common.model.TradeLocation;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 // @compat 0.10.x
-import net.sf.freecol.common.model.EquipmentType;
 // end @compat 0.10.x
 
 import org.w3c.dom.Element;
@@ -75,7 +67,7 @@ public class Unit extends GoodsLocation
     public static final int MANY_TURNS = 10000;
 
     /** A comparator to order units by skill level. */
-    private static Comparator<Unit> skillLevelComp
+    private static final Comparator<Unit> skillLevelComp
         = new Comparator<Unit>() {
             public int compare(Unit u1, Unit u2) {
                 return u1.getSkillLevel() - u2.getSkillLevel();
@@ -1542,8 +1534,8 @@ public class Unit extends GoodsLocation
     public TradeLocation getTradeLocation() {
         Colony colony;
         IndianSettlement is;
-        return ((colony = getColony()) != null) ? (TradeLocation)colony
-            : ((is = getIndianSettlement()) != null) ? (TradeLocation)is
+        return ((colony = getColony()) != null) ? colony
+            : ((is = getIndianSettlement()) != null) ? is
             : (isInEurope()) ? (TradeLocation)getOwner().getEurope()
             : null;
     }
@@ -1870,12 +1862,12 @@ public class Unit extends GoodsLocation
         /**
          * The reason why this move type is illegal.
          */
-        private String reason;
+        private final String reason;
 
         /**
          * Does this move type imply progress towards a destination.
          */
-        private boolean progress;
+        private final boolean progress;
 
         MoveType(String reason) {
             this.reason = reason;
@@ -3019,7 +3011,7 @@ public class Unit extends GoodsLocation
      */
     public int getLineOfSight() {
         final Turn turn = getGame().getTurn();
-        Set<Modifier> result = new HashSet<Modifier>();
+        Set<Modifier> result = new HashSet<>();
         result.addAll(this.getModifiers(Modifier.LINE_OF_SIGHT_BONUS,
                                         unitType, turn));
         if (hasTile() && getTile().isExplored()) {
@@ -3387,7 +3379,7 @@ public class Unit extends GoodsLocation
      * @return The missionary trade bonuses.
      */
     public Set<Modifier> getMissionaryTradeModifiers(boolean sense) {
-        HashSet<Modifier> result = new HashSet<Modifier>();
+        HashSet<Modifier> result = new HashSet<>();
         for (Modifier m : getModifiers(Modifier.MISSIONARY_TRADE_BONUS)) {
             Modifier modifier = new Modifier(m);
             if (!sense) modifier.setValue(-m.getValue());
@@ -3475,7 +3467,7 @@ public class Unit extends GoodsLocation
         FreeColGameObjectType fcgot, Turn turn) {
         final Player owner = getOwner();
         final UnitType unitType = getType();
-        Set<Modifier> result = new HashSet<Modifier>();
+        Set<Modifier> result = new HashSet<>();
 
         // UnitType modifiers always apply
         for (Modifier m : unitType.getModifiers(id, fcgot, turn)) {
@@ -3787,7 +3779,7 @@ public class Unit extends GoodsLocation
             }
         } else {
             throw new IllegalStateException("Can not be added to unit: "
-                + ((FreeColGameObject)locatable));
+                + locatable);
         }
         return false;
     }
@@ -3800,7 +3792,7 @@ public class Unit extends GoodsLocation
         if (locatable == null) {
             throw new IllegalArgumentException("Locatable must not be 'null'.");
         } else if (locatable instanceof Unit && canCarryUnits()) {
-            if (super.remove((Unit)locatable)) {
+            if (super.remove(locatable)) {
                 spendAllMoves();
                 return true;
             }
@@ -3811,7 +3803,7 @@ public class Unit extends GoodsLocation
             }
         } else {
             logger.warning("Tried to remove from unit: "
-                + ((FreeColGameObject)locatable));
+                + locatable);
         }
         return false;
     }
@@ -3866,7 +3858,7 @@ public class Unit extends GoodsLocation
         } else if (locatable instanceof Unit) {
             return (!canCarryUnits())
                 ? NoAddReason.WRONG_TYPE
-                : (((Unit)locatable).getSpaceTaken() > getSpaceLeft())
+                : (locatable.getSpaceTaken() > getSpaceLeft())
                 ? NoAddReason.CAPACITY_EXCEEDED
                 : super.getNoAddReason(locatable);
         } else if (locatable instanceof Goods) {
@@ -3960,7 +3952,7 @@ public class Unit extends GoodsLocation
                                      Turn turn) {
         final Player owner = getOwner();
         final UnitType unitType = getType();
-        Set<Ability> result = new HashSet<Ability>();
+        Set<Ability> result = new HashSet<>();
 
         // UnitType abilities always apply.
         result.addAll(unitType.getAbilities(id));
@@ -4003,7 +3995,7 @@ public class Unit extends GoodsLocation
                                       Turn turn) {
         final Player owner = getOwner();
         final UnitType unitType = getType();
-        Set<Modifier> result = new HashSet<Modifier>();
+        Set<Modifier> result = new HashSet<>();
 
         // UnitType modifiers always apply
         result.addAll(unitType.getModifiers(id, fcgot, turn));
@@ -4055,7 +4047,7 @@ public class Unit extends GoodsLocation
     private static final String EQUIPMENT_TAG = "equipment";
     /** The equipment this Unit carries.  Now subsumed into roles. */
     private final TypeCountMap<EquipmentType> equipment
-        = new TypeCountMap<EquipmentType>();
+        = new TypeCountMap<>();
     // end @compat 0.10.x
 
 

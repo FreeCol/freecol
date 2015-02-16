@@ -37,7 +37,6 @@ import java.util.logging.Logger;
 
 import javax.swing.UIManager;
 
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColDataFile;
@@ -95,7 +94,7 @@ public class Messages {
 
     public static class Key {
         
-        private String key;
+        private final String key;
 
         public Key(String prefix, String suffix) {
             this.key = prefix + suffix;
@@ -144,7 +143,7 @@ public class Messages {
     public static final String NAME_SUFFIX = ".name";
     public static final String RULER_SUFFIX = ".ruler";
 
-    private static final String[] DESCRIPTION_KEYS = new String[] {
+    private static final String[] DESCRIPTION_KEYS = {
         DESCRIPTION_SUFFIX, SHORT_DESCRIPTION_SUFFIX, NAME_SUFFIX
     };
 
@@ -161,7 +160,7 @@ public class Messages {
      * A map with Selector values and the tag keys used in choice
      * formats.
      */
-    private static Map<String, Selector> tagMap = new HashMap<>();
+    private static final Map<String, Selector> tagMap = new HashMap<>();
     static {
         tagMap.put("turn", new TurnSelector());
     }
@@ -948,7 +947,7 @@ public class Messages {
                 continue;
             }
             String selector = input.substring(colonIndex + 1, pipeIndex);
-            if ("".equals(selector)) {
+            if (selector.isEmpty()) {
                 selector = "default";
             } else if (selector.startsWith("%") && selector.endsWith("%")) {
                 if (template == null) {
@@ -1036,7 +1035,7 @@ public class Messages {
                 int end = (replacementIndex < 0 || replacementIndex > closeChoice)
                     ? closeChoice : replacementIndex;
                 String replacement = input.substring(start, end);
-                if (replacement.indexOf("{{") < 0) {
+                if (!replacement.contains("{{")) {
                     result.append(replacement);
                 } else {
                     result.append(replaceChoices(replacement, template));

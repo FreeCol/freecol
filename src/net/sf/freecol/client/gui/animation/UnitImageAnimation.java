@@ -41,7 +41,7 @@ public final class UnitImageAnimation {
     private final Unit unit;
     private final Tile tile;
     private final SimpleZippedAnimation animation;
-    private GUI gui;
+    private final GUI gui;
     
     /**
      * Constructor

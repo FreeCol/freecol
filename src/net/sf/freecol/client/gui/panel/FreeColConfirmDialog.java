@@ -24,8 +24,6 @@ import javax.swing.ImageIcon;
 import java.util.List;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.i18n.Messages;
 
 
@@ -76,10 +74,10 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
                                                  ImageIcon icon, String okKey,
                                                  String cancelKey) {
         List<ChoiceItem<Boolean>> c = choices();
-        c.add(new ChoiceItem<Boolean>(Messages.message(okKey),
-                Boolean.TRUE).okOption());
-        c.add(new ChoiceItem<Boolean>(Messages.message(cancelKey),
-                Boolean.FALSE).cancelOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message(okKey), Boolean.TRUE)
+            .okOption());
+        c.add(new ChoiceItem<>(Messages.message(cancelKey), Boolean.FALSE)
+            .cancelOption().defaultOption());
         initializeDialog(DialogType.QUESTION, modal, obj, icon, c);
     }
 }

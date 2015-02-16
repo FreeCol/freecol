@@ -34,19 +34,19 @@ import org.w3c.dom.Element;
 public class FirstContactMessage extends DOMMessage {
 
     /** The identifier for the player making contact. */
-    private String playerId;
+    private final String playerId;
 
     /** The identifier for the player being contacted. */
-    private String otherId;
+    private final String otherId;
 
     /**
      * The identifier for a tile to offer the contacting player if this is a
      * first landing and the contacted player is a friendly native.
      */
-    private String tileId;
+    private final String tileId;
 
     /** The number of settlements the contacted player has, if native. */
-    private String settlementCount;
+    private final String settlementCount;
 
     /** The result of the contact. */
     private String result;

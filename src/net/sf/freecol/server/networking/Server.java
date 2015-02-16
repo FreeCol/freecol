@@ -50,16 +50,16 @@ import org.w3c.dom.Element;
  */
 public final class Server extends Thread {
 
-    private static Logger logger = Logger.getLogger(Server.class.getName());
+    private static final Logger logger = Logger.getLogger(Server.class.getName());
 
     /** Backlog for socket. */
     private static final int BACKLOG_DEFAULT = 10;
 
     /** The public "well-known" socket to which clients may connect. */
-    private ServerSocket serverSocket;
+    private final ServerSocket serverSocket;
 
     /** A hash of Connection objects, keyed by the Socket they relate to. */
-    private HashMap<Socket, Connection> connections = new HashMap<>();
+    private final HashMap<Socket, Connection> connections = new HashMap<>();
 
     /**
      * Whether to keep running the main loop that is awaiting new
@@ -68,13 +68,13 @@ public final class Server extends Thread {
     private boolean running = true;
 
     /** The owner of this <code>Server</code>. */
-    private FreeColServer freeColServer;
+    private final FreeColServer freeColServer;
 
     /** The name of the host for the public socket. */
-    private String host;
+    private final String host;
 
     /** The TCP port that is beeing used for the public socket. */
-    private int port;
+    private final int port;
 
     /** For information about this variable see the run method. */
     private final Object shutdownLock = new Object();

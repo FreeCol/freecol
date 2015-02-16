@@ -177,7 +177,7 @@ public final class PreGameInputHandler extends InputHandler {
 
         String playerId = element.getAttribute("player");
         String reason = element.getAttribute("reason");
-        if (reason != null && !"".equals(reason)) {
+        if (reason != null && !reason.isEmpty()) {
             logger.info("Client logging out: " + reason);
         }
 

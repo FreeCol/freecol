@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Point;
@@ -38,25 +37,19 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.plaf.FreeColOptionPaneUI;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -72,7 +65,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     };
 
     /** The enclosing client. */
-    protected FreeColClient freeColClient;
+    protected final FreeColClient freeColClient;
 
     /** Is this dialog modal? */
     protected boolean modal;

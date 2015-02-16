@@ -32,7 +32,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
  */
 public class FreeColMenuBarUI extends BasicMenuBarUI {
 
-    private static FreeColMenuBarUI sharedInstance = new FreeColMenuBarUI();
+    private static final FreeColMenuBarUI sharedInstance = new FreeColMenuBarUI();
 
 
     public static ComponentUI createUI(@SuppressWarnings("unused") JComponent c) {

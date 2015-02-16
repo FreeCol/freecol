@@ -481,7 +481,7 @@ public class Flag {
      * @return An image of the flag.
      */
     public BufferedImage getImage() {
-        BufferedImage image = new BufferedImage((int) WIDTH, (int) HEIGHT,
+        BufferedImage image = new BufferedImage(WIDTH, HEIGHT,
                                                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -883,8 +883,8 @@ public class Flag {
 
     private void drawQuarters(Graphics2D g) {
         int colors = backgroundColors.size();
-        int[] x = new int[] { 0, 1, 1, 0 };
-        int[] y = new int[] { 0, 0, 1, 1 };
+        int[] x = { 0, 1, 1, 0 };
+        int[] y = { 0, 0, 1, 1 };
         double halfWidth = WIDTH / 2;
         double halfHeight = HEIGHT / 2;
         double offset = (decoration == Decoration.SCANDINAVIAN_CROSS)
@@ -912,8 +912,8 @@ public class Flag {
     private void drawPerSaltire(Graphics2D g) {
         int colors = backgroundColors.size();
         GeneralPath path = new GeneralPath();
-        int[] x = new int[] { 0, WIDTH, WIDTH, 0 };
-        int[] y = new int[] { 0, 0, HEIGHT, HEIGHT };
+        int[] x = { 0, WIDTH, WIDTH, 0 };
+        int[] y = { 0, 0, HEIGHT, HEIGHT };
         double halfWidth = WIDTH / 2;
         double halfHeight = HEIGHT / 2;
         for (int index = 0; index < 4; index++) {
@@ -1109,7 +1109,7 @@ public class Flag {
         double x = 0;
         double y = -radius;
         star.moveTo(x, y);
-        int[] vertex = new int[] { 2, 4, 1, 3 };
+        int[] vertex = { 2, 4, 1, 3 };
         for (int i : vertex) {
             double phi = i * angle;
             x = radius * Math.sin(phi);

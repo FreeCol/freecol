@@ -50,7 +50,7 @@ public final class DifficultyDialog extends OptionsDialog
 
     private static final Logger logger = Logger.getLogger(DifficultyDialog.class.getName());
 
-    private static final FileFilter[] filters = new FileFilter[] {
+    private static final FileFilter[] filters = {
         new FileFilter() {
             public boolean accept(File file) {
                 return file.isDirectory() || file.getName().endsWith(".xml");
@@ -68,7 +68,7 @@ public final class DifficultyDialog extends OptionsDialog
      * We need our own copy of the specification, as the dialog is
      * used before the game has been started.
      */
-    private Specification specification;
+    private final Specification specification;
 
 
     /**

@@ -52,7 +52,6 @@ import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
-import net.sf.freecol.client.gui.panel.ColorCellEditor;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.EuropeanNationType;
@@ -94,7 +93,7 @@ public final class PlayersTable extends JTable {
          * @param nationTypes List of <code>EuropeanNationType></code>
          */
         public AdvantageCellEditor(List<EuropeanNationType> nationTypes) {
-            this(new JComboBox<EuropeanNationType>(nationTypes
+            this(new JComboBox<>(nationTypes
                     .toArray(new EuropeanNationType[0])));
 
             this.box.setRenderer(new FreeColComboBoxRenderer<EuropeanNationType>());
@@ -115,7 +114,7 @@ public final class PlayersTable extends JTable {
     private class AdvantageCellRenderer implements TableCellRenderer {
 
         /** The national advantages type. */
-        private Advantages advantages;
+        private final Advantages advantages;
 
  
         /**
@@ -163,8 +162,8 @@ public final class PlayersTable extends JTable {
 
     private static class AvailableCellRenderer implements TableCellRenderer {
 
-        private JComboBox<NationState> box
-            = new JComboBox<NationState>(NationState.values());
+        private final JComboBox<NationState> box
+            = new JComboBox<>(NationState.values());
 
 
         /**
@@ -191,16 +190,16 @@ public final class PlayersTable extends JTable {
     private final class AvailableCellEditor extends AbstractCellEditor
         implements TableCellEditor {
 
-        private JComboBox<NationState> aiStateBox
-            = new JComboBox<NationState>(new NationState[] {
+        private final JComboBox<NationState> aiStateBox
+            = new JComboBox<>(new NationState[] {
                     NationState.AI_ONLY,
                     NationState.NOT_AVAILABLE
                 });
-        private JComboBox<NationState> allStateBox
-            = new JComboBox<NationState>(NationState.values());
+        private final JComboBox<NationState> allStateBox
+            = new JComboBox<>(NationState.values());
         private JComboBox activeBox;
 
-        private ActionListener listener = new ActionListener() {
+        private final ActionListener listener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     stopCellEditing();
                 }
@@ -237,9 +236,9 @@ public final class PlayersTable extends JTable {
 
     private static class HeaderListener extends MouseAdapter {
 
-        private JTableHeader header;
+        private final JTableHeader header;
 
-        private HeaderRenderer renderer;
+        private final HeaderRenderer renderer;
 
 
         public HeaderListener(JTableHeader header, HeaderRenderer renderer) {
@@ -263,7 +262,7 @@ public final class PlayersTable extends JTable {
 
         private static final int NO_COLUMN = -1;
         private int pressedColumn = NO_COLUMN;
-        private Component[] components;
+        private final Component[] components;
 
         public HeaderRenderer(Component... components) {
             this.components = components;
@@ -329,8 +328,8 @@ public final class PlayersTable extends JTable {
 
     private static class PlayerCellRenderer implements TableCellRenderer {
 
-        private JLabel label = new JLabel();
-        private JButton button = GUI.localizedButton("select");
+        private final JLabel label = new JLabel();
+        private final JButton button = GUI.localizedButton("select");
 
 
         public PlayerCellRenderer() {
@@ -370,7 +369,7 @@ public final class PlayersTable extends JTable {
     private final class PlayerCellEditor extends AbstractCellEditor
         implements TableCellEditor {
 
-        private JButton button = GUI.localizedButton("select");
+        private final JButton button = GUI.localizedButton("select");
 
 
         public PlayerCellEditor() {
@@ -402,13 +401,13 @@ public final class PlayersTable extends JTable {
 
         private final PreGameController preGameController;
 
-        private NationOptions nationOptions;
+        private final NationOptions nationOptions;
 
-        private Player thisPlayer;
+        private final Player thisPlayer;
 
-        private List<Nation> nations;
+        private final List<Nation> nations;
 
-        private Map<Nation, Player> players;
+        private final Map<Nation, Player> players;
 
 
         /**

@@ -357,7 +357,7 @@ public class BuildColonyMission extends Mission {
             // continue on to the target as an intermediate colony.
             Colony c;
             if (target instanceof Tile
-                && (c = ((Tile)target).getColony()) != null
+                && (c = target.getColony()) != null
                 && player.owns(c)) {
                 // Favour improving colony center.
                 Mission m = euaip.getPioneeringMission(aiUnit, c.getTile());

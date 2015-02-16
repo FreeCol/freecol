@@ -39,14 +39,14 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class FreeColImageBorder extends AbstractBorder {
 
     // The buffered image objects
-    private BufferedImage topImage;
-    private BufferedImage leftImage;
-    private BufferedImage bottomImage;    
-    private BufferedImage rightImage;
-    private BufferedImage topLeftCornerImage;
-    private BufferedImage topRightCornerImage;
-    private BufferedImage bottomLeftCornerImage;
-    private BufferedImage bottomRightCornerImage;
+    private final BufferedImage topImage;
+    private final BufferedImage leftImage;
+    private final BufferedImage bottomImage;
+    private final BufferedImage rightImage;
+    private final BufferedImage topLeftCornerImage;
+    private final BufferedImage topRightCornerImage;
+    private final BufferedImage bottomLeftCornerImage;
+    private final BufferedImage bottomRightCornerImage;
     
     public static final FreeColImageBorder imageBorder =
         new FreeColImageBorder(ResourceManager.getImage("menuborder.n.image"),

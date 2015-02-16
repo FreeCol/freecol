@@ -53,7 +53,7 @@ public class UnitTypeChange extends FreeColObject {
     }
 
     public static final Map<ChangeType, String> tags
-        = new EnumMap<ChangeType, String>(ChangeType.class);
+        = new EnumMap<>(ChangeType.class);
     static {
         tags.put(ChangeType.EDUCATION, "learnInSchool");
         tags.put(ChangeType.NATIVES, "learnFromNatives");
@@ -77,8 +77,8 @@ public class UnitTypeChange extends FreeColObject {
     protected int turnsToLearn = 0;
 
     /** A map of change type to probability. */
-    protected Map<ChangeType, Integer> changeTypes
-        = new EnumMap<ChangeType, Integer>(ChangeType.class);
+    protected final Map<ChangeType, Integer> changeTypes
+        = new EnumMap<>(ChangeType.class);
 
     /** A list of Scopes limiting the applicability of this Feature. */
     private List<Scope> scopes = null;

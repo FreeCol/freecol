@@ -44,7 +44,7 @@ public class Turn {
      * The first years of the "ages" of the game, which are only used
      * for weighting {@link FoundingFather}s.
      */
-    private static int[] ages = new int[] {
+    private static final int[] ages = {
         1492, 1600, 1700
     };
 

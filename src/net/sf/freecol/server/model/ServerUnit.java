@@ -426,7 +426,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         }
                     }
                 }
-                if (adjacent.size() > 0) {
+                if (!adjacent.isEmpty()) {
                     int deliverPerCity = newAmount / adjacent.size();
                     for (Settlement s : adjacent) {
                         s.addGoods(deliver.getType(), deliverPerCity);
@@ -521,8 +521,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             cs.add(See.only(owner), carrier);
         }
         if (oldLocation instanceof Tile) {
-            if (carrier.getTile() != (Tile)oldLocation) {
-                cs.addMove(See.only(owner), this, (Tile)oldLocation,
+            if (carrier.getTile() != oldLocation) {
+                cs.addMove(See.only(owner), this, oldLocation,
                            carrier.getTile());
                 owner.invalidateCanSeeTiles();//+vis(serverPlayer)
             }
@@ -1079,7 +1079,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 if (t == null || t.isLand() || t.getFirstUnit() == null) {
                     continue;
                 }
-                if ((ServerPlayer) t.getFirstUnit().getOwner()
+                if (t.getFirstUnit().getOwner()
                     != serverPlayer) csActivateSentries(t, cs);
             }
         }

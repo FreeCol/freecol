@@ -38,16 +38,16 @@ import org.w3c.dom.Element;
 public class InciteMessage extends DOMMessage {
 
     /** The identifier of the unit inciting. */
-    private String unitId;
+    private final String unitId;
 
     /** The direction to the settlement. */
-    private String directionString;
+    private final String directionString;
 
     /** The identifier of the enemy to incite against. */
-    private String enemyId;
+    private final String enemyId;
 
     /** The amount of gold in the bribe. */
-    private String goldString;
+    private final String goldString;
 
 
     /**

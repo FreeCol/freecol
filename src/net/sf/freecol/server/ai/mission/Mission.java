@@ -85,7 +85,7 @@ public abstract class Mission extends AIObject {
     protected static final String UNITNOTONMAP = "unit-not-on-map";
 
     /** The unit to undertake the mission. */
-    private AIUnit aiUnit;
+    private final AIUnit aiUnit;
 
 
     /**
@@ -572,12 +572,11 @@ public abstract class Mission extends AIObject {
 
         Direction[] directions
             = direction.getClosestDirections(logMe, aiRandom);
-        for (int j = 0; j < directions.length; j++) {
-            Direction d = directions[j];
+        for (Direction d : directions) {
             Tile moveTo = unit.getTile().getNeighbourOrNull(d);
             if (moveTo != null
-                && unit.getMoveType(d) == MoveType.MOVE
-                && aiUnit.move(d)) return d;
+                    && unit.getMoveType(d) == MoveType.MOVE
+                    && aiUnit.move(d)) return d;
         }
         return null; // Stuck!
     }

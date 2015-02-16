@@ -34,14 +34,15 @@ public class UnitWas implements Comparable<UnitWas> {
 
     private static final Logger logger = Logger.getLogger(UnitWas.class.getName());
 
-    private Unit unit;
-    private UnitType type;
-    private Role role;
-    private int roleCount;
-    private Location loc;
-    private GoodsType work;
-    private int workAmount, movesLeft;
-    private Colony colony;
+    private final Unit unit;
+    private final UnitType type;
+    private final Role role;
+    private final int roleCount;
+    private final Location loc;
+    private final GoodsType work;
+    private final int workAmount;
+    private final int movesLeft;
+    private final Colony colony;
 
 
     /**

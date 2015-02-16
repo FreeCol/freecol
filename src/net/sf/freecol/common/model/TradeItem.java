@@ -32,7 +32,7 @@ import net.sf.freecol.common.model.Player.Stance;
 public abstract class TradeItem extends FreeColObject {
 
     /** The game this TradeItem belongs to. */
-    protected Game game;
+    protected final Game game;
 
     /** The player who is to provide this item. */
     private Player source;
