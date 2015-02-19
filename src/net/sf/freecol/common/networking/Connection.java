@@ -221,29 +221,18 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Sends a "disconnect"-message and closes this connection.
+     * Get the output stream.
      *
-     * Failure is expected if the other end has closed already.
+     * @return The output stream.
      */
-    public void close() {
-        if (this.out != null) {
-            try {
-                send(DOMMessage.createMessage(DISCONNECT_TAG));
-            } catch (IOException ioe) {
-                logger.fine("Error disconnecting " + this.name
-                    + ": " + ioe.getMessage());
-            } finally {
-                reallyClose();
-            }
-        }
+    private synchronized OutputStream getOutputStream() {
+        return this.out;
     }
 
     /**
-     * Really closes this connection.
+     * Close and clear the output stream.
      */
-    public void reallyClose() {
-        if (this.thread != null) thread.askToStop();
-
+    private synchronized void closeOutputStream() {
         if (this.out != null) {
             try {
                 this.out.close();
@@ -253,6 +242,31 @@ public class Connection implements Closeable {
                 this.out = null;
             }
         }
+    }
+
+    /**
+     * Sends a "disconnect"-message and closes this connection.
+     *
+     * Failure is expected if the other end has closed already.
+     */
+    public void close() {
+        try {
+            send(DOMMessage.createMessage(DISCONNECT_TAG));
+        } catch (IOException ioe) {
+            logger.fine("Error disconnecting " + this.name
+                + ": " + ioe.getMessage());
+        } finally {
+            reallyClose();
+        }
+    }
+
+    /**
+     * Really closes this connection.
+     */
+    public void reallyClose() {
+        if (this.thread != null) thread.askToStop();
+
+        closeOutputStream();
         if (this.in != null) {
             try {
                 this.in.close();
@@ -310,25 +324,6 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Transform a DOMsource to output.  Duplicate to System.err if required.
-     *
-     * @param source The <code>DOMSource</code> to log.
-     * @param out An <code>OutputStream</code> to write to.
-     * @exception IOException If an error occur while sending the message.
-     */
-    private void transform(DOMSource source, OutputStream out) throws IOException {
-        if (out != null) {
-            try {
-                xmlTransformer.transform(source, new StreamResult(out));
-                out.write('\n');
-            } catch (TransformerException te) {
-                logger.log(Level.WARNING, "Failed to transform", te);
-            }
-        }
-        log(source, out != null);
-    }
-
-    /**
      * Low level routine to send a message over this Connection.
      *
      * @param element The <code>Element</code> (root element in a
@@ -336,11 +331,17 @@ public class Connection implements Closeable {
      * @exception IOException If an error occur while sending the message.
      */
     private void sendInternal(Element element) throws IOException {
-        DOMSource src = new DOMSource(element);
-        synchronized (this.out) {
-            transform(src, this.out);
-            this.out.flush();
-            this.out.notifyAll(); // Just in case others are waiting
+        OutputStream os = getOutputStream();
+        if (os != null) {
+            DOMSource source = new DOMSource(element);
+            try {
+                xmlTransformer.transform(source, new StreamResult(os));
+            } catch (TransformerException te) {
+                logger.log(Level.WARNING, "Failed to transform", te);
+            }
+            os.write('\n');
+            os.flush();
+            log(source, true);
         }
     }
 
