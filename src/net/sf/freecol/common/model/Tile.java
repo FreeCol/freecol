@@ -2343,7 +2343,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
         
         if (owningSettlement != null) {
-            if (owningSettlement.isDisposed()) {
+            if (owningSettlement.isDisposed()
+                || owningSettlement.getId() == null) {
                 // Owning settlement is a special case because it is a
                 // reference to something outside this tile.  If the
                 // tile being written here is a cached copy, and the
