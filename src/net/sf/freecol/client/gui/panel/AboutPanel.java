@@ -52,14 +52,13 @@ public final class AboutPanel extends FreeColPanel {
     public static final String PROJECT_URL
         = "http://sourceforge.net/projects/freecol/";
 
-
     /**
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public AboutPanel(FreeColClient freeColClient) {
-        super(freeColClient, new MigLayout("wrap 2"));
+        super(freeColClient, new MigLayout("wrap"));
 
         // Header with image
         Image tempImage = ResourceManager.getImage("TitleImage");
@@ -67,38 +66,38 @@ public final class AboutPanel extends FreeColPanel {
             JLabel logoLabel = new JLabel(new ImageIcon(tempImage));
             logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,2,2),
                     new BevelBorder(BevelBorder.LOWERED)));
-            add(logoLabel, "span, center");
+            add(logoLabel, "center");
         }
-
+        
         // version and links
         add(GUI.localizedLabel("aboutPanel.version"), "newline 20");
-        add(new JLabel(FreeCol.getRevision()));
+        add(new JLabel(FreeCol.getRevision()), "newline");
 
-        add(GUI.localizedLabel("aboutPanel.officialSite"));
+        add(GUI.localizedLabel("aboutPanel.officialSite"), "newline 10");
         JButton site = GUI.getLinkButton(SITE_URL, null, SITE_URL);
         site.addActionListener(this);
-        add(site);
+        add(site, "newline");
 
-        add(GUI.localizedLabel("aboutPanel.sfProject"));
+        add(GUI.localizedLabel("aboutPanel.sfProject"), "newline 10");
         JButton project = GUI.getLinkButton(PROJECT_URL, null, PROJECT_URL);
         project.addActionListener(this);
-        add(project);
+        add(project, "newline");
 
         // license disclaimer
         add(GUI.getDefaultTextArea(Messages.message("aboutPanel.legalDisclaimer")),
-            "newline 20, span, growx");
+            "newline 20, width 300px");
 
         // copyright
-        add(GUI.localizedLabel("aboutPanel.copyright"), "span, center");
+        add(GUI.localizedLabel("aboutPanel.copyright"), "newline 10");
 
-        add(okButton, "newline 20, span, tag ok");
+        add(okButton, "newline 20, tag ok");
     }
-
 
     // Interface ActionListener
 
     /**
      * {@inheritDoc}
+     * @param event
      */
     @Override
     public void actionPerformed(ActionEvent event) {
