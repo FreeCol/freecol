@@ -20,7 +20,9 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -63,7 +65,8 @@ public final class Market extends FreeColGameObject implements Ownable {
     private Player owner;
 
     /** Watching listeners.  Do not serialize. */
-    private final ArrayList<TransactionListener> transactionListeners = new ArrayList<>();
+    private final ArrayList<TransactionListener> transactionListeners
+        = new ArrayList<>();
 
 
     /**
@@ -127,6 +130,15 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     // ------------------------------------------------------------ API methods
+
+    /**
+     * Get the market data values.
+     *
+     * @return The market data in this market.
+     */
+    public Collection<MarketData> getMarketData() {
+        return this.marketData.values();
+    }
 
     /**
      * Gets the market data for a type of goods.

@@ -72,6 +72,7 @@ import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.MarketWas;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
@@ -93,7 +94,6 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeLocation;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRouteStop;
-import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -364,7 +364,7 @@ public final class InGameController implements NetworkConstants {
 
         final Player player = carrier.getOwner();
         final Market market = player.getMarket();
-        int price = 0;
+        MarketWas marketWas = (market != null) ? new MarketWas(player) : null;
 
         if (carrier.isInEurope()) {
             // Are the goods boycotted?
@@ -375,18 +375,13 @@ public final class InGameController implements NetworkConstants {
                 gui.showErrorMessage("notEnoughGold");
                 return false;
             }
-            price = market.getCostToBuy(type);
         }
 
         // Try to purchase.
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
         boolean ret = askServer().loadGoods(type, amount, carrier)
             && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount;
-        if (ret && price > 0) {
-            for (TransactionListener l : market.getTransactionListener()) {
-                l.logPurchase(type, amount, price);
-            }
-        }
+        if (ret && marketWas != null) marketWas.fireChanges(type, amount);
         return ret;
     }
 
@@ -415,21 +410,12 @@ public final class InGameController implements NetworkConstants {
         // which can happen anywhere
         final Player player = freeColClient.getMyPlayer();
         final Market market = player.getMarket();
-        int price = 0, tax = 0;
-
-        if (carrier.isInEurope() && player.canTrade(type)) {
-            price = market.getPaidForSale(type);
-            tax = player.getTax();
-        }
+        MarketWas marketWas = (market != null) ? new MarketWas(player) : null;
 
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
         boolean ret = askServer().unloadGoods(type, amount, carrier)
             && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount;
-        if (ret && price > 0) {
-            for (TransactionListener l : market.getTransactionListener()) {
-                l.logSale(type, amount, price, tax);
-            }
-        }
+        if (ret && marketWas != null) marketWas.fireChanges(type, -amount);
         return ret;
     }
 
@@ -3194,6 +3180,7 @@ public final class InGameController implements NetworkConstants {
         final Europe europe = player.getEurope();
         EuropeWas europeWas = (europe != null) ? new EuropeWas(europe) : null;
         final Market market = (europe != null) ? player.getMarket() : null;
+        MarketWas marketWas = (market != null) ? new MarketWas(player) : null;
         int price = -1;
 
         List<AbstractGoods> req = unit.getGoodsDifference(role, roleCount);
@@ -3228,21 +3215,8 @@ public final class InGameController implements NetworkConstants {
             && unit.getRole() == role;
         if (colonyWas != null) colonyWas.fireChanges();
         if (europeWas != null) europeWas.fireChanges();
+        if (marketWas != null) marketWas.fireChanges(req);
         unitWas.fireChanges();
-        if (market != null) {
-            for (AbstractGoods ag : req) {
-                GoodsType type = ag.getType();
-                for (TransactionListener l : market.getTransactionListener()) {
-                    if (ag.getAmount() > 0) {
-                        l.logPurchase(type, ag.getAmount(),
-                                      market.getCostToBuy(type));
-                    } else {
-                        l.logSale(type, -ag.getAmount(),
-                                  market.getPaidForSale(type), player.getTax());
-                    }
-                }
-            }
-        }
         updateControls();
         return ret;
     }
