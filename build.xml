@@ -402,6 +402,7 @@
                         <res id="packsLang.xml_ukr" src="@{freecol.build.dir}/installer/lang.xml_ukr"/>
                     </resources>
                     <native type="izpack" name="ShellLink.dll"/>
+                    <native type="izpack" name="ShellLink_x64.dll"/>
                     <panels>
                         <panel classname="HelloPanel"/>
                         <panel classname="LicencePanel"/>
