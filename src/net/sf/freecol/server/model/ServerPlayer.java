@@ -208,8 +208,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 this.europe = new ServerEurope(game, this);
                 initializeHighSeas();
                 if (this.playerType == PlayerType.COLONIAL) {
-                    this.monarch = new Monarch(game, this,
-                                               nation.getRulerNameKey());
+                    this.monarch = new Monarch(game, this);
                     // In BR#2615 misiulo reports that Col1 players start
                     // with 2 crosses.  This is surprising, but you could
                     // argue that some level of religious unrest might
@@ -234,10 +233,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
         connected = connection != null;
     }
 
+
     /**
-     * Checks if this player is currently connected to the server.
-     * @return <i>true</i> if this player is currently connected to the server
-     *         and <code>false</code> otherwise.
+     * Is this player is currently connected to the server?
+     *
+     * @return True if this player is currently connected to the server.
      */
     public boolean isConnected() {
         return connected;

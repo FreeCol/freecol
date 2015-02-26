@@ -55,10 +55,12 @@
       <xs:attribute name="ID" type="MonarchId" use="optional"/>
       <!-- end @compat -->
       <xs:attribute name="player" type="PlayerId" use="required"/>
-      <xs:attribute name="nameKey" type="xs:string" use="required"/>
       <!-- @compat 0.11.1 -->
       <xs:attribute name="name" type="xs:string" use="optional"/>
       <!-- end @compat 0.11.1 -->
+      <!-- @compat 0.11.2 -->
+      <xs:attribute name="nameKey" type="xs:string" use="optional"/>
+      <!-- end @compat 0.11.2 -->
       <xs:attribute name="supportSea" type="xs:boolean"
                     use="optional" default="false"/>
       <xs:attribute name="displeasure" type="xs:boolean"

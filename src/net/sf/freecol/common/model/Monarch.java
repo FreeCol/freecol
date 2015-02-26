@@ -274,9 +274,6 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public static final int MINIMUM_TAX_RATE = 20;
 
-    /** The name key of this monarch. */
-    private String nameKey;
-
     /** The player of this monarch. */
     private Player player;
 
@@ -346,9 +343,8 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @param game The enclosing <code>Game</code>.
      * @param player The <code>Player</code> to create the
      *     <code>Monarch</code> for.
-     * @param nameKey The name key of the <code>Monarch</code>.
      */
-    public Monarch(Game game, Player player, String nameKey) {
+    public Monarch(Game game, Player player) {
         super(game);
 
         if (player == null) {
@@ -356,7 +352,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
 
         this.player = player;
-        this.nameKey = nameKey;
 
         final Specification spec = getSpecification();
         UnitListOption op;
@@ -880,7 +875,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * {@inheritDoc}
      */
     public String getNameKey() {
-        return this.nameKey;
+        return this.player.getNation().getRulerNameKey();
     }
 
 
@@ -923,7 +918,6 @@ public final class Monarch extends FreeColGameObject implements Named {
     private static final String EXPEDITIONARY_FORCE_TAG = "expeditionaryForce";
     private static final String INTERVENTION_FORCE_TAG = "interventionForce";
     private static final String MERCENARY_FORCE_TAG = "mercenaryForce";
-    private static final String NAMEKEY_TAG = "nameKey";
     private static final String PLAYER_TAG = "player";
     private static final String SUPPORT_SEA_TAG = "supportSea";
     // @compat 0.11.1
@@ -938,8 +932,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         super.writeAttributes(xw);
 
         xw.writeAttribute(PLAYER_TAG, this.player);
-
-        xw.writeAttribute(NAMEKEY_TAG, nameKey);
 
         if (xw.validFor(this.player)) {
 
@@ -974,15 +966,6 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         player = xr.findFreeColGameObject(getGame(), PLAYER_TAG,
                                           Player.class, (Player)null, true);
-
-        // @compat 0.11.1
-        // Replace with
-        //   nameKey = xr.getAttribute(NAMEKEY_TAG, player.getNation().getRulerNameKey());
-        nameKey = xr.getAttribute(NAMEKEY_TAG, null);
-        if (nameKey == null) {
-            nameKey = xr.getAttribute(NAME_TAG, player.getNation().getRulerNameKey());                                      
-        }
-        // end @compat 0.11.1
 
         supportSea = xr.getAttribute(SUPPORT_SEA_TAG, false);
 
