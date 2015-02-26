@@ -160,8 +160,9 @@ public final class CornerMapControls extends MapControls {
         try {
             canvas.add(component, CONTROLS_LAYER);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Component add fail: "
-                + component.getLocation() + " in " + canvas.getSize(), e);
+            logger.log(Level.WARNING, "Component add: " + component.getSize()
+                + " at " + component.getLocation()
+                + " in " + canvas.getSize(), e);
         }
     }
 
