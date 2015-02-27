@@ -504,17 +504,17 @@ public final class InGameController extends Controller {
         return reply;
     }
 
-
     /**
-     * Get a list of all server players, optionally excluding supplied ones.
+     * Get a list of all live server players, optionally excluding
+     * supplied ones.
      *
      * @param serverPlayers The <code>ServerPlayer</code>s to exclude.
      * @return A list of all connected server players, with exclusions.
      */
-    private List<ServerPlayer> getOtherPlayers(ServerPlayer... serverPlayers) {
+    private List<ServerPlayer> getOtherLivePlayers(ServerPlayer... serverPlayers) {
         List<ServerPlayer> result = new ArrayList<>();
         outer: for (Player otherPlayer : getGame().getLivePlayers(null)) {
-            ServerPlayer enemyPlayer = (ServerPlayer) otherPlayer;
+            ServerPlayer enemyPlayer = (ServerPlayer)otherPlayer;
             if (!enemyPlayer.isConnected()) continue;
             for (ServerPlayer exclude : serverPlayers) {
                 if (enemyPlayer == exclude) continue outer;
@@ -525,14 +525,20 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Send a set of changes to all players.
+     * Send a set of changes to all live players, and optional extras.
      *
+     * @param serverPlayer Optional extra <code>ServerPlayer</code>s
+     *     to include (useful when a player dies).
      * @param cs The <code>ChangeSet</code> to send.
      */
-    private void sendToAll(ChangeSet cs) {
-        sendToList(getOtherPlayers(), cs);
+    private void sendToAll(ChangeSet cs, ServerPlayer... serverPlayers) {
+        List<ServerPlayer> live = getOtherLivePlayers();
+        for (ServerPlayer sp : serverPlayers) {
+            if (!live.contains(sp)) live.add(sp);
+        }
+        sendToList(live, cs);
     }
-
+    
 
     /**
      * Send an update to all players except one.
@@ -541,7 +547,7 @@ public final class InGameController extends Controller {
      * @param cs The <code>ChangeSet</code> encapsulating the update.
      */
     private void sendToOthers(ServerPlayer serverPlayer, ChangeSet cs) {
-        sendToList(getOtherPlayers(serverPlayer), cs);
+        sendToList(getOtherLivePlayers(serverPlayer), cs);
     }
 
     /**
@@ -552,7 +558,7 @@ public final class InGameController extends Controller {
      * @param element An <code>Element</code> to send.
      */
     private void sendToOthers(ServerPlayer serverPlayer, Element element) {
-        sendToList(getOtherPlayers(serverPlayer), element);
+        sendToList(getOtherLivePlayers(serverPlayer), element);
     }
 
     /**
@@ -712,17 +718,18 @@ public final class InGameController extends Controller {
             switch (player.checkForDeath()) {
             case ServerPlayer.IS_DEAD:
                 player.csWithdraw(cs);
-                sendToAll(cs);
-                logger.info(player.getNation() + " is dead.");
+                logger.info("For " + serverPlayer.getSuffix()
+                    + ", " + player.getNation() + " is dead.");
+                sendToAll(cs, player);
                 continue;
             case ServerPlayer.IS_ALIVE:
                 if (player.isREF() && player.checkForREFDefeat()) {
                     for (Player p : player.getRebels()) {
-                        csGiveIndependence(player, (ServerPlayer) p, cs);
+                        csGiveIndependence(player, (ServerPlayer)p, cs);
                     }
                     player.csWithdraw(cs);
-                    sendToAll(cs);
                     logger.info(player.getNation() + " is defeated.");
+                    sendToAll(cs, player);
                     continue;
                 }
                 break;
@@ -742,6 +749,7 @@ public final class InGameController extends Controller {
                 }
             }
             if (!human) {
+                logger.info("No human player left.");
                 if (debugOnlyAITurns > 0) { // Complete debug runs
                     FreeColDebugger.signalEndDebugRun();
                 }
@@ -826,7 +834,7 @@ public final class InGameController extends Controller {
                 sendElement(player, cs);
                 continue;
             }
-            sendToList(getOtherPlayers(player, serverPlayer), cs);
+            sendToList(getOtherLivePlayers(player, serverPlayer), cs);
             if (player != serverPlayer) sendElement(player, cs);
             return cs.build(serverPlayer);
         }
@@ -2839,7 +2847,7 @@ public final class InGameController extends Controller {
             settlement.equipForRole(unit, spec.getDefaultRole(), 0);
 
             // Coronado
-            for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
+            for (ServerPlayer sp : getOtherLivePlayers(serverPlayer)) {
                 if (!sp.hasAbility(Ability.SEE_ALL_COLONIES)) continue;
                 cs.add(See.only(sp), sp.exploreForSettlement(settlement));//-vis(sp)
                 sp.invalidateCanSeeTiles();//+vis(sp)
@@ -2972,7 +2980,7 @@ public final class InGameController extends Controller {
 
         if (settlement != null && serverPlayer.isEuropean()) {
             // Define Coronado to make all colony-owned tiles visible
-            for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
+            for (ServerPlayer sp : getOtherLivePlayers(serverPlayer)) {
                 if (sp.isEuropean()
                     && sp.hasAbility(Ability.SEE_ALL_COLONIES)) {
                     sp.exploreTile(tile);
@@ -4233,6 +4241,12 @@ public final class InGameController extends Controller {
                                             true, cs);
             }
         }
+
+        // Revenge begins
+        game.setCurrentPlayer(serverPlayer);
+        cs.addTrivial(See.all(), "setCurrentPlayer",
+                      ChangePriority.CHANGE_LATE,
+                      "player", serverPlayer.getId());
 
         // Others can tell something has happened to the player,
         // and possibly see the units.

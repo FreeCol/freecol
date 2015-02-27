@@ -230,11 +230,10 @@ public class ServerGame extends Game implements ServerModelObject {
         final Specification spec = getSpecification();
         Event succession = spec.getEvent("model.event.spanishSuccession");
         if (succession != null && !getSpanishSuccession()) {
-            Limit yearLimit
-                = succession.getLimit("model.limit.spanishSuccession.year");
-            if (yearLimit.evaluate(this)) {
-                csSpanishSuccession(cs, lb, succession);
-            }
+            ServerPlayer loser = csSpanishSuccession(cs, lb, succession);
+            // TODO: send update to loser.  It will not see anything
+            // because it is no longer a live player.
+            // if (loser != null) sendElement(loser, cs);
         }
     }
 
@@ -247,8 +246,15 @@ public class ServerGame extends Game implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      * @param lb A <code>LogBuilder</code> to log to.
      * @param event The Spanish Succession <code>Event</code>.
+     * @return The <code>ServerPlayer</code> that is eliminated if
+     *     any, or null if none found.
      */
-    private void csSpanishSuccession(ChangeSet cs, LogBuilder lb, Event event) {
+    private ServerPlayer csSpanishSuccession(ChangeSet cs, LogBuilder lb,
+                                             Event event) {
+        Limit yearLimit
+            = event.getLimit("model.limit.spanishSuccession.year");
+        if (!yearLimit.evaluate(this)) return null;
+
         Limit weakLimit
             = event.getLimit("model.limit.spanishSuccession.weakestPlayer");
         Limit strongLimit
@@ -265,7 +271,7 @@ public class ServerGame extends Game implements ServerModelObject {
                     Integer.valueOf(player.getSpanishSuccessionScore()));
             }
         }
-        if (!ready) return; // No player meets the support limit.
+        if (!ready) return null; // No player meets the support limit.
 
         int bestScore = Integer.MIN_VALUE;
         int worstScore = Integer.MAX_VALUE;
@@ -285,7 +291,7 @@ public class ServerGame extends Game implements ServerModelObject {
         }
         if (weakestAIPlayer == null
             || strongestAIPlayer == null
-            || weakestAIPlayer == strongestAIPlayer) return;
+            || weakestAIPlayer == strongestAIPlayer) return null;
 
         lb.add("Spanish succession scores[");
         for (Entry<Player, Integer> entry : scores.entrySet()) {
@@ -369,6 +375,8 @@ public class ServerGame extends Game implements ServerModelObject {
                     + " fcgo: " + fcgo);
             }
         }
+
+        return weakest;
     }
 
     /**
