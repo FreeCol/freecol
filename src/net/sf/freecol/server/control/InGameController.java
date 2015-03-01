@@ -927,20 +927,16 @@ public final class InGameController extends Controller {
         // Who surrenders?
         List<Unit> surrenderUnits = new ArrayList<>();
         for (Unit u : serverPlayer.getUnits()) {
-            if (!u.isNaval() && !u.isOnCarrier() && !u.isInEurope()) {
+            if (u.hasTile() && !u.isNaval() && !u.isOnCarrier()
+                && serverPlayer.csChangeOwner(u, independent,
+                    ChangeType.CAPTURE, null, cs)) {//-vis(both)
+                u.setMovesLeft(0);
+                u.setState(Unit.UnitState.ACTIVE);
+                cs.add(See.perhaps().always(serverPlayer), u.getTile());
                 surrenderUnits.add(u);
             }
         }
         if (!surrenderUnits.isEmpty()) {
-            for (Unit u : surrenderUnits) {
-                Tile oldTile = u.getTile();
-                if (serverPlayer.csChangeOwner(u, independent,
-                        ChangeType.CAPTURE, null, cs)) {//-vis(both)
-                    u.setMovesLeft(0);
-                    u.setState(Unit.UnitState.ACTIVE);
-                    cs.add(See.perhaps().always(serverPlayer), oldTile);
-                }
-            }
             cs.addMessage(See.only(independent),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                     "model.player.independence.unitsAcquired", independent)
