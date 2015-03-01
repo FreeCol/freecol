@@ -342,8 +342,8 @@ public class HighScore extends FreeColObject {
      * @return True if the given score can be added to the list.
      */
     public static boolean checkHighScore(int score, List<HighScore> scores) {
-        return !FreeColDebugger.isInDebugMode()
-            && score >= 0
+        return /*!FreeColDebugger.isInDebugMode()
+                 && */score >= 0
             && (scores.size() < NUMBER_OF_HIGH_SCORES
                 || score > scores.get(scores.size()-1).getScore());
     }
@@ -494,7 +494,8 @@ public class HighScore extends FreeColObject {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // HighScores do not have ids, no super.writeAttributes().
 
-        xw.writeAttribute(DATE_TAG, date.getTime());
+        long l = date.getTime();
+        xw.writeAttribute(DATE_TAG, l);
 
         xw.writeAttribute(RETIREMENT_TURN_TAG, retirementTurn);
 
@@ -532,21 +533,37 @@ public class HighScore extends FreeColObject {
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // HighScores do not have ids, no super.readAttributes().
 
-        long l = xr.getAttribute(DATE_TAG, -1L);
-        date = (l >= 0L) ? new Date(l) : new Date();
+        date = null;
+        try {
+            long l = xr.getAttribute(DATE_TAG, -1L);
+            if (l >= 0) date = new Date(l);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Bad long date", e);
+        }
+        // Early 0.11.x had a bug that wrote date as a float
+        if (date == null) {
+            try {
+                float f = xr.getAttribute(DATE_TAG, -1.0f);
+                if (f >= 0.0 && f < Long.MAX_VALUE) {
+                    date = new Date(new Float(f).longValue());
+                }
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Bad float date", e);
+            }
+        } 
         // @compat 0.10.x
         // Serializing the long as of 0.11.x
-        if (l < 0L) {
+        if (date == null) {
             String str = xr.getAttribute(DATE_TAG, "2014-07-01 00:00:00+0000");
             try {
                 date = dateFormat.parse(str);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Bad date: " + str, e);
-                date = new Date();
             }
         }
         // end @compat
-
+        if (date == null) date = new Date(); // Give up
+        
         retirementTurn = xr.getAttribute(RETIREMENT_TURN_TAG, 0);
 
         independenceTurn = xr.getAttribute(INDEPENDENCE_TURN_TAG, 0);

@@ -288,6 +288,17 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     }
 
     /**
+     * Write a long attribute to the stream.
+     *
+     * @param attributeName The attribute name.
+     * @param value A long to write.
+     * @exception XMLStreamException if a write error occurs.
+     */
+    public void writeAttribute(String attributeName, long value) throws XMLStreamException {
+        xmlStreamWriter.writeAttribute(attributeName, String.valueOf(value));
+    }
+
+    /**
      * Write an enum attribute to the stream.
      *
      * @param attributeName The attribute name.
