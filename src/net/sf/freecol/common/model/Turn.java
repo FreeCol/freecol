@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.i18n.Messages;
+
 
 /**
  * Represents a given turn in the game.
@@ -26,25 +28,54 @@ package net.sf.freecol.common.model;
 public class Turn {
 
     /**
-     * The season.  Not distingished before 1600, then split into
-     * SPRING and AUTUMN.
+     * The season.  Normally not distingished before 1600, then split
+     * into SPRING and AUTUMN.
      */
-    public static enum Season { YEAR, SPRING, AUTUMN }
+    public static enum Season implements Named {
+        YEAR,
+        SPRING,
+        AUTUMN;
 
-    /** The year in which the game starts. */
-    private static int startingYear = 1492;
 
-    /** The first year in which there are two seasons. */
-    private static int seasonYear = 1600;
+        /**
+         * Get the suffix for a save game name for a turn with this season.
+         *
+         * @return The save game suffix.
+         */
+        public String getSaveGameSeasonSuffix() {
+            switch (this) {
+            case YEAR:
+                break;
+            case SPRING:
+                return "_1_" + Messages.getName(this);
+            case AUTUMN:
+                return "_2_" + Messages.getName(this);
+            }
+            return "";
+        }
+        
+        // Interface Named
+
+        /**
+         * {@inheritDoc}
+         */
+        public String getNameKey() {
+            return "season." + toString();
+        }
+    }
 
     /**
      * The first years of the "ages" of the game, which are only used
      * for weighting {@link FoundingFather}s.
      */
-    private static final int[] ages = {
-        1492, 1600, 1700
-    };
+    private static final int[] ages = { 1492, 1600, 1700 };
 
+    /** Index in ages of the starting year. */
+    private static final int STARTING_YEAR_INDEX = 0;
+
+    /** Index in ages of the year the seasons begin. */
+    private static final int SEASON_YEAR_INDEX = 1;
+    
     /**
      * The number of ages.
      * Used by FoundingFather for age-dependent weights.
@@ -86,10 +117,10 @@ public class Turn {
      */
     public static int yearToTurn(int year, Season season) {
         int turn = 1;
-        if (year >= startingYear) {
-            turn += year - startingYear;
-            if (year >= seasonYear) {
-                turn += (year - seasonYear);
+        if (year >= getStartingYear()) {
+            turn += year - getStartingYear();
+            if (year >= getSeasonYear()) {
+                turn += (year - getSeasonYear());
                 if (season == Season.AUTUMN) {
                     turn++;
                 }
@@ -153,9 +184,9 @@ public class Turn {
      * @return The calculated year based on the turn number.
      */
     public static int getYear(int turn) {
-        int year = turn - 1 + startingYear;
-        return (year < seasonYear) ? year
-            : seasonYear + (year - seasonYear)/2;
+        int year = turn - 1 + getStartingYear();
+        return (year < getSeasonYear()) ? year
+            : getSeasonYear() + (year - getSeasonYear())/2;
     }
 
     /**
@@ -165,10 +196,9 @@ public class Turn {
      * @return The season corresponding to the turn number.
      */
     public static Season getSeason(int turn) {
-        int year = turn - 1 + startingYear;
-        return (year < seasonYear) ? Season.YEAR
-            : (year % 2 == 0) ? Season.SPRING
-            : Season.AUTUMN;
+        int year = turn - 1 + getStartingYear();
+        return (year < getSeasonYear()) ? Season.YEAR
+            : (year % 2 == 0) ? Season.SPRING : Season.AUTUMN;
     }
 
     /**
@@ -196,8 +226,12 @@ public class Turn {
      * @return A <code>StringTemplate</code> describing the turn.
      */
     public static StringTemplate getLabel(int turn) {
-        return StringTemplate.template("year." + getSeason(turn))
-            .addAmount("%year%", getYear(turn));
+        Season season = getSeason(turn);
+        StringTemplate t = StringTemplate.label("");
+        t.add(season.getNameKey());
+        if (season != Season.YEAR) t.addName(" ");
+        t.addName(Integer.toString(getYear(turn)));
+        return t;
     }
 
     /**
@@ -206,7 +240,7 @@ public class Turn {
      * @return The numeric value of the starting year.
      */
     public static final int getStartingYear() {
-        return startingYear;
+        return ages[STARTING_YEAR_INDEX];
     }
 
     /**
@@ -215,7 +249,7 @@ public class Turn {
      * @param newStartingYear The new starting year value.
      */
     public static final void setStartingYear(final int newStartingYear) {
-        startingYear = newStartingYear;
+        ages[STARTING_YEAR_INDEX] = newStartingYear;
     }
 
     /**
@@ -224,7 +258,7 @@ public class Turn {
      * @return The numeric value of the season year.
      */
     public static final int getSeasonYear() {
-        return seasonYear;
+        return ages[SEASON_YEAR_INDEX];
     }
 
     /**
@@ -233,7 +267,7 @@ public class Turn {
      * @param newSeasonYear The new season year value.
      */
     public static final void setSeasonYear(final int newSeasonYear) {
-        seasonYear = newSeasonYear;
+        ages[SEASON_YEAR_INDEX] = newSeasonYear;
     }
 
     /**
@@ -251,14 +285,14 @@ public class Turn {
      * @return True if this turn is the season year.
      */
     public boolean isFirstSeasonTurn() {
-        return turn == yearToTurn(seasonYear, Season.SPRING);
+        return turn == yearToTurn(getSeasonYear(), Season.SPRING);
     }
 
     /**
      * Gets a non-localized string representation of the given turn.
      *
-     * @return A string with the format: "<i>season year</i>".
-     *     Examples: "SPRING 1602", "YEAR 1503"...
+     * @return A string with the format: "<i>season year</i>", such as
+     *     "SPRING 1602", "YEAR 1503"...
      */
     public static String toString(int turn) {
         return getSeason(turn) + " " + Integer.toString(getYear(turn));

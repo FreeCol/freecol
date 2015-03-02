@@ -434,21 +434,11 @@ public final class InGameController implements NetworkConstants {
         final Player player = freeColClient.getMyPlayer();
         final String gid = Integer.toHexString(game.getUUID().hashCode());
         final Turn turn = game.getTurn();
-        String turnString = Integer.toString(turn.getYear());
-        switch (turn.getSeason()) {
-        case SPRING:
-            turnString += "_1_" + Messages.message("spring");
-            break;
-        case AUTUMN:
-            turnString += "_2_" + Messages.message("autumn");
-            break;
-        case YEAR: default:
-            break;
-        }
-
-        String fileName = /* player.getName() + "_" */ gid + "_"
-            + Messages.message(player.getNationName()) + "_" + turnString;
-        return fileName.replaceAll(" ", "_");
+        return (/* player.getName() + "_" */ gid
+            + "_" + Messages.message(player.getNationName())
+            + "_" + Integer.toString(turn.getYear())
+            + turn.getSeason().getSaveGameSeasonSuffix())
+            .replaceAll(" ", "_");
     }
 
     /**
