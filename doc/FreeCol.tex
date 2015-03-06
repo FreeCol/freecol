@@ -1,4 +1,15 @@
-\newcommand{\fcversion}{0.11.2}
+\documentclass[12pt]{book}
+\usepackage{version}
+\usepackage[T1]{fontenc}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{index}
+\usepackage[
+  colorlinks=true,
+  hyperindex=true,
+  pdftitle={FreeCol Documentation, User Guide for Version v\fcversion},
+  pdfauthor={The FreeCol Team}
+]{hyperref}
 \newcommand{\Goods}[1]{\index{#1}\index{Goods!#1}\hypertarget{#1}{\textbf{#1}}}
 \newcommand{\Terrain}[1]{\index{#1}\index{Terrain!#1}\hypertarget{#1}{\textbf{#1}}}
 \newcommand{\Unit}[1]{\index{#1}\index{Units!#1}\hypertarget{#1}{\textbf{#1}}}
@@ -11,17 +22,6 @@
 \newcommand{\Wikipedia}[1]{\href{http://en.wikipedia.org/wiki/#1}%
 {\includegraphics[scale=0.6]{images/wikipedia.png}}}
 
-\documentclass[12pt]{book}
-\usepackage[T1]{fontenc}
-\usepackage{longtable}
-\usepackage{graphicx}
-\usepackage{index}
-\usepackage[
-  colorlinks=true,
-  hyperindex=true,
-  pdftitle={FreeCol Documentation, User Guide for Version v\fcversion},
-  pdfauthor={The FreeCol Team}
-]{hyperref}
 \makeindex
 
 \begin{document}
