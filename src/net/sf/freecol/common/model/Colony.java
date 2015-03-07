@@ -2813,6 +2813,13 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     //
 
     /**
+     * Add port ability to non-landlocked colonies.
+     */
+    protected void addPortAbility() {
+        addAbility(new Ability(Ability.HAS_PORT));
+    }
+    
+    /**
      * Check the integrity of the build queues.  Catches build fails
      * due to broken requirements.
      *
@@ -2866,7 +2873,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         // @compat 0.10.x
         if (!isLandLocked() && !hasAbility(Ability.HAS_PORT)) {
             if (fix) {
-                addAbility(new Ability(Ability.HAS_PORT));
+                addPortAbility();
                 result = Math.min(result, 0);
             } else {
                 result = -1;
@@ -2951,17 +2958,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             Collections.sort(keys);
             for (String key : keys) {
                 exportData.get(key).toXML(xw);
-            }
-
-            // Only write the features that need specific instantiation,
-            // which is currently only those with increments.
-            // Fixed features will be added from their origins (usually
-            // buildings).
-            Turn turn = getGame().getTurn();
-            for (Modifier modifier : getSortedModifiers()) {
-                if (modifier.hasIncrement() && !modifier.isOutOfDate(turn)) {
-                    modifier.toXML(xw);
-                }
             }
 
             for (WorkLocation workLocation : getSortedCopy(getAllWorkLocations())) {

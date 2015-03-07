@@ -279,7 +279,8 @@ public abstract class Feature extends FreeColObject implements Named {
     public boolean isIndependent() {
         if (source instanceof BuildingType
             || source instanceof FoundingFather
-            || source instanceof NationType) return false;
+            || source instanceof NationType
+            || source instanceof SettlementType) return false;
         return true;
     }
 
