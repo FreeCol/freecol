@@ -527,7 +527,7 @@ public final class InGameController extends Controller {
     /**
      * Send a set of changes to all live players, and optional extras.
      *
-     * @param serverPlayer Optional extra <code>ServerPlayer</code>s
+     * @param serverPlayers Optional extra <code>ServerPlayer</code>s
      *     to include (useful when a player dies).
      * @param cs The <code>ChangeSet</code> to send.
      */
