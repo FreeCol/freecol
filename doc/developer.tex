@@ -340,7 +340,16 @@ that code indentations result in the insertion of 4 spaces, and avoid
 using tabs.
 
 
-\hypertarget{How to build a FreeCol release}{\chapter{How to build a FreeCol release}}
+\hypertarget{How to build a FreeCol release}{\chapter{How to make a FreeCol release}}
+
+You will obviously need to have installed \texttt{ant} to do the
+build, and \texttt{git} to make the commits, however this will be
+normal for a developer.  To generate the online manual you will also
+need \texttt{htlatex}, and \texttt{pdflatex} for the print manual.
+You can avoid these requirements by setting the ant properties
+\texttt{online.manual.is.up.to.date} and
+\texttt{print.manual.is.up.to.date} respectively, however this is not
+recommended for a release.
 
 \begin{itemize}
 
@@ -361,7 +370,7 @@ using tabs.
   match the release version.
 
 \item Likewise, change the value of the \verb+fcversion+ macro in
-  doc/FreeCol.tex to the release version.
+  \texttt{doc/version.sty} to the release version.
 
 \item Start a clean compile, run all tests and verify the
   specification(s). You can do that by calling \verb+ant prepare-commit+.
@@ -443,22 +452,6 @@ FILE
 
 \item Post a news item on the FreeCol project \href{https://sourceforge.net/p/freecol/news/}{news} page on sourceforge.
 
-
-\end{itemize}
-
-The following items can be omitted for unstable releases:
-
-\begin{itemize}
-
-\item Go to the bug tracker and create a new milestone (``Edit
-  Milestones'') called ``Fixed\_\emph{release}''
-  (e.g. ``Fixed\_0.10.2'').  Select the ``Fixed\_trunk'' group and do
-  a mass edit (the pencil icon in the top right of the bug tracker
-  list) and move all bugs to the new milestone.
-
-\item Do the corresponding action in other ticket categories that
-  have distinct release milestones.
-
 \item Regenerate the documentation (with \verb+ant manual+) and
   JavaDoc (with \verb+ant javadoc+) and update JavaDoc and User
   Documentation on \href{freecol.org}{freecol.org}. You can do that
@@ -482,94 +475,50 @@ cd doc
 
 \end{verbatim}
 
-Note that generating FreeCol.html requires \verb+htlatex+
-to be installed.
-
+%% Omitting the following for now.  It will need to be revised if we
+%% start doing unstable releases again.
+%
+%The following items can be omitted for unstable releases:
+%
+%\begin{itemize}
+%
+%\item Go to the bug tracker and create a new milestone (``Edit
+%  Milestones'') called ``Fixed\_\emph{release}''
+%  (e.g. ``Fixed\_0.10.2'').  Select the ``Fixed\_trunk'' group and do
+%  a mass edit (the pencil icon in the top right of the bug tracker
+%  list) and move all bugs to the new milestone.
+%
+%\item Do the corresponding action in other ticket categories that
+%  have distinct release milestones.
+%
 %\item Create news items at \href{Linuxgames.com}{Linuxgames.com},
 %  \href{linux-gamers.com}{linux-gamers.com} and
 %  \href{happypenguin.org}{happypenguin.org}.
 
 \end{itemize}
 
-
 \hypertarget{Missing features}{\chapter{Missing features}}
 
 We know that FreeCol does not yet emulate all features of the original
-game. In particular, the initial contact with other nations differs
-considerably from that in the original game. At some point, we will
-fix this, as far AI players are concerned. In a multi-player game,
-however, European nations played by other humans will never behave
-like the AI nations in the original game.
+game.  However there are several features which are inevitably
+different to Colonization due to FreeCol being a multiplayer game ---
+interactions with other European players being the obvious example.
+Similarly we do not attempt to exactly emulate the graphical look and
+feel of Colonization, although no displayed information should be lost.
 
-Other missing features include the intervention force. You can report
-any missing feature as a bug.
+Otherwise, any missing feature from Colonization is considered to be a
+bug.  Please report such omissions on the
+\href{https://sourceforge.net/p/freecol/pending-features-for-freecol/}{pending
+  features} tracker.
 
 Since we do not have access to the source code of the original game,
-we can only guess at the algorithms used to calculate production,
-combat results, bells required to elect a founding father and so
-on. In some cases, players have reverse-engineered the algorithm. If
-you know of some calcuation in FreeCol that differs from that of the
-original game, please tell us about it.
-
-We know that the calculation of the player's score differs from that
-of Colonization, and we will fix that issue.
-
-We also know that the calculation of production differs, but we lack
-the necessary data to fix the issue. If you have further information,
-please contribute by telling us about your conclusions.
-
-
-\hypertarget{Colonization production reports}
-            {\section{Colonization production reports}}
-
-
-All production numbers are given for colonists and experts for the
-production of the goods (col/ex). When adding to the list, please give
-all relevant data, particularly the difficulty level, production bonus
-of the colony and all relevant founding fathers.
-
-\begin{itemize}
-
-\item Difficulty: viceroy, colony production bonus: 0
-
-\begin{tabular}{lr@{ / }r}
-Food production:\\
-
-Hills: & 2 & 4\\
-Conifer forest: & 2 & 4\\
-Broadleaf forest: & 2 & 4\\
-\bigskip
-Plains / minor river / plowed: & 7 & 9\\
-
-
-Lumber production:\\
-
-Conifer forest: & 6 & 12\\
-Broadleaf forest: & 4 & 8\\
-Conifer forest / road: & 8 & 14\\
-\end{tabular}
-
-
-\item Difficulty viceroy, colony production bonus: 1
-
-\begin{tabular}{lr@{ / }r}
-Food production:\\
-
-Hills: & 3 & 6\\
-Conifer forest: & 3 & 6\\
-Broadleaf forest: & 3 & 6\\
-\bigskip
-Plains / minor river / plowed: & 8 & 11\\
-
-Lumber production:\\
-
-Conifer forest: & 8 & 16\\
-Broadleaf forest: & 6 & 12\\
-Conifer forest / road: & 10 & 18\\
-\end{tabular}
-
-\end{itemize}
-
+we can only guess at the algorithms used.  This is particularly clear
+in complex, detailed areas such as production and combat.  In some
+cases, players have reverse-engineered the algorithm.  If you know of
+some calcuation in FreeCol that differs from that of the original
+game, please tell us about it.  There is an effort underway to
+completely document Colonization's production amounts
+\href{https://sourceforge.net/p/freecol/wiki/WWC1D%20-%20resource%20output%20v2/}{here}.
 
 
 \hypertarget{Changing the Rules}{\chapter{Changing the Rules}}
@@ -579,10 +528,14 @@ becomes capable of emulating many similar games. For this purpose,
 we have made many of the game's features configurable.
 
 At some point in the future, we will probably add a special rule set
-editor, but at the moment, your only option is to edit the file
+editor, but at the moment, the most effective option is to edit the file
 specification.xml directly. This file defines the abilities of units,
 founding fathers, buildings, terrain types, goods and equipment, for
-example. You can find this file in the \textit{data/freecol} directory.
+example. You can find this file in the \textit{data/freecol}
+directory.  Try to avoid overriding the base Colonization-compatible
+rules in \textit{data/classic}.  For a small self-contained rule
+change, another option is to build a \emph{mod} --- see the Mods
+section following.
 
 This is still work in progress, however, and the schema for the rule
 set certain to change again in the future. If you wish to develop your
@@ -608,13 +561,13 @@ the result with the command \verb$ant validate$.
 \hypertarget{Modifiers and Abilities}{\section{Modifiers and Abilities}}
 
 Most of the objects defined by the rule set can be customized via
-modifiers and abilities.  Abilities are boolean values (``true'' or
-``false''). If the value is not explicitly stated, it defaults to
-true. If an ability is not present, it defaults to false. Modifiers
-define a bonus or penalty to be applied to a numeric value, such as
-the number of goods produced by a unit. The modifier may be an
-additive, multiplicative or a percentage modifier. Modifiers default
-to ``identity'', which means they have no effect.
+modifiers and abilities.  Abilities are usually boolean values
+(``true'' or ``false''). If the value is not explicitly stated, it
+defaults to true. If an ability is not present, it defaults to
+false. Modifiers define a bonus or penalty to be applied to a numeric
+value, such as the number of goods produced by a unit. The modifier
+may be an additive, multiplicative or a percentage modifier. Modifiers
+default to ``identity'', which means they have no effect.
 
 The code also checks that all abilities and modifiers it uses are
 defined by the specification. Therefore, you must define all of them,
@@ -637,6 +590,7 @@ in the case of an additive modifier.
 \newcommand{\affectsTile}{\\\textit{Affects: Tile\\Provided by:
     Tile Type}}
 
+TODO: This section is out of date (version 0.11.2).
 
 \ability{model.ability.addTaxToBells}
 \affectsPlayer
