@@ -49,7 +49,8 @@ public class ProductionCache {
         = new TypeCountMap<>();
 
     /** A map of production info for various producers and consumers. */
-    private final Map<Object, ProductionInfo> productionAndConsumption = new HashMap<>();
+    private final Map<Object, ProductionInfo> productionAndConsumption
+        = new HashMap<>();
 
     /** A set of the goods used by the colony. */
     private final Set<GoodsType> goodsUsed = new HashSet<>();

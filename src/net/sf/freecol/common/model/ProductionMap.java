@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
@@ -140,7 +141,18 @@ public class ProductionMap {
             return null;
         }
 
-
+        /**
+         * {@inheritDoc}
+         */
+        public String toString() {
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("[").append(root.getSuffix()).append(":");
+            for (AbstractGoods ag : leafs) {
+                sb.append(" ").append(ag.toString());
+            }
+            sb.append(" ]");
+            return sb.toString();
+        }
     }
 
 
@@ -210,4 +222,17 @@ public class ProductionMap {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[");
+        for (Entry<GoodsType, Object> e : cache.entrySet()) {
+            sb.append(" ").append(e.getKey().getSuffix())
+                .append(":").append(e.getValue().toString());
+        }
+        sb.append(" ]");
+        return sb.toString();
+    }
 }

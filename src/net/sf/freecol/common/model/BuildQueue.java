@@ -168,7 +168,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
      * Return the <code>ProductionInfo</code> for this BuildQueue.
      *
      * @param input A list of input <code>AbstractGoods</code>.
-     * @return The <code>ProductionInfo</code> for this BuildQueue
+     * @return The <code>ProductionInfo</code> for this BuildQueue.
      */
     public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();
@@ -176,7 +176,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         if (current != null) {
             // ATTENTION: this code presupposes that we will consume
             // all required goods at once
-            boolean overflow = colony.getSpecification()
+            final boolean overflow = colony.getSpecification()
                 .getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW);
             List<AbstractGoods> consumption = new ArrayList<>();
             for (AbstractGoods ag : current.getRequiredGoods()) {
