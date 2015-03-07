@@ -71,6 +71,9 @@ public final class FreeCol {
 
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
+    /** The FreeCol release version number. */
+    private static final String FREECOL_VERSION = "0.11.3";
+
     /** The difficulty levels. */
     public static final String[] DIFFICULTIES = {
         "veryEasy", "easy", "medium", "hard", "veryHard"
@@ -96,8 +99,9 @@ public final class FreeCol {
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
 
-    private static final String FREECOL_VERSION = "0.11.2";
+    /** Specific revision number (currently the git tag of trunk at release) */
     private static String       FREECOL_REVISION;
+
 
     // Cli defaults.
     private static final Advantages ADVANTAGES_DEFAULT = Advantages.SELECTABLE;
