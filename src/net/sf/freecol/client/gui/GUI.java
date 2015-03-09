@@ -292,9 +292,6 @@ public class GUI {
     /** Bold version of the default font. */
     public static final Font DEFAULT_BOLD_FONT
         = DEFAULT_FONT.deriveFont(Font.BOLD);
-    /** Single use font for damaged unit in UnitLabel */
-    public static final Font LESS_TINY_DEFAULT_FONT
-        = ResourceManager.getFont("NormalFont", 14f);
     /** Simple fonts for arrows, labels in panels etc. */
     public static final Font TINY_SIMPLE_FONT
         = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
