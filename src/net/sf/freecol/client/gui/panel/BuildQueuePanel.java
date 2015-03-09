@@ -878,6 +878,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         // Update the construction panel
         if (current.getSize() > 0) {
             this.constructionPanel.update(current.getElementAt(0));
+        } else if (current.getSize() == 0) {
+            this.constructionPanel.update(); // generates Building: Nothing
         }
     }
 
