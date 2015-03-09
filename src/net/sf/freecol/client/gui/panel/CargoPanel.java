@@ -215,17 +215,16 @@ public class CargoPanel extends FreeColPanel
                 }
 
             } else if (comp instanceof GoodsLabel) {
-                Goods goods = ((GoodsLabel) comp).getGoods();
+                Goods goods = ((GoodsLabel)comp).getGoods();
                 int loadableAmount = carrier.getLoadableAmount(goods.getType());
-                if (loadableAmount == 0) {
-                    return null;
-                } else if (loadableAmount > goods.getAmount()) {
+                if (loadableAmount == 0) return null;
+                if (loadableAmount > goods.getAmount()) {
                     loadableAmount = goods.getAmount();
                 }
-                Goods goodsToAdd = new Goods(goods.getGame(), goods.getLocation(),
-                                             goods.getType(), loadableAmount);
+                Goods toAdd = new Goods(goods.getGame(), goods.getLocation(),
+                                        goods.getType(), loadableAmount);
                 goods.setAmount(goods.getAmount() - loadableAmount);
-                igc().loadCargo(goodsToAdd, carrier);
+                igc().loadCargo(toAdd, carrier);
                 update();
                 return comp;
 

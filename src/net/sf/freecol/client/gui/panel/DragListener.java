@@ -76,64 +76,38 @@ public final class DragListener extends MouseAdapter {
         // if (e.isPopupTrigger() && (comp instanceof UnitLabel)) {
 
         if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
-            // Popup must not be shown when panel is not editable
-            if (!parentPanel.isEditable()) {
+            if (!parentPanel.isEditable()) { // No panel when not editable
                 logger.warning("Button3 disabled on non-editable panel: "
                     + parentPanel);
-            } else {
-                QuickActionMenu menu = null;
-                if (comp instanceof UnitLabel) {
-                    menu = new QuickActionMenu(freeColClient, parentPanel);
-                    menu.createUnitMenu((UnitLabel) comp);
-                } else if (comp instanceof GoodsLabel) {
-                    menu = new QuickActionMenu(freeColClient, parentPanel);
-                    menu.createGoodsMenu((GoodsLabel)comp);
-                } else if (comp instanceof MarketLabel
-                           && parentPanel instanceof EuropePanel) {
-                    Europe europe = freeColClient.getMyPlayer().getEurope();
-                    menu = new QuickActionMenu(freeColClient, parentPanel);
-                    menu.createMarketMenu((MarketLabel)comp, europe);
-                } else if (comp instanceof ASingleTilePanel) {
-                    menu = new QuickActionMenu(freeColClient, parentPanel);
-                    menu.createTileMenu((ASingleTilePanel)comp);
-                } else if (comp.getParent() instanceof ASingleTilePanel) {
-                    // Also check the parent to show the popup in the
-                    // center of the colony panel tile.
-                    menu = new QuickActionMenu(freeColClient, parentPanel);
-                    menu.createTileMenu((ASingleTilePanel)(comp.getParent()));
-                }
-                if (menu != null) {
-                    int elements = menu.getSubElements().length;
-                    if (elements > 0) {
-                        int lastIndex = menu.getComponentCount() - 1;
-                        if (menu.getComponent(lastIndex) instanceof JPopupMenu.Separator) {
-                            menu.remove(lastIndex);
-                        }
-                        GUI gui = freeColClient.getGUI();
-                        boolean windows = System.getProperty("os.name")
-                            .startsWith("Windows");
-                        boolean small = Toolkit.getDefaultToolkit()
-                            .getScreenSize().getHeight() < 768;
-                        if (gui.isWindowed() && windows) {
-                            // Work-around: JRE on Windows is unable
-                            // to display popup menus that extend
-                            // beyond the canvas
-                            menu.show(gui.getCanvas(), menu.getLocation().x, 0);
-                        } else if (!gui.isWindowed() && small) {
-                            /*
-                             * Move popup up when in full screen mode
-                             * and when the screen size is too small
-                             * to fit.  Similar to above workaround,
-                             * but targeted for users with smaller
-                             * screens such as netbooks
-                             */
-                            menu.show(gui.getCanvas(), menu.getLocation().x, 0);
-                        } else {
-                            menu.show(comp, e.getX(), e.getY());
-                        }
-                    }
-                }
+                return;
             }
+            QuickActionMenu menu
+                = new QuickActionMenu(freeColClient, parentPanel)
+                .addMenuItems(comp);
+            int lastIdx = menu.getComponentCount() - 1;
+            if (lastIdx >= 0
+                && menu.getComponent(lastIdx) instanceof JPopupMenu.Separator)
+                menu.remove(lastIdx);
+            if (menu.getComponentCount() <= 0) return;
+
+            final GUI gui = freeColClient.getGUI();
+            boolean windows = System.getProperty("os.name").startsWith("Windows");
+            boolean small = Toolkit.getDefaultToolkit()
+                .getScreenSize().getHeight() < 768;
+            if (gui.isWindowed() && windows) {
+                // Work-around: JRE on Windows is unable to
+                // display popup menus that extend beyond the canvas.
+                menu.show(gui.getCanvas(), menu.getLocation().x, 0);
+            } else if (!gui.isWindowed() && small) {
+                // Move popup up when in full screen mode and when
+                // the screen size is too small to fit.  Similar
+                // to above workaround, but targeted for users
+                // with smaller screens such as netbooks.
+                menu.show(gui.getCanvas(), menu.getLocation().x, 0);
+            } else {
+                menu.show(comp, e.getX(), e.getY());
+            }
+
         } else {
             if (comp instanceof AbstractGoodsLabel) {
                 AbstractGoodsLabel label = (AbstractGoodsLabel)comp;

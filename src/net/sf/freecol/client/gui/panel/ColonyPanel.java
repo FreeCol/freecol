@@ -664,8 +664,7 @@ public final class ColonyPanel extends PortPanel
             subMenu = new JMenuItem(menuTitle, unitIcon);
             subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        unitMenu.createUnitMenu(new UnitLabel(freeColClient,
-                                                              unit));
+                        unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
                     }
                 });
@@ -674,15 +673,14 @@ public final class ColonyPanel extends PortPanel
         }
         colonyUnitsMenu.addSeparator();
         for (final Unit unit : colonyTile.getUnitList()) {
-            if(unit.isCarrier()){
+            if (unit.isCarrier()) {
                 unitIcon = getLibrary().getUnitImageIcon(unit, 0.5);
                 String menuTitle = unit.getDescription()
                     + " " + Messages.message("inPort.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        unitMenu.createUnitMenu(new UnitLabel(freeColClient,
-                                                              unit));
+                        unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
                     }
                 });
@@ -697,7 +695,7 @@ public final class ColonyPanel extends PortPanel
                         subMenu = new JMenuItem(menuTitle, unitIcon);
                         subMenu.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                unitMenu.createUnitMenu(new UnitLabel(freeColClient, innerUnit));
+                                unitMenu.addMenuItems(new UnitLabel(freeColClient, innerUnit));
                                 unitMenu.show(getGUI().getCanvas(), 0, 0);
                             }
                         });
@@ -705,16 +703,16 @@ public final class ColonyPanel extends PortPanel
                         colonyUnitsMenu.add(subMenu);
                     }
                 }
-            }else if(!unit.isOnCarrier()){
+            } else if (!unit.isOnCarrier()) {
                 unitIcon = getLibrary().getUnitImageIcon(unit, 0.5);
                 String menuTitle = unit.getDescription()
                     + " " + Messages.message("outsideOfColony.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        unitMenu.createUnitMenu(new UnitLabel(freeColClient, unit));
+                        unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
-                        }
+                    }
                 });
                 unitNumber++;
                 colonyUnitsMenu.add(subMenu);

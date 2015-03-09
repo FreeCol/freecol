@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -88,6 +89,9 @@ public final class QuickActionMenu extends JPopupMenu {
 
     /**
      * Creates a standard empty menu
+     *
+     * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param parentPanel The parent <code>FreeColPanel</code>.
      */
     public QuickActionMenu(FreeColClient freeColClient,
                            FreeColPanel freeColPanel) {
@@ -96,6 +100,32 @@ public final class QuickActionMenu extends JPopupMenu {
         this.parentPanel = freeColPanel;
     }
 
+
+    /**
+     * Add specific menu items for a given component.
+     *
+     * @param comp The specific <code>JComponent</code>.
+     * @return This <code>QuickActionMenu</code>.
+     */
+    public QuickActionMenu addMenuItems(JComponent comp) {
+        if (comp instanceof UnitLabel) {
+            createUnitMenu((UnitLabel)comp);
+        } else if (comp instanceof GoodsLabel) {
+            createGoodsMenu((GoodsLabel)comp);
+        } else if (comp instanceof MarketLabel
+                   && this.parentPanel instanceof EuropePanel) {
+            createMarketMenu((MarketLabel)comp,
+                             this.freeColClient.getMyPlayer().getEurope());
+        } else if (comp instanceof ASingleTilePanel) {
+            createTileMenu((ASingleTilePanel)comp);
+        } else if (comp.getParent() instanceof ASingleTilePanel) {
+            // Also check the parent to show the popup in the
+            // center of the colony panel tile.
+            createTileMenu((ASingleTilePanel)comp.getParent());
+        }
+        return this;
+    }
+    
 
     /**
      * Prompt for an amount of goods to use.
@@ -114,7 +144,7 @@ public final class QuickActionMenu extends JPopupMenu {
     /**
      * Creates a popup menu for a Unit.
      */
-    public void createUnitMenu(final UnitLabel unitLabel) {
+    private void createUnitMenu(final UnitLabel unitLabel) {
         final ImageLibrary imageLibrary = gui.getImageLibrary();
         final Unit unit = unitLabel.getUnit();
 
@@ -688,7 +718,7 @@ public final class QuickActionMenu extends JPopupMenu {
     /**
      * Creates a menu for a tile.
      */
-    public void createTileMenu(final ASingleTilePanel singleTilePanel) {
+    private void createTileMenu(final ASingleTilePanel singleTilePanel) {
         if (singleTilePanel.getColonyTile() != null
             && singleTilePanel.getColonyTile().getColony() != null) {
             addTileItem(singleTilePanel.getColonyTile().getWorkTile());
@@ -754,7 +784,7 @@ public final class QuickActionMenu extends JPopupMenu {
     /**
      * Creates a menu for some goods.
      */
-    public void createGoodsMenu(final GoodsLabel goodsLabel) {
+    private void createGoodsMenu(final GoodsLabel goodsLabel) {
         final InGameController igc = freeColClient.getInGameController();
         final Player player = freeColClient.getMyPlayer();
         final Goods goods = goodsLabel.getGoods();
@@ -840,8 +870,8 @@ public final class QuickActionMenu extends JPopupMenu {
      * @param marketLabel The <code>MarketLabel</code> to create for.
      * @param europe The <code>Europe</code> containing the label.
      */
-    public void createMarketMenu(final MarketLabel marketLabel,
-                                 final Europe europe) {
+    private void createMarketMenu(final MarketLabel marketLabel,
+                                  final Europe europe) {
         final Player player = freeColClient.getMyPlayer();
         final AbstractGoods ag = marketLabel.getGoods();
         final ImageLibrary imageLibrary = gui.getImageLibrary();

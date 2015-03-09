@@ -70,13 +70,180 @@ public final class DefaultTransferHandler extends TransferHandler {
 
     private static final Logger logger = Logger.getLogger(DefaultTransferHandler.class.getName());
 
-    public static final DataFlavor flavor = new DataFlavor(ImageSelection.class, "ImageSelection");
+    /**
+     * This is the default drag handler for drag and drop operations that
+     * use the <code>TransferHandler</code>.
+     */
+    private static class FreeColDragHandler
+        implements DragGestureListener, DragSourceListener {
 
-    private final FreeColPanel parentPanel;
+        private boolean scrolls;
+
+
+        // --- DragGestureListener methods -----------------------------------
+
+        /**
+         * A Drag gesture has been recognized.
+         */
+        public void dragGestureRecognized(DragGestureEvent dge) {
+            JComponent c = (JComponent)dge.getComponent();
+            DefaultTransferHandler th
+                = (DefaultTransferHandler)c.getTransferHandler();
+            Transferable t = th.createTransferable(c);
+
+            if (t != null) {
+                scrolls = c.getAutoscrolls();
+                c.setAutoscrolls(false);
+                try {
+                    if (c instanceof JLabel
+                        && ((JLabel)c).getIcon() instanceof ImageIcon) {
+                        Toolkit tk = Toolkit.getDefaultToolkit();
+                        ImageIcon imageIcon = ((ImageIcon)((JLabel)c).getIcon());
+                        Dimension bestSize = tk.getBestCursorSize(imageIcon.getIconWidth(),
+                            imageIcon.getIconHeight());
+
+                        if (bestSize.width == 0 || bestSize.height == 0) {
+                            dge.startDrag(null, t, this);
+                            return;
+                        }
+
+                        Image image;
+                        if (bestSize.width > bestSize.height) {
+                            bestSize.height = (int)((((double)bestSize.width)
+                                    / ((double)imageIcon.getIconWidth()))
+                                * imageIcon.getIconHeight());
+                        } else {
+                            bestSize.width = (int)((((double)bestSize.height)
+                                    / ((double)imageIcon.getIconHeight()))
+                                * imageIcon.getIconWidth());
+                        }
+                        image = imageIcon.getImage().getScaledInstance(bestSize.width,
+                            bestSize.height, Image.SCALE_DEFAULT);
+
+                        // We have to use a MediaTracker to ensure that the
+                        // image has been scaled before we use it.
+                        MediaTracker mt = new MediaTracker(c);
+                        mt.addImage(image, 0, bestSize.width, bestSize.height);
+                        try {
+                            mt.waitForID(0);
+                        } catch (InterruptedException e) {
+                            dge.startDrag(null, t, this);
+                            return;
+                        }
+
+                        Point point = new Point(bestSize.width / 2,
+                                                bestSize.height / 2);
+                        Cursor cursor;
+                        try {
+                            cursor = tk.createCustomCursor(image, point,
+                                                           "freeColDragIcon");
+                        } catch (RuntimeException re) {
+                            cursor = null;
+                        }
+                        // Point point = new Point(0, 0);
+                        dge.startDrag(cursor, t, this);
+                    } else {
+                        dge.startDrag(null, t, this);
+                    }
+
+                    return;
+                } catch (RuntimeException re) {
+                    c.setAutoscrolls(scrolls);
+                }
+            }
+
+            th.exportDone(c, null, NONE);
+        }
+
+        // --- DragSourceListener methods -----------------------------------
+
+        /**
+         * As the hotspot enters a platform dependent drop site.
+         */
+        public void dragEnter(DragSourceDragEvent dsde) {}
+
+        /**
+         * As the hotspot moves over a platform dependent drop site.
+         */
+        public void dragOver(DragSourceDragEvent dsde) {}
+
+        /**
+         * As the hotspot exits a platform dependent drop site.
+         */
+        public void dragExit(DragSourceEvent dsde) {}
+
+        /**
+         * As the operation completes.
+         */
+        public void dragDropEnd(DragSourceDropEvent dsde) {
+            DragSourceContext dsc = dsde.getDragSourceContext();
+            JComponent c = (JComponent)dsc.getComponent();
+
+            if (dsde.getDropSuccess()) {
+                ((DefaultTransferHandler)c.getTransferHandler()).exportDone(c,
+                    dsc.getTransferable(), dsde.getDropAction());
+            } else {
+                ((DefaultTransferHandler)c.getTransferHandler()).exportDone(c,
+                    null, NONE);
+            }
+            c.setAutoscrolls(scrolls);
+        }
+
+        public void dropActionChanged(DragSourceDragEvent dsde) {
+            DragSourceContext dsc = dsde.getDragSourceContext();
+            JComponent comp = (JComponent)dsc.getComponent();
+            updatePartialChosen(comp, dsde.getUserAction() == MOVE);
+        }
+
+        private void updatePartialChosen(JComponent comp, boolean partial) {
+            if (comp instanceof GoodsLabel) {
+                ((GoodsLabel)comp).setPartialChosen(partial);
+            } else if (comp instanceof MarketLabel) {
+                ((MarketLabel)comp).setPartialChosen(partial);
+            }
+        }
+    }
+
+    private static class FreeColDragGestureRecognizer extends DragGestureRecognizer {
+
+        FreeColDragGestureRecognizer(DragGestureListener dgl) {
+            super(DragSource.getDefaultDragSource(), null, NONE, dgl);
+        }
+
+        void gestured(JComponent c, MouseEvent e, int srcActions, int action) {
+            setComponent(c);
+            setSourceActions(srcActions);
+            appendEvent(e);
+
+            fireDragGestureRecognized(action, e.getPoint());
+        }
+
+        /**
+         * Register this DragGestureRecognizer's Listeners with the
+         * Component.
+         */
+        protected void registerListeners() {}
+
+        /**
+         * Unregister this DragGestureRecognizer's Listeners with the
+         * Component.
+         *
+         * subclasses must override this method
+         */
+        protected void unregisterListeners() {}
+    }
+
+
+    public static final DataFlavor flavor
+        = new DataFlavor(ImageSelection.class, "ImageSelection");
+
+    private static FreeColDragGestureRecognizer recognizer = null;
 
     private final FreeColClient freeColClient;
 
     private final GUI gui;
+
+    private final FreeColPanel parentPanel;
 
 
     /**
@@ -106,15 +273,12 @@ public final class DefaultTransferHandler extends TransferHandler {
 
 
     /**
-     * Returns 'true' if the given component can import a selection of
-     * the flavor that is indicated by the second parameter, 'false'
-     * otherwise.
+     * Can the given component import a selection of a given flavor.
      *
      * @param comp The component that needs to be checked.
      * @param flavor The flavor that needs to be checked for.
-     * @return 'true' if the given component can import a selection of
-     *     the flavor that is indicated by the second parameter,
-     *     'false' otherwise.
+     * @return True if the given component can import a selection of
+     *     the flavor that is indicated by the second parameter.
      */
     public boolean canImport(JComponent comp, DataFlavor[] flavor) {
         if (comp instanceof JPanel || comp instanceof JLabel) {
@@ -155,17 +319,15 @@ public final class DefaultTransferHandler extends TransferHandler {
         try {
             JLabel data;
 
-            /*
-              This variable is used to temporarily keep the old selected unit,
-              while moving cargo from one carrier to another:
-            */
+            // This variable is used to temporarily keep the old
+            // selected unit, while moving cargo from one carrier to another:
             UnitLabel oldSelectedUnit = null;
 
             // Check flavor.
             if (t.isDataFlavorSupported(DefaultTransferHandler.flavor)) {
                 data = (JLabel)t.getTransferData(DefaultTransferHandler.flavor);
             } else {
-                logger.warning("Data flavor is not supported!");
+                logger.warning("Data flavor is not supported for " + t);
                 return false;
             }
 
@@ -252,23 +414,17 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 } else if (comp instanceof DropTarget) {
                     DropTarget target = (DropTarget) comp;
-                    if (target.accepts(goods)) {
-                        target.add(data, true);
-                    } else {
-                        return false;
-                    }
-
+                    if (!target.accepts(goods)) return false;
+                    target.add(data, true);
                     restoreSelection(oldSelectedUnit);
-
                     comp.revalidate();
-
                     return true;
 
                 } else if (comp instanceof JLabel) {
-                    logger.warning("Oops, I thought we didn't have to write this part.");
+                    logger.warning("Failed to handle: " + comp);
                     return true;
-
                 }
+
             } else if (data instanceof MarketLabel) {
                 MarketLabel label = (MarketLabel)data;
 
@@ -295,15 +451,15 @@ public final class DefaultTransferHandler extends TransferHandler {
                     comp.revalidate();
                     return true;
                 } else if (comp instanceof JLabel) {
-                    logger.warning("Oops, I thought we didn't have to write this part.");
+                    logger.warning("Failed to handle: " + comp);
                     return true;
                 } else {
-                    logger.warning("The receiving component is of an invalid type.");
+                    logger.warning("Invalid type for receiving component: "
+                                   + comp);
                     return false;
                 }
             }
-
-            logger.warning("The dragged component is of an invalid type.");
+            logger.warning("Invalid type for dragged component: " + data);
 
         } catch (Exception e) { // FIXME: Suggest a reconnect?
             logger.log(Level.WARNING, "Import data fail", e);
@@ -312,13 +468,11 @@ public final class DefaultTransferHandler extends TransferHandler {
     }
 
     public JComponent getDropTarget(JComponent component) {
-        if (component instanceof DropTarget) {
-            return component;
-        } else if (component.getParent() instanceof JComponent) {
-            return getDropTarget((JComponent)component.getParent());
-        } else {
-            return null;
-        }
+        return (component instanceof DropTarget)
+            ? component
+            : (component.getParent() instanceof JComponent)
+            ? getDropTarget((JComponent)component.getParent())
+            : null;
     }
 
     private void restoreSelection(UnitLabel oldSelectedUnit) {
@@ -361,16 +515,11 @@ public final class DefaultTransferHandler extends TransferHandler {
      * Displays an input dialog box where the user should specify a
      * goods transfer amount.
      */
-    private int getAmount(GoodsType goodsType, int available, int defaultAmount,
-                          boolean needToPay) {
+    private int getAmount(GoodsType goodsType, int available,
+                          int defaultAmount, boolean needToPay) {
         return gui.showSelectAmountDialog(goodsType, available, defaultAmount,
                                           needToPay);
     }
-
-    // Methods/inner-classes below have been copied from
-    // TransferHandler in order to allow partial loading.
-
-    private static FreeColDragGestureRecognizer recognizer = null;
 
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
         int srcActions = getSourceActions(comp);
@@ -387,171 +536,6 @@ public final class DefaultTransferHandler extends TransferHandler {
             recognizer.gestured(comp, (MouseEvent)e, srcActions, dragAction);
         } else {
             exportDone(comp, null, NONE);
-        }
-    }
-
-
-    /**
-     * This is the default drag handler for drag and drop operations that
-     * use the <code>TransferHandler</code>.
-     */
-    private static class FreeColDragHandler
-        implements DragGestureListener, DragSourceListener {
-
-        private boolean scrolls;
-
-
-        // --- DragGestureListener methods -----------------------------------
-
-        /**
-         * A Drag gesture has been recognized.
-         */
-        public void dragGestureRecognized(DragGestureEvent dge) {
-            JComponent c = (JComponent) dge.getComponent();
-            DefaultTransferHandler th = (DefaultTransferHandler) c.getTransferHandler();
-            Transferable t = th.createTransferable(c);
-
-            if (t != null) {
-                scrolls = c.getAutoscrolls();
-                c.setAutoscrolls(false);
-                try {
-                    if (c instanceof JLabel && ((JLabel) c).getIcon() instanceof ImageIcon) {
-                        Toolkit tk = Toolkit.getDefaultToolkit();
-                        ImageIcon imageIcon = ((ImageIcon) ((JLabel) c).getIcon());
-                        Dimension bestSize = tk.getBestCursorSize(imageIcon.getIconWidth(), imageIcon.getIconHeight());
-
-                        if (bestSize.width == 0 || bestSize.height == 0) {
-                            dge.startDrag(null, t, this);
-                            return;
-                        }
-
-                        Image image;
-                        if (bestSize.width > bestSize.height) {
-                            bestSize.height = (int) ((((double) bestSize.width) / ((double) imageIcon.getIconWidth())) * imageIcon.getIconHeight());
-                        } else {
-                            bestSize.width = (int) ((((double) bestSize.height) / ((double) imageIcon.getIconHeight())) * imageIcon.getIconWidth());
-                        }
-                        image = imageIcon.getImage().getScaledInstance(bestSize.width, bestSize.height, Image.SCALE_DEFAULT);
-
-                        /*
-                          We have to use a MediaTracker to ensure that the
-                          image has been scaled before we use it.
-                        */
-                        MediaTracker mt = new MediaTracker(c);
-                        mt.addImage(image, 0, bestSize.width, bestSize.height);
-                        try {
-                            mt.waitForID(0);
-                        } catch (InterruptedException e) {
-                            dge.startDrag(null, t, this);
-                            return;
-                        }
-
-                        Point point = new Point(bestSize.width / 2, bestSize.height / 2);
-                        Cursor cursor;
-                        try {
-                            cursor = tk.createCustomCursor(image, point, "freeColDragIcon");
-                        } catch (RuntimeException re) {
-                            cursor = null;
-                        }
-                        //Point point = new Point(0, 0);
-                        dge.startDrag(cursor, t, this);
-                    } else {
-                        dge.startDrag(null, t, this);
-                    }
-
-                    return;
-                } catch (RuntimeException re) {
-                    c.setAutoscrolls(scrolls);
-                }
-            }
-
-            th.exportDone(c, null, NONE);
-        }
-
-        // --- DragSourceListener methods -----------------------------------
-
-        /**
-         * as the hotspot enters a platform dependent drop site.
-         */
-        public void dragEnter(DragSourceDragEvent dsde) {
-        }
-
-
-        /**
-         * as the hotspot moves over a platform dependent drop site.
-         */
-        public void dragOver(DragSourceDragEvent dsde) {
-        }
-
-
-        /**
-         * as the hotspot exits a platform dependent drop site.
-         */
-        public void dragExit(DragSourceEvent dsde) {
-        }
-
-
-        /**
-         * as the operation completes.
-         */
-        public void dragDropEnd(DragSourceDropEvent dsde) {
-            DragSourceContext dsc = dsde.getDragSourceContext();
-            JComponent c = (JComponent)dsc.getComponent();
-
-            if (dsde.getDropSuccess()) {
-                ((DefaultTransferHandler) c.getTransferHandler()).exportDone(c, dsc.getTransferable(), dsde.getDropAction());
-            } else {
-                ((DefaultTransferHandler) c.getTransferHandler()).exportDone(c, null, NONE);
-            }
-            c.setAutoscrolls(scrolls);
-        }
-
-
-        public void dropActionChanged(DragSourceDragEvent dsde) {
-            DragSourceContext dsc = dsde.getDragSourceContext();
-            JComponent comp = (JComponent)dsc.getComponent();
-            updatePartialChosen(comp, dsde.getUserAction() == MOVE);
-        }
-
-
-        private void updatePartialChosen(JComponent comp, boolean partialChosen) {
-            if (comp instanceof GoodsLabel) {
-                ((GoodsLabel) comp).setPartialChosen(partialChosen);
-            } else if (comp instanceof MarketLabel) {
-                ((MarketLabel) comp).setPartialChosen(partialChosen);
-            }
-        }
-    }
-
-
-    private static class FreeColDragGestureRecognizer extends DragGestureRecognizer {
-
-        FreeColDragGestureRecognizer(DragGestureListener dgl) {
-            super(DragSource.getDefaultDragSource(), null, NONE, dgl);
-        }
-
-        void gestured(JComponent c, MouseEvent e, int srcActions, int action) {
-            setComponent(c);
-            setSourceActions(srcActions);
-            appendEvent(e);
-
-            fireDragGestureRecognized(action, e.getPoint());
-        }
-
-
-        /**
-         * register this DragGestureRecognizer's Listeners with the Component.
-         */
-        protected void registerListeners() {
-        }
-
-
-        /**
-         * unregister this DragGestureRecognizer's Listeners with the Component.
-         *
-         * subclasses must override this method
-         */
-        protected void unregisterListeners() {
         }
     }
 }
