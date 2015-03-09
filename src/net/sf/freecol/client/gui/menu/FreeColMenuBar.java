@@ -55,8 +55,6 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
     protected final ActionManager am;
 
-    protected GUI gui;
-
 
     /**
      * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
@@ -91,15 +89,6 @@ public abstract class FreeColMenuBar extends JMenuBar {
         setBorder(FreeColImageBorder.imageBorder);
     }
 
-
-    /**
-     * Get the GUI.
-     *
-     * @return The GUI.
-     */
-    public GUI getGUI() {
-        return freeColClient.getGUI();
-    }
 
     /**
      * Resets this menu bar.
