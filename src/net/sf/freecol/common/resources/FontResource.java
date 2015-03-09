@@ -23,6 +23,7 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.net.URI;
 import java.net.URL;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -55,22 +56,28 @@ public class FontResource extends Resource {
     public FontResource(URI resourceLocator) throws Exception {
         super(resourceLocator);
         font = null;
-        if (resourceLocator.getPath() != null
-            && resourceLocator.getPath().endsWith(".ttf")) {
-            URL url = resourceLocator.toURL();
-            font = Font.createFont(Font.TRUETYPE_FONT, url.openStream());
-        } else {
-            String name = resourceLocator.getSchemeSpecificPart();
-            font = Font.decode(name.substring(SCHEME.length()));
-        }
+        try {
+            if (resourceLocator.getPath() != null
+                && resourceLocator.getPath().endsWith(".ttf")) {
+                URL url = resourceLocator.toURL();
+                font = Font.createFont(Font.TRUETYPE_FONT, url.openStream());
+            } else {
+                String name = resourceLocator.getSchemeSpecificPart();
+                font = Font.decode(name.substring(SCHEME.length()));
+            }
 
-        if (font != null) {
-            GraphicsEnvironment.getLocalGraphicsEnvironment()
-                .registerFont(font);
-        }
+            if (font != null) {
+                GraphicsEnvironment.getLocalGraphicsEnvironment()
+                    .registerFont(font);
+            }
 
-        logger.info("Loaded font: " + font.getFontName()
-                    + " from: " + resourceLocator);
+            logger.info("Loaded font: " + font.getFontName()
+                + " from: " + resourceLocator);
+        } catch(Exception e) {
+            logger.log(Level.WARNING,
+                "Failed loading font from: " + resourceLocator, e);
+            throw e;
+        }
     }
 
 
@@ -86,6 +93,7 @@ public class FontResource extends Resource {
     public Font getFont() {
         if (font == null) {
             font = FontResource.getEmergencyFont();
+            logger.warning("Font is null");
         }
         return font;
     }
@@ -97,6 +105,7 @@ public class FontResource extends Resource {
      * @return The default Java font.
      */
     public static Font getEmergencyFont() {
+        logger.warning("Using emergency font");
         return Font.decode(null);
     }
 }
