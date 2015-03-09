@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<freecol-specification>
+<freecol-specification id="markovoss">
   <!-- Remove silver from minerals -->
   <resource-types>
     <resource-type id="model.resource.minerals"
