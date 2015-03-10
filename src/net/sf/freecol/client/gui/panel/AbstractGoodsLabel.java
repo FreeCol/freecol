@@ -21,7 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import javax.swing.JLabel;
 
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsType;
@@ -36,32 +36,19 @@ public class AbstractGoodsLabel extends JLabel {
 
     private boolean partialChosen = false;
 
-    private final GUI gui;
-
 
     /**
      * Initializes this JLabel with the given goods data.
      *
      * @param goods The <code>AbstractGoods</code> that this JLabel
      *     will visually represent.
-     * @param gui The <code>GUI</code> to extract an icon from.
      */
-    public AbstractGoodsLabel(AbstractGoods goods, GUI gui) {
-        super(gui.getImageLibrary().getGoodsImageIcon(goods.getType()));
+    public AbstractGoodsLabel(AbstractGoods goods) {
+        super(ImageLibrary.getGoodsImageIcon(goods.getType()));
         this.goods = goods;
         setToolTipText(Messages.getName(goods));
-        this.gui = gui;
     }
 
-
-    /**
-     * Get the label gui.
-     *
-     * @return The label gui.
-     */
-    protected GUI getGUI() {
-        return gui;
-    }
 
     /**
      * Has a partial amount been selected?

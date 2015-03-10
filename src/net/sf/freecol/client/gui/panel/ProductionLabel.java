@@ -31,6 +31,7 @@ import javax.swing.ImageIcon;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsType;
@@ -44,6 +45,8 @@ import net.sf.freecol.common.model.StringTemplate;
 public final class ProductionLabel extends AbstractGoodsLabel {
 
     private static final Logger logger = Logger.getLogger(ProductionLabel.class.getName());
+
+    private final GUI gui;
 
     /**
      * The maximum number of goodsIcons to display.
@@ -137,8 +140,9 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      */
     public ProductionLabel(FreeColClient freeColClient,
                            AbstractGoods goods, int maximum) {
-        super(goods, freeColClient.getGUI());
+        super(goods);
 
+        this.gui = freeColClient.getGUI();
         this.maximumProduction = maximum;
         ClientOptions options = freeColClient.getClientOptions();
         maxIcons = options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
@@ -151,7 +155,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             setForeground(Color.WHITE);
         }
         if (goods.getType() != null) {
-            setGoodsIcon(getGUI().getImageLibrary().getGoodsImageIcon(goods.getType()));
+            setGoodsIcon(ImageLibrary.getGoodsImageIcon(goods.getType()));
             updateToolTipText();
         }
     }
@@ -476,10 +480,11 @@ public final class ProductionLabel extends AbstractGoodsLabel {
                     number = number + "/" + String.valueOf(maximumProduction);
                 }
                 Font font = GUI.TINY_SIMPLE_FONT;
-                stringImage = getGUI().getImageLibrary().getStringImage(getGUI().getCanvas().getGraphics(),
-                                                                     number, getForeground(), font);
+                stringImage = ImageLibrary.getStringImage(
+                    gui.getCanvas().getGraphics(), number, getForeground(), font);
             }
         }
         return stringImage;
     }
+
 }

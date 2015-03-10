@@ -52,7 +52,7 @@ public final class MarketLabel extends AbstractGoodsLabel
      * @param gui The <code>GUI</code> to display on.
      */
     public MarketLabel(GoodsType type, Market market, GUI gui) {
-        super(new AbstractGoods(type, GoodsContainer.CARGO_SIZE), gui);
+        super(new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
 
         if (market == null) throw new IllegalArgumentException("Null market");
         this.market = market;

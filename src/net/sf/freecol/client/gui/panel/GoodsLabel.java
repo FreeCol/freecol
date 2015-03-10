@@ -24,6 +24,7 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
@@ -48,10 +49,9 @@ public final class GoodsLabel extends AbstractGoodsLabel
      * Initializes this JLabel with the given goods data.
      *
      * @param goods The Goods that this JLabel will visually represent.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public GoodsLabel(Goods goods, GUI gui) {
-        super(goods, gui);
+    public GoodsLabel(Goods goods) {
+        super(goods);
         initializeDisplay();
     }
 
@@ -110,7 +110,7 @@ public final class GoodsLabel extends AbstractGoodsLabel
     @Override
     public void setPartialChosen(boolean partialChosen) {
         super.setPartialChosen(partialChosen);
-        Image image = getGUI().getImageLibrary()
+        Image image = ImageLibrary
             .getGoodsImage(getType(), partialChosen ? 0.75f : 1f);
         setIcon(new ImageIcon(image));
     }
