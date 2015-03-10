@@ -135,9 +135,9 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
         } else if (option instanceof FileOption) {
             return new FileOptionUI(gui, (FileOption)option, editable);
         } else if (option instanceof PercentageOption) {
-            return new PercentageOptionUI(gui, (PercentageOption)option, editable);
+            return new PercentageOptionUI((PercentageOption)option, editable);
         } else if (option instanceof RangeOption) {
-            return new RangeOptionUI(gui, (RangeOption)option, editable);
+            return new RangeOptionUI((RangeOption)option, editable);
         } else if (option instanceof SelectOption) {
             return new SelectOptionUI((SelectOption)option, editable);
         } else if (option instanceof IntegerOption) {

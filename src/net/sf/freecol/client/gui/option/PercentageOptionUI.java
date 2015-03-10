@@ -45,8 +45,7 @@ public final class PercentageOptionUI extends SliderOptionUI<PercentageOption>  
      *     interface for.
      * @param editable boolean whether user can modify the setting
      */
-    public PercentageOptionUI(GUI gui, final PercentageOption option,
-                              boolean editable) {
+    public PercentageOptionUI(final PercentageOption option, boolean editable) {
         super(option, editable);
 
         JSlider slider = getComponent();
