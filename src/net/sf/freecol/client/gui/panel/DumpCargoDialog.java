@@ -29,7 +29,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
@@ -59,8 +58,6 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
     public DumpCargoDialog(FreeColClient freeColClient, Unit unit) {
         super(freeColClient);
 
-        final ImageLibrary lib = getGUI().getImageLibrary();
-
         this.goodsList = unit.getGoodsList();
         this.checkBoxes = new ArrayList<>(goodsList.size());
 
@@ -89,7 +86,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
         c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
             .cancelOption());
         initializeDialog(DialogType.QUESTION, false, panel,
-                         lib.getImageIcon(unit, false), c);
+                         getImageLibrary().getImageIcon(unit, false), c);
     }
 
 

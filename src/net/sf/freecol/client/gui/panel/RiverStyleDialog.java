@@ -61,9 +61,8 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
         panel.add(GUI.getDefaultHeader(str), "align center");
 
         List<ChoiceItem<String>> c = choices();
-        c.add(new ChoiceItem<>(DELETE, DELETE)
-            .setIcon(new ImageIcon(getGUI().getImageLibrary()
-                    .getMiscImage(ImageLibrary.DELETE, 0.5))));
+        c.add(new ChoiceItem<>(DELETE, DELETE).setIcon(new ImageIcon(
+            ImageLibrary.getMiscImage(ImageLibrary.DELETE, 0.5))));
         for (String key : ResourceManager.getKeys(PREFIX)) {
             c.add(new ChoiceItem<>(key, key)
                 .setIcon(new ImageIcon(ResourceManager.getImage(key, 0.5))));
