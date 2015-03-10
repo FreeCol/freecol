@@ -44,6 +44,7 @@ import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
  */
 public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
 
+    private final GUI gui;
     private final JPanel panel = new JPanel();
     private final JComboBox<MixerWrapper> cbox;
     private final JButton button1;
@@ -77,7 +78,9 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
      */
     public AudioMixerOptionUI(GUI gui, final AudioMixerOption option,
                               boolean editable) {
-        super(gui, option, editable);
+        super(option, editable);
+
+        this.gui = gui;
 
         BorderLayout layout = new BorderLayout();
         layout.setHgap(15);

@@ -24,7 +24,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.ListCellRenderer;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColModFile;
@@ -79,12 +78,11 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
      * Creates a new <code>ModOptionUI</code> for the given
      * <code>ModOption</code>.
      *
-     * @param gui The <code>GUI</code> to display with.
      * @param option The <code>ModOption</code> to make a user interface for
      * @param editable boolean whether user can modify the setting
      */
-    public ModOptionUI(GUI gui, final ModOption option, boolean editable) {
-        super(gui, option, editable);
+    public ModOptionUI(final ModOption option, boolean editable) {
+        super(option, editable);
 
         DefaultComboBoxModel<FreeColModFile> model
             = new DefaultComboBoxModel<>();

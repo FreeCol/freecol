@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.option;
 
 import javax.swing.JCheckBox;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.option.BooleanOption;
 
 
@@ -43,9 +42,8 @@ public final class BooleanOptionUI extends OptionUI<BooleanOption>  {
      *     interface for.
      * @param editable Whether user can modify the setting.
      */
-    public BooleanOptionUI(GUI gui, final BooleanOption option,
-                           boolean editable) {
-        super(gui, option, editable);
+    public BooleanOptionUI(final BooleanOption option, boolean editable) {
+        super(option, editable);
         setValue(option.getValue());
         initialize();
     }

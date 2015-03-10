@@ -23,7 +23,6 @@ import javax.swing.JComponent;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.option.IntegerOption;
 
 
@@ -41,8 +40,8 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
      * @param option The <code>IntegerOption</code> to make a user interface for.
      * @param editable boolean whether user can modify the setting
      */
-    public IntegerOptionUI(GUI gui, final IntegerOption option, boolean editable) {
-        super(gui, option, editable);
+    public IntegerOptionUI(final IntegerOption option, boolean editable) {
+        super(option, editable);
 
         int value = option.getValue();
         if (editable) {

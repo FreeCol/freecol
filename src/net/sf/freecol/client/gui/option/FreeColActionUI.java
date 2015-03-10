@@ -64,8 +64,8 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
      *       interface for.
      * @param editable boolean whether user can modify the setting
      */
-    public FreeColActionUI(GUI gui, FreeColAction option, boolean editable) {
-        super(gui, option, editable);
+    public FreeColActionUI(FreeColAction option, boolean editable) {
+        super(option, editable);
 
         this.optionGroupUI = null;
 

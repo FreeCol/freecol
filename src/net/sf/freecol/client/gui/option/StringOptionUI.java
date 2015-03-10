@@ -24,7 +24,6 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.option.StringOption;
 
@@ -47,9 +46,8 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
      *     interface for.
      * @param editable Whether user can modify the setting.
      */
-    public StringOptionUI(GUI gui, final StringOption option,
-                          boolean editable) {
-        super(gui, option, editable);
+    public StringOptionUI(final StringOption option, boolean editable) {
+        super(option, editable);
 
         List<String> choices = option.getChoices();
         box.setModel(new DefaultComboBoxModel<>(choices

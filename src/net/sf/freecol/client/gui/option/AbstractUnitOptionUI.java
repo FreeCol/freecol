@@ -84,9 +84,8 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
      *     user interface for
      * @param editable boolean whether user can modify the setting
      */
-    public AbstractUnitOptionUI(GUI gui, final AbstractUnitOption option,
-                                boolean editable) {
-        super(gui, option, editable);
+    public AbstractUnitOptionUI(final AbstractUnitOption option, boolean editable) {
+        super(option, editable);
 
         panel = new MigPanel();
         panel.setLayout(new MigLayout());
@@ -97,13 +96,13 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
 
         boolean numberEditable = editable
             && (numberOption.getMaximumValue() > numberOption.getMinimumValue());
-        numberUI = new IntegerOptionUI(gui, numberOption, numberEditable);
+        numberUI = new IntegerOptionUI(numberOption, numberEditable);
         GUI.localizeToolTip(numberUI.getComponent(), "report.numberOfUnits");
         panel.add(numberUI.getComponent(), "width 30%");
 
         boolean typeEditable = editable
             && typeOption.getChoices().size() > 1;
-        typeUI = new UnitTypeOptionUI(gui, typeOption, typeEditable);
+        typeUI = new UnitTypeOptionUI(typeOption, typeEditable);
 
         GUI.localizeToolTip(typeUI.getComponent(), "model.unit.type");
         typeUI.getComponent().addItemListener(this);
@@ -111,7 +110,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
 
         roleEditable = editable
             && roleOption.getChoices().size() > 1;
-        roleUI = new StringOptionUI(gui, roleOption, roleEditable);
+        roleUI = new StringOptionUI(roleOption, roleEditable);
         GUI.localizeToolTip(roleUI.getComponent(), "model.role.name");
         roleUI.getComponent().setRenderer(new RoleRenderer());
         panel.add(roleUI.getComponent(), "width 35%");

@@ -51,7 +51,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
     * @param editable boolean whether user can modify the setting
     */
     public FileOptionUI(final GUI gui, final FileOption option, boolean editable) {
-        super(gui, option, editable);
+        super(option, editable);
 
         panel.add(getJLabel());
 

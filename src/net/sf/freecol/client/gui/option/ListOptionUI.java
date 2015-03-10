@@ -74,7 +74,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
      */
     public ListOptionUI(final GUI gui, final ListOption<T> option,
                         boolean editable) {
-        super(gui, option, editable);
+        super(option, editable);
 
         this.panel = new JPanel();
         this.panel.setBorder(GUI.localizedBorder(super.getJLabel().getText(),

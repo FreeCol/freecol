@@ -45,7 +45,7 @@ public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {
      * @param editable boolean whether user can modify the setting
      */
     public RangeOptionUI(GUI gui, final RangeOption option, boolean editable) {
-        super(gui, option, editable);
+        super(option, editable);
 
         JSlider slider = getComponent();
 

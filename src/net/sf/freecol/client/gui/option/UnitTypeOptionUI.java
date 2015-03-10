@@ -25,7 +25,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.UnitType;
@@ -63,9 +62,8 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
      *     interface for.
      * @param editable boolean whether user can modify the setting
      */
-    public UnitTypeOptionUI(GUI gui, final UnitTypeOption option,
-                            boolean editable) {
-        super(gui, option, editable);
+    public UnitTypeOptionUI(final UnitTypeOption option, boolean editable) {
+        super(option, editable);
 
         List<UnitType> choices = option.getChoices();
         box.setModel(new DefaultComboBoxModel<>(choices

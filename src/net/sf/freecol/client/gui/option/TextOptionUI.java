@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.option;
 
 import javax.swing.JTextField;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.option.TextOption;
 
 
@@ -42,8 +41,8 @@ public final class TextOptionUI extends OptionUI<TextOption>  {
      * @param option The <code>TextOption</code> to make a user interface for.
      * @param editable boolean whether user can modify the setting.
      */
-    public TextOptionUI(GUI gui, final TextOption option, boolean editable) {
-        super(gui, option, editable);
+    public TextOptionUI(final TextOption option, boolean editable) {
+        super(option, editable);
 
         box.setText(option.getValue());
         initialize();

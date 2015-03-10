@@ -23,7 +23,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.option.SelectOption;
 
@@ -46,9 +45,8 @@ public final class SelectOptionUI extends OptionUI<SelectOption> {
      *     interface for.
      * @param editable Whether user can modify the setting.
      */
-    public SelectOptionUI(GUI gui, final SelectOption option,
-                          boolean editable) {
-        super(gui, option, editable);
+    public SelectOptionUI(final SelectOption option, boolean editable) {
+        super(option, editable);
 
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
         for (String string : option.getItemValues().values()) {

@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.option;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
@@ -46,9 +45,8 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
      *     interface for.
      * @param editable boolean whether user can modify the setting
      */
-    public LanguageOptionUI(GUI gui, final LanguageOption option,
-                            boolean editable) {
-        super(gui, option, editable);
+    public LanguageOptionUI(final LanguageOption option, boolean editable) {
+        super(option, editable);
 
         Language[] languages = option.getChoices().toArray(new Language[0]);
         box.setModel(new DefaultComboBoxModel<>(languages));

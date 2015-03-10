@@ -46,8 +46,8 @@ public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
      *     interface for.
      * @param editable boolean whether user can modify the setting
      */
-    public SliderOptionUI(GUI gui, final T option, boolean editable) {
-        super(gui, option, editable);
+    public SliderOptionUI(final T option, boolean editable) {
+        super(option, editable);
 
         slider.setBorder(GUI.localizedBorder(super.getJLabel().getText(),
                                              Color.BLACK));
