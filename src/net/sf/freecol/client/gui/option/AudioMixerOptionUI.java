@@ -23,7 +23,6 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.sound.sampled.Mixer;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -31,8 +30,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.sound.SoundPlayer;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
 
@@ -113,14 +110,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
     }
 
     private void updateMixerLabel() {
-        SoundPlayer soundPlayer = gui.getSoundPlayer();
-        Mixer mixer;
-        String text = (soundPlayer == null)
-            ? Messages.message("nothing")
-            : ((mixer = soundPlayer.getMixer()) == null)
-            ? Messages.message("none")
-            : mixer.getMixerInfo().getName();
-        currentMixerLabel.setText(Messages.message("Current") + ":  " + text);
+        currentMixerLabel.setText(gui.getSoundMixerLabelText());
     }
 
 

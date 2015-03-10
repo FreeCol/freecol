@@ -50,6 +50,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.sound.sampled.Mixer;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -409,14 +410,20 @@ public class GUI {
     }
 
     /**
-     * Get the sound player.
+     * Get the label text for the sound player mixer.
      *
-     * Needed for access to the mixer by the audio mixer option UI.
+     * Needed by the audio mixer option UI.
      *
-     * @return The current <code>SoundPlayer</code>.
+     * @return The text.
      */
-    public SoundPlayer getSoundPlayer() {
-        return soundPlayer;
+    public String getSoundMixerLabelText() {
+        Mixer mixer;
+        String text = (soundPlayer == null)
+            ? Messages.message("nothing")
+            : ((mixer = soundPlayer.getMixer()) == null)
+            ? Messages.message("none")
+            : mixer.getMixerInfo().getName();
+        return Messages.message("Current") + ":  " + text;
     }
 
     public boolean isWindowed() {
