@@ -2662,32 +2662,42 @@ public final class InGameController extends Controller {
      * Load goods.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is loading.
+     * @param loc The <code>Location</code> where the goods are.
      * @param goodsType The <code>GoodsType</code> to load.
      * @param amount The amount of goods to load.
      * @param carrier The <code>Unit</code> to load.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element loadGoods(ServerPlayer serverPlayer, GoodsType goodsType,
-                             int amount, Unit carrier) {
+    public Element loadGoods(ServerPlayer serverPlayer, Location loc,
+                             GoodsType goodsType, int amount, Unit carrier) {
+        if (loc instanceof Europe) {
+            if (carrier.isInEurope()) {
+                return buyGoods(serverPlayer, goodsType, amount, carrier);
+            } else {
+                return DOMMessage.clientError("Carrier not in Europe: " + loc);
+            }
+        }
+        // All loading locations other than Europe are GoodsLocations
+        if (!(loc instanceof GoodsLocation)) {
+            return DOMMessage.clientError("Not a goods location: " + loc);
+        }
+        GoodsLocation gl = (GoodsLocation)loc;
+        if (!carrier.isAtLocation(loc)) {
+            return DOMMessage.clientError("Carrier not at location: " + loc);
+        }
         if (carrier.getLoadableAmount(goodsType) < amount) {
             return DOMMessage.clientError("Too much goods");
         }
-        if (carrier.isInEurope()) {
-            return buyGoods(serverPlayer, goodsType, amount, carrier);
-        }
-
-        Settlement settlement = carrier.getSettlement();
-        if (settlement == null) {
-            return DOMMessage.clientError("Carrier not at settlement");
-        } else if (settlement.getGoodsCount(goodsType) < amount) {
-            return DOMMessage.clientError("Not enough goods");
+        if (gl.getGoodsCount(goodsType) < amount) {
+            return DOMMessage.clientError("Not enough goods ("
+                + gl.getGoodsCount(goodsType) + " < " + amount + ")");
         }
 
         ChangeSet cs = new ChangeSet();
-        moveGoods(settlement, goodsType, amount, carrier);
-        logger.finest(settlement.getName() + " loaded " + amount
+        moveGoods(gl, goodsType, amount, carrier);
+        logger.finest(gl.getId() + " loaded " + amount
             + " " + goodsType.getSuffix() + " onto " + carrier);
-        cs.add(See.only(serverPlayer), settlement.getGoodsContainer());
+        cs.add(See.only(serverPlayer), gl.getGoodsContainer());
         cs.add(See.only(serverPlayer), carrier.getGoodsContainer());
         if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
             carrier.setMovesLeft(0);

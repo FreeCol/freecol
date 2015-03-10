@@ -986,14 +986,15 @@ public final class ColonyPanel extends PortPanel
                 break;
             case FILL:
                 if (unit == null || !unit.isCarrier()) break;
-                for (Goods goods : unit.getGoodsContainer().getGoods()) {
-                    int space = GoodsContainer.CARGO_SIZE - goods.getAmount();
-                    int count = colony.getGoodsCount(goods.getType());
+                for (Goods goods : unit.getCompactGoodsList()) {
+                    final GoodsType type = goods.getType();
+                    int space = unit.getLoadableAmount(type);
+                    int count = colony.getGoodsCount(type);
                     if (space > 0 && count > 0) {
-                        Goods newGoods = new Goods(goods.getGame(), colony,
-                                                   goods.getType(),
-                                                   Math.min(space, count));
-                        igc().loadCargo(newGoods, unit);
+                        int n = Math.min(space, count);
+                        igc().loadCargo(new Goods(goods.getGame(), colony,
+                                                  type, n),
+                                        unit);
                     }
                 }
                 break;

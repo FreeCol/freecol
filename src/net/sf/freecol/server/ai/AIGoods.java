@@ -280,9 +280,8 @@ public class AIGoods extends TransportableAIObject {
         GoodsType goodsType = goods.getType();
         int goodsAmount = goods.getAmount();
         int oldAmount = carrier.getGoodsCount(goodsType);
-        boolean result
-            = AIMessage.askLoadGoods(goods.getType(), goods.getAmount(),
-                                     aiCarrier);
+        boolean result = AIMessage.askLoadGoods(goods.getLocation(),
+            goods.getType(), goods.getAmount(), aiCarrier);
         if (result) {
             int newAmount = carrier.getGoodsCount(goodsType);
             if (newAmount - oldAmount != goodsAmount) {

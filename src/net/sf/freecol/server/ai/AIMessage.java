@@ -552,15 +552,16 @@ public class AIMessage {
     /**
      * An AI unit loads some cargo.
      *
+     * @param loc The <code>Location</code> where the goods are.
      * @param type The <code>GoodsType</code> to load.
      * @param amount The amount of goods to load.
      * @param aiUnit The <code>AIUnit</code> that is loading.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askLoadGoods(GoodsType type, int amount,
-                                       AIUnit aiUnit) {
+    public static boolean askLoadGoods(Location loc, GoodsType type,
+                                       int amount, AIUnit aiUnit) {
         return sendMessage(aiUnit.getAIOwner().getConnection(),
-            new LoadGoodsMessage(type, amount, aiUnit.getUnit()));
+            new LoadGoodsMessage(loc, type, amount, aiUnit.getUnit()));
     }
 
 

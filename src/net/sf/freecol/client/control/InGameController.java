@@ -349,12 +349,14 @@ public final class InGameController implements NetworkConstants {
     /**
      * Load some goods onto a carrier.
      *
+     * @param loc The <code>Location</code> to load from.
      * @param type The <code>GoodsType</code> to load.
      * @param amount The amount of goods to load.
      * @param carrier The <code>Unit</code> to load onto.
      * @return True if the load succeeded.
      */
-    private boolean askLoadGoods(GoodsType type, int amount, Unit carrier) {
+    private boolean askLoadGoods(Location loc, GoodsType type, int amount,
+                                 Unit carrier) {
         TradeLocation trl = carrier.getTradeLocation();
         if (trl == null) return false;
 
@@ -379,7 +381,7 @@ public final class InGameController implements NetworkConstants {
 
         // Try to purchase.
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
-        boolean ret = askServer().loadGoods(type, amount, carrier)
+        boolean ret = askServer().loadGoods(loc, type, amount, carrier)
             && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount;
         if (ret && marketWas != null) marketWas.fireChanges(type, amount);
         return ret;
@@ -2268,7 +2270,7 @@ public final class InGameController implements NetworkConstants {
         for (AbstractGoods ag : toLoad) {
             GoodsType type = ag.getType();
             int demand = ag.getAmount();
-            ret = askLoadGoods(type, demand, unit);
+            ret = askLoadGoods(stop.getLocation(), type, demand, unit);
             if (ret) {
                 int present = stop.getGoodsCount(type);
                 int export = stop.getExportAmount(type, 0);
@@ -2683,7 +2685,7 @@ public final class InGameController implements NetworkConstants {
         Europe europe = carrier.getOwner().getEurope();
         EuropeWas europeWas = new EuropeWas(europe);
         UnitWas unitWas = new UnitWas(carrier);
-        boolean ret = askLoadGoods(type, amount, carrier);
+        boolean ret = askLoadGoods(europe, type, amount, carrier);
         if (ret) {
             gui.playSound("sound.event.loadCargo");
             displayModelMessages(false, false);
@@ -3532,23 +3534,31 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean loadCargo(Goods goods, Unit carrier) {
         if (!requireOurTurn() || goods == null || goods.getAmount() <= 0
+            || goods.getLocation() == null
             || carrier == null || !carrier.isCarrier()) return false;
 
-        if (carrier.isInEurope()) {
+        if (goods.getLocation() instanceof Europe) {
             return buyGoods(goods.getType(), goods.getAmount(), carrier);
         }
-
-        Colony colony = carrier.getColony();
-        if (colony == null) return false;
-
-        ColonyWas colonyWas = new ColonyWas(colony);
-        UnitWas unitWas = new UnitWas(carrier);
-        boolean ret = askLoadGoods(goods.getType(), goods.getAmount(), carrier);
+        UnitWas carrierWas = new UnitWas(carrier);
+        UnitWas sourceWas = null;
+        ColonyWas colonyWas = null;
+        if (goods.getLocation() instanceof Unit) {
+            Unit source = (Unit)goods.getLocation();
+            sourceWas = new UnitWas(source);
+        } else {
+            Colony colony = carrier.getColony();
+            if (colony == null) return false;
+            colonyWas = new ColonyWas(colony);
+        }
+        boolean ret = askLoadGoods(goods.getLocation(), goods.getType(),
+                                   goods.getAmount(), carrier);
         if (ret) {
             gui.playSound("sound.event.loadCargo");
         }
-        colonyWas.fireChanges();
-        unitWas.fireChanges();
+        if (colonyWas != null) colonyWas.fireChanges();
+        if (sourceWas != null) sourceWas.fireChanges();
+        carrierWas.fireChanges();
         updateControls();
         return ret;
     }

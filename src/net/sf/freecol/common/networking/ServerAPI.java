@@ -1005,13 +1005,15 @@ public abstract class ServerAPI {
     /**
      * Server query-response for loading goods.
      *
+     * @param loc The <code>Location</code> where the goods are.
      * @param type The <code>GoodsType</code> to load.
      * @param amount The amount of goods to load.
      * @param carrier The <code>Unit</code> to load onto.
      * @return True if the query-response succeeds.
      */
-    public boolean loadGoods(GoodsType type, int amount, Unit carrier) {
-        return askHandling(new LoadGoodsMessage(type, amount, carrier),
+    public boolean loadGoods(Location loc, GoodsType type, int amount,
+                             Unit carrier) {
+        return askHandling(new LoadGoodsMessage(loc, type, amount, carrier),
             null, null);
     }
 

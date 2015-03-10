@@ -184,12 +184,12 @@ public class ServerPlayerTest extends FreeColTestCase {
             = new ServerUnit(game, map.getTile(10, 10), dutch, wagonTrainType);
 
         // Fail to move to wagon not in colony
-        igc.loadGoods(dutch, cottonType, 50, wagonNotInColony);
+        igc.loadGoods(dutch, colony, cottonType, 50, wagonNotInColony);
         assertEquals(0, wagonNotInColony.getGoodsCount(cottonType));
         assertEquals(200, colony.getGoodsCount(cottonType));
 
         // Check colony to wagon
-        igc.loadGoods(dutch, cottonType, 10, wagonInColony);
+        igc.loadGoods(dutch, colony, cottonType, 10, wagonInColony);
         assertEquals(10, wagonInColony.getGoodsCount(cottonType));
         assertEquals(190, colony.getGoodsCount(cottonType));
 
@@ -199,19 +199,19 @@ public class ServerPlayerTest extends FreeColTestCase {
         assertEquals(195, colony.getGoodsCount(cottonType));
 
         // Fail to load more than present
-        igc.loadGoods(dutch, cottonType, 200, wagonInColony);
+        igc.loadGoods(dutch, colony, cottonType, 200, wagonInColony);
         assertEquals(5, wagonInColony.getGoodsCount(cottonType));
         assertEquals(195, colony.getGoodsCount(cottonType));
 
         // Fill wagon
-        igc.loadGoods(dutch, cottonType, 195, wagonInColony);
+        igc.loadGoods(dutch, colony, cottonType, 195, wagonInColony);
         assertEquals(200, wagonInColony.getGoodsCount(cottonType));
         assertEquals(0, colony.getGoodsCount(cottonType));
         assertFalse(wagonInColony.hasSpaceLeft());
 
         // Fail to add more
         colony.addGoods(cottonType, 1);
-        igc.loadGoods(dutch, cottonType, 1, wagonInColony);
+        igc.loadGoods(dutch, colony, cottonType, 1, wagonInColony);
         assertEquals(200, wagonInColony.getGoodsCount(cottonType));
         assertEquals(1, colony.getGoodsCount(cottonType));
     }
@@ -230,12 +230,12 @@ public class ServerPlayerTest extends FreeColTestCase {
             = new ServerUnit(game, map.getTile(1,1), dutch, privateerType);
 
         // Check Europe to privateer, should fail due to funds
-        igc.loadGoods(dutch, cottonType, 10, privateer1);
+        igc.loadGoods(dutch, europe, cottonType, 10, privateer1);
         assertEquals(0, privateer1.getGoodsCount(cottonType));
 
         // Add gold and succeed
         dutch.setGold(10000);
-        igc.loadGoods(dutch, cottonType, 10, privateer1);
+        igc.loadGoods(dutch, europe, cottonType, 10, privateer1);
         assertEquals(10, privateer1.getGoodsCount(cottonType));
 
         // Check Privateer to Europe
@@ -243,12 +243,12 @@ public class ServerPlayerTest extends FreeColTestCase {
         assertEquals(5, privateer1.getGoodsCount(cottonType));
 
         // Fail to load to privateer not in Europe
-        igc.loadGoods(dutch, cottonType, 10, privateer2);
+        igc.loadGoods(dutch, europe, cottonType, 10, privateer2);
         assertEquals(0, privateer2.getGoodsCount(cottonType));
 
         // Establish boycott and fail again
         dutch.getMarket().setArrears(cottonType, 1);
-        igc.loadGoods(dutch, cottonType, 10, privateer1);
+        igc.loadGoods(dutch, europe, cottonType, 10, privateer1);
         assertEquals(5, privateer1.getGoodsCount(cottonType));
     }
 

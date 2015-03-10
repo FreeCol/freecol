@@ -395,7 +395,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                     return equipUnitIfPossible((UnitLabel)comp, goods);
 
                 } else if (comp instanceof DropTarget) {
-                    DropTarget target = (DropTarget) comp;
+                    DropTarget target = (DropTarget)comp;
                     if (!target.accepts(goods)) return false;
                     target.add(data, true);
                     restoreSelection(oldSelectedUnit);

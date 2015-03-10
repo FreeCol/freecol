@@ -19,8 +19,10 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
@@ -34,6 +36,9 @@ import org.w3c.dom.Element;
  */
 public class LoadGoodsMessage extends DOMMessage {
 
+    /** The identifier for the location of the goods. */
+    private final String locationId;
+    
     /** The identifier of the type of goods to load. */
     private final String goodsTypeId;
 
@@ -47,13 +52,16 @@ public class LoadGoodsMessage extends DOMMessage {
     /**
      * Create a new <code>LoadGoodsMessage</code>.
      *
-     * @param type The type of goods to load.
+     * @param loc The <code>Location</code> of the goods.
+     * @param type The <code>GoodsType</code> to load.
      * @param amount The amount of goods to load.
      * @param carrier The <code>Unit</code> to load the goods onto.
      */
-    public LoadGoodsMessage(GoodsType type, int amount, Unit carrier) {
+    public LoadGoodsMessage(Location loc, GoodsType type, int amount,
+                            Unit carrier) {
         super(getXMLElementTagName());
 
+        this.locationId = loc.getId();
         this.goodsTypeId = type.getId();
         this.amountString = Integer.toString(amount);
         this.carrierId = carrier.getId();
@@ -69,6 +77,7 @@ public class LoadGoodsMessage extends DOMMessage {
     public LoadGoodsMessage(Game game, Element element) {
         super(getXMLElementTagName());
 
+        this.locationId = element.getAttribute("location");
         this.goodsTypeId = element.getAttribute("type");
         this.amountString = element.getAttribute("amount");
         this.carrierId = element.getAttribute("carrier");
@@ -87,6 +96,12 @@ public class LoadGoodsMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+
+        FreeColGameObject fcgo = player.getGame()
+            .getFreeColGameObject(locationId);
+        if (fcgo == null || !(fcgo instanceof Location)) {
+            return DOMMessage.clientError("Not a location: " + locationId);
+        }
 
         Unit carrier;
         try {
@@ -120,7 +135,7 @@ public class LoadGoodsMessage extends DOMMessage {
 
         // Load the goods
         return server.getInGameController()
-            .loadGoods(serverPlayer, type, amount, carrier);
+            .loadGoods(serverPlayer, (Location)fcgo, type, amount, carrier);
     }
 
     /**
@@ -130,6 +145,7 @@ public class LoadGoodsMessage extends DOMMessage {
      */
     public Element toXMLElement() {
         return createMessage(getXMLElementTagName(),
+            "location", locationId,
             "type", goodsTypeId,
             "amount", amountString,
             "carrier", carrierId);
