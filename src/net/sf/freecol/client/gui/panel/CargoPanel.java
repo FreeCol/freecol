@@ -203,7 +203,7 @@ public class CargoPanel extends FreeColPanel
 
         if (editState) {
             if (comp instanceof UnitLabel) {
-                Unit unit = ((UnitLabel) comp).getUnit();
+                Unit unit = ((UnitLabel)comp).getUnit();
                 if (carrier.canAdd(unit)) {
                     Container oldParent = comp.getParent();
                     if (igc().boardShip(unit, carrier)) {
@@ -229,17 +229,17 @@ public class CargoPanel extends FreeColPanel
                 return comp;
 
             } else if (comp instanceof MarketLabel) {
-                MarketLabel label = (MarketLabel) comp;
+                MarketLabel label = (MarketLabel)comp;
                 Player player = carrier.getOwner();
-                if (player.canTrade(label.getType())) {
-                    igc().buyGoods(label.getType(), label.getAmount(), carrier);
-                    igc().nextModelMessage();
-                    update();
-                    return comp;
-                } else {
+                if (!player.canTrade(label.getType())) {
                     igc().payArrears(label.getType());
                     return null;
                 }
+                igc().buyGoods(label.getType(), label.getAmount(), carrier);
+                igc().nextModelMessage();
+                update();
+                return comp;
+
             } else {
                 return null;
             }

@@ -26,6 +26,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -68,20 +69,21 @@ public class LoadAction extends MapboardAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        Unit unit = getGUI().getActiveUnit();
+        final Unit unit = getGUI().getActiveUnit();
         if (unit == null) return;
-        Colony colony = unit.getColony();
+
+        final Colony colony = unit.getColony();
         if (colony == null) return;
-        Iterator<Goods> goodsIterator = unit.getGoodsIterator();
-        while (goodsIterator.hasNext()) {
-            Goods goods = goodsIterator.next();
-            if (goods.getAmount() < GoodsContainer.CARGO_SIZE
-                && colony.getGoodsCount(goods.getType()) > 0) {
-                int amount = Math.min(colony.getGoodsCount(goods.getType()),
-                    GoodsContainer.CARGO_SIZE - goods.getAmount());
-                Goods newGoods = new Goods(goods.getGame(), colony,
-                                           goods.getType(), amount);
-                igc().loadCargo(newGoods, unit);
+
+        for (Goods goods : unit.getCompactGoodsList()) {
+            final GoodsType type = goods.getType();
+            int loadable = unit.getLoadableAmount(type);
+            int present = colony.getGoodsCount(type);
+            if (loadable > 0 && present > 0) {
+                int n = Math.min(Math.min(loadable, present),
+                                          GoodsContainer.CARGO_SIZE);
+                igc().loadCargo(new Goods(goods.getGame(), colony, type, n),
+                                unit);
             }
         }
     }
