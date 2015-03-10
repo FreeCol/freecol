@@ -104,7 +104,7 @@ public class ConceptDetailPanel extends FreeColPanel
         Collections.sort(nodes, nodeComparator);
         for (DefaultMutableTreeNode n : nodes) {
             node.add(n);
-        };
+        }
         root.add(node);
     }
 

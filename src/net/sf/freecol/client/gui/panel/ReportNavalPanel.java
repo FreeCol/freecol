@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Dimension;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -28,7 +27,6 @@ import javax.swing.JSeparator;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;

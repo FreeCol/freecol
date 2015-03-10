@@ -57,7 +57,7 @@ public final class ReportReligiousPanel extends ReportPanel {
         final GoodsType crosses = spec.getGoodsType("model.goods.crosses");
 
         FreeColProgressBar progressBar
-            = new FreeColProgressBar(getGUI(), crosses);
+            = new FreeColProgressBar(crosses);
         reportPanel.add(progressBar, "span");
 
         List<Colony> colonies = freeColClient.getMySortedColonies();

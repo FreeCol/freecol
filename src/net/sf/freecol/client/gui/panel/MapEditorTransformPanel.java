@@ -91,7 +91,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     public MapEditorTransformPanel(FreeColClient freeColClient) {
         super(freeColClient, new BorderLayout());
 
-        this.nativeNation = getSpecification().getIndianNations().get(0);
+        nativeNation = getSpecification().getIndianNations().get(0);
 
         listPanel = new JPanel(new GridLayout(2, 0));
 
@@ -119,20 +119,20 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                       Messages.getName(type),
                                       new TileTypeTransform(type)));
         }
-        listPanel.add(buildButton(getLibrary().getRiverImage("0101", 0.5),
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("0101", 0.5),
                                   Messages.message("minorRiver"),
                                   new RiverTransform(TileImprovement.SMALL_RIVER)));
-        listPanel.add(buildButton(getLibrary().getRiverImage("0202", 0.5),
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", 0.5),
                                   Messages.message("majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
-        listPanel.add(buildButton(getLibrary().getBonusImage(getSpecification()
+        listPanel.add(buildButton(ImageLibrary.getBonusImage(getSpecification()
                                                              .getResourceTypeList().get(0), 0.8),
                                   Messages.message("editor.resource"), new ResourceTransform()));
-        listPanel.add(buildButton(getLibrary().getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.66),
+        listPanel.add(buildButton(ImageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.66),
                                   Messages.message("model.message.LOST_CITY_RUMOUR"),
                                   new LostCityRumourTransform()));
         SettlementType settlementType = nativeNation.getType().getCapitalType();
-        settlementButton = buildButton(getLibrary().getSettlementImage(settlementType, 0.5),
+        settlementButton = buildButton(ImageLibrary.getSettlementImage(settlementType, 0.5),
                                        Messages.message("Settlement"),
                                        new SettlementTransform());
         listPanel.add(settlementButton);

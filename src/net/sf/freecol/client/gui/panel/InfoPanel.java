@@ -77,7 +77,7 @@ public final class InfoPanel extends FreeColPanel {
      */
     public class EndTurnPanel extends MigPanel {
 
-        public EndTurnPanel(GUI gui) {
+        public EndTurnPanel() {
             super(new MigLayout("wrap 1, center", "[center]", ""));
 
             String labelString = Messages.message("infoPanel.endTurnPanel.text");
@@ -171,7 +171,7 @@ public final class InfoPanel extends FreeColPanel {
 
                     for (AbstractGoods goods : tile.getType().getPossibleProduction(true)) {
                         JLabel goodsLabel = new JLabel(String.valueOf(tile.getPotentialProduction(goods.getType(), null)),
-                            getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.50f),
+                            ImageLibrary.getScaledGoodsImageIcon(goods.getType(), 0.50f),
                             JLabel.RIGHT);
                         goodsLabel.setToolTipText(Messages.getName(goods.getType()));
                         goodsLabel.setFont(font);
@@ -275,14 +275,14 @@ public final class InfoPanel extends FreeColPanel {
                     ImageIcon icon;
                     JLabel label;
                     for (Goods goods : unit.getGoodsList()) {
-                        icon = lib.getScaledGoodsImageIcon(goods.getType(), 0.66f);
+                        icon = ImageLibrary.getScaledGoodsImageIcon(goods.getType(), 0.66f);
                         label = new JLabel(icon);
                         text = Messages.message(goods.getLabel(true));
                         label.setToolTipText(text);
                         add(label);
                     }
                     for (Unit carriedUnit : unit.getUnitList()) {
-                        icon = lib.getUnitImageIcon(carriedUnit, 0.5);
+                        icon = ImageLibrary.getUnitImageIcon(carriedUnit, 0.5);
                         label = new JLabel(icon);
                         text = carriedUnit.getDescription(Unit.UnitLabelType.NATIONAL);
                         label.setToolTipText(text);
@@ -346,7 +346,7 @@ public final class InfoPanel extends FreeColPanel {
         super(freeColClient);
 
         this.player = freeColClient.getMyPlayer();
-        this.endTurnPanel = new EndTurnPanel(getGUI());
+        this.endTurnPanel = new EndTurnPanel();
         this.mapEditorPanel = new JPanel(null);
         this.mapEditorPanel.setSize(130, 100);
         this.mapEditorPanel.setOpaque(false);

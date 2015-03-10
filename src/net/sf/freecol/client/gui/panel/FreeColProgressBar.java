@@ -73,37 +73,33 @@ public class FreeColProgressBar extends JPanel {
     /**
      * Creates a new <code>FreeColProgressBar</code> instance.
      *
-     * @param gui The <code>GUI</code> to display on.
      * @param goodsType the type of goods produced
      */
-    public FreeColProgressBar(GUI gui, GoodsType goodsType) {
-        this(gui, goodsType, 0, 100, 0, 0);
+    public FreeColProgressBar(GoodsType goodsType) {
+        this(goodsType, 0, 100, 0, 0);
     }
 
     /**
      * Creates a new <code>FreeColProgressBar</code> instance.
      *
-     * @param gui The <code>GUI</code> to display on.
      * @param goodsType the type of goods produced
      * @param min the minimum value of the progress bar
      * @param max the maximum value of the progress bar
      */
-    public FreeColProgressBar(GUI gui, GoodsType goodsType, int min, int max) {
-        this(gui, goodsType, min, max, 0, 0);
+    public FreeColProgressBar(GoodsType goodsType, int min, int max) {
+        this(goodsType, min, max, 0, 0);
     }
 
     /**
      * Creates a new <code>FreeColProgressBar</code> instance.
      *
-     * @param gui The <code>GUI</code> to display on.
      * @param goodsType the type of goods produced
      * @param min the minimum value of the progress bar
      * @param max the maximum value of the progress bar
      * @param value the current value of the progress bar
      * @param step the expected increase next turn
      */
-    public FreeColProgressBar(GUI gui, GoodsType goodsType, int min, int max,
-                              int value, int step) {
+    public FreeColProgressBar(GoodsType goodsType, int min, int max, int value, int step) {
         this.goodsType = goodsType;
         this.min = min;
         this.max = max;
@@ -112,7 +108,7 @@ public class FreeColProgressBar extends JPanel {
 
         setBorder(GUI.PROGRESS_BORDER);
         if (goodsType != null) {
-            ImageIcon icon = gui.getImageLibrary().getGoodsImageIcon(goodsType);
+            ImageIcon icon = ImageLibrary.getGoodsImageIcon(goodsType);
             // scale to a height of 16px, preserving aspect ratio
             image = icon.getImage()
                 .getScaledInstance(-1, iconHeight, Image.SCALE_SMOOTH);

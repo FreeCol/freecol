@@ -218,7 +218,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     @Override
     public void paintComponent(Graphics g) {
         ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
-        g.drawImage(lib.fadeImage(lib.getBuildingImage(building), 0.6f, 192.0f),
+        g.drawImage(ImageLibrary.fadeImage(lib.getBuildingImage(building), 0.6f, 192.0f),
                     0, 0, this);
     }
 
@@ -240,8 +240,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             super(freeColClient.getGUI().getImageLibrary()
                 .getMiscImageIcon("coin"));
 
-            ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
-            image = lib.getStringImage(freeColClient.getGUI().getCanvas()
+            image = ImageLibrary.getStringImage(freeColClient.getGUI().getCanvas()
                 .getGraphics(),
                 Integer.toString(number), getForeground(),
                 GUI.TINY_SIMPLE_FONT);

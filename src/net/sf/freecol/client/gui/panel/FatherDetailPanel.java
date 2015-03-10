@@ -34,6 +34,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
@@ -138,7 +139,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
         JLabel header = new JLabel(name + " (" + type + ")");
         header.setFont(GUI.SMALL_HEADER_FONT);
 
-        Image image = getLibrary().getFoundingFatherImage(father);
+        Image image = ImageLibrary.getFoundingFatherImage(father);
         JLabel label = new JLabel(new ImageIcon(image));
 
         StringBuilder text = new StringBuilder();

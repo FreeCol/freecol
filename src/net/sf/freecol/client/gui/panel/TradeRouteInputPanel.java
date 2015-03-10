@@ -56,6 +56,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -90,7 +91,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
 
         public CargoLabel(GoodsType type) {
-            super(getLibrary().getGoodsImageIcon(type));
+            super(ImageLibrary.getGoodsImageIcon(type));
 
             this.goodsType = type;
             setDisabledIcon(getDisabledIcon());
@@ -451,13 +452,13 @@ public final class TradeRouteInputPanel extends FreeColPanel
             JLabel icon, name;
             if (location instanceof Europe) {
                 Europe europe = (Europe) location;
-                Image image = getLibrary()
+                Image image = ImageLibrary
                     .getCoatOfArmsImage(europe.getOwner().getNation(), 0.5);
                 icon = new JLabel(new ImageIcon(image));
                 name = GUI.localizedLabel(europe.getNameKey());
             } else if (location instanceof Colony) {
                 Colony colony = (Colony) location;
-                icon = new JLabel(new ImageIcon(getLibrary()
+                icon = new JLabel(new ImageIcon(ImageLibrary
                         .getSettlementImage(colony, 0.5)));
                 name = new JLabel(colony.getName());
             } else {
@@ -466,7 +467,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             panel.add(icon, "spany");
             panel.add(name, "span, wrap");
             for (GoodsType cargo : value.getCargo()) {
-                panel.add(new JLabel(new ImageIcon(getLibrary()
+                panel.add(new JLabel(new ImageIcon(ImageLibrary
                             .getGoodsImage(cargo, 0.5))));
             }
             return panel;

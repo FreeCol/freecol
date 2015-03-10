@@ -584,7 +584,7 @@ public final class MapViewer {
 
         ImageIcon image;
         if (unit != null
-            && (image = lib.getUnitImageIcon(unit, 0.5)) != null) {
+            && (image = ImageLibrary.getUnitImageIcon(unit, 0.5)) != null) {
             g.drawImage(image.getImage(),
                         tileWidth/4 - image.getIconWidth() / 2,
                         halfHeight - image.getIconHeight() / 2, null);
@@ -1298,7 +1298,7 @@ public final class MapViewer {
 
         g2.setColor(backgroundColor);
         g2.fill(new RoundRectangle2D.Float(0, 0, width, height, radius, radius));
-        g2.setColor(lib.getForegroundColor(backgroundColor));
+        g2.setColor(ImageLibrary.getForegroundColor(backgroundColor));
         int offset = 0;
         for (i = 0; i < labels.length; i++) {
             if (i > 0) {
@@ -1355,7 +1355,7 @@ public final class MapViewer {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(backgroundColor);
         g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
-        g.setColor(lib.getForegroundColor(backgroundColor));
+        g.setColor(ImageLibrary.getForegroundColor(backgroundColor));
         if (expertMissionary) {
             g.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             g.draw(circle);
@@ -1496,21 +1496,21 @@ public final class MapViewer {
             if (point == null) continue;
 
             Image image = (p.isOnCarrier())
-                ? lib.getPathImage(ImageLibrary.PathType.NAVAL)
+                ? ImageLibrary.getPathImage(ImageLibrary.PathType.NAVAL)
                 : (activeUnit != null)
-                ? lib.getPathImage(activeUnit)
+                ? ImageLibrary.getPathImage(activeUnit)
                 : null;
 
             Image turns = (p.getTurns() <= 0) ? null
-                : lib.getStringImage(g, Integer.toString(p.getTurns()),
+                : ImageLibrary.getStringImage(g, Integer.toString(p.getTurns()),
                                       Color.WHITE, font);
             g.setColor((turns == null) ? Color.GREEN : Color.RED);
 
             if (debug) { // More detailed display
                 if (activeUnit != null) {
-                    image = lib.getPathNextTurnImage(activeUnit);
+                    image = ImageLibrary.getPathNextTurnImage(activeUnit);
                 }
-                turns = lib.getStringImage(g, Integer.toString(p.getTurns())
+                turns = ImageLibrary.getStringImage(g, Integer.toString(p.getTurns())
                     + "/" + Integer.toString(p.getMovesLeft()),
                     Color.WHITE, font);
             }
@@ -1744,7 +1744,7 @@ public final class MapViewer {
                 g.setTransform(settlementTransforms.get(index));
                 switch (colonyLabels) {
                 case ClientOptions.COLONY_LABELS_CLASSIC:
-                    Image img = lib.getStringImage(g, name, backgroundColor, font);
+                    Image img = ImageLibrary.getStringImage(g, name, backgroundColor, font);
                     g.drawImage(img, (tileWidth - img.getWidth(null))/2 + 1,
                                 yOffset, null);
                     break;
@@ -1859,7 +1859,7 @@ public final class MapViewer {
             && !freeColClient.currentPlayerIsMyPlayer()) {
 
             if (greyLayer == null) {
-                greyLayer = new GrayLayer(freeColClient, lib);
+                greyLayer = new GrayLayer(freeColClient);
             }
             if (greyLayer.getParent() == null) { // Not added to the canvas yet.
                 canvas.add(greyLayer, JLayeredPane.DRAG_LAYER);
@@ -1885,7 +1885,7 @@ public final class MapViewer {
             synchronized (this) {
                 Font font = lib.getScaledFont("NormalFont", 12f);
                 GUIMessage message = getMessage(0);
-                Image si = lib.getStringImage(g, message.getMessage(),
+                Image si = ImageLibrary.getStringImage(g, message.getMessage(),
                                               message.getColor(), font);
                 int yy = size.height - 300 - getMessageCount()
                     * si.getHeight(null);
@@ -1893,7 +1893,7 @@ public final class MapViewer {
 
                 for (int i = 0; i < getMessageCount(); i++) {
                     message = getMessage(i);
-                    g.drawImage(lib.getStringImage(g, message.getMessage(),
+                    g.drawImage(ImageLibrary.getStringImage(g, message.getMessage(),
                                                    message.getColor(), font),
                                 xx, yy, null);
                     yy += si.getHeight(null);
@@ -2012,7 +2012,7 @@ public final class MapViewer {
                     Font font = (colony.getPreferredSizeChange() > 0)
                         ? lib.getScaledFont("SimpleFont", Font.BOLD | Font.ITALIC, 18f)
                         : lib.getScaledFont("SimpleFont", Font.BOLD, 12f);
-                    Image stringImage = lib.getStringImage(g, populationString,
+                    Image stringImage = ImageLibrary.getStringImage(g, populationString,
                                                            theColor, font);
                     centerImage(g, stringImage);
                 }

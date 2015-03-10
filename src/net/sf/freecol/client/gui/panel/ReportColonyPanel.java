@@ -245,7 +245,7 @@ public final class ReportColonyPanel extends ReportPanel
                 }
 
                 JLabel buildingLabel =
-                    new JLabel(new ImageIcon(getGUI().getImageLibrary().
+                    new JLabel(new ImageIcon(ImageLibrary.
                                              getBuildingImage(building, 0.66)));
                 buildingLabel.setToolTipText(Messages.getName(building));
                 buildingsPanel.add(buildingLabel);
@@ -338,7 +338,6 @@ public final class ReportColonyPanel extends ReportPanel
         final Specification spec = getSpecification();
         final GoodsType foodType = spec.getPrimaryFoodType();
         final UnitType colonistType = spec.getDefaultUnitType();
-        final ImageLibrary lib = getGUI().getImageLibrary();
 
         // Assemble the fundamental facts about this colony
         final String cac = colony.getId();
@@ -658,7 +657,7 @@ public final class ReportColonyPanel extends ReportPanel
                     stpl("report.colony.making.constructing.description")
                         .addName("%colony%", colony.getName())
                         .add("%buildable%", build.getNameKey())
-                        .addAmount("%turns%", turns));;
+                        .addAmount("%turns%", turns));
             } else if (turns < 0) {
                 GoodsType goodsType = needed.getType();
                 int goodsAmount = needed.getAmount()
@@ -682,7 +681,7 @@ public final class ReportColonyPanel extends ReportPanel
                 - u.getTurnsOfTraining();
             if (left <= 0) {
                 b = colourButton(cac, Integer.toString(0),
-                    lib.getUnitImageIcon(u.getType(),
+                    ImageLibrary.getUnitImageIcon(u.getType(),
                         Specification.DEFAULT_ROLE_ID, true, 0.333),
                     cAlarm,
                     stpl("report.colony.making.noteach.description")
@@ -691,7 +690,7 @@ public final class ReportColonyPanel extends ReportPanel
                             u.getLabel(Unit.UnitLabelType.NATIONAL)));
             } else {
                 b = colourButton(cac, Integer.toString(left),
-                    lib.getUnitImageIcon(u.getType(),
+                    ImageLibrary.getUnitImageIcon(u.getType(),
                         Specification.DEFAULT_ROLE_ID, true, 0.333),
                     Color.BLACK,
                     stpl("report.colony.making.educating.description")
@@ -742,8 +741,7 @@ public final class ReportColonyPanel extends ReportPanel
         reportPanel.add(newLabel("report.colony.road.header", null, null,
                                  stpl("report.colony.road.description")));
         for (GoodsType g : goodsTypes) {
-            ImageIcon ii = getGUI().getImageLibrary()
-                .getScaledGoodsImageIcon(g, 0.667);
+            ImageIcon ii = ImageLibrary.getScaledGoodsImageIcon(g, 0.667);
             JLabel l = newLabel(null, ii, null,
                 stpl("report.colony.production.header")
                     .add("%goods%", g.getNameKey()));
@@ -752,7 +750,7 @@ public final class ReportColonyPanel extends ReportPanel
         }
         final UnitType colonistType = getSpecification().getDefaultUnitType();
         ImageIcon colonistIcon
-            = getGUI().getImageLibrary().getUnitImageIcon(colonistType,
+            = ImageLibrary.getUnitImageIcon(colonistType,
                 Specification.DEFAULT_ROLE_ID, true, 0.333);
         reportPanel.add(newLabel(null, colonistIcon, null,
                                  stpl("report.colony.birth.description")));
@@ -863,7 +861,7 @@ public final class ReportColonyPanel extends ReportPanel
             }
             Suggestion suggestion = suggestions.get(type);
             String label = Integer.toString(suggestion.amount);
-            ImageIcon ii = lib.getUnitImageIcon(type,
+            ImageIcon ii = ImageLibrary.getUnitImageIcon(type,
                 Specification.DEFAULT_ROLE_ID, true, 0.333);
             StringTemplate tip = (suggestion.oldType == null)
                 ? stpl("report.colony.wanting.description")

@@ -33,6 +33,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
@@ -75,11 +76,11 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             JButton button = GUI.getLinkButton(name, null, father.getId());
             button.addActionListener(this);
             recruitingPanel.add(button);
-            JLabel currentFatherLabel = new JLabel(new ImageIcon(getLibrary().getFoundingFatherImage(father)));
+            JLabel currentFatherLabel = new JLabel(new ImageIcon(ImageLibrary.getFoundingFatherImage(father)));
             currentFatherLabel.setToolTipText(Messages.getDescription(father));
             recruitingPanel.add(currentFatherLabel);
             GoodsType bellsType = getSpecification().getGoodsType("model.goods.bells");
-            FreeColProgressBar progressBar = new FreeColProgressBar(getGUI(), bellsType);
+            FreeColProgressBar progressBar = new FreeColProgressBar(bellsType);
             int total = 0;
             for (Colony colony : player.getColonies()) {
                 total += colony.getNetProductionOf(bellsType);
@@ -111,7 +112,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             Image image;
             Turn turn = null;
             if (player.hasFather(father)) {
-                image = getLibrary().getFoundingFatherImage(father);
+                image = ImageLibrary.getFoundingFatherImage(father);
                 turn = electionTurns.get(name);
             } else {
                 image = ResourceManager.getGrayscaleImage(father.getId() + ".image", 1);

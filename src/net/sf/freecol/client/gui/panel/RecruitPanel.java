@@ -28,6 +28,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -104,7 +105,7 @@ public final class RecruitPanel extends FreeColPanel {
         for (UnitType ut : europe.getRecruitables()) {
             boolean enable = player.checkGold(recruitPrice);
             person[i].setText(Messages.getName(ut));
-            person[i].setIcon(getLibrary().getUnitImageIcon(ut, 0.66));
+            person[i].setIcon(ImageLibrary.getUnitImageIcon(ut, 0.66));
             person[i].setEnabled(enable);
             add(person[i], "growx");
             shouldEnable |= enable;

@@ -59,8 +59,6 @@ public class GrayLayer extends Component {
 
     /** The client for this FreeCol game */
     private final FreeColClient freeColClient;
-    /** Image library for icon lookup */
-    private final ImageLibrary imageLibrary;
     /** Player object or <code>null</code> */
     private Player player;
 
@@ -68,12 +66,10 @@ public class GrayLayer extends Component {
     /**
      * Create a gray layer.
      *
-     * @param imageLibrary The <code>ImageLibrary</code> to use.
      * @param freeColClient The client for the game.
      */
-    public GrayLayer(FreeColClient freeColClient, ImageLibrary imageLibrary) {
+    public GrayLayer(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        this.imageLibrary = imageLibrary;
     }
 
 
@@ -110,7 +106,7 @@ public class GrayLayer extends Component {
             colour = Color.WHITE;
 
         } else {
-            coatOfArmsIcon = imageLibrary
+            coatOfArmsIcon = ImageLibrary
                 .getCoatOfArmsImageIcon(player.getNation());
             StringTemplate t = StringTemplate.template("waitingFor")
                 .addStringTemplate("%nation%", player.getNationName());

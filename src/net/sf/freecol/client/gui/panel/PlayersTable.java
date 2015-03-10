@@ -303,7 +303,7 @@ public final class PlayersTable extends JTable {
             int row, int column) {
             Nation nation = (Nation) value;
             setText(Messages.getName(nation));
-            setIcon(new ImageIcon(library.getCoatOfArmsImage(nation, 0.5)));
+            setIcon(new ImageIcon(ImageLibrary.getCoatOfArmsImage(nation, 0.5)));
             return this;
         }
     }

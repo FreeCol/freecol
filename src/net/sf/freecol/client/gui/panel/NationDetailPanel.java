@@ -30,6 +30,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
@@ -95,7 +96,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
         name.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 
-        JLabel artLabel = new JLabel(new ImageIcon(getLibrary().getMonarchImage(nation)));
+        JLabel artLabel = new JLabel(new ImageIcon(ImageLibrary.getMonarchImage(nation)));
         panel.add(artLabel, "spany, gap 40, top");
 
         panel.add(GUI.localizedLabel("colopedia.nation.ruler"));

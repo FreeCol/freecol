@@ -32,6 +32,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -126,8 +127,6 @@ public class ConstructionPanel extends MigPanel
     }
 
     public void update(BuildableType buildable) {
-        final GUI gui = freeColClient.getGUI();
-
         removeAll();
 
         if (buildable == null) {
@@ -146,9 +145,9 @@ public class ConstructionPanel extends MigPanel
             String turnsStr = Messages.getTurnsText(turnsToComplete);
             // FIXME: distinguish national unit types
             Image image = (buildable instanceof BuildingType)
-                ? gui.getImageLibrary()
-                    .getBuildingImage((BuildingType) buildable, colony.getOwner(), 0.75)
-                : gui.getImageLibrary().getImage(buildable, 0.75);
+                ? ImageLibrary.getBuildingImage(
+                    (BuildingType) buildable, colony.getOwner(), 0.75)
+                : ImageLibrary.getImage(buildable, 0.75);
             add(new JLabel(new ImageIcon(image)), "spany");
             add(GUI.localizedLabel(StringTemplate
                     .template("colonyPanel.currentlyBuilding")
@@ -161,7 +160,7 @@ public class ConstructionPanel extends MigPanel
                 int amountNeeded = ag.getAmount();
                 int amountAvailable = colony.getGoodsCount(ag.getType());
                 int amountProduced = colony.getAdjustedNetProductionOf(ag.getType());
-                add(new FreeColProgressBar(gui, ag.getType(), 0,
+                add(new FreeColProgressBar(ag.getType(), 0,
                                            amountNeeded, amountAvailable, amountProduced),
                     "height 20:");
             }

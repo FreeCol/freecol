@@ -36,6 +36,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -117,14 +118,14 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
         int width = 0;
         int height = 0;
         for (FreeColGameObjectType type : types) {
-            Image image = getLibrary().getImage(type, scale);
+            Image image = ImageLibrary.getImage(type, scale);
             if (image == null) continue;
             width = Math.max(image.getWidth(null), width);
             height = Math.max(image.getHeight(null), height);
         }
         for (FreeColGameObjectType type : types) {
             BufferedImage centeredImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Image image = getLibrary().getImage(type, scale);
+            Image image = ImageLibrary.getImage(type, scale);
             if (image == null) continue;
             int x = (width - image.getWidth(null)) / 2;
             int y = (height - image.getHeight(null)) / 2;
@@ -176,7 +177,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     }
 
     protected JButton getGoodsButton(final GoodsType goodsType, String text) {
-        JButton result = getButton(goodsType, text, getLibrary().getGoodsImageIcon(goodsType));
+        JButton result = getButton(goodsType, text, ImageLibrary.getGoodsImageIcon(goodsType));
         result.setToolTipText(Messages.getName(goodsType));
         return result;
     }
@@ -186,7 +187,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     }
 
     protected JButton getUnitButton(final UnitType unitType, String roleId) {
-        ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, roleId, 0.66);
+        ImageIcon unitIcon = ImageLibrary.getUnitImageIcon(unitType, roleId, 0.66);
         JButton unitButton = getButton(unitType, null, unitIcon);
         unitButton.setHorizontalAlignment(JButton.LEFT);
         return unitButton;

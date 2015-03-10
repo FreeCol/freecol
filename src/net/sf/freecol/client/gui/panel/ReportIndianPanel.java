@@ -101,7 +101,7 @@ public final class ReportIndianPanel extends ReportPanel {
 
         ImageLibrary lib = getLibrary();
         JLabel villageLabel = new JLabel();
-        villageLabel.setIcon(new ImageIcon(lib.getSettlementImage(opponent.getNationType().getCapitalType(), 0.66)));
+        villageLabel.setIcon(new ImageIcon(ImageLibrary.getSettlementImage(opponent.getNationType().getCapitalType(), 0.66)));
         reportPanel.add(villageLabel, "span, split 2");
         JLabel headline = GUI.localizedLabel(opponent.getNationName());
         headline.setFont(GUI.SMALL_HEADER_FONT);
@@ -194,7 +194,7 @@ public final class ReportIndianPanel extends ReportPanel {
                         skillString = "indianSettlement.skillNone";
                     } else {
                         skillString = skillType.getNameKey();
-                        skillLabel.setIcon(getLibrary()
+                        skillLabel.setIcon(ImageLibrary
                             .getUnitImageIcon(skillType, 0.66));
                     }
                 } else {
@@ -218,7 +218,7 @@ public final class ReportIndianPanel extends ReportPanel {
                     } else {
                         JLabel goodsLabel
                             = GUI.localizedLabel(wantedGoods[0].getNameKey());
-                        goodsLabel.setIcon(new ImageIcon(getLibrary()
+                        goodsLabel.setIcon(new ImageIcon(ImageLibrary
                                 .getGoodsImage(wantedGoods[0], 0.66)));
                         String split = "flowy, split "
                             + String.valueOf(wantedGoods.length);
@@ -228,7 +228,7 @@ public final class ReportIndianPanel extends ReportPanel {
                                 String sale = player.getLastSaleString(settlement, wantedGoods[i]);
                                 goodsLabel = new JLabel(Messages.getName(wantedGoods[i])
                                     + ((sale == null) ? "" : " " + sale));
-                                goodsLabel.setIcon(getLibrary()
+                                goodsLabel.setIcon(ImageLibrary
                                     .getScaledGoodsImageIcon(wantedGoods[i], 0.5));
                                 reportPanel.add(goodsLabel);
                             }
