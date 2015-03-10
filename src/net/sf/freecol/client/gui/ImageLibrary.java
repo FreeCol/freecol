@@ -953,13 +953,13 @@ public final class ImageLibrary {
     }
 
     public Font getScaledFont(final String resource, float size) {
-        return ResourceManager.getFont(resource,
-            (float)Math.rint(size * scalingFactor));
+        return ResourceManager.getFont(resource)
+            .deriveFont((float)Math.rint(size * scalingFactor));
     }
 
     public Font getScaledFont(final String resource, int style, float size) {
-        return ResourceManager.getFont(resource, style,
-            (float)Math.rint(size * scalingFactor));
+        return ResourceManager.getFont(resource)
+            .deriveFont(style, (float)Math.rint(size * scalingFactor));
     }
 
     /**

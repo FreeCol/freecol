@@ -411,45 +411,6 @@ public class ResourceManager {
     }
 
     /**
-     * Gets the font with the given name and applies a style change.
-     *
-     * @param resource The name of the resource to query.
-     * @return The <code>Font</code> found in a FontResource, which
-     *     may default to the Java default font if the resource failed
-     *     to load.
-     */
-    public static Font getFont(final String resource, int style) {
-        Font font = ResourceManager.getFont(resource);
-        return font.deriveFont(style);
-    }
-
-    /**
-     * Gets the font with the given name and applies a size change.
-     *
-     * @param resource The name of the resource to query.
-     * @return The <code>Font</code> found in a FontResource, which
-     *     may default to the Java default font if the resource failed
-     *     to load.
-     */
-    public static Font getFont(final String resource, float size) {
-        Font font = ResourceManager.getFont(resource);
-        return font.deriveFont(size);
-    }
-
-    /**
-     * Gets the font with the given name and applies style and size changes.
-     *
-     * @param resource The name of the resource to query.
-     * @return The <code>Font</code> found in a FontResource, which
-     *     may default to the Java default font if the resource failed
-     *     to load.
-     */
-    public static Font getFont(final String resource, int style, float size) {
-        Font font = ResourceManager.getFont(resource);
-        return font.deriveFont(style, size);
-    }
-
-    /**
      * Gets a FAFile resource with the given name.
      *
      * @param resource The name of the resource to query.

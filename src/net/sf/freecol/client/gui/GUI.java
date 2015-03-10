@@ -289,24 +289,24 @@ public class GUI {
 
     /** Font to use for text areas. */
     public static final Font DEFAULT_FONT
-        = ResourceManager.getFont("NormalFont", 13f);
+        = ResourceManager.getFont("NormalFont").deriveFont(13f);
     /** Bold version of the default font. */
     public static final Font DEFAULT_BOLD_FONT
         = DEFAULT_FONT.deriveFont(Font.BOLD);
     /** Simple fonts for arrows, labels in panels etc. */
     public static final Font TINY_SIMPLE_FONT
-        = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
+        = ResourceManager.getFont("SimpleFont").deriveFont(Font.BOLD, 12f);
     public static final Font SMALLER_SIMPLE_FONT
-        = ResourceManager.getFont("SimpleFont", Font.BOLD, 16f);
+        = ResourceManager.getFont("SimpleFont").deriveFont(Font.BOLD, 16f);
     public static final Font SMALL_SIMPLE_FONT
-        = ResourceManager.getFont("SimpleFont", Font.BOLD, 24f);
+        = ResourceManager.getFont("SimpleFont").deriveFont(Font.BOLD, 24f);
     /** Header fonts for reports etc. */
     public static final Font SMALL_HEADER_FONT
-        = ResourceManager.getFont("HeaderFont", 24f);
+        = ResourceManager.getFont("HeaderFont").deriveFont(24f);
     public static final Font MEDIUM_HEADER_FONT
-        = ResourceManager.getFont("HeaderFont", 36f);
+        = ResourceManager.getFont("HeaderFont").deriveFont(36f);
     public static final Font BIG_HEADER_FONT
-        = ResourceManager.getFont("HeaderFont", 48f);
+        = ResourceManager.getFont("HeaderFont").deriveFont(48f);
 
     /** The margin to use for a link button. */
     public static final Insets EMPTY_MARGIN = new Insets(0, 0, 0, 0);
@@ -1074,9 +1074,8 @@ public class GUI {
             = new DefaultStyledDocument(GUI.STYLE_CONTEXT) {
                     @Override
                     public Font getFont(AttributeSet attr) {
-                        Font font = ResourceManager.getFont(StyleConstants
-                            .getFontFamily(attr),
-                            StyleConstants.getFontSize(attr));
+                        Font font = ResourceManager
+                            .getFont(StyleConstants.getFontFamily(attr));
                         int fontStyle = Font.PLAIN;
                         if (StyleConstants.isBold(attr)) {
                             fontStyle |= Font.BOLD;
@@ -1084,8 +1083,10 @@ public class GUI {
                         if (StyleConstants.isItalic(attr)) {
                             fontStyle |= Font.ITALIC;
                         }
-                        return (fontStyle == Font.PLAIN) ? font
-                            : font.deriveFont(fontStyle);
+                        return (fontStyle == Font.PLAIN)
+                            ? font.deriveFont(StyleConstants.getFontSize(attr))
+                            : font.deriveFont(fontStyle,
+                                StyleConstants.getFontSize(attr));
                     }
                 };
 
