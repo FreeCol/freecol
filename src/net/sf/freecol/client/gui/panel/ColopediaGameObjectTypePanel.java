@@ -160,7 +160,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     }
 
     protected JButton getResourceButton(final ResourceType resourceType) {
-        return getButton(resourceType, null, getLibrary().getBonusImageIcon(resourceType));
+        return getButton(resourceType, null, new ImageIcon(getLibrary().getBonusImage(resourceType)));
     }
 
     protected JButton getGoodsButton(final GoodsType goodsType) {

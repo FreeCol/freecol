@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 
@@ -381,22 +379,6 @@ public class ResourceManager {
     public static Image getGrayscaleImage(final String resource, final double scale) {
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getGrayscaleImage(scale) : null;
-    }
-
-    /**
-     * Creates an <code>ImageIcon</code> for the image of
-     * the given name.
-     *
-     * @param resource The name of the resource to return.
-     * @return An <code>ImageIcon</code> created with the image
-     *      identified by <code>resource</code> or
-     *      <code>null</code> if there is no image identified
-     *      by that name.
-     * @see #getImage(String)
-     */
-    public static ImageIcon getImageIcon(final String resource) {
-        final Image im = getImage(resource);
-        return (im != null) ? new ImageIcon(im) : null;
     }
 
     /**

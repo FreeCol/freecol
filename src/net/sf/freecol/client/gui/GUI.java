@@ -243,9 +243,10 @@ public class GUI {
         = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
 
     public static final Border COLOR_CELL_BORDER = BorderFactory
-        .createCompoundBorder(BorderFactory.createMatteBorder(5, 10, 5, 10,
-                ResourceManager.getImageIcon("background.ColorCellRenderer")),
-                              BorderFactory.createLineBorder(BORDER_COLOR));
+        .createCompoundBorder(
+            BorderFactory.createMatteBorder(5, 10, 5, 10,
+                new ImageIcon(ResourceManager.getImage("background.ColorCellRenderer"))),
+            BorderFactory.createLineBorder(BORDER_COLOR));
 
     public static final Border DIALOG_BORDER = BorderFactory
         .createCompoundBorder(TRIVIAL_LINE_BORDER, blankBorder(10, 20, 10, 20));

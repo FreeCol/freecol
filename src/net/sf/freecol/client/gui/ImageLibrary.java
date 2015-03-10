@@ -443,16 +443,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the bonus-ImageIcon at the given index.
-     *
-     * @param type The type of the bonus-ImageIcon to return.
-     * @return <code>ImageIcon</code>
-     */
-    public ImageIcon getBonusImageIcon(ResourceType type) {
-        return new ImageIcon(getBonusImage(type));
-    }
-
-    /**
      * Returns the border terrain-image for the given type.
      *
      * @param type The type of the terrain-image to return.
@@ -492,7 +482,7 @@ public final class ImageLibrary {
      * @return the coat-of-arms of this nation
      */
     public static ImageIcon getCoatOfArmsImageIcon(Nation nation) {
-        return ResourceManager.getImageIcon(nation.getId() + ".image");
+        return new ImageIcon(ResourceManager.getImage(nation.getId() + ".image"));
     }
 
     /**
@@ -620,7 +610,7 @@ public final class ImageLibrary {
      * @return The goods-image at the given index.
      */
     public static ImageIcon getGoodsImageIcon(GoodsType goodsType) {
-        return ResourceManager.getImageIcon(goodsType.getId() + ".image");
+        return new ImageIcon(ResourceManager.getImage(goodsType.getId() + ".image"));
     }
 
     public Image getBuildingImage(Building building) {
@@ -789,16 +779,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the monarch-image icon for the given Nation.
-     *
-     * @param nation The nation this monarch rules.
-     * @return the monarch-image for the given nation.
-     */
-    public static ImageIcon getMonarchImageIcon(Nation nation) {
-        return ResourceManager.getImageIcon(nation.getId() + ".monarch.image");
-    }
-
-    /**
      * Gets a chip for an occupation indicator, i.e. a small image with a
      * single letter or symbol that indicates the Unit's state.
      *
@@ -959,10 +939,6 @@ public final class ImageLibrary {
         String key = "model.tile.delta_" + direction
             + (magnitude == 1 ? "_small" : "_large");
         return ResourceManager.getImage(key, scalingFactor);
-    }
-
-    public static ImageIcon getScaledBonusImageIcon(ResourceType type, float scale) {
-        return new ImageIcon(getBonusImage(type, scale));
     }
 
     /**

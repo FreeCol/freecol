@@ -27,6 +27,7 @@ import java.awt.Image;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 
 import javax.swing.border.BevelBorder;
 import javax.swing.JLabel;
@@ -82,7 +83,7 @@ public final class CornerMapControls extends MapControls {
     public CornerMapControls(final FreeColClient freeColClient) {
         super(freeColClient, true);
 
-        compassRose = new JLabel(ResourceManager.getImageIcon("compass.image"));
+        compassRose = new JLabel(new ImageIcon(ResourceManager.getImage("compass.image")));
         compassRose.setFocusable(false);
         compassRose.setSize(compassRose.getPreferredSize());
         compassRose.addMouseListener(new MouseAdapter() {

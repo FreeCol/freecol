@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -94,7 +95,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
         name.setFont(GUI.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 
-        JLabel artLabel = new JLabel(getLibrary().getMonarchImageIcon(nation));
+        JLabel artLabel = new JLabel(new ImageIcon(getLibrary().getMonarchImage(nation)));
         panel.add(artLabel, "spany, gap 40, top");
 
         panel.add(GUI.localizedLabel("colopedia.nation.ruler"));
