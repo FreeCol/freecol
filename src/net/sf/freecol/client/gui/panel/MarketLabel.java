@@ -20,9 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Graphics;
-import java.util.logging.Logger;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -38,8 +36,6 @@ import net.sf.freecol.common.model.Player;
 public final class MarketLabel extends AbstractGoodsLabel
     implements Draggable {
 
-    private static final Logger logger = Logger.getLogger(MarketLabel.class.getName());
-
     /** The enclosing market. */
     private final Market market;
 
@@ -49,9 +45,8 @@ public final class MarketLabel extends AbstractGoodsLabel
      *
      * @param type The <code>GoodsType</code> to represent.
      * @param market The <code>Market</code> in which to trade the goods.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public MarketLabel(GoodsType type, Market market, GUI gui) {
+    public MarketLabel(GoodsType type, Market market) {
         super(new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
 
         if (market == null) throw new IllegalArgumentException("Null market");

@@ -701,7 +701,7 @@ public final class EuropePanel extends PortPanel {
             for (GoodsType goodsType : goodsTypes) {
                 if (goodsType.isStorable()) {
                     MarketLabel marketLabel
-                        = new MarketLabel(goodsType, market, getGUI());
+                        = new MarketLabel(goodsType, market);
                     marketLabel.setTransferHandler(defaultTransferHandler);
                     marketLabel.addMouseListener(pressListener);
                     add(marketLabel);
