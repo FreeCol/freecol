@@ -20,6 +20,8 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Graphics;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -34,7 +36,7 @@ import net.sf.freecol.common.model.Player;
  * This label represents a cargo type on the European market.
  */
 public final class MarketLabel extends AbstractGoodsLabel
-    implements Draggable {
+    implements Draggable, PropertyChangeListener {
 
     /** The enclosing market. */
     private final Market market;
@@ -51,53 +53,16 @@ public final class MarketLabel extends AbstractGoodsLabel
 
         if (market == null) throw new IllegalArgumentException("Null market");
         this.market = market;
+        update();
     }
 
 
     /**
-     * Get this MarketLabel's market.
-     *
-     * @return The enclosing <code>Market</code>.
+     * Update this label.
      */
-    public Market getMarket() {
-        return market;
-    }
-
-    /**
-     * Sets this MarketLabel's goods amount.
-     *
-     * @param amount The amount of goods.
-     */
-    public void setAmount(int amount) {
-        getGoods().setAmount(amount);
-    }
-
-    /**
-     * Sets the amount of the goods wrapped by this Label to
-     * GoodsContainer.CARGO_SIZE.
-     */
-    public void setDefaultAmount() {
-        setAmount(GoodsContainer.CARGO_SIZE);
-    }
-
-    /**
-     * Is this label on a carrier?  No, it is in a market!
-     *
-     * @return False.
-     */
-    public boolean isOnCarrier() {
-        return false;
-    }
-
-    /**
-     * Paint this MarketLabel.
-     *
-     * @param g The graphics context in which to do the painting.
-     */
-    @Override
-    public void paintComponent(Graphics g) {
-        Player player = market.getOwner();
-        GoodsType type = getType();
+    public void update() {
+        final GoodsType type = getType();
+        final Player player = market.getOwner();
         String toolTipText = Messages.getName(type);
         if (player == null || player.canTrade(type)) {
             setEnabled(true);
@@ -109,9 +74,47 @@ public final class MarketLabel extends AbstractGoodsLabel
             toolTipText += " " + market.getAmountInMarket(type);
         }
         setToolTipText(toolTipText);
+        
+        setText(market.getPaidForSale(type) + "/" + market.getCostToBuy(type));
+    }
 
-        super.setText(market.getPaidForSale(type)
-                      + "/" + market.getCostToBuy(type));
-        super.paintComponent(g);
+    /**
+     * Get this MarketLabel's market.
+     *
+     * @return The enclosing <code>Market</code>.
+     */
+    public Market getMarket() {
+        return market;
+    }
+
+    /**
+     * Sets the amount of the goods wrapped by this Label to
+     * GoodsContainer.CARGO_SIZE.
+     */
+    @Override
+    public void setDefaultAmount() {
+        setAmount(GoodsContainer.CARGO_SIZE);
+    }
+
+
+    // Implement Draggable
+
+    /**
+     * Is this label on a carrier?  No, it is in a market!
+     *
+     * @return False.
+     */
+    public boolean isOnCarrier() {
+        return false;
+    }
+
+
+    // Interface PropertyChangeListener
+
+    /**
+     * {@inheritDoc}
+     */
+    public void propertyChange(PropertyChangeEvent event) {
+        update(); // Just update the text and tool tip.
     }
 }

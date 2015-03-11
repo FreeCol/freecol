@@ -45,7 +45,9 @@ public class AbstractGoodsLabel extends JLabel {
      */
     public AbstractGoodsLabel(AbstractGoods goods) {
         super(ImageLibrary.getGoodsImageIcon(goods.getType()));
+
         this.goods = goods;
+
         setToolTipText(Messages.getName(goods));
     }
 
@@ -93,6 +95,15 @@ public class AbstractGoodsLabel extends JLabel {
      */
     public int getAmount() {
         return goods.getAmount();
+    }
+
+    /**
+     * Set the goods amount.
+     *
+     * @param amount The amount of goods.
+     */
+    public void setAmount(int amount) {
+        goods.setAmount(amount);
     }
 
     /**

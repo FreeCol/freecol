@@ -22,8 +22,8 @@ package net.sf.freecol.common.model;
 
 
 /**
-* Interface for classes which listen to transactions in market
-*/
+ * Interface for classes which listen to transactions in market
+ */
 public interface TransactionListener {
 
     /**

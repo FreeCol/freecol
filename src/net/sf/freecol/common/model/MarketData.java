@@ -373,6 +373,11 @@ public class MarketData extends FreeColGameObject {
         int oldCostToBuy = costToBuy, oldPaidForSale = paidForSale;
         costToBuy = newPrice;
         paidForSale = newSalePrice;
+        if (costToBuy != oldCostToBuy) {
+            firePropertyChange(goodsType.getId(), oldCostToBuy, costToBuy);
+        } else if (paidForSale != oldPaidForSale) {
+            firePropertyChange(goodsType.getId(), oldPaidForSale, paidForSale);
+        }            
         return costToBuy != oldCostToBuy || paidForSale != oldPaidForSale;
     }
 

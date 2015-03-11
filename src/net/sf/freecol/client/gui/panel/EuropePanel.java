@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.MarketData;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
@@ -71,6 +72,198 @@ import net.sf.freecol.common.model.Unit;
 public final class EuropePanel extends PortPanel {
 
     private static final Logger logger = Logger.getLogger(EuropePanel.class.getName());
+
+    /**
+     * A panel to hold unit labels that represent units that are going
+     * to America or Europe.
+     */
+    private final class DestinationPanel extends JPanel implements DropTarget {
+
+        private Location destination;
+
+
+        /**
+         * Initialize this DestinationPanel.
+         */
+        public void initialize(Location destination) {
+            this.destination = destination;
+            update();
+        }
+
+        /**
+         * Cleans up this DestinationPanel.
+         */
+        public void cleanup() {}
+
+        /**
+         * Update this DestinationPanel.
+         */
+        public void update() {
+            removeAll();
+
+            HighSeas highSeas = getMyPlayer().getHighSeas();
+            if (highSeas != null) {
+                for (Unit unit : highSeas.getUnitList()) {
+                    boolean belongs;
+                    if (destination instanceof Europe) {
+                        belongs = unit.getDestination() == destination;
+                    } else if (destination instanceof Map) {
+                        belongs = unit.getDestination() == destination
+                            || (unit.getDestination() != null
+                                && unit.getDestination().getTile() != null
+                                && unit.getDestination().getTile().getMap()
+                                == destination);
+                    } else {
+                        logger.warning("Bogus DestinationPanel location: "
+                            + destination
+                            + " for unit: " + unit);
+                        belongs = false;
+                    }
+                    if (belongs) {
+                        UnitLabel unitLabel
+                            = new UnitLabel(getFreeColClient(), unit);
+                        unitLabel.setTransferHandler(defaultTransferHandler);
+                        unitLabel.addMouseListener(pressListener);
+                        add(unitLabel);
+                    }
+                }
+            }
+
+            GUI.localizeBorder(this, StringTemplate.template("goingTo")
+                .add("%type%", "ship")
+                .addStringTemplate("%location%",
+                    destination.getLocationLabelFor(getMyPlayer())));
+            revalidate();
+        }
+
+
+        // Interface DropTarget
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean accepts(Unit unit) {
+            return unit.isNaval() && !unit.isDamaged();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean accepts(Goods goods) {
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Component add(Component comp, boolean editState) {
+            if (editState) {
+                if (!(comp instanceof UnitLabel)) {
+                    logger.warning("Invalid component: " + comp);
+                    return null;
+                }
+                final Unit unit = ((UnitLabel)comp).getUnit();
+
+                if (unit.getTradeRoute() != null) {
+                    if (!getGUI().confirmClearTradeRoute(unit)
+                        || !igc().assignTradeRoute(unit, null)) return null;
+                }
+
+                Location dest = destination;
+                if (unit.isInEurope()) {
+                    dest = getGUI().showSelectDestinationDialog(unit);
+                    if (dest == null) return null; // user aborted
+                }
+
+                final ClientOptions co = getClientOptions();
+                if (!co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)
+                    && unit.isInEurope()
+                    && !(destination instanceof Europe)
+                    && docksPanel.getComponentCount() > 0
+                    && unit.hasSpaceLeft()) {
+                    StringTemplate locName = destination
+                        .getLocationLabelFor(unit.getOwner());
+                    if (!getGUI().confirm(true, null,
+                            StringTemplate.template("europe.leaveColonists")
+                                .addStringTemplate("%newWorld%", locName),
+                            unit, "ok", "cancel")) return null;
+                }
+
+                comp.getParent().remove(comp);
+                igc().moveTo(unit, dest);
+                inPortPanel.update();
+                docksPanel.update();
+                cargoPanel.update();
+                if (unit == cargoPanel.getCarrier()) {
+                    cargoPanel.setCarrier(null);
+                }
+            }
+
+            Component c = add(comp);
+            revalidate();
+            EuropePanel.this.refresh();
+            return c;
+        }
+    }
+
+    /**
+     * A panel that holds UnitLabels that represent Units that are
+     * waiting on the docks in Europe.
+     */
+    public final class DocksPanel extends UnitPanel implements DropTarget {
+
+        public DocksPanel() {
+            super(EuropePanel.this, "Europe - docks", true);
+
+            setLayout(new MigLayout("wrap 6"));
+        }
+
+
+        public void addPropertyChangeListeners() {
+            europe.addPropertyChangeListener(this);
+        }
+
+        public void removePropertyChangeListeners() {
+            europe.removePropertyChangeListener(this);
+        }
+
+
+        // Interface DropTarget
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean accepts(Unit unit) {
+            return !unit.isNaval();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean accepts(Goods goods) {
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Component add(Component comp, boolean editState) {
+            Component c = add(comp);
+            update();
+            return c;
+        }
+
+
+        // Override Container
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void remove(Component comp) {
+            update();
+        }
+    }
 
     private static final class EuropeButton extends JButton {
 
@@ -90,6 +283,240 @@ public final class EuropePanel extends PortPanel {
                                              closeInputMap);
         }
     }
+
+    /**
+     * A panel that holds unit labels that represent naval units that
+     * are waiting in Europe.
+     */
+    private final class EuropeInPortPanel extends InPortPanel {
+
+        public EuropeInPortPanel() {
+            super(EuropePanel.this, "Europe - port", true);
+        }
+
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void addPropertyChangeListeners() {
+            europe.addPropertyChangeListener(this);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void removePropertyChangeListeners() {
+            europe.removePropertyChangeListener(this);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean accepts(Unit unit) {
+            if (!unit.isNaval()) return false;
+            switch (unit.getState()) {
+            case ACTIVE: case FORTIFIED: case FORTIFYING:
+            case SENTRY: case SKIPPED:
+                return true;
+            }
+            return false;
+        }
+    }
+
+    /**
+     * A panel that shows goods available for purchase in Europe.
+     */
+    private final class MarketPanel extends JPanel implements DropTarget {
+
+        /**
+         * Creates this MarketPanel.
+         *
+         * @param europePanel The panel that holds this CargoPanel.
+         */
+        public MarketPanel(EuropePanel europePanel) {
+            super(new GridLayout(2, 8));
+        }
+
+
+        /**
+         * Initialize this MarketPanel.
+         */
+        public void initialize() {
+            removeAll();
+
+            final Market market = getMyPlayer().getMarket();
+            for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
+                if (goodsType.isStorable()) {
+                    MarketLabel label = new MarketLabel(goodsType, market);
+                    label.setTransferHandler(defaultTransferHandler);
+                    label.addMouseListener(pressListener);
+                    MarketData md = market.getMarketData(goodsType);
+                    if (md != null) md.addPropertyChangeListener(label);
+                    add(label);
+                }
+            }
+        }
+
+        /**
+         * Cleans up this MarketPanel.
+         */
+        public void cleanup() {}
+
+
+        // Interface DropTarget
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean accepts(Unit unit) {
+            return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean accepts(Goods goods) {
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Component add(Component comp, boolean editState) {
+            if (editState) {
+                if (!(comp instanceof GoodsLabel)) {
+                    logger.warning("Invalid component: " + comp);
+                    return null;
+                }
+
+                Goods goods = ((GoodsLabel)comp).getGoods();
+                if (getMyPlayer().canTrade(goods.getType())) {
+                    igc().sellGoods(goods);
+                } else {
+                    GUI.BoycottAction act = getGUI().getBoycottChoice(goods,
+                                                                      europe);
+                    if (act != null) {
+                        switch (act) {
+                        case PAY_ARREARS:
+                            igc().payArrears(goods.getType());
+                            break;
+                        case DUMP_CARGO:
+                            igc().unloadCargo(goods, true);
+                            break;
+                        default:
+                            logger.warning("showBoycottedGoodsDialog fail: "
+                                + act);
+                            break;
+                        }
+                    }
+                }
+                cargoPanel.revalidate();
+                revalidate();
+                igc().nextModelMessage();
+            }
+            EuropePanel.this.refresh();
+            return comp;
+        }
+
+
+        // Override Container
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void remove(Component comp) {
+            // Don't remove market labels.
+        }
+    }
+
+    /**
+     * To log transactions made in Europe
+     */
+    private final class TransactionLog extends JTextPane
+        implements TransactionListener {
+
+        /**
+         * Creates a transaction log.
+         */
+        public TransactionLog() {
+            setEditable(false);
+        }
+
+
+        /**
+         * Initializes this TransactionLog.
+         */
+        public void initialize() {
+            getMyPlayer().getMarket().addTransactionListener(this);
+            setText("");
+        }
+
+        /**
+         * Cleans up this TransactionLog.
+         */
+        public void cleanup() {
+            getMyPlayer().getMarket().removeTransactionListener(this);
+        }
+
+        /**
+         * Add text to the transaction log.
+         *
+         * @param text The text to add.
+         */
+        private void add(String text) {
+            StyledDocument doc = getStyledDocument();
+            try {
+                if (doc.getLength() > 0) text = "\n\n" + text;
+                doc.insertString(doc.getLength(), text, null);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Transaction log update failure", e);
+            }
+        }
+
+        // Implement TransactionListener
+
+        /**
+         * {@inheritDoc}
+         */
+        public void logPurchase(GoodsType goodsType, int amount, int price) {
+            int total = amount * price;
+            StringTemplate t1 = StringTemplate.template("transaction.purchase")
+                .add("%goods%", goodsType.getNameKey())
+                .addAmount("%amount%", amount)
+                .addAmount("%gold%", price);
+            StringTemplate t2 = StringTemplate.template("transaction.price")
+                .addAmount("%gold%", total);
+            add(Messages.message(t1) + "\n" + Messages.message(t2));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void logSale(GoodsType goodsType, int amount,
+                            int price, int tax) {
+            int totalBeforeTax = amount * price;
+            int totalTax = totalBeforeTax * tax / 100;
+            int totalAfterTax = totalBeforeTax - totalTax;
+
+            StringTemplate t1 = StringTemplate.template("transaction.sale")
+                .add("%goods%", goodsType.getNameKey())
+                .addAmount("%amount%", amount)
+                .addAmount("%gold%", price);
+            StringTemplate t2 = StringTemplate.template("transaction.price")
+                .addAmount("%gold%", totalBeforeTax);
+            StringTemplate t3 = StringTemplate.template("transaction.tax")
+                .addAmount("%tax%", tax)
+                .addAmount("%gold%", totalTax);
+            StringTemplate t4 = StringTemplate.template("transaction.net")
+                .addAmount("%gold%", totalAfterTax);
+            add(Messages.message(t1) + "\n" + Messages.message(t2)
+                + "\n" + Messages.message(t3) + "\n" + Messages.message(t4));
+        }
+    }
+
 
     public static enum EuropeAction {
         EXIT,
@@ -440,424 +867,5 @@ public final class EuropePanel extends PortPanel {
         log = null;
         exitButton = trainButton = purchaseButton = recruitButton
             = unloadButton = sailButton = null;
-    }
-
-
-    /**
-     * A panel that holds UnitsLabels that represent Units that are going to
-     * America or Europe.
-     */
-    public final class DestinationPanel extends JPanel implements DropTarget {
-
-        private Location destination;
-
-        /**
-         * Initialize this DestinationPanel.
-         */
-        public void initialize(Location destination) {
-            this.destination = destination;
-            update();
-        }
-
-        /**
-         * Cleans up this DestinationPanel.
-         */
-        public void cleanup() {}
-
-        /**
-         * Update this DestinationPanel.
-         */
-        public void update() {
-            removeAll();
-
-            HighSeas highSeas = getMyPlayer().getHighSeas();
-            if (highSeas != null) {
-                for (Unit unit : highSeas.getUnitList()) {
-                    boolean belongs;
-                    if (destination instanceof Europe) {
-                        belongs = unit.getDestination() == destination;
-                    } else if (destination instanceof Map) {
-                        belongs = unit.getDestination() == destination
-                            || (unit.getDestination() != null
-                                && unit.getDestination().getTile() != null
-                                && unit.getDestination().getTile().getMap()
-                                == destination);
-                    } else {
-                        logger.warning("Bogus DestinationPanel location: "
-                            + destination
-                            + " for unit: " + unit);
-                        belongs = false;
-                    }
-                    if (belongs) {
-                        UnitLabel unitLabel
-                            = new UnitLabel(getFreeColClient(), unit);
-                        unitLabel.setTransferHandler(defaultTransferHandler);
-                        unitLabel.addMouseListener(pressListener);
-                        add(unitLabel);
-                    }
-                }
-            }
-
-            GUI.localizeBorder(this, StringTemplate.template("goingTo")
-                .add("%type%", "ship")
-                .addStringTemplate("%location%",
-                    destination.getLocationLabelFor(getMyPlayer())));
-            revalidate();
-        }
-
-
-        // Interface DropTarget
-
-        /**
-         * {@inheritDoc}
-         */
-        public boolean accepts(Unit unit) {
-            return unit.isNaval() && !unit.isDamaged();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public boolean accepts(Goods goods) {
-            return false;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Component add(Component comp, boolean editState) {
-            if (editState) {
-                if (!(comp instanceof UnitLabel)) {
-                    logger.warning("Invalid component: " + comp);
-                    return null;
-                }
-                final Unit unit = ((UnitLabel)comp).getUnit();
-
-                if (unit.getTradeRoute() != null) {
-                    if (!getGUI().confirmClearTradeRoute(unit)
-                        || !igc().assignTradeRoute(unit, null)) return null;
-                }
-
-                Location dest = destination;
-                if (unit.isInEurope()) {
-                    dest = getGUI().showSelectDestinationDialog(unit);
-                    if (dest == null) return null; // user aborted
-                }
-
-                final ClientOptions co = getClientOptions();
-                if (!co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)
-                    && unit.isInEurope()
-                    && !(destination instanceof Europe)
-                    && docksPanel.getComponentCount() > 0
-                    && unit.hasSpaceLeft()) {
-                    StringTemplate locName = destination
-                        .getLocationLabelFor(unit.getOwner());
-                    if (!getGUI().confirm(true, null,
-                            StringTemplate.template("europe.leaveColonists")
-                                .addStringTemplate("%newWorld%", locName),
-                            unit, "ok", "cancel")) return null;
-                }
-
-                comp.getParent().remove(comp);
-                igc().moveTo(unit, dest);
-                inPortPanel.update();
-                docksPanel.update();
-                cargoPanel.update();
-                if (unit == cargoPanel.getCarrier()) {
-                    cargoPanel.setCarrier(null);
-                }
-            }
-
-            Component c = add(comp);
-            revalidate();
-            EuropePanel.this.refresh();
-            return c;
-        }
-    }
-
-    /**
-     * A panel that holds UnitLabels that represent naval units that are
-     * waiting in Europe.
-     */
-    public final class EuropeInPortPanel extends InPortPanel {
-
-        public EuropeInPortPanel() {
-            super(EuropePanel.this, "Europe - port", true);
-        }
-
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void addPropertyChangeListeners() {
-            europe.addPropertyChangeListener(this);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void removePropertyChangeListeners() {
-            europe.removePropertyChangeListener(this);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public boolean accepts(Unit unit) {
-            if (!unit.isNaval()) return false;
-            switch (unit.getState()) {
-            case ACTIVE: case FORTIFIED: case FORTIFYING:
-            case SENTRY: case SKIPPED:
-                return true;
-            }
-            return false;
-        }
-    }
-
-    /**
-     * A panel that holds UnitLabels that represent Units that are
-     * waiting on the docks in Europe.
-     */
-    public final class DocksPanel extends UnitPanel implements DropTarget {
-
-        public DocksPanel() {
-            super(EuropePanel.this, "Europe - docks", true);
-
-            setLayout(new MigLayout("wrap 6"));
-        }
-
-
-        public void addPropertyChangeListeners() {
-            europe.addPropertyChangeListener(this);
-        }
-
-        public void removePropertyChangeListeners() {
-            europe.removePropertyChangeListener(this);
-        }
-
-
-        // Interface DropTarget
-
-        /**
-         * {@inheritDoc}
-         */
-        public boolean accepts(Unit unit) {
-            return !unit.isNaval();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public boolean accepts(Goods goods) {
-            return false;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Component add(Component comp, boolean editState) {
-            Component c = add(comp);
-            update();
-            return c;
-        }
-
-
-        // Override Container
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void remove(Component comp) {
-            update();
-        }
-    }
-
-    /**
-     * A panel that shows goods available for purchase in Europe.
-     */
-    public final class MarketPanel extends JPanel implements DropTarget {
-
-        /**
-         * Creates this MarketPanel.
-         *
-         * @param europePanel The panel that holds this CargoPanel.
-         */
-        public MarketPanel(EuropePanel europePanel) {
-            super(new GridLayout(2, 8));
-        }
-
-
-        /**
-         * Initialize this MarketPanel.
-         */
-        public void initialize() {
-            removeAll();
-
-            List<GoodsType> goodsTypes = getSpecification().getGoodsTypeList();
-            Market market = getMyPlayer().getMarket();
-            for (GoodsType goodsType : goodsTypes) {
-                if (goodsType.isStorable()) {
-                    MarketLabel marketLabel
-                        = new MarketLabel(goodsType, market);
-                    marketLabel.setTransferHandler(defaultTransferHandler);
-                    marketLabel.addMouseListener(pressListener);
-                    add(marketLabel);
-                }
-            }
-        }
-
-        /**
-         * Cleans up this MarketPanel.
-         */
-        public void cleanup() {}
-
-
-        // Interface DropTarget
-
-        /**
-         * {@inheritDoc}
-         */
-        public boolean accepts(Unit unit) {
-            return false;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public boolean accepts(Goods goods) {
-            return true;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Component add(Component comp, boolean editState) {
-            if (editState) {
-                if (!(comp instanceof GoodsLabel)) {
-                    logger.warning("Invalid component: " + comp);
-                    return null;
-                }
-
-                Goods goods = ((GoodsLabel)comp).getGoods();
-                if (getMyPlayer().canTrade(goods.getType())) {
-                    igc().sellGoods(goods);
-                } else {
-                    GUI.BoycottAction act = getGUI().getBoycottChoice(goods,
-                                                                      europe);
-                    if (act != null) {
-                        switch (act) {
-                        case PAY_ARREARS:
-                            igc().payArrears(goods.getType());
-                            break;
-                        case DUMP_CARGO:
-                            igc().unloadCargo(goods, true);
-                            break;
-                        default:
-                            logger.warning("showBoycottedGoodsDialog fail: "
-                                + act);
-                            break;
-                        }
-                    }
-                }
-                cargoPanel.revalidate();
-                revalidate();
-                igc().nextModelMessage();
-            }
-            EuropePanel.this.refresh();
-            return comp;
-        }
-
-
-        // Override Container
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void remove(Component comp) {
-            // Don't remove market labels.
-        }
-    }
-
-    /**
-     * To log transactions made in Europe
-     */
-    public final class TransactionLog extends JTextPane
-        implements TransactionListener {
-
-        /**
-         * Creates a transaction log.
-         */
-        public TransactionLog() {
-            setEditable(false);
-        }
-
-        /**
-         * Initializes this TransactionLog.
-         */
-        public void initialize() {
-            getMyPlayer().getMarket().addTransactionListener(this);
-            setText("");
-        }
-
-        /**
-         * Cleans up this TransactionLog.
-         */
-        public void cleanup() {
-            getMyPlayer().getMarket().removeTransactionListener(this);
-        }
-
-        private void add(String text) {
-            StyledDocument doc = getStyledDocument();
-            try {
-                if (doc.getLength() > 0) text = "\n\n" + text;
-                doc.insertString(doc.getLength(), text, null);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Transaction log update failure", e);
-            }
-        }
-
-        // Implement TransactionListener
-
-        /**
-         * {@inheritDoc}
-         */
-        public void logPurchase(GoodsType goodsType, int amount, int price) {
-            int total = amount * price;
-            StringTemplate t1 = StringTemplate.template("transaction.purchase")
-                .add("%goods%", goodsType.getNameKey())
-                .addAmount("%amount%", amount)
-                .addAmount("%gold%", price);
-            StringTemplate t2 = StringTemplate.template("transaction.price")
-                .addAmount("%gold%", total);
-            add(Messages.message(t1) + "\n" + Messages.message(t2));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void logSale(GoodsType goodsType, int amount,
-                            int price, int tax) {
-            int totalBeforeTax = amount * price;
-            int totalTax = totalBeforeTax * tax / 100;
-            int totalAfterTax = totalBeforeTax - totalTax;
-
-            StringTemplate t1 = StringTemplate.template("transaction.sale")
-                .add("%goods%", goodsType.getNameKey())
-                .addAmount("%amount%", amount)
-                .addAmount("%gold%", price);
-            StringTemplate t2 = StringTemplate.template("transaction.price")
-                .addAmount("%gold%", totalBeforeTax);
-            StringTemplate t3 = StringTemplate.template("transaction.tax")
-                .addAmount("%tax%", tax)
-                .addAmount("%gold%", totalTax);
-            StringTemplate t4 = StringTemplate.template("transaction.net")
-                .addAmount("%gold%", totalAfterTax);
-            add(Messages.message(t1) + "\n" + Messages.message(t2)
-                + "\n" + Messages.message(t3) + "\n" + Messages.message(t4));
-        }
     }
 }
