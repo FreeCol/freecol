@@ -857,7 +857,7 @@ public final class ColonyPanel extends PortPanel
             int amount = colony.getAdjustedNetProductionOf(goodsType);
             if (amount != 0) {
                 netProductionPanel.add(new ProductionLabel(getFreeColClient(),
-                                                           goodsType, amount));
+                        new AbstractGoods(goodsType, amount)));
             }
         }
 

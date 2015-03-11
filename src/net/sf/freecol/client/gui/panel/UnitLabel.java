@@ -38,6 +38,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
@@ -271,7 +272,7 @@ public final class UnitLabel extends JLabel
                 int production = ((ColonyTile)unit.getLocation())
                     .getTotalProductionOf(workType);
                 ProductionLabel pl = new ProductionLabel(freeColClient,
-                                                         workType, production);
+                    new AbstractGoods(workType, production));
                 g.translate(0, 10);
                 pl.paintComponent(g);
                 g.translate(0, -10);

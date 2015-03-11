@@ -38,6 +38,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Unit;
@@ -55,9 +56,6 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
 
     /** The Building to display. */
     private final Building building;
-
-    /** A label for the production, if any. */
-    private ProductionLabel productionOutput = null;
 
     /** Labels for any units present. */
     private final List<UnitLabel> unitLabels = new ArrayList<>();
@@ -93,7 +91,6 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
      */
     public void cleanup() {
         unitLabels.clear();
-        productionOutput = null;
         removePropertyChangeListeners();
         removeAll();
     }
@@ -122,23 +119,25 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     public void update() {
         removeAll();
         unitLabels.clear();
-        productionOutput = null;
 
+        final Colony colony = building.getColony();
+        ProductionLabel productionOutput = null;
         ProductionInfo info = building.getProductionInfo();
         if (info != null && !info.getProduction().isEmpty()) {
             AbstractGoods output = info.getProduction().get(0);
             if (output.getAmount() > 0) {
                 if (building.hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
-                    int stored = building.getColony().getGoodsCount(output.getType());
-                    int capacity = building.getColony().getWarehouseCapacity();
+                    int stored = colony.getGoodsCount(output.getType());
+                    int capacity = colony.getWarehouseCapacity();
                     if (output.getAmount() + stored > capacity) {
-                        output = new AbstractGoods(output.getType(), capacity - stored);
+                        output = new AbstractGoods(output.getType(),
+                                                   capacity - stored);
                     }
                 }
                 AbstractGoods maximum = info.getMaximumProduction().isEmpty()
                     ? output : info.getMaximumProduction().get(0);
-                productionOutput = new ProductionLabel(freeColClient,
-                                                       output, maximum);
+                productionOutput = new ProductionLabel(freeColClient, output,
+                                                       maximum.getAmount());
             }
         }
         JLabel upkeep = null;

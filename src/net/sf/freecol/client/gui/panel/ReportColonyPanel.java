@@ -198,35 +198,32 @@ public final class ReportColonyPanel extends ReportPanel
                                                     true, true);
                 unitsPanel.add(unitLabel);
             }
-            if(buildableLabel != null && currentType.getSpecification().getUnitTypeList().contains(currentType)) {
+            if (buildableLabel != null
+                && currentType.getSpecification().getUnitTypeList()
+                    .contains(currentType)) {
                 unitsPanel.add(buildableLabel);
             }
             reportPanel.add(colonistsPanel, "newline, growx");
             reportPanel.add(unitsPanel, "newline, growx");
 
             // Production
-            GoodsType horses = getSpecification().getGoodsType("model.goods.horses");
             int count = 0;
             for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
                 int newValue = colony.getNetProductionOf(goodsType);
                 int stockValue = colony.getGoodsCount(goodsType);
                 if (newValue != 0 || stockValue > 0) {
                     int maxProduction = 0;
-                    for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
+                    for (WorkLocation wl
+                             : colony.getWorkLocationsForProducing(goodsType)) {
                         maxProduction += wl.getMaximumProductionOf(goodsType);
                     }
-                    ProductionLabel productionLabel = new ProductionLabel(getFreeColClient(), goodsType, newValue);
-                    if (maxProduction > 0) {
-                        productionLabel.setMaximumProduction(maxProduction);
-                    }
-                    if (goodsType == horses) {
-                        // horse images don't stack well
-                        productionLabel.setMaxGoodsIcons(1);
-                    }
-                    // Show stored items in ReportColonyPanel
-                    productionLabel.setStockNumber(stockValue);
+                    ProductionLabel productionLabel
+                        = new ProductionLabel(getFreeColClient(),
+                            new AbstractGoods(goodsType, newValue),
+                                              maxProduction, stockValue);
                     if (count % GOODS_PER_ROW == 0) {
-                        reportPanel.add(productionLabel, "newline, split " + GOODS_PER_ROW);
+                        reportPanel.add(productionLabel,
+                                        "newline, split " + GOODS_PER_ROW);
                     } else {
                         reportPanel.add(productionLabel);
                     }
@@ -235,7 +232,8 @@ public final class ReportColonyPanel extends ReportPanel
             }
 
             // Buildings
-            JPanel buildingsPanel = new JPanel(new GridLayout(0, BUILDINGS_PER_ROW));
+            JPanel buildingsPanel
+                = new JPanel(new GridLayout(0, BUILDINGS_PER_ROW));
             buildingsPanel.setOpaque(false);
             List<Building> buildingList = colony.getBuildings();
             Collections.sort(buildingList);
@@ -243,14 +241,14 @@ public final class ReportColonyPanel extends ReportPanel
                 if(building.getType().isAutomaticBuild()) {
                     continue;
                 }
-
-                JLabel buildingLabel =
-                    new JLabel(new ImageIcon(ImageLibrary.
-                                             getBuildingImage(building, 0.66)));
+                JLabel buildingLabel = new JLabel(new ImageIcon(ImageLibrary.
+                        getBuildingImage(building, 0.66)));
                 buildingLabel.setToolTipText(Messages.getName(building));
                 buildingsPanel.add(buildingLabel);
             }
-            if(buildableLabel != null && currentType.getSpecification().getBuildingTypeList().contains(currentType)) {
+            if (buildableLabel != null
+                && currentType.getSpecification().getBuildingTypeList()
+                    .contains(currentType)) {
                 buildingsPanel.add(buildableLabel);
             }
             reportPanel.add(buildingsPanel, "newline, growx");

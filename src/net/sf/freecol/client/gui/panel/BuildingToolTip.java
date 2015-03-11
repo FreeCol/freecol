@@ -89,19 +89,23 @@ public class BuildingToolTip extends JToolTip {
             add(new JLabel(), "span");
         } else {
             AbstractGoods production = info.getProduction().get(0);
-            AbstractGoods maximumProduction = info.getMaximumProduction().isEmpty()
-                ? production : info.getMaximumProduction().get(0);
             ProductionLabel productionOutput
-                = new ProductionLabel(freeColClient, production, maximumProduction);
+                = new ProductionLabel(freeColClient, production,
+                    ((info.getMaximumProduction().isEmpty())
+                        ? production
+                        : info.getMaximumProduction().get(0))
+                    .getAmount());
             if (info.getConsumption().isEmpty()) {
                 add(productionOutput, "span");
             } else {
                 AbstractGoods consumption = info.getConsumption().get(0);
                 if (consumption.getAmount() > 0) {
-                    AbstractGoods maximumConsumption = info.getMaximumConsumption().isEmpty()
-                        ? consumption: info.getMaximumConsumption().get(0);
                     ProductionLabel productionInput
-                        = new ProductionLabel(freeColClient, consumption, maximumConsumption);
+                        = new ProductionLabel(freeColClient, consumption,
+                            ((info.getMaximumConsumption().isEmpty())
+                                ? consumption
+                                : info.getMaximumConsumption().get(0))
+                            .getAmount());
                     add(productionInput, "span, split 3");
                     add(arrow);
                     add(productionOutput);
@@ -121,8 +125,8 @@ public class BuildingToolTip extends JToolTip {
             int production = building.getUnitProduction(unit, output);
             if (production > 0) {
                 add(unitLabel);
-                JLabel pLabel = new ProductionLabel(freeColClient, output,
-                                                    production);
+                JLabel pLabel = new ProductionLabel(freeColClient,
+                    new AbstractGoods(output, production));
                 add(pLabel, "split 2");
                 add(new JLabel());
             } else if (building.canTeach() && unit.getStudent() != null) {

@@ -29,6 +29,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -81,8 +82,9 @@ public class RebelToolTip extends JToolTip {
             add(new JLabel(Messages.getName(goodsType)));
             int production = colony.getNetProductionOf(goodsType);
             libertyProduction += production;
-            add(new ProductionLabel(freeColClient, goodsType, production),
-                                    "span 2");
+            add(new ProductionLabel(freeColClient,
+                                    new AbstractGoods(goodsType, production)),
+                "span 2");
         }
         libertyProduction = (int)FeatureContainer
             .applyModifiers((float)libertyProduction, turn, modifiers);
