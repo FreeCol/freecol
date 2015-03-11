@@ -232,6 +232,10 @@ public final class FreeColClient {
         loadClientOptions(savedGame);
 
         if (!headless) {
+            // Once resources are in place, get preloading started ASAP!
+            logger.info("Preload of resources starting.");
+            ResourceManager.preload();
+
             // Work out the main font now that base resources are loaded.
             Font font = null;
             if (fontName != null) {
@@ -249,10 +253,6 @@ public final class FreeColClient {
             } catch (Exception e) {
                 fatal(Messages.message("client.laf") + "\n" + e.getMessage());
             }
-
-            // Once resources are in place, get preloading started.
-            logger.info("Preload of resources starting.");
-            ResourceManager.preload();
 
             gui.hideSplashScreen();
         }
