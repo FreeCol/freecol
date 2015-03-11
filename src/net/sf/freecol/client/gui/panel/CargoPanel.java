@@ -202,19 +202,7 @@ public class CargoPanel extends FreeColPanel
         if (carrier == null) return null;
 
         if (editState) {
-            if (comp instanceof UnitLabel) {
-                Unit unit = ((UnitLabel)comp).getUnit();
-                if (carrier.canAdd(unit)) {
-                    Container oldParent = comp.getParent();
-                    if (igc().boardShip(unit, carrier)) {
-                        ((UnitLabel) comp).setSmall(false);
-                        if (oldParent != null) oldParent.remove(comp);
-                        update();
-                        return comp;
-                    }
-                }
-
-            } else if (comp instanceof GoodsLabel) {
+            if (comp instanceof GoodsLabel) {
                 Goods goods = ((GoodsLabel)comp).getGoods();
                 int loadableAmount = carrier.getLoadableAmount(goods.getType());
                 if (loadableAmount == 0) return null;
@@ -240,8 +228,17 @@ public class CargoPanel extends FreeColPanel
                 update();
                 return comp;
 
-            } else {
-                return null;
+            } else if (comp instanceof UnitLabel) {
+                Unit unit = ((UnitLabel)comp).getUnit();
+                if (carrier.canAdd(unit)) {
+                    Container oldParent = comp.getParent();
+                    if (igc().boardShip(unit, carrier)) {
+                        ((UnitLabel) comp).setSmall(false);
+                        if (oldParent != null) oldParent.remove(comp);
+                        update();
+                        return comp;
+                    }
+                }
             }
         } else {
             super.add(comp);

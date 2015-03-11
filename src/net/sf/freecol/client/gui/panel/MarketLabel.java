@@ -22,7 +22,9 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Graphics;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.JLabel;
 
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -56,6 +58,18 @@ public final class MarketLabel extends AbstractGoodsLabel
         update();
     }
 
+
+    /**
+     * Wrap the label with a border.
+     *
+     * @return This <code>MarketLabel</code>.
+     */
+    public MarketLabel addBorder() {
+        setBorder(GUI.TOPCELLBORDER);
+        setVerticalTextPosition(JLabel.BOTTOM);
+        setHorizontalTextPosition(JLabel.CENTER);
+        return this;
+    }
 
     /**
      * Update this label.

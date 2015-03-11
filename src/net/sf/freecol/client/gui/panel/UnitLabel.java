@@ -328,7 +328,7 @@ public final class UnitLabel extends JLabel
      */
     public boolean canUnitBeEquippedWith(JLabel data) {
         return getUnit().hasAbility(Ability.CAN_BE_EQUIPPED)
-            && (data instanceof GoodsLabel || data instanceof MarketLabel);
+            && data instanceof AbstractGoodsLabel;
     }
 
     /**

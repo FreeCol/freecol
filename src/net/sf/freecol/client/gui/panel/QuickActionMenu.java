@@ -112,10 +112,8 @@ public final class QuickActionMenu extends JPopupMenu {
             createUnitMenu((UnitLabel)comp);
         } else if (comp instanceof GoodsLabel) {
             createGoodsMenu((GoodsLabel)comp);
-        } else if (comp instanceof MarketLabel
-                   && this.parentPanel instanceof EuropePanel) {
-            createMarketMenu((MarketLabel)comp,
-                             this.freeColClient.getMyPlayer().getEurope());
+        } else if (comp instanceof MarketLabel) {
+            createMarketMenu((MarketLabel)comp);
         } else if (comp instanceof ASingleTilePanel) {
             createTileMenu((ASingleTilePanel)comp);
         } else if (comp.getParent() instanceof ASingleTilePanel) {
@@ -125,7 +123,7 @@ public final class QuickActionMenu extends JPopupMenu {
         }
         return this;
     }
-    
+
 
     /**
      * Prompt for an amount of goods to use.
@@ -140,6 +138,7 @@ public final class QuickActionMenu extends JPopupMenu {
                                              ag.getAmount(), true);
         if (ret > 0) ag.setAmount(ret);
     }
+
 
     /**
      * Creates a popup menu for a Unit.
@@ -235,33 +234,6 @@ public final class QuickActionMenu extends JPopupMenu {
                                 promptForGoods(goods);
                             }
                             igc.loadCargo(goods, unit);
-                        }
-                    });
-                this.add(menuItem);
-                added = true;
-            }
-        }
-        return added;
-    }
-
-    private boolean addMarketItems(final AbstractGoods ag, Europe europe) {
-        final InGameController igc = freeColClient.getInGameController();
-        final Goods goods = new Goods(europe.getGame(), null,
-                                      ag.getType(), ag.getAmount());
-        boolean added = false;
-        for (final Unit unit : europe.getUnitList()) {
-            if (unit.isCarrier() && unit.canCarryGoods()
-                && unit.canAdd(goods)) {
-                StringTemplate template = StringTemplate.template("loadOnTo")
-                    .addStringTemplate("%unit%",
-                        unit.getLabel(Unit.UnitLabelType.NATIONAL));
-                JMenuItem menuItem = GUI.localizedMenuItem(template);
-                menuItem.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                                promptForGoods(ag);
-                            }
-                            igc.buyGoods(ag.getType(), ag.getAmount(), unit);
                         }
                     });
                 this.add(menuItem);
@@ -501,7 +473,6 @@ public final class QuickActionMenu extends JPopupMenu {
         return separatorNeeded;
     }
 
-
     private boolean addCommandItems(final UnitLabel unitLabel) {
         final Unit tempUnit = unitLabel.getUnit();
         final boolean isUnitAtSea = tempUnit.isAtSea();
@@ -709,71 +680,6 @@ public final class QuickActionMenu extends JPopupMenu {
         return separatorNeeded;
     }
 
-    /**
-     * Creates a menu for a tile.
-     */
-    private void createTileMenu(final ASingleTilePanel singleTilePanel) {
-        if (singleTilePanel.getColonyTile() != null
-            && singleTilePanel.getColonyTile().getColony() != null) {
-            addTileItem(singleTilePanel.getColonyTile().getWorkTile());
-        }
-    }
-
-    /**
-     * Add a menu item for the tile a unit is working.
-     *
-     * @param unitLabel The <code>UnitLabel</code> specifying the unit.
-     * @return True if an item was added.
-     */
-    private boolean addTileItem(final UnitLabel unitLabel) {
-        final Unit unit = unitLabel.getUnit();
-        if (unit.getWorkTile() != null) {
-            final Tile tile = unit.getWorkTile().getWorkTile();
-            addTileItem(tile);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Add a menu item to show the tile panel for a tile.
-     *
-     * @param tile The <code>Tile</code> to use.
-     */
-    private void addTileItem(final Tile tile) {
-        if (tile != null) {
-            JMenuItem menuItem = new JMenuItem(Messages.getName(tile));
-            menuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    gui.showTilePanel(tile);
-                }
-            });
-            this.add(menuItem);
-        }
-    }
-
-    /**
-     * Add an item to pay arrears on the given goods type.
-     *
-     * @param goodsType The <code>GoodsType</code> to pay arrears on.
-     */
-    private void addPayArrears(final GoodsType goodsType) {
-        final InGameController igc = freeColClient.getInGameController();
-
-        JMenuItem menuItem = GUI.localizedMenuItem("boycottedGoods.payArrears");
-        menuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    igc.payArrears(goodsType);
-                    // FIXME: fix pcls so this hackery can go away
-                    if (parentPanel instanceof CargoPanel) {
-                        CargoPanel cargoPanel = (CargoPanel) parentPanel;
-                        cargoPanel.initialize();
-                    }
-                    parentPanel.revalidate();
-                }
-            });
-        this.add(menuItem);
-    }
 
     /**
      * Creates a menu for some goods.
@@ -858,15 +764,37 @@ public final class QuickActionMenu extends JPopupMenu {
     }
 
     /**
-     * Creates a menu for some goods in a market.
+     * Add an item to pay arrears on the given goods type.
      *
-     * @param marketLabel The <code>MarketLabel</code> to create for.
-     * @param europe The <code>Europe</code> containing the label.
+     * @param goodsType The <code>GoodsType</code> to pay arrears on.
      */
-    private void createMarketMenu(final MarketLabel marketLabel,
-                                  final Europe europe) {
-        final Player player = freeColClient.getMyPlayer();
+    private void addPayArrears(final GoodsType goodsType) {
+        final InGameController igc = freeColClient.getInGameController();
+
+        JMenuItem menuItem = GUI.localizedMenuItem("boycottedGoods.payArrears");
+        menuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    igc.payArrears(goodsType);
+                    // FIXME: fix pcls so this hackery can go away
+                    if (parentPanel instanceof CargoPanel) {
+                        CargoPanel cargoPanel = (CargoPanel) parentPanel;
+                        cargoPanel.initialize();
+                    }
+                    parentPanel.revalidate();
+                }
+            });
+        this.add(menuItem);
+    }
+
+
+    /**
+     * Creates menu items for some goods in a market.
+     *
+     * @param ag The <code>AbstractGoods</code> to create entries for.
+     */
+    private void createMarketMenu(MarketLabel marketLabel) {
         final AbstractGoods ag = marketLabel.getGoods();
+        final Player player = freeColClient.getMyPlayer();
 
         this.setLabel(Messages.message("cargo"));
         JMenuItem name = new JMenuItem(Messages.getName(ag)
@@ -879,10 +807,82 @@ public final class QuickActionMenu extends JPopupMenu {
             });
         this.add(name);
 
+        final Europe europe = this.freeColClient.getMyPlayer().getEurope();
         addMarketItems(ag, europe);
 
         if (!player.canTrade(ag.getType())) {
             addPayArrears(ag.getType());
+        }
+    }
+
+    private boolean addMarketItems(final AbstractGoods ag, Europe europe) {
+        final InGameController igc = freeColClient.getInGameController();
+        final Goods goods = new Goods(europe.getGame(), null,
+                                      ag.getType(), ag.getAmount());
+        boolean added = false;
+        for (final Unit unit : europe.getUnitList()) {
+            if (unit.isCarrier() && unit.canCarryGoods()
+                && unit.canAdd(goods)) {
+                StringTemplate template = StringTemplate.template("loadOnTo")
+                    .addStringTemplate("%unit%",
+                        unit.getLabel(Unit.UnitLabelType.NATIONAL));
+                JMenuItem menuItem = GUI.localizedMenuItem(template);
+                menuItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                                promptForGoods(ag);
+                            }
+                            igc.buyGoods(ag.getType(), ag.getAmount(), unit);
+                        }
+                    });
+                this.add(menuItem);
+                added = true;
+            }
+        }
+        return added;
+    }
+
+
+    /**
+     * Creates a menu for a tile.
+     */
+    private void createTileMenu(final ASingleTilePanel singleTilePanel) {
+        if (singleTilePanel.getColonyTile() != null
+            && singleTilePanel.getColonyTile().getColony() != null) {
+            addTileItem(singleTilePanel.getColonyTile().getWorkTile());
+        }
+    }
+
+    /**
+     * Add a menu item for the tile a unit is working.
+     *
+     * @param unitLabel The <code>UnitLabel</code> specifying the unit.
+     * @return True if an item was added.
+     */
+    private boolean addTileItem(final UnitLabel unitLabel) {
+        final Unit unit = unitLabel.getUnit();
+        if (unit.getWorkTile() != null) {
+            final Tile tile = unit.getWorkTile().getWorkTile();
+            addTileItem(tile);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Add a menu item to show the tile panel for a tile.
+     *
+     * @param tile The <code>Tile</code> to use.
+     */
+    private void addTileItem(final Tile tile) {
+        if (tile != null) {
+            JMenuItem menuItem = new JMenuItem(Messages.getName(tile));
+            menuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    gui.showTilePanel(tile);
+                }
+            });
+            this.add(menuItem);
         }
     }
 }

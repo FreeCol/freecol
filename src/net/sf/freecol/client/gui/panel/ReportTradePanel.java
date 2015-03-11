@@ -122,18 +122,16 @@ public final class ReportTradePanel extends ReportPanel {
             int sales = player.getSales(goodsType);
             int beforeTaxes = player.getIncomeBeforeTaxes(goodsType);
             int afterTaxes = player.getIncomeAfterTaxes(goodsType);
-            MarketLabel marketLabel = new MarketLabel(goodsType, market);
-            marketLabel.setBorder(GUI.TOPCELLBORDER);
-            marketLabel.setVerticalTextPosition(JLabel.BOTTOM);
-            marketLabel.setHorizontalTextPosition(JLabel.CENTER);
+            goodsHeader.add(new MarketLabel(goodsType, market).addBorder());
 
-            goodsHeader.add(marketLabel);
-
-            reportPanel.add(createNumberLabel(sales), "cell " + column + " 0");
-            reportPanel.add(createNumberLabel(beforeTaxes), "cell " + column + " 1");
-            reportPanel.add(createNumberLabel(afterTaxes), "cell " + column + " 2");
-            reportPanel.add(createNumberLabel(cargoUnits.getCount(goodsType)), "cell " + column + " 3");
-
+            reportPanel.add(createNumberLabel(sales),
+                            "cell " + column + " 0");
+            reportPanel.add(createNumberLabel(beforeTaxes),
+                            "cell " + column + " 1");
+            reportPanel.add(createNumberLabel(afterTaxes),
+                            "cell " + column + " 2");
+            reportPanel.add(createNumberLabel(cargoUnits.getCount(goodsType)),
+                            "cell " + column + " 3");
         }
 
         int row = 6;

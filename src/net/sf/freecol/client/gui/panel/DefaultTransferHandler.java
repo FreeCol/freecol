@@ -196,10 +196,8 @@ public final class DefaultTransferHandler extends TransferHandler {
         }
 
         private void updatePartialChosen(JComponent comp, boolean partial) {
-            if (comp instanceof GoodsLabel) {
-                ((GoodsLabel)comp).setPartialChosen(partial);
-            } else if (comp instanceof MarketLabel) {
-                ((MarketLabel)comp).setPartialChosen(partial);
+            if (comp instanceof AbstractGoodsLabel) {
+                ((AbstractGoodsLabel)comp).setPartialChosen(partial);
             }
         }
     }
@@ -368,23 +366,7 @@ public final class DefaultTransferHandler extends TransferHandler {
             // Ignore if data is already in comp.
             if (data.getParent() == comp) return false;
 
-            if (data instanceof UnitLabel) {
-                // Check if the unit can be dragged to comp.
-                Unit unit = ((UnitLabel)data).getUnit();
-                if (!(comp instanceof DropTarget)) return false;
-
-                DropTarget target = (DropTarget)comp;
-                if (!target.accepts(unit)) return false;
-                target.add(data, true);
-
-                // Update unit selection.
-                // New unit selection has already been taken care of
-                // if this unit was moved to ToAmericaPanel
-                restoreSelection(oldSelectedUnit);
-                comp.revalidate();
-                return true;
-
-            } else if (data instanceof GoodsLabel) {
+            if (data instanceof GoodsLabel) {
                 // Check if the goods can be dragged to comp.
                 GoodsLabel label = (GoodsLabel)data;
                 Goods goods = label.getGoods();
@@ -422,20 +404,16 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 } else if (comp instanceof JLabel) {
                     logger.warning("Failed to handle: " + comp);
-                    return true;
                 }
 
             } else if (data instanceof MarketLabel) {
                 MarketLabel label = (MarketLabel)data;
-
-                // Import the data.
                 if (label.isPartialChosen()) {
                     int amount = getAmount(label.getType(), label.getAmount(),
                                            -1, true);
                     if (amount <= 0) return false;
                     label.setAmount(amount);
                 }
-
                 if (comp instanceof UnitLabel) {
                     if (equipUnitIfPossible((UnitLabel)comp,
                                             label.getGoods())) return true;
@@ -456,11 +434,27 @@ public final class DefaultTransferHandler extends TransferHandler {
                 } else {
                     logger.warning("Invalid type for receiving component: "
                                    + comp);
-                    return false;
                 }
-            }
-            logger.warning("Invalid type for dragged component: " + data);
 
+            } else if (data instanceof UnitLabel) {
+                // Check if the unit can be dragged to comp.
+                Unit unit = ((UnitLabel)data).getUnit();
+                if (!(comp instanceof DropTarget)) return false;
+
+                DropTarget target = (DropTarget)comp;
+                if (!target.accepts(unit)) return false;
+                target.add(data, true);
+
+                // Update unit selection.
+                // New unit selection has already been taken care of
+                // if this unit was moved to ToAmericaPanel
+                restoreSelection(oldSelectedUnit);
+                comp.revalidate();
+                return true;
+
+            } else {
+                logger.warning("Invalid type for dragged component: " + data);
+            }
         } catch (Exception e) { // FIXME: Suggest a reconnect?
             logger.log(Level.WARNING, "Import data fail", e);
         }
