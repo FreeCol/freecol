@@ -30,8 +30,6 @@ import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.ColonyPanel.TilesPanel.ASingleTilePanel;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Unit;
 
 

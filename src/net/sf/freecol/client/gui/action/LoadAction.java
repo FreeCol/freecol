@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.Iterator;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Colony;

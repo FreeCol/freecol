@@ -26,7 +26,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.option.PercentageOption;
 
 
