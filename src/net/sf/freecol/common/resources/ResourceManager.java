@@ -137,7 +137,7 @@ public class ResourceManager {
     public static synchronized void addGameMapping(String key, Resource resource) {
         if (gameMapping == null) gameMapping = new ResourceMapping();
         gameMapping.add(key, resource);
-        if (!dirty) mergedContainer.add(key, resource);
+        mergedContainer.add(key, resource);
     }
 
     /**
