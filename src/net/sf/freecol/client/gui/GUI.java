@@ -523,7 +523,6 @@ public class GUI {
                     @Override
                     public void componentResized(ComponentEvent e) {
                         logger.info("Window size changes to " + canvas.getSize());
-                        ResourceManager.preload();
                     }
                 });
         }
