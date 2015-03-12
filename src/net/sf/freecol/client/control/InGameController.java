@@ -2221,7 +2221,6 @@ public final class InGameController implements NetworkConstants {
 
         // Get the collapsed list of goods to load at this stop.
         List<AbstractGoods> toLoad = stop.getCompactCargo();
-        
         // If already at capacity for a goods type, drop it from the
         // toLoad list, otherwise reduce its amount by the amount
         // already loaded.  Handle excess goods.
@@ -2236,14 +2235,11 @@ public final class InGameController implements NetworkConstants {
                     ag.setAmount(amount);
                 }
             } else {
-                // Excess goods on board.  They either must have
-                // failed to unload somewhere, or are maintained goods
-                // to deliver downstream.  Since they are already on
-                // board we might as well top them up if possible.
-                int loadable = unit.getLoadableAmount(g.getType());
-                if (loadable > 0) {
-                    toLoad.add(0, new AbstractGoods(g.getType(), loadable));
-                }
+                // Excess goods on board.  They must have failed to
+                // unload somewhere.
+                lb.add(" ", Messages.message(StringTemplate
+                        .template("tradeRoute.loadStopBlocked")
+                        .addStringTemplate("%goods%", g.getLabel())));
             }                
         }
 
@@ -2271,12 +2267,15 @@ public final class InGameController implements NetworkConstants {
             GoodsType type = ag.getType();
             int demand = ag.getAmount();
             ret = askLoadGoods(stop.getLocation(), type, demand, unit);
-            if (ret) {
-                int present = stop.getGoodsCount(type);
-                int export = stop.getExportAmount(type, 0);
-                lb.add(" ", getLoadGoodsMessage(type, demand, present,
-                                                export, demand));
+            if (!ret) {
+                // Assume any failure is due to goods still on board,
+                // and thus no further loading is likely to succeed.
+                break;
             }
+            int present = stop.getGoodsCount(type);
+            int export = stop.getExportAmount(type, 0);
+            lb.add(" ", getLoadGoodsMessage(type, demand, present,
+                                            export, demand));
         }
         return ret;
     }
@@ -2348,7 +2347,6 @@ public final class InGameController implements NetworkConstants {
             int amount = toUnload;
             if (amount > atStop) {
                 StringTemplate locName = ((Location)trl).getLocationLabel();
-                String overflow = Integer.toString(toUnload - atStop);
                 int option = freeColClient.getClientOptions()
                     .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);
                 switch (option) {
@@ -2358,7 +2356,7 @@ public final class InGameController implements NetworkConstants {
                         .addStringTemplate("%unit%",
                             unit.getLabel(Unit.UnitLabelType.NATIONAL))
                         .addStringTemplate("%colony%", locName)
-                        .addName("%amount%", overflow)
+                        .addAmount("%amount%", toUnload - atStop)
                         .add("%goods%", goods.getNameKey());
                     if (!gui.confirm(true, unit.getTile(), template,
                                      unit, "yes", "no")) amount = atStop;
