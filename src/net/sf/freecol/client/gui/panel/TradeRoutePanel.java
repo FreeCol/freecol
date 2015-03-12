@@ -302,7 +302,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         }
 
         // Select the route if given.
-        if (selectRoute != null) {
+        if (selectRoute != null && this.tradeRoutes != null) {
             this.tradeRoutes.setSelectedValue(selectRoute, true);
         }
     }
