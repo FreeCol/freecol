@@ -416,7 +416,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 }
                 if (comp instanceof UnitLabel) {
                     if (equipUnitIfPossible((UnitLabel)comp,
-                                            label.getGoods())) return true;
+                            label.getAbstractGoods())) return true;
                     // Try again with parent
                     if (comp.getParent() instanceof JComponent) {
                         comp = (JComponent)comp.getParent();

@@ -139,7 +139,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         setFont(GUI.TINY_SIMPLE_FONT);
         setForeground((getAmount() < 0) ? Color.RED : Color.WHITE);
         setToolTipText((getType() == null || getAmount() == 0) ? null
-            : Messages.message(getGoods().getLabel()));
+            : Messages.message(getAbstractGoods().getLabel()));
 
         final Graphics g = freeColClient.getGUI().getCanvas().getGraphics();
         final int amount = getAmount();

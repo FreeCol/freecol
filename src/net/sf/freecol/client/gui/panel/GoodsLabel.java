@@ -31,16 +31,18 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
- * This label holds Goods data in addition to the JLabel data, which makes it
- * ideal to use for drag and drop purposes.
+ * This label holds Goods data in addition to the JLabel data, which
+ * makes it ideal to use for drag and drop purposes.
  */
 public final class GoodsLabel extends AbstractGoodsLabel
     implements Draggable {
@@ -52,60 +54,69 @@ public final class GoodsLabel extends AbstractGoodsLabel
      */
     public GoodsLabel(Goods goods) {
         super(goods);
-        initializeDisplay();
+
+        initialize();
     }
 
 
     /**
-     * Initializes the display that shows the goods.
+     * Initialize this label.
      */
-    private void initializeDisplay() {
-        Player player = null;
-        Goods goods = getGoods();
-        Location location = goods.getLocation();
+    private void initialize() {
+        final Goods goods = getGoods();
+        final Location location = goods.getLocation();
+        final Player player = (location instanceof Ownable)
+            ? ((Ownable)location).getOwner()
+            : null;
+        final GoodsType type = goods.getType();
+        final Specification spec = goods.getGame().getSpecification();
 
-        if (getAmount() < GoodsContainer.CARGO_SIZE) {
-            setPartialChosen(true);
-        }
+        if (getAmount() < GoodsContainer.CARGO_SIZE) setPartialChosen(true);
 
-        if (location instanceof Ownable) {
-            player = ((Ownable) location).getOwner();
-        }
         if (player == null
-            || !goods.getType().isStorable()
-            || player.canTrade(goods.getType())
+            || !type.isStorable()
+            || player.canTrade(type)
             || (location instanceof Colony
-                && player.getGame().getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
-                && ((Colony) location).hasAbility(Ability.EXPORT))) {
-            setToolTipText(Messages.getName(goods));
+                && spec.getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
+                && ((Colony)location).hasAbility(Ability.EXPORT))) {
+            GUI.localizeToolTip(this, goods.getLabel(true));
         } else {
             GUI.localizeToolTip(this, goods.getLabel(false));
             setIcon(getDisabledIcon());
         }
 
-        if (!goods.getType().limitIgnored()
+        String key = (!goods.getType().limitIgnored()
             && location instanceof Colony
-            && ((Colony) location).getWarehouseCapacity() < goods.getAmount()) {
-            setForeground(ResourceManager.getColor("goodsLabel.capacityExceeded.color"));
-        } else if (location instanceof Colony
-                   && goods.getType().isStorable()
-                   && ((Colony)location).getExportData(goods.getType()).getExported()) {
-            setForeground(ResourceManager.getColor("goodsLabel.exported.color"));
-        } else if (goods.getAmount() == 0) {
-            setForeground(ResourceManager.getColor("goodsLabel.zeroAmount.color"));
-        } else if (goods.getAmount() < 0) {
-            setForeground(ResourceManager.getColor("goodsLabel.negativeAmount.color"));
-        } else {
-            setForeground(ResourceManager.getColor("goodsLabel.positiveAmount.color"));
-        }
-
+            && ((Colony)location).getWarehouseCapacity() < goods.getAmount())
+            ? "goodsLabel.capacityExceeded.color"
+            : (location instanceof Colony && type.isStorable()
+                && ((Colony)location).getExportData(type).getExported())
+            ? "goodsLabel.exported.color"
+            : (goods.getAmount() == 0)
+            ? "goodsLabel.zeroAmount.color"
+            : (goods.getAmount() < 0)
+            ? "goodsLabel.negativeAmount.color"
+            : "goodsLabel.positiveAmount.color";
+        setForeground(ResourceManager.getColor(key));
         super.setText(String.valueOf(goods.getAmount()));
     }
 
     /**
+     * Get the goods being labelled.
+     *
+     * @return The <code>Goods</code> we have labelled.
+     */
+    public Goods getGoods() {
+        return (Goods)getAbstractGoods();
+    }
+
+
+    // Override AbstractGoods
+
+    /**
      * Set whether only a partial amount is to be selected.
      *
-     * @param partialChosen a <code>boolean</code> value
+     * @param partialChosen The new partial choice.
      */
     @Override
     public void setPartialChosen(boolean partialChosen) {
@@ -115,19 +126,14 @@ public final class GoodsLabel extends AbstractGoodsLabel
         setIcon(new ImageIcon(image));
     }
 
-    /**
-     * Returns this GoodsLabel's goods data.
-     *
-     * @return This GoodsLabel's goods data.
-     */
-    @Override
-    public Goods getGoods() {
-        return (Goods) super.getGoods();
-    }
 
+    // Implement Draggable
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean isOnCarrier() {
         Goods goods = getGoods();
         return goods != null && goods.getLocation() instanceof Unit;
     }
-
 }

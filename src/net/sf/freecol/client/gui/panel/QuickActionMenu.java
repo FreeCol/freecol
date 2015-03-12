@@ -793,7 +793,7 @@ public final class QuickActionMenu extends JPopupMenu {
      * @param ag The <code>AbstractGoods</code> to create entries for.
      */
     private void createMarketMenu(MarketLabel marketLabel) {
-        final AbstractGoods ag = marketLabel.getGoods();
+        final AbstractGoods ag = marketLabel.getAbstractGoods();
         final Player player = freeColClient.getMyPlayer();
 
         this.setLabel(Messages.message("cargo"));

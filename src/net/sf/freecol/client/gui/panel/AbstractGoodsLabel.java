@@ -32,7 +32,7 @@ import net.sf.freecol.common.model.GoodsType;
  */
 public class AbstractGoodsLabel extends JLabel {
 
-    private final AbstractGoods goods;
+    private final AbstractGoods abstractGoods;
 
     private boolean partialChosen = false;
 
@@ -40,15 +40,15 @@ public class AbstractGoodsLabel extends JLabel {
     /**
      * Initializes this JLabel with the given goods data.
      *
-     * @param goods The <code>AbstractGoods</code> that this JLabel
+     * @param abstractGoods The <code>AbstractGoods</code> that this JLabel
      *     will visually represent.
      */
-    public AbstractGoodsLabel(AbstractGoods goods) {
-        super(ImageLibrary.getGoodsImageIcon(goods.getType()));
+    public AbstractGoodsLabel(AbstractGoods abstractGoods) {
+        super(ImageLibrary.getGoodsImageIcon(abstractGoods.getType()));
 
-        this.goods = goods;
+        this.abstractGoods = abstractGoods;
 
-        setToolTipText(Messages.getName(goods));
+        setToolTipText(Messages.getName(abstractGoods));
     }
 
 
@@ -75,8 +75,8 @@ public class AbstractGoodsLabel extends JLabel {
      *
      * @return The goods data for this label.
      */
-    public AbstractGoods getGoods() {
-        return goods;
+    public AbstractGoods getAbstractGoods() {
+        return abstractGoods;
     }
 
     /**
@@ -85,7 +85,7 @@ public class AbstractGoodsLabel extends JLabel {
      * @return The goods type for this label.
      */
     public GoodsType getType() {
-        return goods.getType();
+        return abstractGoods.getType();
     }
 
     /**
@@ -94,7 +94,7 @@ public class AbstractGoodsLabel extends JLabel {
      * @return The goods amount.
      */
     public int getAmount() {
-        return goods.getAmount();
+        return abstractGoods.getAmount();
     }
 
     /**
@@ -103,7 +103,7 @@ public class AbstractGoodsLabel extends JLabel {
      * @param amount The amount of goods.
      */
     public void setAmount(int amount) {
-        goods.setAmount(amount);
+        abstractGoods.setAmount(amount);
     }
 
     /**
