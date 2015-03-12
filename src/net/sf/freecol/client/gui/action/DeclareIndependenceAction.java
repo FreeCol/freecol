@@ -44,10 +44,10 @@ public class DeclareIndependenceAction extends MapboardAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return True if the player can declare independence.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

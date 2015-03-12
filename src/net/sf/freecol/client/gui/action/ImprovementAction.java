@@ -53,11 +53,10 @@ public class ImprovementAction extends UnitAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return <code>false</code> if there is no active unit or if the unit
-     *         cannot plow/clear forest.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

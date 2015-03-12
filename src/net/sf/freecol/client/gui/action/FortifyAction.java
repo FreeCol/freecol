@@ -45,10 +45,10 @@ public class FortifyAction extends UnitAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return True if there is an active unit.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

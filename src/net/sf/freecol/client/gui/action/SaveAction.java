@@ -42,10 +42,10 @@ public class SaveAction extends FreeColAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return true if this action should be enabled.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

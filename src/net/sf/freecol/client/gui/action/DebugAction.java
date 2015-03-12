@@ -49,10 +49,10 @@ public class DebugAction extends FreeColAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return True if not already in debug mode.
+     * {@inheritDoc}
      */
     @Override
     public boolean shouldBeEnabled() {

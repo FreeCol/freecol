@@ -47,19 +47,6 @@ public class ScaleMapAction extends FreeColAction {
 
 
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return <code>false</code> if there is no active map.
-     */
-    @Override
-    protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled()
-            && freeColClient.isMapEditor()
-            && getGame() != null
-            && getGame().getMap() != null;
-    }
-
-    /**
      * Scales the current map into the specified size. The current
      * map is given by freeColClient.getGame().getMap().
      *
@@ -111,6 +98,20 @@ public class ScaleMapAction extends FreeColAction {
 
         getGUI().setSelectedTile(map.getTile(0, 0), false);
         getGUI().refresh();
+    }
+
+
+    // Override FreeColAction
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean shouldBeEnabled() {
+        return super.shouldBeEnabled()
+            && freeColClient.isMapEditor()
+            && getGame() != null
+            && getGame().getMap() != null;
     }
 
 

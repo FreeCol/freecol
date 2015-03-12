@@ -19,7 +19,11 @@
 
 package net.sf.freecol.client.gui.action;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 
@@ -41,7 +45,7 @@ public abstract class SelectableAction extends MapboardAction {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param id The object identifier.
-     * @param optionId the id of a boolean client option
+     * @param optionId The identifier of a boolean client option.
      */
     protected SelectableAction(FreeColClient freeColClient,
                                String id, String optionId) {
@@ -53,26 +57,36 @@ public abstract class SelectableAction extends MapboardAction {
 
 
     /**
-     * Updates the "enabled" status with the value returned by {@link
-     * #shouldBeEnabled} and the "selected" status with the value
-     * returned by {@link #shouldBeSelected}.
+     * Get the value of the underlying option.
+     *
+     * @return The option value.
      */
-    @Override
-    public void update() {
-        super.update();
-
-        final Game game = getFreeColClient().getGame();
-        final Player player = getFreeColClient().getMyPlayer();
-        if (game != null && player != null && !player.getNewModelMessages().isEmpty()) {
-            enabled = false;
+    public final boolean getOption() {
+        ClientOptions co = freeColClient.getClientOptions();
+        if (co != null && optionId != null) {
+            try {
+                return co.getBoolean(optionId);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Failure with option: " + optionId, e);
+            }
         }
-        setSelected(shouldBeSelected());
+        return false;
     }
 
     /**
-     * Returns whether the action is selected.
+     * Set the option value.
      *
-     * @return <code>true</code> if the map controls is selected.
+     * @param value The new boolean value.
+     */
+    public final void setOption(boolean value) {
+        ClientOptions co = freeColClient.getClientOptions();
+        if (co != null && optionId != null) co.setBoolean(optionId, value);
+    }
+
+    /**
+     * Gets whether the action is selected.
+     *
+     * @return True if this action is selected.
      */
     public final boolean isSelected() {
         return selected;
@@ -81,26 +95,44 @@ public abstract class SelectableAction extends MapboardAction {
     /**
      * Sets whether the action is selected.
      *
-     * @param b a <code>boolean</code> value
+     * @param b The new selection value.
      */
     public final void setSelected(boolean b) {
         this.selected = b;
     }
 
     /**
-     * Returns true if this action should be selected.
+     * Should this action be selected?
      *
-     * @return a <code>boolean</code> value
+     * Override this in subclasses.
+     *
+     * @return True of this action should be selected.
      */
     protected boolean shouldBeSelected() {
-        if (freeColClient.getClientOptions() == null) {
-            return false;
-        } else {
-            return freeColClient.getClientOptions().getBoolean(optionId);
-        }
+        return getOption();
     }
 
-    protected void updateOption(boolean value) {
-        freeColClient.getClientOptions().setBoolean(optionId, value);
+
+    // Override FreeColAction
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean shouldBeEnabled() {
+        final Player player = getFreeColClient().getMyPlayer();
+        return super.shouldBeEnabled() && getFreeColClient().getGame() != null
+            && player != null && player.getNewModelMessages().isEmpty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void update() {
+        super.update();
+
+        // Augment functionality to also update selection state.
+        setSelected(shouldBeSelected());
     }
 }

@@ -43,23 +43,31 @@ public class ChangeWindowedModeAction extends SelectableAction {
     }
 
 
-    /**
-     * Updates the "enabled"-status
-     */
-    @Override
-    public void update() {
-        selected = !getGUI().isWindowed();
-    }
+    // Override SelectableAction
 
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean shouldBeSelected() {
-        GUI gui = getGUI();
-        return !(gui == null || gui.isWindowed());
+        final GUI gui = getGUI();
+        return super.shouldBeSelected()
+            && !(gui == null || gui.isWindowed());
     }
 
+
+    // Override FreeColAction
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean shouldBeEnabled() {
+        final GUI gui = getGUI();
+        return super.shouldBeEnabled()
+            && gui != null;
+    }
+    
 
     // Interface ActionListener
 
@@ -67,6 +75,8 @@ public class ChangeWindowedModeAction extends SelectableAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getGUI().changeWindowedMode(!getGUI().isWindowed());
+        GUI gui = getGUI();
+        if (gui == null) return;
+        gui.changeWindowedMode(!gui.isWindowed());
     }
 }

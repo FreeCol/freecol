@@ -40,10 +40,10 @@ public abstract class MapboardAction extends FreeColAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     * 
-     * @return True if the mapboard is selected.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() { 

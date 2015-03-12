@@ -40,10 +40,10 @@ public abstract class UnitAction extends MapboardAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return True if the active unit belongs to the player.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

@@ -45,14 +45,16 @@ public class MapControlsAction extends SelectableAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Updates the "enabled"-status and map controls.
+     * {@inheritDoc}
      */
     @Override
     public void update() {
         super.update();
 
-        getGUI().enableMapControls(enabled && isSelected());
+        getGUI().enableMapControls(isEnabled() && isSelected());
     }
 
 
@@ -62,8 +64,8 @@ public class MapControlsAction extends SelectableAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        selected = ((AbstractButton) e.getSource()).isSelected();
-        updateOption(selected);
-        getGUI().enableMapControls(enabled && selected);
+        setSelected(((AbstractButton)e.getSource()).isSelected());
+        setOption(isSelected());
+        update();
     }
 }

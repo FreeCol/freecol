@@ -45,11 +45,10 @@ public class BuildColonyAction extends UnitAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return <code>false</code> if there is no active unit or the active
-     *         unit cannot build a colony, and <code>true</code> otherwise.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

@@ -47,10 +47,10 @@ public class LoadAction extends MapboardAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     * 
-     * @return True if there is an active carrier with space to load to.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

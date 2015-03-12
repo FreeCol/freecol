@@ -43,10 +43,10 @@ public class RetireAction extends FreeColAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return True if this action should be enabled.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

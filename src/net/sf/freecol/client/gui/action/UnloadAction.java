@@ -65,10 +65,11 @@ public class UnloadAction extends MapboardAction {
         return (unit != null) ? unit : getGUI().getActiveUnit();
     }
 
+
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return True if there is an active carrier with cargo to unload.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

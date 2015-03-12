@@ -46,12 +46,10 @@ public class NewEmptyMapAction extends MapboardAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return <code>true</code> if currently
-     *      in map editor mode.
-     * @see FreeColClient#isMapEditor()
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

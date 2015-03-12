@@ -56,10 +56,10 @@ public class MiniMapZoomOutAction extends MapboardAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return <code>true</code> if the minimap can be zoomed out.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

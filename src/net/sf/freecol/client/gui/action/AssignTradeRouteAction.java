@@ -43,10 +43,10 @@ public class AssignTradeRouteAction extends UnitAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return <code>true</code> if there is a carrier active
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

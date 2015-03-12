@@ -45,10 +45,10 @@ public class GotoAction extends UnitAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return <code>true</code> if the mapboard is selected.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

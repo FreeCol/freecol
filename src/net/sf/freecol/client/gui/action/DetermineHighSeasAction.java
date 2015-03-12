@@ -44,10 +44,10 @@ public class DetermineHighSeasAction extends FreeColAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return <code>false</code> if there is no active map.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

@@ -53,9 +53,18 @@ public class ChangeAction extends UnitAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Updates the "enabled"-status with the value returned by
-     * {@link #shouldBeEnabled} and updates the name of the action.
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean shouldBeEnabled() {
+        return super.shouldBeEnabled() && getGUI().getActiveUnit().hasTile();
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public final void update() {
@@ -71,16 +80,6 @@ public class ChangeAction extends UnitAction {
                 putValue(NAME, Messages.message("changeAction.nextUnitOnTile.name"));
             }
         }
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     *
-     * @return False if there is no active unit.
-     */
-    @Override
-    protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled() && getGUI().getActiveUnit().hasTile();
     }
 
 

@@ -52,7 +52,45 @@ import net.sf.freecol.common.resources.ResourceManager;
 public abstract class FreeColAction extends AbstractAction
     implements Option<FreeColAction> {
 
-    private static final Logger logger = Logger.getLogger(FreeColAction.class.getName());
+    /** Protected to congregate the subclasses here. */
+    protected static final Logger logger = Logger.getLogger(FreeColAction.class.getName());
+
+    /**
+     * A class used by Actions which have a mnemonic. Those Actions should
+     * assign this listener to the JMenuItem they are a part of. This captures
+     * the mnemonic key press and keeps other menus from processing keys meant
+     * for other actions.
+     *
+     * @author johnathanj
+     */
+    public class InnerMenuKeyListener implements MenuKeyListener {
+
+        final int mnemonic;
+
+
+        public InnerMenuKeyListener() {
+            mnemonic = ((Integer) getValue(MNEMONIC_KEY)).intValue();
+        }
+
+        public void menuKeyPressed(MenuKeyEvent e) {
+
+            if (e.getKeyCode() == mnemonic) {
+                ActionEvent ae = new ActionEvent(e.getSource(), e.getID(), (String) getValue(Action.NAME),
+                                                 e.getModifiers());
+                actionPerformed(ae);
+
+                e.consume();
+            }
+        }
+
+        public void menuKeyReleased(MenuKeyEvent e) {
+            // do nothing
+        }
+
+        public void menuKeyTyped(MenuKeyEvent e) {
+            // do nothing
+        }
+    }
 
     public static final String ACTION_ID = "ACTION_ID";
     public static final String BUTTON_IMAGE = "BUTTON_IMAGE";
@@ -215,28 +253,6 @@ public abstract class FreeColAction extends AbstractAction
     }
 
     /**
-     * Updates the "enabled"-status with the value returned by
-     * {@link #shouldBeEnabled}.
-     */
-    public void update() {
-        boolean b = shouldBeEnabled();
-        if (isEnabled() != b) {
-            setEnabled(b);
-        }
-    }
-
-    /**
-     * Checks if this action should be enabled.
-     *
-     * @return True if the
-     *     {@link net.sf.freecol.client.gui.panel.ClientOptionsDialog}
-     *     is not visible.
-     */
-    protected boolean shouldBeEnabled() {
-        return !getGUI().isClientOptionsDialogShowing();
-    }
-
-    /**
      * Sets a keyboard accelerator.
      *
      * @param accelerator The <code>KeyStroke</code>. Using <code>null</code>
@@ -322,48 +338,29 @@ public abstract class FreeColAction extends AbstractAction
         logger.warning("Calling unsupported method setValue.");
     }
 
-
-
     public MenuKeyListener getMenuKeyListener() {
         return new InnerMenuKeyListener();
     }
 
     /**
-     * A class used by Actions which have a mnemonic. Those Actions should
-     * assign this listener to the JMenuItem they are a part of. This captures
-     * the mnemonic key press and keeps other menus from processing keys meant
-     * for other actions.
+     * Checks if this action should be enabled.
      *
-     * @author johnathanj
+     * @return True if the {@link net.sf.freecol.client.gui.panel.ClientOptionsDialog}
+     *     is not visible.
      */
-    public class InnerMenuKeyListener implements MenuKeyListener {
+    protected boolean shouldBeEnabled() {
+        return !getGUI().isClientOptionsDialogShowing();
+    }
 
-        final int mnemonic;
-
-
-        public InnerMenuKeyListener() {
-            mnemonic = ((Integer) getValue(MNEMONIC_KEY)).intValue();
+    /**
+     * Updates the "enabled"-status with the value returned by
+     * {@link #shouldBeEnabled}.
+     */
+    public void update() {
+        boolean b = shouldBeEnabled();
+        if (isEnabled() != b) {
+            setEnabled(b);
         }
-
-        public void menuKeyPressed(MenuKeyEvent e) {
-
-            if (e.getKeyCode() == mnemonic) {
-                ActionEvent ae = new ActionEvent(e.getSource(), e.getID(), (String) getValue(Action.NAME),
-                                                 e.getModifiers());
-                actionPerformed(ae);
-
-                e.consume();
-            }
-        }
-
-        public void menuKeyReleased(MenuKeyEvent e) {
-            // do nothing
-        }
-
-        public void menuKeyTyped(MenuKeyEvent e) {
-            // do nothing
-        }
-
     }
 
 

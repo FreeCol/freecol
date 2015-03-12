@@ -43,10 +43,10 @@ public class EuropeAction extends MapboardAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return <code>true</code> if the player has access to Europe.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {

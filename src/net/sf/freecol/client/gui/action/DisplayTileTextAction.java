@@ -66,27 +66,18 @@ public class DisplayTileTextAction extends SelectableAction {
     }
 
 
-    /**
-     * Checks if this action should be enabled.
-     *
-     * @return true if this action should be enabled.
-     */
-    @Override
-    protected boolean shouldBeEnabled() {
-        return true;
-    }
+    // Override SelectableAction
 
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean shouldBeSelected() {
-        if (freeColClient.getClientOptions() == null || display == null) {
-            return false;
-        } else {
-            return freeColClient.getClientOptions()
-                .getDisplayTileText() == display.ordinal();
-        }
+        return super.shouldBeEnabled()
+            && freeColClient.getClientOptions() != null
+            && display != null
+            && freeColClient.getClientOptions().getDisplayTileText()
+                == display.ordinal();
     }
 
 

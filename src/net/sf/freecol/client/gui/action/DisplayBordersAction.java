@@ -51,8 +51,8 @@ public class DisplayBordersAction extends SelectableAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        boolean b = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-        updateOption(b);
+        setSelected(((JCheckBoxMenuItem) e.getSource()).isSelected());
+        setOption(isSelected());
         getGUI().refresh();
     }
 }

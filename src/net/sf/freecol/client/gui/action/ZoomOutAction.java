@@ -42,10 +42,10 @@ public class ZoomOutAction extends FreeColAction {
     }
 
 
+    // Override FreeColAction
+
     /**
-     * Checks if this action should be enabled.
-     *
-     * @return True if the mapboard is selected and can be zoomed onto.
+     * {@inheritDoc}
      */
     @Override
     protected boolean shouldBeEnabled() {
