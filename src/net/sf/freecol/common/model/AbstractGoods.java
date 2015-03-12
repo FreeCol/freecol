@@ -117,6 +117,27 @@ public class AbstractGoods extends FreeColObject implements Named {
         this.amount = newAmount;
     }
 
+    /**
+     * Get a label for these goods.
+     *
+     * @return The label for these goods.
+     */
+    public StringTemplate getLabel() {
+        return getLabel(type, amount);
+    }
+
+    /**
+     * Get a label given a goods type and amount.
+     *
+     * @param type The <code>GoodsType</code> to display.
+     * @param amount The amount of goods.
+     * @return The goods label.
+     */
+    public static StringTemplate getLabel(GoodsType type, int amount) {
+        return StringTemplate.template("model.goods.goodsAmount")
+            .addStringTemplate("%goods%", type.getLabel())
+            .addAmount("%amount%", amount);
+    }
 
     /**
      * Convenience lookup of the member of a collection of abstract goods that

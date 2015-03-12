@@ -70,11 +70,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
          */
         @Override
         public String toString() {
-            StringTemplate template
-                = StringTemplate.template("model.goods.goodsAmount")
-                    .add("%goods%", this.goods.getNameKey())
-                    .addAmount("%amount%", this.goods.getAmount());
-            return Messages.message(template);
+            return Messages.message(this.goods.getLabel());
         }
     }
 

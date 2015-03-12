@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Locale;
 
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -152,6 +153,7 @@ public class MessagesTest extends FreeColTestCase {
     }
 
     public void testStringTemplates() {
+        final Game game = getGame();
         Messages.setMessageBundle(Locale.US);
 
         // template with key not in message bundle
@@ -163,9 +165,8 @@ public class MessagesTest extends FreeColTestCase {
         assertTrue("Plains"
             .equals(Messages.message(s2)));
 
-        StringTemplate t1 = StringTemplate.template("model.goods.goodsAmount")
-            .add("%goods%", "model.goods.food.name")
-            .addName("%amount%", "100");
+        StringTemplate t1 = AbstractGoods
+            .getLabel(game.getSpecification().getPrimaryFoodType(), 100);
         assertEquals(2, t1.getKeys().size());
         assertEquals(2, t1.getReplacements().size());
         assertEquals(StringTemplate.TemplateType.KEY,
@@ -183,7 +184,6 @@ public class MessagesTest extends FreeColTestCase {
         assertTrue("Food / xyz"
             .equals(Messages.message(t2)));
 
-        Game game = getGame();
         game.setMap(getTestMap());
         Colony colony = getStandardColony();
         assertTrue("New Amsterdam"

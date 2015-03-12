@@ -130,8 +130,8 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * @return A template for these <code>Goods</code>.
      */
     public StringTemplate getLabel(boolean sellable) {
-        return StringTemplate.template((sellable) ? "model.goods.goodsAmount"
-            : "model.goods.goodsBoycotted")
+        if (sellable) return super.getLabel();
+        return StringTemplate.template("model.goods.goodsBoycotted")
             .addAmount("%amount%", getAmount())
             .add("%goods%", getType().getNameKey());
     }

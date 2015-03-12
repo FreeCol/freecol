@@ -346,10 +346,7 @@ public class Unit extends GoodsLocation
                     extra = StringTemplate.label("");
                     for (AbstractGoods ag : requiredGoods) {
                         if (first) first = false; else extra.addName(" ");
-                        extra.addStringTemplate(StringTemplate
-                            .template("model.goods.goodsAmount")
-                            .addName("%goods%", ag.getType())
-                            .addAmount("%amount%", ag.getAmount()));
+                        extra.addStringTemplate(ag.getLabel());
                     }
                 }
             }
