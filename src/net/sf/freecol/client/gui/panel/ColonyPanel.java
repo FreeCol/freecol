@@ -1972,8 +1972,8 @@ public final class ColonyPanel extends PortPanel
                     int xx = ((2 - x) + y) * tileWidth;
                     int yy = (x + y) * tileHeight;
                     g.translate(xx, yy);
-                    getGUI().displayColonyTile((Graphics2D)g, tiles[x][y],
-                                               colony);
+                    getGUI().getColonyTileMapViewer().displayColonyTile(
+                        (Graphics2D)g, tiles[x][y], colony);
                     g.translate(-xx, -yy);
                 }
             }

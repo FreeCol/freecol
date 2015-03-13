@@ -99,7 +99,7 @@ public final class TilePanel extends FreeColPanel {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D)image.getGraphics();
         g.translate(0, height - baseHeight);
-        getGUI().displayColonyTile(g, tile, null);
+        getGUI().getColonyTileMapViewer().displayColonyTile(g, tile, null);
         add(new JLabel(new ImageIcon(image)), "span, center");
 
         if (tile.getRegion() != null) {

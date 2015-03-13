@@ -342,7 +342,7 @@ public class GUI {
      * in the ColonyPanel and other panels.  It should not be scaled
      * along with the default MapViewer.
      */
-    private MapViewer colonyTileGUI;
+    private MapViewer colonyTileMapViewer;
 
     /** The parent frame, either a window or the full screen. */
     private FreeColFrame frame;
@@ -398,6 +398,10 @@ public class GUI {
 
     public MapViewer getMapViewer() {
         return mapViewer;
+    }
+
+    public MapViewer getColonyTileMapViewer() {
+        return colonyTileMapViewer;
     }
 
     /**
@@ -572,18 +576,6 @@ public class GUI {
         mapViewer.addMessage(new GUIMessage(player.getName() + ": " + message,
                                             player.getNationColor()));
         canvas.repaint(0, 0, canvas.getWidth(), canvas.getHeight());
-    }
-
-    /**
-     * Delegate the colony tile display to the colony tile GUI.
-     *
-     * @param g The <code>Graphics</code> to display on.
-     * @param tile The <code>Tile</code> to display.
-     * @param colony The <code>Colony</code> using the tile.
-     */
-    public void displayColonyTile(Graphics2D g, Tile tile, Colony colony) {
-        if (colonyTileGUI == null) return;
-        colonyTileGUI.displayColonyTile(g, tile, colony);
     }
 
     /**
@@ -837,7 +829,7 @@ public class GUI {
         }
         this.mapViewer = new MapViewer(freeColClient, windowSize, imageLibrary);
         this.canvas = new Canvas(freeColClient, windowSize, mapViewer);
-        this.colonyTileGUI = new MapViewer(freeColClient, windowSize, imageLibrary);
+        this.colonyTileMapViewer = new MapViewer(freeColClient, windowSize, imageLibrary);
 
         changeWindowedMode(isWindowed());
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));

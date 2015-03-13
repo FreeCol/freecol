@@ -96,8 +96,8 @@ public class WorkProductionPanel extends FreeColPanel {
             image = new BufferedImage(terrain.getWidth(null),
                                       terrain.getHeight(null),
                                       BufferedImage.TYPE_INT_ARGB);
-            getGUI().displayColonyTile((Graphics2D)image.getGraphics(),
-                                       tile, colony);
+            getGUI().getColonyTileMapViewer().displayColonyTile(
+                (Graphics2D)image.getGraphics(), tile, colony);
             
         } else if (wl instanceof Building) {
             final Building building = (Building)wl;
