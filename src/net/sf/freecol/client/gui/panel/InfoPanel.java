@@ -41,6 +41,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.i18n.Messages;
@@ -51,6 +52,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -132,15 +134,17 @@ public final class InfoPanel extends FreeColPanel {
             removeAll();
 
             if (tile != null) {
-                final Image terrain = getLibrary().getTerrainImage(tile.getType(),
-                    tile.getX(), tile.getY());
-                int width = terrain.getWidth(null);
-                int height = terrain.getHeight(null);
-                int compoundHeight = getLibrary().getCompoundTerrainImageHeight(tile.getType());
+                TileType tileType = tile.getType();
+                final MapViewer mapViewer = getGUI().getMapViewer();
+                final ImageLibrary lib = getLibrary();
+                final Image terrain = lib.getTerrainImage(tileType, tile.getX(), tile.getY());
+                final int width = terrain.getWidth(null);
+                final int height = terrain.getHeight(null);
+                final int compoundHeight = lib.getCompoundTerrainImageHeight(tileType);
                 BufferedImage image = new BufferedImage(width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = image.createGraphics();
                 g.translate(0, compoundHeight - height);
-                getGUI().getMapViewer().displayTerrain(g, tile);
+                mapViewer.displayTerrain(g, tile);
                 if (tile.isExplored()) {
                     StringTemplate items = StringTemplate.label(", ");
                     items.add(tile.getNameKey());

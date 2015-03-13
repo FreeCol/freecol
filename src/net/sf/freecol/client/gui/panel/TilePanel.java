@@ -40,6 +40,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -91,15 +92,16 @@ public final class TilePanel extends FreeColPanel {
             .addAmount("%y%", tile.getY());
         add(GUI.localizedLabel(template), "span, center");
 
+        final MapViewer mapViewer = getGUI().getColonyTileMapViewer();
         final ImageLibrary lib = getLibrary();
         final Image terrain = lib.getTerrainImage(tileType, tile.getX(), tile.getY());
         final int width = terrain.getWidth(null);
-        final int baseHeight = terrain.getHeight(null);
-        int height = lib.getCompoundTerrainImageHeight(tileType);
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = (Graphics2D)image.getGraphics();
-        g.translate(0, height - baseHeight);
-        getGUI().getColonyTileMapViewer().displayColonyTile(g, tile, null);
+        final int height = terrain.getHeight(null);
+        final int compoundHeight = lib.getCompoundTerrainImageHeight(tileType);
+        BufferedImage image = new BufferedImage(width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        g.translate(0, compoundHeight - height);
+        mapViewer.displayColonyTile(g, tile, null);
         add(new JLabel(new ImageIcon(image)), "span, center");
 
         if (tile.getRegion() != null) {
