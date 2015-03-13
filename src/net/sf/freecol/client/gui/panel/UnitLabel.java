@@ -34,6 +34,7 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
@@ -290,7 +291,7 @@ public final class UnitLabel extends JLabel
                                                       .addAmount("%turns%", unit.getTurnsForRepair()));
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
-                Font font = GUI.DEFAULT_FONT;
+                Font font = FontLibrary.DEFAULT_FONT;
                 Image repairImage1 = ImageLibrary.getStringImage(g, underRepair1, Color.RED, font);
                 Image repairImage2 = ImageLibrary.getStringImage(g, underRepair2, Color.RED, font);
                 int textHeight = repairImage1.getHeight(null) + repairImage2.getHeight(null);

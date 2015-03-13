@@ -288,27 +288,6 @@ public class GUI {
             BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
 
-    /** Font to use for text areas. */
-    public static final Font DEFAULT_FONT
-        = ResourceManager.getFont("NormalFont").deriveFont(13f);
-    /** Bold version of the default font. */
-    public static final Font DEFAULT_BOLD_FONT
-        = DEFAULT_FONT.deriveFont(Font.BOLD);
-    /** Simple fonts for arrows, labels in panels etc. */
-    public static final Font TINY_SIMPLE_FONT
-        = ResourceManager.getFont("SimpleFont").deriveFont(Font.BOLD, 12f);
-    public static final Font SMALLER_SIMPLE_FONT
-        = ResourceManager.getFont("SimpleFont").deriveFont(Font.BOLD, 16f);
-    public static final Font SMALL_SIMPLE_FONT
-        = ResourceManager.getFont("SimpleFont").deriveFont(Font.BOLD, 24f);
-    /** Header fonts for reports etc. */
-    public static final Font SMALL_HEADER_FONT
-        = ResourceManager.getFont("HeaderFont").deriveFont(24f);
-    public static final Font MEDIUM_HEADER_FONT
-        = ResourceManager.getFont("HeaderFont").deriveFont(36f);
-    public static final Font BIG_HEADER_FONT
-        = ResourceManager.getFont("HeaderFont").deriveFont(48f);
-
     /** The margin to use for a link button. */
     public static final Insets EMPTY_MARGIN = new Insets(0, 0, 0, 0);
 
@@ -949,7 +928,7 @@ public class GUI {
      */
     public static JLabel getDefaultHeader(String text) {
         JLabel header = new JLabel(text, JLabel.CENTER);
-        header.setFont(BIG_HEADER_FONT);
+        header.setFont(FontLibrary.BIG_HEADER_FONT);
         header.setBorder(blankBorder(20, 0, 20, 0));
         return header;
     }
@@ -1047,7 +1026,7 @@ public class GUI {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setFocusable(false);
-        textArea.setFont(DEFAULT_FONT);
+        textArea.setFont(FontLibrary.DEFAULT_FONT);
         textArea.setSize(textArea.getPreferredSize());
         return textArea;
     }

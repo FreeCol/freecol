@@ -28,6 +28,7 @@ import javax.swing.JTextArea;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
@@ -74,7 +75,7 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
             : "monarchDialog.header.fromCrown";
         String hdr = Messages.message(hdrKey);
         JTextArea header = GUI.getDefaultTextArea(hdr);
-        header.setFont(GUI.MEDIUM_HEADER_FONT);
+        header.setFont(FontLibrary.MEDIUM_HEADER_FONT);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 2, insets 10",
                                                     "[]20[]"));

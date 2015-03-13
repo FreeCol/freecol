@@ -30,6 +30,7 @@ import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -136,7 +137,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         this.compressedWidth = (this.goodsIcon == null) ? 0
             : this.goodsIcon.getIconWidth() * 2;
 
-        setFont(GUI.TINY_SIMPLE_FONT);
+        setFont(FontLibrary.TINY_SIMPLE_FONT);
         setForeground((getAmount() < 0) ? Color.RED : Color.WHITE);
         setToolTipText((getType() == null || getAmount() == 0) ? null
             : Messages.message(getAbstractGoods().getLabel()));

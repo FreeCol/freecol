@@ -25,6 +25,7 @@ import javax.swing.JTextArea;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
@@ -69,7 +70,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
             imageKey = IMAGE_BASE_KEY + NATIVES_KEY;
         }
         JLabel header = GUI.localizedLabel(headerKey);
-        header.setFont(GUI.MEDIUM_HEADER_FONT);
+        header.setFont(FontLibrary.MEDIUM_HEADER_FONT);
         JLabel image
             = new JLabel(new ImageIcon(ResourceManager.getImage(imageKey)));
 

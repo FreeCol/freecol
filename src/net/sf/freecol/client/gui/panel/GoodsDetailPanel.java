@@ -29,6 +29,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
@@ -88,7 +89,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
         panel.setLayout(new MigLayout("wrap 4", "[]20[]"));
 
         JLabel name = GUI.localizedLabel(type.getNameKey());
-        name.setFont(GUI.SMALL_HEADER_FONT);
+        name.setFont(FontLibrary.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 
         if (type.isFarmed()) {

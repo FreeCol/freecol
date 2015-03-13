@@ -44,6 +44,7 @@ import javax.swing.event.ListSelectionListener;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
@@ -108,7 +109,7 @@ public final class FindSettlementPanel extends FreeColPanel
                                            "[]30[]30[]"));
 
         JLabel header = GUI.localizedLabel("findSettlementPanel.name");
-        header.setFont(GUI.SMALL_HEADER_FONT);
+        header.setFont(FontLibrary.SMALL_HEADER_FONT);
         add(header);
 
         this.settlementList = new JList<>();

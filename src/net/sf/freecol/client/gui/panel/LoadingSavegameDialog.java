@@ -33,6 +33,7 @@ import javax.swing.SpinnerNumberModel;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 
@@ -69,7 +70,7 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         panel.setOpaque(false);
 
         JLabel header = GUI.localizedLabel("LoadingSavegame.title", JLabel.CENTER);
-        header.setFont(GUI.MEDIUM_HEADER_FONT);
+        header.setFont(FontLibrary.MEDIUM_HEADER_FONT);
         header.setBorder(GUI.blankBorder(20, 0, 0, 0));
 
         JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEFT));

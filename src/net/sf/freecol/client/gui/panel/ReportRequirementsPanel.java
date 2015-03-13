@@ -35,6 +35,7 @@ import javax.swing.text.StyledDocument;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -399,7 +400,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
         JButton button = GUI.getLinkButton(colony.getName() + info, null,
             colony.getId());
         if (headline) {
-            button.setFont(GUI.SMALL_HEADER_FONT);
+            button.setFont(FontLibrary.SMALL_HEADER_FONT);
         }
         button.addActionListener(this);
         return button;

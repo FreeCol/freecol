@@ -91,6 +91,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 
 
@@ -274,7 +275,7 @@ public final class ColonyPanel extends PortPanel
         selectedUnitLabel = null;
 
         // Make the colony label
-        this.nameBox.setFont(GUI.SMALL_HEADER_FONT);
+        this.nameBox.setFont(FontLibrary.SMALL_HEADER_FONT);
         if (editable) {
             for (Colony c : freeColClient.getMySortedColonies()) {
                 this.nameBox.addItem(c);

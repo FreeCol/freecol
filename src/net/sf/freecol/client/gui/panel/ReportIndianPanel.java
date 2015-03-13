@@ -30,6 +30,7 @@ import javax.swing.JSeparator;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
@@ -104,23 +105,23 @@ public final class ReportIndianPanel extends ReportPanel {
         villageLabel.setIcon(new ImageIcon(ImageLibrary.getSettlementImage(opponent.getNationType().getCapitalType(), 0.66)));
         reportPanel.add(villageLabel, "span, split 2");
         JLabel headline = GUI.localizedLabel(opponent.getNationName());
-        headline.setFont(GUI.SMALL_HEADER_FONT);
+        headline.setFont(FontLibrary.SMALL_HEADER_FONT);
         reportPanel.add(headline, "wrap 20");
         JLabel label = GUI.localizedLabel("report.indian.chieftain");
-        label.setFont(GUI.DEFAULT_BOLD_FONT);
+        label.setFont(FontLibrary.DEFAULT_BOLD_FONT);
         reportPanel.add(label);
         reportPanel.add(GUI.localizedLabel(opponent.getName()), "left, wrap");
         label = GUI.localizedLabel("report.indian.typeOfSettlements");
-        label.setFont(GUI.DEFAULT_BOLD_FONT);
+        label.setFont(FontLibrary.DEFAULT_BOLD_FONT);
         reportPanel.add(label);
         reportPanel.add(GUI.localizedLabel(Messages.nameKey(opponent.getNationType().getCapitalType().getId())), "left, wrap");
         label = GUI.localizedLabel("report.indian.numberOfSettlements");
         reportPanel.add(label);
-        label.setFont(GUI.DEFAULT_BOLD_FONT);
+        label.setFont(FontLibrary.DEFAULT_BOLD_FONT);
         reportPanel.add(new JLabel(numSettlements), "left, wrap");
         label = GUI.localizedLabel("report.indian.tribeTension");
         reportPanel.add(label);
-        label.setFont(GUI.DEFAULT_BOLD_FONT);
+        label.setFont(FontLibrary.DEFAULT_BOLD_FONT);
         reportPanel.add(GUI.localizedLabel(StringTemplate
                 .template("report.indian.tensionStance")
                 .add("%tension%", opponent.getTension(player).getKey())
@@ -130,7 +131,7 @@ public final class ReportIndianPanel extends ReportPanel {
         if (!nativeSettlements.isEmpty()) {
             for (String key : headlines) {
                 JLabel head = GUI.localizedLabel(key);
-                head.setFont(GUI.DEFAULT_BOLD_FONT);
+                head.setFont(FontLibrary.DEFAULT_BOLD_FONT);
                 reportPanel.add(head);
             }
             List<IndianSettlement> settlements

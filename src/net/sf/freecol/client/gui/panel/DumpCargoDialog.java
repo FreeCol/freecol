@@ -28,6 +28,7 @@ import javax.swing.JLabel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
@@ -62,7 +63,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
         this.checkBoxes = new ArrayList<>(goodsList.size());
 
         JLabel header = GUI.getDefaultHeader(Messages.message("dumpCargo"));
-        header.setFont(GUI.SMALL_HEADER_FONT);
+        header.setFont(FontLibrary.SMALL_HEADER_FONT);
 
         for (Goods goods : goodsList) {
             // FIXME: find out why check box is not displayed when icon

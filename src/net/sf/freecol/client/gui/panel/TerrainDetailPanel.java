@@ -31,6 +31,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
@@ -98,7 +99,7 @@ public class TerrainDetailPanel
         }
 
         JLabel nameLabel = GUI.localizedLabel(tileType.getNameKey());
-        nameLabel.setFont(GUI.SMALL_HEADER_FONT);
+        nameLabel.setFont(FontLibrary.SMALL_HEADER_FONT);
         panel.add(nameLabel, "span, align center");
 
         panel.add(GUI.localizedLabel("colopedia.terrain.terrainImage"), "spany 3");

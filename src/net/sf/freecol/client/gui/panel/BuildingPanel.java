@@ -33,6 +33,7 @@ import javax.swing.JToolTip;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Ability;
@@ -242,7 +243,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             image = ImageLibrary.getStringImage(freeColClient.getGUI().getCanvas()
                 .getGraphics(),
                 Integer.toString(number), getForeground(),
-                GUI.TINY_SIMPLE_FONT);
+                FontLibrary.TINY_SIMPLE_FONT);
         }
 
         /**

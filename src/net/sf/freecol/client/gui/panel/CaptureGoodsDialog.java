@@ -36,6 +36,7 @@ import javax.swing.ListCellRenderer;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
@@ -125,7 +126,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
         String hdr = Messages.message("lootCargo.header");
         JLabel header = GUI.getDefaultHeader(hdr);
-        header.setFont(GUI.MEDIUM_HEADER_FONT);
+        header.setFont(FontLibrary.MEDIUM_HEADER_FONT);
 
         this.allButton = GUI.localizedButton("All");
         this.allButton.addActionListener(new ActionListener() {

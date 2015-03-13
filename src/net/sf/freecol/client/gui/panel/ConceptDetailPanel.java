@@ -34,6 +34,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
@@ -122,7 +123,7 @@ public class ConceptDetailPanel extends FreeColPanel
         panel.setLayout(new MigLayout("wrap 1, center"));
 
         JLabel header = GUI.localizedLabel(Messages.nameKey(id));
-        header.setFont(GUI.SMALL_HEADER_FONT);
+        header.setFont(FontLibrary.SMALL_HEADER_FONT);
         panel.add(header, "align center, wrap 20");
 
         //panel.add(getDefaultTextArea(Messages.message(id + ".description"), 40));

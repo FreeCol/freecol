@@ -39,6 +39,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
@@ -134,7 +135,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
         panel.setLayout(new MigLayout("wrap 7, gapx 20", "", ""));
 
         JLabel name = GUI.localizedLabel(buildingType.getNameKey());
-        name.setFont(GUI.SMALL_HEADER_FONT);
+        name.setFont(FontLibrary.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 
         // Requires - prerequisites to build
@@ -208,7 +209,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
                 if (!inputs.isEmpty()) {
                     panel.add(getGoodsButton(inputs.get(0)), "span, split 3");
                     JLabel arrow = new JLabel("\u2192");
-                    arrow.setFont(GUI.SMALL_SIMPLE_FONT);
+                    arrow.setFont(FontLibrary.SMALL_SIMPLE_FONT);
                     panel.add(arrow);
                 }
                 if (!outputs.isEmpty()) {

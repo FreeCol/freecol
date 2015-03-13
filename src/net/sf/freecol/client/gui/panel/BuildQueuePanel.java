@@ -61,6 +61,7 @@ import javax.swing.plaf.PanelUI;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
@@ -569,7 +570,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
         // Create the components
         JLabel header = GUI.localizedLabel("colonyPanel.buildQueue");
-        header.setFont(GUI.BIG_HEADER_FONT);
+        header.setFont(FontLibrary.BIG_HEADER_FONT);
 
         DefaultListModel<UnitType> units = new DefaultListModel<>();
         this.unitList = new JList<>(units);

@@ -30,6 +30,7 @@ import javax.swing.JToolTip;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -52,7 +53,7 @@ public class BuildingToolTip extends JToolTip {
 
     private static final JLabel arrow = new JLabel("\u2192");
     static {
-        arrow.setFont(GUI.SMALL_SIMPLE_FONT);
+        arrow.setFont(FontLibrary.SMALL_SIMPLE_FONT);
     }
 
 
@@ -81,7 +82,7 @@ public class BuildingToolTip extends JToolTip {
         setLayout(layout);
 
         JLabel buildingName = new JLabel(Messages.getName(building));
-        buildingName.setFont(GUI.SMALLER_SIMPLE_FONT);
+        buildingName.setFont(FontLibrary.SMALLER_SIMPLE_FONT);
         add(buildingName, "span");
 
         ProductionInfo info = building.getProductionInfo();

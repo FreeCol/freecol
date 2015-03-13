@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.HighScore;
@@ -59,7 +60,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
         for (HighScore highScore : highScores) {
             JLabel scoreValue = new JLabel(String.valueOf(highScore.getScore()));
-            scoreValue.setFont(GUI.SMALL_HEADER_FONT);
+            scoreValue.setFont(FontLibrary.SMALL_HEADER_FONT);
             reportPanel.add(scoreValue);
 
             String messageId = (highScore.getIndependenceTurn() > 0)
@@ -69,7 +70,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
                 .addName("%name%", highScore.getPlayerName())
                 .addName("%nation%", highScore.getNewLandName());
             JLabel headline = GUI.localizedLabel(template);
-            headline.setFont(GUI.SMALL_HEADER_FONT);
+            headline.setFont(FontLibrary.SMALL_HEADER_FONT);
             reportPanel.add(headline,
                             "span, wrap 10");
             reportPanel.add(GUI.localizedLabel("report.highScores.turn"),

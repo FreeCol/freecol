@@ -41,6 +41,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -129,7 +130,7 @@ public final class ReportTurnPanel extends ReportPanel {
                 if (message.getMessageType() != type) {
                     type = message.getMessageType();
                     JLabel headline = GUI.localizedLabel(message.getMessageTypeName());
-                    headline.setFont(GUI.SMALL_HEADER_FONT);
+                    headline.setFont(FontLibrary.SMALL_HEADER_FONT);
                     reportPanel.add(headline, "newline 20, skip, span");
                 }
                 break;
@@ -299,7 +300,7 @@ public final class ReportTurnPanel extends ReportPanel {
             headline = new JLabel(source.toString());
         }
 
-        headline.setFont(GUI.SMALL_HEADER_FONT);
+        headline.setFont(FontLibrary.SMALL_HEADER_FONT);
         headline.setOpaque(false);
         headline.setForeground(GUI.LINK_COLOR);
         headline.setBorder(GUI.blankBorder(5, 0, 0, 0));

@@ -47,6 +47,7 @@ import javax.swing.event.ListSelectionListener;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
@@ -359,7 +360,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         String sel = Messages.message("selectDestination.text");
         JLabel header = GUI.getDefaultHeader(sel);
-        header.setFont(GUI.SMALL_HEADER_FONT);
+        header.setFont(FontLibrary.SMALL_HEADER_FONT);
 
         DefaultListModel<Destination> model
             = new DefaultListModel<>();
