@@ -52,6 +52,7 @@ public class ServerRegion extends Region {
      */
     public ServerRegion(Game game, Region region) {
         super(game);
+
         this.name = region.getName();
         this.nameKey = region.getNameKey();
         this.parent = null;
@@ -75,9 +76,10 @@ public class ServerRegion extends Region {
     public ServerRegion(Game game, String nameKey, RegionType type,
                         Region parent) {
         super(game);
-        setNameKey(nameKey);
-        setType(type);
-        setParent(parent);
+
+        this.nameKey = nameKey;
+        this.type = type;
+        this.parent = parent;
     }
 
 

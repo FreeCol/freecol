@@ -157,7 +157,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return The name, or null if it does not have one.
      */
     public final String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -175,16 +175,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return The name key.
      */
     public final String getNameKey() {
-        return nameKey;
-    }
-
-    /**
-     * Set the name key.
-     *
-     * @param newNameKey The new name key.
-     */
-    public final void setNameKey(final String newNameKey) {
-        this.nameKey = newNameKey;
+        return this.nameKey;
     }
 
     /**
@@ -196,13 +187,8 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return True if this region is the Pacific.
      */
     public boolean isPacific() {
-        if (PACIFIC_NAME_KEY.equals(nameKey)) {
-            return true;
-        } else if (parent != null) {
-            return parent.isPacific();
-        } else {
-            return false;
-        }
+        return PACIFIC_NAME_KEY.equals(this.nameKey)
+            || (this.parent != null && this.parent.isPacific());
     }
 
     /**
@@ -222,16 +208,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return The region type.
      */
     public final RegionType getType() {
-        return type;
-    }
-
-    /**
-     * Sets the region type.
-     *
-     * @param newType The new type value.
-     */
-    public final void setType(final RegionType newType) {
-        this.type = newType;
+        return this.type;
     }
 
     /**
@@ -240,7 +217,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return The parent region
      */
     public final Region getParent() {
-        return parent;
+        return this.parent;
     }
 
     /**
@@ -258,8 +235,8 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return The child regions.
      */
     public final List<Region> getChildren() {
-        return (children == null) ? Collections.<Region>emptyList()
-            : children;
+        return (this.children == null) ? Collections.<Region>emptyList()
+            : this.children;
     }
 
     /**
@@ -277,8 +254,8 @@ public class Region extends FreeColGameObject implements Nameable {
      * @param child The child <code>Region</code> to add.
      */
     public void addChild(Region child) {
-        if (children == null) children = new ArrayList<>();
-        children.add(child);
+        if (this.children == null) this.children = new ArrayList<>();
+        this.children.add(child);
     }
 
     /**
@@ -287,7 +264,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return True if the region has no children.
      */
     public boolean isLeaf() {
-        return children == null || children.isEmpty();
+        return this.children == null || this.children.isEmpty();
     }
 
     /**
@@ -296,7 +273,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return True if the region can be claimed.
      */
     public final boolean isClaimable() {
-        return claimable;
+        return this.claimable;
     }
 
     /**
@@ -314,7 +291,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return True if the region can be discovered.
      */
     public final boolean isDiscoverable() {
-        return discoverable;
+        return this.discoverable;
     }
 
     /**
@@ -324,9 +301,7 @@ public class Region extends FreeColGameObject implements Nameable {
      */
     public final void setDiscoverable(final boolean newDiscoverable) {
         this.discoverable = newDiscoverable;
-        if (discoverable) {
-            prediscovered = false;
-        }
+        if (this.discoverable) this.prediscovered = false;
     }
 
     /**
@@ -357,13 +332,9 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return A discoverable a region, or null if none found.
      */
     public Region getDiscoverableRegion() {
-        if (isDiscoverable()) {
-            return this;
-        } else if (parent != null) {
-            return parent.getDiscoverableRegion();
-        } else {
-            return null;
-        }
+        return (isDiscoverable()) ? this
+            : (getParent() != null) ? getParent().getDiscoverableRegion()
+            : null;
     }
 
     /**
@@ -372,7 +343,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return The discovery turn.
      */
     public final Turn getDiscoveredIn() {
-        return discoveredIn;
+        return this.discoveredIn;
     }
 
     /**
@@ -390,7 +361,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return The discovering <code>Player</code>.
      */
     public final Player getDiscoveredBy() {
-        return discoveredBy;
+        return this.discoveredBy;
     }
 
     /**
@@ -408,7 +379,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return True if the region is prediscovered.
      */
     public final boolean isPrediscovered() {
-        return prediscovered;
+        return this.prediscovered;
     }
 
     /**
@@ -429,8 +400,8 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return A <code>HistoryEvent</code> documenting the discovery.
      */
     public HistoryEvent discover(Unit unit, Turn turn, String newName) {
+        final Player player = unit.getOwner();
         if (!isPacific()) this.name = newName;
-        Player player = unit.getOwner();
         this.discoveredBy = player;
         this.discoveredIn = turn;
         this.discoverable = false;
@@ -453,7 +424,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return The score.
      */
     public final int getScoreValue() {
-        return scoreValue;
+        return this.scoreValue;
     }
 
     /**
