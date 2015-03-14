@@ -1190,7 +1190,7 @@ public final class MapViewer {
      */
     private void centerString(Graphics2D g, String text) {
         g.setColor(Color.BLACK);
-        g.setFont(lib.getScaledFont("NormalFont", 12f));
+        g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY, lib.getScalingFactor()));
         g.drawString(text,
                      (tileWidth - g.getFontMetrics().stringWidth(text))/2,
                      (tileHeight - g.getFontMetrics().getAscent())/2);
@@ -1485,7 +1485,7 @@ public final class MapViewer {
      * @param path The <code>PathNode</code> to display.
      */
     private void displayPath(Graphics2D g, PathNode path) {
-        final Font font = lib.getScaledFont("NormalFont", 12f);
+        final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY, lib.getScalingFactor());
         final boolean debug = FreeColDebugger
             .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
 
@@ -1540,6 +1540,7 @@ public final class MapViewer {
         AffineTransform originTransform = g.getTransform();
         Rectangle clipBounds = g.getClipBounds();
         Map map = freeColClient.getGame().getMap();
+        FontLibrary fontLibrary = new FontLibrary(lib.getScalingFactor());
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);
@@ -1736,9 +1737,9 @@ public final class MapViewer {
                 if (name == null) continue;
                 Color backgroundColor = settlement.getOwner().getNationColor();
                 if (backgroundColor == null) backgroundColor = Color.WHITE;
-                Font font = lib.getScaledFont("NormalFont", 18f);
-                Font italicFont = lib.getScaledFont("NormalFont", Font.ITALIC, 18f);
-                Font productionFont = lib.getScaledFont("NormalFont", 12f);
+                Font font = fontLibrary.createScaledFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER);
+                Font italicFont = fontLibrary.createScaledFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER, Font.ITALIC);
+                Font productionFont = fontLibrary.createScaledFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY);
                 // int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
                 int yOffset = tileHeight;
                 g.setTransform(settlementTransforms.get(index));
@@ -1883,7 +1884,7 @@ public final class MapViewer {
         if (getMessageCount() > 0) {
             // Don't edit the list of messages while I'm drawing them.
             synchronized (this) {
-                Font font = lib.getScaledFont("NormalFont", 12f);
+                Font font = fontLibrary.createScaledFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY);
                 GUIMessage message = getMessage(0);
                 Image si = ImageLibrary.getStringImage(g, message.getMessage(),
                                               message.getColor(), font);
@@ -1958,7 +1959,7 @@ public final class MapViewer {
                 centerString(g, text);
             } else {
                 g.setColor(Color.BLACK);
-                g.setFont(lib.getScaledFont("NormalFont", 12f));
+                g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY, lib.getScalingFactor()));
                 g.drawString(text.substring(0, b),
                              (tileWidth -
                               g.getFontMetrics().stringWidth(text.substring(0, b)))/2,
@@ -2010,8 +2011,8 @@ public final class MapViewer {
                     // if government admits even more units, use
                     // italic and bigger number icon
                     Font font = (colony.getPreferredSizeChange() > 0)
-                        ? lib.getScaledFont("SimpleFont", Font.BOLD | Font.ITALIC, 18f)
-                        : lib.getScaledFont("SimpleFont", Font.BOLD, 12f);
+                        ? FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.SMALLER, Font.BOLD | Font.ITALIC, lib.getScalingFactor())
+                        : FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD, lib.getScalingFactor());
                     Image stringImage = ImageLibrary.getStringImage(g, populationString,
                                                            theColor, font);
                     centerImage(g, stringImage);

@@ -167,7 +167,7 @@ public final class ImageLibrary {
     private Image createChip(String text, Color border,
                              Color background, Color foreground) {
         // Draw it and put it in the cache
-        Font font = getScaledFont("SimpleFont", Font.BOLD, 12f);
+        Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
         // hopefully, this is big enough
         BufferedImage bi = new BufferedImage(100, 100,
                                              BufferedImage.TYPE_INT_ARGB);
@@ -203,7 +203,7 @@ public final class ImageLibrary {
                                    double amount, Color fill,
                                    Color foreground) {
         // Draw it and put it in the cache
-        Font font = getScaledFont("SimpleFont", Font.BOLD, 12f);
+        Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
         // hopefully, this is big enough
         BufferedImage bi = new BufferedImage(100, 100,
                                              BufferedImage.TYPE_INT_ARGB);
@@ -950,16 +950,6 @@ public final class ImageLibrary {
      */
     public static ImageIcon getScaledGoodsImageIcon(GoodsType type, double scale) {
         return new ImageIcon(getGoodsImage(type, scale));
-    }
-
-    public Font getScaledFont(final String resource, float size) {
-        return ResourceManager.getFont(resource)
-            .deriveFont((float)Math.rint(size * scalingFactor));
-    }
-
-    public Font getScaledFont(final String resource, int style, float size) {
-        return ResourceManager.getFont(resource)
-            .deriveFont(style, (float)Math.rint(size * scalingFactor));
     }
 
     /**

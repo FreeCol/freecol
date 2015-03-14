@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Font;
+import java.util.logging.Logger;
 import net.sf.freecol.common.resources.ResourceManager;
 
 /**
@@ -27,6 +28,8 @@ import net.sf.freecol.common.resources.ResourceManager;
  *
  */
 public class FontLibrary {
+
+    private static final Logger logger = Logger.getLogger(FontLibrary.class.getName());
     
     /** Font to use for text areas. */
     public static final Font DEFAULT_FONT
@@ -48,5 +51,88 @@ public class FontLibrary {
         = ResourceManager.getFont("HeaderFont").deriveFont(36f);
     public static final Font BIG_HEADER_FONT
         = ResourceManager.getFont("HeaderFont").deriveFont(48f);
+
+    public static enum FontType {
+        NORMAL,
+        SIMPLE,
+        HEADER
+    }
+
+    public static enum FontSize {
+        TINY,
+        SMALLER,
+        SMALL,
+        MEDIUM,
+        BIG
+    }
+
+    private final float scaleFactor;
+
+    public FontLibrary() {
+        this.scaleFactor = 1f;
+    }
+
+    public FontLibrary(float scaleFactor) {
+        this.scaleFactor = scaleFactor;
+    }
+
+    public Font createScaledFont(FontType fontType, FontSize fontSize) {
+        return createFont(fontType, fontSize, Font.PLAIN, scaleFactor);
+    }
+
+    public Font createScaledFont(FontType fontType, FontSize fontSize, int style) {
+        return createFont(fontType, fontSize, style, scaleFactor);
+    }
+
+    public static Font createFont(FontType fontType, FontSize fontSize) {
+        return createFont(fontType, fontSize, Font.PLAIN, 1f);
+    }
+
+    public static Font createFont(FontType fontType, FontSize fontSize, int style) {
+        return createFont(fontType, fontSize, style, 1f);
+    }
+
+    public static Font createFont(FontType fontType, FontSize fontSize, float scaleFactor) {
+        return createFont(fontType, fontSize, Font.PLAIN, scaleFactor);
+    }
+
+    public static Font createFont(FontType fontType, FontSize fontSize, int style, float scaleFactor) {
+        String fontName;
+        switch(fontType) {
+            default:
+                logger.warning("Unknown FontType");
+            case NORMAL:
+                fontName = "NormalFont";
+                break;
+            case SIMPLE:
+                fontName = "SimpleFont";
+                break;
+            case HEADER:
+                fontName = "HeaderFont";
+        }
+        float pixelSize;
+        switch(fontSize) {
+            default:
+                logger.warning("Unknown FontSize");
+            case TINY:
+                pixelSize = 12f;
+                break;
+            case SMALLER:
+                pixelSize = 16f;
+                break;
+            case SMALL:
+                pixelSize = 24f;
+                break;
+            case MEDIUM:
+                pixelSize = 36f;
+                break;
+            case BIG:
+                pixelSize = 48f;
+        }
+        float scaledSize = pixelSize*scaleFactor;
+        Font font = ResourceManager.getFont(fontName);
+        font = font.deriveFont(style, scaledSize);
+        return font;
+    }
 
 }
