@@ -31,9 +31,6 @@ public class Turn {
      */
     public static enum Season { YEAR, SPRING, AUTUMN }
 
-    /** The numerical value of the Turn, never less than one. */
-    private int turn = 1;
-
     /** The year in which the game starts. */
     private static int startingYear = 1492;
 
@@ -53,6 +50,10 @@ public class Turn {
      * Used by FoundingFather for age-dependent weights.
      */
     public static final int NUMBER_OF_AGES = ages.length;
+
+
+    /** The numerical value of the Turn, never less than one. */
+    private int turn = 1;
 
 
     /**

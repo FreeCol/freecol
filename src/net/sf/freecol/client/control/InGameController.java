@@ -526,21 +526,90 @@ public final class InGameController implements NetworkConstants {
         return (option == null) ? true : option.getValue();
     }
 
-    private synchronized void startIgnoringMessage(String key, int turn) {
-        logger.finer("Ignoring model message with key " + key);
-        messagesToIgnore.put(key, Integer.valueOf(turn));
+    /**
+     * Start ignoring a kind of message.
+     *
+     * @param key The key for a message to ignore.
+     * @param turn The current <code>Turn</code>.
+     */
+    private synchronized void startIgnoringMessage(String key, Turn turn) {
+        messagesToIgnore.put(key, turn.getNumber());
+        logger.finer("Ignore message start: " + key);
     }
 
+    /**
+     * Stop ignoring a kind of message.
+     *
+     * @param key The key for a message to stop ignoring.
+     */
     private synchronized void stopIgnoringMessage(String key) {
-        logger.finer("Removing model message with key " + key
-            + " from ignored messages.");
         messagesToIgnore.remove(key);
+        logger.finer("Ignore message stop: " + key);
     }
 
-    private synchronized Integer getTurnForMessageIgnored(String key) {
-        return messagesToIgnore.get(key);
+    /**
+     * Reap all ignored message keys that are older than the given turn.
+     *
+     * @param turn The <code>Turn</code> value to test against.
+     */
+    private synchronized void reapIgnoredMessages(Turn turn) {
+        Iterator<String> keys = messagesToIgnore.keySet().iterator();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            if (messagesToIgnore.get(key) < turn.getNumber()) {
+                keys.remove();
+                logger.finer("Ignore message reap: " + key);
+            }
+        }
     }
 
+    /**
+     * See if messages with a given key were ignored last turn.  If so,
+     * continue to ignore them.
+     *
+     * @param key The key to check.
+     * @param turn The current <code>Turn</code>.
+     * @return True if the message should continue to be ignored.
+     */
+    private synchronized boolean continueIgnoreMessage(String key, Turn turn) {
+        Integer value;
+        if (key != null
+            && (value = messagesToIgnore.get(key)) != null
+            && value + 1 == turn.getNumber()) {
+            messagesToIgnore.put(key, value + 1);
+            logger.finer("Ignore message continue: " + key);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get a key for messages that might be ignored.
+     *
+     * @param message The <code>ModelMessage</code> to ignore.
+     * @return A key, or null if the message should not be ignored.
+     */
+    private String getIgnoredMessageKey(ModelMessage message) {
+        if (message == null) return null;
+        switch (message.getMessageType()) {
+        case WAREHOUSE_CAPACITY:
+            String key = message.getSourceId();
+            switch (message.getTemplateType()) {
+            case TEMPLATE:
+                for (String k : message.getKeys()) {
+                    if ("%goods%".equals(k)) {
+                        key += "-" + message.getReplacement(k).getId();
+                    }
+                }
+                break;
+            }
+            return key;
+        default:
+            break;
+        }
+        return null;
+    }
+            
     /**
      * Displays the messages in the current turn report.
      */
@@ -557,51 +626,20 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean displayModelMessages(final boolean allMessages,
                                         final boolean endOfTurn) {
-        Player player = freeColClient.getMyPlayer();
-        int thisTurn = freeColClient.getGame().getTurn().getNumber();
+        final Player player = freeColClient.getMyPlayer();
+        final Turn thisTurn = freeColClient.getGame().getTurn();
         final ArrayList<ModelMessage> messages = new ArrayList<>();
+
         for (ModelMessage m : ((allMessages) ? player.getModelMessages()
                 : player.getNewModelMessages())) {
-            if (shouldAllowMessage(m)) {
-                if (m.getMessageType() == MessageType.WAREHOUSE_CAPACITY) {
-                    String key = m.getSourceId();
-                    switch (m.getTemplateType()) {
-                    case TEMPLATE:
-                        for (String otherkey : m.getKeys()) {
-                            if ("%goods%".equals(otherkey)) {
-                                key += otherkey;
-                                break;
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-
-                    Integer turn = getTurnForMessageIgnored(key);
-                    if (turn != null && turn.intValue() == thisTurn - 1) {
-                        startIgnoringMessage(key, thisTurn);
-                        m.setBeenDisplayed(true);
-                        continue;
-                    }
-                }
+            if (shouldAllowMessage(m)
+                && !continueIgnoreMessage(getIgnoredMessageKey(m), thisTurn)) {
                 messages.add(m);
             }
-
-            // flag all messages delivered as "beenDisplayed".
             m.setBeenDisplayed(true);
         }
 
-        List<String> todo = new ArrayList<>();
-        for (Entry<String, Integer> entry : messagesToIgnore.entrySet()) {
-            if (entry.getValue().intValue() < thisTurn - 1) {
-                todo.add(entry.getKey());
-            }
-        }
-        while (!todo.isEmpty()) {
-            String key = todo.remove(0);
-            stopIgnoringMessage(key);
-        }
+        reapIgnoredMessages(thisTurn);
 
         if (!messages.isEmpty()) {
             Runnable uiTask;
@@ -3360,20 +3398,13 @@ public final class InGameController implements NetworkConstants {
      * @return True, ignore message status changes can not fail.
      */
     public boolean ignoreMessage(ModelMessage message, boolean flag) {
-        if (message == null) return false;
-
-        String key = message.getSourceId();
-        if (message.getTemplateType() == StringTemplate.TemplateType.TEMPLATE) {
-            for (String otherkey : message.getKeys()) {
-                if ("%goods%".equals(otherkey)) {
-                    key += otherkey;
-                }
-                break;
-            }
-        }
+        String key = getIgnoredMessageKey(message);
+        if (key == null) return false;
         if (flag) {
-            Turn turn = freeColClient.getGame().getTurn();
-            startIgnoringMessage(key, turn.getNumber());
+            final Turn turn = freeColClient.getGame().getTurn();
+            if (!continueIgnoreMessage(key, turn)) {
+                startIgnoringMessage(key, turn);
+            }
         } else {
             stopIgnoringMessage(key);
         }
