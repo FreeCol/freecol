@@ -38,7 +38,7 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 public class SZAResource extends Resource implements Resource.Preloadable {
     private static final Logger logger = Logger.getLogger(SZAResource.class.getName());
 
-    private final Map<Double, SimpleZippedAnimation> scaledSzAnimations
+    private final Map<Float, SimpleZippedAnimation> scaledSzAnimations
         = new HashMap<>();
     private SimpleZippedAnimation szAnimation = null;
     private final Object loadingLock = new Object();
@@ -91,9 +91,9 @@ public class SZAResource extends Resource implements Resource.Preloadable {
      *      will be performed unless using 1.
      * @return The <code>SimpleZippedAnimation</code>.
      */
-    public SimpleZippedAnimation getSimpleZippedAnimation(double scale) {
+    public SimpleZippedAnimation getSimpleZippedAnimation(float scale) {
         final SimpleZippedAnimation sza = getSimpleZippedAnimation();
-        if (scale == 1.0) {
+        if (scale == 1.0f) {
             return sza;
         }
         final SimpleZippedAnimation cachedScaledVersion = scaledSzAnimations.get(scale);

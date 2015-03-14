@@ -426,7 +426,7 @@ public final class ImageLibrary {
         return getBonusImage(type, scalingFactor);
     }
 
-    public static Image getBonusImage(ResourceType type, double scale) {
+    public static Image getBonusImage(ResourceType type, float scale) {
         return ResourceManager.getImage(type.getId() + ".image", scale);
     }
 
@@ -471,7 +471,7 @@ public final class ImageLibrary {
         return getCoatOfArmsImage(nation, scalingFactor);
     }
 
-    public static Image getCoatOfArmsImage(Nation nation, double scale) {
+    public static Image getCoatOfArmsImage(Nation nation, float scale) {
         return ResourceManager.getImage(nation.getId() + ".image", scale);
     }
 
@@ -492,7 +492,7 @@ public final class ImageLibrary {
      * @param scale The scale of the terrain image to return.
      * @return The terrain-image
      */
-    public Image getCompoundTerrainImage(TileType type, double scale) {
+    public Image getCompoundTerrainImage(TileType type, float scale) {
         // Currently used for hills and mountains
         Image terrainImage = getTerrainImage(type, 0, 0, scale);
         Image overlayImage = getOverlayImage(type, type.getId(), scale);
@@ -567,11 +567,11 @@ public final class ImageLibrary {
         return getForestImage(type, riverStyle, scalingFactor);
     }
 
-    public static Image getForestImage(TileType type, double scale) {
+    public static Image getForestImage(TileType type, float scale) {
         return ResourceManager.getImage(type.getId() + ".forest", scale);
     }
 
-    public static Image getForestImage(TileType type, TileImprovementStyle riverStyle, double scale) {
+    public static Image getForestImage(TileType type, TileImprovementStyle riverStyle, float scale) {
         if (riverStyle == null) {
             return ResourceManager.getImage(type.getId() + ".forest", scale);
         } else {
@@ -599,7 +599,7 @@ public final class ImageLibrary {
         return getGoodsImage(goodsType, scalingFactor);
     }
 
-    public static Image getGoodsImage(GoodsType goodsType, double scale) {
+    public static Image getGoodsImage(GoodsType goodsType, float scale) {
         return ResourceManager.getImage(goodsType.getId() + ".image", scale);
     }
 
@@ -617,11 +617,11 @@ public final class ImageLibrary {
         return getBuildingImage(building.getType(), building.getOwner(), scalingFactor);
     }
 
-    public static Image getBuildingImage(Building building, double scale) {
+    public static Image getBuildingImage(Building building, float scale) {
         return getBuildingImage(building.getType(), building.getOwner(), scale);
     }
 
-    public static Image getBuildingImage(BuildingType buildingType, Player player, double scale) {
+    public static Image getBuildingImage(BuildingType buildingType, Player player, float scale) {
         String key = buildingType.getId() + "." + player.getNationNameKey() + ".image";
         if (!ResourceManager.hasResource(key)) {
             key = buildingType.getId() + ".image";
@@ -653,7 +653,7 @@ public final class ImageLibrary {
         return ResourceManager.getImage(type.getId() + ".image", scalingFactor);
     }
 
-    public static Image getImage(FreeColGameObjectType type, double scale) {
+    public static Image getImage(FreeColGameObjectType type, float scale) {
         return ResourceManager.getImage(type.getId() + ".image", scale);
     }
 
@@ -730,7 +730,7 @@ public final class ImageLibrary {
         return getMiscImage(id, scalingFactor);
     }
 
-    public static Image getMiscImage(String id, double scale) {
+    public static Image getMiscImage(String id, float scale) {
         return ResourceManager.getImage(id, scale);
     }
 
@@ -755,7 +755,7 @@ public final class ImageLibrary {
         Color background = owner.getNationColor();
         String key = "dynamic.mission." + ((expert) ? "expert" : "normal")
             + "." + Integer.toHexString(background.getRGB());
-        Image img = ResourceManager.getImage(key, 1.0);
+        Image img = ResourceManager.getImage(key, 1.0f);
         if (img == null) {
             Color foreground = ResourceManager.getColor("mission."
                 + ((expert) ? "expert" : "normal") + ".foreground.color");
@@ -819,11 +819,11 @@ public final class ImageLibrary {
      * @param scale The scale of the image to return.
      * @return The terrain-image at the given index.
      */
-    public Image getOverlayImage(TileType type, String id, double scale) {
+    public Image getOverlayImage(TileType type, String id, float scale) {
         return getRandomizedImage(type.getId() + ".overlay", id, scale);
     }
 
-    private Image getRandomizedImage(String prefix, String id, double scale) {
+    private Image getRandomizedImage(String prefix, String id, float scale) {
         // TODO: Fix this brittle way of randomly choosing. Would be better to
         // keep the list of image names, sort and choose one available string.
         int count = getImageCount(prefix);
@@ -908,7 +908,7 @@ public final class ImageLibrary {
      * @param scale a <code>double</code> value
      * @return The image with the given style.
      */
-    public static Image getRiverImage(TileImprovementStyle style, double scale) {
+    public static Image getRiverImage(TileImprovementStyle style, float scale) {
         return getRiverImage(style.getString(), scale);
     }
 
@@ -919,7 +919,7 @@ public final class ImageLibrary {
      * @param scale a <code>double</code> value
      * @return The image with the given style.
      */
-    public static Image getRiverImage(String style, double scale) {
+    public static Image getRiverImage(String style, float scale) {
         return ResourceManager.getImage("model.tile.river" + style, scale);
     }
 
@@ -948,7 +948,7 @@ public final class ImageLibrary {
      * @param scale The scale of the goods-ImageIcon to return.
      * @return The goods-ImageIcon at the given index.
      */
-    public static ImageIcon getScaledGoodsImageIcon(GoodsType type, double scale) {
+    public static ImageIcon getScaledGoodsImageIcon(GoodsType type, float scale) {
         return new ImageIcon(getGoodsImage(type, scale));
     }
 
@@ -969,7 +969,7 @@ public final class ImageLibrary {
      * @param scale a <code>double</code> value
      * @return The graphics that will represent the given settlement.
      */
-    public static Image getSettlementImage(Settlement settlement, double scale) {
+    public static Image getSettlementImage(Settlement settlement, float scale) {
         return ResourceManager.getImage(settlement.getImageKey(), scale);
     }
 
@@ -985,7 +985,7 @@ public final class ImageLibrary {
     }
 
     public static Image getSettlementImage(SettlementType settlementType,
-                                    double scale) {
+                                    float scale) {
         return ResourceManager.getImage(settlementType.getId() + ".image",
                                         scale);
     }
@@ -1064,7 +1064,7 @@ public final class ImageLibrary {
         return getTerrainImage(type, x, y, scalingFactor);
     }
 
-    public static Image getTerrainImage(TileType type, int x, int y, double scale) {
+    public static Image getTerrainImage(TileType type, int x, int y, float scale) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
         return ResourceManager.getImage(key + ".center"
             + (isEven(x, y) ? "0" : "1") + ".image", scale);
@@ -1087,12 +1087,12 @@ public final class ImageLibrary {
     }
 
     public static ImageIcon getUnitImageIcon(Unit unit, boolean grayscale,
-                                      double scale) {
+                                      float scale) {
         return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), grayscale, scale);
     }
 
-    public static ImageIcon getUnitImageIcon(Unit unit, double scale) {
+    public static ImageIcon getUnitImageIcon(Unit unit, float scale) {
         return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), false, scale);
     }
@@ -1114,12 +1114,12 @@ public final class ImageLibrary {
     }
 
     public static ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale,
-                                      double scale) {
+                                      float scale) {
         return getUnitImageIcon(unitType, unitType.getDisplayRoleId(),
                                 false, grayscale, scale);
     }
 
-    public static ImageIcon getUnitImageIcon(UnitType unitType, double scale) {
+    public static ImageIcon getUnitImageIcon(UnitType unitType, float scale) {
         return getUnitImageIcon(unitType, unitType.getDisplayRoleId(),
                                 false, false, scale);
     }
@@ -1136,13 +1136,13 @@ public final class ImageLibrary {
     }
 
     public static ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
-                                      boolean grayscale, double scale) {
+                                      boolean grayscale, float scale) {
         return getUnitImageIcon(unitType, roleId,
                                 false, grayscale, scale);
     }
 
     public static ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
-                                      double scale) {
+                                      float scale) {
         return getUnitImageIcon(unitType, roleId,
                                 false, false, scale);
     }
@@ -1158,7 +1158,7 @@ public final class ImageLibrary {
      */
     public static ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
                                       boolean nativeEthnicity,
-                                      boolean grayscale, double scale) {
+                                      boolean grayscale, float scale) {
         // units that can only be native don't need the .native key part
         if (unitType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)) {
             nativeEthnicity = false;

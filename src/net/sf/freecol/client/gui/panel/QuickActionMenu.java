@@ -147,7 +147,7 @@ public final class QuickActionMenu extends JPopupMenu {
         final Unit unit = unitLabel.getUnit();
 
         this.setLabel("Unit");
-        ImageIcon unitIcon = ImageLibrary.getUnitImageIcon(unit, 0.66);
+        ImageIcon unitIcon = ImageLibrary.getUnitImageIcon(unit, 0.66f);
         JMenuItem name = new JMenuItem(unit.getDescription(Unit.UnitLabelType.NATIONAL)
             + " (" + Messages.message("menuBar.colopedia") + ")", unitIcon);
         name.setActionCommand(UnitAction.COLOPEDIA.toString());
@@ -402,7 +402,7 @@ public final class QuickActionMenu extends JPopupMenu {
             for (Unit teacher : unit.getColony().getTeachers()) {
                 if (unit.canBeStudent(teacher) && unit.isInColony()) {
                     JMenuItem menuItem = null;
-                    ImageIcon teacherIcon = ImageLibrary.getUnitImageIcon(teacher, 0.5);
+                    ImageIcon teacherIcon = ImageLibrary.getUnitImageIcon(teacher, 0.5f);
                     if (teacher.getStudent() != unit) {
                         menuItem = GUI.localizedMenuItem("assignToTeacher",
                                                          teacherIcon);
@@ -453,7 +453,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 String jobName = Messages.message(goods.getWorkingAsKey());
                 JPanel experiencePanel = new MigPanel();
                 experiencePanel.setLayout(new MigLayout("wrap 3"));
-                experiencePanel.add(new JLabel(ImageLibrary.getUnitImageIcon(expertType, 0.5)),
+                experiencePanel.add(new JLabel(ImageLibrary.getUnitImageIcon(expertType, 0.5f)),
                                     "spany 2");
                 experiencePanel.add(GUI.localizedLabel(StringTemplate
                         .template("menu.unit.experience")
@@ -667,7 +667,7 @@ public final class QuickActionMenu extends JPopupMenu {
         if (newUnitType != null) {
             if (separatorNeeded) this.addSeparator();
             JMenuItem menuItem = GUI.localizedMenuItem("clearSpeciality",
-                ImageLibrary.getUnitImageIcon(newUnitType, 1.0/3));
+                ImageLibrary.getUnitImageIcon(newUnitType, 1.0f/3.0f));
             menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
             menuItem.addActionListener(unitLabel);
             this.add(menuItem);

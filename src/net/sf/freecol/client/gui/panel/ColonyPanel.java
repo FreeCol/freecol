@@ -629,7 +629,7 @@ public final class ColonyPanel extends PortPanel
             GoodsType goodsType = unit.getWorkType();
             Unit student = unit.getStudent();
 
-            unitIcon = ImageLibrary.getUnitImageIcon(unit, 0.5);
+            unitIcon = ImageLibrary.getUnitImageIcon(unit, 0.5f);
             StringBuilder sb = new StringBuilder(64);
             if (student != null) {
                 sb.append(unit.getDescription())
@@ -676,7 +676,7 @@ public final class ColonyPanel extends PortPanel
         colonyUnitsMenu.addSeparator();
         for (final Unit unit : colonyTile.getUnitList()) {
             if (unit.isCarrier()) {
-                unitIcon = ImageLibrary.getUnitImageIcon(unit, 0.5);
+                unitIcon = ImageLibrary.getUnitImageIcon(unit, 0.5f);
                 String menuTitle = unit.getDescription()
                     + " " + Messages.message("inPort.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
@@ -690,7 +690,7 @@ public final class ColonyPanel extends PortPanel
                 colonyUnitsMenu.add(subMenu);
                 if (unit.getUnitList() != null) {
                     for (final Unit innerUnit : unit.getUnitList()) {
-                        unitIcon = ImageLibrary.getUnitImageIcon(innerUnit, 0.5);
+                        unitIcon = ImageLibrary.getUnitImageIcon(innerUnit, 0.5f);
                         menuTitle = innerUnit.getDescription()
                             + " " + Messages.message("cargoOnCarrier")
                             + " " + unit.getDescription();
@@ -706,7 +706,7 @@ public final class ColonyPanel extends PortPanel
                     }
                 }
             } else if (!unit.isOnCarrier()) {
-                unitIcon = ImageLibrary.getUnitImageIcon(unit, 0.5);
+                unitIcon = ImageLibrary.getUnitImageIcon(unit, 0.5f);
                 String menuTitle = unit.getDescription()
                     + " " + Messages.message("outsideOfColony.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
@@ -1212,7 +1212,7 @@ public final class ColonyPanel extends PortPanel
             removeAll();
 
             rebelShield.setIcon(new ImageIcon(ImageLibrary
-                    .getCoatOfArmsImage(nation, 0.5)));
+                    .getCoatOfArmsImage(nation, 0.5f)));
             add(rebelShield, "bottom");
 
             t = StringTemplate.template("colonyPanel.rebelLabel")
@@ -1248,7 +1248,7 @@ public final class ColonyPanel extends PortPanel
                 : nation.getREFNation();
             try {
                 royalistShield.setIcon(new ImageIcon(ImageLibrary
-                        .getCoatOfArmsImage(other, 0.5)));
+                        .getCoatOfArmsImage(other, 0.5f)));
                 add(royalistShield, "bottom");
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Shield: " + nation + "/" + other, e);

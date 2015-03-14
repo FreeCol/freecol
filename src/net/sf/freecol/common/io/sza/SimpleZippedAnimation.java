@@ -176,7 +176,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
      *      2 twice the size, 0.5 half the size etc).
      * @return The scaled animation.
      */
-    public SimpleZippedAnimation createScaledVersion(double scale) {
+    public SimpleZippedAnimation createScaledVersion(float scale) {
         final List<AnimationEvent> newEvents = new ArrayList<>();
         for (AnimationEvent event : events) {
             if (event instanceof ImageAnimationEvent) {
@@ -208,7 +208,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
             return durationInMs;
         }
         
-        private ImageAnimationEvent createScaledVersion(double scale) {
+        private ImageAnimationEvent createScaledVersion(float scale) {
             final int width = (int) (image.getWidth(null) * scale);
             final int height = (int) (image.getHeight(null) * scale);
             

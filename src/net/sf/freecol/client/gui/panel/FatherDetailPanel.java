@@ -59,7 +59,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
     public FatherDetailPanel(FreeColClient freeColClient,
                              ColopediaPanel colopediaPanel) {
         super(freeColClient, colopediaPanel,
-              PanelType.FATHERS.toString(), 0.75);
+              PanelType.FATHERS.toString(), 0.75f);
     }
 
 

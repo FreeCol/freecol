@@ -453,13 +453,13 @@ public final class TradeRouteInputPanel extends FreeColPanel
             if (location instanceof Europe) {
                 Europe europe = (Europe) location;
                 Image image = ImageLibrary
-                    .getCoatOfArmsImage(europe.getOwner().getNation(), 0.5);
+                    .getCoatOfArmsImage(europe.getOwner().getNation(), 0.5f);
                 icon = new JLabel(new ImageIcon(image));
                 name = GUI.localizedLabel(europe.getNameKey());
             } else if (location instanceof Colony) {
                 Colony colony = (Colony) location;
                 icon = new JLabel(new ImageIcon(ImageLibrary
-                        .getSettlementImage(colony, 0.5)));
+                        .getSettlementImage(colony, 0.5f)));
                 name = new JLabel(colony.getName());
             } else {
                 throw new IllegalStateException("Bogus location: " + location);
@@ -468,7 +468,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             panel.add(name, "span, wrap");
             for (GoodsType cargo : value.getCargo()) {
                 panel.add(new JLabel(new ImageIcon(ImageLibrary
-                            .getGoodsImage(cargo, 0.5))));
+                            .getGoodsImage(cargo, 0.5f))));
             }
             return panel;
         }

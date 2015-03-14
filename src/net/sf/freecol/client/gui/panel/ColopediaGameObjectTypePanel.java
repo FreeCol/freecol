@@ -58,12 +58,12 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     extends FreeColPanel implements ColopediaDetailPanel<T> {
 
     private final String id;
-    private double scale = 1;
+    private float scale = 1;
     private ColopediaPanel colopediaPanel;
 
 
     public ColopediaGameObjectTypePanel(FreeColClient freeColClient,
-        ColopediaPanel colopediaPanel, String id, double scale) {
+        ColopediaPanel colopediaPanel, String id, float scale) {
         super(freeColClient);
 
         this.colopediaPanel = colopediaPanel;
@@ -88,9 +88,9 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     /**
      * Returns the scale to use for icons.
      *
-     * @return a double value
+     * @return a float value
      */
-    protected double getScale() {
+    protected float getScale() {
         return scale;
     }
 
@@ -187,7 +187,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     }
 
     protected JButton getUnitButton(final UnitType unitType, String roleId) {
-        ImageIcon unitIcon = ImageLibrary.getUnitImageIcon(unitType, roleId, 0.66);
+        ImageIcon unitIcon = ImageLibrary.getUnitImageIcon(unitType, roleId, 0.66f);
         JButton unitButton = getButton(unitType, null, unitIcon);
         unitButton.setHorizontalAlignment(JButton.LEFT);
         return unitButton;

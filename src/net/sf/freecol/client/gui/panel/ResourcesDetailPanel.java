@@ -56,7 +56,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
     public ResourcesDetailPanel(FreeColClient freeColClient,
                                 ColopediaPanel colopediaPanel) {
         super(freeColClient, colopediaPanel,
-              PanelType.RESOURCES.toString(), 0.75);
+              PanelType.RESOURCES.toString(), 0.75f);
     }
 
 

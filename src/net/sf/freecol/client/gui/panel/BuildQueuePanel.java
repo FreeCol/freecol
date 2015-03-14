@@ -422,7 +422,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         private final JLabel nameLabel = new JLabel();
 
         private final JLabel lockLabel
-            = new JLabel(new ImageIcon(ResourceManager.getImage("lock.image", 0.5)));
+            = new JLabel(new ImageIcon(ResourceManager.getImage("lock.image", 0.5f)));
 
         private final Dimension buildingDimension = new Dimension(-1, 48);
 
@@ -467,7 +467,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 AbstractGoods goods = required.get(i);
                 String id = goods.getType().getId() + ".image";
                 ImageIcon icon = new ImageIcon(ResourceManager
-                    .getImage(id, 0.66));
+                    .getImage(id, 0.66f));
                 JLabel goodsLabel = new JLabel(Integer.toString(goods.getAmount()),
                                                icon, SwingConstants.CENTER);
                 if (i == 0 && size > 1) {

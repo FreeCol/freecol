@@ -584,7 +584,7 @@ public final class MapViewer {
 
         ImageIcon image;
         if (unit != null
-            && (image = ImageLibrary.getUnitImageIcon(unit, 0.5)) != null) {
+            && (image = ImageLibrary.getUnitImageIcon(unit, 0.5f)) != null) {
             g.drawImage(image.getImage(),
                         tileWidth/4 - image.getIconWidth() / 2,
                         halfHeight - image.getIconHeight() / 2, null);

@@ -146,8 +146,8 @@ public class ConstructionPanel extends MigPanel
             // FIXME: distinguish national unit types
             Image image = (buildable instanceof BuildingType)
                 ? ImageLibrary.getBuildingImage(
-                    (BuildingType) buildable, colony.getOwner(), 0.75)
-                : ImageLibrary.getImage(buildable, 0.75);
+                    (BuildingType) buildable, colony.getOwner(), 0.75f)
+                : ImageLibrary.getImage(buildable, 0.75f);
             add(new JLabel(new ImageIcon(image)), "spany");
             add(GUI.localizedLabel(StringTemplate
                     .template("colonyPanel.currentlyBuilding")

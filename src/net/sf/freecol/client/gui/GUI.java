@@ -532,11 +532,11 @@ public class GUI {
 
         // FIXME: this can probably done more efficiently by applying
         // a suitable AffineTransform to the Graphics2D
-        double scaledWidth = Math.min((64 * width) / height, 128);
-        BufferedImage scaledImage = new BufferedImage((int) scaledWidth, 64,
+        int scaledWidth = Math.min((int)((64 * width) / (float)height), 128);
+        BufferedImage scaledImage = new BufferedImage(scaledWidth, 64,
             BufferedImage.TYPE_INT_ARGB);
         scaledImage.createGraphics().drawImage(image, 0, 0,
-            (int)scaledWidth, 64, null);
+            scaledWidth, 64, null);
         return scaledImage;
     }
 

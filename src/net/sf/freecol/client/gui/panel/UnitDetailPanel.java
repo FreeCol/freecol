@@ -68,7 +68,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
      */
     public UnitDetailPanel(FreeColClient freeColClient,
                            ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.UNITS.toString(), 0.5);
+        super(freeColClient, colopediaPanel, PanelType.UNITS.toString(), 0.5f);
     }
 
 

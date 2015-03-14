@@ -300,7 +300,7 @@ public class ResourceManager {
      *      or <code>null</code> if there is no animation
      *      identified by that name.
      */
-    public static SimpleZippedAnimation getSimpleZippedAnimation(final String resource, final double scale) {
+    public static SimpleZippedAnimation getSimpleZippedAnimation(final String resource, final float scale) {
         final SZAResource r = getResource(resource, SZAResource.class);
         return (r != null) ? r.getSimpleZippedAnimation(scale) : null;
     }
@@ -329,7 +329,7 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getImage(final String resource, final double scale) {
+    public static Image getImage(final String resource, final float scale) {
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getImage(scale) : null;
     }
@@ -376,7 +376,7 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getGrayscaleImage(final String resource, final double scale) {
+    public static Image getGrayscaleImage(final String resource, final float scale) {
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getGrayscaleImage(scale) : null;
     }

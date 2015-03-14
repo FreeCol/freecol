@@ -172,7 +172,7 @@ public final class ReportColonyPanel extends ReportPanel
             JLabel buildableLabel = null;
             if (currentType != null) {
                 buildableLabel = new JLabel(new ImageIcon(ResourceManager.getImage(currentType.getId()
-                                                          + ".image", 0.66)));
+                                                          + ".image", 0.66f)));
                 GUI.localizeToolTip(buildableLabel, StringTemplate
                     .template("colonyPanel.currentlyBuilding")
                     .add("%buildable%", currentType.getNameKey()));
@@ -242,7 +242,7 @@ public final class ReportColonyPanel extends ReportPanel
                     continue;
                 }
                 JLabel buildingLabel = new JLabel(new ImageIcon(ImageLibrary.
-                        getBuildingImage(building, 0.66)));
+                        getBuildingImage(building, 0.66f)));
                 buildingLabel.setToolTipText(Messages.getName(building));
                 buildingsPanel.add(buildingLabel);
             }
@@ -680,7 +680,7 @@ public final class ReportColonyPanel extends ReportPanel
             if (left <= 0) {
                 b = colourButton(cac, Integer.toString(0),
                     ImageLibrary.getUnitImageIcon(u.getType(),
-                        Specification.DEFAULT_ROLE_ID, true, 0.333),
+                        Specification.DEFAULT_ROLE_ID, true, 0.333f),
                     cAlarm,
                     stpl("report.colony.making.noteach.description")
                         .addName("%colony%", colony.getName())
@@ -689,7 +689,7 @@ public final class ReportColonyPanel extends ReportPanel
             } else {
                 b = colourButton(cac, Integer.toString(left),
                     ImageLibrary.getUnitImageIcon(u.getType(),
-                        Specification.DEFAULT_ROLE_ID, true, 0.333),
+                        Specification.DEFAULT_ROLE_ID, true, 0.333f),
                     Color.BLACK,
                     stpl("report.colony.making.educating.description")
                         .addName("%colony%", colony.getName())
@@ -739,7 +739,7 @@ public final class ReportColonyPanel extends ReportPanel
         reportPanel.add(newLabel("report.colony.road.header", null, null,
                                  stpl("report.colony.road.description")));
         for (GoodsType g : goodsTypes) {
-            ImageIcon ii = ImageLibrary.getScaledGoodsImageIcon(g, 0.667);
+            ImageIcon ii = ImageLibrary.getScaledGoodsImageIcon(g, 0.667f);
             JLabel l = newLabel(null, ii, null,
                 stpl("report.colony.production.header")
                     .add("%goods%", g.getNameKey()));
@@ -749,7 +749,7 @@ public final class ReportColonyPanel extends ReportPanel
         final UnitType colonistType = getSpecification().getDefaultUnitType();
         ImageIcon colonistIcon
             = ImageLibrary.getUnitImageIcon(colonistType,
-                Specification.DEFAULT_ROLE_ID, true, 0.333);
+                Specification.DEFAULT_ROLE_ID, true, 0.333f);
         reportPanel.add(newLabel(null, colonistIcon, null,
                                  stpl("report.colony.birth.description")));
         reportPanel.add(newLabel("report.colony.making.header", null, null,
@@ -860,7 +860,7 @@ public final class ReportColonyPanel extends ReportPanel
             Suggestion suggestion = suggestions.get(type);
             String label = Integer.toString(suggestion.amount);
             ImageIcon ii = ImageLibrary.getUnitImageIcon(type,
-                Specification.DEFAULT_ROLE_ID, true, 0.333);
+                Specification.DEFAULT_ROLE_ID, true, 0.333f);
             StringTemplate tip = (suggestion.oldType == null)
                 ? stpl("report.colony.wanting.description")
                     .addName("%colony%", colony.getName())

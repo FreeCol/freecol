@@ -63,7 +63,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
     public NationTypeDetailPanel(FreeColClient freeColClient,
                                  ColopediaPanel colopediaPanel) {
         super(freeColClient, colopediaPanel,
-              PanelType.NATION_TYPES.toString(), 0.75);
+              PanelType.NATION_TYPES.toString(), 0.75f);
     }
 
 

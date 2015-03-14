@@ -120,7 +120,7 @@ public class ImageResource extends Resource implements Resource.Preloadable {
      *     normal size, 2 twice the size, 0.5 half the size etc).
      * @return The scaled <code>Image</code>.
      */
-    public Image getImage(double scale) {
+    public Image getImage(float scale) {
         final Image im = getImage();
         return (im == null) ? null
             : getImage(new Dimension((int)(im.getWidth(null) * scale),
@@ -202,7 +202,7 @@ public class ImageResource extends Resource implements Resource.Preloadable {
      *      will be performed unless using 1.
      * @return The <code>Image</code>.
      */
-    public Image getGrayscaleImage(double scale) {
+    public Image getGrayscaleImage(float scale) {
         final Image im = getImage();
         if (im == null) return im;
         return getGrayscaleImage(new Dimension((int) (im.getWidth(null) * scale), (int) (im.getHeight(null) * scale)));    

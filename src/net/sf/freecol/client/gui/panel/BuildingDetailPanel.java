@@ -67,7 +67,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
     public BuildingDetailPanel(FreeColClient freeColClient,
                                ColopediaPanel colopediaPanel) {
         super(freeColClient, colopediaPanel,
-              PanelType.BUILDINGS.toString(), 0.75);
+              PanelType.BUILDINGS.toString(), 0.75f);
     }
 
 

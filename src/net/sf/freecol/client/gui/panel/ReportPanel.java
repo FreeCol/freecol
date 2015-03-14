@@ -129,7 +129,7 @@ public class ReportPanel extends FreeColPanel {
         String roleId = au.getRoleId();
         int count = au.getNumber();
         ImageIcon unitIcon = ImageLibrary.getUnitImageIcon(unitType, roleId,
-                                                           (count == 0), 0.66);
+                                                           (count == 0), 0.66f);
         JLabel unitLabel = new JLabel(unitIcon);
         unitLabel.setText(String.valueOf(count));
         if (count == 0) {

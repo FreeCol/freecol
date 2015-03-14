@@ -115,24 +115,24 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         final Specification spec = getSpecification();
         List<TileType> tileList = spec.getTileTypeList();
         for (TileType type : tileList) {
-            listPanel.add(buildButton(getLibrary().getCompoundTerrainImage(type, 0.5),
+            listPanel.add(buildButton(getLibrary().getCompoundTerrainImage(type, 0.5f),
                                       Messages.getName(type),
                                       new TileTypeTransform(type)));
         }
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("0101", 0.5),
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("0101", 0.5f),
                                   Messages.message("minorRiver"),
                                   new RiverTransform(TileImprovement.SMALL_RIVER)));
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", 0.5),
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", 0.5f),
                                   Messages.message("majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
         listPanel.add(buildButton(ImageLibrary.getBonusImage(getSpecification()
-                                                             .getResourceTypeList().get(0), 0.8),
+                                                             .getResourceTypeList().get(0), 0.8f),
                                   Messages.message("editor.resource"), new ResourceTransform()));
-        listPanel.add(buildButton(ImageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.66),
+        listPanel.add(buildButton(ImageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.66f),
                                   Messages.message("model.message.LOST_CITY_RUMOUR"),
                                   new LostCityRumourTransform()));
         SettlementType settlementType = nativeNation.getType().getCapitalType();
-        settlementButton = buildButton(ImageLibrary.getSettlementImage(settlementType, 0.5),
+        settlementButton = buildButton(ImageLibrary.getSettlementImage(settlementType, 0.5f),
                                        Messages.message("Settlement"),
                                        new SettlementTransform());
         listPanel.add(settlementButton);

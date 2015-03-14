@@ -62,10 +62,10 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
 
         List<ChoiceItem<String>> c = choices();
         c.add(new ChoiceItem<>(DELETE, DELETE).setIcon(new ImageIcon(
-            ImageLibrary.getMiscImage(ImageLibrary.DELETE, 0.5))));
+            ImageLibrary.getMiscImage(ImageLibrary.DELETE, 0.5f))));
         for (String key : ResourceManager.getKeys(PREFIX)) {
             c.add(new ChoiceItem<>(key, key)
-                .setIcon(new ImageIcon(ResourceManager.getImage(key, 0.5))));
+                .setIcon(new ImageIcon(ResourceManager.getImage(key, 0.5f))));
         }
        
         initializeChoiceDialog(true, panel, null, "cancel", c);
