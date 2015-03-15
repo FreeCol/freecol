@@ -164,9 +164,9 @@ public final class Monarch extends FreeColGameObject implements Named {
          * @param au The addition to this Force.
          */
         public void add(AbstractUnit au) {
-            Specification spec = getSpecification();
-            UnitType unitType = au.getType(spec);
-            int n = au.getNumber();
+            final Specification spec = getSpecification();
+            final UnitType unitType = au.getType(spec);
+            final int n = au.getNumber();
             boolean added = false;
             if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 for (AbstractUnit refUnit : navalUnits) {
@@ -249,11 +249,11 @@ public final class Monarch extends FreeColGameObject implements Named {
 
                 if (LAND_UNITS_TAG.equals(tag)) {
                     while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        landUnits.add(new AbstractUnit(xr));
+                        add(new AbstractUnit(xr));
                     }
                 } else if (NAVAL_UNITS_TAG.equals(tag)) {
                     while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        navalUnits.add(new AbstractUnit(xr));
+                        add(new AbstractUnit(xr));
                     }
                 } else {
                     logger.warning("Bogus Force tag: " + tag);
