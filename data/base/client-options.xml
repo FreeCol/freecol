@@ -234,7 +234,7 @@
       <!-- Option for setting the period of autosaves.  The value 0
            signals that autosaving is disabled -->
       <integerOption id="model.option.autosavePeriod"
-                     defaultValue="0" minimumValue="0" maximumValue="100"/>
+                     defaultValue="1" minimumValue="0" maximumValue="100"/>
       <!-- Option for setting the number of days autosaves are kept
            (valid time).  0 to ignore this condition. -->
       <integerOption id="model.option.autosaveValidity"

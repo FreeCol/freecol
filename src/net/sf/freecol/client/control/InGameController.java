@@ -482,8 +482,7 @@ public final class InGameController implements NetworkConstants {
         // conditional save after user-set period
         int saveGamePeriod = options.getInteger(ClientOptions.AUTOSAVE_PERIOD);
         int turnNumber = game.getTurn().getNumber();
-        if (saveGamePeriod <= 1
-            || (saveGamePeriod != 0 && turnNumber % saveGamePeriod == 0)) {
+        if (saveGamePeriod >= 1 && turnNumber % saveGamePeriod == 0) {
             String fileName = prefix + "-" + getSaveGameString(game)
                 + FreeCol.FREECOL_SAVE_EXTENSION;
             saveGame(new File(autoSaveDir, fileName));
