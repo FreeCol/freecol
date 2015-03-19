@@ -90,6 +90,10 @@ section "Defences"
 sed -n -e 's/^Count defences: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
+section "Founding Fathers"
+sed -n -e 's/^Count FF: *\(.*\)$/\1/p' "$tmp" | statit
+blockit
+
 section "Missions"
 sed -n -e 's/^Count missions: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
