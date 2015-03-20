@@ -1172,7 +1172,7 @@ public class GUI {
      * @return The <code>JLabel</code>.
      */
     public static JLabel localizedLabel(String key) {
-        return localizedLabel(Messages.message(key), SwingConstants.LEADING);
+        return localizedLabel(key, SwingConstants.LEADING);
     }
 
     /**

@@ -867,18 +867,18 @@ public class Messages {
         case LABEL:
             if (template.getReplacements() == null
                 || template.getReplacements().isEmpty()) {
-                return message(template.getId());
+                result = message(template.getId());
             } else {
                 for (StringTemplate other : template.getReplacements()) {
                     result += template.getId() + message(other);
                 }
                 if (result.length() > template.getId().length()) {
-                    return result.substring(template.getId().length());
+                    result = result.substring(template.getId().length());
                 } else {
                     logger.warning("incorrect use of template " + template);
-                    return result;
                 }
             }
+            break;
         case TEMPLATE:
             if (containsKey(template.getId())) {
                 result = messageBundle.get(template.getId());
@@ -890,18 +890,18 @@ public class Messages {
                 result = result.replace(template.getKeys().get(index),
                     message(template.getReplacements().get(index)));
             }
-            return result;
+            break;
         case KEY:
             String key = messageBundle.get(template.getId());
-            if (key == null) {
-                return template.getId();
-            } else {
-                return replaceChoices(key, null);
-            }
+            result = (key == null) ? template.getId()
+                : replaceChoices(key, null);
+            break;
         case NAME:
         default:
-            return template.getId();
+            result = template.getId();
+            break;
         }
+        return result;
     }
 
     /**
