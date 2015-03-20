@@ -1021,29 +1021,73 @@ public final class ImageLibrary {
                 BufferedImage.TYPE_INT_ARGB);
             // draw the string with selected color
             Graphics2D big = bi.createGraphics();
-            big.setColor(color);
+            big.setColor(getStringBorderColor(color));
             big.setFont(font);
             big.drawString(text, 2, fm.getMaxAscent());
 
             // draw the border around letters
-            int textColor = color.getRGB();
+            int borderWidth = 1;
             int borderColor = getStringBorderColor(color).getRGB();
-            for (int biX = 0; biX < bi.getWidth(); biX++) {
-                for (int biY = 0; biY < bi.getHeight(); biY++) {
-                    int r = bi.getRGB(biX, biY);
-                    if (r == textColor) continue;
-
-                    for (int cX = -1; cX <= 1; cX++) {
-                        for (int cY = -1; cY <= 1; cY++) {
-                            if (biX+cX >= 0 && biY+cY >= 0
-                                && biX+cX < bi.getWidth() && biY+cY < bi.getHeight()
-                                && bi.getRGB(biX + cX, biY + cY) == textColor) {
-                                bi.setRGB(biX, biY, borderColor);
-                            }
-                        }
-                    }
-                }
+            int srcRGB, dstRGB, srcA;
+            for (int biY = 0; biY < bi.getHeight(); biY++) {
+            	for (int biX = borderWidth; biX < bi.getWidth() - borderWidth; biX++) {
+            		int biXI = bi.getWidth() - biX - 1;
+            		for (int d = 1; d <= borderWidth; d++) {
+            			// left to right
+            			srcRGB = bi.getRGB(biX, biY);
+            			srcA = (srcRGB >> 24) & 0xFF;
+            			dstRGB = bi.getRGB(biX - d, biY);
+            			if(dstRGB != borderColor) {
+            				if(srcA > 0) {
+            					bi.setRGB(biX, biY, borderColor);
+            					bi.setRGB(biX - d, biY, srcRGB);
+            				}
+            			}
+            			// right to left
+            			srcRGB = bi.getRGB(biXI, biY);
+            			srcA = (srcRGB >> 24) & 0xFF;
+            			dstRGB = bi.getRGB(biXI + d, biY);
+            			if(dstRGB != borderColor) {
+            				if(srcA > 0) {
+            					bi.setRGB(biXI, biY, borderColor);
+            					bi.setRGB(biXI + d, biY, srcRGB);
+            				}
+            			}
+            		}
+            	}
             }
+
+            for (int biX = 0; biX < bi.getWidth(); biX++) {
+            	for (int biY = borderWidth; biY < bi.getHeight() - borderWidth; biY++) {
+            		int biYI = bi.getHeight() - biY - 1;
+            		for (int d = 1; d <= borderWidth; d++) {
+            			// top to bottom
+            			srcRGB = bi.getRGB(biX, biY);
+            			srcA = (srcRGB >> 24) & 0xFF;
+            			dstRGB = bi.getRGB(biX, biY - d);
+            			if(dstRGB != borderColor) {
+            				if(srcA > 0) {
+            					bi.setRGB(biX, biY, borderColor);
+            					bi.setRGB(biX, biY - d, srcRGB);
+            				}
+            			}
+            			// bottom to top
+            			srcRGB = bi.getRGB(biX, biYI);
+            			srcA = (srcRGB >> 24) & 0xFF;
+            			dstRGB = bi.getRGB(biX, biYI + d);
+            			if(dstRGB != borderColor) {
+            				if(srcA > 0) {
+            					bi.setRGB(biX, biYI, borderColor);
+            					bi.setRGB(biX, biYI + d, srcRGB);
+            				}
+            			}
+            		}
+            	}
+            }
+
+            big.setColor(color);
+            big.drawString(text, 2, fm.getMaxAscent());
+
             ResourceManager.addGameMapping(key, new ImageResource(bi));
             img = ResourceManager.getImage(key);//, scalingFactor);
         }
