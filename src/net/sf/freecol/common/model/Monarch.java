@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -889,11 +890,17 @@ public final class Monarch extends FreeColGameObject implements Named {
         int result = super.checkIntegrity(fix);
         // @compat 0.10.x
         // Detects/fixes bogus expeditionary force roles
-        for (AbstractUnit au : expeditionaryForce.getLandUnits()) {
+        List<AbstractUnit> todo = new ArrayList<>();
+        Iterator<AbstractUnit> it = expeditionaryForce.getLandUnits()
+            .iterator();
+        while (it.hasNext()) {
+            AbstractUnit au = it.next();
             if ("model.role.soldier".equals(au.getRoleId())) {
                 if (fix) {
                     au.setRoleId("model.role.infantry");
                     result = 0;
+                    it.remove();
+                    todo.add(au);
                 } else {
                     return -1;
                 }
@@ -902,11 +909,14 @@ public final class Monarch extends FreeColGameObject implements Named {
                 if (fix) {
                     au.setRoleId("model.role.cavalry");
                     result = 0;
+                    it.remove();
+                    todo.add(au);
                 } else {
                     return -1;
                 }
             }
         }
+        for (AbstractUnit au : todo) expeditionaryForce.add(au);
         // end @compat 0.10.x
         return result;
     }
