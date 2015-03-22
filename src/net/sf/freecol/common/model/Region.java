@@ -51,12 +51,21 @@ public class Region extends FreeColGameObject implements Nameable {
         DESERT;
 
         /**
+         * Get a stem key for this region type.
+         *
+         * @return A stem key.
+         */
+        public String getKey() {
+            return toString().toLowerCase(Locale.US);
+        }
+
+        /**
          * Gets a name index key for this region type.
          *
          * @return A name index key.
          */
         public String getNameIndexKey() {
-            return "index." + toString().toLowerCase(Locale.US);
+            return "index." + getKey();
         }
 
         /**
@@ -65,8 +74,7 @@ public class Region extends FreeColGameObject implements Nameable {
          * @return A message key.
          */
         public String getUnknownKey() {
-            return "model.region." + toString().toLowerCase(Locale.US)
-                + ".unknown";
+            return "model.region." + getKey() + ".unknown";
         }
 
         // Interface Named
@@ -75,8 +83,7 @@ public class Region extends FreeColGameObject implements Nameable {
          * {@inheritDoc}
          */
         public String getNameKey() {
-            return Messages.nameKey("model.region."
-                + toString().toLowerCase(Locale.US));
+            return Messages.nameKey("model.region." + getKey());
         }
     }
 

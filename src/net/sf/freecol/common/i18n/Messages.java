@@ -681,7 +681,7 @@ public class Messages {
         int index = player.getNameIndex(region.getType().getNameIndexKey());
         if (index < 1) index = 1;
         String prefix = player.getNationId() + ".region."
-            + region.getType().toString().toLowerCase(Locale.US) + ".";
+            + region.getType().getKey() + ".";
         String name;
         do {
             name = null;
@@ -705,10 +705,12 @@ public class Messages {
 
         // Fall back to generic names.
         if (name == null) {
+            StringTemplate nn = player.getNationName();
+            String nk = region.getType().getNameKey();
             do {
                 name = message(StringTemplate.template("model.region.default")
-                    .addStringTemplate("%nation%", player.getNationName())
-                    .add("%type%", region.getType().getNameKey())
+                    .addStringTemplate("%nation%", nn)
+                    .add("%type%", nk)
                     .addAmount("%index%", index));
                 index++;
             } while (map.getRegionByName(name) != null);
