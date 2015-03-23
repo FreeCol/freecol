@@ -344,7 +344,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                             new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                 "model.unit.arriveInEurope",
                                 europe, this)
-                            .add("%europe%", europe.getNameKey()));
+                            .addNamed("%europe%", europe));
                     }
                     setState(UnitState.ACTIVE);
                     setLocation(europe);//-vis: safe/Europe
@@ -755,7 +755,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                     "lostCityRumour.learn", serverPlayer, this)
                 .addStringTemplate("%unit%", oldName)
-                .add("%type%", getType().getNameKey()));
+                .addNamed("%type%", getType()));
             break;
         case TRIBAL_CHIEF:
             int chiefAmount = randomInt(logger, "Chief base amount",

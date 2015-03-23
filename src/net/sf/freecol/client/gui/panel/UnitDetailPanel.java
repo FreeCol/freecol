@@ -211,7 +211,8 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         }
         int bonusNumber = bonusList.size();
         if (bonusNumber > 0) {
-            StringTemplate template = StringTemplate.template("colopedia.unit.productionBonus")
+            StringTemplate template = StringTemplate
+                .template("colopedia.unit.productionBonus")
                 .addAmount("%number%", bonusNumber);
             panel.add(GUI.localizedLabel(template), "newline 20, top");
             JPanel productionPanel = new JPanel(new GridLayout(0, MODIFIERS_PER_ROW));

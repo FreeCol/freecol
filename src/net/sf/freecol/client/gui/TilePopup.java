@@ -83,8 +83,8 @@ public final class TilePopup extends JPopupMenu {
      */
     public TilePopup(final FreeColClient freeColClient, final Tile tile) {
         super(Messages.message(StringTemplate.template("tile")
-                               .addAmount("%x%", tile.getX())
-                               .addAmount("%y%", tile.getY())));
+                                             .addAmount("%x%", tile.getX())
+                                             .addAmount("%y%", tile.getY())));
 
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
@@ -261,7 +261,8 @@ public final class TilePopup extends JPopupMenu {
 
         if (tile.getUnitCount() > 1 && player.owns(firstUnit)) {
             if (moreUnits) addSeparator();
-            JMenuItem activateAllItem = GUI.localizedMenuItem(StringTemplate.template("activateAllUnits"));
+            JMenuItem activateAllItem = GUI.localizedMenuItem(StringTemplate
+                .template("activateAllUnits"));
             activateAllItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         Unit lastUnit = null;

@@ -3228,18 +3228,18 @@ public class Unit extends GoodsLocation
         Building school = (Building)((teacher) ? getLocation()
             : getTeacher().getLocation());
 
-        return (leavingColony)
-            ? StringTemplate.template("abandonEducation.text")
-                .addStringTemplate("%unit%", getLabel(UnitLabelType.NATIONAL))
-                .addName("%colony%", getColony().getName())
-                .add("%building%", school.getNameKey())
-                .addStringTemplate("%action%", (teacher)
-                    ? StringTemplate.key("abandonEducation.action.teaching")
-                    : StringTemplate.key("abandonEducation.action.studying"))
+        return (leavingColony) ? StringTemplate
+            .template("abandonEducation.text")
+            .addStringTemplate("%unit%", getLabel(UnitLabelType.NATIONAL))
+            .addName("%colony%", getColony().getName())
+            .addNamed("%building%", school)
+            .addStringTemplate("%action%", (teacher)
+                ? StringTemplate.key("abandonEducation.action.teaching")
+                : StringTemplate.key("abandonEducation.action.studying"))
             : (teacher)
             ? StringTemplate.template("abandonTeaching.text")
                 .addStringTemplate("%unit%", getLabel(UnitLabelType.NATIONAL))
-                .add("%building%", school.getNameKey())
+                .addNamed("%building%", school)
             : null;
     }
 

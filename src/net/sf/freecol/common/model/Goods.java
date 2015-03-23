@@ -133,7 +133,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
         if (sellable) return super.getLabel();
         return StringTemplate.template("model.goods.goodsBoycotted")
             .addAmount("%amount%", getAmount())
-            .add("%goods%", getType().getNameKey());
+            .addNamed("%goods%", getType());
     }
 
     /**

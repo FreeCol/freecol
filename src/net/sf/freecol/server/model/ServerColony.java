@@ -197,9 +197,9 @@ public class ServerColony extends Colony implements ServerModelObject {
                                              "model.colony.buildableNeedsGoods",
                                              this, build)
                                 .addName("%colony%", getName())
-                                .add("%buildable%", build.getNameKey())
+                                .addNamed("%buildable%", build)
                                 .addAmount("%amount%", amount)
-                                .add("%goodsType%", type.getNameKey()));
+                                .addNamed("%goodsType%", type));
                     }
                 }
             } else {
@@ -336,7 +336,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 }
                 StringTemplate st = StringTemplate.template("customs.saleData")
                     .addAmount("%amount%", amount)
-                    .add("%goods%", type.getNameKey())
+                    .addNamed("%goods%", type)
                     .addAmount("%gold%", (owner.getGold() - oldGold));
                 lb2.add(Messages.message(st), ", ");
             }
@@ -371,7 +371,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
                                      "model.building.warehouseEmpty",
                                      this, type)
-                              .add("%goods%", type.getNameKey())
+                              .addNamed("%goods%", type)
                               .addAmount("%level%", low)
                               .addName("%colony%", getName()));
                 continue;
@@ -396,7 +396,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 cs.addMessage(See.only(owner),
                               new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
                                                messageId, this, type)
-                              .add("%goods%", type.getNameKey())
+                              .addNamed("%goods%", type)
                               .addAmount("%waste%", waste)
                               .addAmount("%level%", high)
                               .addName("%colony%", getName()));
@@ -413,7 +413,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                         new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
                                          "model.building.warehouseSoonFull",
                                          this, type)
-                            .add("%goods%", goods.getNameKey())
+                            .addNamed("%goods%", goods)
                             .addName("%colony%", getName())
                             .addAmount("%amount%", loss));
                 }
@@ -542,8 +542,8 @@ public class ServerColony extends Colony implements ServerModelObject {
                               new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
                                                "model.building.notEnoughInput",
                                                this, goods.getType())
-                              .add("%inputGoods%", goods.getType().getNameKey())
-                              .add("%building%", building.getNameKey())
+                              .addNamed("%inputGoods%", goods.getType())
+                              .addNamed("%building%", building)
                               .addName("%colony%", getName()));
             }
         }
@@ -642,7 +642,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                                      "colonyPanel.unbuildable",
                                      this)
                         .addName("%colony%", getName())
-                        .add("%object%", type.getNameKey()));
+                        .addNamed("%object%", type));
             }
         }
         if (success) {
@@ -651,7 +651,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                                  "model.colony.buildingReady",
                                  this)
                     .addName("%colony%", getName())
-                    .add("%building%", type.getNameKey()));
+                    .addNamed("%building%", type));
             if (owner.isAI()) {
                 firePropertyChange(REARRANGE_WORKERS, true, false);
             }
@@ -705,7 +705,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                                      "model.colony.buildNeedPop",
                                      this)
                         .addName("%colony%", getName())
-                        .add("%building%", buildable.getNameKey()));
+                        .addNamed("%building%", buildable));
                 break;
             default: // Are there other warnings to send?
                 logger.warning("Unexpected build failure at " + getName()
@@ -716,7 +716,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                                      "colonyPanel.unbuildable",
                                      this, buildable)
                         .addName("%colony%", getName())
-                        .add("%object%", buildable.getNameKey()));
+                        .addNamed("%object%", buildable));
                 break;
             }
             queue.remove(0);

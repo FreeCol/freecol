@@ -198,8 +198,9 @@ public class FreeColProgressBar extends JPanel {
             }
             turnsString = Integer.toString(turns);
         }
-        progressString += " " + Messages.message(StringTemplate.template("turnsToComplete.short")
-                                                 .addName("%number%", turnsString));
+        progressString += " " + Messages.message(StringTemplate
+            .template("turnsToComplete.short")
+            .addName("%number%", turnsString));
 
         int stringWidth = g2d.getFontMetrics().stringWidth(progressString);
         int stringHeight = g2d.getFontMetrics().getAscent() + g2d.getFontMetrics().getDescent();

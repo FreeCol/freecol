@@ -92,10 +92,10 @@ public final class RecruitPanel extends FreeColPanel {
             if (immigrationRequired % production > 0) turns++;
         }
         int recruitPrice = player.getRecruitPrice();
-        String header
-            = Messages.message(StringTemplate.template("recruitPanel.clickOn")
-                .addAmount("%money%", recruitPrice)
-                .addAmount("%number%", turns));
+        String header = Messages.message(StringTemplate
+            .template("recruitPanel.clickOn")
+            .addAmount("%money%", recruitPrice)
+            .addAmount("%number%", turns));
         question.setText(header);
         add(question, "wrap 20");
 

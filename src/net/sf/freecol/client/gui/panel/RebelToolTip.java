@@ -61,14 +61,16 @@ public class RebelToolTip extends JToolTip {
 
         setLayout(new MigLayout("fillx, wrap 3", "[][right][right]", ""));
 
-        add(GUI.localizedLabel(StringTemplate.template("colonyPanel.rebelLabel")
+        add(GUI.localizedLabel(StringTemplate
+                .template("colonyPanel.rebelLabel")
                 .addName("%number%", "")));
 
         add(new JLabel(Integer.toString(rebels)));
 
         add(new JLabel(solPercent + "%"));
 
-        add(GUI.localizedLabel(StringTemplate.template("colonyPanel.royalistLabel")
+        add(GUI.localizedLabel(StringTemplate
+                .template("colonyPanel.royalistLabel")
                 .addName("%number%", "")));
 
         add(new JLabel(Integer.toString(population - rebels)));

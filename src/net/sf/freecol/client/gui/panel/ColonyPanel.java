@@ -650,9 +650,9 @@ public final class ColonyPanel extends PortPanel
             } else if (workingInBuilding != null && goodsType != null) {
                 int producing = workingInBuilding.getProductionOf(unit,
                                                                   goodsType);
-                String nominative = Messages.message(
-                    StringTemplate.template(goodsType.getNameKey())
-                        .addAmount("%amount%", producing));
+                String nominative = Messages.message(StringTemplate
+                    .template(goodsType.getNameKey())
+                    .addAmount("%amount%", producing));
                 sb.append(unit.getDescription())
                     .append(" ").append(Messages.message("producing.name"))
                     .append(" ").append(producing)
@@ -899,11 +899,11 @@ public final class ColonyPanel extends PortPanel
             BuildableType buildable = colony.getCurrentlyBuilding();
             if (buildable != null
                 && buildable.getRequiredPopulation() > colony.getUnitCount()
-                && !getGUI().confirm(true, null,
-                    StringTemplate.template("colonyPanel.reducePopulation")
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%number%", buildable.getRequiredPopulation())
-                        .add("%buildable%", buildable.getNameKey()),
+                && !getGUI().confirm(true, null, StringTemplate
+                    .template("colonyPanel.reducePopulation")
+                    .addName("%colony%", colony.getName())
+                    .addAmount("%number%", buildable.getRequiredPopulation())
+                    .addNamed("%buildable%", buildable),
                     this, "ok", "cancel")) {
                 return;
             }
@@ -1052,11 +1052,11 @@ public final class ColonyPanel extends PortPanel
             FreeColGameObject object = (FreeColGameObject)event.getSource();
             UnitType oldType = (UnitType) event.getOldValue();
             UnitType newType = (UnitType) event.getNewValue();
-            getGUI().showInformationMessage(object,
-                StringTemplate.template("model.colony.unitChange")
-                    .addName("%colony%", colony.getName())
-                    .add("%oldType%", oldType.getNameKey())
-                    .add("%newType%", newType.getNameKey()));
+            getGUI().showInformationMessage(object, StringTemplate
+                .template("model.colony.unitChange")
+                .addName("%colony%", colony.getName())
+                .addNamed("%oldType%", oldType)
+                .addNamed("%newType%", newType));
             updateTilesPanel();
         } else if (property.startsWith("model.goods.")) {
             // Changes to warehouse goods count may affect building production
@@ -2173,7 +2173,7 @@ public final class ColonyPanel extends PortPanel
                             .template("colonyPanel.notBestTile")
                             .addStringTemplate("%unit%",
                                 unit.getLabel(Unit.UnitLabelType.NATIONAL))
-                            .add("%goods%", workType.getNameKey())
+                            .addNamed("%goods%", workType)
                             .addStringTemplate("%tile%", best.getLabel());
                         getGUI().showInformationMessage(best, template);
                     }

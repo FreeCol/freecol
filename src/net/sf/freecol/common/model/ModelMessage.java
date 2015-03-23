@@ -338,6 +338,14 @@ public class ModelMessage extends StringTemplate {
      * {@inheritDoc}
      */
     @Override
+    public ModelMessage addNamed(String key, Named named) {
+        return (ModelMessage) super.addNamed(key, named);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ModelMessage addAmount(String key, Number amount) {
         return (ModelMessage) super.addAmount(key, amount);
     }

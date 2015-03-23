@@ -135,11 +135,11 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 this.icon = new ImageIcon(lib.getSettlementImage(settlement)
                     .getScaledInstance(64, -1, Image.SCALE_SMOOTH));
             }
-            StringTemplate template
-                = StringTemplate.template("selectDestination.destinationTurns")
-                    .addName("%location%", name)
-                    .addAmount("%turns%", this.turns)
-                    .addName("%extras%", this.extras);
+            StringTemplate template = StringTemplate
+                .template("selectDestination.destinationTurns")
+                .addName("%location%", name)
+                .addAmount("%turns%", this.turns)
+                .addName("%extras%", this.extras);
             this.text = Messages.message(template);
         }
 

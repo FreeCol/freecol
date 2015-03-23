@@ -999,18 +999,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             List<String> keys = new ArrayList<>();
             for (TileItem item : tileItemContainer.getTileItems()) {
                 if (item instanceof Resource) {
-                    keys.add(((Resource) item).getType().getNameKey());
+                    keys.add(((Resource)item).getType().getNameKey());
                 } else if (item instanceof TileImprovement
-                           && ((TileImprovement) item).isComplete()) {
-                    keys.add(((TileImprovement) item).getType().getNameKey());
+                           && ((TileImprovement)item).isComplete()) {
+                    keys.add(((TileImprovement)item).getType().getNameKey());
                 }
             }
             if (!keys.isEmpty()) {
-                label = StringTemplate.label("/")
-                    .add(type.getNameKey());
-                for (String key : keys) {
-                    label.add(key);
-                }
+                label = StringTemplate.label("/").add(type.getNameKey());
+                for (String key : keys) label.add(key);
             }
         }
         return label;
@@ -1484,7 +1481,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 && entry.getValue().intValue() < LOW_PRODUCTION_WARNING_VALUE) {
                 lb.add(Messages.message(StringTemplate
                         .template("buildColony.noBuildingMaterials")
-                        .add("%goods%", entry.getKey().getNameKey())),
+                        .addNamed("%goods%", entry.getKey())),
                     "\n");
             }
         }
@@ -2045,22 +2042,24 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 && nearSettlement.getName() != null) {
                 String name = nearSettlement.getName();
                 Direction d = Map.getRoughDirection(tile, this);
-                StringTemplate l = StringTemplate.template("nearLocation")
-                    .add("%direction%", d.getNameKey())
-                    .addName("%location%", name);
-                return StringTemplate.template("nameLocation")
-                    .add("%name%", ((type == null) ? "unexplored"
-                            : type.getNameKey()))
-                    .addStringTemplate("%location%", l);
+                StringTemplate t = StringTemplate.template("nameLocation")
+                    .addStringTemplate("%location%", StringTemplate
+                        .template("nearLocation")
+                        .addNamed("%direction%", d)
+                        .addName("%location%", name));
+                if (type == null) {
+                    t.add("%name%", "unexplored");
+                } else {
+                    t.addNamed("%name%", type);
+                }
+                return t;
             }
         }
-        if (region != null && region.getName() != null) {
-            return StringTemplate.template("nameLocation")
-                .add("%name%", type.getNameKey())
-                .add("%location%", region.getNameKey());
-        } else {
-            return StringTemplate.key(type.getNameKey());
-        }
+        return (region != null && region.getName() != null)
+            ? StringTemplate.template("nameLocation")
+                .addNamed("%name%", type)
+                .addNamed("%location%", region)
+            : StringTemplate.key(type.getNameKey());
     }
 
     /**
@@ -2076,22 +2075,24 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 StringTemplate name
                     = nearSettlement.getLocationLabelFor(player);
                 Direction d = Map.getRoughDirection(tile, this);
-                StringTemplate l = StringTemplate.template("nearLocation")
-                    .add("%direction%", d.getNameKey())
-                    .addStringTemplate("%location%", name);
-                return StringTemplate.template("nameLocation")
-                    .add("%name%", ((type == null) ? "unexplored"
-                            : type.getNameKey()))
-                    .addStringTemplate("%location%", l);
+                StringTemplate t = StringTemplate.template("nameLocation")
+                    .addStringTemplate("%location%", StringTemplate
+                        .template("nearLocation")
+                        .addNamed("%direction%", d)
+                        .addStringTemplate("%location%", name));
+                if (type == null) {
+                    t.add("%name%", "unexplored");
+                } else {
+                    t.addNamed("%name%", type);
+                }
+                return t;
             }
         }
-        if (region != null && region.getName() != null) {
-            return StringTemplate.template("nameLocation")
-                .add("%name%", type.getNameKey())
-                .addStringTemplate("%location%", region.getLabel());
-        } else {
-            return StringTemplate.key(type.getNameKey());
-        }
+        return (region != null && region.getName() != null)
+            ? StringTemplate.template("nameLocation")
+                .addNamed("%name%", type)
+                .addStringTemplate("%location%", region.getLabel())
+            : StringTemplate.key(type.getNameKey());
     }
 
     /**

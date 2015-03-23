@@ -333,8 +333,9 @@ public final class CompactLabourReport extends ReportPanel {
         if (!allColonists) {
             row = addRow(data,
                          data.getOtherStudentsName(),
-                         Messages.message(StringTemplate.template("report.labour.learning")
-                                          .addName("%unit%", data.getUnitData().getUnitName())),
+                         Messages.message(StringTemplate
+                             .template("report.labour.learning")
+                             .addName("%unit%", data.getUnitData().getUnitName())),
                          data.getOtherStudents(),
                          0, row);
         }
@@ -355,8 +356,9 @@ public final class CompactLabourReport extends ReportPanel {
                 }
 
                 String student = resultOfTraining.size() == 1 ?
-                    Messages.message(StringTemplate.template("report.labour.learning")
-                                     .addName("%unit%", resultOfTraining.iterator().next())) :
+                    Messages.message(StringTemplate
+                        .template("report.labour.learning")
+                        .addName("%unit%", resultOfTraining.iterator().next())) :
                     Messages.message("report.labour.learningOther");
                 addRow(data,
                        data.getUnitData().getUnitName(),

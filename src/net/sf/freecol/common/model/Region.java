@@ -35,7 +35,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 /**
  * A named region on the map.
  */
-public class Region extends FreeColGameObject implements Nameable {
+public class Region extends FreeColGameObject implements Nameable, Named {
 
     private static final Logger logger = Logger.getLogger(Region.class.getName());
 
@@ -157,33 +157,6 @@ public class Region extends FreeColGameObject implements Nameable {
         super(game, id);
     }
 
-
-    /**
-     * Get the explicit region name.
-     *
-     * @return The name, or null if it does not have one.
-     */
-    public final String getName() {
-        return this.name;
-    }
-
-    /**
-     * Sets the region name.
-     *
-     * @param newName The new name value.
-     */
-    public final void setName(final String newName) {
-        this.name = newName;
-    }
-
-    /**
-     * Gets the name key.
-     *
-     * @return The name key.
-     */
-    public final String getNameKey() {
-        return this.nameKey;
-    }
 
     /**
      * Is this region the Pacific Ocean?
@@ -441,6 +414,33 @@ public class Region extends FreeColGameObject implements Nameable {
      */
     public final void setScoreValue(final int newScoreValue) {
         this.scoreValue = newScoreValue;
+    }
+
+
+    // Implement Nameable
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setName(final String newName) {
+        this.name = newName;
+    }
+
+
+    // Implement Named
+    
+    /**
+     * {@inheritDoc}
+     */
+    public final String getNameKey() {
+        return this.nameKey;
     }
 
 

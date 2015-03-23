@@ -61,7 +61,7 @@ public class ModelMessageTest extends FreeColTestCase {
         ModelMessage mm1 = new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
                                             "model.building.warehouseSoonFull",
                                             colony, cotton)
-            .add("%goods%", cotton.getNameKey())
+            .addNamed("%goods%", cotton)
             .addName("%colony%", colony.getName())
             .addAmount("%amount%", 10);
                                     
@@ -69,7 +69,7 @@ public class ModelMessageTest extends FreeColTestCase {
         ModelMessage mm2 = new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
                                             "model.building.warehouseSoonFull",
                                             colony, cotton)
-            .add("%goods%", cotton.getNameKey())
+            .addNamed("%goods%", cotton)
             .addName("%colony%", colony.getName())
             .addAmount("%amount%", 10);
 

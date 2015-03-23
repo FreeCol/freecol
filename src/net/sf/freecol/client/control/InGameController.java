@@ -966,8 +966,8 @@ public final class InGameController implements NetworkConstants {
             if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessBeached")
+                gui.showInformationMessage(unit, StringTemplate
+                    .template("move.noAccessBeached")
                     .addStringTemplate("%nation%", nation));
             }
             break;
@@ -975,8 +975,8 @@ public final class InGameController implements NetworkConstants {
             if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessContact")
+                gui.showInformationMessage(unit, StringTemplate
+                    .template("move.noAccessContact")
                     .addStringTemplate("%nation%", nation));
             }
             break;
@@ -984,8 +984,8 @@ public final class InGameController implements NetworkConstants {
             if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessGoods")
+                gui.showInformationMessage(unit, StringTemplate
+                    .template("move.noAccessGoods")
                     .addStringTemplate("%nation%", nation)
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL)));
@@ -1002,8 +1002,8 @@ public final class InGameController implements NetworkConstants {
             if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessMissionBan")
+                gui.showInformationMessage(unit, StringTemplate
+                    .template("move.noAccessMissionBan")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL))
                     .addStringTemplate("%nation%", nation));
@@ -1013,8 +1013,8 @@ public final class InGameController implements NetworkConstants {
             if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessSettlement")
+                gui.showInformationMessage(unit, StringTemplate
+                    .template("move.noAccessSettlement")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL))
                     .addStringTemplate("%nation%", nation));
@@ -1023,8 +1023,8 @@ public final class InGameController implements NetworkConstants {
         case MOVE_NO_ACCESS_SKILL:
             if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessSkill")
+                gui.showInformationMessage(unit, StringTemplate
+                    .template("move.noAccessSkill")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL)));
             }
@@ -1033,8 +1033,8 @@ public final class InGameController implements NetworkConstants {
             if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessTrade")
+                gui.showInformationMessage(unit, StringTemplate
+                    .template("move.noAccessTrade")
                     .addStringTemplate("%nation%", nation));
             }
             break;
@@ -1042,16 +1042,16 @@ public final class InGameController implements NetworkConstants {
             if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessWar")
+                gui.showInformationMessage(unit, StringTemplate
+                    .template("move.noAccessWar")
                     .addStringTemplate("%nation%", nation));
             }
             break;
         case MOVE_NO_ACCESS_WATER:
             if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAccessWater")
+                gui.showInformationMessage(unit, StringTemplate
+                    .template("move.noAccessWater")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL)));
             }
@@ -1059,8 +1059,8 @@ public final class InGameController implements NetworkConstants {
         case MOVE_NO_ATTACK_MARINE:
             if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noAttackWater")
+                gui.showInformationMessage(unit, StringTemplate
+                    .template("move.noAttackWater")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL)));
             }
@@ -1076,8 +1076,8 @@ public final class InGameController implements NetworkConstants {
         case MOVE_NO_TILE:
             if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("move.noTile")
+                gui.showInformationMessage(unit, StringTemplate
+                    .template("move.noTile")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL)));
             }
@@ -1459,9 +1459,9 @@ public final class InGameController implements NetworkConstants {
                 moveTo(unit, unit.getDestination());
                 return false;
             } else {
-                if (gui.confirm(true, oldTile,
-                        StringTemplate.template("highseas.text")
-                            .addAmount("%number%", unit.getSailTurns()),
+                if (gui.confirm(true, oldTile, StringTemplate
+                        .template("highseas.text")
+                        .addAmount("%number%", unit.getSailTurns()),
                         unit, "highseas.yes", "highseas.no")) {
                     moveTo(unit, unit.getOwner().getEurope());
                     return false;
@@ -1494,14 +1494,14 @@ public final class InGameController implements NetworkConstants {
             gui.showInformationMessage(settlement,
                                        "indianSettlement.noMoreSkill");
         } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
-            gui.showInformationMessage(settlement,
-                StringTemplate.template("indianSettlement.cantLearnSkill")
-                    .addStringTemplate("%unit%",
-                        unit.getLabel(Unit.UnitLabelType.NATIONAL))
-                    .add("%skill%", skill.getNameKey()));
-        } else if (gui.confirm(true, unit.getTile(),
-                StringTemplate.template("learnSkill.text")
-                    .add("%skill%", skill.getNameKey()),
+            gui.showInformationMessage(settlement, StringTemplate
+                .template("indianSettlement.cantLearnSkill")
+                .addStringTemplate("%unit%",
+                    unit.getLabel(Unit.UnitLabelType.NATIONAL))
+                .addNamed("%skill%", skill));
+        } else if (gui.confirm(true, unit.getTile(), StringTemplate
+                .template("learnSkill.text")
+                .addNamed("%skill%", skill),
                 unit, "learnSkill.yes", "learnSkill.no")) {
             if (askServer().learnSkill(unit, direction)) {
                 if (unit.isDisposed()) {
@@ -1664,19 +1664,19 @@ public final class InGameController implements NetworkConstants {
                     "scoutSettlement.speakDie");
                 return false;
             } else if ("expert".equals(result)) {
-                gui.showInformationMessage(settlement,
-                    StringTemplate.template("scoutSettlement.expertScout")
-                    .add("%unit%", unit.getType().getNameKey()));
+                gui.showInformationMessage(settlement, StringTemplate
+                    .template("scoutSettlement.expertScout")
+                    .addNamed("%unit%", unit.getType()));
             } else if ("tales".equals(result)) {
                 gui.showInformationMessage(settlement,
                     "scoutSettlement.speakTales");
             } else if ("beads".equals(result)) {
-                gui.showInformationMessage(settlement,
-                    StringTemplate.template("scoutSettlement.speakBeads")
+                gui.showInformationMessage(settlement, StringTemplate
+                    .template("scoutSettlement.speakBeads")
                     .addAmount("%amount%", player.getGold() - oldGold));
             } else if ("nothing".equals(result)) {
-                gui.showInformationMessage(settlement,
-                    StringTemplate.template("scoutSettlement.speakNothing")
+                gui.showInformationMessage(settlement, StringTemplate
+                    .template("scoutSettlement.speakNothing")
                     .addStringTemplate("%nation%", player.getNationName()));
             } else {
                 logger.warning("Invalid result from askScoutSpeak: " + result);
@@ -1750,11 +1750,11 @@ public final class InGameController implements NetworkConstants {
     private boolean moveTradeIndianSettlement(Unit unit, Direction direction) {
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
 
-        StringTemplate baseTemplate
-            = StringTemplate.template("tradeProposition.welcome")
-                .addStringTemplate("%nation%",
-                    settlement.getOwner().getNationName())
-                .addName("%settlement%", settlement.getName());
+        StringTemplate baseTemplate = StringTemplate
+            .template("tradeProposition.welcome")
+            .addStringTemplate("%nation%",
+                settlement.getOwner().getNationName())
+            .addName("%settlement%", settlement.getName());
         StringTemplate template = baseTemplate;
         boolean[] results = askServer()
             .openTransactionSession(unit, settlement);
@@ -1826,7 +1826,7 @@ public final class InGameController implements NetworkConstants {
         switch (fail) {
         case NO_TRADE_GOODS:
             return StringTemplate.template("trade.noTradeGoods")
-                .add("%goods%", goods.getNameKey());
+                .addNamed("%goods%", goods);
         case NO_TRADE_HAGGLE:
             return StringTemplate.template("trade.noTradeHaggle");
         case NO_TRADE_HOSTILE:
@@ -2068,15 +2068,15 @@ public final class InGameController implements NetworkConstants {
             if (gold < 0) {
                 // protocol fail
             } else if (!player.checkGold(gold)) {
-                gui.showInformationMessage(settlement,
-                    StringTemplate.template("missionarySettlement.inciteGoldFail")
+                gui.showInformationMessage(settlement, StringTemplate
+                    .template("missionarySettlement.inciteGoldFail")
                     .add("%player%", enemy.getName())
                     .addAmount("%amount%", gold));
             } else {
-                if (gui.confirm(true, unit.getTile(),
-                        StringTemplate.template("missionarySettlement.inciteConfirm")
-                            .add("%player%", enemy.getName())
-                            .addAmount("%amount%", gold),
+                if (gui.confirm(true, unit.getTile(), StringTemplate
+                        .template("missionarySettlement.inciteConfirm")
+                        .add("%player%", enemy.getName())
+                        .addAmount("%amount%", gold),
                         unit, "yes", "no")) {
                     if (askServer().incite(unit, direction, enemy, gold) >= 0) {
                         updateControls();
@@ -2352,7 +2352,7 @@ public final class InGameController implements NetworkConstants {
         }
         return Messages.message(StringTemplate.template(key)
             .addAmount("%amount%", amount)
-            .add("%goods%", type.getNameKey())
+            .addNamed("%goods%", type)
             .addAmount("%more%", more));
     }
 
@@ -2388,13 +2388,13 @@ public final class InGameController implements NetworkConstants {
                     .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);
                 switch (option) {
                 case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_ASK:
-                    StringTemplate template
-                        = StringTemplate.template("traderoute.warehouseCapacity")
+                    StringTemplate template = StringTemplate
+                        .template("traderoute.warehouseCapacity")
                         .addStringTemplate("%unit%",
                             unit.getLabel(Unit.UnitLabelType.NATIONAL))
                         .addStringTemplate("%colony%", locName)
                         .addAmount("%amount%", toUnload - atStop)
-                        .add("%goods%", goods.getNameKey());
+                        .addNamed("%goods%", goods);
                     if (!gui.confirm(true, unit.getTile(), template,
                                      unit, "yes", "no")) amount = atStop;
                     break;
@@ -2470,7 +2470,7 @@ public final class InGameController implements NetworkConstants {
         return Messages.message(StringTemplate.template(key)
             .addAmount("%amount%", amount)
             .addAmount("%more%", more)
-            .add("%goods%", type.getNameKey()));
+            .addNamed("%goods%", type));
     }
 
 
@@ -2610,9 +2610,9 @@ public final class InGameController implements NetworkConstants {
         Tile tile = unit.getTile();
         if (tile == null) return false;
         if (!unit.canBuildColony()) {
-            gui.showInformationMessage(unit,
-                StringTemplate.template("buildColony.badUnit")
-                    .addName("%unit%", unit.getName()));
+            gui.showInformationMessage(unit, StringTemplate
+                .template("buildColony.badUnit")
+                .addName("%unit%", unit.getName()));
             return false;
         }
 
@@ -2674,8 +2674,8 @@ public final class InGameController implements NetworkConstants {
                 ret = false; // 0-length invalid.
             } else if (player.getSettlementByName(name) != null) {
                 // Must be unique
-                gui.showInformationMessage(tile,
-                    StringTemplate.template("nameColony.notUnique")
+                gui.showInformationMessage(tile, StringTemplate
+                    .template("nameColony.notUnique")
                     .addName("%name%", name));
                 ret = false;
             }
@@ -2949,9 +2949,9 @@ public final class InGameController implements NetworkConstants {
             || !unit.checkSetState(UnitState.ACTIVE)) return false;
 
         if (unit.getState() == UnitState.IMPROVING
-            && !gui.confirm(true, unit.getTile(),
-                StringTemplate.template("model.unit.confirmCancelWork")
-                    .addAmount("%turns%", unit.getWorkTurnsLeft()),
+            && !gui.confirm(true, unit.getTile(), StringTemplate
+                .template("model.unit.confirmCancelWork")
+                .addAmount("%turns%", unit.getWorkTurnsLeft()),
                 unit, "ok", "cancel")) {
             return false;
         }
@@ -2979,19 +2979,19 @@ public final class InGameController implements NetworkConstants {
         UnitType newType = oldType.getTargetType(ChangeType.CLEAR_SKILL,
                                                  unit.getOwner());
         if (newType == null) {
-            gui.showInformationMessage(unit,
-                StringTemplate.template("clearSpeciality.impossible")
-                              .addStringTemplate("%unit%",
-                                  unit.getLabel(Unit.UnitLabelType.NATIONAL)));
+            gui.showInformationMessage(unit, StringTemplate
+                .template("clearSpeciality.impossible")
+                .addStringTemplate("%unit%",
+                    unit.getLabel(Unit.UnitLabelType.NATIONAL)));
             return false;
         }
 
         Tile tile = (gui.isShowingSubPanel()) ? null : unit.getTile();
-        if (!gui.confirm(true, tile,
-                StringTemplate.template("clearSpeciality.areYouSure")
-                              .addStringTemplate("%oldUnit%",
-                                  unit.getLabel(Unit.UnitLabelType.NATIONAL))
-                              .add("%unit%", newType.getNameKey()),
+        if (!gui.confirm(true, tile, StringTemplate
+                .template("clearSpeciality.areYouSure")
+                .addStringTemplate("%oldUnit%",
+                    unit.getLabel(Unit.UnitLabelType.NATIONAL))
+                .addNamed("%unit%", newType),
                 unit, "ok", "cancel")) {
             return false;
         }
@@ -3236,7 +3236,7 @@ public final class InGameController implements NetworkConstants {
                     StringTemplate template = StringTemplate
                         .template("equipUnit.impossible")
                         .addName("%colony%", colony.getName())
-                        .add("%equipment%", ag.getType().getNameKey())
+                        .addNamed("%equipment%", ag.getType())
                         .addStringTemplate("%unit%",
                             unit.getLabel(Unit.UnitLabelType.NATIONAL));
                     gui.showInformationMessage(unit, template);
@@ -3434,11 +3434,11 @@ public final class InGameController implements NetworkConstants {
         if (type == null) {
             switch (opt) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
-                accepted = gui.confirm(true, colony.getTile(),
-                    StringTemplate.template("indianDemand.gold.text")
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount),
+                accepted = gui.confirm(true, colony.getTile(), StringTemplate
+                    .template("indianDemand.gold.text")
+                    .addName("%nation%", nation)
+                    .addName("%colony%", colony.getName())
+                    .addAmount("%amount%", amount),
                     unit, "indianDemand.gold.yes", "indianDemand.gold.no");
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
@@ -3466,17 +3466,17 @@ public final class InGameController implements NetworkConstants {
                 if (type.isFoodType()) {
                     accepted = gui.confirm(true, colony.getTile(),
                         StringTemplate.template("indianDemand.food.text")
-                            .addName("%nation%", nation)
-                            .addName("%colony%", colony.getName())
-                            .addAmount("%amount%", amount),
+                        .addName("%nation%", nation)
+                        .addName("%colony%", colony.getName())
+                        .addAmount("%amount%", amount),
                         unit, "indianDemand.food.yes", "indianDemand.food.no");
                 } else {
                     accepted = gui.confirm(true, colony.getTile(),
                         StringTemplate.template("indianDemand.other.text")
-                            .addName("%nation%", nation)
-                            .addName("%colony%", colony.getName())
-                            .addAmount("%amount%", amount)
-                            .add("%goods%", type.getNameKey()),
+                        .addName("%nation%", nation)
+                        .addName("%colony%", colony.getName())
+                        .addAmount("%amount%", amount)
+                        .addNamed("%goods%", type),
                         unit, "indianDemand.other.yes", "indianDemand.other.no");
                 }
                 break;
@@ -3493,7 +3493,7 @@ public final class InGameController implements NetworkConstants {
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
                         .addAmount("%amount%", amount)
-                        .add("%goods%", type.getNameKey());
+                        .addNamed("%goods%", type);
                 }
                 accepted = true;
                 break;
@@ -3510,7 +3510,7 @@ public final class InGameController implements NetworkConstants {
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
                         .addAmount("%amount%", amount)
-                        .add("%goods%", type.getNameKey());
+                        .addNamed("%goods%", type);
                 }
                 accepted = false;
                 break;
@@ -3897,10 +3897,10 @@ public final class InGameController implements NetworkConstants {
             return false;
         }
 
-        boolean ret = gui.confirm(true, null,
-                StringTemplate.template("model.europe.payArrears")
-                    .addAmount("%amount%", arrears),
-                type, "ok", "cancel")
+        boolean ret = gui.confirm(true, null, StringTemplate
+            .template("model.europe.payArrears")
+            .addAmount("%amount%", arrears),
+            type, "ok", "cancel")
             && askServer().payArrears(type)
             && player.canTrade(type);
         updateControls();
@@ -3931,10 +3931,10 @@ public final class InGameController implements NetworkConstants {
         }
 
         int price = colony.getPriceForBuilding();
-        if (!gui.confirm(true, null,
-                         StringTemplate.template("payForBuilding.text")
-                            .addAmount("%amount%", price),
-                         colony, "payForBuilding.yes", "payForBuilding.no")) {
+        if (!gui.confirm(true, null, StringTemplate
+                .template("payForBuilding.text")
+                .addAmount("%amount%", price),
+                colony, "payForBuilding.yes", "payForBuilding.no")) {
             return false;
         }
 
@@ -4049,8 +4049,8 @@ public final class InGameController implements NetworkConstants {
                 return false;
             } else if (player.getSettlementByName(name) != null) {
                 // Colony name must be unique.
-                gui.showInformationMessage((Colony) object,
-                    StringTemplate.template("nameColony.notUnique")
+                gui.showInformationMessage((Colony)object, StringTemplate
+                    .template("nameColony.notUnique")
                     .addName("%name%", name));
                 return false;
             }

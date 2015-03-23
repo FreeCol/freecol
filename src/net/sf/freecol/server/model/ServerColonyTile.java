@@ -86,7 +86,7 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
                     cs.addMessage(See.only(owner),
                         new ModelMessage(ModelMessage.MessageType.WARNING,
                             "model.tile.resourceExhausted", colony)
-                            .add("%resource%", resource.getNameKey())
+                            .addNamed("%resource%", resource)
                             .addName("%colony%", colony.getName()));
                     cs.add(See.perhaps(), workTile);
                     break;

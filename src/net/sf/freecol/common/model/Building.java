@@ -389,7 +389,7 @@ public class Building extends WorkLocation
      */
     public StringTemplate getLocationLabel() {
         return StringTemplate.template("inLocation")
-            .add("%location%", getNameKey());
+            .addNamed("%location%", this);
     }
 
     /**

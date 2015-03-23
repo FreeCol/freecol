@@ -737,9 +737,9 @@ public final class TradeRouteInputPanel extends FreeColPanel
             if (route.getName() == null) continue;
             if (route.getName().equals(this.newRoute.getName())) continue;
             if (route.getName().equals(newName)) {
-                StringTemplate template
-                    = StringTemplate.template("tradeRoute.duplicateName")
-                        .addName("%name%", newName);
+                StringTemplate template = StringTemplate
+                    .template("tradeRoute.duplicateName")
+                    .addName("%name%", newName);
                 getGUI().showErrorMessage(template);
                 return false;
             }

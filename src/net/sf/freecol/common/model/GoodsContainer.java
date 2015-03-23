@@ -199,8 +199,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
         if (newAmount < 0) {
             throw new IllegalStateException("Operation would leave "
-                + newAmount + " goods of type "
-                + type.getNameKey() + " in Location " + parent);
+                + newAmount + " goods of type " + type
+                + " in Location " + parent);
         } else if (newAmount == 0) {
             synchronized (storedGoods) {
                 storedGoods.remove(type);

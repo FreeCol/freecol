@@ -153,10 +153,10 @@ public class BuildingToolTip extends JToolTip {
             : output.getBreedingNumber();
         if (breedingNumber < GoodsType.INFINITY
             && breedingNumber > building.getColony().getGoodsCount(output)) {
-            StringTemplate t = StringTemplate.template("buildingToolTip.breeding")
-                .addAmount("%number%", breedingNumber)
-                .add("%goods%", output.getNameKey());
-            add(GUI.localizedLabel(t));
+            add(GUI.localizedLabel(StringTemplate
+                    .template("buildingToolTip.breeding")
+                    .addAmount("%number%", breedingNumber)
+                    .addNamed("%goods%", output)));
         }
 
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {

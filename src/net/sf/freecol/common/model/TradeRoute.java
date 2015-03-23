@@ -259,7 +259,7 @@ public class TradeRoute extends FreeColGameObject
         if (empty) return StringTemplate.template("tradeRoute.allEmpty");
         if (!always.isEmpty()) {
             return StringTemplate.template("tradeRoute.alwaysPresent")
-                .add("%goodsType%", always.iterator().next().getNameKey());
+                .addNamed("%goodsType%", always.iterator().next());
         }
         
         return null;

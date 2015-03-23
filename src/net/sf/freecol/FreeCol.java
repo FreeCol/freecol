@@ -418,7 +418,8 @@ public final class FreeCol {
 
         // Ordinary options, handled here.
         options.addOption(OptionBuilder.withLongOpt("advantages")
-                          .withDescription(Messages.message(StringTemplate.template("cli.advantages")
+                          .withDescription(Messages.message(StringTemplate
+                                  .template("cli.advantages")
                                   .addName("%advantages%", getValidAdvantages())))
                           .withArgName(Messages.message("cli.arg.advantages"))
                           .hasArg()
@@ -434,7 +435,8 @@ public final class FreeCol {
                           .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("debug")
-                          .withDescription(Messages.message(StringTemplate.template("cli.debug")
+                          .withDescription(Messages.message(StringTemplate
+                                  .template("cli.debug")
                                   .addName("%modes%", FreeColDebugger.getDebugModes())))
                           .withArgName(Messages.message("cli.arg.debug"))
                           .hasOptionalArg()

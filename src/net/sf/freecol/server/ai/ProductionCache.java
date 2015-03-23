@@ -413,12 +413,12 @@ public class ProductionCache {
         public String toString() {
             String result = "Cache entry: " + unit;
             if (workLocation instanceof ColonyTile) {
-                return result
-                    + workLocation.getTile().getNameKey()
-                    + "(" + workLocation.getId() + ") " + goodsType.getNameKey();
+                return result + workLocation.getTile().getNameKey()
+                    + "(" + workLocation.getId() + ") "
+                    + goodsType.getNameKey();
             } else if (workLocation instanceof Building) {
-                return result
-                    + ((Building) workLocation).getNameKey() + "(" + workLocation.getId() + ") ";
+                return result + ((Building)workLocation).getNameKey()
+                    + "(" + workLocation.getId() + ") ";
             } else {
                 return result;
             }

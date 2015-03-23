@@ -204,6 +204,14 @@ public class HistoryEvent extends StringTemplate {
      * {@inheritDoc}
      */
     @Override
+    public HistoryEvent addNamed(String key, Named value) {
+        return (HistoryEvent)super.addNamed(key, value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public HistoryEvent addAmount(String key, Number amount) {
         return (HistoryEvent) super.addAmount(key, amount);
     }

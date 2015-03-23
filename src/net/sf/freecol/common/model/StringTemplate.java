@@ -43,6 +43,7 @@ import net.sf.freecol.common.util.Utils;
  *
  * @version 1.0
  */
+
 public class StringTemplate extends FreeColObject {
 
     /**
@@ -214,11 +215,8 @@ public class StringTemplate extends FreeColObject {
         if (keys != null && replacements != null) {
             for (int index = 0; index < keys.size(); index++) {
                 if (key.equals(keys.get(index))) {
-                    if (replacements.size() > index) {
-                        return replacements.get(index);
-                    } else {
-                        return null;
-                    }
+                    return (replacements.size() <= index) ? null
+                        : replacements.get(index);
                 }
             }
         }
@@ -236,7 +234,7 @@ public class StringTemplate extends FreeColObject {
     public StringTemplate add(String key, String value) {
         if (templateType == TemplateType.TEMPLATE) {
             addKey(key);
-            addReplacement(new StringTemplate(value, TemplateType.KEY));
+            addReplacement(this.key(value));
         } else {
             throw new IllegalArgumentException("Cannot add key-value pair to StringTemplate type "
                                                + templateType);
@@ -253,7 +251,7 @@ public class StringTemplate extends FreeColObject {
      */
     public StringTemplate add(String value) {
         if (templateType == TemplateType.LABEL) {
-            addReplacement(new StringTemplate(value, TemplateType.KEY));
+            addReplacement(this.key(value));
         } else {
             throw new IllegalArgumentException("Cannot add a single string to StringTemplate type "
                                                + templateType);
@@ -273,7 +271,7 @@ public class StringTemplate extends FreeColObject {
     public StringTemplate addName(String key, String value) {
         if (templateType == TemplateType.TEMPLATE) {
             addKey(key);
-            addReplacement(new StringTemplate(value, TemplateType.NAME));
+            addReplacement(this.name(value));
         } else {
             throw new IllegalArgumentException("Cannot add key-value pair to StringTemplate type "
                                                + templateType);
@@ -293,8 +291,7 @@ public class StringTemplate extends FreeColObject {
     public StringTemplate addName(String key, FreeColObject object) {
         if (templateType == TemplateType.TEMPLATE) {
             addKey(key);
-            addReplacement(new StringTemplate(Messages.nameKey(object.getId()),
-                                              TemplateType.KEY));
+            addReplacement(this.key(Messages.nameKey(object.getId())));
         } else {
             throw new IllegalArgumentException("Cannot add key-value pair to StringTemplate type "
                                                + templateType);
@@ -312,12 +309,23 @@ public class StringTemplate extends FreeColObject {
      */
     public StringTemplate addName(String value) {
         if (templateType == TemplateType.LABEL) {
-            addReplacement(new StringTemplate(value, TemplateType.NAME));
+            addReplacement(this.name(value));
         } else {
             throw new IllegalArgumentException("Cannot add a single string to StringTemplate type "
                                                + templateType);
         }
         return this;
+    }
+
+    /**
+     * Add a key and named object to the StringTemplate.
+     *
+     * @param key The key to add.
+     * @param named The <code>Named</code> to add.
+     * @return This <code>StringTemplate</code>.
+     */
+    public StringTemplate addNamed(String key, Named named) {
+        return add(key, named.getNameKey());
     }
 
     /**
@@ -328,19 +336,18 @@ public class StringTemplate extends FreeColObject {
      * @return This <code>StringTemplate</code>.
      */
     public StringTemplate addAmount(String key, Number amount) {
-        addName(key, amount.toString());
-        return this;
+        return addName(key, amount.toString());
     }
 
     /**
      * Add a key and a StringTemplate to replace it to this StringTemplate.
      *
      * @param key The key to add.
-     * @param template The template value.
+     * @param template The <code>StringTemplate</code> value.
      * @return This <code>StringTemplate</code>.
      */
     public StringTemplate addStringTemplate(String key,
-                                                          StringTemplate template) {
+                                            StringTemplate template) {
         if (templateType == TemplateType.TEMPLATE) {
             addKey(key);
             addReplacement(template);

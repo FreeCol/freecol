@@ -738,7 +738,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Select one from each father type
         List<FoundingFather> randomFathers = new ArrayList<>();
-        String logMessage = "Random fathers";
+        LogBuilder lb = new LogBuilder(64);
+        lb.add("Random fathers");
         for (FoundingFatherType type : FoundingFatherType.values()) {
             List<RandomChoice<FoundingFather>> rc = choices.get(type);
             if (rc != null) {
@@ -746,11 +747,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     "Choose founding father", rc, random);
                 if (f != null) {
                     randomFathers.add(f);
-                    logMessage += ":" + f.getNameKey();
+                    lb.add(":", f.getSuffix());
                 }
             }
         }
-        logger.info(logMessage);
+        lb.log(logger, Level.INFO);
         return randomFathers;
     }
 
@@ -1623,7 +1624,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         // Add message before damaging building
                         messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                 effect.getId(), colony)
-                            .add("%building%", building.getType().getNameKey()));
+                            .addNamed("%building%", building.getType()));
                         csDamageBuilding(building, cs);
                         colonyDirty = true;
                     }
@@ -2004,12 +2005,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
             new ModelMessage(ModelMessage.MessageType.SONS_OF_LIBERTY,
                              "model.player.foundingFatherJoinedCongress",
                              this)
-                      .add("%foundingFather%", father.getNameKey())
+                      .addNamed("%foundingFather%", father)
                       .add("%description%", father.getDescriptionKey()));
         cs.addHistory(this,
             new HistoryEvent(getGame().getTurn(),
                 HistoryEvent.EventType.FOUNDING_FATHER, this)
-                    .add("%father%", father.getNameKey()));
+                    .addNamed("%father%", father));
 
         List<AbstractUnit> units = father.getUnits();
         if (units != null && !units.isEmpty() && europe != null) {
@@ -2231,7 +2232,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                      "model.europe.emigrate",
                                      this, unit)
-                        .add("%europe%", europe.getNameKey())
+                        .addNamed("%europe%", europe)
                         .addStringTemplate("%unit%", unit.getLabel()));
             }
             break;
@@ -2241,7 +2242,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                  "model.europe.autoRecruit",
                                  this, unit)
-                    .add("%europe%", europe.getNameKey())
+                    .addNamed("%europe%", europe)
                     .addStringTemplate("%unit%", unit.getLabel()));
             break;
         default:
@@ -3006,7 +3007,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                                "model.unit.equipmentCaptured",
                                                winnerPlayer)
                               .addStringTemplate("%nation%", winnerNation)
-                              .add("%equipment%", goodsType.getNameKey()));
+                              .addNamed("%equipment%", goodsType));
 
                 // CHEAT: Immediately transferring the captured goods
                 // back to a potentially remote settlement is pretty
@@ -3684,7 +3685,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.addMessage(See.only(colonyPlayer),
                 new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                     "model.unit.buildingDamaged", colony)
-                .add("%building%", building.getNameKey())
+                .addNamed("%building%", building)
                 .addName("%colony%", colony.getName())
                 .addStringTemplate("%enemyNation%", attackerNation)
                 .addStringTemplate("%enemyUnit%", attacker.getLabel()));
@@ -3706,7 +3707,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                     "model.unit.goodsStolen", colony, goods)
                 .addAmount("%amount%", goods.getAmount())
-                .add("%goods%", goods.getType().getNameKey())
+                .addNamed("%goods%", goods.getType())
                 .addName("%colony%", colony.getName())
                 .addStringTemplate("%enemyNation%", attackerNation)
                 .addStringTemplate("%enemyUnit%", attacker.getLabel()));
@@ -4024,7 +4025,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.add(See.only(this), ChangePriority.CHANGE_NORMAL,
                 new MonarchActionMessage(Monarch.MonarchAction.FORCE_TAX,
                     StringTemplate.template("model.monarch.action.FORCE_TAX")
-                        .addAmount("%amount%", tax + extraTax),
+                    .addAmount("%amount%", tax + extraTax),
                     monarchKey));
             logger.info("Forced tax raise to: " + (tax + extraTax));
         } else { // Tea party
@@ -4053,7 +4054,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     messageId, this)
                 .addName("%colony%", colony.getName())
                 .addAmount("%amount%", amount)
-                .add("%goods%", goodsType.getNameKey()));
+                .addNamed("%goods%", goodsType));
             cs.addAttribute(See.only(this), "flush", Boolean.TRUE.toString());
             logger.info("Goods party at " + colony.getName()
                 + " with: " + goods + " arrears: " + arrears);

@@ -148,7 +148,8 @@ public final class InfoPanel extends FreeColPanel {
                 if (tile.isExplored()) {
                     StringTemplate items = StringTemplate.label(", ");
                     items.add(tile.getNameKey());
-                    for (TileImprovement tileImprovement : tile.getCompletedTileImprovements()) {
+                    for (TileImprovement tileImprovement
+                             : tile.getCompletedTileImprovements()) {
                         items.add(tileImprovement.getType().getDescriptionKey());
                     }
                     add(GUI.localizedLabel(items), "span, align center");

@@ -183,8 +183,8 @@ public final class PreGameController {
             Direction sailDirection = (player.getNation().startsOnEastCoast())
                 ? Direction.W : Direction.E;
             player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
-                                     "tutorial.startGame", player)
-                .add("%direction%", sailDirection.getNameKey()));
+                                                    "tutorial.startGame", player)
+                .addNamed("%direction%", sailDirection));
             igc.nextModelMessage();
         }
         return true;

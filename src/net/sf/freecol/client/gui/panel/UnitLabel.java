@@ -287,8 +287,9 @@ public final class UnitLabel extends JLabel
             g.drawImage(lib.getOccupationIndicatorChip(unit, text), 0, 0, null);
 
             if (unit.isDamaged()) {
-                String underRepair = Messages.message(StringTemplate.template("underRepair")
-                                                      .addAmount("%turns%", unit.getTurnsForRepair()));
+                String underRepair = Messages.message(StringTemplate
+                    .template("underRepair")
+                    .addAmount("%turns%", unit.getTurnsForRepair()));
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
                 Font font = FontLibrary.DEFAULT_FONT;

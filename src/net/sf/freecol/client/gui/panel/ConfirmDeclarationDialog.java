@@ -259,7 +259,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
         StringTemplate sure = StringTemplate
             .template("declareIndependence.areYouSure.text")
-            .add("%monarch%", player.getMonarch().getNameKey());
+            .addNamed("%monarch%", player.getMonarch());
 
         StringTemplate country = StringTemplate
             .template("declareIndependence.defaultCountry")

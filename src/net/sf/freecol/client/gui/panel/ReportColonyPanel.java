@@ -175,7 +175,7 @@ public final class ReportColonyPanel extends ReportPanel
                                                           + ".image", 0.66f)));
                 GUI.localizeToolTip(buildableLabel, StringTemplate
                     .template("colonyPanel.currentlyBuilding")
-                    .add("%buildable%", currentType.getNameKey()));
+                    .addNamed("%buildable%", currentType));
                 buildableLabel.setIcon(buildableLabel.getDisabledIcon());
             }
 
@@ -468,14 +468,14 @@ public final class ReportColonyPanel extends ReportPanel
                     c = cAlarm;
                     tip = stpl("report.colony.production.low.description")
                         .addName("%colony%", colony.getName())
-                        .add("%goods%", g.getNameKey())
+                        .addNamed("%goods%", g)
                         .addAmount("%amount%", p)
                         .addAmount("%turns%", turns);
                 } else {
                     c = cWarn;
                     tip = stpl("report.colony.production.description")
-                            .addName("%colony%", colony.getName())
-                            .add("%goods%", g.getNameKey())
+                        .addName("%colony%", colony.getName())
+                        .addNamed("%goods%", g)
                         .addAmount("%amount%", p);
                 }
             } else if (p == 0) {
@@ -486,14 +486,14 @@ public final class ReportColonyPanel extends ReportPanel
                     c = cPlain;
                     tip = stpl("report.colony.production.description")
                         .addName("%colony%", colony.getName())
-                        .add("%goods%", g.getNameKey())
+                        .addNamed("%goods%", g)
                         .addAmount("%amount%", p);
                 }
             } else if (exportData.getExported()) {
                 c = cExport;
                 tip = stpl("report.colony.production.export.description")
                     .addName("%colony%", colony.getName())
-                    .add("%goods%", g.getNameKey())
+                    .addNamed("%goods%", g)
                     .addAmount("%amount%", p)
                     .addAmount("%export%", exportData.getExportLevel());
             } else if (g != foodType
@@ -502,7 +502,7 @@ public final class ReportColonyPanel extends ReportPanel
                 int waste = amount + p - colony.getWarehouseCapacity();
                 tip = stpl("report.colony.production.waste.description")
                     .addName("%colony%", colony.getName())
-                    .add("%goods%", g.getNameKey())
+                    .addNamed("%goods%", g)
                     .addAmount("%amount%", p)
                     .addAmount("%waste%", waste);
             } else if (g != foodType && amount > high) {
@@ -510,14 +510,14 @@ public final class ReportColonyPanel extends ReportPanel
                 c = cWarn;
                 tip = stpl("report.colony.production.high.description")
                     .addName("%colony%", colony.getName())
-                    .add("%goods%", g.getNameKey())
+                    .addNamed("%goods%", g)
                     .addAmount("%amount%", p)
                     .addAmount("%turns%", turns);
             } else {
                 c = cGood;
                 tip = stpl("report.colony.production.description")
                     .addName("%colony%", colony.getName())
-                    .add("%goods%", g.getNameKey())
+                    .addNamed("%goods%", g)
                     .addAmount("%amount%", p);
             }
             if (c == null) reportPanel.add(new JLabel());
@@ -610,7 +610,7 @@ public final class ReportColonyPanel extends ReportPanel
                 null, cGood,
                 stpl("report.colony.arriving.description")
                     .addName("%colony%", colony.getName())
-                    .add("%unit%", colonistType.getNameKey())
+                    .addNamed("%unit%", colonistType)
                     .addAmount("%turns%", newColonist));
             reportPanel.add(b);
         } else if (newColonist < 0) {
@@ -654,7 +654,7 @@ public final class ReportColonyPanel extends ReportPanel
                 b = colourButton(qac, name, null, cGood,
                     stpl("report.colony.making.constructing.description")
                         .addName("%colony%", colony.getName())
-                        .add("%buildable%", build.getNameKey())
+                        .addNamed("%buildable%", build)
                         .addAmount("%turns%", turns));
             } else if (turns < 0) {
                 GoodsType goodsType = needed.getType();
@@ -666,8 +666,8 @@ public final class ReportColonyPanel extends ReportPanel
                     stpl("report.colony.making.blocking.description")
                         .addName("%colony%", colony.getName())
                         .addAmount("%amount%", goodsAmount)
-                        .add("%goods%", goodsType.getNameKey())
-                        .add("%buildable%", build.getNameKey())
+                        .addNamed("%goods%", goodsType)
+                        .addNamed("%buildable%", build)
                         .addAmount("%turns%", turns));
             }
         }
@@ -742,7 +742,7 @@ public final class ReportColonyPanel extends ReportPanel
             ImageIcon ii = ImageLibrary.getScaledGoodsImageIcon(g, 0.667f);
             JLabel l = newLabel(null, ii, null,
                 stpl("report.colony.production.header")
-                    .add("%goods%", g.getNameKey()));
+                    .addNamed("%goods%", g));
             l.setEnabled(market == null || market.getArrears(g) <= 0);
             reportPanel.add(l);
         }
@@ -864,14 +864,14 @@ public final class ReportColonyPanel extends ReportPanel
             StringTemplate tip = (suggestion.oldType == null)
                 ? stpl("report.colony.wanting.description")
                     .addName("%colony%", colony.getName())
-                    .add("%unit%", type.getNameKey())
-                    .add("%goods%", suggestion.goodsType.getNameKey())
+                    .addNamed("%unit%", type)
+                    .addNamed("%goods%", suggestion.goodsType)
                     .addAmount("%amount%", suggestion.amount)
                 : stpl("report.colony.improving.description")
                     .addName("%colony%", colony.getName())
-                    .add("%oldUnit%", suggestion.oldType.getNameKey())
-                    .add("%unit%", type.getNameKey())
-                    .add("%goods%", suggestion.goodsType.getNameKey())
+                    .addNamed("%oldUnit%", suggestion.oldType)
+                    .addNamed("%unit%", type)
+                    .addNamed("%goods%", suggestion.goodsType)
                     .addAmount("%amount%", suggestion.amount);
             JButton b = colourButton(action, label, ii,
                 (present) ? cGood : cPlain, tip);

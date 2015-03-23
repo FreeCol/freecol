@@ -229,8 +229,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
                                 String messageId, Tile tile) {
         Direction direction = colony.getTile().getDirection(tile);
         String message = Messages.message(StringTemplate.template(messageId)
-            .add("%type%", tile.getType().getNameKey())
-            .add("%direction%", direction.getNameKey())
+            .addNamed("%type%", tile.getType())
+            .addNamed("%direction%", direction)
             .addName("%colony%", colony.getName()));
         try {
             doc.insertString(doc.getLength(), "\n\n" + message,
@@ -241,7 +241,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
     }
 
     private void addPlowCenterWarning(StyledDocument doc, Colony colony) {
-        String message = Messages.message(StringTemplate.template("report.requirements.plowCenter")
+        String message = Messages.message(StringTemplate
+            .template("report.requirements.plowCenter")
             .addName("%colony%", colony.getName()));
         try {
             doc.insertString(doc.getLength(), "\n\n" + message,
@@ -259,29 +260,30 @@ public final class ReportRequirementsPanel extends ReportPanel {
         String nonExpertName = Messages.getName(nonExpert.getType());
         String expertProductionName = Messages.message(expertGoods.getWorkingAsKey());
         String nonExpertProductionName = Messages.message(nonExpertGoods.getWorkingAsKey());
-        String newMessage = Messages.message(StringTemplate.template("report.requirements.badAssignment")
-                                             .addName("%colony%", colonyName)
-                                             .addName("%expert%", expertName)
-                                             .addName("%expertWork%", expertProductionName)
-                                             .addName("%nonExpert%", nonExpertName)
-                                             .addName("%nonExpertWork%", nonExpertProductionName));
-
+        String newMessage = Messages.message(StringTemplate
+            .template("report.requirements.badAssignment")
+            .addName("%colony%", colonyName)
+            .addName("%expert%", expertName)
+            .addName("%expertWork%", expertProductionName)
+            .addName("%nonExpert%", nonExpertName)
+            .addName("%nonExpertWork%", nonExpertProductionName));
         try {
-            doc.insertString(doc.getLength(), "\n\n" + newMessage, doc.getStyle("regular"));
+            doc.insertString(doc.getLength(), "\n\n" + newMessage,
+                             doc.getStyle("regular"));
         } catch (Exception e) {
             logger.log(Level.WARNING, "Bad assignment fail", e);
         }
     }
 
     private void addExpertWarning(StyledDocument doc, Colony c, GoodsType goodsType, UnitType workType) {
-        String newMessage = Messages.message(StringTemplate.template("report.requirements.noExpert")
-                                             .addName("%colony%", c.getName())
-                                             .addName("%goods%", goodsType)
-                                             .addName("%unit%", workType));
-
+        String newMessage = Messages.message(StringTemplate
+            .template("report.requirements.noExpert")
+            .addName("%colony%", c.getName())
+            .addName("%goods%", goodsType)
+            .addName("%unit%", workType));
         try {
-            doc.insertString(doc.getLength(), "\n\n" + newMessage, doc.getStyle("regular"));
-
+            doc.insertString(doc.getLength(), "\n\n" + newMessage,
+                             doc.getStyle("regular"));
             ArrayList<Colony> misusedExperts = new ArrayList<>();
             ArrayList<Colony> severalExperts = new ArrayList<>();
             ArrayList<Colony> canTrainExperts = new ArrayList<>();
@@ -308,25 +310,28 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
             if (!misusedExperts.isEmpty()) {
                 doc.insertString(doc.getLength(), "\n"
-                                 + Messages.message(StringTemplate.template("report.requirements.misusedExperts")
-                                                    .addName("%unit%", workType)
-                                                    .add("%work%", goodsType.getWorkingAsKey())) + " ",
+                                 + Messages.message(StringTemplate
+                                     .template("report.requirements.misusedExperts")
+                                     .addName("%unit%", workType)
+                                     .add("%work%", goodsType.getWorkingAsKey())) + " ",
                                  doc.getStyle("regular"));
                 insertColonyButtons(doc, misusedExperts);
             }
 
             if (!severalExperts.isEmpty()) {
                 doc.insertString(doc.getLength(),
-                                 "\n" + Messages.message(StringTemplate.template("report.requirements.severalExperts")
-                                                         .addName("%unit%", workType)) + " ",
+                                 "\n" + Messages.message(StringTemplate
+                                     .template("report.requirements.severalExperts")
+                                     .addName("%unit%", workType)) + " ",
                         doc.getStyle("regular"));
                 insertColonyButtons(doc, severalExperts);
             }
 
             if (!canTrainExperts.isEmpty()) {
                 doc.insertString(doc.getLength(),
-                                 "\n" + Messages.message(StringTemplate.template("report.requirements.canTrainExperts")
-                                                         .addName("%unit%", workType)) + " ",
+                                 "\n" + Messages.message(StringTemplate
+                                     .template("report.requirements.canTrainExperts")
+                                     .addName("%unit%", workType)) + " ",
                         doc.getStyle("regular"));
                 insertColonyButtons(doc, canTrainExperts);
             }
@@ -346,15 +351,18 @@ public final class ReportRequirementsPanel extends ReportPanel {
         doc.remove(doc.getLength() - 2, 2);
     }
 
-    private void addProductionWarning(StyledDocument doc, Colony colony, GoodsType output, GoodsType input) {
+    private void addProductionWarning(StyledDocument doc, Colony colony,
+                                      GoodsType output, GoodsType input) {
         String colonyName = colony.getName();
-        String newMessage = Messages.message(StringTemplate.template("report.requirements.missingGoods")
-                                             .addName("%colony%", colonyName)
-                                             .add("%goods%", output.getNameKey())
-                                             .add("%input%", input.getNameKey()));
+        String newMessage = Messages.message(StringTemplate
+            .template("report.requirements.missingGoods")
+            .addName("%colony%", colonyName)
+            .addNamed("%goods%", output)
+            .addNamed("%input%", input));
 
         try {
-            doc.insertString(doc.getLength(), "\n\n" + newMessage, doc.getStyle("regular"));
+            doc.insertString(doc.getLength(), "\n\n" + newMessage,
+                             doc.getStyle("regular"));
 
             ArrayList<Colony> withSurplus = new ArrayList<>();
             ArrayList<Integer> theSurplus = new ArrayList<>();
@@ -367,10 +375,11 @@ public final class ReportRequirementsPanel extends ReportPanel {
             }
 
             if (!withSurplus.isEmpty()) {
-                doc.insertString(doc.getLength(),
-                                 "\n" + Messages.message(StringTemplate.template("report.requirements.surplus")
-                                                  .add("%goods%", input.getNameKey())) + " ",
-                                 doc.getStyle("regular"));
+                doc.insertString(doc.getLength(), "\n"
+                    + Messages.message(StringTemplate
+                        .template("report.requirements.surplus")
+                        .addNamed("%goods%", input)) + " ",
+                    doc.getStyle("regular"));
                 for (int index = 0; index < withSurplus.size() - 1; index++) {
                     String amount = " (" + theSurplus.get(index) + ")";
                     StyleConstants.setComponent(doc.getStyle("button"),

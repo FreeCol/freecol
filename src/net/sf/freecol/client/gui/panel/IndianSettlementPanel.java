@@ -61,9 +61,9 @@ public final class IndianSettlementPanel extends FreeColPanel {
         boolean visited = settlement.hasVisited(player);
         String text = Messages.message(settlement.getLocationLabelFor(player))
             + ", "
-            + Messages.message(StringTemplate.template(settlement.isCapital()
-                                                       ? "indianCapital"
-                                                       : "indianSettlement")
+            + Messages.message(StringTemplate
+                .template(settlement.isCapital() ? "indianCapital"
+                    : "indianSettlement")
                 .addStringTemplate("%nation%", indian.getNationName()));
         String messageId = settlement.getShortAlarmLevelMessageId(player);
         text += " (" + Messages.message(messageId);
@@ -76,8 +76,10 @@ public final class IndianSettlementPanel extends FreeColPanel {
 
         Unit missionary = settlement.getMissionary();
         if (missionary != null) {
-            String missionaryName = Messages.message(StringTemplate.template("model.unit.nationUnit")
-                .addStringTemplate("%nation%", missionary.getOwner().getNationName())
+            String missionaryName = Messages.message(StringTemplate
+                .template("model.unit.nationUnit")
+                .addStringTemplate("%nation%",
+                    missionary.getOwner().getNationName())
                 .addStringTemplate("%unit%",
                     missionary.getLabel(Unit.UnitLabelType.NATIONAL)));
             add(new JLabel(missionaryName, getGUI().getImageIcon(missionary, true), JLabel.CENTER));

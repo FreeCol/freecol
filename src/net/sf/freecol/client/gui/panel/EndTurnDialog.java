@@ -147,9 +147,9 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
         JLabel header = GUI.getDefaultHeader(endName);
         //header.setFont(GUI.SMALL_HEADER_FONT);
 
-        StringTemplate template
-            = StringTemplate.template("endTurnDialog.areYouSure")
-                .addAmount("%number%", units.size());
+        StringTemplate template = StringTemplate
+            .template("endTurnDialog.areYouSure")
+            .addAmount("%number%", units.size());
         JTextArea text = GUI.getDefaultTextArea(template);
 
         DefaultListModel<UnitWrapper> model = new DefaultListModel<>();

@@ -260,9 +260,10 @@ public final class ReportTurnPanel extends ReportPanel {
             return new JLabel();
         } else if (source instanceof Player) {
             Player player = (Player) source;
-            headline = GUI.localizedLabel(StringTemplate.template("playerNation")
-                                      .addName("%player%", player.getName())
-                                      .addStringTemplate("%nation%", player.getNationName()));
+            headline = GUI.localizedLabel(StringTemplate
+                .template("playerNation")
+                .addName("%player%", player.getName())
+                .addStringTemplate("%nation%", player.getNationName()));
         } else if (source instanceof Europe) {
             Europe europe = (Europe) source;
             JButton button = new JButton(Messages.getName(europe));

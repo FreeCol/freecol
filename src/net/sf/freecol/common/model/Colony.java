@@ -2306,31 +2306,35 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         if (goodsType.isFoodType() && goodsType.isStorable()) {
             // Food is never wasted -> new settler is produced
             if (amount + production < 0) {
-                result.add(StringTemplate.template("model.colony.famineFeared")
-                           .addName("%colony%", getName())
-                           .addAmount("%number%", 0));
+                result.add(StringTemplate
+                    .template("model.colony.famineFeared")
+                    .addName("%colony%", getName())
+                    .addAmount("%number%", 0));
             }
         } else {
             int waste = (amount + production - getWarehouseCapacity());
             if (waste > 0 && !getExportData(goodsType).getExported()
                 && !goodsType.limitIgnored()) {
-                result.add(StringTemplate.template("model.building.warehouseSoonFull")
-                           .add("%goods%", goodsType.getNameKey())
-                           .addName("%colony%", getName())
-                           .addAmount("%amount%", waste));
-
+                result.add(StringTemplate
+                    .template("model.building.warehouseSoonFull")
+                    .addNamed("%goods%", goodsType)
+                    .addName("%colony%", getName())
+                    .addAmount("%amount%", waste));
             }
         }
 
         BuildableType currentlyBuilding = getCurrentlyBuilding();
         if (currentlyBuilding != null) {
             for (AbstractGoods goods : currentlyBuilding.getRequiredGoods()) {
-                if (goods.getType().equals(goodsType) && amount < goods.getAmount()) {
-                    result.add(StringTemplate.template("model.colony.buildableNeedsGoods")
-                               .addName("%colony%", getName())
-                               .add("%buildable%", currentlyBuilding.getNameKey())
-                               .addAmount("%amount%", (goods.getAmount() - amount))
-                               .add("%goodsType%", goodsType.getNameKey()));
+                if (goods.getType().equals(goodsType)
+                    && amount < goods.getAmount()) {
+                    int needsAmount = goods.getAmount() - amount;
+                    result.add(StringTemplate
+                        .template("model.colony.buildableNeedsGoods")
+                        .addName("%colony%", getName())
+                        .addNamed("%buildable%", currentlyBuilding)
+                        .addAmount("%amount%", needsAmount)
+                        .addNamed("%goodsType%", goodsType));
                 }
             }
         }
@@ -2378,10 +2382,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         warnings.add(StringTemplate
             .template("model.colony.insufficientProduction")
             .addAmount("%outputAmount%", missingOutput)
-            .add("%outputType%", outputType.getNameKey())
+            .addNamed("%outputType%", outputType)
             .addName("%colony%", getName())
             .addAmount("%inputAmount%", missingInput)
-            .add("%inputType%", inputType.getNameKey()));
+            .addNamed("%inputType%", inputType));
     }
 
     /**

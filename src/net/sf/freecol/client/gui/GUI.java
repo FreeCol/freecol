@@ -826,7 +826,8 @@ public class GUI {
                         Locale l = language.getLocale();
                         Messages.setMessageBundle(l);
                         Messages.setModMessageBundle(l);
-                        showInformationMessage(StringTemplate.template("newLanguageSelected")
+                        showInformationMessage(StringTemplate
+                            .template("newLanguageSelected")
                             .addName("%language%", l.getDisplayName()));
                     }
                 }
@@ -1496,11 +1497,11 @@ public class GUI {
     public boolean confirmClearTradeRoute(Unit unit) {
         TradeRoute tr = unit.getTradeRoute();
         if (tr == null) return true;
-        StringTemplate template
-            = StringTemplate.template("traderoute.reassignRoute")
-                .addStringTemplate("%unit%",
-                    unit.getLabel(Unit.UnitLabelType.NATIONAL))
-                .addName("%route%", tr.getName());
+        StringTemplate template = StringTemplate
+            .template("traderoute.reassignRoute")
+            .addStringTemplate("%unit%",
+                unit.getLabel(Unit.UnitLabelType.NATIONAL))
+            .addName("%route%", tr.getName());
         return confirm(true, unit.getTile(), template, unit, "yes", "no");
     }
 
@@ -1601,10 +1602,10 @@ public class GUI {
             messageId = "model.diplomacy.attack.peace";
             break;
         }
-        return confirm(true, attacker.getTile(),
-                       StringTemplate.template(messageId)
-                           .addStringTemplate("%nation%", enemy.getNationName()),
-                       attacker, "model.diplomacy.attack.confirm", "cancel");
+        return confirm(true, attacker.getTile(), StringTemplate
+            .template(messageId)
+            .addStringTemplate("%nation%", enemy.getNationName()),
+            attacker, "model.diplomacy.attack.confirm", "cancel");
     }
 
     /**
@@ -1648,11 +1649,10 @@ public class GUI {
             : (is.getAlarm(player).getLevel() == Tension.Level.HAPPY)
             ? "confirmTribute.happy"
             : "confirmTribute.normal";
-        return (confirm(true, is.getTile(),
-                        StringTemplate.template(messageId)
-                            .addName("%settlement%", is.getName())
-                            .addStringTemplate("%nation%", other.getNationName()),
-                        attacker, "confirmTribute.yes", "confirmTribute.no"))
+        return (confirm(true, is.getTile(), StringTemplate.template(messageId)
+                .addName("%settlement%", is.getName())
+                .addStringTemplate("%nation%", other.getNationName()),
+                attacker, "confirmTribute.yes", "confirmTribute.no"))
             ? 1 : -1;
     }
 
@@ -1719,8 +1719,8 @@ public class GUI {
     public BoycottAction getBoycottChoice(Goods goods, Europe europe) {
         int arrears = europe.getOwner().getArrears(goods.getType());
         StringTemplate template = StringTemplate.template("boycottedGoods.text")
-            .add("%goods%", goods.getNameKey())
-            .add("%europe%", europe.getNameKey())
+            .addNamed("%goods%", goods)
+            .addNamed("%europe%", europe)
             .addAmount("%amount%", arrears);
 
         List<ChoiceItem<BoycottAction>> choices = new ArrayList<>();
@@ -1917,16 +1917,15 @@ public class GUI {
             .getSettlementTypeKey(true);
         sb.append(Messages.message(StringTemplate
                 .template("scoutSettlement.greetings")
-                    .addStringTemplate("%nation%", owner.getNationName())
-                    .addName("%settlement%", settlement.getName())
-                    .addName("%number%", numberString)
-                    .add("%settlementType%", key)))
+                .addStringTemplate("%nation%", owner.getNationName())
+                .addName("%settlement%", settlement.getName())
+                .addName("%number%", numberString)
+                .add("%settlementType%", key)))
             .append(" ");
         if (settlement.getLearnableSkill() != null) {
-            key = settlement.getLearnableSkill().getNameKey();
             sb.append(Messages.message(StringTemplate
                     .template("scoutSettlement.skill")
-                        .add("%skill%", key)))
+                    .addNamed("%skill%", settlement.getLearnableSkill())))
                 .append(" ");
         }
         GoodsType[] wantedGoods = settlement.getWantedGoods();
@@ -1938,8 +1937,8 @@ public class GUI {
             StringTemplate t = StringTemplate.template("scoutSettlement.trade."
                 + Integer.toString(present));
             for (int i = 0; i < present; i++) {
-                t.add("%goods" + Integer.toString(i+1) + "%",
-                    wantedGoods[i].getNameKey());
+                String tradeKey = "%goods" + Integer.toString(i+1) + "%";
+                t.addNamed(tradeKey, wantedGoods[i]);
             }
             sb.append(Messages.message(t)).append("\n\n");
         }
@@ -1980,9 +1979,10 @@ public class GUI {
                                      SellAction.SELL));
         choices.add(new ChoiceItem<>(Messages.message("sell.moreGold"),
                                      SellAction.HAGGLE));
-        choices.add(new ChoiceItem<>(Messages.message(StringTemplate.template("sell.gift")
+        choices.add(new ChoiceItem<>(Messages.message(StringTemplate
+                    .template("sell.gift")
                     .addStringTemplate("%goods%", goodsTemplate)),
-                                     SellAction.GIFT));
+                SellAction.GIFT));
 
         return getChoice(true, unit.getTile(), getDefaultTextArea(template),
                          goods, "sellProposition.cancel", choices);

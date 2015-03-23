@@ -153,7 +153,8 @@ public class ConstructionPanel extends MigPanel
                     .template("colonyPanel.currentlyBuilding")
                     .addName("%buildable%", buildable)));
 
-            add(GUI.localizedLabel(StringTemplate.template("turnsToComplete.long")
+            add(GUI.localizedLabel(StringTemplate
+                    .template("turnsToComplete.long")
                     .addName("%number%", turnsStr)));
 
             for (AbstractGoods ag : buildable.getRequiredGoods()) {

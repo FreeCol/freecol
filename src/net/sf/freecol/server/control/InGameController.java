@@ -1070,7 +1070,7 @@ public final class InGameController extends Controller {
             monarch.getExpeditionaryForce().add(refAdditions);
             template = StringTemplate.template(messageId)
                 .addAmount("%number%", refAdditions.getNumber())
-                .add("%unit%", refAdditions.getType(spec).getNameKey());
+                .addNamed("%unit%", refAdditions.getType(spec));
             cs.add(See.only(serverPlayer), monarch);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action, template, monarchKey));
@@ -1083,9 +1083,9 @@ public final class InGameController extends Controller {
             serverPlayer.csChangeStance(Stance.PEACE, (ServerPlayer)friend,
                                         true, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new MonarchActionMessage(action,
-                    StringTemplate.template(messageId)
-                        .addStringTemplate("%nation%", friend.getNationName()),
+                new MonarchActionMessage(action, StringTemplate
+                    .template(messageId)
+                    .addStringTemplate("%nation%", friend.getNationName()),
                     monarchKey));
             break;
         case DECLARE_WAR:
@@ -1096,9 +1096,9 @@ public final class InGameController extends Controller {
             serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)enemy,
                                         true, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new MonarchActionMessage(action,
-                    StringTemplate.template(messageId)
-                        .addStringTemplate("%nation%", enemy.getNationName()),
+                new MonarchActionMessage(action, StringTemplate
+                    .template(messageId)
+                    .addStringTemplate("%nation%", enemy.getNationName()),
                     monarchKey));
             break;
         case SUPPORT_LAND: case SUPPORT_SEA:
@@ -1109,10 +1109,10 @@ public final class InGameController extends Controller {
                 serverPlayer.getEurope());//-vis: safe, Europe
             cs.add(See.only(serverPlayer), serverPlayer.getEurope());
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-                new MonarchActionMessage(action,
-                    StringTemplate.template(messageId)
-                        .addStringTemplate("%addition%",
-                            abstractUnitTemplate(", ", support)),
+                new MonarchActionMessage(action, StringTemplate
+                    .template(messageId)
+                    .addStringTemplate("%addition%",
+                        abstractUnitTemplate(", ", support)),
                     monarchKey));
             break;
         case MONARCH_MERCENARIES:
@@ -1120,11 +1120,11 @@ public final class InGameController extends Controller {
                 = monarch.getMercenaries(random);
             if (mercenaries.isEmpty()) break;
             final int mercPrice = serverPlayer.priceMercenaries(mercenaries);
-            message = new MonarchActionMessage(action,
-                StringTemplate.template("model.monarch.action.MONARCH_MERCENARIES")
-                    .addAmount("%gold%", mercPrice)
-                    .addStringTemplate("%mercenaries%",
-                        abstractUnitTemplate(", ", mercenaries)),
+            message = new MonarchActionMessage(action, StringTemplate
+                .template("model.monarch.action.MONARCH_MERCENARIES")
+                .addAmount("%gold%", mercPrice)
+                .addStringTemplate("%mercenaries%",
+                    abstractUnitTemplate(", ", mercenaries)),
                 monarchKey);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
                    message);
@@ -1137,12 +1137,12 @@ public final class InGameController extends Controller {
             int n = Messages.getMercenaryLeaderCount();
             n = randomInt(logger, "Mercenary leader", random, n);
             final int hessPrice = serverPlayer.priceMercenaries(hessians);
-            message = new MonarchActionMessage(action,
-                StringTemplate.template("model.monarch.action.HESSIAN_MERCENARIES")
-                    .addName("%leader%", Messages.getMercenaryLeaderName(n))
-                    .addAmount("%gold%", hessPrice)
-                    .addStringTemplate("%mercenaries%",
-                        abstractUnitTemplate(", ", hessians)),
+            message = new MonarchActionMessage(action, StringTemplate
+                .template("model.monarch.action.HESSIAN_MERCENARIES")
+                .addName("%leader%", Messages.getMercenaryLeaderName(n))
+                .addAmount("%gold%", hessPrice)
+                .addStringTemplate("%mercenaries%",
+                    abstractUnitTemplate(", ", hessians)),
                 "model.mercenaries." + n + ".image");
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
                    message);
@@ -1369,8 +1369,8 @@ public final class InGameController extends Controller {
                         serverPlayer, colony)
                     .addName("%colony%", colony.getName())
                     .addAmount("%number%", n)
-                    .add("%oldUnit%", type.getNameKey())
-                    .add("%unit%", upgrades.get(type).getNameKey()));
+                    .addNamed("%oldUnit%", type)
+                    .addNamed("%unit%", upgrades.get(type)));
                 limit -= n;
             }
         }
@@ -2639,7 +2639,7 @@ public final class InGameController extends Controller {
                                           "model.unit.gift",
                                           settlement, goods.getType())
             .addStringTemplate("%player%", serverPlayer.getNationName())
-            .add("%type%", goods.getNameKey())
+            .addNamed("%type%", goods)
             .addAmount("%amount%", goods.getAmount())
             .addName("%settlement%", settlement.getName());
         cs.addMessage(See.only(serverPlayer), m);

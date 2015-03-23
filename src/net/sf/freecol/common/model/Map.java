@@ -88,7 +88,7 @@ public class Map extends FreeColGameObject implements Location {
      * to adjacent squares, which are required due to the isometric
      * map. Starting north and going clockwise.
     */
-    public static enum Direction {
+    public static enum Direction implements Named {
         N  ( 0, -2,  0, -2),
         NE ( 1, -1,  0, -1),
         E  ( 1,  0,  1,  0),
@@ -136,15 +136,6 @@ public class Map extends FreeColGameObject implements Location {
             this.evenDY = evenDY;
         }
 
-
-        /**
-         * Get the name key for this direction.
-         *
-         * @return The name key.
-         */
-        public String getNameKey() {
-            return "direction." + this;
-        }
 
         /**
          * Step an x coordinate in this direction.
@@ -280,6 +271,15 @@ public class Map extends FreeColGameObject implements Location {
          */
         public static Direction angleToDirection(double angle) {
             return Direction.values()[(int)Math.floor(angle / (Math.PI/4))];
+        }
+
+        // Implement Named
+
+        /**
+         * {@inheritDoc}
+         */
+        public String getNameKey() {
+            return "direction." + this;
         }
     }
 

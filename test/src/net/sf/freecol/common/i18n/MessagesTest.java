@@ -141,8 +141,9 @@ public class MessagesTest extends FreeColTestCase {
         errMsg = "Wrong message";
         expected = "You establish the colony of $specialColName\\.";
         try {
-            message = Messages.message(StringTemplate.template("model.history.FOUND_COLONY")
-                                       .addName("%colony%", colNameWithSpecialChars));
+            message = Messages.message(StringTemplate
+                .template("model.history.FOUND_COLONY")
+                .addName("%colony%", colNameWithSpecialChars));
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("Illegal group reference")){
                 fail("Does not process messages with special chars");
@@ -229,20 +230,20 @@ public class MessagesTest extends FreeColTestCase {
         // default Number is Other
         Messages.setGrammaticalNumber(NumberRules.OTHER_NUMBER_RULE);
         for (double d : numbers) {
-            assertTrue("abcother|xyz"
-                .equals(Messages.message(StringTemplate.template("some.key")
+            assertTrue("abcother|xyz".equals(Messages.message(StringTemplate
+                        .template("some.key")
                         .addAmount("%number%", d))));
         }
         // apply English rules
         Messages.setGrammaticalNumber(NumberRules.PLURAL_NUMBER_RULE);
         for (double d : numbers) {
             if (d == 1) {
-                assertTrue("abcone|xyz"
-                    .equals(Messages.message(StringTemplate.template("some.key")
+                assertTrue("abcone|xyz".equals(Messages.message(StringTemplate
+                            .template("some.key")
                             .addAmount("%number%", d))));
             } else {
-                assertTrue("abcother|xyz"
-                    .equals(Messages.message(StringTemplate.template("some.key")
+                assertTrue("abcother|xyz".equals(Messages.message(StringTemplate
+                            .template("some.key")
                             .addAmount("%number%", d))));
             }
         }
@@ -304,8 +305,7 @@ public class MessagesTest extends FreeColTestCase {
         StringTemplate template = StringTemplate.template("unit.template")
             .addAmount("%number%", 1)
             .add("%unit%", "unit.key");
-        assertTrue("1 piece of artillery"
-            .equals(Messages.message(template)));
+        assertTrue("1 piece of artillery".equals(Messages.message(template)));
     }
 
     public void testReplaceChoicesGrammar() {
@@ -408,33 +408,32 @@ public class MessagesTest extends FreeColTestCase {
     }
 
     public void testREFMessages() {
-        StringTemplate template
-            = StringTemplate.template("model.monarch.action.ADD_TO_REF")
-                            .addAmount("%number%", 1)
-                            .add("%unit%", kingsRegular.getNameKey());
+        StringTemplate template = StringTemplate
+            .template("model.monarch.action.ADD_TO_REF")
+            .addAmount("%number%", 1)
+            .addNamed("%unit%", kingsRegular);
         String expected = "The Crown has added 1 King's Regular"
             + " to the Royal Expeditionary Force."
             + " Colonial leaders express concern.";
-        assertTrue(expected
-            .equals(Messages.message(template)));
+        assertTrue(expected.equals(Messages.message(template)));
 
-        template = StringTemplate.template("model.monarch.action.ADD_TO_REF")
-                                 .addAmount("%number%", 2)
-                                 .add("%unit%", artillery.getNameKey());
+        template = StringTemplate
+            .template("model.monarch.action.ADD_TO_REF")
+            .addAmount("%number%", 2)
+            .addNamed("%unit%", artillery);
         expected = "The Crown has added 2 Pieces of Artillery"
             + " to the Royal Expeditionary Force."
             + " Colonial leaders express concern.";
-        assertTrue(expected
-            .equals(Messages.message(template)));
+        assertTrue(expected.equals(Messages.message(template)));
 
-        template = StringTemplate.template("model.monarch.action.ADD_TO_REF")
-                                 .addAmount("%number%", 3)
-                                 .add("%unit%", manOWar.getNameKey());
+        template = StringTemplate
+            .template("model.monarch.action.ADD_TO_REF")
+            .addAmount("%number%", 3)
+            .addNamed("%unit%", manOWar);
         expected = "The Crown has added 3 Men of War"
             + " to the Royal Expeditionary Force."
             + " Colonial leaders express concern.";
-        assertTrue(expected
-            .equals(Messages.message(template)));
+        assertTrue(expected.equals(Messages.message(template)));
     }
 
     public void testAbstractUnitDescription() {

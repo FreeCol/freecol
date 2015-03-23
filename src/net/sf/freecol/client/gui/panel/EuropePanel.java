@@ -183,9 +183,9 @@ public final class EuropePanel extends PortPanel {
                     && unit.hasSpaceLeft()) {
                     StringTemplate locName = destination
                         .getLocationLabelFor(unit.getOwner());
-                    if (!getGUI().confirm(true, null,
-                            StringTemplate.template("europe.leaveColonists")
-                                .addStringTemplate("%newWorld%", locName),
+                    if (!getGUI().confirm(true, null, StringTemplate
+                            .template("europe.leaveColonists")
+                            .addStringTemplate("%newWorld%", locName),
                             unit, "ok", "cancel")) return null;
                 }
 
@@ -484,7 +484,7 @@ public final class EuropePanel extends PortPanel {
         public void logPurchase(GoodsType goodsType, int amount, int price) {
             int total = amount * price;
             StringTemplate t1 = StringTemplate.template("transaction.purchase")
-                .add("%goods%", goodsType.getNameKey())
+                .addNamed("%goods%", goodsType)
                 .addAmount("%amount%", amount)
                 .addAmount("%gold%", price);
             StringTemplate t2 = StringTemplate.template("transaction.price")
@@ -502,7 +502,7 @@ public final class EuropePanel extends PortPanel {
             int totalAfterTax = totalBeforeTax - totalTax;
 
             StringTemplate t1 = StringTemplate.template("transaction.sale")
-                .add("%goods%", goodsType.getNameKey())
+                .addNamed("%goods%", goodsType)
                 .addAmount("%amount%", amount)
                 .addAmount("%gold%", price);
             StringTemplate t2 = StringTemplate.template("transaction.price")
