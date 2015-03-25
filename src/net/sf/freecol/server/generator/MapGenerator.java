@@ -21,6 +21,8 @@ package net.sf.freecol.server.generator;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.util.LogBuilder;
+
 
 /**
  * Creates maps and sets the starting locations for the players.
@@ -34,7 +36,7 @@ public interface MapGenerator {
      * @param height The map height.
      * @return A new empty <code>Map</code>.
      */
-    public abstract Map createEmptyMap(int width, int height);
+    public abstract Map createEmptyMap(int width, int height, LogBuilder lb);
 
     /**
      * Creates the map with the current set options
@@ -42,5 +44,5 @@ public interface MapGenerator {
      * @return The new <code>Map</code>.
      * @exception FreeColException if an error occurs
      */
-    public abstract Map createMap();
+    public abstract Map createMap(LogBuilder lb);
 }

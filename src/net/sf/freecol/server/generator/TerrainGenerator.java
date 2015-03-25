@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.model.ServerRegion;
@@ -354,8 +355,9 @@ public class TerrainGenerator {
      * At the moment, the ocean is divided into two by two regions.
      *
      * @param map The <code>Map</code> to work on.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void createOceanRegions(Map map) {
+    private void createOceanRegions(Map map, LogBuilder lb) {
         ServerRegion pacific = (ServerRegion)map
             .getRegion("model.region.pacific");
         ServerRegion northPacific = (ServerRegion)map
@@ -469,15 +471,15 @@ public class TerrainGenerator {
         if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rAll);
         if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rAll);
 
-        if (nNP <= 0) logger.warning("No North Pacific tiles found");
-        if (nSP <= 0) logger.warning("No South Pacific tiles found");
-        if (nNA <= 0) logger.warning("No North Atlantic tiles found");
-        if (nSA <= 0) logger.warning("No South Atlantic tiles found");
-        logger.info("Ocean regions complete: "
-            + nNP + " North Pacific, "
-            + nSP + " South Pacific, "
-            + nNA + " North Atlantic, "
-            + nSP + " South Atlantic");
+        if (nNP <= 0) lb.add("No North Pacific tiles found.\n");
+        if (nSP <= 0) lb.add("No South Pacific tiles found");
+        if (nNA <= 0) lb.add("No North Atlantic tiles found");
+        if (nSA <= 0) lb.add("No South Atlantic tiles found");
+        lb.add("Ocean regions complete: ",
+            nNP, " North Pacific, ",
+            nSP, " South Pacific, ",
+            nNA, " North Atlantic, ",
+            nSP, " South Atlantic");
     }
 
     /**
@@ -670,8 +672,9 @@ public class TerrainGenerator {
      * landmass is created.
      *
      * @param map The <code>Map</code> to work on.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void createLandRegions(Map map) {
+    private void createLandRegions(Map map, LogBuilder lb) {
         // Create "explorable" land regions
         int continents = 0;
         boolean[][] landmap = new boolean[map.getWidth()][map.getHeight()];
@@ -713,7 +716,7 @@ public class TerrainGenerator {
                 }
             }
         }
-        logger.info("Number of individual landmasses is " + continents);
+        lb.add("Number of individual landmasses is ", continents, "\n");
 
         // Get landmass sizes
         int[] continentsize = new int[continents+1];
@@ -766,7 +769,7 @@ public class TerrainGenerator {
                 }
             }
         }
-        logger.info("Number of land regions being created: " + continents);
+        lb.add("Number of land regions being created: ", continents, "\n");
 
         // Create ServerRegions for all land regions
         ServerRegion[] landregions = new ServerRegion[continents+1];
@@ -802,19 +805,17 @@ public class TerrainGenerator {
                                  LAND_REGION_MIN_SCORE);
             sr.setScoreValue(score);
             setGeographicRegion(sr);
-            logger.fine("Created land region " + sr.getNameKey()
-                        + " (size " + sr.getSize()
-                        + ", score " + sr.getScoreValue()
-                        + ", parent " + ((sr.getParent() == null) ? "(null)"
-                                         : sr.getParent().getNameKey())
-                        + ")");
+            lb.add("Created land region ", sr.toString(),
+                " (size ", sr.getSize(),
+                ", score ", sr.getScoreValue(),
+                ", parent ", ((sr.getParent() == null) ? "(null)"
+                    : sr.getParent().toString()), ")\n");
         }
 
         for (ServerRegion gr : geographicRegions) {
-            logger.fine("Geographic region " + gr.getNameKey()
-                        + " (size " + gr.getSize()
-                        + ", children " + gr.getChildren().size()
-                        + ")");
+            lb.add("Geographic region ", gr.toString(),
+                " (size ", gr.getSize(),
+                ", children ", gr.getChildren().size(), ")\n");
         }
     }
 
@@ -823,8 +824,9 @@ public class TerrainGenerator {
      * of mountain ranges depends on the map size.
      *
      * @param map The map to use.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void createMountains(Map map) {
+    private void createMountains(Map map, LogBuilder lb) {
         float randomHillsRatio = 0.5f;
         // 50% of user settings will be allocated for random hills
         // here and there the rest will be allocated for large
@@ -835,8 +837,8 @@ public class TerrainGenerator {
         int number = (int)((1.0f - randomHillsRatio)
             * (getApproximateLandCount()
                 / mapOptions.getInteger(MapGeneratorOptions.MOUNTAIN_NUMBER)));
-        logger.info("Number of mountain tiles is " + number);
-        logger.fine("Maximum length of mountain ranges is " + maximumLength);
+        lb.add("Number of mountain tiles is ", number, "\n",
+            "Maximum length of mountain ranges is ", maximumLength, "\n");
 
         // lookup the resources from specification
         TileType hills = spec.getTileType("model.tile.hills");
@@ -902,13 +904,13 @@ public class TerrainGenerator {
                 }
                 int scoreValue = 2 * mountainRegion.getSize();
                 mountainRegion.setScoreValue(scoreValue);
-                logger.fine("Created mountain region (direction " + direction
-                    + ", length " + length
-                    + ", size " + mountainRegion.getSize()
-                    + ", score value " + scoreValue + ").");
+                lb.add("Created mountain region (direction ", direction,
+                    ", length ", length,
+                    ", size ", mountainRegion.getSize(),
+                    ", score value ", scoreValue, ").\n");
             }
         }
-        logger.info("Added " + counter + " mountain range tiles.");
+        lb.add("Added ", counter, " mountain range tiles.\n");
 
         // and sprinkle a few random hills/mountains here and there
         number = (int) (getApproximateLandCount() * randomHillsRatio)
@@ -942,7 +944,7 @@ public class TerrainGenerator {
                 counter++;
             }
         }
-        logger.info("Added " + counter + " random hills tiles.");
+        lb.add("Added ", counter, " random hills tiles.\n");
     }
 
     /**
@@ -950,8 +952,9 @@ public class TerrainGenerator {
      * on the map size.
      *
      * @param map The <code>Map</code> to create rivers on.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void createRivers(Map map) {
+    private void createRivers(Map map, LogBuilder lb) {
         final TileImprovementType riverType
             = spec.getTileImprovementType("model.improvement.river");
         final int number = getApproximateLandCount()
@@ -982,19 +985,19 @@ public class TerrainGenerator {
                     riverRegion.setClaimable(true);
                     River river = new River(map, riverMap, riverRegion, random);
                     if (river.flowFromSource(tile)) {
-                        logger.fine("Created new river with length "
-                            + river.getLength());
+                        lb.add("Created new river with length ",
+                            river.getLength(), "\n");
                         map.putRegion(riverRegion);
                         rivers.add(river);
                         counter++;
                     } else {
-                        logger.fine("Failed to generate river.");
+                        lb.add("Failed to generate river.\n");
                     }
                     break;
                 }
             }
         }
-        logger.info("Created " + counter + " rivers of maximum " + number);
+        lb.add("Created ", counter, " rivers of maximum ", number, "\n");
 
         for (River river : rivers) {
             ServerRegion region = river.getRegion();
@@ -1004,8 +1007,8 @@ public class TerrainGenerator {
             }
             scoreValue *= 2;
             region.setScoreValue(scoreValue);
-            logger.fine("Created river region (length " + river.getLength()
-                + ", score value " + scoreValue + ").");
+            lb.add("Created river region (length ", river.getLength(),
+                ", score value ", scoreValue, ").\n");
         }
     }
 
@@ -1013,15 +1016,16 @@ public class TerrainGenerator {
      * Finds all the lake regions.
      *
      * @param map The <code>Map</code> to work on.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void createLakeRegions(Map map) {
+    private void createLakeRegions(Map map, LogBuilder lb) {
         final TileType lakeType = spec.getTileType("model.tile.lake");
 
         // Create the water map, and find any tiles that are water but
         // not part of any region (such as the oceans).  These are
         // lake tiles.
         List<Tile> lakes = new ArrayList<>();
-        StringBuilder sb = new StringBuilder("Lakes at:");
+        lb.add("Lakes at:");
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {
                 Tile tile;
@@ -1029,15 +1033,14 @@ public class TerrainGenerator {
                     && !(tile = map.getTile(x, y)).isLand()
                     && map.getTile(x, y).getRegion() == null) {
                     lakes.add(tile);
-                    sb.append(" ").append(Integer.toString(x))
-                        .append(",").append(Integer.toString(y));
+                    lb.add(" ", x, ",", y);
                 }
             }
         }
-        logger.fine(sb.toString());
         for (ServerRegion sr : makeLakes(map, lakes)) {
             setGeographicRegion(sr);
         }            
+        lb.add("\n");
     }
 
 
@@ -1228,9 +1231,10 @@ public class TerrainGenerator {
      * Creates a <code>Map</code>.
      *
      * @param landMap The <code>LandMap</code> to use as a template.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return The new <code>Map</code>.
      */
-    public Map createMap(LandMap landMap) {
+    public Map createMap(LandMap landMap, LogBuilder lb) {
         final int width = landMap.getWidth();
         final int height = landMap.getHeight();
         final boolean importTerrain = (importGame != null)
@@ -1252,12 +1256,12 @@ public class TerrainGenerator {
 
         java.util.Map<String, ServerRegion> regionMap = new HashMap<>();
         if (importTerrain) { // Import the regions
-            String ids = "";
+            lb.add("Imported regions: ");
             for (Region r : importGame.getMap().getRegions()) {
                 ServerRegion region = new ServerRegion(game, r);
                 map.putRegion(region);
                 regionMap.put(r.getId(), region);
-                ids += " " + region.getNameKey();
+                lb.add(" ", region.toString());
             }
             for (Region r : importGame.getMap().getRegions()) {
                 ServerRegion region = regionMap.get(r.getId());
@@ -1269,7 +1273,7 @@ public class TerrainGenerator {
                     if (x != null) region.addChild(x);
                 }
             }
-            logger.info("Imported regions: " + ids);
+            lb.add("\n");
         }
 
         List<Tile> fixRegions = new ArrayList<>();
@@ -1303,8 +1307,8 @@ public class TerrainGenerator {
                     } else {
                         ServerRegion ours = regionMap.get(r.getId());
                         if (ours == null) {
-                            logger.warning("Could not set tile region "
-                                + r.getId() + " for tile: " + t);
+                            lb.add("Could not set tile region ", r.getId(),
+                                " for tile: ", t, "\n");
                             fixRegions.add(t);
                         } else {
                             ours.addTile(t);
@@ -1321,22 +1325,23 @@ public class TerrainGenerator {
 
         if (importTerrain) {
             if (!fixRegions.isEmpty()) { // Fix the tiles missing regions.
-                createOceanRegions(map);
-                createLakeRegions(map);
-                createLandRegions(map);
+                createOceanRegions(map, lb);
+                createLakeRegions(map, lb);
+                createLandRegions(map, lb);
             }
         } else {
-            createOceanRegions(map);
+            createOceanRegions(map, lb);
             map.resetHighSeas(
                 mapOptions.getInteger(MapGeneratorOptions.DISTANCE_TO_HIGH_SEA),
                 mapOptions.getInteger(MapGeneratorOptions.MAXIMUM_DISTANCE_TO_EDGE));
             if (mapHasLand) {
-                createMountains(map);
-                createRivers(map);
-                createLakeRegions(map);
-                createLandRegions(map);
+                createMountains(map, lb);
+                createRivers(map, lb);
+                createLakeRegions(map, lb);
+                createLandRegions(map, lb);
             }
         }
+        lb.shrink("\n");
 
         // Add the bonuses only after the map is completed.
         // Otherwise we risk creating resources on fields where they

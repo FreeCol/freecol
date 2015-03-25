@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.generator.MapGenerator;
@@ -171,7 +172,7 @@ public final class MapEditorController {
         if (mgo == null) return;
         game.setMapGeneratorOptions(mgo);
         Map map = freeColClient.getFreeColServer().getMapGenerator()
-            .createMap();
+            .createMap(new LogBuilder(-1));
         requireNativeNations(game);
         gui.setFocus(game.getMap().getTile(1,1));
         freeColClient.updateActions();

@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
@@ -62,7 +63,7 @@ public class MapGeneratorTest extends FreeColTestCase {
             }
         }
 
-        gen.createMap();
+        gen.createMap(new LogBuilder(-1));
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -82,7 +83,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         g.addPlayer(new ServerPlayer(g, false, nation, null, null));
 
-        gen.createMap();
+        gen.createMap(new LogBuilder(-1));
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -118,7 +119,7 @@ public class MapGeneratorTest extends FreeColTestCase {
             players.add(p);
         }
 
-        gen.createMap();
+        gen.createMap(new LogBuilder(-1));
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -169,7 +170,7 @@ public class MapGeneratorTest extends FreeColTestCase {
             players.add(p);
         }
 
-        gen.createMap();
+        gen.createMap(new LogBuilder(-1));
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -202,7 +203,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         for (File importFile : mapDir.listFiles(FreeCol.freeColSaveFileFilter)) {
             ((FileOption)spec().getOption(MapGeneratorOptions.IMPORT_FILE))
                 .setValue(importFile);
-            assertNotNull(gen.createMap());
+            assertNotNull(gen.createMap(new LogBuilder(-1)));
         }
         // Clear import file option
         ((FileOption)spec().getOption(MapGeneratorOptions.IMPORT_FILE))
@@ -212,7 +213,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testRegions() {
         Game game = new ServerGame(spec());
         MapGenerator gen = new SimpleMapGenerator(game, new Random(1));
-        gen.createMap();
+        gen.createMap(new LogBuilder(-1));
 
         Map map = game.getMap();
         Region pacific = map.getRegion("model.region.pacific");

@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.MarketData;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.generator.MapGenerator;
 
 
@@ -44,7 +45,7 @@ public class MockMapGenerator implements MapGenerator {
         this.map = map;
     }
 	
-    public Map createMap() {
+    public Map createMap(LogBuilder lb) {
         // For all map descendents in the old game, move them to the
         // new game.
         Game oldGame = map.getGame();
@@ -71,7 +72,7 @@ public class MockMapGenerator implements MapGenerator {
         return map;
     }
 
-    public Map createEmptyMap(int width, int height) {
+    public Map createEmptyMap(int width, int height, LogBuilder lb) {
         // do nothing yet
         return map;
     }

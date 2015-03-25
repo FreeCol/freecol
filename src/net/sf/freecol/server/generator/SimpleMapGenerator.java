@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -66,6 +67,7 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.FreeColServer;
@@ -186,8 +188,9 @@ public class SimpleMapGenerator implements MapGenerator {
      * The number of rumours depends on the map size.
      *
      * @param map The <code>Map</code> to use.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void makeLostCityRumours(Map map) {
+    private void makeLostCityRumours(Map map, LogBuilder lb) {
         final boolean importRumours
             = mapOptions.getBoolean(MapGeneratorOptions.IMPORT_RUMOURS);
         if (importGame != null && importRumours) {
@@ -206,7 +209,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
             if (nLCRs > 0) {
-                logger.info("Imported " + nLCRs + " lost city rumours.");
+                lb.add("Imported ", nLCRs, " lost city rumours.\n");
                 return;
             }
             // Otherwise fall through and create them
@@ -240,11 +243,11 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
         }
-        logger.info("Created " + counter
-            + " lost city rumours of maximum " + number + ".");
+        lb.add("Created ", counter,
+            " lost city rumours of maximum ", number, ".\n");
     }
 
-    private boolean importIndianSettlements(Map map) {
+    private boolean importIndianSettlements(Map map, LogBuilder lb) {
         int nSettlements = 0;
 
         for (Player player : importGame.getLiveNativePlayers(null)) {
@@ -252,17 +255,17 @@ public class SimpleMapGenerator implements MapGenerator {
             if (indian == null) {
                 Nation nation = spec.getNation(player.getNationId());
                 if (nation == null) {
-                    logger.warning("Native nation "
-                        + player.getNationId() + " not found in spec.");
+                    lb.add("Native nation ", player.getNationId(),
+                        " not found in spec.\n");
                     continue;
                 }
                 indian = new ServerPlayer(game, false, nation, null, null);
-                logger.info("Imported new native nation "
-                    + player.getNationId() + ": " + indian.getId());
+                lb.add("Imported new native nation ", player.getNationId(),
+                    ": ", indian.getId(), "\n");
                 game.addPlayer(indian);
             } else {
-                logger.info("Found native nation " + player.getNationId()
-                    + " for import: " + indian.getId());
+                lb.add("Found native nation ", player.getNationId(),
+                    " for import: ", indian.getId(), "\n");
             }
             for (IndianSettlement is : player.getIndianSettlements()) {
                 int x = is.getTile().getX();
@@ -322,7 +325,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
         }
-        logger.info("Imported " + nSettlements + " native settlements.");
+        lb.add("Imported ", nSettlements, " native settlements.\n");
         return nSettlements > 0;
     }
 
@@ -331,12 +334,13 @@ public class SimpleMapGenerator implements MapGenerator {
      * nation and random numbers of other settlements.
      *
      * @param map The <code>Map</code> to place the indian settlements on.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void makeNativeSettlements(final Map map) {
+    private void makeNativeSettlements(final Map map, LogBuilder lb) {
         final boolean importSettlements
             = mapOptions.getBoolean(MapGeneratorOptions.IMPORT_SETTLEMENTS);
         if (importSettlements && importGame != null) {
-            if (importIndianSettlements(map)) return;
+            if (importIndianSettlements(map, lb)) return;
             // Fall through and create them
         }
         
@@ -376,14 +380,14 @@ public class SimpleMapGenerator implements MapGenerator {
                             territory = new Territory(player, region);
                         }
                         territoryMap.put(name, territory);
-                        logger.fine("Allocated region " + name
-                                    + " for " + player + ".");
+                        lb.add("Allocated region ", name,
+                            " for ", player, ".\n");
                         break;
                     }
                 }
                 if (territory == null) {
-                    logger.warning("Failed to allocate preferred region " + regionNames.get(0)
-                                   + " for " + player.getNation());
+                    lb.add("Failed to allocate preferred region ",
+                        regionNames.get(0), " for ", player.getNation(), "\n");
                     outer: for (String name : regionNames) {
                         Territory otherTerritory = territoryMap.get(name);
                         for (String otherName : ((IndianNationType) otherTerritory.player.getNationType())
@@ -399,8 +403,8 @@ public class SimpleMapGenerator implements MapGenerator {
                         }
                     }
                     if (territory == null) {
-                        logger.warning("Unable to find free region for "
-                                       + player.getName());
+                        lb.add("Unable to find free region for ",
+                            player.getName(), "\n");
                         territory = new Territory(player, map.getRandomLandTile(random));
                         territoryMap.put(player.getId(), territory);
                     }
@@ -433,10 +437,10 @@ public class SimpleMapGenerator implements MapGenerator {
         float share = settlementsToPlace / shares;
         if (settlementTiles.size() < indians.size()) {
             // FIXME: something drastic to boost the settlement number
-            logger.warning("There are only " + settlementTiles.size()
-                           + " settlement sites."
-                           + " This is smaller than " + indians.size()
-                           + " the number of tribes.");
+            lb.add("There are only ", settlementTiles.size(),
+                " settlement sites.\n",
+                " This is smaller than ", indians.size(),
+                " the number of tribes.\n");
         }
 
         // Find the capitals
@@ -459,7 +463,7 @@ public class SimpleMapGenerator implements MapGenerator {
             int radius = territory.player.getNationType().getCapitalType()
                 .getClaimableRadius();
             IndianSettlement is = placeCapital(map, territory, radius,
-                new ArrayList<>(settlementTiles));
+                new ArrayList<>(settlementTiles), lb);
             if (is != null) {
                 settlements.add(is);
                 settlementsPlaced++;
@@ -490,12 +494,12 @@ public class SimpleMapGenerator implements MapGenerator {
             if (territory.player.getClaimableTiles(tile, radius).size()
                 > 2 * radius + 1) {
                 String name = (territory.region == null) ? "default region"
-                    : territory.region.getNameKey();
-                logger.fine("Placing a " + territory.player
-                            + " camp in region: " + name
-                            + " at tile: " + tile);
+                    : territory.region.toString();
+                lb.add("Placing a ", territory.player,
+                    " camp in region: ", name,
+                    " at tile: ", tile, "\n");
                 settlements.add(placeIndianSettlement(territory.player,
-                                                      false, tile, map));
+                                                      false, tile, map, lb));
                 settlementsPlaced++;
                 territory.numberOfSettlements--;
                 if (territory.numberOfSettlements <= 0) {
@@ -588,13 +592,12 @@ public class SimpleMapGenerator implements MapGenerator {
             }
             if (!choices.isEmpty()) {
                 // ...and pick one that could do the missing job.
-                IndianSettlement chose
-                    = RandomChoice.getWeightedRandom(logger, "expert", choices,
-                                                     random);
-                logger.finest("At " + chose.getName()
-                              + " replaced " + extraSkill
-                              + " (one of " + extras.size() + ")"
-                              + " by missing " + neededSkill);
+                IndianSettlement chose = RandomChoice
+                    .getWeightedRandom(logger, "expert", choices, random);
+                lb.add("At ", chose.getName(),
+                    " replaced ", extraSkill,
+                    " (one of ", extras.size(), ")",
+                    " by missing ", neededSkill, "\n");
                 chose.setLearnableSkill(neededSkill);
                 extras.remove(chose);
                 isList.add(0, extras); // Try to stay well sorted
@@ -602,21 +605,20 @@ public class SimpleMapGenerator implements MapGenerator {
                 neededList.add(chose);
                 isList.add(neededList);
             } else { // `can not happen'
-                logger.finest("Game is missing skill: " + neededSkill);
+                lb.add("Game is missing skill: ", neededSkill, "\n");
             }
         }
-        String msg = "Settlement skills:";
+        lb.add("Settlement skills:");
         for (List<IndianSettlement> iss : isList) {
             if (iss.isEmpty()) {
-                msg += "  0 x <none>";
+                lb.add("  0 x <none>");
             } else {
-                msg += "  " + iss.size() + " x " + iss.get(0).getLearnableSkill();
+                lb.add("  ", iss.size(),
+                    " x ", iss.get(0).getLearnableSkill());
             }
         }
-        logger.info(msg);
-
-        logger.info("Created " + settlementsPlaced
-                    + " Indian settlements of maximum " + settlementsToPlace);
+        lb.add("\nCreated ", settlementsPlaced,
+            " Indian settlements of maximum ", settlementsToPlace, ".\n");
     }
 
     /**
@@ -674,11 +676,13 @@ public class SimpleMapGenerator implements MapGenerator {
      * @param territory The <code>Territory</code> within the map.
      * @param radius The settlement radius.
      * @param tiles A list of <code>Tile</code>s to select from.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return The <code>IndianSettlement</code> placed, or null if
      *     none placed.
      */
     private IndianSettlement placeCapital(final Map map, Territory territory,
-                                          int radius, List<Tile> tiles) {
+                                          int radius, List<Tile> tiles,
+                                          LogBuilder lb) {
         final Tile center = territory.getCenterTile(map);
         Collections.sort(tiles, new Comparator<Tile>() {
                 public int compare(Tile t1, Tile t2) {
@@ -691,11 +695,11 @@ public class SimpleMapGenerator implements MapGenerator {
             if (territory.player.getClaimableTiles(t, radius).size()
                 >= (2 * radius + 1) * (2 * radius + 1) / 2) {
                 String name = (territory.region == null) ? "default region"
-                    : territory.region.getNameKey();
-                logger.fine("Placing the " + territory.player
-                    + " capital in region: " + name + " at tile: " + t);
-                IndianSettlement is
-                    = placeIndianSettlement(territory.player, true, t, map);
+                    : territory.region.toString();
+                lb.add("Placing the ", territory.player,
+                    " capital in region: ", name, " at tile: ", t, "\n");
+                IndianSettlement is = placeIndianSettlement(territory.player,
+                    true, t, map, lb);
                 territory.numberOfSettlements--;
                 territory.tile = t;
                 return is;
@@ -712,11 +716,12 @@ public class SimpleMapGenerator implements MapGenerator {
      *      {@link IndianSettlement#isCapital() capital}.
      * @param tile The <code>Tile</code> to place the settlement.
      * @param map The map that should get a new settlement.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return The <code>IndianSettlement</code> just being placed
      *      on the map.
      */
     private IndianSettlement placeIndianSettlement(Player player,
-        boolean capital, Tile tile, Map map) {
+        boolean capital, Tile tile, Map map, LogBuilder lb) {
         String name = (capital) ? player.getCapitalName(random)
             : player.getSettlementName(random);
         UnitType skill
@@ -725,7 +730,8 @@ public class SimpleMapGenerator implements MapGenerator {
             = new ServerIndianSettlement(map.getGame(), player, name, tile,
                                          capital, skill, null);
         player.addSettlement(settlement);
-        logger.fine("Generated skill: " + settlement.getLearnableSkill());
+        lb.add("Generated skill for ", settlement.getName(),
+            ": ", settlement.getLearnableSkill());
 
         settlement.placeSettlement(true);
         settlement.addRandomGoods(random);
@@ -786,8 +792,10 @@ public class SimpleMapGenerator implements MapGenerator {
      * @param players The players to create <code>Settlement</code>s
      *      and starting locations for. That is; both indian and
      *      european players.
+     * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void createEuropeanUnits(Map map, List<Player> players) {
+    private void createEuropeanUnits(Map map, List<Player> players,
+                                     LogBuilder lb) {
         final int width = map.getWidth();
         final int height = map.getHeight();
         final int poleDistance = (int)(MIN_DISTANCE_FROM_POLE*height/2);
@@ -803,10 +811,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 player.setEntryLocation(map.getTile(x, y));
                 continue;
             }
-            if (player.isEuropean()) {
-                europeanPlayers.add(player);
-                logger.finest("found European player " + player);
-            }
+            if (player.isEuropean()) europeanPlayers.add(player);
         }
 
         List<Position> positions = generateStartingPositions(map, europeanPlayers);
@@ -817,7 +822,7 @@ public class SimpleMapGenerator implements MapGenerator {
         for (int index = 0; index < europeanPlayers.size(); index++) {
             Player player = europeanPlayers.get(index);
             Position position = positions.get(index);
-            logger.fine("generating units for player " + player);
+            lb.add("Generating units for player ", player, ".\n");
 
             carriers.clear();
             passengers.clear();
@@ -842,7 +847,7 @@ public class SimpleMapGenerator implements MapGenerator {
 
             boolean startAtSea = true;
             if (carriers.isEmpty()) {
-                logger.warning("No carriers defined for player " + player);
+                lb.add("No carriers defined for player ", player, ".\n");
                 startAtSea = false;
             }
 
@@ -853,7 +858,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 int offset = (i % 2 == 0) ? i / 2 : -(1 + i / 2);
                 int row = y + offset;
                 if (row < 0 || row >= map.getHeight()) continue;
-                startTile = findTileFor(map, row, x, startAtSea);
+                startTile = findTileFor(map, row, x, startAtSea, lb);
                 if (startTile != null) {
                     if (startingTiles.contains(startTile)) {
                         startTile = null;
@@ -864,17 +869,17 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
             if (startTile == null) {
-                String err = "Failed to find start tile "
-                    + ((startAtSea) ? "at sea" : "on land")
-                    + " for player " + player
-                    + " from (" + x + "," + y + ")"
-                    + " avoiding:";
-                for (Tile t : startingTiles) err += " " + t;
-                err += " with map: ";
+                LogBuilder lb2 = new LogBuilder(64);
+                lb2.add("Failed to find start tile ",
+                    ((startAtSea) ? "at sea" : "on land"),
+                    " for player ", player,
+                    " from (", x, ",", y, ") avoiding:");
+                for (Tile t : startingTiles) lb2.add(" ", t);
+                lb2.add(" with map: ");
                 for (int xx = 0; xx < map.getWidth(); xx++) {
-                    err += map.getTile(xx, y);
+                    lb2.add(" ", map.getTile(xx, y));
                 }
-                throw new RuntimeException(err);
+                throw new RuntimeException(lb2.toString());
             }
 
             player.setEntryLocation(startTile);
@@ -902,14 +907,15 @@ public class SimpleMapGenerator implements MapGenerator {
             }
 
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.INIT)) {
-                createDebugUnits(map, player, startTile);
+                createDebugUnits(map, player, startTile, lb);
                 IntegerOption op = spec.getIntegerOption(GameOptions.STARTING_MONEY);
                 if (op != null) op.setValue(10000);
             }
         }
     }
 
-    private Tile findTileFor(Map map, int row, int start, boolean startAtSea) {
+    private Tile findTileFor(Map map, int row, int start, boolean startAtSea,
+                             LogBuilder lb) {
         Tile tile = null;
         Tile seas = null;
         int offset = (start == 0) ? 1 : -1;
@@ -921,11 +927,12 @@ public class SimpleMapGenerator implements MapGenerator {
                 return (startAtSea) ? seas : tile;
             } 
         }
-        logger.warning("No land in row " + row);
+        lb.add("No land in row ", row, ".\n");
         return null;
     }
 
-    private void createDebugUnits(Map map, Player player, Tile startTile) {
+    private void createDebugUnits(Map map, Player player, Tile startTile,
+                                  LogBuilder lb) {
         // In debug mode give each player a few more units and a colony.
         UnitType unitType = spec.getUnitType("model.unit.galleon");
         Unit unit4 = new ServerUnit(game, startTile, player, unitType);
@@ -950,7 +957,7 @@ public class SimpleMapGenerator implements MapGenerator {
         }
 
         if (colonyTile == null) {
-            logger.warning("Could not find a debug colony site.");
+            lb.add("Could not find a debug colony site.\n");
             return;
         }
         for (TileType t : spec.getTileTypeList()) {
@@ -963,7 +970,7 @@ public class SimpleMapGenerator implements MapGenerator {
         Unit buildColonyUnit = new ServerUnit(game, colonyTile,
                                               player, unitType);
         String colonyName = Messages.message(player.getNationName())
-            + " Colony";
+            + " " + Messages.message("Colony");
         Colony colony = new ServerColony(game, player, colonyName, colonyTile);
         player.addSettlement(colony);
         colony.placeSettlement(true);
@@ -1045,7 +1052,7 @@ public class SimpleMapGenerator implements MapGenerator {
     }
 
     private List<Position> generateStartingPositions(Map map,
-        List<Player> players) {
+                                                     List<Player> players) {
         int number = players.size();
         List<Position> positions = new ArrayList<>(number);
         if (number > 0) {
@@ -1094,17 +1101,17 @@ public class SimpleMapGenerator implements MapGenerator {
     /**
      * {@inheritDoc}
      */
-    public Map createEmptyMap(int width, int height) {
+    public Map createEmptyMap(int width, int height, LogBuilder lb) {
         recache(false); // Reload the options and specification
 
         return new TerrainGenerator(game, null, random)
-            .createMap(new LandMap(width, height));
+            .createMap(new LandMap(width, height), lb);
     }
 
     /**
      * {@inheritDoc}
      */
-    public Map createMap() {
+    public Map createMap(LogBuilder lb) {
         recache(true); // Reload the options and specification
 
         // Create land map.
@@ -1113,12 +1120,12 @@ public class SimpleMapGenerator implements MapGenerator {
 
         // Create terrain.
         Map map = new TerrainGenerator(game, importGame, random)
-            .createMap(landMap);
+            .createMap(landMap, lb);
 
         // Decorate the map.
-        makeNativeSettlements(map);
-        makeLostCityRumours(map);
-        createEuropeanUnits(map, game.getLiveEuropeanPlayers(null));
+        makeNativeSettlements(map, lb);
+        makeLostCityRumours(map, lb);
+        createEuropeanUnits(map, game.getLiveEuropeanPlayers(null), lb);
         return map;
     }
 }

@@ -67,6 +67,7 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
@@ -1098,7 +1099,8 @@ public final class FreeColServer {
      * @return The new empty <code>Map</code>.
      */
     public Map createEmptyMap(Game game, int width, int height) {
-        return getMapGenerator().createEmptyMap(width, height);
+        return getMapGenerator().createEmptyMap(width, height,
+                                                new LogBuilder(-1));
     }
 
     /**
@@ -1117,8 +1119,10 @@ public final class FreeColServer {
         establishUnknownEnemy(game);
 
         // Create the map.
-        game.setMap(getMapGenerator().createMap());
-
+        LogBuilder lb = new LogBuilder(256);
+        game.setMap(getMapGenerator().createMap(lb));
+        lb.log(logger, Level.FINER);
+        
         // Initial stances and randomizations for all players.
         spec.generateDynamicOptions();
         Random random = getServerRandom();
