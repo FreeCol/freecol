@@ -866,18 +866,13 @@ public class Messages {
         String result = "";
         switch (template.getTemplateType()) {
         case LABEL:
-            if (template.getReplacements() == null
-                || template.getReplacements().isEmpty()) {
-                result = message(template.getId());
+            for (StringTemplate other : template.getReplacements()) {
+                result += template.getId() + message(other);
+            }
+            if (result.length() >= template.getId().length()) {
+                result = result.substring(template.getId().length());
             } else {
-                for (StringTemplate other : template.getReplacements()) {
-                    result += template.getId() + message(other);
-                }
-                if (result.length() > template.getId().length()) {
-                    result = result.substring(template.getId().length());
-                } else {
-                    logger.warning("incorrect use of template " + template);
-                }
+                logger.warning("incorrect use of template " + template);
             }
             break;
         case TEMPLATE:
@@ -887,9 +882,9 @@ public class Messages {
                 result = messageBundle.get(template.getDefaultId());
             }
             result = replaceChoices(result, template);
-            for (int index = 0; index < template.getKeys().size(); index++) {
-                result = result.replace(template.getKeys().get(index),
-                    message(template.getReplacements().get(index)));
+            for (String key : template.getKeys()) {
+                result = result.replace(key,
+                                        message(template.getReplacement(key)));
             }
             break;
         case KEY:

@@ -79,6 +79,18 @@ public class ModelMessage extends StringTemplate {
      * @param id The object identifier.
      * @param source The source of the message. This is what the
      *               message should be associated with.
+     */
+    public ModelMessage(String id, FreeColGameObject source) {
+        this(MessageType.DEFAULT, id, source,
+             getDefaultDisplay(MessageType.DEFAULT, source));
+    }
+
+    /**
+     * Creates a new <code>ModelMessage</code>.
+     *
+     * @param id The object identifier.
+     * @param source The source of the message. This is what the
+     *               message should be associated with.
      * @param display The <code>FreeColObject</code> to display.
      */
     public ModelMessage(String id, FreeColGameObject source,
@@ -102,13 +114,16 @@ public class ModelMessage extends StringTemplate {
     /**
      * Creates a new <code>ModelMessage</code>.
      *
+     * @param messageType The type of this model message.
      * @param id The object identifier.
+     * @param defaultId The default identifier.
      * @param source The source of the message. This is what the
      *               message should be associated with.
      */
-    public ModelMessage(String id, FreeColGameObject source) {
-        this(MessageType.DEFAULT, id, source,
-             getDefaultDisplay(MessageType.DEFAULT, source));
+    public ModelMessage(MessageType messageType, String id, String defaultId,
+                        FreeColGameObject source) {
+        this(messageType, id, defaultId, source,
+             getDefaultDisplay(messageType, source));
     }
 
     /**
@@ -122,7 +137,22 @@ public class ModelMessage extends StringTemplate {
      */
     public ModelMessage(MessageType messageType, String id,
                         FreeColGameObject source, FreeColObject display) {
-        super(id, TemplateType.TEMPLATE);
+        this(messageType, id, null, source, display);
+    }
+
+    /**
+     * Creates a new <code>ModelMessage</code>.
+     *
+     * @param messageType The type of this model message.
+     * @param id The object identifier.
+     * @param defaultId The default identifier.
+     * @param source The source of the message. This is what the
+     *               message should be associated with.
+     * @param display The <code>FreeColObject</code> to display.
+     */
+    public ModelMessage(MessageType messageType, String id, String defaultId,
+                        FreeColGameObject source, FreeColObject display) {
+        super(id, defaultId, TemplateType.TEMPLATE);
         this.messageType = messageType;
         this.sourceId = source.getId();
         this.displayId = (display != null) ? display.getId() : source.getId();
@@ -285,14 +315,6 @@ public class ModelMessage extends StringTemplate {
         return o;
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final ModelMessage setDefaultId(final String newDefaultId) {
-        return (ModelMessage) super.setDefaultId(newDefaultId);
-    }
 
     /**
      * {@inheritDoc}

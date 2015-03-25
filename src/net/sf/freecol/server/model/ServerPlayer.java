@@ -3060,8 +3060,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             // Winner message post-capture when it owns the loser
             cs.addMessage(See.only(winnerPlayer),
                 new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                                 messageId, loser)
-                    .setDefaultId("model.unit.unitCaptured")
+                    messageId, "model.unit.unitCaptured", loser)
                     .addStringTemplate("%nation%", loserNation)
                     .addStringTemplate("%unit%", oldName)
                     .addStringTemplate("%enemyNation%", winnerNation)
@@ -3070,8 +3069,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         cs.addMessage(See.only(loserPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                             messageId, loser.getTile())
-                .setDefaultId("model.unit.unitCaptured")
+                messageId, "model.unit.unitCaptured", loser.getTile())
                 .addStringTemplate("%nation%", loserNation)
                 .addStringTemplate("%unit%", oldName)
                 .addStringTemplate("%enemyNation%", winnerNation)
@@ -3226,8 +3224,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         cs.addMessage(See.only(winnerPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                messageId, winner)
-            .setDefaultId("model.unit.unitDemoted")
+                messageId, "model.unit.unitDemoted", winner)
             .addStringTemplate("%nation%", loserNation)
             .addStringTemplate("%oldName%", oldName)
             .addStringTemplate("%unit%", loser.getLabel())
@@ -3236,8 +3233,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .addStringTemplate("%location%", winnerLocation));
         cs.addMessage(See.only(loserPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                messageId, loser)
-            .setDefaultId("model.unit.unitDemoted")
+                messageId, "model.unit.unitDemoted", loser)
             .addStringTemplate("%nation%", loserPlayer.getNationName())
             .addStringTemplate("%oldName%", oldName)
             .addStringTemplate("%unit%", loser.getLabel())
@@ -3602,8 +3598,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         cs.addMessage(See.only(winnerPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                messageId, winner)
-            .setDefaultId("model.unit.unitDemoted")
+                messageId, "model.unit.unitDemoted", winner)
             .addStringTemplate("%nation%", loserNation)
             .addStringTemplate("%oldName%", oldName)
             .addStringTemplate("%unit%", loser.getLabel())
@@ -3612,8 +3607,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .addStringTemplate("%location%", winnerLocation));
         cs.addMessage(See.only(loserPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                messageId, loser)
-            .setDefaultId("model.unit.unitDemoted")
+                messageId, "model.unit.unitDemoted", loser)
             .addStringTemplate("%nation%", loserNation)
             .addStringTemplate("%oldName%", oldName)
             .addStringTemplate("%unit%", loser.getLabel())
@@ -3929,8 +3923,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         cs.addMessage(See.only(winnerPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                             messageId, winner)
-            .setDefaultId("model.unit.unitSlaughtered")
+                messageId, "model.unit.unitSlaughtered", winner)
             .addStringTemplate("%nation%", loserNation)
             .addStringTemplate("%unit%", loser.getLabel())
             .addStringTemplate("%enemyNation%", winnerPlayer.getNationName())
@@ -3938,8 +3931,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .addStringTemplate("%location%", winnerLocation));
         cs.addMessage(See.only(loserPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                             messageId, loser.getTile())
-            .setDefaultId("model.unit.unitSlaughtered")
+                messageId, "model.unit.unitSlaughtered", loser.getTile())
             .addStringTemplate("%nation%", loserPlayer.getNationName())
             .addStringTemplate("%unit%", loser.getLabel())
             .addStringTemplate("%enemyNation%", winnerNation)

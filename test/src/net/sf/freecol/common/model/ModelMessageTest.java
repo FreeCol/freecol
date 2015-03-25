@@ -29,31 +29,34 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class ModelMessageTest extends FreeColTestCase {
 
     public void testHashCode() {
-    
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(1);
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
         
-        ModelMessage mm1 = new ModelMessage(MessageType.MISSING_GOODS, "buildColony.landLocked",
+        ModelMessage mm1 = new ModelMessage(MessageType.MISSING_GOODS,
+                                            "buildColony.landLocked",
                                             colony, cotton);
-        ModelMessage mm2 = new ModelMessage(MessageType.MISSING_GOODS, "buildColony.landLocked",
+        ModelMessage mm2 = new ModelMessage(MessageType.MISSING_GOODS,
+                                            "buildColony.landLocked",
                                             colony, cotton);
         assertEquals(mm1, mm2);
         assertEquals(mm1.hashCode(), mm2.hashCode());
         
-        ModelMessage mm3 = new ModelMessage(MessageType.MISSING_GOODS, "buildColony.landLocked",
+        ModelMessage mm3 = new ModelMessage(MessageType.MISSING_GOODS,
+                                            "buildColony.landLocked",
                                             colony, cotton);
-        ModelMessage mm4 = new ModelMessage(MessageType.MISSING_GOODS, "buildColony.landLocked",
+        ModelMessage mm4 = new ModelMessage(MessageType.MISSING_GOODS,
+                                            "buildColony.landLocked",
                                             colony, cotton);
         assertNotSame(mm3, mm4);
         assertNotSame(mm3.hashCode(), mm4.hashCode());
     }
     
     public void testModelMapSet2() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(1);
         GoodsType cotton = spec().getGoodsType("model.goods.cotton");
@@ -81,18 +84,15 @@ public class ModelMessageTest extends FreeColTestCase {
     }
 
     public void testDefaultId() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
     	
         Player player = game.getPlayer("model.nation.dutch");
-        
+        String realMessageId = "player"; // Must exist
+        String fakeMessageId = "no.such.messageId"; // Must no exist
         ModelMessage mm1 = new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
-                                            "no.such.messageId",
-                                            player, null)
-            .setDefaultId("player");
-
-        assertEquals("Player", Messages.message(mm1));
-
+                                            fakeMessageId, realMessageId,
+                                            player, null);
+        assertEquals(Messages.message(realMessageId), Messages.message(mm1));
     }
-    
 }

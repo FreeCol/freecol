@@ -81,7 +81,7 @@ public class HistoryEvent extends StringTemplate {
      *     this event.
      */
     public HistoryEvent(Turn turn, EventType eventType, Player player) {
-        super("model.history." + eventType, TemplateType.TEMPLATE);
+        super("model.history." + eventType, null, TemplateType.TEMPLATE);
         this.turn = turn;
         this.eventType = eventType;
         this.playerId = (player == null) ? null : player.getId();
@@ -184,12 +184,15 @@ public class HistoryEvent extends StringTemplate {
         this.score = score;
     }
 
+
+    // Override StringTemplate routines to return HistoryEvents
+
     /**
      * {@inheritDoc}
      */
     @Override
     public HistoryEvent add(String key, String value) {
-        return (HistoryEvent) super.add(key, value);
+        return (HistoryEvent)super.add(key, value);
     }
 
     /**
@@ -197,7 +200,7 @@ public class HistoryEvent extends StringTemplate {
      */
     @Override
     public HistoryEvent addName(String key, String value) {
-        return (HistoryEvent) super.addName(key, value);
+        return (HistoryEvent)super.addName(key, value);
     }
 
     /**
@@ -213,7 +216,7 @@ public class HistoryEvent extends StringTemplate {
      */
     @Override
     public HistoryEvent addAmount(String key, Number amount) {
-        return (HistoryEvent) super.addAmount(key, amount);
+        return (HistoryEvent)super.addAmount(key, amount);
     }
 
     /**
@@ -221,8 +224,9 @@ public class HistoryEvent extends StringTemplate {
      */
     @Override
     public HistoryEvent addStringTemplate(String key, StringTemplate template) {
-        return (HistoryEvent) super.addStringTemplate(key, template);
+        return (HistoryEvent)super.addStringTemplate(key, template);
     }
+
 
     // Interface Object
 
