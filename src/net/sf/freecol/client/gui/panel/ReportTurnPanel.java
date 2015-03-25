@@ -35,6 +35,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import net.miginfocom.swing.MigLayout;
@@ -330,19 +331,19 @@ public final class ReportTurnPanel extends ReportPanel {
             int end;
             while ((end = input.indexOf('%', start + 1)) >= 0) {
                 String var = input.substring(start, end + 1);
-                String[] item = findReplacementData(message, var);
+                String item = Messages.message(message.getReplacement(var));
                 FreeColGameObject messageSource = getFreeColClient().getGame()
                     .getMessageSource(message);
-                if (item != null && var.equals(item[0])) {
+                if (item != null) {
                     // found variable to replace
                     if ("%colony%".equals(var) || var.endsWith("Colony%")) {
-                        Colony colony = player.getColonyByName(item[1]);
+                        Colony colony = player.getColonyByName(item);
                         if (colony != null) {
-                            insertLinkButton(document, colony, item[1]);
+                            insertLinkButton(document, colony, item);
                         } else if (messageSource instanceof Tile) {
-                            insertLinkButton(document, messageSource, item[1]);
+                            insertLinkButton(document, messageSource, item);
                         } else {
-                            insertText(document, item[1]);
+                            insertText(document, item);
                         }
                     } else if ("%europe%".equals(var)
                         || ("%market%".equals(var) && player.isColonial())) {
@@ -353,19 +354,19 @@ public final class ReportTurnPanel extends ReportPanel {
                         || "%newName%".equals(var)) {
                         Tile tile = null;
                         if (messageSource instanceof Unit) {
-                            tile = ((Unit) messageSource).getTile();
+                            tile = ((Unit)messageSource).getTile();
                         } else if (messageSource instanceof Tile) {
-                            tile = (Tile) messageSource;
+                            tile = (Tile)messageSource;
                         }
                         if (tile != null) {
                             Settlement settlement = tile.getSettlement();
                             if (settlement != null) {
-                                insertLinkButton(document, settlement, item[1]);
+                                insertLinkButton(document, settlement, item);
                             } else {
-                                insertLinkButton(document, tile, item[1]);
+                                insertLinkButton(document, tile, item);
                             }
                         } else {
-                            insertText(document, item[1]);
+                            insertText(document, item);
                         }
                     } else if ("%location%".equals(var)
                         || var.endsWith("Location%")) {
@@ -375,12 +376,12 @@ public final class ReportTurnPanel extends ReportPanel {
                         } else if (messageSource instanceof Location) {
                             Location loc = upLoc((Location)messageSource);
                             insertLinkButton(document, (FreeColGameObject)loc,
-                                             item[1]);
+                                             item);
                         } else {
-                            insertText(document, item[1]);
+                            insertText(document, item);
                         }
                     } else {
-                        insertText(document, item[1]);
+                        insertText(document, item);
                     }
                     start = end + 1;
                 } else {
@@ -401,30 +402,15 @@ public final class ReportTurnPanel extends ReportPanel {
         }
     }
 
-    private String[] findReplacementData(ModelMessage message, String variable) {
-        List<String> data = message.getKeys();
-        if (data != null) {
-            for (int index = 0; index < data.size(); index++) {
-                if (variable.equals(data.get(index))) {
-                    return new String[] {
-                        variable,
-                        Messages.message(message.getReplacements().get(index))
-                    };
-                }
-            }
-        }
-        return null;
-    }
-
     private void insertText(StyledDocument document, String text)
-        throws Exception {
+        throws BadLocationException {
         document.insertString(document.getLength(), text,
                               document.getStyle("regular"));
     }
 
     private void insertLinkButton(StyledDocument document,
                                   FreeColGameObject object, String name)
-        throws Exception {
+        throws BadLocationException {
         JButton button = GUI.getLinkButton(name, null, object.getId());
         button.addActionListener(this);
         StyleConstants.setComponent(document.getStyle("button"), button);
