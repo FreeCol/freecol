@@ -315,13 +315,40 @@ public class ModelMessage extends StringTemplate {
         return o;
     }
 
+    /**
+     * Get a key for a message that might be ignored.
+     *
+     * @return A key, or null if the message should not be ignored.
+     */
+    public String getIgnoredMessageKey() {
+        switch (getMessageType()) {
+        case WAREHOUSE_CAPACITY:
+            String key = getSourceId();
+            switch (getTemplateType()) {
+            case TEMPLATE:
+                for (String k : getKeys()) {
+                    if ("%goods%".equals(k)) {
+                        key += "-" + getReplacement(k).getId();
+                    }
+                }
+                break;
+            }
+            return key;
+        default:
+            break;
+        }
+        return null;
+    }
+        
+    
+    // Quasi-override StringTemplate routines to return ModelMessages
 
     /**
      * {@inheritDoc}
      */
     @Override
     public ModelMessage add(String key, String value) {
-        return (ModelMessage) super.add(key, value);
+        return (ModelMessage)super.add(key, value);
     }
 
     /**
@@ -329,7 +356,7 @@ public class ModelMessage extends StringTemplate {
      */
     @Override
     public ModelMessage add(String value) {
-        return (ModelMessage) super.add(value);
+        return (ModelMessage)super.add(value);
     }
 
     /**
@@ -337,7 +364,7 @@ public class ModelMessage extends StringTemplate {
      */
     @Override
     public ModelMessage addName(String key, String value) {
-        return (ModelMessage) super.addName(key, value);
+        return (ModelMessage)super.addName(key, value);
     }
 
     /**
@@ -345,7 +372,7 @@ public class ModelMessage extends StringTemplate {
      */
     @Override
     public ModelMessage addName(String value) {
-        return (ModelMessage) super.addName(value);
+        return (ModelMessage)super.addName(value);
     }
 
     /**
@@ -353,7 +380,7 @@ public class ModelMessage extends StringTemplate {
      */
     @Override
     public ModelMessage addName(String key, FreeColObject object) {
-        return (ModelMessage) super.addName(key, object);
+        return (ModelMessage)super.addName(key, object);
     }
 
     /**
@@ -361,7 +388,7 @@ public class ModelMessage extends StringTemplate {
      */
     @Override
     public ModelMessage addNamed(String key, Named named) {
-        return (ModelMessage) super.addNamed(key, named);
+        return (ModelMessage)super.addNamed(key, named);
     }
     
     /**
@@ -369,7 +396,7 @@ public class ModelMessage extends StringTemplate {
      */
     @Override
     public ModelMessage addAmount(String key, Number amount) {
-        return (ModelMessage) super.addAmount(key, amount);
+        return (ModelMessage)super.addAmount(key, amount);
     }
 
     /**
@@ -377,7 +404,7 @@ public class ModelMessage extends StringTemplate {
      */
     @Override
     public ModelMessage addStringTemplate(String key, StringTemplate template) {
-        return (ModelMessage) super.addStringTemplate(key, template);
+        return (ModelMessage)super.addStringTemplate(key, template);
     }
 
     /**
@@ -385,7 +412,7 @@ public class ModelMessage extends StringTemplate {
      */
     @Override
     public ModelMessage addStringTemplate(StringTemplate template) {
-        return (ModelMessage) super.addStringTemplate(template);
+        return (ModelMessage)super.addStringTemplate(template);
     }
 
 

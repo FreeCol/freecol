@@ -583,33 +583,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Get a key for messages that might be ignored.
-     *
-     * @param message The <code>ModelMessage</code> to ignore.
-     * @return A key, or null if the message should not be ignored.
-     */
-    private String getIgnoredMessageKey(ModelMessage message) {
-        if (message == null) return null;
-        switch (message.getMessageType()) {
-        case WAREHOUSE_CAPACITY:
-            String key = message.getSourceId();
-            switch (message.getTemplateType()) {
-            case TEMPLATE:
-                for (String k : message.getKeys()) {
-                    if ("%goods%".equals(k)) {
-                        key += "-" + message.getReplacement(k).getId();
-                    }
-                }
-                break;
-            }
-            return key;
-        default:
-            break;
-        }
-        return null;
-    }
-            
-    /**
      * Displays the messages in the current turn report.
      */
     public void displayTurnReportMessages() {
@@ -632,7 +605,7 @@ public final class InGameController implements NetworkConstants {
         for (ModelMessage m : ((allMessages) ? player.getModelMessages()
                 : player.getNewModelMessages())) {
             if (shouldAllowMessage(m)
-                && !continueIgnoreMessage(getIgnoredMessageKey(m), thisTurn)) {
+                && !continueIgnoreMessage(m.getIgnoredMessageKey(), thisTurn)) {
                 messages.add(m);
             }
             m.setBeenDisplayed(true);
@@ -3397,8 +3370,9 @@ public final class InGameController implements NetworkConstants {
      * @return True, ignore message status changes can not fail.
      */
     public boolean ignoreMessage(ModelMessage message, boolean flag) {
-        String key = getIgnoredMessageKey(message);
-        if (key == null) return false;
+        String key;
+        if (message == null
+            || (key = message.getIgnoredMessageKey()) == null) return false;
         if (flag) {
             final Turn turn = freeColClient.getGame().getTurn();
             if (!continueIgnoreMessage(key, turn)) {
