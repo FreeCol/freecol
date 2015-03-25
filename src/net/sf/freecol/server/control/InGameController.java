@@ -1303,19 +1303,22 @@ public final class InGameController extends Controller {
         // Dispose of units in or heading to Europe.
         Europe europe = serverPlayer.getEurope();
         StringTemplate seized = StringTemplate.label(", ");
+        boolean lost = false;
         for (Unit u : europe.getUnitList()) {
             seized.addStringTemplate(u.getLabel());
             cs.addRemoves(See.only(serverPlayer), null, u.getDisposeList());
             u.dispose();
+            lost = true;
         }
         for (Unit u : serverPlayer.getHighSeas().getUnitList()) {
             if (u.getDestination() == europe) {
                 seized.addStringTemplate(u.getLabel());
                 cs.addRemoves(See.only(serverPlayer), null, u.getDisposeList());
                 u.dispose();
+                lost = true;
             }
         }
-        if (!seized.getReplacements().isEmpty()) {
+        if (lost) {
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
                                  "model.player.independence.unitsSeized",
