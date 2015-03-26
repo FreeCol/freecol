@@ -64,7 +64,7 @@ public class ZoomInAction extends FreeColAction {
      * {@inheritDoc}
      */
     public void actionPerformed(ActionEvent e) {
-        getGUI().scaleMap(1/4f);
+        getGUI().zoomInMap();
         update();
         getActionManager().getFreeColAction(ZoomOutAction.id).update();
     }

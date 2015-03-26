@@ -684,14 +684,20 @@ public class GUI {
         }
     }
 
-    /**
-     * Scale the map.
-     *
-     * @param scale The scale factor to apply.
-     */
-    public void scaleMap(float scale) {
+    private void resetMapZoom() {
+        mapViewer.scaleMap(2f);
+        refresh();
+    }
+
+    public void zoomInMap() {
         if (mapViewer == null) return;
-        mapViewer.scaleMap(scale);
+        mapViewer.scaleMap(0.25f);
+        refresh();
+    }
+
+    public void zoomOutMap() {
+        if (mapViewer == null) return;
+        mapViewer.scaleMap(-0.25f);
         refresh();
     }
 
@@ -845,7 +851,7 @@ public class GUI {
         if (frame == null || canvas == null) return;
 
         // We may need to reset the zoom value to the default value
-        scaleMap(2f);
+        resetMapZoom();
 
         frame.setJMenuBar(new MapEditorMenuBar(freeColClient));
         canvas.showMapEditorTransformPanel();
