@@ -869,7 +869,7 @@ public class Messages {
             for (StringTemplate other : template.getReplacements()) {
                 result += template.getId() + message(other);
             }
-            if (result.length() >= template.getId().length()) {
+            if (result.length() > template.getId().length()) {
                 result = result.substring(template.getId().length());
             } else {
                 logger.warning("incorrect use of template " + template);
