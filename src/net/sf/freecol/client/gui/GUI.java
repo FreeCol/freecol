@@ -685,7 +685,7 @@ public class GUI {
     }
 
     private void resetMapZoom() {
-        mapViewer.scaleMap(2f);
+        mapViewer.resetMapScale();
         refresh();
     }
 
@@ -814,9 +814,9 @@ public class GUI {
             windowSize = determineWindowSize(gd);
             logger.info("Inner window size is " + windowSize);
         }
-        this.mapViewer = new MapViewer(freeColClient, windowSize, imageLibrary);
+        this.mapViewer = new MapViewer(freeColClient, windowSize);
         this.canvas = new Canvas(freeColClient, windowSize, mapViewer);
-        this.colonyTileMapViewer = new MapViewer(freeColClient, windowSize, imageLibrary);
+        this.colonyTileMapViewer = new MapViewer(freeColClient, windowSize);
 
         changeWindowedMode(isWindowed());
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));

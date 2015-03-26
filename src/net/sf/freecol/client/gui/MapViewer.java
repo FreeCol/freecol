@@ -50,7 +50,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -266,16 +265,13 @@ public final class MapViewer {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param size The size of the GUI (= the entire screen if the app
      *     is displayed in full-screen).
-     * @param lib The library of images needed to display certain
-     *     things visually.
      */
-    public MapViewer(FreeColClient freeColClient, Dimension size,
-                     ImageLibrary lib) {
+    public MapViewer(FreeColClient freeColClient, Dimension size) {
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
         this.size = size;
 
-        setImageLibrary(lib);
+        resetMapScale();
 
         unitsOutForAnimation = new HashMap<>();
         unitsOutForAnimationLabels = new HashMap<>();
@@ -1152,21 +1148,22 @@ public final class MapViewer {
     }
 
     /**
+     * Reset the scale of the map to the default.
+     */
+    void resetMapScale() {
+        setImageLibrary(new ImageLibrary());
+    }
+
+    /**
      * Change the scale of the map by delta.
      *
      * @param delta a <code>float</code> value
      */
     void scaleMap(float delta) {
         float newScale = lib.getScalingFactor() + delta;
-        try {
-            if (newScale >= 1f) {
-                setImageLibrary(gui.getImageLibrary());
-            } else {
-                setImageLibrary(new ImageLibrary(newScale));
-            }
-        } catch (Exception ex) {
-            logger.log(Level.WARNING, "Failed to retrieve scaled image library.", ex);
-        }
+        if (newScale >= 1f)
+            newScale = 1f;
+        setImageLibrary(new ImageLibrary(newScale));
     }
 
     /**
