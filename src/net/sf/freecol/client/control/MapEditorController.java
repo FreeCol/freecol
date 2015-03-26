@@ -168,6 +168,7 @@ public final class MapEditorController {
         final Game game = freeColClient.getGame();
         final Specification spec = game.getSpecification();
 
+        gui.removeInGameComponents();
         OptionGroup mgo = gui.showMapGeneratorOptionsDialog(true);
         if (mgo == null) return;
         game.setMapGeneratorOptions(mgo);
