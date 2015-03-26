@@ -50,7 +50,7 @@ public class NationOptions extends FreeColObject {
         /**
          * {@inheritDoc}
          */
-        public String getNameKey() {
+        public final String getNameKey() {
             return Messages.nameKey("playerOptions." + this);
         }
     };

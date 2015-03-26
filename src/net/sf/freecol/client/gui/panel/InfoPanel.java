@@ -147,7 +147,7 @@ public final class InfoPanel extends FreeColPanel {
                 mapViewer.displayTerrain(g, tile);
                 if (tile.isExplored()) {
                     StringTemplate items = StringTemplate.label(", ");
-                    items.add(tile.getNameKey());
+                    items.addNamed(tile);
                     for (TileImprovement tileImprovement
                              : tile.getCompletedTileImprovements()) {
                         items.add(tileImprovement.getType().getDescriptionKey());

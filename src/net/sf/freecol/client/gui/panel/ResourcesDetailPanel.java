@@ -86,7 +86,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
         ResourceType type = getSpecification().getResourceType(id);
         panel.setLayout(new MigLayout("wrap 2", "[]20[]"));
 
-        JLabel name = GUI.localizedLabel(type.getNameKey());
+        JLabel name = GUI.localizedLabel(type);
         name.setFont(FontLibrary.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 

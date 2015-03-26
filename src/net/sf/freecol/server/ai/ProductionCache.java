@@ -411,17 +411,18 @@ public class ProductionCache {
          */
         @Override
         public String toString() {
-            String result = "Cache entry: " + unit;
-            if (workLocation instanceof ColonyTile) {
-                return result + workLocation.getTile().getNameKey()
-                    + "(" + workLocation.getId() + ") "
-                    + goodsType.getNameKey();
-            } else if (workLocation instanceof Building) {
-                return result + ((Building)workLocation).getNameKey()
-                    + "(" + workLocation.getId() + ") ";
-            } else {
-                return result;
+            StringBuilder sb = new StringBuilder(64);
+            sb.append("Cache entry: ").append(unit.toString());
+            if (goodsType != null) {
+                sb.append(" ").append(goodsType.getSuffix());
             }
+            if (workLocation instanceof ColonyTile) {
+                sb.append(workLocation.getTile().getType().getSuffix());
+            } else if (workLocation instanceof Building) {
+                sb.append(((Building)workLocation).getType().getSuffix());
+            }
+            sb.append("(").append(workLocation.getId()).append(") ");
+            return sb.toString();
         }
     }
 }

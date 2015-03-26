@@ -634,14 +634,14 @@ public final class ColonyPanel extends PortPanel
             if (student != null) {
                 sb.append(unit.getDescription())
                     .append(" ").append(Messages.message("producing.name"))
-                    .append(" ").append(Messages.message(unit.getType()
-                            .getSkillTaught().getNameKey()))
+                    .append(" ").append(Messages.getName(unit.getType()
+                            .getSkillTaught()))
                     .append(" ").append(unit.getTurnsOfTraining())
                     .append("/").append(unit.getNeededTurnsOfTraining());
             } else if (workingOnLand != null && goodsType != null) {
                 int producing = workingOnLand.getProductionOf(unit, goodsType);
                 String nominative = Messages.message(StringTemplate
-                    .template(goodsType.getNameKey())
+                    .template(goodsType)
                     .addAmount("%amount%", producing));
                 sb.append(unit.getDescription())
                     .append(" ").append(Messages.message("producing.name"))
@@ -651,7 +651,7 @@ public final class ColonyPanel extends PortPanel
                 int producing = workingInBuilding.getProductionOf(unit,
                                                                   goodsType);
                 String nominative = Messages.message(StringTemplate
-                    .template(goodsType.getNameKey())
+                    .template(goodsType)
                     .addAmount("%amount%", producing));
                 sb.append(unit.getDescription())
                     .append(" ").append(Messages.message("producing.name"))

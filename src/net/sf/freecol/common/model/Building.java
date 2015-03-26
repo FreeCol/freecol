@@ -141,18 +141,6 @@ public class Building extends WorkLocation
     }
 
     /**
-     * Gets the name of the improved building of the same type.
-     * An improved building is a building of a higher level.
-     *
-     * @return The name of the improved building or <code>null</code> if the
-     *     improvement does not exist.
-     */
-    public String getNextNameKey() {
-        final BuildingType next = getType().getUpgradesTo();
-        return (next == null) ? null : next.getNameKey();
-    }
-
-    /**
      * Does this building have a higher level?
      *
      * @return True if this <code>Building</code> can have a higher level.
@@ -438,7 +426,7 @@ public class Building extends WorkLocation
      */
     public StringTemplate getLabel() {
         return (buildingType == null) ? null
-            : StringTemplate.key(buildingType.getNameKey());
+            : StringTemplate.key(buildingType);
     }
 
     /**

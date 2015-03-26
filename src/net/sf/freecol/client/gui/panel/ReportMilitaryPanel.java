@@ -94,8 +94,7 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
         final Specification spec = getSpecification();
         final Nation refNation = getMyPlayer().getNation().getREFNation();
 
-        reportPanel.add(GUI.localizedLabel(refNation.getNameKey()),
-                        "span, split 2");
+        reportPanel.add(GUI.localizedLabel(refNation), "span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         List<AbstractUnit> refUnits = igc().getREFUnits();

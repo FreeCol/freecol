@@ -161,10 +161,7 @@ public abstract class FreeColGameObjectType extends FreeColObject
     // Interface Named
 
     /**
-     * Gets a string suitable for looking up the name of this
-     * object in {@link net.sf.freecol.common.i18n.Messages}.
-     *
-     * @return A message key.
+     * {@inheritDoc}
      */
     public final String getNameKey() {
         return Messages.nameKey(getId());

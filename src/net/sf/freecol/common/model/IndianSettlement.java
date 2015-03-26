@@ -276,6 +276,20 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
+     * Get a message key appropriate to the current skill and whether
+     * the requestor has visited this settlement.
+     *
+     * @param visited The visiting status.
+     * @return A message key describing the perceived skill.
+     */
+    public String getLearnableSkillKey(boolean visited) {
+        return (visited)
+            ? ((learnableSkill == null) ? "indianSettlement.skillNone"
+                : learnableSkill.getNameKey())
+            : "indianSettlement.skillUnknown";
+    }
+            
+    /**
      * Gets the missionary from this settlement.
      *
      * @return The missionary at this settlement, or null if there is none.

@@ -189,19 +189,12 @@ public final class ReportIndianPanel extends ReportPanel {
                 skillLabel.setVerticalTextPosition(JLabel.TOP);
                 skillLabel.setHorizontalTextPosition(JLabel.CENTER);
                 UnitType skillType = settlement.getLearnableSkill();
-                String skillString;
-                if (visited) {
-                    if (skillType == null) {
-                        skillString = "indianSettlement.skillNone";
-                    } else {
-                        skillString = skillType.getNameKey();
-                        skillLabel.setIcon(ImageLibrary
-                            .getUnitImageIcon(skillType, 0.66f));
-                    }
-                } else {
-                    skillString = "indianSettlement.skillUnknown";
+                String skillKey = settlement.getLearnableSkillKey(visited);
+                if (visited && skillType != null) {
+                    skillLabel.setIcon(ImageLibrary
+                        .getUnitImageIcon(skillType, 0.66f));
                 }
-                skillLabel.setText(Messages.message(skillString));
+                skillLabel.setText(Messages.message(skillKey));
                 reportPanel.add(skillLabel);
 
                 Player mostHated = settlement.getMostHated();
@@ -217,8 +210,7 @@ public final class ReportIndianPanel extends ReportPanel {
                     if (wantedGoods[0] == null) {
                         reportPanel.add(GUI.localizedLabel("indianSettlement.wantedGoodsNone"));
                     } else {
-                        JLabel goodsLabel
-                            = GUI.localizedLabel(wantedGoods[0].getNameKey());
+                        JLabel goodsLabel = GUI.localizedLabel(wantedGoods[0]);
                         goodsLabel.setIcon(new ImageIcon(ImageLibrary
                                 .getGoodsImage(wantedGoods[0], 0.66f)));
                         String split = "flowy, split "

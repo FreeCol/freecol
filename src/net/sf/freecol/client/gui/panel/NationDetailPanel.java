@@ -78,9 +78,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
      * @param panel the detail panel to build
      */
     public void buildDetail(String id, JPanel panel) {
-        if (getId().equals(id)) {
-            return;
-        }
+        if (getId().equals(id)) return;
 
         Nation nation = getSpecification().getNation(id);
         NationType currentNationType = nation.getType();
@@ -93,7 +91,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
 
         panel.setLayout(new MigLayout("wrap 3, fillx, gapx 20", "", ""));
 
-        JLabel name = GUI.localizedLabel(nation.getNameKey());
+        JLabel name = GUI.localizedLabel(nation);
         name.setFont(FontLibrary.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 

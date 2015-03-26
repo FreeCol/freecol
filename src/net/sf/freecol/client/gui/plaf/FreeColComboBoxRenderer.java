@@ -136,7 +136,7 @@ public class FreeColComboBoxRenderer<T>
             }
         } else if (value instanceof Named) {
             Named named = (Named)value;
-            String[] nad = Messages.getBestNameAndDescription(named.getNameKey());
+            String[] nad = Messages.getBestNameAndDescription(named);
             c.setText(nad[0]);
             if (nad[1] != null) c.setToolTipText(nad[1]);
         } else if (value instanceof ObjectWithId) {

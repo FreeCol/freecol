@@ -284,7 +284,7 @@ public class Europe extends UnitLocation
      */
     @Override
     public StringTemplate getLocationLabel() {
-        return StringTemplate.key(getNameKey());
+        return StringTemplate.key(this);
     }
 
     /**

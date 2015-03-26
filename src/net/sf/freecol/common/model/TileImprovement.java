@@ -173,15 +173,6 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Gets a key for message routines.
-     *
-     * @return The name key.
-     */
-    public String getNameKey() {
-        return type.getNameKey();
-    }
-
-    /**
      * How many turns remain until this improvement is complete?
      *
      * @return The current turns to completion.
@@ -437,6 +428,16 @@ public class TileImprovement extends TileItem implements Named {
             }
         }
         return (style == null) ? null : style.getString();
+    }
+
+
+    // Interface Named
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getNameKey() {
+        return (type == null) ? null : type.getNameKey();
     }
 
 

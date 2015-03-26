@@ -130,9 +130,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
 
             setLayout(new MigLayout("wrap 2", "", ""));
             setOpaque(false);
-            String goodsName = Messages.getName(goodsType);
-
-            setBorder(GUI.localizedBorder(goodsType.getNameKey()));
+            setBorder(GUI.localizedBorder(goodsType));
             GUI.padBorder(this, 6,6,6,6);
 
             ExportData exportData = colony.getExportData(goodsType);

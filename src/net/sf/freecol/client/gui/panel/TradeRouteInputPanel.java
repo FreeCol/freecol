@@ -455,7 +455,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
                 Image image = ImageLibrary
                     .getCoatOfArmsImage(europe.getOwner().getNation(), 0.5f);
                 icon = new JLabel(new ImageIcon(image));
-                name = GUI.localizedLabel(europe.getNameKey());
+                name = GUI.localizedLabel(europe);
             } else if (location instanceof Colony) {
                 Colony colony = (Colony) location;
                 icon = new JLabel(new ImageIcon(ImageLibrary

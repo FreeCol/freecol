@@ -135,12 +135,12 @@ public final class ReportProductionPanel extends ReportPanel {
             reportPanel.add(newLabel, "newline 20");
 
             for (int index = 0; index < selectedTypes.size(); index++) {
-                newLabel = GUI.localizedLabel(selectedTypes.get(index).getNameKey());
+                newLabel = GUI.localizedLabel(selectedTypes.get(index));
                 newLabel.setBorder(GUI.TOPCELLBORDER);
                 reportPanel.add(newLabel);
 
                 for (BuildingType buildingType : basicBuildingTypes.get(index)) {
-                    newLabel = GUI.localizedLabel(buildingType.getNameKey());
+                    newLabel = GUI.localizedLabel(buildingType);
                     newLabel.setBorder(GUI.TOPCELLBORDER);
                     reportPanel.add(newLabel);
                 }

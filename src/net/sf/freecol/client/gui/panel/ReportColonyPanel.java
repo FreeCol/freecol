@@ -86,7 +86,7 @@ public final class ReportColonyPanel extends ReportPanel
                 int r1 = rank(g1);
                 int r2 = rank(g2);
                 return (r1 != r2) ? r1 - r2
-                : g1.getNameKey().compareTo(g2.getNameKey());
+                : g1.getId().compareTo(g2.getId());
             }
         };
 
@@ -644,7 +644,7 @@ public final class ReportColonyPanel extends ReportPanel
         } else {
             AbstractGoods needed = new AbstractGoods();
             int turns = colony.getTurnsToComplete(build, needed);
-            String name = Messages.message(build.getNameKey());
+            String name = Messages.getName(build);
             if (turns == FreeColObject.UNDEFINED) {
                 b = colourButton(qac, name, null, cAlarm,
                     stpl("report.colony.making.noconstruction.description")

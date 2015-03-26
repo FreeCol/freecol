@@ -124,8 +124,16 @@ public class StringTemplate extends FreeColObject {
         return new StringTemplate(value, null, TemplateType.NAME);
     }
 
+    public static StringTemplate key(Named named) {
+        return key(named.getNameKey());
+    }
+
     public static StringTemplate key(String value) {
         return new StringTemplate(value, null, TemplateType.KEY);
+    }
+
+    public static StringTemplate template(Named named) {
+        return template(named.getNameKey());
     }
 
     public static StringTemplate template(String value) {
@@ -323,6 +331,16 @@ public class StringTemplate extends FreeColObject {
      */
     public StringTemplate addNamed(String key, Named named) {
         return add(key, named.getNameKey());
+    }
+
+    /**
+     * Add named object without key to this template.
+     *
+     * @param named The <code>Named</code> to add.
+     * @return This <code>StringTemplate</code>.
+     */
+    public StringTemplate addNamed(Named named) {
+        return add(named.getNameKey());
     }
 
     /**

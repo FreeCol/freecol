@@ -98,7 +98,7 @@ public class TerrainDetailPanel
             defenseBonus = ModifierFormat.getModifierAsString(defenceModifiers.iterator().next());
         }
 
-        JLabel nameLabel = GUI.localizedLabel(tileType.getNameKey());
+        JLabel nameLabel = GUI.localizedLabel(tileType);
         nameLabel.setFont(FontLibrary.SMALL_HEADER_FONT);
         panel.add(nameLabel, "span, align center");
 

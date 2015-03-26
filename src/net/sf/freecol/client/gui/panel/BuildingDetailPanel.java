@@ -134,7 +134,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
         BuildingType buildingType = getSpecification().getBuildingType(id);
         panel.setLayout(new MigLayout("wrap 7, gapx 20", "", ""));
 
-        JLabel name = GUI.localizedLabel(buildingType.getNameKey());
+        JLabel name = GUI.localizedLabel(buildingType);
         name.setFont(FontLibrary.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 

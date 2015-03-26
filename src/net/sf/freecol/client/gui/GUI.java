@@ -114,6 +114,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
@@ -1111,6 +1112,16 @@ public class GUI {
     }
 
     /**
+     * Get a titled border for a Named object.
+     *
+     * @param named The <code>Named</code> to use.
+     * @return The <code>TitledBorder</code>.
+     */
+    public static TitledBorder localizedBorder(Named named) {
+        return localizedBorder(named.getNameKey());
+    }
+
+    /**
      * Get a titled border with Messages.message(key) as text.
      *
      * @param key The key to use.
@@ -1164,6 +1175,16 @@ public class GUI {
     public static JCheckBoxMenuItem localizedCheckBoxMenuItem(String key,
                                                               boolean value) {
         return new JCheckBoxMenuItem(Messages.message(key), value);
+    }
+
+    /**
+     * Get a JLabel with a named object.
+     *
+     * @param named The <code>Named</code> to use.
+     * @return The <code>JLabel</code>.
+     */
+    public static JLabel localizedLabel(Named named) {
+        return localizedLabel(named.getNameKey());
     }
 
     /**

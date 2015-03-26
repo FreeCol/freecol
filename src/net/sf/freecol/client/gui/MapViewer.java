@@ -1924,11 +1924,11 @@ public final class MapViewer {
      */
     private void displayOptionalValues(Graphics2D g, Tile tile) {
         String text = null;
-        switch (freeColClient.getClientOptions().getInteger(ClientOptions.DISPLAY_TILE_TEXT)) {
+        int op = freeColClient.getClientOptions()
+            .getInteger(ClientOptions.DISPLAY_TILE_TEXT);
+        switch (op) {
         case ClientOptions.DISPLAY_TILE_TEXT_NAMES:
-            if (tile.getNameKey() != null) {
-                text = Messages.getName(tile);
-            }
+            text = Messages.getName(tile);
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_OWNERS:
             if (tile.getOwner() != null) {
@@ -1949,7 +1949,7 @@ public final class MapViewer {
         case ClientOptions.DISPLAY_TILE_TEXT_EMPTY:
             break;
         default:
-            logger.warning("displayTileText out of range");
+            logger.warning("displayTileText option " + op + " out of range");
             break;
         }
 

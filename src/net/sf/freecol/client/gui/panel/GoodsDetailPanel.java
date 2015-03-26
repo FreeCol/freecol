@@ -88,7 +88,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
         GoodsType type = getSpecification().getGoodsType(id);
         panel.setLayout(new MigLayout("wrap 4", "[]20[]"));
 
-        JLabel name = GUI.localizedLabel(type.getNameKey());
+        JLabel name = GUI.localizedLabel(type);
         name.setFont(FontLibrary.SMALL_HEADER_FONT);
         panel.add(name, "span, align center, wrap 40");
 

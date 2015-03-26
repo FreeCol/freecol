@@ -366,12 +366,6 @@ public class Messages {
         return message(nameKey(id));
     }
 
-    /*
-    public static String getName(ObjectWithId object) {
-        return getName(object.getId());
-    }
-    */
-
     public static String getName(Named named) {
         return message(named.getNameKey());
     }
@@ -449,6 +443,19 @@ public class Messages {
             }
         }
         return id;
+    }
+
+    /**
+     * Get the name and best description for a given named object.
+     *
+     * Favour the .name form, but degrade gracefully if it is not present.
+     * If .name is present, also look for a description.
+     *
+     * @param named The <code>Named</code> to look up.
+     * @return A 2-element array of name and description found.
+     */
+    public static String[] getBestNameAndDescription(Named named) {
+        return getBestNameAndDescription(named.getNameKey());
     }
 
     /**

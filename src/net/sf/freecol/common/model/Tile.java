@@ -994,20 +994,20 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The description label for this <code>Tile</code>.
      */
     public StringTemplate getLabel() {
-        StringTemplate label = StringTemplate.key(type.getNameKey());
+        StringTemplate label = StringTemplate.key(type);
         if (tileItemContainer != null) {
-            List<String> keys = new ArrayList<>();
+            List<Named> keys = new ArrayList<>();
             for (TileItem item : tileItemContainer.getTileItems()) {
                 if (item instanceof Resource) {
-                    keys.add(((Resource)item).getType().getNameKey());
+                    keys.add((Resource)item);
                 } else if (item instanceof TileImprovement
                            && ((TileImprovement)item).isComplete()) {
-                    keys.add(((TileImprovement)item).getType().getNameKey());
+                    keys.add((TileImprovement)item);
                 }
             }
             if (!keys.isEmpty()) {
-                label = StringTemplate.label("/").add(type.getNameKey());
-                for (String key : keys) label.add(key);
+                label = StringTemplate.label("/").addNamed(type);
+                for (Named key : keys) label.addNamed(key);
             }
         }
         return label;
@@ -2059,7 +2059,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             ? StringTemplate.template("nameLocation")
                 .addNamed("%name%", type)
                 .addNamed("%location%", region)
-            : StringTemplate.key(type.getNameKey());
+            : StringTemplate.key(type);
     }
 
     /**
@@ -2092,7 +2092,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             ? StringTemplate.template("nameLocation")
                 .addNamed("%name%", type)
                 .addStringTemplate("%location%", region.getLabel())
-            : StringTemplate.key(type.getNameKey());
+            : StringTemplate.key(type);
     }
 
     /**
