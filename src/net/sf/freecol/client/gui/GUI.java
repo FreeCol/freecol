@@ -588,11 +588,10 @@ public class GUI {
      * Simple delegation of image icon retrieval.
      *
      * @param display The object to find an icon for.
-     * @param small Choose a small icon?
      * @return The <code>ImageIcon</code> found.
      */
-    public ImageIcon getImageIcon(Object display, boolean small) {
-        return imageLibrary.getImageIcon(display, small);
+    public ImageIcon getImageIcon(Object display) {
+        return imageLibrary.getImageIcon(display, false);
     }
 
     /**
@@ -1513,7 +1512,7 @@ public class GUI {
 
         return canvas.showConfirmDialog(modal, tile,
                                         getDefaultTextArea(template),
-                                        getImageIcon(obj, false),
+                                        imageLibrary.getImageIcon(obj, false),
                                         okKey, cancelKey);
     }
 
@@ -2036,7 +2035,7 @@ public class GUI {
         if (canvas == null) return null;
 
         return canvas.showChoiceDialog(modal, tile, explain,
-                                       getImageIcon(obj, false),
+                                       imageLibrary.getImageIcon(obj, false),
                                        cancelKey, choices);
     }
 

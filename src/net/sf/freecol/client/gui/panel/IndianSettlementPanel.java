@@ -20,12 +20,14 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 
 import javax.swing.JLabel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -53,8 +55,10 @@ public final class IndianSettlementPanel extends FreeColPanel {
     public IndianSettlementPanel(FreeColClient freeColClient,
                                  IndianSettlement settlement) {
         super(freeColClient, new MigLayout("wrap 2, gapx 20", "", ""));
-        
-        JLabel settlementLabel = new JLabel(getGUI().getImageIcon(settlement, false));
+
+        ImageLibrary imageLibrary = getLibrary();
+        JLabel settlementLabel = new JLabel(new ImageIcon(
+            imageLibrary.getSettlementImage(settlement)));
         Player indian = settlement.getOwner();
         Player player = getMyPlayer();
         boolean contacted = settlement.hasContacted(player);
@@ -82,7 +86,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                     missionary.getOwner().getNationName())
                 .addStringTemplate("%unit%",
                     missionary.getLabel(Unit.UnitLabelType.NATIONAL)));
-            add(new JLabel(missionaryName, getGUI().getImageIcon(missionary, true), JLabel.CENTER));
+            add(new JLabel(missionaryName, imageLibrary.getImageIcon(missionary, true), JLabel.CENTER));
         }
 
         add(GUI.localizedLabel("indianSettlement.learnableSkill"), "newline");
@@ -92,7 +96,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 add(GUI.localizedLabel("indianSettlement.skillNone"));
             } else {
                 add(new JLabel(Messages.getName(skillType),
-                        getGUI().getImageIcon(skillType, true), JLabel.CENTER));
+                        imageLibrary.getImageIcon(skillType, true), JLabel.CENTER));
             }
         } else {
             add(GUI.localizedLabel("indianSettlement.skillUnknown"));
@@ -105,7 +109,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 add(GUI.localizedLabel("indianSettlement.mostHatedNone"));
             } else {
                 add(GUI.localizedLabel(mostHated.getNationName(),
-                        getGUI().getImageIcon(mostHated, true), JLabel.CENTER));
+                        imageLibrary.getImageIcon(mostHated, true), JLabel.CENTER));
             }
         } else {
             add(GUI.localizedLabel("indianSettlement.mostHatedUnknown"));
@@ -125,7 +129,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 sale = player.getLastSaleString(settlement, wantedGoods[0]);
                 add(new JLabel(Messages.getName(wantedGoods[0])
                         + ((sale == null) ? "" : " " + sale),
-                        getGUI().getImageIcon(wantedGoods[0], false),
+                        new ImageIcon(imageLibrary.getGoodsImage(wantedGoods[0])),
                         JLabel.CENTER));
                 n--;
             }
@@ -141,7 +145,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 sale = player.getLastSaleString(settlement, wantedGoods[1]);
                 add(new JLabel(Messages.getName(wantedGoods[1])
                         + ((sale == null) ? "" : " " + sale),
-                        getGUI().getImageIcon(wantedGoods[1], false),
+                        new ImageIcon(imageLibrary.getGoodsImage(wantedGoods[1])),
                         JLabel.CENTER),
                     "split " + Integer.toString(n));
                 for (int i = 2; i < wantedGoods.length; i++) {
@@ -149,7 +153,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                         sale = player.getLastSaleString(settlement,wantedGoods[i]);
                         add(new JLabel(Messages.getName(wantedGoods[i])
                                 + ((sale == null) ? "" : " " + sale),
-                                getGUI().getImageIcon(wantedGoods[i], false),
+                                new ImageIcon(imageLibrary.getGoodsImage(wantedGoods[i])),
                                 JLabel.CENTER));
                     }
                 }

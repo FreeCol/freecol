@@ -185,7 +185,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         c.add(new ChoiceItem<>(Messages.message("ok"), fake)
             .okOption().defaultOption());
         initializeDialog(DialogType.QUESTION, false, panel,
-            getImageLibrary().getImageIcon(winner, false), c);
+            getImageLibrary().getUnitImageIcon(winner), c);
     }
 
 

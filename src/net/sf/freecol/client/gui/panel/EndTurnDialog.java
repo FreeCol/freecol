@@ -186,7 +186,8 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
         panel.add(listScroller, "newline 10");
         panel.setSize(panel.getPreferredSize());
 
-        ImageIcon icon = getImageLibrary().getImageIcon(player, false);
+        ImageIcon icon = new ImageIcon(
+            getImageLibrary().getCoatOfArmsImage(player.getNation()));
         initializeConfirmDialog(false, panel, icon, "ok", "cancel");
     }
 

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.swing.ImageIcon;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -93,7 +94,8 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         } else if (combatModel.combatIsSettlementAttack(attacker, defender)) {
             Settlement settlement = (Settlement) defender;
             defenderName = settlement.getName();
-            defenderLabel = new JLabel(getGUI().getImageIcon(settlement, false));
+            defenderLabel = new JLabel(new ImageIcon(
+                getGUI().getImageLibrary().getSettlementImage(settlement)));
 
         } else {
             throw new IllegalStateException("Bogus attack");
