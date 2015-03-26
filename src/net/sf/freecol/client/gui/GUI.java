@@ -315,6 +315,8 @@ public class GUI {
     /** The client for the game. */
     private final FreeColClient freeColClient;
 
+    private final GraphicsDevice graphicsDevice;
+
     /** The canvas that implements much of the functionality. */
     private Canvas canvas;
 
@@ -352,9 +354,11 @@ public class GUI {
      * Create the GUI.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param headless If the game is running headless.
      */
-    public GUI(FreeColClient freeColClient) {
+    public GUI(FreeColClient freeColClient, boolean headless) {
         this.freeColClient = freeColClient;
+        this.graphicsDevice = headless ? null : getGoodGraphicsDevice();
         this.imageLibrary = new ImageLibrary();
     }
 
@@ -474,16 +478,6 @@ public class GUI {
      *     and <code>false</code> for fullscreen mode.
      */
     public void changeWindowedMode(boolean windowed) {
-        // Get the graphics device
-        GraphicsDevice gd;
-        if (this.frame != null) {
-            GraphicsConfiguration GraphicsConf
-                = this.frame.getGraphicsConfiguration();
-            gd = GraphicsConf.getDevice();
-        } else {
-            gd = getGoodGraphicsDevice();
-        }
-
         // Clean up the old frame
         JMenuBar menuBar = null;
         if (this.frame != null) {
@@ -498,8 +492,8 @@ public class GUI {
 
         // User might have moved window to new screen in a
         // multi-screen setup, so make this.gd point to the current screen.
-        this.frame = (windowed) ? new WindowedFrame(freeColClient, gd)
-            : new FullScreenFrame(freeColClient, gd);
+        this.frame = (windowed) ? new WindowedFrame(freeColClient, graphicsDevice)
+            : new FullScreenFrame(freeColClient, graphicsDevice);
         this.frame.setJMenuBar(menuBar);
         this.frame.setCanvas(canvas);
         this.frame.updateBounds(getWindowBounds());
@@ -564,17 +558,17 @@ public class GUI {
      *
      * @param splashFilename The name of the file to find the image in.
      */
-    public void displaySplashScreen(final String splashFilename,
-                                    GraphicsDevice gd) {
+    public void displaySplashScreen(final String splashFilename) {
         splash = null;
-        if (splashFilename == null) return;
+        if (splashFilename == null || graphicsDevice == null)
+            return;
         try {
             Image im = Toolkit.getDefaultToolkit().getImage(splashFilename);
-            splash = new JWindow(gd.getDefaultConfiguration());
+            splash = new JWindow(graphicsDevice.getDefaultConfiguration());
             splash.getContentPane().add(new JLabel(new ImageIcon(im)));
             splash.pack();
             Point start = splash.getLocation();
-            DisplayMode dm = gd.getDisplayMode();
+            DisplayMode dm = graphicsDevice.getDisplayMode();
             splash.setLocation(start.x + dm.getWidth()/2 - splash.getWidth() / 2,
                 start.y + dm.getHeight()/2 - splash.getHeight() / 2);
             splash.setVisible(true);
@@ -729,7 +723,7 @@ public class GUI {
      * @param desiredWindowSize The desired size of the GUI window.
      * @param sound Enable sound if true.
      */
-    public void startGUI(GraphicsDevice gd, final Dimension desiredWindowSize,
+    public void startGUI(final Dimension desiredWindowSize,
                          boolean sound) {
         final ClientOptions opts = freeColClient.getClientOptions();
 
@@ -752,7 +746,7 @@ public class GUI {
             this.soundPlayer = null;
         }
 
-        if (gd == null) {
+        if (graphicsDevice == null) {
             logger.info("It seems that the GraphicsEnvironment is headless!");
             return;
         }
@@ -794,9 +788,9 @@ public class GUI {
         // Determine the window size.
         Dimension windowSize;
         if (desiredWindowSize == null) {
-            if(gd.isFullScreenSupported()) {
+            if(graphicsDevice.isFullScreenSupported()) {
                 setWindowed(false);
-                windowSize = determineFullScreenSize(gd);
+                windowSize = determineFullScreenSize(graphicsDevice);
                 logger.info("Full screen window size is " + windowSize);
             } else {
                 setWindowed(true);
@@ -810,7 +804,7 @@ public class GUI {
             logger.info("Desired window size is " + windowSize);
         }
         if(isWindowed() && (windowSize.width <= 0 || windowSize.height <= 0)) {
-            windowSize = determineWindowSize(gd);
+            windowSize = determineWindowSize(graphicsDevice);
             logger.info("Inner window size is " + windowSize);
         }
         this.mapViewer = new MapViewer(freeColClient, windowSize);
@@ -934,7 +928,7 @@ public class GUI {
      * @return A screen device, or null if none available
      *     (as in headless mode).
      */
-    public static GraphicsDevice getGoodGraphicsDevice() {
+    private static GraphicsDevice getGoodGraphicsDevice() {
         try {
             return MouseInfo.getPointerInfo().getDevice();
         } catch (HeadlessException he) {}

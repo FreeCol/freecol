@@ -21,7 +21,6 @@ package net.sf.freecol.client;
 
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GraphicsDevice;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -186,13 +185,10 @@ public final class FreeColClient {
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
         // Once the basic resources are in place the GUI can be started.
-        gui = new GUI(this);
+        gui = new GUI(this, headless);
+        gui.displaySplashScreen(splashFilename);
+
         serverAPI = new UserServerAPI(gui);
-        GraphicsDevice gd = null;
-        if (!headless) {
-            gd = GUI.getGoodGraphicsDevice();
-            gui.displaySplashScreen(splashFilename, gd);
-        }
 
         // Control.  Controllers expect GUI to be available.
         connectController = new ConnectController(this);
@@ -253,12 +249,11 @@ public final class FreeColClient {
             } catch (Exception e) {
                 fatal(Messages.message("client.laf") + "\n" + e.getMessage());
             }
-
-            gui.hideSplashScreen();
         }
 
         // Start the GUI (headless-safe)
-        gui.startGUI(gd, size, sound);
+        gui.hideSplashScreen();
+        gui.startGUI(size, sound);
 
         // Now the GUI is going, either:
         //   - load the saved game if one was supplied
