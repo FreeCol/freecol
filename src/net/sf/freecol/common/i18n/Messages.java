@@ -859,20 +859,25 @@ public class Messages {
     /**
      * Localizes a StringTemplate.
      *
-     * @param template a <code>StringTemplate</code> value
-     * @return a <code>String</code> value
+     * @param template The <code>StringTemplate</code> to localize.
+     * @return The localized string.
      */
     public static String message(StringTemplate template) {
         String result = "";
         switch (template.getTemplateType()) {
         case LABEL:
-            for (StringTemplate other : template.getReplacements()) {
-                result += template.getId() + message(other);
-            }
-            if (result.length() > template.getId().length()) {
-                result = result.substring(template.getId().length());
+            List<StringTemplate> replacements = template.getReplacements();
+            if (replacements.isEmpty()) {
+                result = message(template.getId());
             } else {
-                logger.warning("incorrect use of template " + template);
+                for (StringTemplate other : replacements) {
+                    result += template.getId() + message(other);
+                }
+                if (result.length() >= template.getId().length()) {
+                    result = result.substring(template.getId().length());
+                } else {
+                    logger.warning("incorrect use of template " + template);
+                }
             }
             break;
         case TEMPLATE:
