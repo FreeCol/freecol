@@ -133,7 +133,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
         this.scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         
         this.panel = new MigPanel(new MigLayout("wrap 1, fill"));
-        this.panel.add(GUI.localizedHeader(Messages.nameKey(headerKey)),
+        this.panel.add(GUI.localizedHeader(Messages.nameKey(headerKey), false),
                        "span, center");
     }
 

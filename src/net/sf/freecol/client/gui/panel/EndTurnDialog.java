@@ -143,9 +143,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
 
         final Player player = getMyPlayer();
 
-        JLabel header = GUI.localizedHeader(Messages.nameKey("endTurnDialog"));
-        //header.setFont(GUI.SMALL_HEADER_FONT);
-
+        JLabel header = GUI.localizedHeader(Messages.nameKey("endTurnDialog"), false);
         StringTemplate template = StringTemplate
             .template("endTurnDialog.areYouSure")
             .addAmount("%number%", units.size());

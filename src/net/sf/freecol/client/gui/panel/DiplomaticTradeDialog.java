@@ -797,8 +797,6 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         this.agreement = agreement;
         this.comment = comment;
 
-        JLabel header = GUI.localizedHeader("negotiationDialog.title."
-            + agreement.getContext().getKey());
         StringTemplate nation = player.getNationName(),
             otherNation = otherPlayer.getNationName();
         t = StringTemplate.template("negotiationDialog.demand")
@@ -885,7 +883,9 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 3",
                 "[200, fill][300, fill][200, fill]", ""));
-        panel.add(header, "span 3, center");
+        panel.add(GUI.localizedHeader("negotiationDialog.title."
+                + agreement.getContext().getKey(), false),
+                  "span 3, center");
         panel.add(GUI.getDefaultTextArea(this.demandMessage), "center");
         panel.add(tutArea, "center");
         panel.add(GUI.getDefaultTextArea(this.offerMessage), "center");

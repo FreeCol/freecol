@@ -1179,11 +1179,13 @@ public class GUI {
      * Gets a default header for panels containing a localized message.
      *
      * @param key The message key to use.
+     * @param small If true, use a smaller font.
      * @return A suitable <code>JLabel</code>.
      */
-    public static JLabel localizedHeader(String key) {
+    public static JLabel localizedHeader(String key, boolean small) {
         JLabel header = new JLabel(Messages.message(key), JLabel.CENTER);
-        header.setFont(FontLibrary.BIG_HEADER_FONT);
+        header.setFont((small) ? FontLibrary.SMALL_HEADER_FONT
+            : FontLibrary.BIG_HEADER_FONT);
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         return header;
     }

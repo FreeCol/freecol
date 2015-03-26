@@ -124,9 +124,6 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
         this.maxCargo = winner.getSpaceLeft();
 
-        JLabel header = GUI.localizedHeader("lootCargo.header");
-        header.setFont(FontLibrary.MEDIUM_HEADER_FONT);
-
         this.allButton = GUI.localizedButton("All");
         this.allButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -177,7 +174,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1", "[center]",
                                                     "[]20[]20[]"));
-        panel.add(header);
+        panel.add(GUI.localizedHeader("lootCargo.header", true));
         panel.add(this.allButton, "split 2");
         panel.add(this.noneButton);
         panel.add(this.goodsList);

@@ -358,9 +358,6 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         }
         loadDestinations(unit, goodsTypes);
 
-        JLabel header = GUI.localizedHeader("selectDestination.text");
-        header.setFont(FontLibrary.SMALL_HEADER_FONT);
-
         DefaultListModel<Destination> model
             = new DefaultListModel<>();
         this.destinationList = new JList<>(model);
@@ -409,7 +406,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
                                                     "[align center]", ""));
-        panel.add(header);
+        panel.add(GUI.localizedHeader("selectDestination.text", true));
+
         panel.add(listScroller, "newline 30, growx, growy");
         panel.add(this.onlyMyColoniesBox, "left");
         panel.add(this.comparatorBox, "left");

@@ -658,7 +658,8 @@ public final class EuropePanel extends PortPanel {
         initialize(europe);
 
         if (canvas.getHeight() > 780) {
-            add(GUI.localizedHeader(europe.getNameKey()), "span, top, center");
+            add(GUI.localizedHeader(europe.getNameKey(), false),
+                "span, top, center");
         }
         add(toAmericaScroll, "sg, height 124:, grow");
         add(toEuropeScroll, "sg, height 124:, grow");

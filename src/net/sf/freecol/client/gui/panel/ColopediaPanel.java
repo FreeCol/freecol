@@ -72,7 +72,8 @@ public final class ColopediaPanel extends FreeColPanel
         super(freeColClient, new MigLayout("fill", 
                 "[200:]unrelated[550:, grow, fill]", "[][grow, fill][]"));
 
-        add(GUI.localizedHeader("menuBar.colopedia"), "span, align center");
+        add(GUI.localizedHeader("menuBar.colopedia", false),
+            "span, align center");
 
         listPanel = new MigPanel("ColopediaPanelUI");
         listPanel.setOpaque(true);

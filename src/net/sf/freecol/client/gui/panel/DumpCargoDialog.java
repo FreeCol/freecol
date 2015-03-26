@@ -62,9 +62,6 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
         this.goodsList = unit.getGoodsList();
         this.checkBoxes = new ArrayList<>(goodsList.size());
 
-        JLabel header = GUI.localizedHeader("dumpCargo");
-        header.setFont(FontLibrary.SMALL_HEADER_FONT);
-
         for (Goods goods : goodsList) {
             // FIXME: find out why check box is not displayed when icon
             // is present
@@ -76,7 +73,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
         }
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
-        panel.add(header);
+        panel.add(GUI.localizedHeader("dumpCargo", true));
         for (JCheckBox c : checkBoxes) panel.add(c);
         panel.setSize(panel.getPreferredSize());
 

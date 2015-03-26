@@ -58,7 +58,9 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
         heightLabel.setLabelFor(inputHeight);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 2"));
-        panel.add(GUI.localizedLabel("editor.mapSize"), "span, align center");
+        
+        panel.add(GUI.localizedHeader("editor.mapSize", true),
+                  "span, align center");
         panel.add(widthLabel, "newline 20");
         panel.add(inputWidth);
         panel.add(heightLabel);

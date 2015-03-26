@@ -612,7 +612,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         cancelButton.addActionListener(this);
         setCancelComponent(cancelButton);
 
-        add(GUI.localizedHeader("tradeRouteInputPanel.editRoute"),
+        add(GUI.localizedHeader("tradeRouteInputPanel.editRoute", false),
             "span, align center");
         add(tradeRouteView, "span 1 5, grow");
         add(nameLabel);
