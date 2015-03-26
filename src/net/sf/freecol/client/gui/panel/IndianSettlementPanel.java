@@ -86,7 +86,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                     missionary.getOwner().getNationName())
                 .addStringTemplate("%unit%",
                     missionary.getLabel(Unit.UnitLabelType.NATIONAL)));
-            add(new JLabel(missionaryName, imageLibrary.getImageIcon(missionary, true), JLabel.CENTER));
+            add(new JLabel(missionaryName, imageLibrary.getSmallImageIcon(missionary), JLabel.CENTER));
         }
 
         add(GUI.localizedLabel("indianSettlement.learnableSkill"), "newline");
@@ -96,7 +96,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 add(GUI.localizedLabel("indianSettlement.skillNone"));
             } else {
                 add(new JLabel(Messages.getName(skillType),
-                        imageLibrary.getImageIcon(skillType, true), JLabel.CENTER));
+                        imageLibrary.getSmallImageIcon(skillType), JLabel.CENTER));
             }
         } else {
             add(GUI.localizedLabel("indianSettlement.skillUnknown"));
@@ -109,7 +109,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 add(GUI.localizedLabel("indianSettlement.mostHatedNone"));
             } else {
                 add(GUI.localizedLabel(mostHated.getNationName(),
-                        imageLibrary.getImageIcon(mostHated, true), JLabel.CENTER));
+                        imageLibrary.getSmallImageIcon(mostHated), JLabel.CENTER));
             }
         } else {
             add(GUI.localizedLabel("indianSettlement.mostHatedUnknown"));

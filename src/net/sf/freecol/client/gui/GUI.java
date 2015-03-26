@@ -591,7 +591,7 @@ public class GUI {
      * @return The <code>ImageIcon</code> found.
      */
     public ImageIcon getImageIcon(Object display) {
-        return imageLibrary.getImageIcon(display, false);
+        return imageLibrary.getImageIcon(display);
     }
 
     /**
@@ -1512,7 +1512,7 @@ public class GUI {
 
         return canvas.showConfirmDialog(modal, tile,
                                         getDefaultTextArea(template),
-                                        imageLibrary.getImageIcon(obj, false),
+                                        imageLibrary.getImageIcon(obj),
                                         okKey, cancelKey);
     }
 
@@ -2035,7 +2035,7 @@ public class GUI {
         if (canvas == null) return null;
 
         return canvas.showChoiceDialog(modal, tile, explain,
-                                       imageLibrary.getImageIcon(obj, false),
+                                       imageLibrary.getImageIcon(obj),
                                        cancelKey, choices);
     }
 

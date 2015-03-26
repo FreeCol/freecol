@@ -75,7 +75,7 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
                 .setIcon(ImageLibrary.getUnitImageIcon(ut, 0.66f)));
         }
 
-        initializeChoiceDialog(false, panel, lib.getImageIcon(europe, true), 
+        initializeChoiceDialog(false, panel, lib.getSmallImageIcon(europe), 
                                null, c);
     }
 }

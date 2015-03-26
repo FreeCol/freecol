@@ -67,7 +67,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
             // is present
             JCheckBox checkBox
                 = new JCheckBox(Messages.message(goods.getLabel(true)),
-                                //lib.getImageIcon(goods.getType(), true),
+                                //lib.getSmallImageIcon(goods.getType()),
                                 true);
             checkBoxes.add(checkBox);
         }

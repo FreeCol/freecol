@@ -663,60 +663,95 @@ public final class ImageLibrary {
      * @param display The Object to display.
      * @return The appropriate ImageIcon.
      */
-    public ImageIcon getImageIcon(Object display, boolean small) {
-        Image image = null;
-        if (display instanceof Goods) display = ((Goods)display).getType();
+    public ImageIcon getImageIcon(Object display) {
+        try {
+            Image image;
+            if (display instanceof Goods)
+                display = ((Goods)display).getType();
 
-        if (display == null) {
-            return new ImageIcon();
-        } else if (display instanceof GoodsType) {
-            GoodsType goodsType = (GoodsType)display;
-            try {
-                image = this.getGoodsImage(goodsType);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "could not find image for goods "
-                    + goodsType, e);
+            if (display instanceof GoodsType) {
+                GoodsType goodsType = (GoodsType)display;
+                image = getGoodsImage(goodsType);
+            } else if (display instanceof Unit) {
+                Unit unit = (Unit)display;
+                image = getUnitImageIcon(unit).getImage();
+            } else if (display instanceof UnitType) {
+                UnitType unitType = (UnitType)display;
+                image = getUnitImageIcon(unitType).getImage();
+            } else if (display instanceof Settlement) {
+                Settlement settlement = (Settlement)display;
+                image = getSettlementImage(settlement);
+            } else if (display instanceof LostCityRumour) {
+                image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
+            } else if (display instanceof Player) {
+                image = getCoatOfArmsImage(((Player)display).getNation());
+            } else {
+                logger.warning("could not find image of unknown type for " + display);
+                return null;
             }
-        } else if (display instanceof Unit) {
-            Unit unit = (Unit)display;
-            try {
-                image = this.getUnitImageIcon(unit).getImage();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "could not find image for unit "
-                    + unit, e);
+            if (image == null) {
+                logger.warning("could not find image for " + display);
+                return null;
             }
-        } else if (display instanceof UnitType) {
-            UnitType unitType = (UnitType)display;
-            try {
-                image = this.getUnitImageIcon(unitType).getImage();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "could not find image for unit "
-                    + unitType, e);
-            }
-        } else if (display instanceof Settlement) {
-            Settlement settlement = (Settlement)display;
-            try {
-                image = this.getSettlementImage(settlement);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "could not find image for settlement "
-                    + settlement.getId(), e);
-            }
-        } else if (display instanceof LostCityRumour) {
-            try {
-                image = this.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "could not find image for LCR", e);
-            }
-        } else if (display instanceof Player) {
-            image = this.getCoatOfArmsImage(((Player)display).getNation());
+            return new ImageIcon(image);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "could not find image", e);
+            return null;
         }
-        if (image != null && small) {
-            int width = (image.getWidth(null) / 3) * 2;
-            int height = (image.getHeight(null) / 3) * 2;
-            return new ImageIcon(image.getScaledInstance(width, height,
-                                                         Image.SCALE_SMOOTH));
-        } else {
-            return (image == null) ? null : new ImageIcon(image);
+    }
+
+    /**
+     * Returns the appropriate small ImageIcon for Object.
+     *
+     * @param display The Object to display.
+     * @return The appropriate ImageIcon.
+     */
+    public ImageIcon getSmallImageIcon(Object display) {
+        try {
+            Image image = null;
+            if (display instanceof Goods)
+                display = ((Goods)display).getType();
+
+            final float scale = 2f/3f;
+            final float combinedScale = scalingFactor * scale;
+            if (display instanceof GoodsType) {
+                GoodsType goodsType = (GoodsType)display;
+                image = getGoodsImage(goodsType, combinedScale);
+            } else if (display instanceof Settlement) {
+                Settlement settlement = (Settlement)display;
+                image = getSettlementImage(settlement, combinedScale);
+            } else if (display instanceof LostCityRumour) {
+                image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR,
+                    combinedScale);
+            } else if (display instanceof Player) {
+                image = getCoatOfArmsImage(((Player)display).getNation(),
+                    combinedScale);
+            }
+            if (image != null)
+                return new ImageIcon(image);
+            // TODO: change these to directly retrieve a scaled Image
+            if (display instanceof Unit) {
+                Unit unit = (Unit)display;
+                image = getUnitImageIcon(unit).getImage();
+            } else if (display instanceof UnitType) {
+                UnitType unitType = (UnitType)display;
+                image = getUnitImageIcon(unitType).getImage();
+            } else {
+                logger.warning("could not find image of unknown type for "
+                    + display);
+                return null;
+            }
+            if (image == null) {
+                logger.warning("could not find image for " + display);
+                return null;
+            }
+            int width = (int)(image.getWidth(null) * scale);
+            int height = (int)(image.getHeight(null) * scale);
+            return new ImageIcon(image.getScaledInstance(
+                width, height, Image.SCALE_SMOOTH));
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "could not find image", e);
+            return null;
         }
     }
 
