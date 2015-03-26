@@ -20,7 +20,6 @@
 package net.sf.freecol.client;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,7 +39,6 @@ import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.control.PreGameInputHandler;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ActionManager;
-import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.networking.UserServerAPI;
 import net.sf.freecol.common.FreeColSeed;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -232,20 +230,9 @@ public final class FreeColClient {
             logger.info("Preload of resources starting.");
             ResourceManager.preload();
 
-            // Work out the main font now that base resources are loaded.
-            Font font = null;
-            if (fontName != null) {
-                font = Font.decode(fontName);
-                if (font == null) {
-                    logger.warning("Font not found: " + fontName);
-                }
-            }
-            if (font == null) font = ResourceManager.getFont("NormalFont");
-
             // Swing system and look-and-feel initialization.
             try {
-                FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
-                FreeColLookAndFeel.install(fclaf, font);
+                GUI.installLookAndFeel(fontName);
             } catch (Exception e) {
                 fatal(Messages.message("client.laf") + "\n" + e.getMessage());
             }

@@ -76,6 +76,16 @@ public class FontLibrary {
         this.scaleFactor = scaleFactor;
     }
 
+    static Font createMainFont(String fontName) {
+        if (fontName != null) {
+            Font font = Font.decode(fontName);
+            if (font != null)
+                return font;
+            logger.warning("Font not found: " + fontName);
+        }
+        return ResourceManager.getFont("NormalFont");
+    }
+
     public Font createScaledFont(FontType fontType, FontSize fontSize) {
         return createFont(fontType, fontSize, Font.PLAIN, scaleFactor);
     }

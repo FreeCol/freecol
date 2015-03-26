@@ -96,7 +96,9 @@ import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.client.gui.panel.TradeRoutePanel;
+import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -597,6 +599,15 @@ public class GUI {
             splash.dispose();
             splash = null;
         }
+    }
+
+    /** 
+     * Swing system and look-and-feel initialization.
+     */
+    public static void installLookAndFeel(String fontName) throws FreeColException {
+        Font font = FontLibrary.createMainFont(fontName);
+        FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
+        FreeColLookAndFeel.install(fclaf, font);
     }
 
     /**
