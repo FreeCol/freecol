@@ -870,6 +870,7 @@ public class Messages {
      * @return The localized string.
      */
     public static String message(StringTemplate template) {
+        if (template == null) return null;
         String result = "";
         switch (template.getTemplateType()) {
         case LABEL:
