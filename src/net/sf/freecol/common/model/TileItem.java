@@ -29,7 +29,8 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 /**
  * Represents a <code>TileItem</code> item on a <code>Tile</code>.
  */
-public abstract class TileItem extends FreeColGameObject implements Locatable {
+public abstract class TileItem extends FreeColGameObject
+    implements Locatable, Named {
 
     public static final int RESOURCE_ZINDEX = 400;
     public static final int RUMOUR_ZINDEX = 500;
@@ -135,6 +136,13 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
      */
     public abstract boolean isNatural();
 
+    /**
+     * Is this improvement complete?
+     *
+     * @return True if complete.
+     */
+    public abstract boolean isComplete();
+
 
     // Interface Locatable
 
@@ -176,4 +184,11 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
     public int getSpaceTaken() {
         return 0;
     }
+
+    // Interface Named
+
+    /**
+     * {@inheritDoc}
+     */
+    public abstract String getNameKey();
 }

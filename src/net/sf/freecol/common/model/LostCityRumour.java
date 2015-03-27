@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.RandomChoice;
@@ -231,6 +232,16 @@ public class LostCityRumour extends TileItem {
     }
 
 
+    // Interface Named
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getNameKey() {
+        return Messages.nameKey("lostCityRumour");
+    }
+
+
     // Interface TileItem
 
     /**
@@ -277,6 +288,13 @@ public class LostCityRumour extends TileItem {
      */
     public boolean isNatural() {
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isComplete() {
+        return true;
     }
 
 

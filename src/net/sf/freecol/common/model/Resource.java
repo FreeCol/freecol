@@ -36,7 +36,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  * vein, located on a Tile. A resource may be exhausted. In the
  * original game, only resources that produced silver were exhausted.
  */
-public class Resource extends TileItem implements Named {
+public class Resource extends TileItem {
 
     private static final Logger logger = Logger.getLogger(Resource.class.getName());
 
@@ -241,6 +241,13 @@ public class Resource extends TileItem implements Named {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isComplete() {
+        return true;
+    }
+    
 
     // Override FreeColGameObject
 

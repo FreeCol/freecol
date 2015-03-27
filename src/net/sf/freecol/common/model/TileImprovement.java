@@ -182,15 +182,6 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Is this improvement complete?
-     *
-     * @return True if complete.
-     */
-    public boolean isComplete() {
-        return turnsToComplete <= 0;
-    }
-
-    /**
      * Sets the turns required to complete the improvement.
      *
      * @param turns The new turns to completion.
@@ -508,6 +499,13 @@ public class TileImprovement extends TileItem implements Named {
      */
     public boolean isNatural() {
         return type.isNatural();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isComplete() {
+        return turnsToComplete <= 0;
     }
 
 

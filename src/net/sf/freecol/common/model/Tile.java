@@ -998,12 +998,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (tileItemContainer != null) {
             List<Named> keys = new ArrayList<>();
             for (TileItem item : tileItemContainer.getTileItems()) {
-                if (item instanceof Resource) {
-                    keys.add((Resource)item);
-                } else if (item instanceof TileImprovement
-                           && ((TileImprovement)item).isComplete()) {
-                    keys.add((TileImprovement)item);
-                }
+                if (!item.isComplete()) continue;
+                keys.add(item);
             }
             if (!keys.isEmpty()) {
                 label = StringTemplate.label("/").addNamed(type);
