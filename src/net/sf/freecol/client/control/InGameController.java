@@ -2611,37 +2611,37 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
+        // Get and check the name.
+        boolean ret = true;
+        String suggested = player.getSettlementName(null);
+        String name = gui.getInput(true, tile,
+            StringTemplate.key("nameColony.text"), suggested,
+            "nameColony.yes", "nameColony.no");
+        if (name == null) {
+            ret = false;
+        } else if (name.isEmpty()) {
+            gui.showErrorMessage("enterSomeText");
+            ret = false; // 0-length invalid.
+        } else if (player.getSettlementByName(name) != null) {
+            // Must be unique
+            gui.showInformationMessage(tile, StringTemplate
+                .template("nameColony.notUnique")
+                .addName("%name%", name));
+            ret = false;
+        }
+        if (!ret) {
+            player.putSettlementName(suggested);
+            return false;
+        }
+
         // Claim tile from other owners before founding a settlement.
         // Only native owners that we can steal, buy from, or use a
         // bonus center tile exception should be possible by this point.
         UnitWas unitWas = new UnitWas(unit);
-        boolean ret = true;
-        if (tile.getOwner() != null && !player.owns(tile)) {
-            if (!askClaimTile(player, tile, unit,
-                              player.getLandPrice(tile))
-                || !player.canClaimToFoundSettlement(tile)) {
-                ret = false;
-            }
-        }
-
-        // Get and check the name.
-        String name = null;
-        if (ret) {
-            name = player.getSettlementName(null);
-            name = gui.getInput(true, tile, StringTemplate.key("nameColony.text"),
-                                name, "nameColony.yes", "nameColony.no");
-            if (name == null) {
-                ret = false;
-            } else if (name.isEmpty()) {
-                gui.showErrorMessage("enterSomeText");
-                ret = false; // 0-length invalid.
-            } else if (player.getSettlementByName(name) != null) {
-                // Must be unique
-                gui.showInformationMessage(tile, StringTemplate
-                    .template("nameColony.notUnique")
-                    .addName("%name%", name));
-                ret = false;
-            }
+        if (tile.getOwner() != null && !player.owns(tile)
+            && (!askClaimTile(player, tile, unit, player.getLandPrice(tile))
+                || !player.canClaimToFoundSettlement(tile))) {
+            ret = false;
         }
 
         ret = ret && askServer().buildColony(name, unit)
@@ -2651,13 +2651,11 @@ public final class InGameController implements NetworkConstants {
             gui.setActiveUnit(null);
             gui.setSelectedTile(tile, false);
             gui.playSound("sound.event.buildingComplete");
-
             // Check units present for treasure cash-in as they are now
-            // suddenly in-colony.
-            for (Unit unitInTile : tile.getUnitList()) {
-                checkCashInTreasureTrain(unitInTile);
-            }
+            // at a colony.
+            for (Unit u : tile.getUnitList()) checkCashInTreasureTrain(u);
         }
+        if (!ret) player.putSettlementName(suggested);
         unitWas.fireChanges();
         updateControls();
         return ret;

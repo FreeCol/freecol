@@ -899,6 +899,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get the stem of the fallback settlement name.
+     *
+     * @return The base settlement name for this player.
+     */
+    private String baseSettlementName() {
+        return Messages.message((isEuropean()) ? "Colony" : "Settlement") + "-";
+    }
+    
+    /**
      * Gets a settlement name suitable for this player.
      *
      * @param random An optional pseudo-random number source.
@@ -915,14 +924,26 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         // Fallback method
-        final String base = Messages.message((isEuropean()) ? "Colony"
-            : "Settlement") + "-";
+        final String base = baseSettlementName();
         String name;
         int i = settlements.size() + 1;
         while (game.getSettlement(name = base + Integer.toString(i)) != null) {
             i++;
         }
         return name;
+    }
+
+    /**
+     * Puts a suggested settlement name back into the pool.
+     *
+     * @param name A formerly suggested settlement name.
+     */
+    public void putSettlementName(String name) {
+        if (settlementNames == null) return; // Can not happen
+        if (!name.startsWith(baseSettlementName())) {
+            // Only if it is not a fallback name
+            settlementNames.add(name);
+        }
     }
 
     /**
