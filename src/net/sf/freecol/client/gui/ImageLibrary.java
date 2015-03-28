@@ -682,10 +682,10 @@ public final class ImageLibrary {
                 image = getGoodsImage(goodsType);
             } else if (display instanceof Unit) {
                 Unit unit = (Unit)display;
-                image = getUnitImageIcon(unit).getImage();
+                image = getUnitImage(unit);
             } else if (display instanceof UnitType) {
                 UnitType unitType = (UnitType)display;
-                image = getUnitImageIcon(unitType).getImage();
+                image = getUnitImage(unitType);
             } else if (display instanceof Settlement) {
                 Settlement settlement = (Settlement)display;
                 image = getSettlementImage(settlement);
@@ -697,6 +697,7 @@ public final class ImageLibrary {
                 logger.warning("could not find image of unknown type for " + display);
                 return null;
             }
+
             if (image == null) {
                 logger.warning("could not find image for " + display);
                 return null;
@@ -725,6 +726,12 @@ public final class ImageLibrary {
             if (display instanceof GoodsType) {
                 GoodsType goodsType = (GoodsType)display;
                 image = getGoodsImage(goodsType, combinedScale);
+            } else if (display instanceof Unit) {
+                Unit unit = (Unit)display;
+                image = getUnitImage(unit, combinedScale);
+            } else if (display instanceof UnitType) {
+                UnitType unitType = (UnitType)display;
+                image = getUnitImage(unitType, combinedScale);
             } else if (display instanceof Settlement) {
                 Settlement settlement = (Settlement)display;
                 image = getSettlementImage(settlement, combinedScale);
@@ -734,29 +741,17 @@ public final class ImageLibrary {
             } else if (display instanceof Player) {
                 image = getCoatOfArmsImage(((Player)display).getNation(),
                     combinedScale);
-            }
-            if (image != null)
-                return new ImageIcon(image);
-            // TODO: change these to directly retrieve a scaled Image
-            if (display instanceof Unit) {
-                Unit unit = (Unit)display;
-                image = getUnitImageIcon(unit).getImage();
-            } else if (display instanceof UnitType) {
-                UnitType unitType = (UnitType)display;
-                image = getUnitImageIcon(unitType).getImage();
             } else {
                 logger.warning("could not find image of unknown type for "
                     + display);
                 return null;
             }
+
             if (image == null) {
                 logger.warning("could not find image for " + display);
                 return null;
             }
-            int width = (int)(image.getWidth(null) * scale);
-            int height = (int)(image.getHeight(null) * scale);
-            return new ImageIcon(image.getScaledInstance(
-                width, height, Image.SCALE_SMOOTH));
+            return new ImageIcon(image);
         } catch (Exception e) {
             logger.log(Level.WARNING, "could not find image", e);
             return null;
@@ -1240,9 +1235,47 @@ public final class ImageLibrary {
      * @param roleId The id of the unit role.
      * @param nativeEthnicity If true the unit is a former native.
      * @param grayscale If true draw in inactive/disabled-looking state.
+     * @param scale How much the image icon is scaled.
      * @return A suitable <code>ImageIcon</code>.
      */
     public static ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
+                                      boolean nativeEthnicity,
+                                      boolean grayscale, float scale) {
+        return new ImageIcon(getUnitImage(unitType,roleId,
+                                          nativeEthnicity,grayscale,scale));
+    }
+
+    public Image getUnitImage(Unit unit) {
+        return getUnitImage(unit.getType(), unit.getRole().getId(),
+            unit.hasNativeEthnicity(), false, scalingFactor);
+    }
+
+    public static Image getUnitImage(Unit unit, float scale) {
+        return getUnitImage(unit.getType(), unit.getRole().getId(),
+            unit.hasNativeEthnicity(), false, scale);
+    }
+
+    public Image getUnitImage(UnitType unitType) {
+        return getUnitImage(unitType, unitType.getDisplayRoleId(),
+            false, false, scalingFactor);
+    }
+
+    public static Image getUnitImage(UnitType unitType, float scale) {
+        return getUnitImage(unitType, unitType.getDisplayRoleId(),
+            false, false, scale);
+    }
+
+    /**
+     * Gets the image that will represent a given unit.
+     *
+     * @param unitType The type of unit to be represented.
+     * @param roleId The id of the unit role.
+     * @param nativeEthnicity If true the unit is a former native.
+     * @param grayscale If true draw in inactive/disabled-looking state.
+     * @param scale How much the image is scaled.
+     * @return A suitable <code>Image</code>.
+     */
+    public static Image getUnitImage(UnitType unitType, String roleId,
                                       boolean nativeEthnicity,
                                       boolean grayscale, float scale) {
         // units that can only be native don't need the .native key part
@@ -1271,6 +1304,6 @@ public final class ImageLibrary {
             return null;
             // Consider throwing a RuntimeException.
         }
-        return new ImageIcon(image);
+        return image;
     }
 }
