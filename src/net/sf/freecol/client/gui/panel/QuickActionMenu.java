@@ -149,7 +149,7 @@ public final class QuickActionMenu extends JPopupMenu {
         this.setLabel("Unit");
         ImageIcon unitIcon = ImageLibrary.getUnitImageIcon(unit, 0.66f);
         JMenuItem name = new JMenuItem(unit.getDescription(Unit.UnitLabelType.NATIONAL)
-            + " (" + Messages.message("menuBar.colopedia") + ")", unitIcon);
+            + " (" + Messages.message("colopedia") + ")", unitIcon);
         name.setActionCommand(UnitAction.COLOPEDIA.toString());
         name.addActionListener(unitLabel);
         this.add(name);
@@ -691,7 +691,7 @@ public final class QuickActionMenu extends JPopupMenu {
 
         this.setLabel(Messages.message("cargo"));
         JMenuItem name = new JMenuItem(Messages.getName(goods)
-            + " (" + Messages.message("menuBar.colopedia") + ")",
+            + " (" + Messages.message("colopedia") + ")",
             ImageLibrary.getScaledGoodsImageIcon(goods.getType(), 0.66f));
         name.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -798,7 +798,7 @@ public final class QuickActionMenu extends JPopupMenu {
 
         this.setLabel(Messages.message("cargo"));
         JMenuItem name = new JMenuItem(Messages.getName(ag)
-            + " (" + Messages.message("menuBar.colopedia") + ")",
+            + " (" + Messages.message("colopedia") + ")",
             ImageLibrary.getScaledGoodsImageIcon(ag.getType(), 0.66f));
         name.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {

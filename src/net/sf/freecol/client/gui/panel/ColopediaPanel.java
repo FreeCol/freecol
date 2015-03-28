@@ -72,7 +72,7 @@ public final class ColopediaPanel extends FreeColPanel
         super(freeColClient, new MigLayout("fill", 
                 "[200:]unrelated[550:, grow, fill]", "[][grow, fill][]"));
 
-        add(GUI.localizedHeader("menuBar.colopedia", false),
+        add(GUI.localizedHeader("colopedia", false),
             "span, align center");
 
         listPanel = new MigPanel("ColopediaPanelUI");
@@ -120,7 +120,7 @@ public final class ColopediaPanel extends FreeColPanel
      * @return The navigation tree.
      */
     private JTree buildTree() {
-        String name = Messages.message("menuBar.colopedia");
+        String name = Messages.message("colopedia");
         DefaultMutableTreeNode root
             = new DefaultMutableTreeNode(new ColopediaTreeItem(null, null, name, null));
 
