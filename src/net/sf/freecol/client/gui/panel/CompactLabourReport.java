@@ -230,7 +230,7 @@ public final class CompactLabourReport extends ReportPanel {
         }
 
         if (!isSummary()) {
-            ImageIcon icon = getUnitIcon(unitData.getUnitType());
+            ImageIcon icon = getLibrary().getUnitImageIcon(unitData.getUnitType());
             header.setIcon(icon);
             header.setIconTextGap(20);
         }
@@ -606,7 +606,7 @@ public final class CompactLabourReport extends ReportPanel {
         });
 
         if (!unitData.isSummary()) {
-            button.setIcon(getUnitIcon(unitData.getUnitType()));
+            button.setIcon(getLibrary().getUnitImageIcon(unitData.getUnitType()));
         }
 
         return button;
@@ -614,10 +614,6 @@ public final class CompactLabourReport extends ReportPanel {
 
     private GoodsType getGoodsType() {
         return isSummary() ? null : unitData.getUnitType().getExpertProduction();
-    }
-
-    private ImageIcon getUnitIcon(UnitType unitType) {
-        return getLibrary().getUnitImageIcon(unitType);
     }
 
     /**
