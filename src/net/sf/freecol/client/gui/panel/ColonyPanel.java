@@ -310,7 +310,6 @@ public final class ColonyPanel extends PortPanel
         constructionPanel = new ConstructionPanel(freeColClient, colony, true);
 
         inPortPanel = new ColonyInPortPanel();
-        inPortPanel.setBorder(GUI.localizedBorder("inPort"));
         inPortScroll = new JScrollPane(inPortPanel);
         inPortScroll.getVerticalScrollBar().setUnitIncrement(16);
         inPortScroll.setBorder(GUI.ETCHED_BORDER);
@@ -1431,6 +1430,7 @@ public final class ColonyPanel extends PortPanel
         public ColonyInPortPanel() {
             super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
 
+            setBorder(GUI.localizedBorder("inPort"));
             setLayout(new MigLayout("wrap 3, fill, insets 0"));
         }
 
@@ -1814,8 +1814,7 @@ public final class ColonyPanel extends PortPanel
                 Building building = getBuilding();
                 NoAddReason reason = building.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    getGUI().showInformationMessage(building, "noAddReason."
-                        + reason.toString().toLowerCase(Locale.US));
+                    getGUI().showInformationMessage(building, reason.getKey());
                     return false;
                 }
 
@@ -2141,8 +2140,7 @@ public final class ColonyPanel extends PortPanel
                         }
                         break;
                     default: // Otherwise, can not use land
-                        getGUI().showInformationMessage(tile, "noClaimReason."
-                            + claim.toString().toLowerCase(Locale.US));
+                        getGUI().showInformationMessage(tile, claim.getKey());
                         return false;
                     }
                     // Check reason again, claim should be satisfied.
@@ -2154,8 +2152,7 @@ public final class ColonyPanel extends PortPanel
                 // Claim sorted, but complain about other failure.
                 NoAddReason reason = colonyTile.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    getGUI().showInformationMessage(colonyTile, "noAddReason."
-                        + reason.toString().toLowerCase(Locale.US));
+                    getGUI().showInformationMessage(colonyTile, reason.getKey());
                     return false;
                 }
 

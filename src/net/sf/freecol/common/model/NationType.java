@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -34,9 +35,31 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  */
 public abstract class NationType extends FreeColGameObjectType {
 
-    public static enum SettlementNumber { LOW, AVERAGE, HIGH }
+    public static enum SettlementNumber {
+        LOW, AVERAGE, HIGH;
 
-    public static enum AggressionLevel { LOW, AVERAGE, HIGH }
+        /**
+         * Get a message key for this settlement number.
+         *
+         * @return A message key.
+         */
+        public String getKey() {
+            return toString().toLowerCase(Locale.US);
+        }
+    }
+
+    public static enum AggressionLevel {
+        LOW, AVERAGE, HIGH;
+
+        /**
+         * Get a message key for this aggression level.
+         *
+         * @return A message key.
+         */
+        public String getKey() {
+            return toString().toLowerCase(Locale.US);
+        }
+    }
 
 
     /** The number of settlements this Nation has. */

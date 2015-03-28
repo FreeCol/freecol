@@ -46,7 +46,6 @@ public final class ErrorPanel extends FreeColPanel {
     private static final String SHOW = "show";
 
 
-
     /**
      * Creates a panel to display the given error message.
      *

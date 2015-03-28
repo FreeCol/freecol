@@ -108,6 +108,6 @@ public class FirstContactDialog extends FreeColConfirmDialog {
 
         ImageIcon icon = new ImageIcon(
             getImageLibrary().getCoatOfArmsImage(other.getNation()));
-        initializeConfirmDialog(false, panel, icon, "welcome.yes", "welcome.no");
+        initializeConfirmDialog(false, panel, icon, "yes", "no");
     }
 }

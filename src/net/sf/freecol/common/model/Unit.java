@@ -91,7 +91,16 @@ public class Unit extends GoodsLocation
         TO_AMERICA,
         // end @compat
         FORTIFYING,
-        SKIPPED
+        SKIPPED;
+
+        /**
+         * Get a message key for this unit state.
+         *
+         * @return A message key.
+         */
+        public String getKey() {
+            return toString().toLowerCase(Locale.US);
+        }
     }
 
 
@@ -3185,7 +3194,7 @@ public class Unit extends GoodsLocation
     // Miscellaneous more complex functionality
 
     /**
-     * Gets a key for the unit occupation.
+     * Get a message key for the unit occupation.
      *
      * @param owner True if the key should be for the owner of the unit.
      * @return A message key.
@@ -3203,8 +3212,7 @@ public class Unit extends GoodsLocation
                 ? (getWorkImprovement().getType().getId() + ".occupationString")
                 : (getState() == Unit.UnitState.ACTIVE && getMovesLeft() <= 0)
                 ? "model.unit.occupation.activeNoMovesLeft"
-                : ("model.unit.occupation."
-                    + getState().toString().toLowerCase(Locale.US)))
+                : ("model.unit.occupation." + getState().getKey()))
             : (isNaval())
             ? Integer.toString(getVisibleGoodsCount())
             : "model.unit.occupation.activeNoMovesLeft";

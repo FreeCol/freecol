@@ -93,13 +93,21 @@ public final class ImageLibrary {
         HORSE,
         FOOT;
 
+        /**
+         * Get a message key for this path type.
+         *
+         * @return A message key.
+         */
+        public String getKey() {
+            return toString().toLowerCase(Locale.US);
+        }
+
         public String getImageKey() {
-            return "path." + this.toString().toLowerCase(Locale.US) + ".image";
+            return "path." + getKey() + ".image";
         }
 
         public String getNextTurnImageKey() {
-            return "path." + this.toString().toLowerCase(Locale.US)
-                + ".nextTurn.image";
+            return "path." + getKey() + ".nextTurn.image";
         }
 
         /**

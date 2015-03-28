@@ -820,7 +820,6 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         this.goldOfferPanel = new GoldTradeItemPanel(player, gold);
 
         String tutorial = "";
-
         TradeContext context = agreement.getContext();
         switch (context) {
         case CONTACT:

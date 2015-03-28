@@ -185,11 +185,11 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
 
         panel.add(GUI.localizedLabel("colopedia.nationType.aggression"));
         panel.add(GUI.localizedLabel("colopedia.nationType.aggression."
-                + nationType.getAggression().toString().toLowerCase()));
+                + nationType.getAggression().getKey()));
 
         panel.add(GUI.localizedLabel("colopedia.nationType.numberOfSettlements"));
         panel.add(GUI.localizedLabel("colopedia.nationType.numberOfSettlements."
-                + nationType.getNumberOfSettlements().toString().toLowerCase()));
+                + nationType.getNumberOfSettlements().getKey()));
 
         panel.add(GUI.localizedLabel("colopedia.nationType.typeOfSettlements"));
         panel.add(new JLabel(Messages.getName(nationType.getCapitalType()),

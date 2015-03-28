@@ -497,7 +497,7 @@ public final class TilePopup extends JPopupMenu {
             occ = StringTemplate.key("model.unit.occupation.goingSomewhere");
         } else {
             occ = StringTemplate.key("model.unit.occupation."
-                + unit.getState().toString().toLowerCase());
+                + unit.getState().getKey());
         }
 
         String text = (indent ? "    " : "")

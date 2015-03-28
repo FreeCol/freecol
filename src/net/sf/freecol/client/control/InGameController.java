@@ -2595,8 +2595,7 @@ public final class InGameController implements NetworkConstants {
         case NATIVES: // Tile can still be claimed
             break;
         default:
-            gui.showInformationMessage("noClaimReason."
-                + reason.toString().toLowerCase(Locale.US));
+            gui.showInformationMessage("noClaimReason." + reason.getKey());
             return false;
         }
 

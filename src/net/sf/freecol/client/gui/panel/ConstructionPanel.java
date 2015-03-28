@@ -141,8 +141,7 @@ public class ConstructionPanel extends MigPanel
                 add(new JLabel(clickToBuild), "span, align center");
             }
         } else {
-            int turnsToComplete = colony.getTurnsToComplete(buildable);
-            String turnsStr = Messages.getTurnsText(turnsToComplete);
+            int turns = colony.getTurnsToComplete(buildable);
             // FIXME: distinguish national unit types
             Image image = (buildable instanceof BuildingType)
                 ? ImageLibrary.getBuildingImage(
@@ -152,10 +151,9 @@ public class ConstructionPanel extends MigPanel
             add(GUI.localizedLabel(StringTemplate
                     .template("colonyPanel.currentlyBuilding")
                     .addName("%buildable%", buildable)));
-
             add(GUI.localizedLabel(StringTemplate
                     .template("turnsToComplete.long")
-                    .addName("%number%", turnsStr)));
+                    .addName("%number%", Messages.getTurnsText(turns))));
 
             for (AbstractGoods ag : buildable.getRequiredGoods()) {
                 int amountNeeded = ag.getAmount();

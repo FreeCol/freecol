@@ -150,9 +150,9 @@ public class Tension {
     }
 
     /**
-     * Gets a message id for this tension.
+     * Get a message key for this tension.
      *
-     * @return A message id string.
+     * @return A message key.
      */
     public String getKey() {
         return "tension." + toString().toLowerCase(Locale.US);

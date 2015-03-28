@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -103,7 +104,16 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         /**
          * Either unclaimed or claimed but could be acquired.
          */
-        CLAIM_REQUIRED,
+        CLAIM_REQUIRED;
+
+        /**
+         * Get a message key describing this reason.
+         *
+         * @return A message key.
+         */
+        public String getKey() {
+            return "noAddReason." + toString().toLowerCase(Locale.US);
+        }
     }
 
     /** The Units present in this Location. */

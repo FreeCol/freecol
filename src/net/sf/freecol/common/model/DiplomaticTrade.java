@@ -46,6 +46,11 @@ public class DiplomaticTrade extends FreeColObject {
         TRADE,      /** Carrier trading */
         TRIBUTE;    /** Offensive unit demanding */
 
+        /**
+         * Get a message key for this trade context.
+         *
+         * @return A message key.
+         */
         public String getKey() {
             return this.toString().toLowerCase(Locale.US);
         }

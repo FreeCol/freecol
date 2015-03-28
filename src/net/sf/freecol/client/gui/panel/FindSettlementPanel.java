@@ -98,7 +98,6 @@ public final class FindSettlementPanel extends FreeColPanel
     private final JList<Settlement> settlementList;
 
 
-
     /**
      * Create a new panel.
      *
@@ -107,17 +106,11 @@ public final class FindSettlementPanel extends FreeColPanel
     public FindSettlementPanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap 1", "[align center]",
                                            "[]30[]30[]"));
-
-        JLabel header = GUI.localizedLabel("findSettlementPanel.name");
-        header.setFont(FontLibrary.SMALL_HEADER_FONT);
-        add(header);
-
         this.settlementList = new JList<>();
         this.settlementList.setCellRenderer(new SettlementRenderer());
         this.settlementList.setFixedCellHeight(48);
         this.settlementList.addListSelectionListener(this);
         this.settlementList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
         Action selectAction = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     selectSettlement();
@@ -126,7 +119,6 @@ public final class FindSettlementPanel extends FreeColPanel
         this.settlementList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"),
                                               "select");
         this.settlementList.getActionMap().put("select", selectAction);
-
         Action quitAction = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     getGUI().removeFromCanvas(FindSettlementPanel.this);
@@ -135,19 +127,15 @@ public final class FindSettlementPanel extends FreeColPanel
         this.settlementList.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"),
                                              "quit");
         this.settlementList.getActionMap().put("quit", quitAction);
-
-        MouseListener mouseListener = new MouseAdapter() {
+        this.settlementList.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() == 2) {
                         selectSettlement();
                     }
                 }
-            };
-        this.settlementList.addMouseListener(mouseListener);
-
+            });
         JScrollPane listScroller = new JScrollPane(this.settlementList);
         listScroller.setPreferredSize(new Dimension(250, 250));
-        add(listScroller, "width max(300, 100%), height max(300, 100%)");
 
         this.displayOptionBox = new JComboBox<>(new String[] {
                 Messages.message("findSettlementPanel.displayAll"),
@@ -155,8 +143,10 @@ public final class FindSettlementPanel extends FreeColPanel
                 Messages.message("findSettlementPanel.displayOnlyEuropean"),
             });
         this.displayOptionBox.addItemListener(this);
-        add(this.displayOptionBox);
 
+        add(GUI.localizedHeader(Messages.nameKey("findSettlementPanel"), true));
+        add(listScroller, "width max(300, 100%), height max(300, 100%)");
+        add(this.displayOptionBox);
         add(okButton, "tag ok");
 
         getGUI().restoreSavedSize(this, getPreferredSize());

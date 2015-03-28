@@ -44,7 +44,16 @@ public class FoundingFather extends FreeColGameObjectType {
         EXPLORATION,
         MILITARY,
         POLITICAL,
-        RELIGIOUS
+        RELIGIOUS;
+
+        /**
+         * Get a message key for this type.
+         *
+         * @return A message key.
+         */
+        public String getKey() {
+            return "model.foundingFather." + toString().toLowerCase(Locale.US);
+        }
     }
 
     /** The type of this FoundingFather. */
@@ -113,13 +122,13 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     /**
-     * Get a key for the type of a FoundingFather.
+     * Get a message key for the type of a FoundingFather.
      *
      * @param type The <code>FoundingFatherType</code> to make a key for.
-     * @return The type key.
+     * @return The message key.
      */
     public static String getTypeKey(FoundingFatherType type) {
-        return "model.foundingFather." + type.toString().toLowerCase(Locale.US);
+        return type.getKey();
     }
 
     /**

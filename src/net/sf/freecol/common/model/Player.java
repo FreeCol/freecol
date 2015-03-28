@@ -3256,7 +3256,16 @@ public class Player extends FreeColGameObject implements Nameable {
         SETTLEMENT,      // Settlement present
         WORKED,          // One of our settlements is working this tile
         EUROPEANS,       // Owned by Europeans and not for sale
-        NATIVES,         // Owned by natives and they want payment for it
+        NATIVES;         // Owned by natives and they want payment for it
+
+        /**
+         * Get a message key describing this reason.
+         *
+         * @return A message key.
+         */
+        public String getKey() {
+            return "noClaimReason." + toString().toLowerCase(Locale.US);
+        }
     };
 
     /**
