@@ -103,7 +103,7 @@ public final class FreeColClient {
     private ClientOptions clientOptions;
 
     /** A worker to perform game loading. */
-    public final Worker worker;
+    private final Worker worker;
 
     /**
      * Indicates if the game has started, has nothing to do with

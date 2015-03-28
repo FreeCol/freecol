@@ -318,7 +318,7 @@ public final class MapEditorController {
                     }
                 }
             };
-        freeColClient.worker.schedule(loadGameJob);
+        freeColClient.setWork(loadGameJob);
     }
 
     private void reloadMainPanel () {
