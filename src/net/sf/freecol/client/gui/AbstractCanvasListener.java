@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 
 import net.sf.freecol.client.ClientOptions;
@@ -106,22 +107,23 @@ public class AbstractCanvasListener {
      */
     private void scroll(int x, int y, int scrollSpace) {
         Direction direction;
+        Dimension size = mapViewer.getSize();
         if (x < scrollSpace && y < scrollSpace) { // Upper-Left
             direction = Direction.NW;
-        } else if (x >= mapViewer.getWidth() - scrollSpace
+        } else if (x >= size.width - scrollSpace
             && y < scrollSpace) { // Upper-Right
             direction = Direction.NE;
-        } else if (x >= mapViewer.getWidth() - scrollSpace
-            && y >= mapViewer.getHeight() - scrollSpace) { // Bottom-Right
+        } else if (x >= size.width - scrollSpace
+            && y >= size.height - scrollSpace) { // Bottom-Right
             direction = Direction.SE;
         } else if (x < scrollSpace
-            && y >= mapViewer.getHeight() - scrollSpace) { // Bottom-Left
+            && y >= size.height - scrollSpace) { // Bottom-Left
             direction = Direction.SW;
         } else if (y < scrollSpace) { // Top
             direction = Direction.N;
-        } else if (x >= mapViewer.getWidth() - scrollSpace) { // Right
+        } else if (x >= size.width - scrollSpace) { // Right
             direction = Direction.E;
-        } else if (y >= mapViewer.getHeight() - scrollSpace) { // Bottom
+        } else if (y >= size.height - scrollSpace) { // Bottom
             direction = Direction.S;
         } else if (x < scrollSpace) { // Left
             direction = Direction.W;

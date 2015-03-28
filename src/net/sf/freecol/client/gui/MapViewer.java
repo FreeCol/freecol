@@ -518,8 +518,8 @@ public final class MapViewer {
                     TextLayout layout = new TextLayout(versionStr, newFont, g.getFontRenderContext());
 
                     Rectangle2D bounds = layout.getBounds();
-                    float x = getWidth() - (float) bounds.getWidth() - 5;
-                    float y = getHeight() - (float) bounds.getHeight();
+                    float x = size.width - (float) bounds.getWidth() - 5;
+                    float y = size.height - (float) bounds.getHeight();
                     g.setColor(Color.white);
                     layout.draw(g, x, y);
 
@@ -687,21 +687,21 @@ public final class MapViewer {
     }
 
     /**
-     * Get the height of this GUI.
-     *
-     * @return The height of this GUI.
-     */
-    public int getHeight() {
-        return size.height;
-    }
-
-    /**
      * Get the current scale of the map.
      *
      * @return The current map scale.
      */
     public float getMapScale() {
         return lib.getScalingFactor();
+    }
+
+    /**
+     * Get the size of this GUI.
+     *
+     * @return The size of this GUI.
+     */
+    public Dimension getSize() {
+        return size;
     }
 
     /**
@@ -785,15 +785,6 @@ public final class MapViewer {
         } else {
             return null;
         }
-    }
-
-    /**
-     * Get the width of the map.
-     *
-     * @return The width of the map.
-     */
-    public int getWidth() {
-        return size.width;
     }
 
     /**
@@ -939,7 +930,7 @@ public final class MapViewer {
         this.focus = focus;
 
         forceReposition();
-        gui.getCanvas().paintImmediately(0, 0, getWidth(), getHeight());
+        gui.getCanvas().paintImmediately(0, 0, size.width, size.height);
     }
 
     /**
