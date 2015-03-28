@@ -61,7 +61,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         fileField.setDisabledTextColor(Color.BLACK);
         panel.add(fileField);
 
-        JButton browse = GUI.localizedButton("file.browse");
+        JButton browse = GUI.localizedButton("browse");
         if (editable) {
             browse.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -78,7 +78,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         }
         panel.add(browse);
 
-        JButton remove = GUI.localizedButton("option.remove");
+        JButton remove = GUI.localizedButton("remove");
         if (editable) {
             remove.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
