@@ -739,15 +739,6 @@ public final class MapViewer {
     }
 
     /**
-     * Get the height of tiles on the map.
-     *
-     * @return The tile height.
-     */
-    public int getTileHeight() {
-        return tileHeight;
-    }
-
-    /**
      * Gets the position of the given <code>Tile</code>
      * on the drawn map.
      *
@@ -767,12 +758,12 @@ public final class MapViewer {
     }
 
     /**
-     * Get the width of tiles on the map.
+     * Get the ratio of width/height of tiles on the map.
      *
-     * @return The tile width.
+     * @return The ratio.
      */
-    public int getTileWidth() {
-        return tileWidth;
+    public double getTileWidthHeightRatio() {
+        return tileWidth / (double)tileHeight;
     }
 
     /**
@@ -785,9 +776,9 @@ public final class MapViewer {
      */
     public Point getUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
         if (tileP != null) {
-            int labelX = tileP.x + getTileWidth()
+            int labelX = tileP.x + tileWidth
                 / 2 - unitLabel.getWidth() / 2;
-            int labelY = tileP.y + getTileHeight()
+            int labelY = tileP.y + tileHeight
                 / 2 - unitLabel.getHeight() / 2
                 - (int) (UNIT_OFFSET * lib.getScalingFactor());
             return new Point(labelX, labelY);
