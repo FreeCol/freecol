@@ -78,88 +78,47 @@ public final class IndianSettlementPanel extends FreeColPanel {
         settlementLabel.setText(text);
         add(settlementLabel);
 
-        Unit missionary = settlement.getMissionary();
+        final Unit missionary = settlement.getMissionary();
         if (missionary != null) {
-            String missionaryName = Messages.message(StringTemplate
-                .template("model.unit.nationUnit")
-                .addStringTemplate("%nation%",
-                    missionary.getOwner().getNationName())
-                .addStringTemplate("%unit%",
-                    missionary.getLabel(Unit.UnitLabelType.NATIONAL)));
-            add(new JLabel(missionaryName, imageLibrary.getSmallImageIcon(missionary), JLabel.CENTER));
+            add(GUI.localizedLabel(missionary.getLabel(Unit.UnitLabelType.NATIONAL),
+                    imageLibrary.getSmallImageIcon(missionary),
+                    JLabel.CENTER));
         }
 
         add(GUI.localizedLabel("indianSettlement.learnableSkill"), "newline");
-        UnitType skillType = settlement.getLearnableSkill();
-        if (visited) {
-            if (skillType == null) {
-                add(GUI.localizedLabel("indianSettlement.skillNone"));
-            } else {
-                add(new JLabel(Messages.getName(skillType),
-                        imageLibrary.getSmallImageIcon(skillType), JLabel.CENTER));
-            }
-        } else {
-            add(GUI.localizedLabel("indianSettlement.skillUnknown"));
-        }
+        final UnitType skillType = settlement.getLearnableSkill();
+        add(GUI.localizedLabel(settlement.getLearnableSkillLabel(visited),
+                ((visited && skillType != null)
+                    ? imageLibrary.getSmallImageIcon(skillType)
+                    : null),
+                JLabel.CENTER));
 
         add(GUI.localizedLabel("indianSettlement.mostHated"), "newline");
-        Player mostHated = settlement.getMostHated();
-        if (contacted) {
-            if (mostHated == null) {
-                add(GUI.localizedLabel("indianSettlement.mostHatedNone"));
-            } else {
-                add(GUI.localizedLabel(mostHated.getNationName(),
-                        imageLibrary.getSmallImageIcon(mostHated), JLabel.CENTER));
-            }
-        } else {
-            add(GUI.localizedLabel("indianSettlement.mostHatedUnknown"));
-        }
+        final Player mostHated = settlement.getMostHated();
+        add(GUI.localizedLabel(settlement.getMostHatedLabel(contacted),
+                ((contacted && mostHated != null)
+                    ? imageLibrary.getSmallImageIcon(mostHated)
+                    : null),
+                JLabel.CENTER));
 
         GoodsType[] wantedGoods = settlement.getWantedGoods();
-        int n = 0;
-        for (GoodsType wantedGood : wantedGoods) {
-            if (wantedGood != null) n++;
-        }
-        String sale;
+        final int n = (visited) ? settlement.getWantedGoodsAmount() : 2;
         add(GUI.localizedLabel("indianSettlement.highlyWanted"), "newline");
-        if (visited) {
-            if (wantedGoods[0] == null) {
-                add(GUI.localizedLabel("indianSettlement.wantedGoodsNone"));
-            } else {
-                sale = player.getLastSaleString(settlement, wantedGoods[0]);
-                add(new JLabel(Messages.getName(wantedGoods[0])
-                        + ((sale == null) ? "" : " " + sale),
-                        new ImageIcon(imageLibrary.getGoodsImage(wantedGoods[0])),
-                        JLabel.CENTER));
-                n--;
-            }
-        } else {
-            add(GUI.localizedLabel("indianSettlement.wantedGoodsUnknown"));
-        }
-
+        add(GUI.localizedLabel(settlement.getWantedGoodsLabel(0, player),
+                ((visited && wantedGoods[0] != null)
+                    ? new ImageIcon(imageLibrary.getGoodsImage(wantedGoods[0]))
+                    : null),
+                JLabel.CENTER));
         add(GUI.localizedLabel("indianSettlement.otherWanted"), "newline");
-        if (visited) {
-            if (n == 0) {
-                add(GUI.localizedLabel("indianSettlement.wantedGoodsNone"));
-            } else {
-                sale = player.getLastSaleString(settlement, wantedGoods[1]);
-                add(new JLabel(Messages.getName(wantedGoods[1])
-                        + ((sale == null) ? "" : " " + sale),
-                        new ImageIcon(imageLibrary.getGoodsImage(wantedGoods[1])),
-                        JLabel.CENTER),
-                    "split " + Integer.toString(n));
-                for (int i = 2; i < wantedGoods.length; i++) {
-                    if (wantedGoods[i] != null) {
-                        sale = player.getLastSaleString(settlement,wantedGoods[i]);
-                        add(new JLabel(Messages.getName(wantedGoods[i])
-                                + ((sale == null) ? "" : " " + sale),
-                                new ImageIcon(imageLibrary.getGoodsImage(wantedGoods[i])),
-                                JLabel.CENTER));
-                    }
-                }
-            }
-        } else {
-            add(GUI.localizedLabel("indianSettlement.wantedGoodsUnknown"));
+        String x = "split " + Integer.toString(n-1);
+        for (int i = 1; i < n; i++) {
+            add(GUI.localizedLabel(settlement.getWantedGoodsLabel(i, player),
+                    ((visited && wantedGoods[i] != null)
+                        ? new ImageIcon(imageLibrary.getGoodsImage(wantedGoods[i]))
+                        : null),
+                    JLabel.CENTER),
+                x);
+            x = null;
         }
 
         add(okButton, "newline 20, span, tag ok");

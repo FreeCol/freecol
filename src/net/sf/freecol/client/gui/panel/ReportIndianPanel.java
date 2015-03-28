@@ -128,7 +128,9 @@ public final class ReportIndianPanel extends ReportPanel {
                 .addStringTemplate("%stance%", opponent.getStance(player).getLabel())),
             "left, wrap 20");
 
-        if (!nativeSettlements.isEmpty()) {
+        if (nativeSettlements.isEmpty()) {
+            reportPanel.add(GUI.localizedLabel("report.indian.noKnownSettlements"));
+        } else {
             for (String key : headlines) {
                 JLabel head = GUI.localizedLabel(key);
                 head.setFont(FontLibrary.DEFAULT_BOLD_FONT);
@@ -162,77 +164,57 @@ public final class ReportIndianPanel extends ReportPanel {
                 settlementButton.addActionListener(this);
                 reportPanel.add(settlementButton, "newline 15");
 
-                JLabel missionLabel = new JLabel();
-                Unit missionary = settlement.getMissionary();
-                if (missionary == null) {
-                    missionLabel.setText("");
-                } else {
-                    boolean expert
-                        = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
-                    Image chip = lib.getMissionChip(missionary.getOwner(),
-                                                    expert);
-                    missionLabel.setIcon(new ImageIcon(chip));
-                    GUI.localizeToolTip(missionLabel, StringTemplate
-                        .template("model.unit.nationUnit")
-                        .addStringTemplate("%nation%",
-                            missionary.getOwner().getNationName())
-                        .addStringTemplate("%unit%",
-                            missionary.getLabel(Unit.UnitLabelType.NATIONAL)));
+                final Unit missionary = settlement.getMissionary();
+                JLabel missionLabel = new JLabel("");
+                if (missionary != null) {
+                    missionLabel.setIcon(new ImageIcon(lib
+                            .getMissionChip(missionary.getOwner(),
+                                missionary.hasAbility(Ability.EXPERT_MISSIONARY))));
+                    GUI.localizeToolTip(missionLabel, Messages
+                        .message(missionary.getLabel(Unit.UnitLabelType.NATIONAL)));
                 }
                 reportPanel.add(missionLabel);
 
-                String messageId
-                    = settlement.getShortAlarmLevelMessageId(player);
-                reportPanel.add(GUI.localizedLabel(messageId));
+                reportPanel.add(GUI.localizedLabel(settlement
+                        .getShortAlarmLevelMessageId(player)));
 
-                JLabel skillLabel = new JLabel();
-                skillLabel.setVerticalTextPosition(JLabel.TOP);
-                skillLabel.setHorizontalTextPosition(JLabel.CENTER);
-                UnitType skillType = settlement.getLearnableSkill();
-                String skillKey = settlement.getLearnableSkillKey(visited);
+                final UnitType skillType = settlement.getLearnableSkill();
+                JLabel skillLabel;
                 if (visited && skillType != null) {
+                    skillLabel = new JLabel("");
                     skillLabel.setIcon(ImageLibrary
                         .getUnitImageIcon(skillType, 0.66f));
+                    GUI.localizeToolTip(skillLabel, Messages
+                        .message(settlement.getLearnableSkillLabel(visited)));
+                } else {
+                    skillLabel = GUI.localizedLabel(settlement
+                        .getLearnableSkillLabel(visited));
                 }
-                skillLabel.setText(Messages.message(skillKey));
                 reportPanel.add(skillLabel);
 
-                Player mostHated = settlement.getMostHated();
-                JLabel mostHatedLabel = (contacted)
-                    ? (mostHated == null)
-                        ? GUI.localizedLabel("indianSettlement.mostHatedNone")
-                        : GUI.localizedLabel(mostHated.getNationName())
-                    : GUI.localizedLabel("indianSettlement.mostHatedUnknown");
-                reportPanel.add(mostHatedLabel);
+                reportPanel.add(GUI.localizedLabel(settlement
+                        .getMostHatedLabel(contacted)));
 
                 GoodsType[] wantedGoods = settlement.getWantedGoods();
-                if (visited) {
-                    if (wantedGoods[0] == null) {
-                        reportPanel.add(GUI.localizedLabel("indianSettlement.wantedGoodsNone"));
-                    } else {
-                        JLabel goodsLabel = GUI.localizedLabel(wantedGoods[0]);
+                final int n = (visited) ? settlement.getWantedGoodsAmount()
+                    : 1;
+                String x = (n > 1) ? "split " + Integer.toString(n) : null;
+                for (int i = 0; i < n; i++) {
+                    JLabel goodsLabel;
+                    if (visited && wantedGoods[i] != null) {
+                        goodsLabel = new JLabel("");
                         goodsLabel.setIcon(new ImageIcon(ImageLibrary
-                                .getGoodsImage(wantedGoods[0], 0.66f)));
-                        String split = "flowy, split "
-                            + String.valueOf(wantedGoods.length);
-                        reportPanel.add(goodsLabel, split);
-                        for (int i = 1; i < wantedGoods.length; i++) {
-                            if (wantedGoods[i] != null) {
-                                String sale = player.getLastSaleString(settlement, wantedGoods[i]);
-                                goodsLabel = new JLabel(Messages.getName(wantedGoods[i])
-                                    + ((sale == null) ? "" : " " + sale));
-                                goodsLabel.setIcon(ImageLibrary
-                                    .getScaledGoodsImageIcon(wantedGoods[i], 0.5f));
-                                reportPanel.add(goodsLabel);
-                            }
-                        }
+                                .getGoodsImage(wantedGoods[i], 0.66f)));
+                        GUI.localizeToolTip(goodsLabel, Messages
+                            .message(settlement.getWantedGoodsLabel(i, player)));
+                    } else {
+                        goodsLabel = GUI.localizedLabel(settlement
+                            .getWantedGoodsLabel(i, player));
                     }
-                } else {
-                    reportPanel.add(GUI.localizedLabel("indianSettlement.wantedGoodsUnknown"));
+                    reportPanel.add(goodsLabel, x);
+                    x = null;
                 }
-            }
-        } else {
-            reportPanel.add(GUI.localizedLabel("report.indian.noKnownSettlements"));
+            }                
         }
     }
 }

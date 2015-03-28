@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
@@ -276,17 +277,18 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
-     * Get a message key appropriate to the current skill and whether
-     * the requestor has visited this settlement.
+     * Get a label appropriate to the current learnable skill
+     * and whether the requestor has visited this settlement.
      *
      * @param visited The visiting status.
-     * @return A message key describing the perceived skill.
+     * @return A <code>StringTemplate</code> describing the perceived skill.
      */
-    public String getLearnableSkillKey(boolean visited) {
-        return (visited)
-            ? ((learnableSkill == null) ? "indianSettlement.skillNone"
+    public StringTemplate getLearnableSkillLabel(boolean visited) {
+        return StringTemplate.key((visited)
+            ? ((learnableSkill == null)
+                ? "indianSettlement.skillNone"
                 : learnableSkill.getNameKey())
-            : "indianSettlement.skillUnknown";
+            : "indianSettlement.skillUnknown");
     }
             
     /**
@@ -390,6 +392,42 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
+     * Get the number of wanted goods.  If any members of the array
+     * are null, we assume that subsequent ones are too.
+     *
+     * @return The number of wanted goods.
+     */
+    public int getWantedGoodsAmount() {
+        int n = 0;
+        for (GoodsType gt : wantedGoods) if (gt != null) n++;
+        return n;
+    }
+
+    /**
+     * Get a label for one of the wanted goods.
+     *
+     * @param index The index into the wanted goods.
+     * @param player The requesting <code>Player</code>.
+     * @return A suitable <code>StringTemplate</code>.
+     */
+    public StringTemplate getWantedGoodsLabel(int index, Player player) {
+        StringTemplate ret;
+        if (hasVisited(player) && 0 <= index && index < wantedGoods.length) {
+            if (wantedGoods[index] == null) {
+                ret = StringTemplate.key("indianSettlement.wantedGoodsNone");
+            } else {
+                ret = StringTemplate.label("")
+                    .add(Messages.nameKey(wantedGoods[index]));
+                String sale = player.getLastSaleString(this, wantedGoods[index]);
+                if (sale != null) ret.addName(" " + sale);
+            }
+        } else {
+            ret = StringTemplate.key("indianSettlement.wantedGoodsUnknown");
+        }
+        return ret;
+    }                
+            
+    /**
      * Gets the most hated nation of this settlement.
      *
      * @return The most hated nation.
@@ -409,6 +447,22 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         this.mostHated = mostHated;
     }
 
+    /**
+     * Get a template for the current most hated nation, depending
+     * whether the requestor has contacted this settlement.
+     *
+     * @param contacted The contact status.
+     * @return A <code>StringTemplate</code> describing the perceived
+     *     most hated nation.
+     */
+    public StringTemplate getMostHatedLabel(boolean contacted) {
+        return (contacted)
+            ? ((mostHated == null)
+                ? StringTemplate.key("indianSettlement.mostHatedNone")
+                : mostHated.getNationName())
+            : StringTemplate.key("indianSettlement.mostHatedUnknown");
+    }
+            
     /**
      * Gets the contact level between this settlement and a player.
      *
