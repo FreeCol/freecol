@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -87,20 +88,18 @@ public class InformationPanel extends FreeColPanel {
             } else {
                 textPanel.add(GUI.getDefaultTextArea(texts[i], 30), "skip");
             }
-            StringTemplate disp = (fcos == null) ? null
-                : displayLabel(fcos[i]);
-            if (disp != null) {
-                JButton button = GUI.localizedButton(StringTemplate
-                    .template("informationPanel.display")
-                    .addStringTemplate("%object%", disp));
-                final FreeColObject fco = fcos[i];
-                button.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            displayFCO(gui, fco);
-                        }
-                    });
-                textPanel.add(button, "skip");
-            }
+            StringTemplate disp = displayLabel(fcos[i]);
+            if (disp == null) continue;
+            JButton button = GUI.localizedButton(StringTemplate
+                .template("informationPanel.display")
+                .addStringTemplate("%object%", disp));
+            final FreeColObject fco = fcos[i];
+            button.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        gui.displayObject(fco);
+                    }
+                });
+            textPanel.add(button, "skip");
         }
 
         JScrollPane scrollPane = new JScrollPane(textPanel,
@@ -123,53 +122,16 @@ public class InformationPanel extends FreeColPanel {
      * @return A <code>StringTemplate</code> label, or null if nothing found.
      */
     private StringTemplate displayLabel(FreeColObject fco) {
-        return (fco instanceof Colony)
-            ? ((getMyPlayer().owns((Colony)fco))
-                ? ((Colony)fco).getLocationLabel()
-                : null)
-
-            : (fco instanceof Europe)
-            ? ((Europe)fco).getLocationLabel()
-
-            : (fco instanceof IndianSettlement)
-            ? ((IndianSettlement)fco).getLocationLabel()
-
-            : (fco instanceof Tile)
-            ? ((((Tile)fco).hasSettlement())
-                ? displayLabel(((Tile)fco).getSettlement())
-                : StringTemplate.template("tile")
-                                .addAmount("%x%", ((Tile)fco).getX())
-                                .addAmount("%y%", ((Tile)fco).getY()))
+        return (fco instanceof Tile && ((Tile)fco).hasSettlement())
+            ? displayLabel(((Tile)fco).getSettlement())
 
             : (fco instanceof Unit)
             ? displayLabel((FreeColObject)((Unit)fco).getLocation())
 
-            : (fco instanceof WorkLocation)
-            ? ((WorkLocation)fco).getColony().getLocationLabel()
+            : (fco instanceof Location)
+            ? ((Location)fco).getLocationLabelFor(getMyPlayer())
 
             : null;
-    }
-
-    /**
-     * Handler for the display buttons on this panel.
-     *
-     * @param gui The <code>GUI</code> to display on.
-     * @param fco The <code>FreeColObject</code> to display.
-     */
-    private void displayFCO(GUI gui, FreeColObject fco) {
-        if (fco instanceof Colony) {
-            gui.showColonyPanel((Colony)fco, null);
-        } else if (fco instanceof Europe) {
-            gui.showEuropePanel();
-        } else if (fco instanceof IndianSettlement) {
-            gui.showIndianSettlementPanel((IndianSettlement)fco);
-        } else if (fco instanceof Tile) {
-            gui.setFocus((Tile)fco);
-        } else if (fco instanceof Unit) {
-            displayFCO(gui, (FreeColObject)(((Unit)fco).getLocation()));
-        } else if (fco instanceof WorkLocation) {
-            gui.showColonyPanel(((WorkLocation)fco).getColony(), null);
-        }
     }
 
 

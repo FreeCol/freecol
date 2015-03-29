@@ -131,6 +131,7 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.LanguageOption;
@@ -2090,6 +2091,30 @@ public class GUI {
                             boolean privateChat) {
         if (canvas == null) return;
         canvas.displayChat(senderName, message, privateChat);
+    }
+
+    /**
+     * Show the appropriate panel for an object.
+     *
+     * TODO: Improve OO.
+     *
+     * @param fco The <code>FreeColObject</code> to display.
+     */
+    public void displayObject(FreeColObject fco) {
+        if (canvas == null) return;
+        if (fco instanceof Colony) {
+            canvas.showColonyPanel((Colony)fco, null);
+        } else if (fco instanceof Europe) {
+            canvas.showEuropePanel();
+        } else if (fco instanceof IndianSettlement) {
+            canvas.showIndianSettlementPanel((IndianSettlement)fco);
+        } else if (fco instanceof Tile) {
+            setFocus((Tile)fco);
+        } else if (fco instanceof Unit) {
+            displayObject((FreeColObject)(((Unit)fco).getLocation()));
+        } else if (fco instanceof WorkLocation) {
+            displayObject(((WorkLocation)fco).getColony());
+        }
     }
 
     public LoadingSavegameDialog getLoadingSavegameDialog() {
