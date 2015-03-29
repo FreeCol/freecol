@@ -275,7 +275,8 @@ public final class ColonyPanel extends PortPanel
         selectedUnitLabel = null;
 
         // Make the colony label
-        this.nameBox.setFont(FontLibrary.SMALL_HEADER_FONT);
+        this.nameBox.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
+            FontLibrary.FontSize.SMALL));
         if (editable) {
             for (Colony c : freeColClient.getMySortedColonies()) {
                 this.nameBox.addItem(c);

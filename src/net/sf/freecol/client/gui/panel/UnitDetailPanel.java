@@ -108,7 +108,8 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         panel.setLayout(new MigLayout("wrap 4", "[]20[]40[]20[]"));
 
         JLabel name = GUI.localizedLabel(type);
-        name.setFont(FontLibrary.SMALL_HEADER_FONT);
+        name.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
+            FontLibrary.FontSize.SMALL));
         panel.add(name, "span, align center, wrap 40");
 
         panel.add(GUI.localizedLabel("colopedia.unit.offensivePower"));

@@ -75,7 +75,8 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
             : "monarchDialog.header.fromCrown";
         String hdr = Messages.message(hdrKey);
         JTextArea header = GUI.getDefaultTextArea(hdr);
-        header.setFont(FontLibrary.MEDIUM_HEADER_FONT);
+        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
+            FontLibrary.FontSize.MEDIUM));
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 2, insets 10",
                                                     "[]20[]"));

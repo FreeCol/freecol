@@ -409,7 +409,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
         JButton button = GUI.getLinkButton(colony.getName() + info, null,
             colony.getId());
         if (headline) {
-            button.setFont(FontLibrary.SMALL_HEADER_FONT);
+            button.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
+                FontLibrary.FontSize.SMALL));
         }
         button.addActionListener(this);
         return button;

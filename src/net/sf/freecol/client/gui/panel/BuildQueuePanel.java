@@ -570,7 +570,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
         // Create the components
         JLabel header = GUI.localizedLabel("colonyPanel.buildQueue");
-        header.setFont(FontLibrary.BIG_HEADER_FONT);
+        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
+            FontLibrary.FontSize.BIG));
 
         DefaultListModel<UnitType> units = new DefaultListModel<>();
         this.unitList = new JList<>(units);

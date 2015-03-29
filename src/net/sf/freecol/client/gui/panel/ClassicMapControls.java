@@ -57,7 +57,8 @@ public final class ClassicMapControls extends MapControls {
         super(freeColClient, false);
 
         am = freeColClient.getActionManager();
-        arrowFont = FontLibrary.SMALL_SIMPLE_FONT;
+        arrowFont = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+            FontLibrary.FontSize.SMALL, Font.BOLD);
 
         panel = new MigPanel();
         panel.setLayout(new MigLayout("wrap 3"));

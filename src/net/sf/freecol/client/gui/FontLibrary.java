@@ -30,27 +30,6 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class FontLibrary {
 
     private static final Logger logger = Logger.getLogger(FontLibrary.class.getName());
-    
-    /** Font to use for text areas. */
-    public static final Font DEFAULT_FONT
-        = ResourceManager.getFont("NormalFont").deriveFont(13f);
-    /** Bold version of the default font. */
-    public static final Font DEFAULT_BOLD_FONT
-        = DEFAULT_FONT.deriveFont(Font.BOLD);
-    /** Simple fonts for arrows, labels in panels etc. */
-    public static final Font TINY_SIMPLE_FONT
-        = ResourceManager.getFont("SimpleFont").deriveFont(Font.BOLD, 12f);
-    public static final Font SMALLER_SIMPLE_FONT
-        = ResourceManager.getFont("SimpleFont").deriveFont(Font.BOLD, 16f);
-    public static final Font SMALL_SIMPLE_FONT
-        = ResourceManager.getFont("SimpleFont").deriveFont(Font.BOLD, 24f);
-    /** Header fonts for reports etc. */
-    public static final Font SMALL_HEADER_FONT
-        = ResourceManager.getFont("HeaderFont").deriveFont(24f);
-    public static final Font MEDIUM_HEADER_FONT
-        = ResourceManager.getFont("HeaderFont").deriveFont(36f);
-    public static final Font BIG_HEADER_FONT
-        = ResourceManager.getFont("HeaderFont").deriveFont(48f);
 
     public static enum FontType {
         NORMAL,

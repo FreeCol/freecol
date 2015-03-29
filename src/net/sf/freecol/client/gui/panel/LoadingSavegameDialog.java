@@ -70,7 +70,8 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         panel.setOpaque(false);
 
         JLabel header = GUI.localizedLabel("LoadingSavegame.title", JLabel.CENTER);
-        header.setFont(FontLibrary.MEDIUM_HEADER_FONT);
+        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
+            FontLibrary.FontSize.MEDIUM));
         header.setBorder(GUI.blankBorder(20, 0, 0, 0));
 
         JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEFT));

@@ -92,7 +92,8 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
         panel.setLayout(new MigLayout("wrap 3, fillx, gapx 20", "", ""));
 
         JLabel name = GUI.localizedLabel(nation);
-        name.setFont(FontLibrary.SMALL_HEADER_FONT);
+        name.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
+            FontLibrary.FontSize.SMALL));
         panel.add(name, "span, align center, wrap 40");
 
         JLabel artLabel = new JLabel(new ImageIcon(ImageLibrary.getMonarchImage(nation)));

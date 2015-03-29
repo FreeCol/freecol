@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Font;
 import java.text.DateFormat;
 import java.util.List;
 
@@ -58,9 +59,11 @@ public final class ReportHighScoresPanel extends ReportPanel {
                             "span, wrap 10");
         }
 
+        Font font = FontLibrary.createFont(FontLibrary.FontType.HEADER,
+            FontLibrary.FontSize.SMALL);
         for (HighScore highScore : highScores) {
             JLabel scoreValue = new JLabel(String.valueOf(highScore.getScore()));
-            scoreValue.setFont(FontLibrary.SMALL_HEADER_FONT);
+            scoreValue.setFont(font);
             reportPanel.add(scoreValue);
 
             String messageId = (highScore.getIndependenceTurn() > 0)
@@ -70,7 +73,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
                 .addName("%name%", highScore.getPlayerName())
                 .addName("%nation%", highScore.getNewLandName());
             JLabel headline = GUI.localizedLabel(template);
-            headline.setFont(FontLibrary.SMALL_HEADER_FONT);
+            headline.setFont(font);
             reportPanel.add(headline,
                             "span, wrap 10");
             reportPanel.add(GUI.localizedLabel("report.highScores.turn"),

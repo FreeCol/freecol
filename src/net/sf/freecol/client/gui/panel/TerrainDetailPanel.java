@@ -99,7 +99,8 @@ public class TerrainDetailPanel
         }
 
         JLabel nameLabel = GUI.localizedLabel(tileType);
-        nameLabel.setFont(FontLibrary.SMALL_HEADER_FONT);
+        nameLabel.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
+            FontLibrary.FontSize.SMALL));
         panel.add(nameLabel, "span, align center");
 
         panel.add(GUI.localizedLabel("colopedia.terrain.terrainImage"), "spany 3");

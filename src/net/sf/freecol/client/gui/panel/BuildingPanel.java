@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
@@ -240,10 +241,11 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             super(freeColClient.getGUI().getImageLibrary()
                 .getMiscImageIcon("coin"));
 
-            image = ImageLibrary.getStringImage(freeColClient.getGUI().getCanvas()
-                .getGraphics(),
+            image = ImageLibrary.getStringImage(
+                freeColClient.getGUI().getCanvas().getGraphics(),
                 Integer.toString(number), getForeground(),
-                FontLibrary.TINY_SIMPLE_FONT);
+                FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+                    FontLibrary.FontSize.TINY, Font.BOLD));
         }
 
         /**

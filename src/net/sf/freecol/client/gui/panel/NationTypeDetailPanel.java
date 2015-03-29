@@ -117,7 +117,8 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
      */
     private void buildEuropeanNationTypeDetail(EuropeanNationType nationType, JPanel panel) {
 
-        Font boldFont = FontLibrary.SMALLER_SIMPLE_FONT;
+        Font boldFont = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+            FontLibrary.FontSize.SMALLER, Font.BOLD);
 
         Set<Ability> abilities = nationType.getAbilities();
         Set<Modifier> modifiers = nationType.getModifiers();
@@ -125,7 +126,8 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
         panel.setLayout(new MigLayout("wrap 2, gapx 20"));
 
         JLabel label = GUI.localizedLabel(nationType);
-        label.setFont(FontLibrary.SMALL_HEADER_FONT);
+        label.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
+            FontLibrary.FontSize.SMALL));
         panel.add(label, "span, align center, wrap 40");
 
         label = GUI.localizedLabel("colopedia.nationType.units");
@@ -180,7 +182,8 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
         panel.setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
 
         JLabel name = GUI.localizedLabel(nationType);
-        name.setFont(FontLibrary.SMALL_HEADER_FONT);
+        name.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
+            FontLibrary.FontSize.SMALL));
         panel.add(name, "span, align center, wrap 40");
 
         panel.add(GUI.localizedLabel("colopedia.nationType.aggression"));
@@ -193,8 +196,8 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
 
         panel.add(GUI.localizedLabel("colopedia.nationType.typeOfSettlements"));
         panel.add(new JLabel(Messages.getName(nationType.getCapitalType()),
-                             new ImageIcon(getLibrary().getSettlementImage(nationType.getCapitalType())),
-                             SwingConstants.CENTER));
+            new ImageIcon(getLibrary().getSettlementImage(nationType.getCapitalType())),
+            SwingConstants.CENTER));
 
         List<String> regionNames = new ArrayList<>();
         for (String regionName : nationType.getRegionNames()) {

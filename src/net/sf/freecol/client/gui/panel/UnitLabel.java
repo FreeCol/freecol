@@ -292,7 +292,7 @@ public final class UnitLabel extends JLabel
                     .addAmount("%turns%", unit.getTurnsForRepair()));
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
-                Font font = FontLibrary.DEFAULT_FONT;
+                Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY);
                 Image repairImage1 = ImageLibrary.getStringImage(g, underRepair1, Color.RED, font);
                 Image repairImage2 = ImageLibrary.getStringImage(g, underRepair2, Color.RED, font);
                 int textHeight = repairImage1.getHeight(null) + repairImage2.getHeight(null);

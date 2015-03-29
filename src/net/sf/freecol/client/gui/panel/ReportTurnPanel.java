@@ -131,7 +131,8 @@ public final class ReportTurnPanel extends ReportPanel {
                 if (message.getMessageType() != type) {
                     type = message.getMessageType();
                     JLabel headline = GUI.localizedLabel(message.getMessageTypeName());
-                    headline.setFont(FontLibrary.SMALL_HEADER_FONT);
+                    headline.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
+                        FontLibrary.FontSize.SMALL));
                     reportPanel.add(headline, "newline 20, skip, span");
                 }
                 break;
@@ -302,7 +303,8 @@ public final class ReportTurnPanel extends ReportPanel {
             headline = new JLabel(source.toString());
         }
 
-        headline.setFont(FontLibrary.SMALL_HEADER_FONT);
+        headline.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
+            FontLibrary.FontSize.SMALL));
         headline.setOpaque(false);
         headline.setForeground(GUI.LINK_COLOR);
         headline.setBorder(GUI.blankBorder(5, 0, 0, 0));

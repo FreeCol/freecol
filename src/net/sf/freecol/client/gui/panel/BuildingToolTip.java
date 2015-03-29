@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -53,7 +54,8 @@ public class BuildingToolTip extends JToolTip {
 
     private static final JLabel arrow = new JLabel("\u2192");
     static {
-        arrow.setFont(FontLibrary.SMALL_SIMPLE_FONT);
+        arrow.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+            FontLibrary.FontSize.SMALL, Font.BOLD));
     }
 
 
@@ -82,7 +84,8 @@ public class BuildingToolTip extends JToolTip {
         setLayout(layout);
 
         JLabel buildingName = new JLabel(Messages.getName(building));
-        buildingName.setFont(FontLibrary.SMALLER_SIMPLE_FONT);
+        buildingName.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+            FontLibrary.FontSize.SMALLER, Font.BOLD));
         add(buildingName, "span");
 
         ProductionInfo info = building.getProductionInfo();

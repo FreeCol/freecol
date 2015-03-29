@@ -1027,7 +1027,8 @@ public class GUI {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setFocusable(false);
-        textArea.setFont(FontLibrary.DEFAULT_FONT);
+        textArea.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY));
         textArea.setSize(textArea.getPreferredSize());
         return textArea;
     }
@@ -1195,8 +1196,8 @@ public class GUI {
      */
     public static JLabel localizedHeader(String key, boolean small) {
         JLabel header = new JLabel(Messages.message(key), JLabel.CENTER);
-        header.setFont((small) ? FontLibrary.SMALL_HEADER_FONT
-            : FontLibrary.BIG_HEADER_FONT);
+        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
+            (small) ? FontLibrary.FontSize.SMALL : FontLibrary.FontSize.BIG));
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         return header;
     }
