@@ -146,11 +146,8 @@ public class ImageResource extends Resource implements Resource.Preloadable {
 
             MediaTracker mt = new MediaTracker(_c);
             try {
-                // Use SCALE_REPLICATE instead of SCALE_SMOOTH to avoid
-                // ClassCastException.
-                // FIXME (perhaps): find a better solution.
                 Image scaled = im.getScaledInstance(d.width, d.height,
-                                                    Image.SCALE_REPLICATE);
+                                                    Image.SCALE_SMOOTH);
                 mt.addImage(scaled, 0, d.width, d.height);
                 mt.waitForID(0);
                 int result = mt.statusID(0, false);
