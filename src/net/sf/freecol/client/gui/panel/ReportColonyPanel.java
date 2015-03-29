@@ -802,11 +802,11 @@ public final class ReportColonyPanel extends ReportPanel
      * building to capacity.
      *
      * FTM then:
+     * - we should produce liberty until we max out the colony SoL
      * - assume that if we have upgraded the building we really do
      *   want to use it
-     * - we should produce hammers if we are not, or if we can upgrade
-     *   and existing unit
-     * - we should produce liberty until we max out the colony SoL
+     * - if we can upgrade an existing unit
+     * - if we are not producing the goods needed for the current build
      *
      * @param wl The <code>WorkLocation</code> where production is to occur.
      * @param goodsType The <code>GoodsType</code> to produce.
@@ -821,15 +821,26 @@ public final class ReportColonyPanel extends ReportPanel
         if (wl instanceof ColonyTile) {
             ret = true;
         } else if (wl instanceof Building) {
-            Building bu = (Building) wl;
-            Colony colony = wl.getColony();
-            ret = bu.canAddType(expert)
-                && (bu.getLevel() > 1
-                    || ("model.goods.hammers".equals(goodsType.getId())
-                        && (colony.getTotalProductionOf(goodsType) == 0
-                            || (unit != null && unit.getType() != expert)))
-                    || (goodsType.isLibertyType()
-                        && colony.getSoL() < 100));
+            Building bu = (Building)wl;
+            if (bu.canAddType(expert)) {
+                Colony colony = wl.getColony();
+                BuildableType bt;
+                if (goodsType.isLibertyType() && colony.getSoL() < 100) {
+                    ret = true;
+                } else if (bu.getLevel() > 1) {
+                    ret = true;
+                } else if (unit != null && unit.getType() != expert) {
+                    ret = true;
+                } else if (colony.getTotalProductionOf(goodsType) == 0
+                    && (bt = colony.getCurrentlyBuilding()) != null) {
+                    for (AbstractGoods ag : bt.getRequiredGoods()) {
+                        if (ag.getType() == goodsType) {
+                            ret = true;
+                            break;
+                        }
+                    }
+                }
+            }
         }
         return ret;
     }
