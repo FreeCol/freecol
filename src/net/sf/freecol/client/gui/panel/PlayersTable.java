@@ -135,26 +135,27 @@ public final class PlayersTable extends JTable {
         public Component getTableCellRendererComponent(JTable table,
             Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
-            Player player = (Player)table.getValueAt(row, PlayersTable.PLAYER_COLUMN);
-            NationType nationType = ((Nation)table.getValueAt(row, PlayersTable.NATION_COLUMN)).getType();
+            final Player player = (Player)table.getValueAt(row,
+                PlayersTable.PLAYER_COLUMN);
+            final NationType nationType = ((Nation)table.getValueAt(row,
+                    PlayersTable.NATION_COLUMN)).getType();
             JLabel label;
             switch (advantages) {
             case SELECTABLE:
-                return new JLabel(Messages.getName((player == null) ? nationType
+                return GUI.localizedLabel(Messages.nameKey((player == null)
+                        ? nationType
                         : player.getNationType()));
             case FIXED:
-                label = new JLabel(Messages.getName(nationType));
+                label = GUI.localizedLabel(Messages.nameKey(nationType));
                 break;
             case NONE:
             default:
-                label = new JLabel(Messages.getName("model.nationType.none"));
+                label = GUI.localizedLabel("none");
                 break;
             }
-            if (player != null && player.isReady()) {
-                label.setForeground(Color.GRAY);
-            } else {
-                label.setForeground(table.getForeground());
-            }
+            label.setForeground((player != null && player.isReady())
+                ? Color.GRAY
+                : table.getForeground());
             label.setBackground(table.getBackground());
             return label;
         }
