@@ -1189,17 +1189,6 @@ public final class ImageLibrary {
                                 false, false, scalingFactor);
     }
 
-    public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale) {
-        return getUnitImageIcon(unitType, unitType.getDisplayRoleId(),
-                                false, grayscale, scalingFactor);
-    }
-
-    public static ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale,
-                                      float scale) {
-        return getUnitImageIcon(unitType, unitType.getDisplayRoleId(),
-                                false, grayscale, scale);
-    }
-
     public static ImageIcon getUnitImageIcon(UnitType unitType, float scale) {
         return getUnitImageIcon(unitType, unitType.getDisplayRoleId(),
                                 false, false, scale);
@@ -1248,6 +1237,11 @@ public final class ImageLibrary {
     public Image getUnitImage(Unit unit) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), false, scalingFactor);
+    }
+
+    public Image getUnitImage(Unit unit, boolean grayscale) {
+        return getUnitImage(unit.getType(), unit.getRole().getId(),
+            unit.hasNativeEthnicity(), grayscale, scalingFactor);
     }
 
     public static Image getUnitImage(Unit unit, float scale) {

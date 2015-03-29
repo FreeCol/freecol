@@ -2159,7 +2159,7 @@ public final class MapViewer {
         boolean fade = (unit.getState() == Unit.UnitState.SENTRY)
             || (unit.hasTile()
                 && player != null && !player.canSee(unit.getTile()));
-        Image image = lib.getUnitImageIcon(unit, fade).getImage();
+        Image image = lib.getUnitImage(unit, fade);
         if (image == null) return; // Defend against resource failure
 
         Point p = getUnitImagePositionInTile(image);
@@ -2544,7 +2544,7 @@ public final class MapViewer {
      * @return A JLabel object with the unit's image.
      */
     private JLabel getUnitLabel(Unit unit) {
-        final Image unitImg = lib.getUnitImageIcon(unit).getImage();
+        final Image unitImg = lib.getUnitImage(unit);
         if (unitImg == null) return null;
 
         final int width = halfWidth + unitImg.getWidth(null)/2;
