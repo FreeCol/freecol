@@ -99,7 +99,7 @@ public final class MapViewer {
 
     private static final Logger logger = Logger.getLogger(MapViewer.class.getName());
 
-    public static enum BorderType { COUNTRY, REGION }
+    private static enum BorderType { COUNTRY, REGION }
 
 
     private static class TextSpecification {
@@ -227,8 +227,8 @@ public final class MapViewer {
     /** The amount of time before a message gets deleted (in milliseconds). */
     private static final int MESSAGE_AGE = 30000;
 
-    public static final int OVERLAY_INDEX = 100;
-    public static final int FOREST_INDEX = 200;
+    private static final int OVERLAY_INDEX = 100;
+    private static final int FOREST_INDEX = 200;
 
     private GeneralPath gridPath = null;
     private final GeneralPath fog = new GeneralPath();
