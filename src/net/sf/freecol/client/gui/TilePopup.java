@@ -184,7 +184,7 @@ public final class TilePopup extends JPopupMenu {
                     hasAnItem = true;
                 }
                 if (activeUnit.checkSetState(UnitState.SKIPPED)) {
-                    ji = GUI.localizedMenuItem("skipUnit");
+                    ji = GUI.localizedMenuItem("skip");
                     ji.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent event) {
                                 if (activeUnit.checkSetState(UnitState.SKIPPED)) {
