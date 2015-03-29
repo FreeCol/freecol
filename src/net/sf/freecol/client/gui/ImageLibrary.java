@@ -140,7 +140,7 @@ public final class ImageLibrary {
      * The constructor to use when needing an unscaled <code>ImageLibrary</code>.
      */
     public ImageLibrary() {
-        this(1);
+        this(1f);
     }
 
     /**
@@ -439,18 +439,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the bonus-image for the given tile.
-     *
-     * @param tile The <code>Tile</code> with the image on it.
-     * @return The bonus-image for the given tile.
-     */
-    public Image getBonusImage(Tile tile) {
-        return (tile.hasResource()) ? getBonusImage(tile.getTileItemContainer()
-            .getResource().getType())
-            : null;
-    }
-
-    /**
      * Returns the border terrain-image for the given type.
      *
      * @param type The type of the terrain-image to return.
@@ -547,6 +535,7 @@ public final class ImageLibrary {
      * @return The height of the terrain-image at the given index.
      */
     public int getCompoundTerrainImageHeight(TileType type) {
+        // TODO: Simplify method to not uselessly create images
         Image terrain = getTerrainImage(type, 0, 0);
         int height = terrain.getHeight(null);
         if (type != null) {
@@ -977,17 +966,6 @@ public final class ImageLibrary {
         String key = "model.tile.delta_" + direction
             + (magnitude == 1 ? "_small" : "_large");
         return ResourceManager.getImage(key, scalingFactor);
-    }
-
-    /**
-     * Returns the scaled goods-ImageIcon for a goods type.
-     *
-     * @param type The type of the goods-ImageIcon to return.
-     * @param scale The scale of the goods-ImageIcon to return.
-     * @return The goods-ImageIcon at the given index.
-     */
-    public static ImageIcon getScaledGoodsImageIcon(GoodsType type, float scale) {
-        return new ImageIcon(getGoodsImage(type, scale));
     }
 
     /**

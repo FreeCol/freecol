@@ -292,7 +292,7 @@ public final class QuickActionMenu extends JPopupMenu {
             t.addName("%claim%", "");
         }
         JMenuItem menuItem = GUI.localizedMenuItem(t,
-            ImageLibrary.getScaledGoodsImageIcon(type, 0.66f));
+            new ImageIcon(ImageLibrary.getGoodsImage(type, 0.66f)));
         menuItem.setActionCommand(UnitLabel.getWorkLabel(wl)
             + "/" + wl.getId() + "/" + type.getId()
             + "/" + ((claim) ? "!" : ""));
@@ -603,7 +603,7 @@ public final class QuickActionMenu extends JPopupMenu {
             break;
         }
         Icon icon = (change == null) ? null
-            : ImageLibrary.getScaledGoodsImageIcon(change.getType(), 0.66f);
+            : new ImageIcon(ImageLibrary.getGoodsImage(change.getType(), 0.66f));
 
         JMenuItem item = new JMenuItem(text, icon);
         final InGameController igc = freeColClient.getInGameController();
@@ -690,9 +690,9 @@ public final class QuickActionMenu extends JPopupMenu {
         final Goods goods = goodsLabel.getGoods();
 
         this.setLabel(Messages.message("cargo"));
-        JMenuItem name = new JMenuItem(Messages.getName(goods)
-            + " (" + Messages.message("colopedia") + ")",
-            ImageLibrary.getScaledGoodsImageIcon(goods.getType(), 0.66f));
+        JMenuItem name = new JMenuItem(
+            Messages.getName(goods) + " (" + Messages.message("colopedia") + ")",
+            new ImageIcon(ImageLibrary.getGoodsImage(goods.getType(), 0.66f)));
         name.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     gui.showColopediaPanel(goods.getType().getId());
@@ -797,9 +797,9 @@ public final class QuickActionMenu extends JPopupMenu {
         final Player player = freeColClient.getMyPlayer();
 
         this.setLabel(Messages.message("cargo"));
-        JMenuItem name = new JMenuItem(Messages.getName(ag)
-            + " (" + Messages.message("colopedia") + ")",
-            ImageLibrary.getScaledGoodsImageIcon(ag.getType(), 0.66f));
+        JMenuItem name = new JMenuItem(
+            Messages.getName(ag) + " (" + Messages.message("colopedia") + ")",
+            new ImageIcon(ImageLibrary.getGoodsImage(ag.getType(), 0.66f)));
         name.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     gui.showColopediaPanel(ag.getType().getId());
