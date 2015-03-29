@@ -383,7 +383,7 @@ public final class QuickActionMenu extends JPopupMenu {
         if (container.getItemCount() > 0) this.add(container);
 
         if (current != null && unit.getWorkType() != null) {
-            JMenuItem ji = GUI.localizedMenuItem("showProductivity");
+            JMenuItem ji = GUI.localizedMenuItem("showProduction");
             ji.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         gui.showWorkProductionPanel(unit);
