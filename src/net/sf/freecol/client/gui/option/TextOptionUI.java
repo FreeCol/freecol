@@ -54,6 +54,7 @@ public final class TextOptionUI extends OptionUI<TextOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JTextField getComponent() {
         return box;
     }
@@ -61,6 +62,7 @@ public final class TextOptionUI extends OptionUI<TextOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateOption() {
         getOption().setValue(box.getText());
     }
@@ -68,6 +70,7 @@ public final class TextOptionUI extends OptionUI<TextOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void reset() {
         box.setText(getOption().getValue());
     }

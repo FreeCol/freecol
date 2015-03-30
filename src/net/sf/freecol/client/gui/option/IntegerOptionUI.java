@@ -67,6 +67,7 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JComponent getComponent() {
         return spinner;
     }
@@ -74,6 +75,7 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateOption() {
         getOption().setValue((Integer) spinner.getValue());
     }
@@ -81,6 +83,7 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void reset() {
         spinner.setValue(getOption().getValue());
     }

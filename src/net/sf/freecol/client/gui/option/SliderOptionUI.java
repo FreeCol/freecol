@@ -74,6 +74,7 @@ public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JSlider getComponent() {
         return slider;
     }
@@ -81,6 +82,7 @@ public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateOption() {
         getOption().setValue(slider.getValue());
     }
@@ -88,6 +90,7 @@ public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void reset() {
         slider.setValue(getOption().getValue());
     }

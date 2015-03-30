@@ -82,6 +82,7 @@ final class UnitMoveAnimation {
 
         gui.executeWithUnitOutForAnimation(unit, sourceTile,
             new OutForAnimationCallback() {
+                @Override
                 public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
                     final Point srcPoint
                         = gui.getMapViewer().getUnitLabelPositionInTile(unitLabel, srcP);

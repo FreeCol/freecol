@@ -119,6 +119,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     }
 
 
+    @Override
     public void itemStateChanged(ItemEvent e) {
         JComboBox<String> box = roleUI.getComponent();
         DefaultComboBoxModel<String> model;
@@ -142,6 +143,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     /**
      * {@inheritDoc}
      */
+    @Override
     public ListCellRenderer getListCellRenderer() {
         return new AbstractUnitRenderer();
     }
@@ -149,6 +151,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     /**
      * {@inheritDoc}
      */
+    @Override
     public JPanel getComponent() {
         return panel;
     }
@@ -156,6 +159,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateOption() {
         typeUI.updateOption();
         roleUI.updateOption();
@@ -169,6 +173,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     /**
      * {@inheritDoc}
      */
+    @Override
     public void reset() {
         typeUI.reset();
         roleUI.reset();

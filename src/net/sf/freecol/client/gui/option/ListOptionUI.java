@@ -109,6 +109,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         }
 
         addButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     AbstractOption<T> oldValue
                         = list.getSelectedValue();
@@ -130,6 +131,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 }
             });
         editButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     Object object = list.getSelectedValue();
                     if (object != null) {
@@ -140,11 +142,13 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 }
             });
         removeButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     model.removeElementAt(list.getSelectedIndex());
                 }
             });
         upButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (list.getSelectedIndex() == 0) return;
                     final int index = list.getSelectedIndex();
@@ -155,6 +159,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                 }
             });
         downButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (list.getSelectedIndex() == model.getSize() - 1) return;
                     final int index = list.getSelectedIndex();
@@ -201,6 +206,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     /**
      * {@inheritDoc}
      */
+    @Override
     public JPanel getComponent() {
         return this.panel;
     }
@@ -208,6 +214,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateOption() {
         getOption().setValue(getValue());
     }
@@ -215,6 +222,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     /**
      * {@inheritDoc}
      */
+    @Override
     public void reset() {
         model.clear();
         for (AbstractOption<T> o : getOption().getValue()) {
@@ -227,6 +235,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     /**
      * {@inheritDoc}
      */
+    @Override
     public void valueChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting() == false) {
             boolean enabled = (isEditable() && list.getSelectedValue() != null);

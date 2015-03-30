@@ -167,6 +167,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent evt) {
         if (evt.getSource() == recordButton) {
             bl.startBlinking();
@@ -196,6 +197,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
             addMouseListener(this);
         }
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() > 1) {
                 startBlinking();
@@ -204,9 +206,13 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
         }
 
 
+        @Override
         public void mouseEntered(MouseEvent e) { /* No such event */ }
+        @Override
         public void mouseExited(MouseEvent e) { /* No such event */ }
+        @Override
         public void mousePressed(MouseEvent e) { /* No such event */ }
+        @Override
         public void mouseReleased(MouseEvent e) { /* No such event */ }
 
 
@@ -232,10 +238,13 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
             repaint();
         }
 
+        @Override
         public void keyPressed(KeyEvent e) { /* No such event */ }
 
+        @Override
         public void keyTyped(KeyEvent e) { /* No such event */ }
 
+        @Override
         public void keyReleased(KeyEvent e) {
             KeyStroke ks = KeyStroke.getKeyStroke(e.getKeyCode(), e.getModifiers());
             if (FreeColActionUI.this.optionGroupUI != null) {
@@ -254,6 +263,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (!hasFocus()) stopBlinking();
 
@@ -276,6 +286,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
     /**
      * {@inheritDoc}
      */
+    @Override
     public JPanel getComponent() {
         return panel;
     }
@@ -283,6 +294,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateOption() {
         getOption().setAccelerator(keyStroke);
     }
@@ -290,6 +302,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
     /**
      * {@inheritDoc}
      */
+    @Override
     public void reset() {
         keyStroke = getOption().getAccelerator();
         bl.setText(getHumanKeyStrokeText(keyStroke));

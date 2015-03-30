@@ -64,6 +64,7 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JComboBox<String> getComponent() {
         return box;
     }
@@ -71,6 +72,7 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateOption() {
         getOption().setValue((String)box.getSelectedItem());
     }
@@ -78,6 +80,7 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void reset() {
         box.setSelectedItem(getOption().getValue());
     }

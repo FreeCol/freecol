@@ -119,6 +119,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ListCellRenderer getListCellRenderer() {
         return new ModOptionRenderer();
     }
@@ -126,6 +127,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateOption() {
         getOption().setValue((FreeColModFile)this.box.getSelectedItem());
     }
@@ -133,6 +135,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JComboBox getComponent() {
         return this.box;
     }
@@ -140,6 +143,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void reset() {
         this.box.setSelectedItem(getOption().getValue());
     }

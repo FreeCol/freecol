@@ -62,6 +62,7 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JComboBox getComponent() {
         return box;
     }
@@ -69,6 +70,7 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateOption() {
         getOption().setValue((Language)box.getSelectedItem());
     }
@@ -76,6 +78,7 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void reset() {
         box.setSelectedItem(getOption().getValue());
     }

@@ -49,6 +49,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
     private final JLabel currentMixerLabel;
 
     private final ActionListener aHandler = new ActionListener () {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == button1) {
                     gui.playSound("sound.event.buildingComplete");
@@ -127,6 +128,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JPanel getComponent() {
         return panel;
     }
@@ -135,6 +137,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
      * Updates the value of the
      * {@link net.sf.freecol.common.option.Option} this object keeps.
      */
+    @Override
     public void updateOption() {
         getOption().setValue((MixerWrapper)cbox.getSelectedItem());
     }
@@ -142,6 +145,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
     /**
      * Reset with the value from the option.
      */
+    @Override
     public void reset() {
         cbox.setSelectedItem(getOption().getValue());
     }

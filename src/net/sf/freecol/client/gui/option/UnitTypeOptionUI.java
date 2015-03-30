@@ -80,6 +80,7 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JComboBox getComponent() {
         return box;
     }
@@ -87,6 +88,7 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateOption() {
         getOption().setValue((UnitType) box.getSelectedItem());
     }
@@ -94,6 +96,7 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void reset() {
         box.setSelectedItem(getOption().getValue());
     }

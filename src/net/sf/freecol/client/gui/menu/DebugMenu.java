@@ -99,6 +99,7 @@ public class DebugMenu extends JMenu {
         sc.setMnemonic(KeyEvent.VK_S);
         this.add(sc);
         sc.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     boolean val = ((JCheckBoxMenuItem)e.getSource()).isSelected();
                     FreeColDebugger.setDebugDisplayCoordinates(val);
@@ -114,6 +115,7 @@ public class DebugMenu extends JMenu {
         reveal.setMnemonic(KeyEvent.VK_R);
         this.add(reveal);
         reveal.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.revealMap(freeColClient, true);
                     reveal.setEnabled(false);
@@ -128,6 +130,7 @@ public class DebugMenu extends JMenu {
         //hide.setMnemonic(KeyEvent.VK_R);
         this.add(hide);
         hide.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.revealMap(freeColClient, false);
                     hide.setEnabled(false);
@@ -142,6 +145,7 @@ public class DebugMenu extends JMenu {
         searchTrace.setOpaque(false);
         this.add(searchTrace);
         searchTrace.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     boolean val = ((JCheckBoxMenuItem)e.getSource()).isSelected();
                     game.getMap().setSearchTrace(val);
@@ -160,6 +164,7 @@ public class DebugMenu extends JMenu {
         cvpMenu.add(cv1);
         bg.add(cv1);
         cv1.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     FreeColDebugger.setDebugDisplayColonyValuePlayer(null);
                     gui.refresh();
@@ -177,6 +182,7 @@ public class DebugMenu extends JMenu {
             bg.add(cv2);
             final Player fp = p;
             cv2.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         FreeColDebugger.setDebugDisplayColonyValuePlayer(fp);
                         gui.refresh();
@@ -191,6 +197,7 @@ public class DebugMenu extends JMenu {
         skipTurns.setMnemonic(KeyEvent.VK_T);
         this.add(skipTurns);
         skipTurns.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.skipTurns(freeColClient);
                 }
@@ -203,6 +210,7 @@ public class DebugMenu extends JMenu {
         addBuilding.setMnemonic(KeyEvent.VK_B);
         this.add(addBuilding);
         addBuilding.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.addBuildings(freeColClient, addBuilding.getText());
                 }
@@ -214,6 +222,7 @@ public class DebugMenu extends JMenu {
         addFather.setMnemonic(KeyEvent.VK_F);
         this.add(addFather);
         addFather.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.addFathers(freeColClient, addFather.getText());
                 }
@@ -225,6 +234,7 @@ public class DebugMenu extends JMenu {
         runMonarch.setMnemonic(KeyEvent.VK_M);
         this.add(runMonarch);
         runMonarch.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.setMonarchAction(freeColClient, runMonarch.getText());
                 }
@@ -236,6 +246,7 @@ public class DebugMenu extends JMenu {
         addGold.setMnemonic(KeyEvent.VK_G);
         this.add(addGold);
         addGold.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.addGold(freeColClient);
                 }
@@ -247,6 +258,7 @@ public class DebugMenu extends JMenu {
         addCrosses.setMnemonic(KeyEvent.VK_I);
         this.add(addCrosses);
         addCrosses.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.addImmigration(freeColClient);
                 }
@@ -258,6 +270,7 @@ public class DebugMenu extends JMenu {
         giveBells.setMnemonic(KeyEvent.VK_L);
         this.add(giveBells);
         giveBells.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.addLiberty(freeColClient);
                 }
@@ -270,6 +283,7 @@ public class DebugMenu extends JMenu {
         rng.setMnemonic(KeyEvent.VK_X);
         this.add(rng);
         rng.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.stepRNG(freeColClient);
                 }
@@ -281,6 +295,7 @@ public class DebugMenu extends JMenu {
         du.setOpaque(false);
         this.add(du);
         du.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.displayUnits(freeColClient);
                 }
@@ -294,6 +309,7 @@ public class DebugMenu extends JMenu {
 
         final JMenuItem monarchDialog = GUI.localizedMenuItem("menuBar.debug.displayMonarchPanel");
         monarchDialog.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     gui.showMonarchDialog(Monarch.MonarchAction.RAISE_TAX_WAR,
                         null, player.getMonarchKey());
@@ -303,6 +319,7 @@ public class DebugMenu extends JMenu {
 
         final JMenuItem errorMessage = GUI.localizedMenuItem("menuBar.debug.displayErrorMessage");
         errorMessage.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     gui.showErrorMessage(ERROR_MESSAGE);
                 }
@@ -316,6 +333,7 @@ public class DebugMenu extends JMenu {
         europeStatus.setMnemonic(KeyEvent.VK_E);
         this.add(europeStatus);
         europeStatus.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.displayEurope(freeColClient);
                 }
@@ -332,6 +350,7 @@ public class DebugMenu extends JMenu {
         dam.setMnemonic(KeyEvent.VK_A);
         this.add(dam);
         dam.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     boolean val = ((JCheckBoxMenuItem) e.getSource()).isSelected();
                     FreeColDebugger.setDebugShowMission(val);
@@ -349,6 +368,7 @@ public class DebugMenu extends JMenu {
                 | InputEvent.ALT_MASK));
         this.add(useAI);
         useAI.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.useAI(freeColClient);
                 }
@@ -359,6 +379,7 @@ public class DebugMenu extends JMenu {
         dami.setMnemonic(KeyEvent.VK_I);
         this.add(dami);
         dami.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     boolean val = ((JCheckBoxMenuItem) e.getSource()).isSelected();
                     FreeColDebugger.setDebugShowMissionInfo(val);
@@ -378,6 +399,7 @@ public class DebugMenu extends JMenu {
                 | InputEvent.ALT_MASK));
         this.add(compareMaps);
         compareMaps.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     DebugUtils.checkDesyncAction(freeColClient);
                 }
@@ -389,6 +411,7 @@ public class DebugMenu extends JMenu {
         //showResourceKeys.setMnemonic(KeyEvent.VK_R);
         this.add(showResourceKeys);
         showResourceKeys.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     Map<String, Resource> resources
                         = ResourceManager.getResources();
@@ -417,6 +440,7 @@ public class DebugMenu extends JMenu {
         //statistics.setMnemonic(KeyEvent.VK_I);
         this.add(statistics);
         statistics.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     gui.showStatisticsPanel();
                 }
@@ -429,6 +453,7 @@ public class DebugMenu extends JMenu {
         //gc.setMnemonic(KeyEvent.VK_G);
         this.add(gc);
         gc.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     System.gc();
                 }

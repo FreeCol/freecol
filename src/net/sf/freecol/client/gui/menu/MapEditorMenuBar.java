@@ -74,6 +74,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
     /**
      * Resets this menu bar.
      */
+    @Override
     public final void reset() {
         removeAll();
 
@@ -100,6 +101,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(SaveAction.id));
         JMenuItem playItem = GUI.localizedMenuItem("startGame");
         playItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     File startFile = FreeColDirectories.getStartMapFile();
                     freeColClient.getMapEditorController()

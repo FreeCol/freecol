@@ -66,6 +66,7 @@ public final class SelectOptionUI extends OptionUI<SelectOption> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JComponent getComponent() {
         return box;
     }
@@ -73,6 +74,7 @@ public final class SelectOptionUI extends OptionUI<SelectOption> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateOption() {
         getOption().setValue(box.getSelectedIndex());
     }
@@ -80,6 +82,7 @@ public final class SelectOptionUI extends OptionUI<SelectOption> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void reset() {
         box.setSelectedIndex(getOption().getValue());
     }

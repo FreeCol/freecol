@@ -206,10 +206,12 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
     /**
      * Update the value of the Option from the UI's component.
      */
+    @Override
     public abstract void updateOption();
 
     /**
      * Reset the value of the UI's component from the Option.
      */
+    @Override
     public abstract void reset();
 }
