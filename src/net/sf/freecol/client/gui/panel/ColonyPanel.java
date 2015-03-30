@@ -407,6 +407,7 @@ public final class ColonyPanel extends PortPanel
         final GUI gui = getGUI();
         this.nameBox.setEnabled(isEditable());
         this.nameBox.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     final Colony newColony = (Colony)nameBox.getSelectedItem();
                     closeColonyPanel();
@@ -665,6 +666,7 @@ public final class ColonyPanel extends PortPanel
             String menuTitle = sb.toString();
             subMenu = new JMenuItem(menuTitle, unitIcon);
             subMenu.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
@@ -681,6 +683,7 @@ public final class ColonyPanel extends PortPanel
                     + " " + Messages.message("inPort.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
@@ -696,6 +699,7 @@ public final class ColonyPanel extends PortPanel
                             + " " + unit.getDescription();
                         subMenu = new JMenuItem(menuTitle, unitIcon);
                         subMenu.addActionListener(new ActionListener() {
+                            @Override
                             public void actionPerformed(ActionEvent e) {
                                 unitMenu.addMenuItems(new UnitLabel(freeColClient, innerUnit));
                                 unitMenu.show(getGUI().getCanvas(), 0, 0);
@@ -711,6 +715,7 @@ public final class ColonyPanel extends PortPanel
                     + " " + Messages.message("outsideOfColony.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
@@ -798,6 +803,7 @@ public final class ColonyPanel extends PortPanel
     // Override PortPanel
 
     /**
+     * @param unitLabel
      * {@inheritDoc}
      */
     @Override
@@ -825,6 +831,7 @@ public final class ColonyPanel extends PortPanel
 
     /**
      * {@inheritDoc}
+     * @return 
      */
     @Override
     public boolean setSelectedUnit(Unit unit) {
@@ -937,6 +944,7 @@ public final class ColonyPanel extends PortPanel
      *
      * @return A sorted list of units on the colony tile.
      */
+    @Override
     public List<Unit> getUnitList() {
         return FreeColObject.getSortedCopy(colony.getTile().getUnitList());
     }
@@ -946,7 +954,9 @@ public final class ColonyPanel extends PortPanel
 
     /**
      * {@inheritDoc}
+     * @param event
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final Colony colony = getColony();
         final String command = event.getActionCommand();
@@ -959,7 +969,8 @@ public final class ColonyPanel extends PortPanel
             try {
                 cmd = Integer.parseInt(command);
             } catch (NumberFormatException nfe) {
-                logger.warning("Invalid action number: " + command);
+                logger.log(Level.WARNING,
+                        "Invalid action number: {0}", command);
                 return;
             }
             switch (cmd) {
@@ -1021,14 +1032,23 @@ public final class ColonyPanel extends PortPanel
 
     /**
      * {@inheritDoc}
+     * @param event
      */
+    @Override
     public void propertyChange(PropertyChangeEvent event) {
         final Colony colony = getColony();
         if (!isShowing() || colony == null) return;
         String property = event.getPropertyName();
-        logger.finest(colony.getName() + " change " + property
-                      + ": " + event.getOldValue()
-                      + " -> " + event.getNewValue());
+        logger.log(
+                Level.FINEST,
+                "{0} change {1}: {2} -> {3}",
+                new Object[]{
+                    colony.getName(),
+                    property,
+                    event.getOldValue(),
+                    event.getNewValue()
+                }
+        );
 
         if (property == null) {
             logger.warning("Null property change");
@@ -1072,8 +1092,11 @@ public final class ColonyPanel extends PortPanel
             // ColonyTiles and Buildings now have their own
             // propertyChangeListeners so {ColonyTile,Building}.UNIT_CHANGE
             // events should not arrive here.
-            logger.warning("Unknown property change event: "
-                           + event.getPropertyName());
+            logger.log(
+                    Level.WARNING,
+                    "Unknown property change event: {0}",
+                    event.getPropertyName()
+            );
         }
     }
 
@@ -1258,6 +1281,7 @@ public final class ColonyPanel extends PortPanel
             repaint();
         }
 
+        @Override
         public JToolTip createToolTip() {
             return new RebelToolTip(getFreeColClient(), getColony());
         }
@@ -1267,6 +1291,7 @@ public final class ColonyPanel extends PortPanel
 
         /**
          * {@inheritDoc}
+         * @return 
          */
         @Override
         public String getUIClassID() {
@@ -1361,6 +1386,7 @@ public final class ColonyPanel extends PortPanel
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Unit unit) {
             return !unit.isCarrier();
         }
@@ -1368,6 +1394,7 @@ public final class ColonyPanel extends PortPanel
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Goods goods) {
             return false;
         }
@@ -1375,6 +1402,7 @@ public final class ColonyPanel extends PortPanel
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component add(Component comp, boolean editState) {
             Container oldParent = comp.getParent();
             if (editState) {
@@ -1398,7 +1426,11 @@ public final class ColonyPanel extends PortPanel
                     initialize();
                     return comp;
                 } else {
-                    logger.warning("Invalid component: " + comp);
+                    logger.log(
+                            Level.WARNING,
+                            "Invalid component: {0}",
+                            comp
+                    );
                     return null;
                 }
             } else {
@@ -1411,6 +1443,7 @@ public final class ColonyPanel extends PortPanel
         // Override JPanel
 
         /**
+         * @return 
          * {@inheritDoc}
          */
         @Override
@@ -1476,7 +1509,9 @@ public final class ColonyPanel extends PortPanel
 
         /**
          * {@inheritDoc}
+         * @return 
          */
+        @Override
         public boolean accepts(Unit unit) {
             return unit.isCarrier();
         }
@@ -1582,6 +1617,7 @@ public final class ColonyPanel extends PortPanel
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Unit unit) {
             return false;
         }
@@ -1589,6 +1625,7 @@ public final class ColonyPanel extends PortPanel
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Goods goods) {
             return true;
         }
@@ -1596,10 +1633,15 @@ public final class ColonyPanel extends PortPanel
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof GoodsLabel)) {
-                    logger.warning("Invalid component: " + comp);
+                    logger.log(
+                            Level.WARNING,
+                            "Invalid component: {0}",
+                            comp
+                    );
                     return null;
                 }
                 comp.getParent().remove(comp);
@@ -1614,14 +1656,22 @@ public final class ColonyPanel extends PortPanel
 
         /**
          * {@inheritDoc}
+         * @param event
          */
+        @Override
         public void propertyChange(PropertyChangeEvent event) {
             final Colony colony = getColony();
             if (colony != null && event != null) {
-                logger.finest(colony.getName() + "-warehouse change "
-                    + event.getPropertyName()
-                    + ": " + event.getOldValue()
-                    + " -> " + event.getNewValue());
+                logger.log(
+                        Level.FINEST,
+                        "{0}-warehouse change {1}: {2} -> {3}",
+                        new Object[]{
+                            colony.getName(),
+                            event.getPropertyName(),
+                            event.getOldValue(),
+                            event.getNewValue()
+                        }
+                );
             }
             update();
         }
@@ -1744,6 +1794,7 @@ public final class ColonyPanel extends PortPanel
             implements DropTarget  {
 
             private final MouseAdapter buildQueueListener = new MouseAdapter() {
+                    @Override
                     public void mousePressed(MouseEvent e) {
                         getGUI().showBuildQueuePanel(getColony());
                     }
@@ -1828,6 +1879,7 @@ public final class ColonyPanel extends PortPanel
             /**
              * {@inheritDoc}
              */
+            @Override
             public boolean accepts(Unit unit) {
                 return unit.isPerson();
             }
@@ -1835,6 +1887,7 @@ public final class ColonyPanel extends PortPanel
             /**
              * {@inheritDoc}
              */
+            @Override
             public boolean accepts(Goods goods) {
                 return false;
             }
@@ -1842,6 +1895,7 @@ public final class ColonyPanel extends PortPanel
             /**
              * {@inheritDoc}
              */
+            @Override
             public Component add(Component comp, boolean editState) {
                 if (editState) {
                     if (comp instanceof UnitLabel) {
@@ -2130,13 +2184,25 @@ public final class ColonyPanel extends PortPanel
                     case NONE: case NATIVES:
                         if (igc().claimTile(tile, colony)
                             && tile.getOwningSettlement() == colony) {
-                            logger.info("Colony " + colony.getName()
-                                + " claims tile " + tile
-                                + " with unit " + unit.getId());
+                            logger.log(
+                                    Level.INFO, 
+                                    "Colony {0} claims tile {1} with unit {2}", 
+                                    new Object[]{
+                                        colony.getName(),
+                                        tile,
+                                        unit.getId()
+                                    }
+                            );
                         } else {
-                            logger.warning("Colony " + colony.getName()
-                                + " did not claim " + tile
-                                + " with unit " + unit.getId());
+                            logger.log(
+                                    Level.WARNING,
+                                    "Colony {0} did not claim {1} with unit {2}",
+                                    new Object[]{
+                                        colony.getName(),
+                                        tile,
+                                        unit.getId()
+                                    }
+                            );
                             return false;
                         }
                         break;
@@ -2185,6 +2251,7 @@ public final class ColonyPanel extends PortPanel
             /**
              * {@inheritDoc}
              */
+            @Override
             public boolean accepts(Unit unit) {
                 return unit.isPerson();
             }
@@ -2192,6 +2259,7 @@ public final class ColonyPanel extends PortPanel
             /**
              * {@inheritDoc}
              */
+            @Override
             public boolean accepts(Goods goods) {
                 return false;
             }
@@ -2199,6 +2267,7 @@ public final class ColonyPanel extends PortPanel
             /**
              * {@inheritDoc}
              */
+            @Override
             public Component add(Component comp, boolean editState) {
                 if (editState) {
                     if (comp instanceof UnitLabel) {
@@ -2221,12 +2290,20 @@ public final class ColonyPanel extends PortPanel
 
             /**
              * {@inheritDoc}
+             * @param event
              */
+            @Override
             public void propertyChange(PropertyChangeEvent event) {
                 String property = event.getPropertyName();
-                logger.finest(colonyTile.getId() + " change " + property
-                              + ": " + event.getOldValue()
-                              + " -> " + event.getNewValue());
+                logger.log(
+                        Level.FINEST,
+                        "{0} change {1}: {2} -> {3}",
+                        new Object[]{colonyTile.getId(),
+                            property,
+                            event.getOldValue(),
+                            event.getNewValue()
+                        }
+                );
                 ColonyPanel.this.updateProduction();
             }
 
@@ -2239,6 +2316,7 @@ public final class ColonyPanel extends PortPanel
              *
              * @param px The x coordinate to check.
              * @param py The y coordinate to check.
+             * @return 
              */
             @Override
             public boolean contains(int px, int py) {
