@@ -46,6 +46,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -80,8 +81,8 @@ public final class FindSettlementPanel extends FreeColPanel
                 .addStringTemplate("%nation%",
                     value.getOwner().getNationName());
             label.setText(Messages.message(template));
-            label.setIcon(new ImageIcon(getLibrary().getSettlementImage(value)
-                    .getScaledInstance(64, -1, Image.SCALE_SMOOTH)));
+            label.setIcon(new ImageIcon(ImageLibrary.getSettlementImage(value,
+                    new Dimension(64, -1))));
         }
     }
 

@@ -124,16 +124,17 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 Europe europe = (Europe)location;
                 Nation nation = europe.getOwner().getNation();
                 name = Messages.getName(europe);
-                this.icon = new ImageIcon(lib.getCoatOfArmsImage(nation)
-                    .getScaledInstance(-1, CELL_HEIGHT, Image.SCALE_SMOOTH));
+                this.icon = new ImageIcon(ImageLibrary.getCoatOfArmsImage(nation,
+                    new Dimension(-1, CELL_HEIGHT)));
             } else if (location instanceof Map) {
                 name = Messages.message(location.getLocationLabelFor(player));
                 this.icon = lib.getMiscImageIcon(ImageLibrary.LOST_CITY_RUMOUR);
             } else if (location instanceof Settlement) {
                 Settlement settlement = (Settlement) location;
                 name = Messages.message(settlement.getLocationLabelFor(player));
-                this.icon = new ImageIcon(lib.getSettlementImage(settlement)
-                    .getScaledInstance(64, -1, Image.SCALE_SMOOTH));
+                this.icon = new ImageIcon(ImageLibrary.getSettlementImage(
+                    settlement,
+                    new Dimension(64, -1)));
             }
             StringTemplate template = StringTemplate
                 .template("selectDestination.destinationTurns")

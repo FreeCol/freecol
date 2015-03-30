@@ -108,10 +108,8 @@ public class FreeColProgressBar extends JPanel {
 
         setBorder(GUI.PROGRESS_BORDER);
         if (goodsType != null) {
-            ImageIcon icon = ImageLibrary.getGoodsImageIcon(goodsType);
-            // scale to a height of 16px, preserving aspect ratio
-            image = icon.getImage()
-                .getScaledInstance(-1, iconHeight, Image.SCALE_SMOOTH);
+            image = ImageLibrary.getGoodsImage(goodsType,
+                new Dimension(-1, iconHeight));
             iconWidth = image.getWidth(this);
         }
         setPreferredSize(new Dimension(200, 20));

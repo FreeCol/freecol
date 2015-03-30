@@ -179,29 +179,18 @@ public final class UnitLabel extends JLabel
      */
     public void setSmall(boolean isSmall) {
         final ImageLibrary lib = gui.getImageLibrary();
-        ImageIcon imageIcon = lib.getUnitImageIcon(unit);
-        ImageIcon disabledImageIcon = lib.getUnitImageIcon(unit, true);
         if (isSmall) {
+            ImageIcon imageIcon = lib.getSmallUnitImageIcon(unit);
+            ImageIcon disabledImageIcon = lib.getSmallUnitImageIcon(unit, true);
             setPreferredSize(null);
-            if (imageIcon != null) {
-                // setIcon(new ImageIcon(imageIcon.getImage()
-                //     .getScaledInstance(imageIcon.getIconWidth() / 2,
-                //                        imageIcon.getIconHeight() / 2,
-                //                        Image.SCALE_DEFAULT)));
-                setIcon(new ImageIcon(imageIcon.getImage()
-                        .getScaledInstance((imageIcon.getIconWidth() / 3) * 2,
-                                           (imageIcon.getIconHeight() / 3) * 2,
-                                           Image.SCALE_SMOOTH)));
-            }
-            if (disabledImageIcon != null && imageIcon != null) {
-                setDisabledIcon(new ImageIcon(disabledImageIcon.getImage()
-                        .getScaledInstance((imageIcon.getIconWidth() / 3) * 2,
-                                           (imageIcon.getIconHeight() / 3) * 2,
-                                           Image.SCALE_SMOOTH)));
-            }
+
+            setIcon(imageIcon);
+            setDisabledIcon(disabledImageIcon);
             setBorder(GUI.blankBorder(0, 2, 0, 0));
             this.isSmall = true;
         } else {
+            ImageIcon imageIcon = lib.getUnitImageIcon(unit);
+            ImageIcon disabledImageIcon = lib.getUnitImageIcon(unit, true);
             if (unit.getLocation() instanceof ColonyTile) {
                 final Tile tile = unit.getLocation().getTile();
                 final TileType tileType = tile.getType();

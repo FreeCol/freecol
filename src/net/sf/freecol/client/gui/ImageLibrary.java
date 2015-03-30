@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -471,6 +472,10 @@ public final class ImageLibrary {
         return ResourceManager.getImage(nation.getId() + ".image", scale);
     }
 
+    public static Image getCoatOfArmsImage(Nation nation, Dimension size) {
+        return ResourceManager.getImage(nation.getId() + ".image", size);
+    }
+
     /**
      * Returns the coat-of-arms image for the given Nation.
      *
@@ -598,6 +603,10 @@ public final class ImageLibrary {
 
     public static Image getGoodsImage(GoodsType goodsType, float scale) {
         return ResourceManager.getImage(goodsType.getId() + ".image", scale);
+    }
+
+    public static Image getGoodsImage(GoodsType goodsType, Dimension size) {
+        return ResourceManager.getImage(goodsType.getId() + ".image", size);
     }
 
     /**
@@ -989,6 +998,10 @@ public final class ImageLibrary {
         return ResourceManager.getImage(settlement.getImageKey(), scale);
     }
 
+    public static Image getSettlementImage(Settlement settlement, Dimension size) {
+        return ResourceManager.getImage(settlement.getImageKey(), size);
+    }
+
     /**
      * Returns the graphics that will represent the given settlement.
      *
@@ -1154,6 +1167,16 @@ public final class ImageLibrary {
     public static ImageIcon getUnitImageIcon(Unit unit, float scale) {
         return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), false, scale);
+    }
+
+    public ImageIcon getSmallUnitImageIcon(Unit unit) {
+        return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
+            unit.hasNativeEthnicity(), false, scalingFactor * (2f/3f));
+    }
+
+    public ImageIcon getSmallUnitImageIcon(Unit unit, boolean grayscale) {
+        return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
+            unit.hasNativeEthnicity(), grayscale, scalingFactor * (2f/3f));
     }
 
     /**
