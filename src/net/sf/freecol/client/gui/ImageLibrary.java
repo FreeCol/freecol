@@ -29,6 +29,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
@@ -262,6 +263,18 @@ public final class ImageLibrary {
 
         g.dispose();
         return bi;
+    }
+
+    public static BufferedImage createResizedImage(Image image,
+                                                  int width, int height) {
+        BufferedImage scaled = new BufferedImage(width, height,
+            BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = scaled.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+            RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.drawImage(image, 0, 0, width, height, null);
+        g.dispose();
+        return scaled;
     }
 
     /**

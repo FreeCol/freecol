@@ -44,6 +44,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -149,11 +150,10 @@ public final class ReportTurnPanel extends ReportPanel {
                     Image image = icon.getImage();
                     int newWidth = (int)((double)image.getWidth(null)
                         / image.getHeight(null)*40.0);
-                    image = image.getScaledInstance(newWidth, 40,
-                                                    Image.SCALE_SMOOTH);
-                    icon.setImage(image);
+                    icon.setImage(ImageLibrary.createResizedImage(
+                        image, newWidth, 40));
                 }
-                
+
                 if (messageDisplay instanceof Colony
                     || messageDisplay instanceof Europe) {
                     JButton button = GUI.getLinkButton(null, icon,

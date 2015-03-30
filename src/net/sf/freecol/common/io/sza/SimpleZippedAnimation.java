@@ -20,8 +20,10 @@
 package net.sf.freecol.common.io.sza;
 
 import java.awt.Component;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MediaTracker;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -212,16 +214,15 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
             final int width = (int) (image.getWidth(null) * scale);
             final int height = (int) (image.getHeight(null) * scale);
             
-            MediaTracker mt = new MediaTracker(_c);
-            final Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-            mt.addImage(scaledImage, 0, width, height);
-            try {
-                mt.waitForID(0);
-            } catch (InterruptedException e) {
-                return null;
-            }
+            BufferedImage scaled = new BufferedImage(width, height,
+                BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = scaled.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            g.drawImage(image, 0, 0, width, height, null);
+            g.dispose();
 
-            return new ImageAnimationEventImpl(scaledImage, durationInMs);
+            return new ImageAnimationEventImpl(scaled, durationInMs);
         }
     }
 }

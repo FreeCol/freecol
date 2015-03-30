@@ -21,8 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.MediaTracker;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -38,6 +36,7 @@ import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -51,6 +50,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
@@ -107,7 +107,6 @@ public final class DefaultTransferHandler extends TransferHandler {
                             return;
                         }
 
-                        Image image;
                         if (bestSize.width > bestSize.height) {
                             bestSize.height = (int)((((double)bestSize.width)
                                     / ((double)imageIcon.getIconWidth()))
@@ -117,25 +116,15 @@ public final class DefaultTransferHandler extends TransferHandler {
                                     / ((double)imageIcon.getIconHeight()))
                                 * imageIcon.getIconWidth());
                         }
-                        image = imageIcon.getImage().getScaledInstance(bestSize.width,
-                            bestSize.height, Image.SCALE_DEFAULT);
-
-                        // We have to use a MediaTracker to ensure that the
-                        // image has been scaled before we use it.
-                        MediaTracker mt = new MediaTracker(c);
-                        mt.addImage(image, 0, bestSize.width, bestSize.height);
-                        try {
-                            mt.waitForID(0);
-                        } catch (InterruptedException e) {
-                            dge.startDrag(null, t, this);
-                            return;
-                        }
+                        BufferedImage scaled = ImageLibrary.createResizedImage(
+                            imageIcon.getImage(),
+                            bestSize.width, bestSize.height);
 
                         Point point = new Point(bestSize.width / 2,
                                                 bestSize.height / 2);
                         Cursor cursor;
                         try {
-                            cursor = tk.createCustomCursor(image, point,
+                            cursor = tk.createCustomCursor(scaled, point,
                                                            "freeColDragIcon");
                         } catch (RuntimeException re) {
                             cursor = null;
