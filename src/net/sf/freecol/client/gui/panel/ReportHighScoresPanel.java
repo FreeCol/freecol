@@ -62,7 +62,8 @@ public final class ReportHighScoresPanel extends ReportPanel {
         Font font = FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.SMALL);
         for (HighScore highScore : highScores) {
-            JLabel scoreValue = new JLabel(String.valueOf(highScore.getScore()));
+            JLabel scoreValue
+                = new JLabel(String.valueOf(highScore.getScore()));
             scoreValue.setFont(font);
             reportPanel.add(scoreValue);
 
@@ -76,32 +77,39 @@ public final class ReportHighScoresPanel extends ReportPanel {
             headline.setFont(font);
             reportPanel.add(headline,
                             "span, wrap 10");
+
             reportPanel.add(GUI.localizedLabel("report.highScores.turn"),
                             "skip");
             int retirementTurn = highScore.getRetirementTurn();
             reportPanel.add((retirementTurn <= 0)
                 ? GUI.localizedLabel("notApplicable.short")
                 : GUI.localizedLabel(Turn.getLabel(retirementTurn)));
+
             reportPanel.add(GUI.localizedLabel("report.highScores.score"),
                             "skip");
             reportPanel.add(new JLabel(String.valueOf(highScore.getScore())));
+
             reportPanel.add(GUI.localizedLabel("report.highScores.difficulty"),
                             "skip");
-            reportPanel.add(new JLabel(Messages.getName(highScore.getDifficulty())));
+            reportPanel.add(GUI.localizedLabel(Messages.nameKey(highScore.getDifficulty())));
+
             reportPanel.add(GUI.localizedLabel("report.highScores.independence"),
                             "skip");
             int independenceTurn = highScore.getIndependenceTurn();
             reportPanel.add((independenceTurn <= 0)
                 ? GUI.localizedLabel("no")
                 : GUI.localizedLabel(Turn.getLabel(independenceTurn)));
+
             reportPanel.add(GUI.localizedLabel("report.highScores.nation"),
                             "skip");
-            reportPanel.add(new JLabel((highScore.getIndependenceTurn() > 0)
-                    ? highScore.getNationName()
-                    : highScore.getOldNationNameKey()));
+            reportPanel.add(GUI.localizedLabel((highScore.getIndependenceTurn() > 0)
+                    ? StringTemplate.name(highScore.getNationName())
+                    : StringTemplate.key(highScore.getOldNationNameKey())));
+
             reportPanel.add(GUI.localizedLabel("report.highScores.nationType"),
                             "skip");
             reportPanel.add(GUI.localizedLabel(Messages.nameKey(highScore.getNationTypeId())));
+
             reportPanel.add(GUI.localizedLabel("report.highScores.units"),
                             "skip");
             reportPanel.add(new JLabel(String.valueOf(highScore.getUnits())));
@@ -109,6 +117,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
             reportPanel.add(GUI.localizedLabel("report.highScores.colonies"),
                             "skip");
             reportPanel.add(new JLabel(String.valueOf(highScore.getColonies())));
+
             reportPanel.add(GUI.localizedLabel("report.highScores.retired"),
                             "skip");
             DateFormat format = DateFormat
@@ -116,7 +125,6 @@ public final class ReportHighScoresPanel extends ReportPanel {
             reportPanel.add(new JLabel(format.format(highScore.getDate())),
                             "wrap 20");
         }
-
         reportPanel.doLayout();
     }
 }
