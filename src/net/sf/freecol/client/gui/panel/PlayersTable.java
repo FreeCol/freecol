@@ -322,7 +322,7 @@ public final class PlayersTable extends JTable {
                                                       int index,
                                                       boolean isSelected,
                                                       boolean cellHasFocus) {
-            setText(Messages.message("nationState." + value));
+            setText(Messages.message(value.getKey()));
             return this;
         }
     }

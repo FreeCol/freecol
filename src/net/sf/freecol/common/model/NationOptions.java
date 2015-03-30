@@ -59,7 +59,20 @@ public class NationOptions extends FreeColObject {
      * Nations may be available to all players, to AI players only, or
      * to no players.
      */
-    public static enum NationState { AVAILABLE, AI_ONLY, NOT_AVAILABLE }
+    public static enum NationState {
+        AVAILABLE,
+        AI_ONLY,
+        NOT_AVAILABLE;
+
+        /**
+         * Get a message key for a nation state.
+         *
+         * @return A message key.
+         */
+        public String getKey() {
+            return "nationState." + this.toString();
+        }
+    }
 
     /** The specification to refer to. */
     private final Specification specification;
