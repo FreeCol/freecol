@@ -77,30 +77,37 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         super();
 
         setCurrentTheme(new DefaultMetalTheme() {
+                @Override
                 protected ColorUIResource getPrimary1() {
                     return new ColorUIResource(ResourceManager.getColor("lookAndFeel.primary1.color"));
                 }
 
+                @Override
                 protected ColorUIResource getPrimary2() {
                     return new ColorUIResource(ResourceManager.getColor("lookAndFeel.backgroundSelect.color"));
                 }
 
+                @Override
                 protected ColorUIResource getPrimary3() {
                     return new ColorUIResource(ResourceManager.getColor("lookAndFeel.primary3.color"));
                 }
 
+                @Override
                 protected ColorUIResource getSecondary1() {
                     return new ColorUIResource(ResourceManager.getColor("lookAndFeel.secondary1.color"));
                 }
 
+                @Override
                 protected ColorUIResource getSecondary2() {
                     return new ColorUIResource(ResourceManager.getColor("lookAndFeel.disabled.color"));
                 }
 
+                @Override
                 protected ColorUIResource getSecondary3() {
                     return new ColorUIResource(ResourceManager.getColor("lookAndFeel.background.color"));
                 }
 
+                @Override
                 public ColorUIResource getMenuDisabledForeground() {
                     return new ColorUIResource(ResourceManager.getColor("lookAndFeel.disabledMenu.color"));
                 }
@@ -112,6 +119,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
      *
      * @return The defaults table.
      */
+    @Override
     public UIDefaults getDefaults() {
         UIDefaults u = super.getDefaults();
 
@@ -208,6 +216,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
      *
      * @return "The default Look and Feel for FreeCol"
      */
+    @Override
     public String getDescription() {
         return "The default Look and Feel for FreeCol";
     }
@@ -218,6 +227,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
      *
      * @return "FreeCol Look and Feel"
      */
+    @Override
     public String getName() {
         return "FreeCol Look and Feel";
     }

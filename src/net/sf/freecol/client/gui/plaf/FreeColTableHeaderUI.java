@@ -38,6 +38,7 @@ public class FreeColTableHeaderUI extends BasicTableHeaderUI {
     }
 
 
+    @Override
     public void installUI(JComponent c) {
         super.installUI(c);
 

@@ -51,6 +51,7 @@ public class FreeColTextFieldUI extends BasicTextFieldUI {
         super.paintSafely(g);
     }
 
+    @Override
     public void paintBackground(java.awt.Graphics g) {
         JComponent c = getComponent();
 

@@ -35,12 +35,14 @@ public class FreeColComboBoxUI extends MetalComboBoxUI {
     }
 
 
+    @Override
     public void installUI(JComponent c) {
         super.installUI(c);
 
         c.setOpaque(false);
     }
 
+    @Override
     protected ListCellRenderer createRenderer() {
         return new FreeColComboBoxRenderer();
     }

@@ -153,6 +153,7 @@ public class VideoComponent extends JPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeNotify() {
         applet.stop();
         applet.destroy();

@@ -74,6 +74,7 @@ public class FreeColToolTipUI extends BasicToolTipUI {
         maximumWidth = width;
     }
 
+    @Override
     public void paint(Graphics g, JComponent c) {
         if (c.isOpaque()) {
             ImageLibrary.drawTiledImage("background.FreeColToolTip", g, c, null);
@@ -108,6 +109,7 @@ public class FreeColToolTipUI extends BasicToolTipUI {
         }
      }
 
+    @Override
     public Dimension getPreferredSize(JComponent c) {
         String tipText = ((JToolTip)c).getTipText();
         if (tipText == null || tipText.isEmpty()) {
@@ -139,10 +141,12 @@ public class FreeColToolTipUI extends BasicToolTipUI {
 
     }
 
+    @Override
     public Dimension getMinimumSize(JComponent c) {
         return getPreferredSize(c);
     }
 
+    @Override
     public Dimension getMaximumSize(JComponent c) {
         return getPreferredSize(c);
     }

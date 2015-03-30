@@ -36,6 +36,7 @@ public class FreeColRadioButtonUI extends BasicRadioButtonUI {
     }
 
 
+    @Override
     public void installUI(JComponent c) {
         super.installUI(c);
 

@@ -39,10 +39,12 @@ public class FreeColListUI extends BasicListUI {
     }
 
 
+    @Override
     public void installUI(JComponent c) {
         super.installUI(c);
     }
 
+    @Override
     public void paint(Graphics g, JComponent c) {
         ImageLibrary.drawTiledImage("background.FreeColList", g, c, null);
         LAFUtilities.setProperties(g, c);

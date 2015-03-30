@@ -42,6 +42,7 @@ public class FreeColSelectedPanelUI extends BasicPanelUI {
         return sharedInstance;
     }
 
+    @Override
     public void paint(Graphics g, JComponent c) {
         Graphics2D g2d = (Graphics2D) g;
         Composite oldComposite = g2d.getComposite();

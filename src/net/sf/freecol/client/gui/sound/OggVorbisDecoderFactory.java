@@ -98,6 +98,7 @@ public class OggVorbisDecoderFactory {
             this.offset = 0;
         }
 
+        @Override
         public void close() {
             oggSyncState.clear();
             oggStreamState.clear();
@@ -114,15 +115,18 @@ public class OggVorbisDecoderFactory {
          *
          * @return A number of bytes to read.
          */
+        @Override
         public int available() {
             return bufCount;
         }
 
+        @Override
         public int read() throws IOException {
             byte[] b = new byte[1];
             return (read(b) > 0) ? b[0] : -1;
         }
 
+        @Override
         public int read(byte[] buf) throws IOException {
             return read(buf, buf.length);
         }
@@ -163,6 +167,7 @@ public class OggVorbisDecoderFactory {
          * @param n The number of bytes to skip.
          * @return The actual number of bytes skipped.
          */
+        @Override
         public long skip(long n) throws IOException {
             long wr = 0;
             while (n > 0) {
@@ -186,6 +191,7 @@ public class OggVorbisDecoderFactory {
         //public void mark(int readLimit) {}
         //public boolean markSupported() { return false; }
 
+        @Override
         public void reset() {}
 
         /**
@@ -377,6 +383,7 @@ public class OggVorbisDecoderFactory {
             this.os = os;
         }
 
+        @Override
         public AudioFormat getFormat() {
             return os.getFormat();
         }
@@ -386,14 +393,17 @@ public class OggVorbisDecoderFactory {
         //    return frameLength;
         //}
 
+        @Override
         public int available() {
             return os.available();
         }
 
+        @Override
         public int read() throws IOException {
             return os.read();
         }
 
+        @Override
         public int read(byte[] buf) throws IOException {
             return os.read(buf);
         }
@@ -402,22 +412,27 @@ public class OggVorbisDecoderFactory {
             return os.read(buf, n);
         }
 
+        @Override
         public void close() {
             os.close();
         }
 
+        @Override
         public long skip(long n) throws IOException {
             return os.skip(n);
         }
 
+        @Override
         public void mark(int readLimit) {
             os.mark(readLimit);
         }
 
+        @Override
         public boolean markSupported() {
             return os.markSupported();
         }
 
+        @Override
         public void reset() {
             os.reset();
         }
@@ -435,6 +450,7 @@ public class OggVorbisDecoderFactory {
      *
      * @param file The <code>File</code> containing the content.
      * @return A new <code>AudioInputStream</code> to decode the input.
+     * @throws java.io.IOException
      */
     public AudioInputStream getOggStream(File file) throws IOException {
         FileInputStream fis = new FileInputStream(file);

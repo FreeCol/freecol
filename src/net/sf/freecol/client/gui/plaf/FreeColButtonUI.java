@@ -50,12 +50,14 @@ public class FreeColButtonUI extends MetalButtonUI {
         return sharedInstance;
     }
 
+    @Override
     public void installUI(JComponent c) {
         super.installUI(c);
 
         c.setOpaque(false);
     }
 
+    @Override
     public void paint(Graphics g, JComponent c) {
         LAFUtilities.setProperties(g, c);
 
@@ -75,6 +77,7 @@ public class FreeColButtonUI extends MetalButtonUI {
         }
     }
 
+    @Override
     protected void paintButtonPressed(Graphics g, AbstractButton c) {
         if (c.isContentAreaFilled()) {
             Graphics2D g2d = (Graphics2D) g;

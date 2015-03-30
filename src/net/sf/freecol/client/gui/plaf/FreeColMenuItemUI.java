@@ -36,6 +36,7 @@ public class FreeColMenuItemUI extends BasicMenuItemUI {
     }
 
 
+    @Override
     public void installUI(JComponent c) {
         super.installUI(c);
 
