@@ -694,15 +694,23 @@ public class GUI {
         refresh();
     }
 
+    public boolean canZoomInMap() {
+        return !mapViewer.isAtMaxMapScale();
+    }
+
+    public boolean canZoomOutMap() {
+        return !mapViewer.isAtMinMapScale();
+    }
+
     public void zoomInMap() {
         if (mapViewer == null) return;
-        mapViewer.scaleMap(0.25f);
+        mapViewer.increaseMapScale();
         refresh();
     }
 
     public void zoomOutMap() {
         if (mapViewer == null) return;
-        mapViewer.scaleMap(-0.25f);
+        mapViewer.decreaseMapScale();
         refresh();
     }
 

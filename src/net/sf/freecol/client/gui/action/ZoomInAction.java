@@ -53,8 +53,7 @@ public class ZoomInAction extends FreeColAction {
 
         if (!getGUI().isMapboardActionsEnabled()) return false;
 
-        float oldScaling = getGUI().getMapScale();
-        return oldScaling < 1.0;
+        return getGUI().canZoomInMap();
     }
 
 

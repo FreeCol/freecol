@@ -214,6 +214,11 @@ public final class MapViewer {
     private boolean alignedTop = false, alignedBottom = false,
         alignedLeft = false, alignedRight = false;
 
+    // How the map can be scaled
+    private static final float MAP_SCALE_MIN = 0.25f;
+    private static final float MAP_SCALE_MAX = 2.0f;
+    private static final float MAP_SCALE_STEP = 0.25f;
+
     // The height offset to paint a Unit at (in pixels).
     private static final int UNIT_OFFSET = 20,
         STATE_OFFSET_X = 25,
@@ -1136,15 +1141,25 @@ public final class MapViewer {
         setImageLibrary(new ImageLibrary());
     }
 
-    /**
-     * Change the scale of the map by delta.
-     *
-     * @param delta a <code>float</code> value
-     */
-    void scaleMap(float delta) {
-        float newScale = lib.getScalingFactor() + delta;
-        if (newScale >= 1f)
-            newScale = 1f;
+    boolean isAtMaxMapScale() {
+        return lib.getScalingFactor() == MAP_SCALE_MAX;
+    }
+
+    boolean isAtMinMapScale() {
+        return lib.getScalingFactor() == MAP_SCALE_MIN;
+    }
+
+    void increaseMapScale() {
+        float newScale = lib.getScalingFactor() + MAP_SCALE_STEP;
+        if (newScale >= MAP_SCALE_MAX)
+            newScale = MAP_SCALE_MAX;
+        setImageLibrary(new ImageLibrary(newScale));
+    }
+
+    void decreaseMapScale() {
+        float newScale = lib.getScalingFactor() - MAP_SCALE_STEP;
+        if (newScale <= MAP_SCALE_MIN)
+            newScale = MAP_SCALE_MIN;
         setImageLibrary(new ImageLibrary(newScale));
     }
 
