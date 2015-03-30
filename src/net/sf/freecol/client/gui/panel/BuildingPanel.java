@@ -193,7 +193,6 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
 
     /**
      * {@inheritDoc}
-     * @param event
      */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
@@ -211,7 +210,6 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     // Override JComponent
 
     /**
-     * @return <code>BuildingToolTip</code> Build Tool Tip.
      * {@inheritDoc}
      */
     @Override

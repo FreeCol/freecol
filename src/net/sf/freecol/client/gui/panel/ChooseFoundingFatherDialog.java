@@ -96,7 +96,6 @@ public final class ChooseFoundingFatherDialog
 
     /**
      * {@inheritDoc}
-     * @return 
      */
     @Override
     public FoundingFather getResponse() {

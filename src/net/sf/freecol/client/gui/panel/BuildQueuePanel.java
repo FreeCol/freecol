@@ -1034,7 +1034,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     /**
      * {@inheritDoc}
-     * @param event
      */
     @Override
     public void actionPerformed(ActionEvent event) {
@@ -1075,7 +1074,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     /**
      * {@inheritDoc}
-     * @param event
      */
     @Override
     public void itemStateChanged(ItemEvent event) {

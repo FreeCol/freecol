@@ -269,7 +269,6 @@ public class CargoPanel extends FreeColPanel
     // Override JLabel
 
     /**
-     * @return 
      * {@inheritDoc}
      */
     @Override

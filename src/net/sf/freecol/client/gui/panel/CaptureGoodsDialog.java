@@ -220,7 +220,6 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
     // Implement FreeColDialog
 
     /**
-     * @return 
      * {@inheritDoc}
      */
     @Override

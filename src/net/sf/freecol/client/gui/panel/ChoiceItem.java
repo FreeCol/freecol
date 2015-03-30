@@ -209,7 +209,6 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
 
     /** 
      * {@inheritDoc}
-     * @param other
      */
     @Override
     public int compareTo(ChoiceItem<T> other) {

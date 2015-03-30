@@ -51,7 +51,6 @@ public final class ClientOptionsDialog extends OptionsDialog  {
 
     /**
      * {@inheritDoc}
-     * @return value
      */
     @Override
     public OptionGroup getResponse() {

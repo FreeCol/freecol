@@ -803,7 +803,6 @@ public final class ColonyPanel extends PortPanel
     // Override PortPanel
 
     /**
-     * @param unitLabel
      * {@inheritDoc}
      */
     @Override
@@ -831,7 +830,6 @@ public final class ColonyPanel extends PortPanel
 
     /**
      * {@inheritDoc}
-     * @return 
      */
     @Override
     public boolean setSelectedUnit(Unit unit) {
@@ -954,9 +952,7 @@ public final class ColonyPanel extends PortPanel
 
     /**
      * {@inheritDoc}
-     * @param event
      */
-    @Override
     public void actionPerformed(ActionEvent event) {
         final Colony colony = getColony();
         final String command = event.getActionCommand();
@@ -1032,7 +1028,6 @@ public final class ColonyPanel extends PortPanel
 
     /**
      * {@inheritDoc}
-     * @param event
      */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
@@ -1291,7 +1286,6 @@ public final class ColonyPanel extends PortPanel
 
         /**
          * {@inheritDoc}
-         * @return 
          */
         @Override
         public String getUIClassID() {
@@ -1443,7 +1437,6 @@ public final class ColonyPanel extends PortPanel
         // Override JPanel
 
         /**
-         * @return 
          * {@inheritDoc}
          */
         @Override
@@ -1509,7 +1502,6 @@ public final class ColonyPanel extends PortPanel
 
         /**
          * {@inheritDoc}
-         * @return 
          */
         @Override
         public boolean accepts(Unit unit) {
@@ -1656,7 +1648,6 @@ public final class ColonyPanel extends PortPanel
 
         /**
          * {@inheritDoc}
-         * @param event
          */
         @Override
         public void propertyChange(PropertyChangeEvent event) {
@@ -2290,7 +2281,6 @@ public final class ColonyPanel extends PortPanel
 
             /**
              * {@inheritDoc}
-             * @param event
              */
             @Override
             public void propertyChange(PropertyChangeEvent event) {
@@ -2316,7 +2306,6 @@ public final class ColonyPanel extends PortPanel
              *
              * @param px The x coordinate to check.
              * @param py The y coordinate to check.
-             * @return 
              */
             @Override
             public boolean contains(int px, int py) {

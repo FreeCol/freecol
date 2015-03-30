@@ -95,7 +95,6 @@ public final class ChatPanel extends FreeColPanel {
 
     /**
      * {@inheritDoc}
-     * @param event
      */
     @Override
     public void actionPerformed(ActionEvent event) {
