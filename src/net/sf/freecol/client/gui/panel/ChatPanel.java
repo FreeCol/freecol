@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
@@ -94,7 +95,9 @@ public final class ChatPanel extends FreeColPanel {
 
     /**
      * {@inheritDoc}
+     * @param event
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         try {
@@ -109,7 +112,8 @@ public final class ChatPanel extends FreeColPanel {
                 super.actionPerformed(event);
             }
         } catch (NumberFormatException e) {
-            logger.warning("Invalid ActionEvent, not a number: " + command);
+            logger.log(Level.WARNING,
+                    "Invalid ActionEvent, not a number: {0}", command);
         }
     }
 }

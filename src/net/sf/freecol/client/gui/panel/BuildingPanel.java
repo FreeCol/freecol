@@ -27,6 +27,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
@@ -35,7 +36,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -193,12 +193,17 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
 
     /**
      * {@inheritDoc}
+     * @param event
      */
+    @Override
     public void propertyChange(PropertyChangeEvent event) {
         String property = event.getPropertyName();
-        logger.finest(building.getId() + " change " + property
-                      + ": " + event.getOldValue()
-                      + " -> " + event.getNewValue());
+        logger.log(Level.FINEST, "{0} change {1}: {2} -> {3}", 
+                new Object[]{
+                    building.getId(),
+                    property,
+                    event.getOldValue(),
+                    event.getNewValue()});
         update();
     }
 
@@ -206,6 +211,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     // Override JComponent
 
     /**
+     * @return <code>BuildingToolTip</code> Build Tool Tip.
      * {@inheritDoc}
      */
     @Override

@@ -24,6 +24,7 @@ import java.awt.Container;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
@@ -184,6 +185,7 @@ public class CargoPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean accepts(Unit unit) {
         return true;
     }
@@ -191,6 +193,7 @@ public class CargoPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean accepts(Goods goods) {
         return true;
     }
@@ -198,6 +201,7 @@ public class CargoPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public Component add(Component comp, boolean editState) {
         if (carrier == null) return null;
 
@@ -249,10 +253,15 @@ public class CargoPanel extends FreeColPanel
 
     // Interface PropertyChangeListener
 
+    @Override
     public void propertyChange(PropertyChangeEvent event) {
-        logger.finest("CargoPanel change " + event.getPropertyName()
-                      + ": " + event.getOldValue()
-                      + " -> " + event.getNewValue());
+        logger.log(Level.FINEST,
+                "CargoPanel change {0}: {1} -> {2}", 
+                new Object[]{
+                    event.getPropertyName(), 
+                    event.getOldValue(),
+                    event.getNewValue()
+                });
         update();
     }
 
@@ -260,6 +269,7 @@ public class CargoPanel extends FreeColPanel
     // Override JLabel
 
     /**
+     * @return 
      * {@inheritDoc}
      */
     @Override

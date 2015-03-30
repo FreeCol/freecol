@@ -26,7 +26,6 @@ import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.action.ActionManager;
@@ -89,6 +88,7 @@ public final class ClassicMapControls extends MapControls {
      * Adds the map controls to the given component.
      * @param component The component to add the map controls to.
      */
+    @Override
     public void addToComponent(Canvas component) {
         if (freeColClient.getGame() == null
             || freeColClient.getGame().getMap() == null) {
@@ -100,6 +100,7 @@ public final class ClassicMapControls extends MapControls {
         component.add(panel, CONTROLS_LAYER);
     }
 
+    @Override
     public boolean isShowing() {
         return panel.getParent() != null;
     }
@@ -109,10 +110,15 @@ public final class ClassicMapControls extends MapControls {
      *
      * @param canvas <code>Canvas</code> parent
      */
+    @Override
     public void removeFromComponent(Canvas canvas) {
         canvas.removeFromCanvas(panel);
     }
 
+    /**
+     * Repaint
+     */
+    @Override
     public void repaint() {
         panel.repaint();
     }

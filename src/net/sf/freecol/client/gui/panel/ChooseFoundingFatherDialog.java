@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import net.miginfocom.swing.MigLayout;
@@ -97,6 +96,7 @@ public final class ChooseFoundingFatherDialog
 
     /**
      * {@inheritDoc}
+     * @return 
      */
     @Override
     public FoundingFather getResponse() {

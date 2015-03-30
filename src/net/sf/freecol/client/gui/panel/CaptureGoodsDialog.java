@@ -30,17 +30,14 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -86,6 +83,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component getListCellRendererComponent(JList<? extends GoodsItem> list,
                                                       GoodsItem value,
                                                       int index,
@@ -126,6 +124,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
         this.allButton = GUI.localizedButton("All");
         this.allButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
                     for (int i = 0; i < gl.getModel().getSize()
@@ -141,6 +140,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
  
         this.noneButton = GUI.localizedButton("None");
         this.noneButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
                     for (int i = 0; i < gl.getModel().getSize(); i++) {
@@ -220,8 +220,10 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
     // Implement FreeColDialog
 
     /**
+     * @return 
      * {@inheritDoc}
      */
+    @Override
     public List<Goods> getResponse() {
         Object value = getValue();
         List<Goods> gl = new ArrayList<>();
