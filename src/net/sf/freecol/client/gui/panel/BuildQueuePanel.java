@@ -29,6 +29,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -140,6 +141,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             /**
              * {@inheritDoc}
              */
+            @Override
             public Object getTransferData(DataFlavor flavor)
                 throws UnsupportedFlavorException {
                 if (isDataFlavorSupported(flavor)) return this.buildables;
@@ -149,6 +151,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             /**
              * {@inheritDoc}
              */
+            @Override
             public DataFlavor[] getTransferDataFlavors() {
                 return supportedFlavors;
             }
@@ -156,6 +159,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             /**
              * {@inheritDoc}
              */
+            @Override
             public boolean isDataFlavorSupported(DataFlavor flavor) {
                 for (DataFlavor myFlavor : supportedFlavors) {
                     if (myFlavor.equals(flavor)) return true;
@@ -182,7 +186,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             JList<? extends BuildableType> target = BuildQueuePanel.this
                 .convertJComp(comp);
             if (target == null) {
-                logger.warning("Build queue import failed to: " + comp);
+                logger.log(Level.WARNING, "Build queue import failed to: {0}", comp);
                 return false;
             }
 
@@ -190,7 +194,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             Object transferData;
             try {
                 transferData = data.getTransferData(BUILD_LIST_FLAVOR);
-            } catch (Exception e) {
+            } catch (UnsupportedFlavorException | IOException e) {
                 logger.log(Level.WARNING, "BuildQueue import", e);
                 return false;
             }
@@ -548,6 +552,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
         BuildQueueMouseAdapter adapter = new BuildQueueMouseAdapter(true);
         Action addAction = new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     JList<BuildableType> bql
                         = BuildQueuePanel.this.buildQueueList;
@@ -597,6 +602,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             .put(KeyStroke.getKeyStroke("DELETE"), "delete");
         this.buildQueueList.getActionMap().put("delete",
             new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     JList<BuildableType> bql = BuildQueuePanel.this.buildQueueList;
                     for (BuildableType bt : bql.getSelectedValuesList()) {
@@ -1028,7 +1034,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     /**
      * {@inheritDoc}
+     * @param event
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final String FAIL = "FAIL";
         if (this.colony.getOwner() == getMyPlayer()) {
@@ -1044,15 +1052,19 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 removeBuildable(buildables.remove(0));
             }
             igc().setBuildQueue(this.colony, buildables);
-            if (FAIL.equals(command)) { // Let the user reconsider.
-                updateAllLists();
-                return;
-            } else if (OK.equals(command)) {
-                // do nothing?
-            } else if (BUY.equals(command)) {
-                igc().payForBuilding(this.colony);
-            } else {
-                super.actionPerformed(event);
+            if (null != command) switch (command) {
+                case FAIL:
+                    // Let the user reconsider.
+                    updateAllLists();
+                    return;
+                case OK:
+                    break;
+                case BUY:
+                    igc().payForBuilding(this.colony);
+                    break;
+                default:
+                    super.actionPerformed(event);
+                    break;
             }
         }
         getGUI().removeFromCanvas(this);
@@ -1063,7 +1075,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     /**
      * {@inheritDoc}
+     * @param event
      */
+    @Override
     public void itemStateChanged(ItemEvent event) {
         if (event.getSource() == this.compactBox) {
             updateDetailView();
