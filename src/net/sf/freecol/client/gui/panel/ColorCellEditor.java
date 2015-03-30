@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractCellEditor;
@@ -72,6 +73,7 @@ public final class ColorCellEditor extends AbstractCellEditor
     /**
      * {@inheritDoc}
      */
+    @Override
     public Component getTableCellEditorComponent(JTable table, Object value,
         boolean hasFocus, int row, int column) {
 
@@ -94,25 +96,28 @@ public final class ColorCellEditor extends AbstractCellEditor
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         GUI gui = freeColClient.getGUI();
-        if (EDIT.equals(command)) {
-            this.colorChooserPanel = gui.showColorChooserPanel(this);
-
-        } else if (FreeColPanel.OK.equals(command)) {
-            if (this.colorChooserPanel != null) {
-                this.currentColor = this.colorChooserPanel.getColor();
-                gui.removeFromCanvas(this.colorChooserPanel);
-            }
-            fireEditingStopped();
-        } else if (FreeColPanel.CANCEL.equals(command)) {
-            if (this.colorChooserPanel != null) {
-                gui.removeFromCanvas(this.colorChooserPanel);
-            }
-            fireEditingCanceled();
-        } else {
-            logger.warning("Bad event: " + command);
+        if (null != command) switch (command) {
+            case EDIT:
+                this.colorChooserPanel = gui.showColorChooserPanel(this);
+                break;
+            case FreeColPanel.OK:
+                if (this.colorChooserPanel != null) {
+                    this.currentColor = this.colorChooserPanel.getColor();
+                    gui.removeFromCanvas(this.colorChooserPanel);
+                }   fireEditingStopped();
+                break;
+            case FreeColPanel.CANCEL:
+                if (this.colorChooserPanel != null) {
+                    gui.removeFromCanvas(this.colorChooserPanel);
+                }   fireEditingCanceled();
+                break;
+            default:
+                logger.log(Level.WARNING, "Bad event: {0}", command);
+                break;
         }
     }
 }

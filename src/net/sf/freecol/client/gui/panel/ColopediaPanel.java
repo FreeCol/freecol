@@ -24,9 +24,9 @@ import java.awt.event.ActionEvent;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -158,11 +158,12 @@ public final class ColopediaPanel extends FreeColPanel
     }
 
     /**
-     * This function analyses a tree selection event and calls the right methods to take care
+     * This function analyzes a tree selection event and calls the right methods to take care
      * of building the requested unit's details.
      *
      * @param event The incoming TreeSelectionEvent.
      */
+    @Override
     public void valueChanged(TreeSelectionEvent event) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (node != null) {
@@ -182,7 +183,7 @@ public final class ColopediaPanel extends FreeColPanel
     private void select(String id) {
         DefaultMutableTreeNode node = nodeMap.get(id);
         if (node == null) {
-            logger.warning("Unable to find node with id '" + id + "'.");
+            logger.log(Level.WARNING, "Unable to find node with id ''{0}''.", id);
         } else {
             TreePath oldPath = tree.getSelectionPath();
             if (oldPath != null && oldPath.getParentPath() != null) {
@@ -195,15 +196,19 @@ public final class ColopediaPanel extends FreeColPanel
         }
     }
 
+    @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         HyperlinkEvent.EventType type = e.getEventType();
         if (type == HyperlinkEvent.EventType.ACTIVATED) {
             String[] path = e.getURL().getPath().split("/");
-            if (FreeColObject.ID_ATTRIBUTE_TAG.equals(path[1])) {
-                select(path[2]);
-            } else if ("action".equals(path[1])) {
-                getFreeColClient().getActionManager().getFreeColAction(path[2])
-                    .actionPerformed(null);
+            if (null != path[1]) switch (path[1]) {
+                case FreeColObject.ID_ATTRIBUTE_TAG:
+                    select(path[2]);
+                    break;
+                case "action":
+                    getFreeColClient().getActionManager().getFreeColAction(path[2])
+                            .actionPerformed(null);
+                    break;
             }
         }
     }
@@ -213,6 +218,7 @@ public final class ColopediaPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {

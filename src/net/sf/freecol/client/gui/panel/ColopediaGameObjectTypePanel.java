@@ -77,6 +77,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
      *
      * @return a String value
      */
+    @Override
     public String getName() {
         return Messages.getName(id);
     }

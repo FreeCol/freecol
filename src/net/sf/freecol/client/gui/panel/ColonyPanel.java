@@ -37,7 +37,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,7 +72,6 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
@@ -953,6 +951,7 @@ public final class ColonyPanel extends PortPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final Colony colony = getColony();
         final String command = event.getActionCommand();

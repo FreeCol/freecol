@@ -48,6 +48,7 @@ public class ColopediaTreeCellRenderer extends DefaultTreeCellRenderer {
      *
      * @return the rendered item's Component
      */
+    @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected,
                                                   boolean expanded, boolean leaf, int row, boolean hasFocus) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
