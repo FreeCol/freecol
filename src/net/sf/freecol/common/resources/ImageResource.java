@@ -138,19 +138,30 @@ public class ImageResource extends Resource implements Resource.Preloadable {
      */
     public Image getImage(Dimension d) {
         final Image im = getImage();
-        if (im == null
-            || (im.getWidth(null) == d.width
-                && im.getHeight(null) == d.height)) return im;
+        if (im == null)
+            return null;
+        int wNew = d.width;
+        int hNew = d.height;
+        if(wNew < 0 && hNew < 0)
+            return im;
+        int w = im.getWidth(null);
+        int h = im.getHeight(null);
+        if(wNew < 0)
+            wNew = (w * hNew)/h;
+        if(hNew < 0)
+            hNew = (h * wNew)/w;
+        if(wNew == w && hNew == h)
+            return im;
 
         synchronized (loadingLock) {
             final Image cached = scaledImages.get(d);
             if (cached != null) return cached;
 
             try {
-                BufferedImage scaled = new BufferedImage(d.width, d.height, BufferedImage.TYPE_INT_ARGB);
+                BufferedImage scaled = new BufferedImage(wNew, hNew, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = scaled.createGraphics();
                 g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-                g.drawImage(im, 0, 0, d.width, d.height, null);
+                g.drawImage(im, 0, 0, wNew, hNew, null);
                 g.dispose();
                 scaledImages.put(d, scaled);
                 return scaled;
