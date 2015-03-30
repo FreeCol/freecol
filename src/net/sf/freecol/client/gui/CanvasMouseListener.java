@@ -76,6 +76,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
      *
      * @param e The MouseEvent that holds all the information.
      */
+    @Override
     public void mouseClicked(MouseEvent e) {
         try {
             if (e.getClickCount() > 1) {
@@ -101,6 +102,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
      *
      * @param e The MouseEvent that holds all the information.
      */
+    @Override
     public void mouseEntered(MouseEvent e) {
         // Ignore for now.
     }
@@ -110,6 +112,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
      *
      * @param e The MouseEvent that holds all the information.
      */
+    @Override
     public void mouseExited(MouseEvent e) {
         // Ignore for now.
     }
@@ -119,6 +122,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
      *
      * @param e The MouseEvent that holds all the information.
      */
+    @Override
     public void mousePressed(MouseEvent e) {
         if (!e.getComponent().isEnabled()) return;
 
@@ -173,6 +177,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
      *
      * @param e The MouseEvent that holds all the information.
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
         try {
             if (mapViewer.getGotoPath() != null) { // A mouse drag has ended.
@@ -197,6 +202,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         doubleClickTimer.stop();
         mapViewer.setSelectedTile(mapViewer.convertToMapTile(centerX, centerY),

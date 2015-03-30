@@ -216,11 +216,13 @@ public final class Canvas extends JDesktopPane {
 
         // Implement Runnable
 
+        @Override
         public void run() {
             // Display the dialog...
             viewFreeColDialog(fcd, tile);
             // ...and use another thread to wait for a dialog response...
             new Thread(fcd.toString()) {
+                @Override
                 public void run() {
                     while (!fcd.responded()) {
                         try {
@@ -1630,6 +1632,7 @@ public final class Canvas extends JDesktopPane {
             if (panel == null) {
                 panel = new EuropePanel(freeColClient, this);
                 panel.addClosingCallback(new Runnable() {
+                        @Override
                         public void run() {
                             removeEuropeanSubpanels();
                         }
@@ -2050,27 +2053,37 @@ public final class Canvas extends JDesktopPane {
 
             private Timer t = null;
 
+            @Override
             public void keyPressed(KeyEvent e) {}
 
+            @Override
             public void keyReleased(KeyEvent e) {
                 execute();
             }
 
+            @Override
             public void keyTyped(KeyEvent e) {}
 
+            @Override
             public void mouseClicked(MouseEvent e) {
                 execute();
             }
 
+            @Override
             public void mouseEntered(MouseEvent e) {}
+            @Override
             public void mouseExited(MouseEvent e) {}
+            @Override
             public void mousePressed(MouseEvent e) {}
+            @Override
             public void mouseReleased(MouseEvent e) {}
 
+            @Override
             public void stopped() {
                 execute();
             }
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 execute();
             }

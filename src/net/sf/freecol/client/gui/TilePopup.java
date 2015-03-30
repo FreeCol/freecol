@@ -120,6 +120,7 @@ public final class TilePopup extends JPopupMenu {
             }
             if (gotoMenuItem != null) {
                 gotoMenuItem.addActionListener(new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent event) {
                             if (!freeColClient.currentPlayerIsMyPlayer()) {
                                 return;
@@ -145,6 +146,7 @@ public final class TilePopup extends JPopupMenu {
                 JMenuItem europeMenuItem = GUI.localizedMenuItem(StringTemplate
                     .template("gotoEurope"));
                 europeMenuItem.addActionListener(new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent event) {
                             if (!freeColClient.currentPlayerIsMyPlayer()) {
                                 return;
@@ -162,6 +164,7 @@ public final class TilePopup extends JPopupMenu {
                 if (activeUnit.checkSetState(UnitState.ACTIVE)) {
                     ji = GUI.localizedMenuItem("activateUnit");
                     ji.addActionListener(new ActionListener() {
+                            @Override
                             public void actionPerformed(ActionEvent event) {
                                 if (activeUnit.checkSetState(UnitState.ACTIVE)) {
                                     igc.changeState(activeUnit, Unit.UnitState.ACTIVE);
@@ -174,6 +177,7 @@ public final class TilePopup extends JPopupMenu {
                 if (activeUnit.checkSetState(UnitState.FORTIFYING)) {
                     ji = GUI.localizedMenuItem("fortifyUnit");
                     ji.addActionListener(new ActionListener() {
+                            @Override
                             public void actionPerformed(ActionEvent event) {
                                 if (activeUnit.checkSetState(UnitState.FORTIFYING)) {
                                     igc.changeState(activeUnit, Unit.UnitState.FORTIFYING);
@@ -186,6 +190,7 @@ public final class TilePopup extends JPopupMenu {
                 if (activeUnit.checkSetState(UnitState.SKIPPED)) {
                     ji = GUI.localizedMenuItem("skip");
                     ji.addActionListener(new ActionListener() {
+                            @Override
                             public void actionPerformed(ActionEvent event) {
                                 if (activeUnit.checkSetState(UnitState.SKIPPED)) {
                                     igc.changeState(activeUnit, Unit.UnitState.SKIPPED);
@@ -199,6 +204,7 @@ public final class TilePopup extends JPopupMenu {
                     && activeUnit.canCashInTreasureTrain()) {
                     ji = GUI.localizedMenuItem("cashInTreasureTrain.order");
                     ji.addActionListener(new ActionListener() {
+                            @Override
                             public void actionPerformed(ActionEvent e) {
                                 igc.checkCashInTreasureTrain(activeUnit);
                             }
@@ -211,6 +217,7 @@ public final class TilePopup extends JPopupMenu {
                 if (activeUnit.getDestination() != null) {
                     ji = GUI.localizedMenuItem("clearUnitOrders");
                     ji.addActionListener(new ActionListener() {
+                            @Override
                             public void actionPerformed(ActionEvent event) {
                                 igc.clearOrders(activeUnit);
                             }
@@ -264,6 +271,7 @@ public final class TilePopup extends JPopupMenu {
             JMenuItem activateAllItem = GUI.localizedMenuItem(StringTemplate
                 .template("activateAllUnits"));
             activateAllItem.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent event) {
                         Unit lastUnit = null;
                         for (Unit unit : tile.getUnitList()) {
@@ -308,6 +316,7 @@ public final class TilePopup extends JPopupMenu {
         for (final Unit unit : tile.getUnitList()) {
             JMenuItem toMenuItem = new JMenuItem(unit.toString());
             toMenuItem.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent event) {
                         DebugUtils.changeOwnership(freeColClient, unit);
                     }
@@ -317,6 +326,7 @@ public final class TilePopup extends JPopupMenu {
             if (unit.isCarrier()) {
                 JMenuItem menuItem = new JMenuItem(unit.toString());
                 menuItem.addActionListener(new ActionListener() {
+                       @Override
                        public void actionPerformed(ActionEvent event) {
                            DebugUtils.displayMission(freeColClient, unit);
                        }
@@ -327,6 +337,7 @@ public final class TilePopup extends JPopupMenu {
             if (unit.isPerson()) {
                 JMenuItem roleMenuItem = new JMenuItem(unit.toString());
                 roleMenuItem.addActionListener(new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent event) {
                             DebugUtils.changeRole(freeColClient, unit);
                         }
@@ -343,6 +354,7 @@ public final class TilePopup extends JPopupMenu {
             JMenuItem toMenuItem = new JMenuItem(tile.getColony().toString());
             final Colony colony = tile.getColony();
             toMenuItem.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent event) {
                         DebugUtils.changeOwnership(freeColClient, colony);
                     }
@@ -351,6 +363,7 @@ public final class TilePopup extends JPopupMenu {
 
             JMenuItem displayColonyPlan = new JMenuItem("Display Colony Plan");
             displayColonyPlan.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent event) {
                         DebugUtils.displayColonyPlan(freeColClient, colony);
                     }
@@ -359,6 +372,7 @@ public final class TilePopup extends JPopupMenu {
 
             JMenuItem applyDisaster = new JMenuItem("Apply Disaster");
             applyDisaster.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent event) {
                         DebugUtils.applyDisaster(freeColClient, colony);
                     }
@@ -369,6 +383,7 @@ public final class TilePopup extends JPopupMenu {
             JMenuItem displayGoods = new JMenuItem("Examine Settlement");
             final IndianSettlement is = tile.getIndianSettlement();
             displayGoods.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent event) {
                         DebugUtils.summarizeSettlement(freeColClient, is);
                     }
@@ -382,6 +397,7 @@ public final class TilePopup extends JPopupMenu {
             JMenuItem rumourItem = new JMenuItem("Set Lost City Rumour type");
             rumourItem.setOpaque(false);
             rumourItem.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent event) {
                         DebugUtils.setRumourType(freeColClient, tile);
                     }
@@ -392,6 +408,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem addu = new JMenuItem("Add unit");
         addu.setOpaque(false);
         addu.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     DebugUtils.addNewUnitToTile(freeColClient, tile);
                 }
@@ -403,6 +420,7 @@ public final class TilePopup extends JPopupMenu {
             adda.setOpaque(false);
             final List<Unit> tileUnits = tile.getUnitList();
             adda.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent event) {
                         DebugUtils.resetMoves(freeColClient, tileUnits);
                     }
@@ -415,6 +433,7 @@ public final class TilePopup extends JPopupMenu {
         if (activeUnit != null && (unitTile = activeUnit.getTile()) != null) {
             JMenuItem menuItem = new JMenuItem("Show search");
             menuItem.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent event) {
                         if (!freeColClient.currentPlayerIsMyPlayer()) return;
                         Tile currTile = activeUnit.getTile();
@@ -438,6 +457,7 @@ public final class TilePopup extends JPopupMenu {
                 addg.setOpaque(false);
                 final Unit unit = u;
                 addg.addActionListener(new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent event) {
                             DebugUtils.addUnitGoods(freeColClient, unit);
                         }
@@ -450,6 +470,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem dumpItem = new JMenuItem("Dump tile");
         dumpItem.setOpaque(false);
         dumpItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     DebugUtils.dumpTile(freeColClient, tile);
                 }
@@ -505,6 +526,7 @@ public final class TilePopup extends JPopupMenu {
             + " (" + Messages.message(occ) + ")";
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     gui.setActiveUnit(unit);
                 }
@@ -552,6 +574,7 @@ public final class TilePopup extends JPopupMenu {
             = colony.getLocationLabelFor(freeColClient.getMyPlayer());
         JMenuItem menuItem = GUI.localizedMenuItem(name);
         menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     gui.showColonyPanel(colony, null);
                 }
@@ -561,6 +584,7 @@ public final class TilePopup extends JPopupMenu {
 
         menuItem = GUI.localizedMenuItem("rename");
         menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     freeColClient.getInGameController().rename(colony);
                 }
@@ -582,6 +606,7 @@ public final class TilePopup extends JPopupMenu {
             = settlement.getLocationLabelFor(freeColClient.getMyPlayer());
         JMenuItem menuItem = GUI.localizedMenuItem(name);
         menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     gui.showIndianSettlementPanel(settlement);
                 }
@@ -598,6 +623,7 @@ public final class TilePopup extends JPopupMenu {
     private void addTile(final Tile tile) {
         JMenuItem menuItem = new JMenuItem(Messages.getName(tile));
         menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     gui.showTilePanel(tile);
                 }

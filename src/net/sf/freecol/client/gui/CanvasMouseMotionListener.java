@@ -62,6 +62,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
      *
      * @param e The MouseEvent that holds all the information.
      */
+    @Override
     public void mouseMoved(MouseEvent e) {
         if (e.getY() >= AUTO_SCROLL_SPACE) {
             performAutoScrollIfActive(e);
@@ -94,6 +95,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
      *
      * @param e The MouseEvent that holds all the information.
      */
+    @Override
     public void mouseDragged(MouseEvent e) {
 
         performDragScrollIfActive(e);

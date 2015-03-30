@@ -47,6 +47,7 @@ public final class FullScreenFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowActivated(WindowEvent event) {
     }
 
@@ -55,6 +56,7 @@ public final class FullScreenFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowClosed(WindowEvent event) {
     }
 
@@ -63,6 +65,7 @@ public final class FullScreenFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowClosing(WindowEvent event) {
         if (freeColClient.isInGame()) {
             freeColClient.askToQuit();
@@ -76,6 +79,7 @@ public final class FullScreenFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowDeactivated(WindowEvent event) {
     }
 
@@ -84,6 +88,7 @@ public final class FullScreenFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowDeiconified(WindowEvent event) {
     }
 
@@ -92,6 +97,7 @@ public final class FullScreenFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowIconified(WindowEvent event) {
         // Counter Java misbehaviour of minimizing JFrame when opening JDialog,
         // causing bug #2729. Sadly, it may take a split second.
@@ -108,6 +114,7 @@ public final class FullScreenFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowOpened(WindowEvent event) {
     }
 }

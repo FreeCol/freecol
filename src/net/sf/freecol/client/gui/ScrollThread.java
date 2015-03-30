@@ -76,6 +76,7 @@ public class ScrollThread extends Thread {
         while (direction != null) {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
                     public void run() {
                         if (!mapViewer.scrollMap(direction)) {
                             direction = null;

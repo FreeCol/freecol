@@ -61,6 +61,7 @@ public final class WindowedFrame extends FreeColFrame  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateBounds(Rectangle rectangle) {
         if (rectangle != null) {
             setBounds(rectangle);

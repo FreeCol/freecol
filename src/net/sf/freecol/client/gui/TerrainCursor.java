@@ -114,6 +114,7 @@ public class TerrainCursor implements ActionListener  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         active = !active;
         int eventId = active? ON : OFF;

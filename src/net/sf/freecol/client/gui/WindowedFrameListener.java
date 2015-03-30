@@ -46,6 +46,7 @@ public final class WindowedFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowActivated(WindowEvent event) {
     }
     
@@ -54,6 +55,7 @@ public final class WindowedFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowClosed(WindowEvent event) {
     }
     
@@ -62,6 +64,7 @@ public final class WindowedFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowClosing(WindowEvent event) {
         if (freeColClient.isInGame()) {
             freeColClient.askToQuit();
@@ -75,6 +78,7 @@ public final class WindowedFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowDeactivated(WindowEvent event) {
     }
     
@@ -83,6 +87,7 @@ public final class WindowedFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowDeiconified(WindowEvent event) {
     }
     
@@ -91,6 +96,7 @@ public final class WindowedFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowIconified(WindowEvent event) {
     }
     
@@ -99,6 +105,7 @@ public final class WindowedFrameListener implements WindowListener {
      *
      * @param event The event that has information on the action.
      */
+    @Override
     public void windowOpened(WindowEvent event) {
     }
 }
