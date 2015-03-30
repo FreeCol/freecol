@@ -49,6 +49,7 @@ public class DisbandUnitAction extends UnitAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         igc().disbandUnit(getGUI().getActiveUnit());
     }

@@ -33,7 +33,7 @@ import net.sf.freecol.common.model.Unit;
  *
  *  - Open a colony panel if the active unit is located on a tile with
  *    a colony.
- *  - If onboard a carrier then the carrier will be the active unit.
+ *  - If aboard a carrier then the carrier will be the active unit.
  *  - In other cases: switch to another unit on the same tile.
  */
 public class ChangeAction extends UnitAction {
@@ -88,6 +88,7 @@ public class ChangeAction extends UnitAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         Unit unit = getGUI().getActiveUnit();
         Tile tile = unit.getTile();

@@ -47,6 +47,7 @@ public class NewAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (freeColClient.isMapEditor()) {
             freeColClient.getMapEditorController().newMap();

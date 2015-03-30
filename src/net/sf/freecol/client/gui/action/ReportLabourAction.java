@@ -48,6 +48,7 @@ public class ReportLabourAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (getClientOptions().getInteger(ClientOptions.LABOUR_REPORT)
             == ClientOptions.LABOUR_REPORT_CLASSIC) {

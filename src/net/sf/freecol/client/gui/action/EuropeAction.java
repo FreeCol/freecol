@@ -61,6 +61,7 @@ public class EuropeAction extends MapboardAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().showEuropePanel();
     }

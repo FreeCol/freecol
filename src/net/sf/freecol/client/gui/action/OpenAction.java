@@ -47,6 +47,7 @@ public class OpenAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (!freeColClient.isMapEditor()) {
             igc().loadGame();

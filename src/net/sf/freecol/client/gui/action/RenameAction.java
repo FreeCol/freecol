@@ -25,7 +25,7 @@ import net.sf.freecol.client.FreeColClient;
 
 
 /**
- * An action for renameing the active unit.
+ * An action for renaming the active unit.
  */
 public class RenameAction extends UnitAction {
 
@@ -47,6 +47,7 @@ public class RenameAction extends UnitAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         igc().rename(getGUI().getActiveUnit());
     }

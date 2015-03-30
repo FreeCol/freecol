@@ -61,6 +61,7 @@ public class MiniMapToggleFogOfWarAction extends MapboardAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().miniMapToggleFogOfWarControls();
 

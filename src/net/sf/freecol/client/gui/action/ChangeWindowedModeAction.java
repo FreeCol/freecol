@@ -74,6 +74,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         GUI gui = getGUI();
         if (gui == null) return;

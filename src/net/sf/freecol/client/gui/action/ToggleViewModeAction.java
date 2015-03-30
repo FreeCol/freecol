@@ -48,6 +48,7 @@ public class ToggleViewModeAction extends MapboardAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().toggleViewMode();
     }

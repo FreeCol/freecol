@@ -72,6 +72,7 @@ public abstract class FreeColAction extends AbstractAction
             mnemonic = ((Integer) getValue(MNEMONIC_KEY)).intValue();
         }
 
+        @Override
         public void menuKeyPressed(MenuKeyEvent e) {
 
             if (e.getKeyCode() == mnemonic) {
@@ -83,10 +84,12 @@ public abstract class FreeColAction extends AbstractAction
             }
         }
 
+        @Override
         public void menuKeyReleased(MenuKeyEvent e) {
             // do nothing
         }
 
+        @Override
         public void menuKeyTyped(MenuKeyEvent e) {
             // do nothing
         }
@@ -196,6 +199,7 @@ public abstract class FreeColAction extends AbstractAction
     /**
      * Don't use this method.
      */
+    @Override
     public FreeColAction clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException("FreeColAction can not be cloned.");
     }
@@ -322,6 +326,7 @@ public abstract class FreeColAction extends AbstractAction
      *
      * @return This <code>FreeColAction</code>.
      */
+    @Override
     public FreeColAction getValue() {
         return this;
     }
@@ -334,6 +339,7 @@ public abstract class FreeColAction extends AbstractAction
      *
      * @param value a <code>FreeColAction</code> value
      */
+    @Override
     public void setValue(FreeColAction value) {
         logger.warning("Calling unsupported method setValue.");
     }
@@ -378,6 +384,7 @@ public abstract class FreeColAction extends AbstractAction
      * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @throws XMLStreamException if there is a problem writing to the stream.
      */
+    @Override
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         xw.writeStartElement(getXMLElementTagName());
 
@@ -394,6 +401,7 @@ public abstract class FreeColAction extends AbstractAction
      * @param xr The <code>FreeColXMLReader</code> to read from.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
+    @Override
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
         // id is hard-wired
         String acc = xr.getAttribute(ACCELERATOR_TAG, "");

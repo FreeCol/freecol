@@ -47,6 +47,7 @@ public class ReportIndianAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().showReportIndianPanel();
     }

@@ -65,6 +65,7 @@ public class DebugAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (shouldBeEnabled()) {
             igc().setInDebugMode();

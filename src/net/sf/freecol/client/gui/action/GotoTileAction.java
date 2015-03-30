@@ -59,6 +59,7 @@ public class GotoTileAction extends UnitAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().activateGotoPath();
     }

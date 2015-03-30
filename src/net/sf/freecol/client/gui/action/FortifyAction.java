@@ -62,6 +62,7 @@ public class FortifyAction extends UnitAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         igc().changeState(getGUI().getActiveUnit(),
             Unit.UnitState.FORTIFYING);

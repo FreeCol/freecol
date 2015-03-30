@@ -47,6 +47,7 @@ public class ReportColonyAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().showReportColonyPanel();
     }

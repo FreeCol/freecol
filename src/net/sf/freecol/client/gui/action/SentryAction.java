@@ -50,6 +50,7 @@ public class SentryAction extends UnitAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
         igc().changeState(getGUI().getActiveUnit(), Unit.UnitState.SENTRY);
     }

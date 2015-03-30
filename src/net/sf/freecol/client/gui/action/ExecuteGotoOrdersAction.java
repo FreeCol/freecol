@@ -47,6 +47,7 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         igc().executeGotoOrders();
     }

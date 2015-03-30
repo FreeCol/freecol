@@ -62,6 +62,7 @@ public class RetireAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         freeColClient.retire();
     }

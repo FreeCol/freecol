@@ -47,6 +47,7 @@ public class ReportForeignAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().showReportForeignAffairPanel();
     }

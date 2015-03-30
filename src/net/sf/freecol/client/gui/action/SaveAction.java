@@ -62,6 +62,7 @@ public class SaveAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (!freeColClient.isMapEditor()) {
             igc().saveGame();

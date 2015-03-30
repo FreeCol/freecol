@@ -47,6 +47,7 @@ public class ReportCargoAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().showReportCargoPanel();
     }

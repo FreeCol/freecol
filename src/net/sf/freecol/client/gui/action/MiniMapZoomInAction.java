@@ -72,6 +72,7 @@ public class MiniMapZoomInAction extends MapboardAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().zoomInMapControls();
         update();

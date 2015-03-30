@@ -61,6 +61,7 @@ public class GotoAction extends UnitAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         Unit unit = getGUI().getActiveUnit();
         if (unit != null) {

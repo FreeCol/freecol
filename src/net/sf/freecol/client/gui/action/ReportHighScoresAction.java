@@ -47,6 +47,7 @@ public class ReportHighScoresAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         igc().displayHighScores(null);
     }

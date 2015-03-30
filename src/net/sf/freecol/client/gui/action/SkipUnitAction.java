@@ -49,6 +49,7 @@ public class SkipUnitAction extends UnitAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         igc().skipUnit(getGUI().getActiveUnit());
     }

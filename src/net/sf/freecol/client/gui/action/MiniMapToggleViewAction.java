@@ -61,6 +61,7 @@ public class MiniMapToggleViewAction extends MapboardAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().miniMapToggleViewControls();
 

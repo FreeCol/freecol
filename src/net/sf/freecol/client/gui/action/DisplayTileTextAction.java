@@ -86,6 +86,7 @@ public class DisplayTileTextAction extends SelectableAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (((JRadioButtonMenuItem) e.getSource()).isSelected()) {
             freeColClient.getClientOptions()

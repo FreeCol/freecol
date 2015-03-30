@@ -49,6 +49,7 @@ public class WaitAction extends UnitAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         igc().waitUnit();
     }

@@ -47,6 +47,7 @@ public class TradeRouteAction extends MapboardAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().showTradeRoutePanel(null);
     }

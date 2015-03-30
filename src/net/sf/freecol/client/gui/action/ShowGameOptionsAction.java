@@ -47,6 +47,7 @@ public class ShowGameOptionsAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().showGameOptionsDialog(false, false);
     }

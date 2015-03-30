@@ -70,6 +70,7 @@ public class ColopediaAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().showColopediaPanel(getId());
     }

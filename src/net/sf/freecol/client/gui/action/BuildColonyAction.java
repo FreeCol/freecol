@@ -67,6 +67,7 @@ public class BuildColonyAction extends UnitAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         igc().buildColony(getGUI().getActiveUnit());
     }

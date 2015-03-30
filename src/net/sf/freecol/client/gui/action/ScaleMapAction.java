@@ -120,6 +120,7 @@ public class ScaleMapAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         Dimension ms = getGUI().showScaleMapSizeDialog();
         if (ms != null) {

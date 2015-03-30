@@ -67,6 +67,7 @@ public class LoadAction extends MapboardAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         final Unit unit = getGUI().getActiveUnit();
         if (unit == null) return;

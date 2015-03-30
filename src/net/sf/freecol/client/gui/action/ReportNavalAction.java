@@ -47,6 +47,7 @@ public class ReportNavalAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().showReportNavalPanel();
     }

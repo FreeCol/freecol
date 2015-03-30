@@ -50,6 +50,7 @@ public class AboutAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().showAboutPanel();
     }

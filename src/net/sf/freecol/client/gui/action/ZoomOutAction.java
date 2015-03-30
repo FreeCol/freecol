@@ -62,6 +62,7 @@ public class ZoomOutAction extends FreeColAction {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         getGUI().zoomOutMap();
         update();
