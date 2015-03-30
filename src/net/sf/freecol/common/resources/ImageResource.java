@@ -21,8 +21,10 @@ package net.sf.freecol.common.resources;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MediaTracker;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
@@ -144,19 +146,13 @@ public class ImageResource extends Resource implements Resource.Preloadable {
             final Image cached = scaledImages.get(d);
             if (cached != null) return cached;
 
-            MediaTracker mt = new MediaTracker(_c);
             try {
-                Image scaled = im.getScaledInstance(d.width, d.height,
-                                                    Image.SCALE_SMOOTH);
-                mt.addImage(scaled, 0, d.width, d.height);
-                mt.waitForID(0);
-                int result = mt.statusID(0, false);
-                if (result == MediaTracker.COMPLETE) {
-                    scaledImages.put(d, scaled);
-                } else {
-                    logger.warning("Scaling image: " + getResourceLocator()
-                        + " => " + result);
-                }
+                BufferedImage scaled = new BufferedImage(d.width, d.height, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = scaled.createGraphics();
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                g.drawImage(im, 0, 0, d.width, d.height, null);
+                g.dispose();
+                scaledImages.put(d, scaled);
                 return scaled;
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Failed to scale image: "
