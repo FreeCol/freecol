@@ -188,7 +188,7 @@ public final class Server extends Thread {
                     logger.log(Level.WARNING, "Unable to send to: " + c, e);
                 }
             } else {
-                logger.log(Level.INFO, "Reap dead connection: " + c);
+                logger.log(Level.INFO, "Reap dead connection: {0}", c);
                 removeConnection(c);
             }
         }
@@ -210,6 +210,7 @@ public final class Server extends Thread {
      * {@link net.sf.freecol.server.control.UserConnectionHandler} as
      * the control object.
      */
+    @Override
     public void run() {
         // This method's entire body is synchronized to shutdownLock.
         // The reason why this is done is to prevent the shutdown
@@ -230,9 +231,14 @@ public final class Server extends Thread {
                 try {
                     clientSocket = serverSocket.accept();
 
-                    logger.info("Got client connection from "
-                        + clientSocket.getInetAddress()
-                        + ":" + clientSocket.getPort());
+                    logger.log(
+                            Level.INFO,
+                            "Got client connection from {0}:{1}",
+                            new Object[]{
+                                clientSocket.getInetAddress(),
+                                clientSocket.getPort()
+                            }
+                    );
                     Connection connection =
                         new Connection(clientSocket,
                             freeColServer.getUserConnectionHandler(),

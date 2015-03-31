@@ -52,6 +52,7 @@ public class MergeTranslations {
 
         final String localeKey = args.length > 2 ? args[2] : "";
         String[] sourceFiles = sourceDirectory.list(new FilenameFilter() {
+                @Override
                 public boolean accept(File dir, String name) {
                     return name.matches("FreeColMessages_" + localeKey + ".*\\.properties");
                 }
@@ -78,30 +79,28 @@ public class MergeTranslations {
                 }
 
                 if (!missingProperties.isEmpty()) {
-                    FileWriter out = new FileWriter(targetFile, true);
-                    out.write("### Merged from trunk on "
-                              + DateFormat.getDateTimeInstance().format(new Date())
-                              + " ###\n");
-                    for (Entry<?,?> entry : missingProperties) {
-                        out.write((String) entry.getKey());
-                        out.write("=");
-                        out.write((String) entry.getValue());
-                        out.write("\n");
+                    try (FileWriter out = new FileWriter(targetFile, true)) {
+                        out.write("### Merged from trunk on "
+                                + DateFormat.getDateTimeInstance().format(new Date())
+                                + " ###\n");
+                        for (Entry<?,?> entry : missingProperties) {
+                            out.write((String) entry.getKey());
+                            out.write("=");
+                            out.write((String) entry.getValue());
+                            out.write("\n");
+                        }
                     }
-                    out.close();
                 }
             } else {
                 System.out.println("Copying " + name + " from trunk.");
-                FileReader in = new FileReader(sourceFile);
-                FileWriter out = new FileWriter(targetFile);
-
-                int c;
-                
-                while ((c = in.read()) != -1) {
-                    out.write(c);
+                FileWriter out;
+                try (FileReader in = new FileReader(sourceFile)) {
+                    out = new FileWriter(targetFile);
+                    int c;
+                    while ((c = in.read()) != -1) {
+                        out.write(c);
+                    }
                 }
-
-                in.close();
                 out.close();
 
             }

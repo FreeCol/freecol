@@ -82,6 +82,7 @@ public final class DummyConnection extends Connection {
     /**
      * Closes this connection.
      */
+    @Override
     public void close() {
         // Do nothing.
     }
@@ -95,6 +96,7 @@ public final class DummyConnection extends Connection {
      * @see #sendAndWait(Element)
      * @see #ask(Element)
      */
+    @Override
     public void send(Element element) throws IOException {
         try {
             outgoingMessageHandler.handle(getOtherConnection(), element);
@@ -113,6 +115,7 @@ public final class DummyConnection extends Connection {
      * @see #send(Element)
      * @see #ask(Element)
      */
+    @Override
     public void sendAndWait(Element element) throws IOException {
         send(element);
     }
@@ -126,6 +129,7 @@ public final class DummyConnection extends Connection {
      * @see #send
      * @see #sendAndWait
      */
+    @Override
     public Element ask(Element request) throws IOException {
         Element reply;
         try {

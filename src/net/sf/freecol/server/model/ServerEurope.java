@@ -22,6 +22,7 @@ package net.sf.freecol.server.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Ability;
@@ -145,7 +146,6 @@ public class ServerEurope extends Europe implements ServerModelObject {
         do {
             unitType = RandomChoice.getWeightedRandom(logger, "Recruits",
                                                       recruits, random);
-if (unitType == null) logger.info("MIGRANTRANDOM " + recruits.size());
         } while (addRecruitable(unitType));
     }
 
@@ -270,8 +270,9 @@ if (unitType == null) logger.info("MIGRANTRANDOM " + recruits.size());
      * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
+    @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
-        logger.finest("ServerEurope.csNewTurn, for " + this);
+        logger.log(Level.FINEST, "ServerEurope.csNewTurn, for {0}", this);
 
         for (Unit unit : getUnitList()) {
             if (unit.isNaval() && unit.isDamaged()) {
@@ -310,6 +311,7 @@ if (unitType == null) logger.info("MIGRANTRANDOM " + recruits.size());
      *
      * @return "serverEurope"
      */
+    @Override
     public String getServerXMLElementTagName() {
         return "serverEurope";
     }

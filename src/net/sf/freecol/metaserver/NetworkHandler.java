@@ -20,6 +20,7 @@
 package net.sf.freecol.metaserver;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
@@ -30,7 +31,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * Handles all network messages beeing sent to the metaserver.
+ * Handles all network messages being sent to the metaserver.
  */
 public final class NetworkHandler implements MessageHandler {
     private static final Logger logger = Logger.getLogger(NetworkHandler.class.getName());
@@ -55,16 +56,14 @@ public final class NetworkHandler implements MessageHandler {
         this.metaRegister = metaRegister;
     }
 
-
-
-
-
+    
     /**
     * Handles a network message.
     *
     * @param connection The <code>Connection</code> the message came from.
     * @param element The message to be processed.
     */
+    @Override
     public synchronized Element handle(Connection connection, Element element) {
         Element reply = null;
 
@@ -87,7 +86,7 @@ public final class NetworkHandler implements MessageHandler {
                 reply = disconnect(connection, element);
                 break;
             default:
-                logger.warning("Unkown request: " + type);
+                logger.log(Level.WARNING, "Unkown request: {0}", type);
                 break;
         }
 

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -132,6 +133,7 @@ public class ServerGame extends Game implements ServerModelObject {
      * 
      * @return A unique identifier.
      */
+    @Override
     public String getNextId() {
         String id = Integer.toString(nextId);
         nextId++;
@@ -208,7 +210,8 @@ public class ServerGame extends Game implements ServerModelObject {
 
         TransactionSession.completeAll(cs);
         setTurn(getTurn().next());
-        logger.finest("Turn is now " + getTurn() + duration);
+        logger.log(Level.FINEST, "Turn is now {0}{1}",
+                new Object[]{getTurn(), duration});
         cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
                       "turn", Integer.toString(getTurn().getNumber()));
     }
@@ -220,6 +223,7 @@ public class ServerGame extends Game implements ServerModelObject {
      * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
+    @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
         lb.add("GAME ", getId(), ", ");
         for (Player player : getLivePlayers(null)) {
@@ -427,6 +431,7 @@ public class ServerGame extends Game implements ServerModelObject {
      *
      * @return "serverGame".
      */
+    @Override
     public String getServerXMLElementTagName() {
         return "serverGame";
     }

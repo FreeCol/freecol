@@ -71,6 +71,7 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
      * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
+    @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
         Colony colony = getColony();
         ServerPlayer owner = (ServerPlayer)colony.getOwner();
@@ -127,6 +128,7 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
      *
      * @return "serverColonyTile"
      */
+    @Override
     public String getServerXMLElementTagName() {
         return "serverColonyTile";
     }

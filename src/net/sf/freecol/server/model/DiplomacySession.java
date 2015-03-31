@@ -64,6 +64,7 @@ public class DiplomacySession extends TransactionSession {
         this.otherUnit = otherUnit;
     }
 
+    @Override
     public void complete(ChangeSet cs) {
         unit.setMovesLeft(0);
         cs.add(See.only((ServerPlayer)unit.getOwner()), unit);

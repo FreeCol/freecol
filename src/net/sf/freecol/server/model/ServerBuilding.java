@@ -226,6 +226,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
      *
      * @return "serverBuilding"
      */
+    @Override
     public String getServerXMLElementTagName() {
         return "serverBuilding";
     }

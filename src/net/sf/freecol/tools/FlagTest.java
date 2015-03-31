@@ -165,6 +165,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         itemStateChanged(null);
     }
 
+    @Override
     public void itemStateChanged(ItemEvent e) {
         Background newBackground = (Background) background.getSelectedItem();
         Decoration newDecoration = (Decoration) decoration.getSelectedItem();
@@ -210,6 +211,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         label.setIcon(new ImageIcon(flag.getImage()));
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         ColorButton button = (ColorButton) e.getSource();
         Color color = JColorChooser

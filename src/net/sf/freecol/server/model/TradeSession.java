@@ -65,6 +65,7 @@ public class TradeSession extends TransactionSession {
         canGift = unit.hasGoodsCargo();
     }
 
+    @Override
     public void complete(ChangeSet cs) {
         super.complete(cs);
     }

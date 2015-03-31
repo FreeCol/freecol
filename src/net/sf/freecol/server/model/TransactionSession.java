@@ -134,7 +134,7 @@ public abstract class TransactionSession {
     }
 
     /**
-     * Look up a session of specified type given the ids of the game objects
+     * Look up a session of specified type given the IDs of the game objects
      * involved.  This version is needed for sessions where one of the objects
      * may have already been disposed of while the session is still valid.
      *

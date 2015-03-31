@@ -124,6 +124,7 @@ public class InstallerTranslations {
         //Set<String> languages = new HashSet<String>();
 
         String[] sourceFiles = SOURCE_DIRECTORY.list(new FilenameFilter() {
+                @Override
                 public boolean accept(File dir, String name) {
                     return name.matches("FreeColMessages_.*\\.properties");
                 }
@@ -178,9 +179,9 @@ public class InstallerTranslations {
             }
             output.append("</langpack>\n");
             File destinationFile = new File(DESTINATION_DIRECTORY, "lang.xml_" + languageCode);
-            FileWriter out = new FileWriter(destinationFile);
-            out.write(output.toString());
-            out.close();
+            try (FileWriter out = new FileWriter(destinationFile)) {
+                out.write(output.toString());
+            }
         }
 
     }

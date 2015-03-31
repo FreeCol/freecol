@@ -21,6 +21,7 @@ package net.sf.freecol.server.model;
 
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Ability;
@@ -160,9 +161,18 @@ public class ServerIndianSettlement extends IndianSettlement
         float cAlarm = missionary.applyModifiers(alarm, turn,
             Modifier.CONVERSION_ALARM_RATE);
         convert += cMiss + (cAlarm - alarm);
-        logger.finest("Conversion at " + getName() + " alarm=" + alarm
-            + " " + convert
-            + " = " + getConvertProgress() + " + " + cMiss + " + " + cAlarm);
+        logger.log(
+                Level.FINEST,
+                "Conversion at {0} alarm={1} {2} = {3} + {4} + {5}",
+                new Object[]{
+                    getName(),
+                    alarm,
+                    convert,
+                    getConvertProgress(),
+                    cMiss,
+                    cAlarm
+                }
+        );
         Settlement colony = tile.getNearestSettlement(other,
             MAX_CONVERT_DISTANCE, true);
         if (convert < (float)getType().getConvertThreshold()
@@ -194,8 +204,8 @@ public class ServerIndianSettlement extends IndianSettlement
                         .addStringTemplate("%nation%", nation)
                         .addName("%colony%", colony.getName()));
                 other.invalidateCanSeeTiles();//+vis(other)
-                logger.fine("Convert at " + getName()
-                    + " for " + colony.getName());
+                logger.log(Level.FINE, "Convert at {0} for {1}",
+                        new Object[]{getName(), colony.getName()});
             }
         }
     }
@@ -242,6 +252,7 @@ public class ServerIndianSettlement extends IndianSettlement
      * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
+    @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
         lb.add(this);
         ServerPlayer owner = (ServerPlayer) getOwner();
@@ -437,10 +448,16 @@ public class ServerIndianSettlement extends IndianSettlement
             ((ServerPlayer)getOwner()).csModifyTension(player,
                 ((isCapital()) ? add : add/2), this, cs);
         }
-        logger.finest("Alarm at " + getName()
-            + " toward " + player.getName()
-            + " modified by " + add
-            + " now = " + getAlarm(player).getValue());
+        logger.log(
+                Level.FINEST,
+                "Alarm at {0} toward {1} modified by {2} now = {3}",
+                new Object[]{
+                    getName(),
+                    player.getName(),
+                    add,
+                    getAlarm(player).getValue()
+                }
+        );
         return change;
     }
 
@@ -534,18 +551,21 @@ public class ServerIndianSettlement extends IndianSettlement
         
         // Inform the enemy of loss of mission
         ServerPlayer missionaryOwner = (ServerPlayer)missionary.getOwner();
-        if ("indianSettlement.mission.denounced".equals(messageId)) {
-            cs.addMessage(See.only(missionaryOwner),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                 messageId, this)
-                    .addStringTemplate("%settlement%", 
-                        getLocationLabelFor(missionaryOwner)));
-        } else if ("indianSettlement.mission.destroyed".equals(messageId)) {
-            cs.addMessage(See.only(missionaryOwner),
-                new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                 messageId, this)
-                    .addStringTemplate("%settlement%", 
-                        getLocationLabelFor(missionaryOwner)));
+        if (null != messageId) switch (messageId) {
+            case "indianSettlement.mission.denounced":
+                cs.addMessage(See.only(missionaryOwner),
+                        new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                messageId, this)
+                                .addStringTemplate("%settlement%",
+                                        getLocationLabelFor(missionaryOwner)));
+                break;
+            case "indianSettlement.mission.destroyed":
+                cs.addMessage(See.only(missionaryOwner),
+                        new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                messageId, this)
+                                .addStringTemplate("%settlement%",
+                                        getLocationLabelFor(missionaryOwner)));
+                break;
         }
     }
 
@@ -575,6 +595,7 @@ public class ServerIndianSettlement extends IndianSettlement
      *
      * @return "serverIndianSettlement"
      */
+    @Override
     public String getServerXMLElementTagName() {
         return "serverIndianSettlement";
     }

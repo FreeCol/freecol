@@ -27,6 +27,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.TexturePaint;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -83,6 +84,7 @@ public class ForestMaker {
 
         // Implement Comparable<ImageLocation>
 
+        @Override
         public int compareTo(ImageLocation other) {
             int dy = other.y - this.y;
             return (dy == 0) ? other.x - this.x : dy;
@@ -165,7 +167,7 @@ public class ForestMaker {
                         if (image.getHeight() > maximumHeight) {
                             maximumHeight = image.getHeight();
                         }
-                    } catch(Exception e) {
+                    } catch(IOException e) {
                         System.out.println("Unable to load image " + imageFile.getName() + ":\n");
                         e.printStackTrace();
                     }

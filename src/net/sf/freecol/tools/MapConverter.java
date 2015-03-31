@@ -22,13 +22,17 @@ package net.sf.freecol.tools;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -66,7 +70,7 @@ public class MapConverter {
                     System.out.println("Saved updated savegame.");
                     server.shutdown();
                     System.out.println("Shut down server.");
-                } catch (Exception e) {
+                } catch (IOException | XMLStreamException | FreeColException | NoRouteToServerException e) {
                     System.out.println(e);
                 }
             }

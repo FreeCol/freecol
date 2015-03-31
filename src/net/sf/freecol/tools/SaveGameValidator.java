@@ -21,6 +21,7 @@ package net.sf.freecol.tools;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import javax.xml.validation.Validator;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 
@@ -71,7 +73,7 @@ public class SaveGameValidator {
                 System.out.println(e.getMessage() 
                                    + " at line=" + e.getLineNumber() 
                                    + " column=" + e.getColumnNumber());
-            } catch (Exception e) {
+            } catch (IOException | SAXException e) {
                 System.out.println("Failed to read " + file.getName());
             }
         }

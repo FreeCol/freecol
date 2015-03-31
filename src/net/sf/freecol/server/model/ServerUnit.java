@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.i18n.Messages;
@@ -217,6 +218,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
+    @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
         lb.add(this);
         ServerPlayer owner = (ServerPlayer) getOwner();
@@ -595,8 +597,15 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 int diff = Math.max(0, Math.round(totalAttackPower - defencePower));
                 int moves = Math.min(9, 3 + diff / 3);
                 setMovesLeft(getMovesLeft() - moves);
-                logger.info(getId() + " slowed by " + attacker.getId()
-                    + " by " + Integer.toString(moves) + " moves.");
+                logger.log(
+                        Level.INFO,
+                        "{0} slowed by {1} by {2} moves.",
+                        new Object[]{
+                            getId(),
+                            attacker.getId(),
+                            Integer.toString(moves)
+                        }
+                );
             } else {
                 attacker = null;
             }
@@ -705,7 +714,13 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
         }
 
-        logger.info("Unit " + getId() + " is exploring rumour " + rumour);
+        logger.log(Level.INFO,
+                "Unit {0} is exploring rumour {1}",
+                new Object[]{
+                    getId(),
+                    rumour
+                }
+        );
         boolean result = true;
         switch (rumour) {
         case BURIAL_GROUND:
@@ -856,7 +871,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             break;
         case NO_SUCH_RUMOUR: case MOUNDS:
         default:
-            logger.warning("Bogus rumour type: " + rumour);
+            logger.log(Level.WARNING, "Bogus rumour type: {0}", rumour);
             break;
         }
         tile.cacheUnseen();//+til
@@ -922,11 +937,17 @@ public class ServerUnit extends Unit implements ServerModelObject {
             setMovesLeft(0); // Disembark always consumes all moves.
         } else {
             if (getMoveCost(newTile) <= 0) {
-                logger.warning("Move of unit: " + getId()
-                    + " from: " + ((oldLocation == null) ? "null"
-                        : oldLocation.getTile().getId())
-                    + " to: " + newTile.getId()
-                    + " has bogus cost: " + getMoveCost(newTile));
+                logger.log(
+                        Level.WARNING,
+                        "Move of unit: {0} from: {1} to: {2} has bogus cost: {3}",
+                        new Object[]{
+                            getId(), (oldLocation == null)
+                                    ? "null"
+                                    : oldLocation.getTile().getId(),
+                            newTile.getId(),
+                            getMoveCost(newTile)
+                        }
+                );
                 setMovesLeft(0);
             }
             setMovesLeft(getMovesLeft() - getMoveCost(newTile));
@@ -995,8 +1016,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 serverPlayer.setNewLandName(newLand);
                 cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                     new NewLandNameMessage(this, newLand));
-                logger.finest("First landing for " + serverPlayer
-                    + " at " + newTile + " with " + this);
+                logger.log(
+                        Level.FINEST,
+                        "First landing for {0} at {1} with {2}",
+                        new Object[]{serverPlayer, newTile, this}
+                );
             }
 
             // Check for new contacts.
@@ -1067,9 +1091,15 @@ public class ServerUnit extends Unit implements ServerModelObject {
                                              this, is)
                                 .addStringTemplate("%nation%", nation)
                                 .addName("%settlement%", is.getName()));
-                        logger.finest("First contact between "
-                            + contactPlayer.getId()
-                            + " and " + is + " at " + newTile);
+                        logger.log(
+                                Level.FINEST,
+                                "First contact between {0} and {1} at {2}",
+                                new Object[]{
+                                    contactPlayer.getId(),
+                                    is,
+                                    newTile
+                                }
+                        );
                     }                   
                 }
                 csActivateSentries(t, cs);
@@ -1115,6 +1145,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      *
      * @return "serverUnit"
      */
+    @Override
     public String getServerXMLElementTagName() {
         return "serverUnit";
     }

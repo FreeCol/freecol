@@ -94,6 +94,7 @@ public class MonarchSession extends TransactionSession {
         super.complete(cs);
     }
 
+    @Override
     public void complete(ChangeSet cs) {
         switch (action) {
         case RAISE_TAX_ACT: case RAISE_TAX_WAR:

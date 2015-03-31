@@ -41,7 +41,7 @@ public class MetaItem extends ServerInfo {
      * @param name The name of the server.
      * @param address The IP-address of the server.
      * @param port The port number in which clients may connect.
-     * @param slotsAvailable Number of players that may conncet.
+     * @param slotsAvailable Number of players that may connect.
      * @param currentlyPlaying Number of players that are currently connected.
      * @param isGameStarted <i>true</i> if the game has started.
      * @param version The version the server is running.
@@ -61,7 +61,7 @@ public class MetaItem extends ServerInfo {
      * @param name The name of the server.
      * @param address The IP-address of the server.
      * @param port The port number in which clients may connect.
-     * @param slotsAvailable Number of players that may conncet.
+     * @param slotsAvailable Number of players that may connect.
      * @param currentlyPlaying Number of players that are currently connected.
      * @param isGameStarted <i>true</i> if the game has started.
      */

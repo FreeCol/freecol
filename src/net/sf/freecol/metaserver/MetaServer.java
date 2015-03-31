@@ -76,10 +76,7 @@ public final class MetaServer extends Thread {
         int port = -1;
         try {
             port = Integer.parseInt(args[0]);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("Usage: java net.sf.freecol.metaserver.MetaServer PORT_NUMBER");
-            System.exit(-1);
-        } catch (NumberFormatException e) {
+        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
             System.out.println("Usage: java net.sf.freecol.metaserver.MetaServer PORT_NUMBER");
             System.exit(-1);
         }
@@ -111,6 +108,7 @@ public final class MetaServer extends Thread {
 
         Timer t = new Timer(true);
         t.scheduleAtFixedRate(new TimerTask() {
+            @Override
             public void run() {
                 try {
                     mr.removeDeadServers();
@@ -127,13 +125,14 @@ public final class MetaServer extends Thread {
      * server a new {@link Connection} is made, with {@link NetworkHandler} as
      * the control object.
      */
+    @Override
     public void run() {
         while (running) {
             Socket clientSocket = null;
             try {
                 clientSocket = serverSocket.accept();
-                logger.info("Client connection from: "
-                    + clientSocket.getInetAddress().toString());
+                logger.log(Level.INFO, "Client connection from: {0}",
+                        clientSocket.getInetAddress().toString());
                 Connection connection = new Connection(clientSocket,
                     getNetworkHandler(), FreeCol.METASERVER_THREAD);
                 connections.put(clientSocket, connection);
@@ -153,7 +152,7 @@ public final class MetaServer extends Thread {
     }
 
     /**
-     * Gets the TCP port that is beeing used for the public socket.
+     * Gets the TCP port that is being used for the public socket.
      * 
      * @return The TCP port.
      */
