@@ -27,6 +27,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -48,23 +49,17 @@ public class ColorCellRenderer extends JLabel implements TableCellRenderer {
     }
 
     /**
-     * Gets the component used to render the cell's value.
-     *
-     * @param table The table whose cell needs to be rendered.
-     * @param color The value of the cell being rendered.
-     * @param hasFocus Indicates whether or not the cell in question has focus.
-     * @param row The row index of the cell that is being rendered.
-     * @param column The column index of the cell that is being rendered.
-     * @return The component used to render the cell's value.
+     * {@inheritDoc}
      */
     public Component getTableCellRendererComponent(JTable table, Object color,
         boolean isSelected, boolean hasFocus, int row, int column) {
-        Color myColor = (Color)color;
-
+        final Color myColor = (Color)color;
         setBackground(myColor);
-
-        setToolTipText("RGB value: " + myColor.getRed()
-            + ", " + myColor.getGreen() + ", " + myColor.getBlue());
+        GUI.localizeToolTip(this, StringTemplate
+            .template("info.rgb")
+            .addAmount("%red%", myColor.getRed())
+            .addAmount("%green%", myColor.getGreen())
+            .addAmount("%blue%", myColor.getBlue()));
         return this;
     }
 }
