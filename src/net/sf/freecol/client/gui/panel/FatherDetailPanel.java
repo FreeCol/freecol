@@ -143,7 +143,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
         header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.SMALL));
 
-        Image image = ImageLibrary.getFoundingFatherImage(father);
+        Image image = ImageLibrary.getFoundingFatherImage(father, false);
         JLabel label = new JLabel(new ImageIcon(image));
 
         StringBuilder text = new StringBuilder();

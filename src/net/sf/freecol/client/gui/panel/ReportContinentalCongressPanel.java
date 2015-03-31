@@ -41,7 +41,6 @@ import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Turn;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -77,7 +76,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             button.addActionListener(this);
             recruitingPanel.add(button);
             JLabel currentFatherLabel
-                = new JLabel(new ImageIcon(ImageLibrary.getFoundingFatherImage(father)));
+                = new JLabel(new ImageIcon(ImageLibrary.getFoundingFatherImage(father, false)));
             currentFatherLabel.setToolTipText(Messages.getDescription(father));
             recruitingPanel.add(currentFatherLabel);
             for (GoodsType gt : getSpecification().getLibertyGoodsTypeList()) {
@@ -113,10 +112,10 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             Image image;
             Turn turn = null;
             if (player.hasFather(father)) {
-                image = ImageLibrary.getFoundingFatherImage(father);
+                image = ImageLibrary.getFoundingFatherImage(father, false);
                 turn = electionTurns.get(name);
             } else {
-                image = ResourceManager.getGrayscaleImage(father.getId() + ".image", 1);
+                image = ImageLibrary.getFoundingFatherImage(father, true);
             }
             panel.add(new JLabel(new ImageIcon(image)), "newline");
             JButton button = GUI.getLinkButton(name, null, father.getId());

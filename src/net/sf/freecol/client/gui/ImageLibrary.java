@@ -598,10 +598,14 @@ public final class ImageLibrary {
      * Returns the portrait of this Founding Father.
      *
      * @param father a <code>FoundingFather</code> value
+     * @param grey if the image should be in greyscale
      * @return an <code>Image</code> value
      */
-    public static Image getFoundingFatherImage(FoundingFather father) {
-        return ResourceManager.getImage(father.getId() + ".image");
+    public static Image getFoundingFatherImage(FoundingFather father, boolean grey) {
+        String resource = father.getId() + ".image";
+        return grey
+            ? ResourceManager.getGrayscaleImage(resource, 1f)
+            : ResourceManager.getImage(resource);
     }
 
     /**
