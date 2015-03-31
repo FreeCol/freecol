@@ -580,7 +580,7 @@ public final class MapViewer {
 
         if (price > 0 && !tile.hasSettlement()) {
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
-            centerImage(g, image);
+            centerImage(g, image, tileWidth, tileHeight);
         }
 
         ImageIcon image;
@@ -1169,7 +1169,8 @@ public final class MapViewer {
      * @param g a <code>Graphics2D</code> value
      * @param image an <code>Image</code> value
      */
-    private void centerImage(Graphics2D g, Image image) {
+    private static void centerImage(Graphics2D g, Image image,
+                                    int tileWidth, int tileHeight) {
         g.drawImage(image,
                     (tileWidth - image.getWidth(null))/2,
                     (tileHeight - image.getHeight(null))/2,
@@ -1372,8 +1373,9 @@ public final class MapViewer {
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
      */
-    private void displayBaseTile(Graphics2D g, ImageLibrary library, Tile tile,
-                                 boolean drawUnexploredBorders) {
+    private static void displayBaseTile(Graphics2D g, ImageLibrary library,
+                                        Tile tile,
+                                        boolean drawUnexploredBorders) {
         if (tile != null) {
             int x = tile.getX();
             int y = tile.getY();
@@ -1515,8 +1517,8 @@ public final class MapViewer {
                 g.setColor(Color.BLACK);
                 g.drawOval(halfWidth, halfHeight, 10, 10);
             } else {
-                centerImage(g, image);
-                if (turns != null) centerImage(g, turns);
+                centerImage(g, image, tileWidth, tileHeight);
+                if (turns != null) centerImage(g, turns, tileWidth, tileHeight);
             }
             g.translate(-point.x, -point.y);
         }
@@ -1705,7 +1707,7 @@ public final class MapViewer {
                 g.setTransform(unitTransforms.get(index));
                 if (unit.isUndead()) {
                     // display darkness
-                    centerImage(g, im);
+                    centerImage(g, im, tileWidth, tileHeight);
                 }
                 displayUnit(g, unit);
             }
@@ -1995,7 +1997,7 @@ public final class MapViewer {
 
                 // Draw image of colony in center of the tile.
                 Image colonyImage = lib.getSettlementImage(settlement);
-                centerImage(g, colonyImage);
+                centerImage(g, colonyImage, tileWidth, tileHeight);
 
                 if (withNumber) {
                     String populationString = Integer.toString(colony.getDisplayUnitCount());
@@ -2009,7 +2011,7 @@ public final class MapViewer {
                         : FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD, lib.getScalingFactor());
                     Image stringImage = ImageLibrary.getStringImage(g, populationString,
                                                            theColor, font);
-                    centerImage(g, stringImage);
+                    centerImage(g, stringImage, tileWidth, tileHeight);
                 }
 
             } else if (settlement instanceof IndianSettlement) {
@@ -2017,7 +2019,7 @@ public final class MapViewer {
                 Image settlementImage = lib.getSettlementImage(settlement);
 
                 // Draw image of indian settlement in center of the tile.
-                centerImage(g, settlementImage);
+                centerImage(g, settlementImage, tileWidth, tileHeight);
 
                 String text = null;
                 Image chip = null;
@@ -2080,7 +2082,7 @@ public final class MapViewer {
             int startIndex = 0;
             for (int index = startIndex; index < tileItems.size(); index++) {
                 if (tileItems.get(index).getZIndex() < OVERLAY_INDEX) {
-                    drawItem(g, tile, tileItems.get(index));
+                    drawItem(g, lib, tile, tileItems.get(index), tileWidth, tileHeight);
                     startIndex = index + 1;
                 } else {
                     startIndex = index;
@@ -2094,7 +2096,7 @@ public final class MapViewer {
             }
             for (int index = startIndex; index < tileItems.size(); index++) {
                 if (tileItems.get(index).getZIndex() < FOREST_INDEX) {
-                    drawItem(g, tile, tileItems.get(index));
+                    drawItem(g, lib, tile, tileItems.get(index), tileWidth, tileHeight);
                     startIndex = index + 1;
                 } else {
                     startIndex = index;
@@ -2117,7 +2119,7 @@ public final class MapViewer {
 
             // draw all remaining items
             for (TileItem ti : tileItems.subList(startIndex, tileItems.size())) {
-                drawItem(g, tile, ti);
+                drawItem(g, lib, tile, ti, tileWidth, tileHeight);
             }
         }
     }
@@ -2247,37 +2249,53 @@ public final class MapViewer {
      * @param tile a <code>Tile</code> value
      * @param item a <code>TileItem</code> value
      */
-    private void drawItem(Graphics2D g, Tile tile, TileItem item) {
+    private void drawItem(Graphics2D g, ImageLibrary lib, Tile tile,
+                          TileItem item, int tileWidth, int tileHeight) {
         if (item instanceof Resource) {
-            Image bonusImage = lib.getBonusImage(((Resource) item).getType());
-            if (bonusImage != null) {
-                centerImage(g, bonusImage);
-            }
+            drawResourceItem(g, lib, (Resource) item, tileWidth, tileHeight);
         } else if (item instanceof LostCityRumour) {
-            centerImage(g, lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR));
+            drawLostCityRumour(g, lib, tileWidth, tileHeight);
         } else {
-            TileImprovement ti = (TileImprovement)item;
-            if (ti.isComplete()) {
-                String key = ti.getType().getId() + ".image";
-                if (ResourceManager.hasResource(key)) {
-                    // Has its own Overlay Image in Misc, use it
-                    Image overlay = ResourceManager.getImage(key,
-                        lib.getScalingFactor());
-                    g.drawImage(overlay, 0, 0, null);
-                } else if (ti.isRiver()
-                    && ti.getMagnitude() < TileImprovement.FJORD_RIVER) {
-                    // @compat 0.10.5
-                    // America_large had some bogus rivers in 0.10.5
-                    if (ti.getStyle() != null)
-                    // end @compat 0.10.5
-                        g.drawImage(lib.getRiverImage(ti.getStyle()), 0, 0, null);
-                } else if (ti.isRoad()) {
-                    drawRoad(g, tile);
-                }
-            }
+            drawTileImprovement(g, lib, tile, (TileImprovement)item);
         }
     }
 
+    private static void drawResourceItem(Graphics2D g, ImageLibrary lib,
+                                         Resource item,
+                                         int tileWidth, int tileHeight) {
+        Image bonusImage = lib.getBonusImage(((Resource) item).getType());
+        if (bonusImage != null) {
+            centerImage(g, bonusImage, tileWidth, tileHeight);
+        }
+    }
+
+    private static void drawLostCityRumour(Graphics2D g, ImageLibrary lib,
+                                           int tileWidth, int tileHeight) {
+        centerImage(g, lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
+            tileWidth, tileHeight);
+    }
+
+    private void drawTileImprovement(Graphics2D g, ImageLibrary lib,
+                                         Tile tile, TileImprovement  ti) {
+        if (ti.isComplete()) {
+            String key = ti.getType().getId() + ".image";
+            if (ResourceManager.hasResource(key)) {
+                // Has its own Overlay Image in Misc, use it
+                Image overlay = ResourceManager.getImage(key,
+                    lib.getScalingFactor());
+                g.drawImage(overlay, 0, 0, null);
+            } else if (ti.isRiver()
+                && ti.getMagnitude() < TileImprovement.FJORD_RIVER) {
+                // @compat 0.10.5
+                // America_large had some bogus rivers in 0.10.5
+                if (ti.getStyle() != null)
+                // end @compat 0.10.5
+                    g.drawImage(lib.getRiverImage(ti.getStyle()), 0, 0, null);
+            } else if (ti.isRoad()) {
+                drawRoad(g, tile);
+            }
+        }
+    }
 
     /**
      * Draws all roads on the given Tile.
