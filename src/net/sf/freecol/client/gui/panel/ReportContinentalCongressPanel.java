@@ -76,23 +76,23 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             JButton button = GUI.getLinkButton(name, null, father.getId());
             button.addActionListener(this);
             recruitingPanel.add(button);
-            JLabel currentFatherLabel = new JLabel(new ImageIcon(ImageLibrary.getFoundingFatherImage(father)));
+            JLabel currentFatherLabel
+                = new JLabel(new ImageIcon(ImageLibrary.getFoundingFatherImage(father)));
             currentFatherLabel.setToolTipText(Messages.getDescription(father));
             recruitingPanel.add(currentFatherLabel);
             for (GoodsType gt : getSpecification().getLibertyGoodsTypeList()) {
-                FreeColProgressBar progressBar = new FreeColProgressBar(gt);
                 int total = 0;
                 for (Colony colony : player.getColonies()) {
                     total += colony.getNetProductionOf(gt);
                 }
-                int liberty = player.getLiberty();
-                int required = player.getTotalFoundingFatherCost();
-                progressBar.update(0, required, liberty, total);
+                FreeColProgressBar progressBar = new FreeColProgressBar(gt, 0,
+                    player.getTotalFoundingFatherCost(), player.getLiberty(),
+                    total);
                 recruitingPanel.add(progressBar, "wrap 20");
             }
         }
-        tabs.addTab(Messages.message("report.continentalCongress.recruiting"), null,
-                    recruitingPanel, null);
+        tabs.addTab(Messages.message("report.continentalCongress.recruiting"),
+                    null, recruitingPanel, null);
 
         Map<FoundingFatherType, JPanel> panels
             = new EnumMap<>(FoundingFatherType.class);

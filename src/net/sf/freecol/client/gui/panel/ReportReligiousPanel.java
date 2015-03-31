@@ -35,8 +35,6 @@ import net.sf.freecol.common.model.WorkLocation;
 
 /**
  * This panel displays the Religious Report.
- *
- * TODO: remove hardcoded "crosses".
  */
 public final class ReportReligiousPanel extends ReportPanel {
 
@@ -48,34 +46,32 @@ public final class ReportReligiousPanel extends ReportPanel {
     public ReportReligiousPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportReligionAction");
 
-        reportPanel.setLayout(new MigLayout("wrap 5, gap 20 20", "", ""));
-        reportPanel.add(GUI.localizedLabel("crosses"));
-
         final Player player = getMyPlayer();
         final Specification spec = getSpecification();
-        final GoodsType crosses = spec.getGoodsType("model.goods.crosses");
 
-        FreeColProgressBar progressBar
-            = new FreeColProgressBar(crosses);
-        reportPanel.add(progressBar, "span");
+        reportPanel.setLayout(new MigLayout("wrap 5, gap 20 20", "", ""));
 
-        List<Colony> colonies = freeColClient.getMySortedColonies();
-        for (Colony colony : colonies) {
-            WorkLocation wl = colony.getWorkLocationForProducing(crosses);
-            if (wl == null
-                || !(wl instanceof Building)) // FIXME: non-OO
-                continue;
-            Building building = (Building)wl;
-            reportPanel.add(createColonyButton(colony),
-                            "split 2, flowy, align center");
-            BuildingPanel bp = new BuildingPanel(getFreeColClient(), building);
-            bp.initialize();
-            reportPanel.add(bp);
+        for (GoodsType gt : spec.getImmigrationGoodsTypeList()) {
+            reportPanel.add(GUI.localizedLabel(gt));
+            FreeColProgressBar progressBar = new FreeColProgressBar(gt, 0,
+                player.getImmigrationRequired(), player.getImmigration(),
+                player.getTotalImmigrationProduction());
+            reportPanel.add(progressBar, "span");
+
+            for (Colony colony : freeColClient.getMySortedColonies()) {
+                WorkLocation wl = colony.getWorkLocationForProducing(gt);
+                if (wl == null
+                    || !(wl instanceof Building)) // FIXME: non-OO
+                    continue;
+                Building building = (Building)wl;
+                reportPanel.add(createColonyButton(colony),
+                                "split 2, flowy, align center");
+                BuildingPanel bp = new BuildingPanel(getFreeColClient(),
+                                                     building);
+                bp.initialize();
+                reportPanel.add(bp);
+            }
         }
-
-        progressBar.update(0, player.getImmigrationRequired(),
-                           player.getImmigration(),
-                           player.getTotalImmigrationProduction());
     }
 }
 
