@@ -415,10 +415,10 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         panel.setSize(panel.getPreferredSize());
 
         List<ChoiceItem<Location>> c = choices();
-        c.add(new ChoiceItem<>(Messages.message("ok"), (Location)null)
-            .okOption());
-        c.add(new ChoiceItem<>(Messages.message("cancel"), (Location)null)
-            .cancelOption().defaultOption());
+        c.add(new ChoiceItem<>(Messages.message("ok"),
+                (Location)null).okOption());
+        c.add(new ChoiceItem<>(Messages.message("selectDestination.cancel"),
+                (Location)null).cancelOption().defaultOption());
         initializeDialog(DialogType.QUESTION, true, panel,
                          getImageLibrary().getSmallImageIcon(unit), c);
     }
