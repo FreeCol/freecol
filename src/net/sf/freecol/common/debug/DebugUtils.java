@@ -205,7 +205,7 @@ public class DebugUtils {
                                                           Player.class);
 
         String response = gui.getInput(true, null,
-            StringTemplate.key("menuBar.debug.addGold"),
+            StringTemplate.template("prompt.selectGold"),
             Integer.toString(1000), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
         int gold;
@@ -234,7 +234,7 @@ public class DebugUtils {
                                                           Player.class);
 
         String response = gui.getInput(true, null,
-            StringTemplate.key("menuBar.debug.addImmigration"),
+            StringTemplate.template("prompt.selectImmigration"),
             Integer.toString(100), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
         int crosses;
@@ -261,7 +261,7 @@ public class DebugUtils {
         final Game sGame = server.getGame();
 
         String response = gui.getInput(true, null,
-            StringTemplate.key("menuBar.debug.addLiberty"),
+            StringTemplate.template("prompt.selectLiberty"),
             Integer.toString(100), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
         int liberty;
@@ -327,8 +327,9 @@ public class DebugUtils {
             uts.add(new ChoiceItem<>(msg, t));
         }
         Collections.sort(uts);
-        UnitType unitChoice = gui.getChoice(true, null, "Select Unit Type",
-                                            null, "cancel", uts);
+        UnitType unitChoice = gui.getChoice(true, null,
+            StringTemplate.template("prompt.selectUnitType"),
+            null, "cancel", uts);
         if (unitChoice == null) return;
 
         Unit carrier = null, sCarrier = null;
@@ -381,13 +382,14 @@ public class DebugUtils {
             gtl.add(new ChoiceItem<>(msg, t));
         }
         Collections.sort(gtl);
-        GoodsType goodsType = gui.getChoice(true, null, "Select Goods Type",
-                                            null, "cancel", gtl);
+        GoodsType goodsType = gui.getChoice(true, null,
+            StringTemplate.template("prompt.selectGoodsType"),
+            null, "cancel", gtl);
         if (goodsType == null) return;
 
         String amount = gui.getInput(true, null,
-                                     StringTemplate.name("Select Goods Amount"),
-                                     "20", "ok", "cancel");
+            StringTemplate.template("prompt.selectGoodsAmount"),
+            "20", "ok", "cancel");
         if (amount == null) return;
 
         int a;
@@ -417,8 +419,9 @@ public class DebugUtils {
         final GUI gui = freeColClient.getGUI();
         List<RandomChoice<Disaster>> disasters = colony.getDisasters();
         if (disasters.isEmpty()) {
-            gui.showErrorMessage(null, "No disasters available for "
-                + colony.getName());
+            gui.showErrorMessage(StringTemplate
+                .template("error.disasterNotAvailable")
+                .addName("%colony%", colony.getName()));
             return;
         }
         List<ChoiceItem<Disaster>> choices = new ArrayList<>();
@@ -428,8 +431,9 @@ public class DebugUtils {
             choices.add(new ChoiceItem<>(label, rc.getObject()));
         }
         Collections.sort(choices);
-        Disaster disaster = gui.getChoice(true, null, "Select disaster",
-                                          null, "cancel", choices);
+        Disaster disaster = gui.getChoice(true, null,
+            StringTemplate.template("prompt.selectDisaster"),
+            null, "cancel", choices);
         if (disaster == null) return;
 
         final FreeColServer server = freeColClient.getFreeColServer();
@@ -440,8 +444,10 @@ public class DebugUtils {
             .getDisaster(disaster.getId());
         if (server.getInGameController().debugApplyDisaster(sColony, sDisaster)
             <= 0) {
-            gui.showErrorMessage(null, "Disaster " + Messages.getName(disaster)
-                + " avoided.");
+            gui.showErrorMessage(StringTemplate
+                .template("error.disasterAvoided")
+                .addName("%colony%", colony.getName())
+                .addNamed("%disaster%", disaster));
         }
         freeColClient.getInGameController().nextModelMessage();
     }
@@ -469,8 +475,9 @@ public class DebugUtils {
             pcs.add(new ChoiceItem<>(msg, p));
         }
         Collections.sort(pcs);
-        Player player = gui.getChoice(true, null, "Select owner", null,
-                                      "cancel", pcs);
+        Player player = gui.getChoice(true, null,
+            StringTemplate.template("prompt.selectOwner"),
+            null, "cancel", pcs);
         if (player == null) return;
 
         ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
@@ -508,8 +515,9 @@ public class DebugUtils {
             }
         }
         Collections.sort(pcs);
-        Player player = gui.getChoice(true, null, "Select owner", null,
-                                      "cancel", pcs);
+        Player player = gui.getChoice(true, null,
+            StringTemplate.template("prompt.selectOwner"),
+            null, "cancel", pcs);
         if (player == null || unit.getOwner() == player) return;
 
         final Game sGame = server.getGame();
@@ -549,8 +557,9 @@ public class DebugUtils {
             rcs.add(new ChoiceItem<>(role.getId(), role));
         }
         Collections.sort(rcs);
-        Role roleChoice = gui.getChoice(true, null, "Select role", null,
-                                        "cancel", rcs);
+        Role roleChoice = gui.getChoice(true, null,
+            StringTemplate.template("prompt.selectRole"),
+            null, "cancel", rcs);
         if (roleChoice == null) return;
 
         sUnit.changeRole(roleChoice, roleChoice.getMaximumCount());
@@ -561,6 +570,7 @@ public class DebugUtils {
      * Debug action to check for client-server desynchronization.
      *
      * Called from the debug menu and client controller.
+     * TODO: This is still fairly new and messy.  Defer i18n for a while.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @return True if desynchronization found.
@@ -672,9 +682,14 @@ public class DebugUtils {
         final FreeColServer server = freeColClient.getFreeColServer();
         final AIMain aiMain = server.getAIMain();
         final AIColony aiColony = aiMain.getAIColony(colony);
-        freeColClient.getGUI().showInformationMessage((aiColony == null)
-            ? colony.getName() + "is not an AI colony."
-            : aiColony.planToString());
+        if (aiColony == null) {
+            freeColClient.getGUI().showErrorMessage(StringTemplate
+                .template("error.notAIColony")
+                .addName("%colony%", colony.getName()));
+        } else {
+            // TODO: Missing i18n
+            freeColClient.getGUI().showInformationMessage(aiColony.planToString());
+        }
     }
 
     /**
@@ -721,9 +736,9 @@ public class DebugUtils {
             toEurope.clear();
             toAmerica.clear();
             units.clear();
-            units.put("To Europe", toEurope);
-            units.put("In Europe", inEurope);
-            units.put("To America", toAmerica);
+            units.put(Messages.message("goingToEurope"), toEurope);
+            units.put(Messages.getName(p.getEurope()), inEurope);
+            units.put(Messages.message("goingToAmerica"), toAmerica);
             lb.add("\n==", Messages.message(p.getNationName()), "==\n");
 
             for (Unit u : p.getEurope().getUnitList()) {
@@ -746,12 +761,13 @@ public class DebugUtils {
                 for (Unit u : list) {
                     lb.add("\n", u.getDescription(Unit.UnitLabelType.NATIONAL));
                     if (u.isDamaged()) {
-                        lb.add(" (Repairing)");
+                        lb.add(" (", Messages.message(u.getRepairLabel()),
+                            ")");
                     } else {
                         lb.add("    ");
                         AIUnit aiu = aiMain.getAIUnit(u);
                         if (!aiu.hasMission()) {
-                            lb.add(" (None)");
+                            lb.add(" (", Messages.message("none"), ")");
                         } else {
                             lb.add(aiu.getMission().toString()
                                 .replaceAll("\n", "    \n"));
@@ -760,7 +776,7 @@ public class DebugUtils {
                 }
                 lb.add("\n");
             }
-            lb.add("\n->Recruitable units\n\n");
+            lb.add("\n->", Messages.message("immigrants"), "\n\n");
             for (UnitType unitType : p.getEurope().getRecruitables()) {
                 lb.add(Messages.getName(unitType), "\n");
             }
@@ -783,7 +799,7 @@ public class DebugUtils {
         final AIMain aiMain = server.getAIMain();
         final AIUnit aiUnit = aiMain.getAIUnit(unit);
         Mission m = aiUnit.getMission();
-        String msg = (m == null) ? "No mission"
+        String msg = (m == null) ? Messages.message("none")
             : (m instanceof TransportMission) ? ((TransportMission)m).toFullString()
             : m.toString();
         freeColClient.getGUI().showInformationMessage(msg);
@@ -793,6 +809,7 @@ public class DebugUtils {
      * Debug action to dump a players units/iterators to stderr.
      *
      * Called from the debug menu.
+     * TODO: missing i18n
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
@@ -836,6 +853,7 @@ public class DebugUtils {
      * Debug action to dump a tile to stderr.
      *
      * Called from tile popup menu.
+     * Not concerned with i18n for stderr output.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param tile The <code>Tile</code> to dump.
@@ -935,11 +953,12 @@ public class DebugUtils {
         }
         Collections.sort(gtl);
         GoodsType goodsType = freeColClient.getGUI().getChoice(true, null,
-            "Select Goods Type", null, "cancel", gtl);
+            StringTemplate.template("prompt.selectGoodsType"),
+            null, "cancel", gtl);
         if (goodsType == null) return;
 
         String response = freeColClient.getGUI().getInput(true, null,
-                StringTemplate.name("Select Goods Amount"),
+                StringTemplate.template("prompt.selectGoodsAmount"),
                 Integer.toString(colony.getGoodsCount(goodsType)),
                 "ok", "cancel");
         if (response == null || response.isEmpty()) return;
@@ -1010,7 +1029,8 @@ public class DebugUtils {
         }
         Collections.sort(rumours);
         RumourType rumourChoice = freeColClient.getGUI().getChoice(true, null,
-            "Select Lost City Rumour", null, "cancel", rumours);
+            StringTemplate.template("prompt.selectLostCityRumour"),
+            null, "cancel", rumours);
         tile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
         sTile.getTileItemContainer().getLostCityRumour()
             .setType(rumourChoice);
@@ -1027,7 +1047,7 @@ public class DebugUtils {
         freeColClient.skipTurns(0); // Clear existing skipping
 
         String response = freeColClient.getGUI().getInput(true, null,
-            StringTemplate.key("menuBar.debug.skipTurns"),
+            StringTemplate.key("prompt.selectTurnsToSkip"),
             Integer.toString(10), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
         int skip;
@@ -1054,7 +1074,7 @@ public class DebugUtils {
         while (more) {
             int val = server.getInGameController().stepRandom();
             more = gui.confirm(true, null, StringTemplate
-                .template("menuBar.debug.randomValue")
+                .template("prompt.stepRNG")
                 .addAmount("%value%", val),
                 null, "more", "cancel");
         }
@@ -1065,6 +1085,7 @@ public class DebugUtils {
      * that is normally hidden.
      *
      * Called from tile popup menu.
+     * TODO: missing i18n
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param is The <code>IndianSettlement</code> to summarize.
