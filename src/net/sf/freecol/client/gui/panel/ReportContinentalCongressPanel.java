@@ -79,16 +79,17 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             JLabel currentFatherLabel = new JLabel(new ImageIcon(ImageLibrary.getFoundingFatherImage(father)));
             currentFatherLabel.setToolTipText(Messages.getDescription(father));
             recruitingPanel.add(currentFatherLabel);
-            GoodsType bellsType = getSpecification().getGoodsType("model.goods.bells");
-            FreeColProgressBar progressBar = new FreeColProgressBar(bellsType);
-            int total = 0;
-            for (Colony colony : player.getColonies()) {
-                total += colony.getNetProductionOf(bellsType);
+            for (GoodsType gt : getSpecification().getLibertyGoodsTypeList()) {
+                FreeColProgressBar progressBar = new FreeColProgressBar(gt);
+                int total = 0;
+                for (Colony colony : player.getColonies()) {
+                    total += colony.getNetProductionOf(gt);
+                }
+                int liberty = player.getLiberty();
+                int required = player.getTotalFoundingFatherCost();
+                progressBar.update(0, required, liberty, total);
+                recruitingPanel.add(progressBar, "wrap 20");
             }
-            int bells = player.getLiberty();
-            int required = player.getTotalFoundingFatherCost();
-            progressBar.update(0, required, bells, total);
-            recruitingPanel.add(progressBar, "wrap 20");
         }
         tabs.addTab(Messages.message("report.continentalCongress.recruiting"), null,
                     recruitingPanel, null);
