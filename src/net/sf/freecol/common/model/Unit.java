@@ -388,6 +388,16 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get a string template describing the repair state of this unit.
+     *
+     * @return A repair label.
+     */
+    public StringTemplate getRepairLabel() {
+        return StringTemplate.template("underRepair")
+            .addAmount("%turns%", getTurnsForRepair());
+    }
+
+    /**
      * Get the <code>UnitType</code> value.
      *
      * @return The current <code>UnitType</code>.
