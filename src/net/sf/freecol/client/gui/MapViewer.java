@@ -1183,12 +1183,15 @@ public final class MapViewer {
      * @param g a <code>Graphics2D</code> value
      * @param text a <code>String</code> value
      */
-    private void centerString(Graphics2D g, String text) {
+    private static void centerString(Graphics2D g, ImageLibrary lib,
+                                     String text,
+                                     int tileWidth, int tileHeight) {
         g.setColor(Color.BLACK);
-        g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY, lib.getScalingFactor()));
+        g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, lib.getScalingFactor()));
         g.drawString(text,
-                     (tileWidth - g.getFontMetrics().stringWidth(text))/2,
-                     (tileHeight - g.getFontMetrics().getAscent())/2);
+            (tileWidth - g.getFontMetrics().stringWidth(text))/2,
+            (tileHeight - g.getFontMetrics().getAscent()     )/2);
     }
 
     /**
@@ -1952,10 +1955,11 @@ public final class MapViewer {
         if (text != null) {
             int b = Messages.getBreakingPoint(text);
             if (b == -1) {
-                centerString(g, text);
+                centerString(g, lib, text, tileWidth, tileHeight);
             } else {
                 g.setColor(Color.BLACK);
-                g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY, lib.getScalingFactor()));
+                g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                    FontLibrary.FontSize.TINY, lib.getScalingFactor()));
                 g.drawString(text.substring(0, b),
                              (tileWidth -
                               g.getFontMetrics().stringWidth(text.substring(0, b)))/2,
@@ -1972,10 +1976,10 @@ public final class MapViewer {
             if (tile.getHighSeasCount() >= 0) {
                 posString += "/" + Integer.toString(tile.getHighSeasCount());
             }
-            centerString(g, posString);
+            centerString(g, lib, posString, tileWidth, tileHeight);
         }
         String value = DebugUtils.getColonyValue(tile);
-        if (value != null) centerString(g, value);
+        if (value != null) centerString(g, lib, value, tileWidth, tileHeight);
     }
 
     /**
@@ -1987,7 +1991,9 @@ public final class MapViewer {
      * @param tile The Tile to draw.
      * @param withNumber Whether to display the number of units present.
      */
-    private void displaySettlement(Graphics2D g, Tile tile, boolean withNumber) {
+    private void displaySettlement(Graphics2D g, ImageLibrary lib,
+                                   Tile tile, int tileWidth, int tileHeight,
+                                   boolean withNumber) {
         final Player player = freeColClient.getMyPlayer();
         final Settlement settlement = tile.getSettlement();
 
@@ -2000,17 +2006,22 @@ public final class MapViewer {
                 centerImage(g, colonyImage, tileWidth, tileHeight);
 
                 if (withNumber) {
-                    String populationString = Integer.toString(colony.getDisplayUnitCount());
+                    String populationString = Integer.toString(
+                        colony.getDisplayUnitCount());
                     int bonus = colony.getProductionBonus();
                     Color theColor = ResourceManager.getColor(
                         "productionBonus." + bonus + ".color");
                     // if government admits even more units, use
                     // italic and bigger number icon
                     Font font = (colony.getPreferredSizeChange() > 0)
-                        ? FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.SMALLER, Font.BOLD | Font.ITALIC, lib.getScalingFactor())
-                        : FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD, lib.getScalingFactor());
-                    Image stringImage = ImageLibrary.getStringImage(g, populationString,
-                                                           theColor, font);
+                        ? FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+                            FontLibrary.FontSize.SMALLER, Font.BOLD | Font.ITALIC,
+                            lib.getScalingFactor())
+                        : FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+                            FontLibrary.FontSize.TINY, Font.BOLD,
+                            lib.getScalingFactor());
+                    Image stringImage = ImageLibrary.getStringImage(g,
+                        populationString, theColor, font);
                     centerImage(g, stringImage, tileWidth, tileHeight);
                 }
 
@@ -2151,7 +2162,7 @@ public final class MapViewer {
                 }
             }
             displayTileItems(g, tile);
-            displaySettlement(g, tile, withNumber);
+            displaySettlement(g, lib, tile, tileWidth, tileHeight, withNumber);
             displayFogOfWar(g, tile);
             displayOptionalValues(g, tile);
         }
