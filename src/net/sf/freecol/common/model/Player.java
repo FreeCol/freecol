@@ -899,22 +899,13 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Get the stem of the fallback settlement name.
-     *
-     * @return The base settlement name for this player.
-     */
-    private String baseSettlementName() {
-        return Messages.message((isEuropean()) ? "Colony" : "Settlement") + "-";
-    }
-    
-    /**
      * Gets a settlement name suitable for this player.
      *
      * @param random An optional pseudo-random number source.
      * @return A new settlement name.
      */
     public String getSettlementName(Random random) {
-        Game game = getGame();
+        final Game game = getGame();
         if (settlementNames == null) initializeSettlementNames(random);
 
         // Try the names in the players national name list.
@@ -923,14 +914,7 @@ public class Player extends FreeColGameObject implements Nameable {
             if (game.getSettlement(name) == null) return name;
         }
 
-        // Fallback method
-        final String base = baseSettlementName();
-        String name;
-        int i = settlements.size() + 1;
-        while (game.getSettlement(name = base + Integer.toString(i)) != null) {
-            i++;
-        }
-        return name;
+        return Messages.getFallbackSettlementName(this);
     }
 
     /**
@@ -940,9 +924,8 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void putSettlementName(String name) {
         if (settlementNames == null) return; // Can not happen
-        if (!name.startsWith(baseSettlementName())) {
-            // Only if it is not a fallback name
-            settlementNames.add(name);
+        if (!Messages.isFallbackSettlementName(name, this)) {
+            settlementNames.add(name); // Only if it is not a fallback name
         }
     }
 
@@ -981,8 +964,6 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A name for the unit, or null if not available.
      */
     public String getNameForUnit(UnitType type, Random random) {
-        String name;
-
         if (!type.isNaval()) return null;
 
         // Collect all the names of existing naval units.
@@ -995,6 +976,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         // Find a new name in the installed ship names if possible.
         if (shipNames == null) initializeShipNames(random);
+        String name;
         while (!shipNames.isEmpty()) {
             name = shipNames.remove(0);
             if (!navalNames.contains(name)) return name;

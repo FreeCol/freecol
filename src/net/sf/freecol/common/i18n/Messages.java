@@ -638,6 +638,27 @@ public class Messages {
     // Other special purpose labels and name collections
 
     /**
+     * Breaks a line between two words. The breaking point
+     * is as close to the center as possible.
+     *
+     * @param string The line for which we should determine a
+     *               breaking point.
+     * @return The best breaking point or <code>-1</code> if there
+     *         are none.
+     */
+    public static int getBreakingPoint(String string) {
+        int center = string.length() / 2;
+        for (int offset = 0; offset < center; offset++) {
+            if (string.charAt(center + offset) == ' ') {
+                return center + offset;
+            } else if (string.charAt(center - offset) == ' ') {
+                return center - offset;
+            }
+        }
+        return -1;
+    }
+
+    /**
      * Gets a string describing the number of turns left for a colony
      * to finish building something.
      *
@@ -652,18 +673,6 @@ public class Messages {
     }
 
     /**
-     * Get the new land name for a player.
-     *
-     * @param player The <code>Player</code> to query.
-     * @return The new land name of a player.
-     */
-    public static String getNewLandName(Player player) {
-        return (player.getNewLandName() == null)
-            ? message(player.getNationId() + ".newLandName")
-            : player.getNewLandName();
-    }
-
-    /**
      * Initialize the otherRivers collection.
      */
     public static synchronized void requireOtherRivers() {
@@ -673,6 +682,66 @@ public class Messages {
             // Does not need to use player or system PRNG
             Collections.shuffle(otherRivers);
         }
+    }
+
+    /**
+     * Initialize the mercenary leaders collection.
+     */
+    private static synchronized void requireMercenaryLeaders() {
+        if (mercenaryLeaders == null) {
+            mercenaryLeaders = new ArrayList<>();
+            collectNames("model.mercenaries.", mercenaryLeaders);
+        }
+    }
+
+    /**
+     * Get the number of mercenary leaders.
+     *
+     * @return The number of mercenary leaders.
+     */
+    public static int getMercenaryLeaderCount() {
+        requireMercenaryLeaders();
+        return mercenaryLeaders.size();
+    }
+
+    /**
+     * Get the name of the nth mercenary leader.
+     *
+     * @param n The index of the leader required.
+     * @return The mercenary leader name.
+     */
+    public static String getMercenaryLeaderName(int n) {
+        requireMercenaryLeaders();
+        return mercenaryLeaders.get(n);
+    }
+
+    /**
+     * Collects all the names with a given prefix.
+     *
+     * @param prefix The prefix to check.
+     * @param names A list to fill with the names found.
+     */
+    private static void collectNames(String prefix, List<String> names) {
+        String name;
+        int i = 0;
+        while (Messages.containsKey(name = prefix + Integer.toString(i))) {
+            names.add(message(name));
+            i++;
+        }
+    }
+
+    // Player-specific naming
+
+    /**
+     * Get the new land name for a player.
+     *
+     * @param player The <code>Player</code> to query.
+     * @return The new land name of a player.
+     */
+    public static String getNewLandName(Player player) {
+        return (player.getNewLandName() == null)
+            ? message(player.getNationId() + ".newLandName")
+            : player.getNewLandName();
     }
 
     /**
@@ -727,49 +796,45 @@ public class Messages {
     }
 
     /**
-     * Initialize the mercenary leaders collection.
+     * Get the stem of the fallback settlement name for a player.
+     *
+     * @param player The <code>Player</code> to get the base settlement name
+     *     for.
+     * @return The base settlement name for a player.
      */
-    private static synchronized void requireMercenaryLeaders() {
-        if (mercenaryLeaders == null) {
-            mercenaryLeaders = new ArrayList<>();
-            collectNames("model.mercenaries.", mercenaryLeaders);
-        }
+    private static String getBaseSettlementName(Player player) {
+        return Messages.message((player.isEuropean()) ? "Colony"
+            : "Settlement") + "-";
     }
 
     /**
-     * Get the number of mercenary leaders.
+     * Is a name a fallback settlement name for a player?
      *
-     * @return The number of mercenary leaders.
+     * @param name The settlement name to check.
+     * @param player The <code>Player</code> to check.
+     * @return True if the name is a fallback settlement name for the player.
      */
-    public static int getMercenaryLeaderCount() {
-        requireMercenaryLeaders();
-        return mercenaryLeaders.size();
+    public static boolean isFallbackSettlementName(String name, Player player) {
+        return name.startsWith(getBaseSettlementName(player));
     }
 
     /**
-     * Get the name of the nth mercenary leader.
+     * Get a fallback settlement name for a player.
      *
-     * @param n The index of the leader required.
-     * @return The mercenary leader name.
+     * @param player The <code>Player</code> to get a fallback
+     *     settlement name for.
+     * @return A unique fallback settlement name for the player.
      */
-    public static String getMercenaryLeaderName(int n) {
-        requireMercenaryLeaders();
-        return mercenaryLeaders.get(n);
-    }
-
-    /**
-     * Collects all the names with a given prefix.
-     *
-     * @param prefix The prefix to check.
-     * @param names A list to fill with the names found.
-     */
-    private static void collectNames(String prefix, List<String> names) {
-        String name;
-        int i = 0;
-        while (Messages.containsKey(name = prefix + Integer.toString(i))) {
-            names.add(message(name));
+    public static String getFallbackSettlementName(Player player) {
+        final String base = getBaseSettlementName(player);
+        int i = player.getSettlements().size() + 1;
+        String name = null;
+        for (;;) {
+            name = base + Integer.toString(i);
+            if (player.getGame().getSettlement(name) == null) break;
             i++;
         }
+        return name;
     }
 
     /**
@@ -816,27 +881,6 @@ public class Messages {
         // Collect the rest
         collectNames(prefix, names);
         return names;
-    }
-
-    /**
-     * Breaks a line between two words. The breaking point
-     * is as close to the center as possible.
-     *
-     * @param string The line for which we should determine a
-     *               breaking point.
-     * @return The best breaking point or <code>-1</code> if there
-     *         are none.
-     */
-    public static int getBreakingPoint(String string) {
-        int center = string.length() / 2;
-        for (int offset = 0; offset < center; offset++) {
-            if (string.charAt(center + offset) == ' ') {
-                return center + offset;
-            } else if (string.charAt(center - offset) == ' ') {
-                return center - offset;
-            }
-        }
-        return -1;
     }
 
 
