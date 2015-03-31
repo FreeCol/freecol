@@ -430,6 +430,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public OptionGroup getValue() {
         return this;
     }
@@ -438,6 +439,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
+    @Override
     public void setValue(OptionGroup value) {
         if (value != null) {
             for (Option other : value.getOptions()) {
@@ -454,6 +456,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setValue(String valueString, String defaultValueString) {
         // No op.  Needed to avoid endless warnings from parent implementation.
     }
@@ -552,6 +555,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

@@ -139,17 +139,20 @@ public class NumberRules {
     private static void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
         while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String tag = xr.getLocalName();
-            if (VERSION_TAG.equals(tag)) {
-                xr.nextTag();
-            } else if (GENERATION_TAG.equals(tag)) {
-                xr.nextTag();
-            } else if (PLURALS_TAG.equals(tag)) {
-                while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    tag = xr.getLocalName();
-                    if (PLURAL_RULES_TAG.equals(tag)) {
-                        readChild(xr);
-                    }
-                }
+            if (null != tag) switch (tag) {
+                case VERSION_TAG:
+                    xr.nextTag();
+                    break;
+                case GENERATION_TAG:
+                    xr.nextTag();
+                    break;
+                case PLURALS_TAG:
+                    while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        tag = xr.getLocalName();
+                        if (PLURAL_RULES_TAG.equals(tag)) {
+                            readChild(xr);
+                        }
+                    }   break;
             }
         }
     }
@@ -181,11 +184,14 @@ public class NumberRules {
             case 1:
                 Rule rule = numberRule.getRule(Category.one);
                 if (rule != null) {
-                    if ("n is 1".equals(rule.toString())) {
+                    if (null != rule.toString()) switch (rule.toString()) {
+                    case "n is 1":
                         number = PLURAL_NUMBER_RULE;
-                    } else if ("n in 0..1".equals(rule.toString())) {
+                        break;
+                    case "n in 0..1":
                         number = ZERO_ONE_NUMBER_RULE;
-                    }
+                        break;
+                }
                 }
                 break;
             case 2:

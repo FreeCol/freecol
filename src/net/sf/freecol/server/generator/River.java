@@ -22,6 +22,7 @@ package net.sf.freecol.server.generator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Map;
@@ -146,7 +147,7 @@ public class River {
             .getTileImprovementType("model.improvement.river");
         this.direction = getRandomMember(logger, "River", Direction.longSides,
                                          random);
-        logger.fine("Starting new river flowing " + direction);
+        logger.log(Level.FINE, "Starting new river flowing {0}", direction);
     }
 
     public List<RiverSection> getSections() {
@@ -274,13 +275,13 @@ public class River {
             map.getSpecification().getTileImprovementType("model.improvement.river");
         if (!riverType.isTileTypeAllowed(tile.getType())) {
             // Mountains, ocean cannot have rivers
-            logger.fine("Tile (" + tile + ") can not have a river.");
+            logger.log(Level.FINE, "Tile ({0}) can not have a river.", tile);
             return false;
         } else if (isNextToWater(tile)) {
-            logger.fine("Tile (" + tile + ") is next to water.");
+            logger.log(Level.FINE, "Tile ({0}) is next to water.", tile);
             return false;
         } else {
-            logger.fine("Tile (" + tile + ") is suitable source.");
+            logger.log(Level.FINE, "Tile ({0}) is a suitable source.", tile);
             return flow(tile);
         }
     }
@@ -299,7 +300,7 @@ public class River {
             int index = randomInt(logger, "Flow", random, length);
             DirectionChange change = DirectionChange.values()[index];
             this.direction = change.getNewDirection(this.direction);
-            logger.fine("Direction is now " + direction);
+            logger.log(Level.FINE, "Direction is now {0}", direction);
         }
 
         for (DirectionChange change : DirectionChange.values()) {
@@ -310,13 +311,16 @@ public class River {
             // is the tile suitable for this river?
             if (!riverType.isTileTypeAllowed(nextTile.getType())) {
                 // Mountains, ocean cannot have rivers
-                logger.fine("Tile (" + nextTile + ") can not have a river.");
+                logger.log(Level.FINE, "Tile ({0}) can not have a river.",
+                        nextTile);
                 continue;
             } else if (this.contains(nextTile)) {
-                logger.fine("Tile (" + nextTile + ") is already in river.");
+                logger.log(Level.FINE, "Tile ({0}) is already in river.",
+                        nextTile);
                 continue;
             } else if (isNextToSelf(nextTile)) {
-                logger.fine("Tile (" + nextTile + ") is next to the river.");
+                logger.log(Level.FINE, "Tile ({0}) is next to the river.",
+                        nextTile);
                 continue;
             } else {
                 // find out if an adjacent tile is next to water
@@ -327,11 +331,13 @@ public class River {
                     if (t.isLand() && !t.hasRiver()) continue;
 
                     sections.add(new RiverSection(source, dir));
-                    RiverSection lastSection = new RiverSection(nextTile, lastDir);
+                    RiverSection lastSection = new RiverSection(nextTile,
+                            lastDir);
                     sections.add(lastSection);
 
                     if (t.hasRiver() && t.isLand()) {
-                        logger.fine("Tile (" + t + ") is next to another river.");
+                        logger.log(Level.FINE,
+                                "Tile ({0}) is next to another river.", t);
                         // increase the size of the other river
                         nextRiver = riverMap.get(t);
                         nextRiver.grow(lastSection, t);
@@ -344,7 +350,8 @@ public class River {
                         drawToMap(sections);
                     } else {
                         // flow into the sea (or a lake)
-                        logger.fine("Tile (" + t + ") is next to water.");
+                        logger.log(Level.FINE,
+                                "Tile ({0}) is next to water.", t);
                         River someRiver = riverMap.get(t);
                         if (someRiver == null) {
                             sections.add(new RiverSection(t, lastDir.getReverseDirection()));
@@ -362,7 +369,7 @@ public class River {
                     return true;
                 }
                 // not next to water
-                logger.fine("Tile (" + nextTile + ") is suitable.");
+                logger.log(Level.FINE, "Tile ({0}) is suitable.", nextTile);
                 sections.add(new RiverSection(source, dir));
                 return flow(nextTile);
             }
@@ -424,14 +431,19 @@ public class River {
                     tile.changeType(greatRiver);
                     // changing the type resets the improvements
                     //container.addRiver(section.getSize(), section.encodeStyle());
-                    logger.fine("Added fjord (magnitude: " + section.getSize() +
-                                ") to tile: " + section.getTile());
+                    logger.log(
+                            Level.FINE,
+                            "Added fjord (magnitude: {0}) to tile: {1}",
+                            new Object[]{section.getSize(), section.getTile()}
+                    );
                 } else if (section.getSize() > TileImprovement.NO_RIVER) {
                     String style = section.encodeStyle();
                     tile.addRiver(section.getSize(), style);
-                    logger.fine("Added river"
-                        + "(magnitude: " + section.getSize()
-                        + " style: " + style);
+                    logger.log(
+                            Level.FINE,
+                            "Added river magnitude: {0} style: {1}",
+                            new Object[]{section.getSize(), style}
+                    );
                 }
                 region.addTile(tile);
                 oldSection = section;

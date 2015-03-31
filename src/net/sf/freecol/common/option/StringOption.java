@@ -92,6 +92,7 @@ public class StringOption extends AbstractOption<String> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringOption clone() {
         StringOption result = new StringOption(getId(), getSpecification());
         result.setValues(this);
@@ -102,6 +103,7 @@ public class StringOption extends AbstractOption<String> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getValue() {
         return value;
     }
@@ -109,6 +111,7 @@ public class StringOption extends AbstractOption<String> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setValue(String value) {
         final String oldValue = this.value;
         this.value = value;
@@ -208,6 +211,7 @@ public class StringOption extends AbstractOption<String> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

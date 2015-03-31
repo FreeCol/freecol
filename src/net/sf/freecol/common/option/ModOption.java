@@ -69,6 +69,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ModOption clone() {
         ModOption result = new ModOption(getSpecification());
         result.setId(this.getId());
@@ -81,6 +82,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
      *
      * @return The value.
      */
+    @Override
     public FreeColModFile getValue() {
         return value;
     }
@@ -90,6 +92,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
      *
      * @param value The new value.
      */
+    @Override
     public void setValue(FreeColModFile value) {
         final FreeColModFile oldValue = this.value;
         this.value = value;
@@ -179,6 +182,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

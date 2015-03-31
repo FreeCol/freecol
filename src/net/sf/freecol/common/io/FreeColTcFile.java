@@ -68,10 +68,11 @@ public class FreeColTcFile extends FreeColModFile {
      * @exception IOException if an error occurs reading the specification.
      */
     public Specification getSpecification() throws IOException {
-        InputStream si = getSpecificationInputStream();
-        if (si == null) return null;
-        Specification specification = new Specification(si);
-        si.close();
+        Specification specification;
+        try (InputStream si = getSpecificationInputStream()) {
+            if (si == null) return null;
+            specification = new Specification(si);
+        }
         return specification;
     }
 

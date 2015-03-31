@@ -192,7 +192,7 @@ public class FreeColDataFile {
                 return new URI("jar:file", file + "!/" + jarDirectory + name,
                                null);
             }
-        } catch (Exception e) {
+        } catch (URISyntaxException e) {
             logger.log(Level.WARNING, "Failed to lookup: " + file + "/" + name,
                        e);
             return null;
@@ -293,6 +293,7 @@ public class FreeColDataFile {
      */
     public FileFilter getFileFilter() {
         return new FileFilter() {
+            @Override
             public boolean accept(File f) {
                 final String name = f.getName();
                 for (String ending : getFileEndings()) {

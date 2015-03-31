@@ -117,6 +117,7 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
      *
      * @return The object identifier of the mod.
      */
+    @Override
     public String getId() {
         return id;
     }

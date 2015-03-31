@@ -69,6 +69,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
 
         // Implement Comparable<MixerWrapper>
 
+        @Override
         public int compareTo(MixerWrapper mw) {
             return getKey().compareTo(mw.getKey());
         }
@@ -165,6 +166,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     /**
      * {@inheritDoc}
      */
+    @Override
     public AudioMixerOption clone() {
         AudioMixerOption result = new AudioMixerOption(getSpecification());
         result.setValues(this);
@@ -174,6 +176,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     /**
      * {@inheritDoc}
      */
+    @Override
     public final MixerWrapper getValue() {
         return value;
     }
@@ -181,6 +184,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void setValue(MixerWrapper newValue) {
         final MixerWrapper oldValue = this.value;
         if (newValue == null) newValue = DEFAULT_MIXER_WRAPPER;
@@ -197,6 +201,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void setValue(String valueString, String defaultValueString) {
         MixerWrapper mw = null;
         if (mw == null && valueString != null) {
@@ -228,6 +233,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

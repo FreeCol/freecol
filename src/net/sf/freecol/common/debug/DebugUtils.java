@@ -291,6 +291,7 @@ public class DebugUtils {
         if (server == null) return;
 
         menu.addChangeListener(new ChangeListener() {
+                @Override
                 public void stateChanged(ChangeEvent e) {
                     boolean skipping = server.getInGameController()
                         .getSkippedTurns() > 0;

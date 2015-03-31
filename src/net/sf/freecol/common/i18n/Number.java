@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.i18n;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -47,11 +48,13 @@ public abstract class Number implements Selector {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getKey(String selector, String template) {
         try {
             return getKey(Double.parseDouble(selector));
         } catch(NumberFormatException e) {
-            logger.warning("Syntax error in string template '" + template + "'");
+            logger.log(Level.WARNING,
+                    "Syntax error in string template ''{0}''", template);
             return Category.other.toString();
         }
     }

@@ -105,6 +105,7 @@ public class CollectionUtils {
     public static <T> Iterable<List<T>> getPermutations(final List<T> l) {
         if (l == null) return null;
         return new Iterable<List<T>>() {
+            @Override
             public Iterator<List<T>> iterator() {
                 return new Iterator<List<T>>() {
                     private final List<T> original = new ArrayList<>(l);
@@ -118,11 +119,13 @@ public class CollectionUtils {
                         return total;
                     }
 
+                    @Override
                     public boolean hasNext() {
                         return index < np;
                     }
 
                     // FIXME: see if we can do it with one array:-)
+                    @Override
                     public List<T> next() {
                         List<T> pick = new ArrayList<>(original);
                         List<T> result = new ArrayList<>();
@@ -137,6 +140,7 @@ public class CollectionUtils {
                         return result;
                     }
 
+                    @Override
                     public void remove() {
                         throw new RuntimeException("remove() not implemented");
                     }

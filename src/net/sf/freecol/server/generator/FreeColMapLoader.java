@@ -52,6 +52,7 @@ public class FreeColMapLoader implements MapLoader {
     }
 
 
+    @Override
     public Layer loadMap(Game game, Layer layer) {
         Map importMap = importGame.getMap();
         Layer highestLayer = layer.compareTo(importMap.getLayer()) < 0
@@ -131,6 +132,7 @@ public class FreeColMapLoader implements MapLoader {
     }
 
 
+    @Override
     public Layer getHighestLayer() {
         return Layer.NATIVES;
     }

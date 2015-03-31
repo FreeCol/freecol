@@ -59,6 +59,7 @@ public class SZAResource extends Resource implements Resource.Preloadable {
     /**
      * Preloading the animation.
      */
+    @Override
     public void preload() {
         synchronized (loadingLock) {
             if (szAnimation != null) return;

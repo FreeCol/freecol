@@ -52,6 +52,7 @@ public class PercentageOption extends IntegerOption {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

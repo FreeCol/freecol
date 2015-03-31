@@ -108,6 +108,7 @@ public class IntegerOption extends AbstractOption<Integer> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IntegerOption clone() {
         IntegerOption result = new IntegerOption(getId(), getSpecification());
         result.setValues(this);
@@ -119,6 +120,7 @@ public class IntegerOption extends AbstractOption<Integer> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Integer getValue() {
         return value;
     }
@@ -126,6 +128,7 @@ public class IntegerOption extends AbstractOption<Integer> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setValue(Integer value) {
         final int oldValue = this.value;
         this.value = value;
@@ -203,6 +206,7 @@ public class IntegerOption extends AbstractOption<Integer> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -473,6 +472,7 @@ public class SimpleMapGenerator implements MapGenerator {
 
         // Sort tiles from the edges of the map inward
         Collections.sort(settlementTiles, new Comparator<Tile>() {
+                @Override
                 public int compare(Tile tile1, Tile tile2) {
                     int distance1 = Math.min(Math.min(tile1.getX(), map.getWidth() - tile1.getX()),
                         Math.min(tile1.getY(), map.getHeight() - tile1.getY()));
@@ -561,6 +561,7 @@ public class SimpleMapGenerator implements MapGenerator {
         List<List<IndianSettlement>> isList = new ArrayList<>(skills.values());
         Comparator<List<IndianSettlement>> listComparator
             = new Comparator<List<IndianSettlement>>() {
+                @Override
                 public int compare(List<IndianSettlement> l1,
                                    List<IndianSettlement> l2) {
                     return l2.size() - l1.size();
@@ -685,6 +686,7 @@ public class SimpleMapGenerator implements MapGenerator {
                                           LogBuilder lb) {
         final Tile center = territory.getCenterTile(map);
         Collections.sort(tiles, new Comparator<Tile>() {
+                @Override
                 public int compare(Tile t1, Tile t2) {
                     return t1.getDistanceTo(center) - t2.getDistanceTo(center);
                 }
@@ -1101,6 +1103,7 @@ public class SimpleMapGenerator implements MapGenerator {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Map createEmptyMap(int width, int height, LogBuilder lb) {
         recache(false); // Reload the options and specification
 
@@ -1111,6 +1114,7 @@ public class SimpleMapGenerator implements MapGenerator {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Map createMap(LogBuilder lb) {
         recache(true); // Reload the options and specification
 

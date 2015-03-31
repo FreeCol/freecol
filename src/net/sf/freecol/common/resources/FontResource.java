@@ -20,7 +20,9 @@
 package net.sf.freecol.common.resources;
 
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.logging.Level;
@@ -71,9 +73,9 @@ public class FontResource extends Resource {
                     .registerFont(font);
             }
 
-            logger.info("Loaded font: " + font.getFontName()
-                + " from: " + resourceLocator);
-        } catch(Exception e) {
+            logger.log(Level.INFO, "Loaded font: {0} from: {1}",
+                    new Object[]{font.getFontName(), resourceLocator});
+        } catch(FontFormatException | IOException e) {
             logger.log(Level.WARNING,
                 "Failed loading font from: " + resourceLocator, e);
             throw e;

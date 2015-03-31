@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
@@ -158,6 +159,7 @@ public class ResourceManager {
 
         preloadThread = new Thread(FreeCol.CLIENT_THREAD
             + "-Resource loader") {
+                @Override
                 public void run() {
                     // Make a local list of the resources to load.
                     // TODO: There are no obvious flaws currently, but this
@@ -171,9 +173,11 @@ public class ResourceManager {
                     int n = 0;
                     for (Resource r : resources) {
                         if (preloadThread != this) {
-                            logger.info(
-                                "Background thread cancelled after it preloaded "
-                                + n + " resources.");
+                            logger.log(Level.INFO,
+                                    "Background thread cancelled after"
+                                            + " it preloaded {0} resources.",
+                                    n
+                            );
                             return;
                         }
                         // TODO: Filter list before running thread?
@@ -182,8 +186,8 @@ public class ResourceManager {
                             n++;
                         }
                     }
-                    logger.info("Background thread preloaded " + n
-                        + " resources.");
+                    logger.log(Level.INFO,
+                            "Background thread preloaded {0} resources.", n);
                 }
             };
         preloadThread.setPriority(2);
@@ -253,15 +257,21 @@ public class ResourceManager {
         final Resource r = getResource(resourceId);
         if (r == null) { // Log only unexpected failures
             if (!resourceId.startsWith("dynamic.")) {
-                logger.finest("getResource(" + resourceId
-                              + ", " + type.getName() + ") failed");
+                logger.log(Level.FINEST, "getResource({0}, {1}) failed",
+                        new Object[]{resourceId, type.getName()});
             }
             return null;
         }
         if (!type.isInstance(r)) { // Log type errors
-            logger.warning("getResource(" + resourceId
-                           + ", " + type.getName() + ") -> "
-                           + r.getClass().getName());
+            logger.log(
+                    Level.WARNING,
+                    "getResource({0}, {1}) -> {2}",
+                    new Object[]{
+                        resourceId,
+                        type.getName(),
+                        r.getClass().getName()
+                    }
+            );
             return null;
         }
         return type.cast(r);

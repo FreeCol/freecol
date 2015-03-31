@@ -209,6 +209,7 @@ public class LogBuilder {
      *
      * @return The buffer contents.
      */
+    @Override
     public String toString() {
         return (sb == null) ? "" : sb.toString();
     }

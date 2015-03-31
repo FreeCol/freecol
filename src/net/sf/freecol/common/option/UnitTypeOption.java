@@ -38,7 +38,8 @@ import net.sf.freecol.common.model.UnitType;
 public class UnitTypeOption extends AbstractOption<UnitType> {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(UnitTypeOption.class.getName());
+    private static final Logger logger = Logger.getLogger(UnitTypeOption.class
+            .getName());
 
     /**
      * FIXME: replace with Predicates.
@@ -113,6 +114,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public UnitTypeOption clone() {
         UnitTypeOption result = new UnitTypeOption(getId(), getSpecification());
         result.value = value;
@@ -128,6 +130,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      *
      * @return The <code>UnitType</code> value.
      */
+    @Override
     public UnitType getValue() {
         return value;
     }
@@ -137,6 +140,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      *
      * @param value The new <code>UnitType</code> value.
      */
+    @Override
     public void setValue(UnitType value) {
         final UnitType oldValue = this.value;
         this.value = value;
@@ -153,6 +157,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void setValue(String valueString, String defaultValueString) {
         if (valueString != null) {
             setValue(getSpecification().getUnitType(valueString));
@@ -166,6 +171,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isNullValueOK() {
         return true;
     }
@@ -173,6 +179,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void generateChoices() {
         if (selector == null) {
             choices.add(getValue());
@@ -260,6 +267,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr); // value is read here
 
@@ -315,6 +323,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

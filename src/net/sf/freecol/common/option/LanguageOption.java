@@ -112,6 +112,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int compareTo(Language l) {
             return toString().compareTo(l.toString());
         }
@@ -244,6 +245,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public LanguageOption clone() {
         LanguageOption result = new LanguageOption(getSpecification());
         result.setValues(this);
@@ -253,6 +255,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final Language getValue() {
         return value;
     }
@@ -260,6 +263,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void setValue(final Language newValue) {
         final Language oldValue = this.value;
         this.value = newValue;
@@ -275,6 +279,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void setValue(String valueString, String defaultValueString) {
         Language l = null;
         if (l == null && valueString != null) {
@@ -306,6 +311,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

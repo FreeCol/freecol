@@ -41,6 +41,7 @@ public class Mods {
     private static final Logger logger = Logger.getLogger(Mods.class.getName());
 
     private static final FileFilter MOD_FILTER = new FileFilter() {
+            @Override
             public boolean accept(File f) {
                 final String name = f.getName();
                 if (name.startsWith(".")) {

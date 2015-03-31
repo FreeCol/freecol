@@ -123,6 +123,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public AbstractUnitOption clone() {
         final Specification spec = getSpecification();
         AbstractUnitOption result = new AbstractUnitOption(getId(), spec);
@@ -141,6 +142,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public AbstractUnit getValue() {
         return value;
     }
@@ -148,6 +150,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setValue(AbstractUnit value) {
         final Specification spec = getSpecification();
         final AbstractUnit oldValue = this.value;
@@ -178,6 +181,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isNullValueOK() {
         return true;
     }
@@ -185,6 +189,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void generateChoices() {
         unitType.generateChoices();
         List<String> roles = new ArrayList<>();
@@ -240,20 +245,22 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
 
-        if (NUMBER_TAG.equals(tag)) {
-            requireNumber();
-            number.readFromXML(xr);
-
-        } else if (ROLE_TAG.equals(tag)) {
-            requireRole();
-            role.readFromXML(xr);
-
-        } else if (UNIT_TYPE_TAG.equals(tag)) {
-            requireUnitType();
-            unitType.readFromXML(xr);
-
-        } else {
-            super.readChild(xr);
+        if (null != tag) switch (tag) {
+            case NUMBER_TAG:
+                requireNumber();
+                number.readFromXML(xr);
+                break;
+            case ROLE_TAG:
+                requireRole();
+                role.readFromXML(xr);
+                break;
+            case UNIT_TYPE_TAG:
+                requireUnitType();
+                unitType.readFromXML(xr);
+                break;
+            default:
+                super.readChild(xr);
+                break;
         }
     }
 
@@ -271,6 +278,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

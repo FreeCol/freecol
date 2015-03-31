@@ -29,6 +29,7 @@ import java.awt.Toolkit;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -79,6 +80,7 @@ public class ImageResource extends Resource implements Resource.Preloadable {
     /**
      * Preload the image.
      */
+    @Override
     public void preload() {
         synchronized (loadingLock) {
             if (image == null) {
@@ -97,7 +99,7 @@ public class ImageResource extends Resource implements Resource.Preloadable {
                     if (mt.statusID(0, false) == MediaTracker.COMPLETE) {
                         image = im;
                     }
-                } catch (Exception e) {
+                } catch (IOException | InterruptedException e) {
                     logger.log(Level.WARNING, "Failed to load image from: "
                         + getResourceLocator(), e);
                 }

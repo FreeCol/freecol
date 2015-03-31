@@ -117,6 +117,7 @@ public class ColonizationMapLoader implements MapLoader {
 
     }
 
+    @Override
     public Layer loadMap(Game game, Layer layer) {
         Specification spec = game.getSpecification();
         Tile[][] tiles = new Tile[header[WIDTH]][header[HEIGHT]];
@@ -167,6 +168,7 @@ public class ColonizationMapLoader implements MapLoader {
         return highestLayer;
     }
 
+    @Override
     public Layer getHighestLayer() {
         return Layer.RIVERS;
     }

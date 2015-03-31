@@ -64,12 +64,14 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
         super(freeColServer);
         // All sub-classes are forced to implement this one
         register("logout", new NetworkRequestHandler() {
+                @Override
                 public Element handle(Connection connection, Element element) {
                     return logout(connection, element);
                 }
             });
         register("disconnect", new DisconnectHandler());
         register("chat", new NetworkRequestHandler() {
+                @Override
                 public Element handle(Connection connection, Element element) {
                     return new ChatMessage(getGame(), element)
                         .handle(freeColServer, connection);
@@ -107,13 +109,14 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      * @param element The root element of the message.
      * @return The reply.
      */
+    @Override
     public final Element handle(Connection connection, Element element) {
         if (element == null) return null;
         String tagName = element.getTagName();
         NetworkRequestHandler handler = _handlerMap.get(tagName);
         if (handler != null) {
             try {
-                logger.log(Level.FINEST, "Handling " + tagName);
+                logger.log(Level.FINEST, "Handling {0}", tagName);
                 return handler.handle(connection, element);
             } catch (Exception e) {
                 // FIXME: should we really catch Exception? The old code did.
@@ -122,7 +125,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
             }
         } else {
             // Should we return an error here? The old handler returned null.
-            logger.warning("No handler installed for " + tagName);
+            logger.log(Level.WARNING, "No handler installed for {0}", tagName);
         }
         return null;
     }
@@ -167,6 +170,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
 
     private class DisconnectHandler implements NetworkRequestHandler {
 
+        @Override
         public Element handle(Connection connection, Element disconnectElement) {
             // The player should be logged out by now, but just in case:
             ServerPlayer player = getFreeColServer().getPlayer(connection);
@@ -183,7 +187,14 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
         }
 
         private void logDisconnect(Connection connection, ServerPlayer player) {
-            logger.info("Disconnection by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
+            logger.log(
+                    Level.INFO,
+                    "Disconnection by: {0}{1}",
+                    new Object[]{
+                        connection,
+                        (player != null) ? " (" + player.getName() + ") " : ""
+                    }
+            );
         }
     }
 }

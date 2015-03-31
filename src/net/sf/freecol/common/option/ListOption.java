@@ -157,6 +157,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      *
      * @return The value.
      */
+    @Override
     public List<AbstractOption<T>> getValue() {
         return value;
     }
@@ -166,6 +167,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      *
      * @param value The value to be set.
      */
+    @Override
     public void setValue(List<AbstractOption<T>> value) {
         // Fail fast: the list value may be empty, but it must not be null.
         if (value==null) throw new IllegalArgumentException("Null ListOption");
@@ -255,34 +257,36 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        // @compat 0.10.4
-        if (OPTION_VALUE_TAG.equals(tag)) {
-            String modId = xr.readId();
-            logger.finest("Found old-style mod value: " + modId);
-            if (modId != null) {
-                FreeColModFile fcmf = Mods.getModFile(modId);
-                if (fcmf != null) {
-                    ModOption modOption = new ModOption(getSpecification());
-                    modOption.setValue(fcmf);
-                    addMember((AbstractOption<T>)modOption);
+        if (null != tag) // @compat 0.10.4
+        switch (tag) {
+            case OPTION_VALUE_TAG:
+                String modId = xr.readId();
+                logger.log(Level.FINEST, "Found old-style mod value: {0}",
+                        modId);
+                if (modId != null) {
+                    FreeColModFile fcmf = Mods.getModFile(modId);
+                    if (fcmf != null) {
+                        ModOption modOption = new ModOption(getSpecification());
+                        modOption.setValue(fcmf);
+                        addMember((AbstractOption<T>)modOption);
+                    }
                 }
-            }
-        // end @compat
-
-        } else if (TEMPLATE_TAG.equals(tag)) {
-            xr.nextTag();
-            template = (AbstractOption<T>)readOption(xr);
-            xr.closeTag(TEMPLATE_TAG);
-
-        } else {
-            AbstractOption<T> op = null;
-            try {
-                op = (AbstractOption<T>)readOption(xr);
-            } catch (XMLStreamException xse) {
-                logger.log(Level.WARNING, "Invalid option at: " + tag, xse);
-                xr.closeTag(tag);
-            }
-            if (op != null) addMember(op);
+                // end @compat
+                break;
+            case TEMPLATE_TAG:
+                xr.nextTag();
+                template = (AbstractOption<T>)readOption(xr);
+                xr.closeTag(TEMPLATE_TAG);
+                break;
+            default:
+                AbstractOption<T> op = null;
+                try {
+                    op = (AbstractOption<T>)readOption(xr);
+                } catch (XMLStreamException xse) {
+                    logger.log(Level.WARNING, "Invalid option at: " + tag, xse);
+                    xr.closeTag(tag);
+            }   if (op != null) addMember(op);
+                break;
         }
     }
 

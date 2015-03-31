@@ -55,6 +55,7 @@ public class FileOption extends AbstractOption<File> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public FileOption clone() {
         FileOption result = new FileOption(getSpecification());
         result.setValues(this);
@@ -64,6 +65,7 @@ public class FileOption extends AbstractOption<File> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public File getValue() {
         return value;
     }
@@ -71,6 +73,7 @@ public class FileOption extends AbstractOption<File> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setValue(File value) {
         final File oldValue = this.value;
         this.value = value;
@@ -137,6 +140,7 @@ public class FileOption extends AbstractOption<File> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

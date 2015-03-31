@@ -74,5 +74,6 @@ public interface Option<T> extends Cloneable, ObjectWithId {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString();
 }

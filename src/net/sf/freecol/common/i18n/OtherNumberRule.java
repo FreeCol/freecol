@@ -26,6 +26,7 @@ package net.sf.freecol.common.i18n;
  */
 public class OtherNumberRule extends Number {
 
+    @Override
     public Category getCategory(double input) {
         return Category.other;
     }

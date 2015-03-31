@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.option;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -156,6 +157,7 @@ public abstract class AbstractOption<T> extends FreeColObject
     /**
      * {@inheritDoc}
      */
+    @Override
     public abstract AbstractOption<T> clone() throws CloneNotSupportedException;
 
     /**
@@ -163,6 +165,7 @@ public abstract class AbstractOption<T> extends FreeColObject
      *
      * @return The value of this <code>Option</code>.
      */
+    @Override
     public abstract T getValue();
 
     /**
@@ -170,6 +173,7 @@ public abstract class AbstractOption<T> extends FreeColObject
      *
      * @param value The new value of this <code>Option</code>.
      */
+    @Override
     public abstract void setValue(T value);
 
 
@@ -217,7 +221,7 @@ public abstract class AbstractOption<T> extends FreeColObject
 
         if (ACTION_TAG.equals(tag)) {
             // FIXME: load FreeColActions from client options?
-            logger.finest("Skipping action " + xr.readId());
+            logger.log(Level.FINEST, "Skipping action {0}", xr.readId());
             xr.nextTag();
 
         } else if (AbstractUnitOption.getXMLElementTagName().equals(tag)) {
@@ -269,7 +273,7 @@ public abstract class AbstractOption<T> extends FreeColObject
             option = new TextOption(spec);
 
         } else {
-            logger.warning("Not an option type: " + tag);
+            logger.log(Level.WARNING, "Not an option type: {0}", tag);
             xr.nextTag();
         }
 

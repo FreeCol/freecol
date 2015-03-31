@@ -26,6 +26,7 @@ package net.sf.freecol.common.i18n;
  */
 public class ZeroOneNumberRule extends Number {
 
+    @Override
     public Category getCategory(double input) {
         if (input == 0 || input == 1) {
             return Category.one;

@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
 
 /**
  * Contains information about a single server.  This information is
- * normally retrived from a meta-server.
+ * normally retrieved from a meta-server.
  * 
  * @see net.sf.freecol.metaserver
  */
@@ -231,6 +231,7 @@ public class ServerInfo {
     /**
      * Returns a <code>String</code> representation of this object for debugging purposes.
      */
+    @Override
     public String toString() {
         return name + "(" + address + ":" + port + ") " + currentlyPlaying 
                 + ", " + slotsAvailable + ", " + isGameStarted + ", " + version

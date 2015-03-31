@@ -89,6 +89,7 @@ public class ChangeSet {
 
     private static final Comparator<Change> changeComparator
         = new Comparator<Change>() {
+            @Override
             public int compare(final Change c1, final Change c2) {
                 return c1.getPriority() - c2.getPriority();
             }
@@ -359,6 +360,7 @@ public class ChangeSet {
          *
          * @return "CHANGE_ANIMATION".
          */
+        @Override
         public int getPriority() {
             return ChangePriority.CHANGE_ANIMATION.getPriority();
         }
@@ -387,6 +389,7 @@ public class ChangeSet {
          * @param doc The owner <code>Document</code>.
          * @return An "animateAttack" element.
          */
+        @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             final Game game = serverPlayer.getGame();
             Element element = doc.createElement("animateAttack");
@@ -412,6 +415,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void attachToElement(Element element) {} // Noop
 
         /**
@@ -458,6 +462,7 @@ public class ChangeSet {
          *
          * @return "CHANGE_ATTRIBUTE", attributes are special.
          */
+        @Override
         public int getPriority() {
             return ChangePriority.CHANGE_ATTRIBUTE.getPriority();
         }
@@ -480,6 +485,7 @@ public class ChangeSet {
          * @param doc The owner <code>Document</code>.
          * @return Null.
          */
+        @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             return null;
         }
@@ -536,6 +542,7 @@ public class ChangeSet {
          *
          * @return The priority.
          */
+        @Override
         public int getPriority() {
             return priority.getPriority();
         }
@@ -547,6 +554,7 @@ public class ChangeSet {
          * @param doc The owner <code>Document</code>.
          * @return An element.
          */
+        @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = message.toXMLElement();
             return (Element) doc.importNode(element, true);
@@ -555,6 +563,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void attachToElement(Element element) {} // Noop
 
         /**
@@ -615,6 +624,7 @@ public class ChangeSet {
          *
          * @return "CHANGE_ANIMATION"
          */
+        @Override
         public int getPriority() {
             return ChangePriority.CHANGE_ANIMATION.getPriority();
         }
@@ -660,6 +670,7 @@ public class ChangeSet {
          * @param doc The owner <code>Document</code>.
          * @return An "animateMove" element.
          */
+        @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("animateMove");
             element.setAttribute("unit", unit.getId());
@@ -678,6 +689,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void attachToElement(Element element) {} // Noop
 
         /**
@@ -728,6 +740,7 @@ public class ChangeSet {
          *
          * @return "CHANGE_UPDATE"
          */
+        @Override
         public int getPriority() {
             return ChangePriority.CHANGE_UPDATE.getPriority();
         }
@@ -773,6 +786,7 @@ public class ChangeSet {
          * @return An "update" element, or null if the update should not
          *     be visible to the player.
          */
+        @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("update");
             element.appendChild(fcgo.toXMLElement(doc, serverPlayer));
@@ -782,6 +796,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void attachToElement(Element element) {} // Noop
 
         /**
@@ -890,6 +905,7 @@ public class ChangeSet {
          *
          * @return "CHANGE_REMOVE"
          */
+        @Override
         public int getPriority() {
             return ChangePriority.CHANGE_REMOVE.getPriority();
         }
@@ -919,6 +935,7 @@ public class ChangeSet {
          * @param doc The owner <code>Document</code>.
          * @return A "remove" element.
          */
+        @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("remove");
             // The main object may be visible, but the contents are
@@ -937,6 +954,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void attachToElement(Element element) {} // Noop
 
         /**
@@ -979,6 +997,7 @@ public class ChangeSet {
          *
          * @return "CHANGE_OWNER"
          */
+        @Override
         public int getPriority() {
             return ChangePriority.CHANGE_OWNED.getPriority();
         }
@@ -991,6 +1010,7 @@ public class ChangeSet {
          * @param doc The owner <code>Document</code>.
          * @return An "addObject" element.
          */
+        @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("addObject");
             Element child = fco.toXMLElement(doc, serverPlayer);
@@ -1002,6 +1022,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void attachToElement(Element element) {} // Noop
 
         /**
@@ -1048,6 +1069,7 @@ public class ChangeSet {
          *
          * @return "CHANGE_OWNER"
          */
+        @Override
         public int getPriority() {
             return ChangePriority.CHANGE_OWNED.getPriority();
         }
@@ -1060,6 +1082,7 @@ public class ChangeSet {
          * @param doc The owner <code>Document</code>.
          * @return An "addObject" element.
          */
+        @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("featureChange");
             element.setAttribute("add", Boolean.toString(add));
@@ -1072,6 +1095,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void attachToElement(Element element) {} // Noop
 
         /**
@@ -1114,6 +1138,7 @@ public class ChangeSet {
          *
          * @return priority.
          */
+        @Override
         public int getPriority() {
             return ChangePriority.CHANGE_NORMAL.getPriority();
         }
@@ -1125,6 +1150,7 @@ public class ChangeSet {
          * @param doc The owner <code>Document</code>.
          * @return An element.
          */
+        @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("spyResult");
             element.setAttribute("tile", tile.getId());
@@ -1139,6 +1165,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void attachToElement(Element element) {} // Noop
 
         /**
@@ -1185,6 +1212,7 @@ public class ChangeSet {
          *
          * @return "CHANGE_STANCE"
          */
+        @Override
         public int getPriority() {
             return ChangePriority.CHANGE_STANCE.getPriority();
         }
@@ -1208,6 +1236,7 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void attachToElement(Element element) {} // Noop
 
         /**
@@ -1259,6 +1288,7 @@ public class ChangeSet {
          *
          * @return priority.
          */
+        @Override
         public int getPriority() {
             return priority;
         }
@@ -1270,6 +1300,7 @@ public class ChangeSet {
          * @param doc The owner <code>Document</code>.
          * @return An element.
          */
+        @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement(name);
             for (int i = 0; i < attributes.length; i += 2) {
@@ -1281,11 +1312,13 @@ public class ChangeSet {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void attachToElement(Element element) {} // Noop
 
         /**
          * Debug helper.
          */
+        @Override
         public String toString() {
             String ret = "[" + getClass().getName() + " " + see
                 + " #" + getPriority()

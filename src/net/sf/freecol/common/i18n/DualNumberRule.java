@@ -29,6 +29,7 @@ public class DualNumberRule extends Number {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Category getCategory(double input) {
         if (input == 1) {
             return Category.one;

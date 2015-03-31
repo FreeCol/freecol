@@ -42,6 +42,7 @@ public class TurnSelector implements Selector {
      * the selector (only used for error reporting)
      * @return a <code>String</code> value
      */
+    @Override
     public String getKey(String selector, String template) {
         String season = null;
         int offset = 5;

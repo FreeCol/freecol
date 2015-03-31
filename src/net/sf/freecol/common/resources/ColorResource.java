@@ -96,14 +96,15 @@ public class ColorResource extends Resource {
                 int col = Integer.decode(colorName);
                 return new Color(col, colorName.length() > 8);
             } catch (NumberFormatException e) {
-                logger.warning("Failed to decode hex colour string: "
-                    + colorName);
+                logger.log(Level.WARNING,
+                        "Failed to decode hex colour string: {0}", colorName);
             }
         } else {
             try {
                 Field field = Color.class.getField(colorName);
                 return (Color) field.get(null);
-            } catch (Exception e) {
+            } catch (IllegalAccessException | IllegalArgumentException
+                    | NoSuchFieldException | SecurityException e) {
                 // probably a non-standard color name
                 logger.log(Level.WARNING, "Failed to decode colour", e);
             }

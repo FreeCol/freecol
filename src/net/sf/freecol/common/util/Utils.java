@@ -22,11 +22,13 @@ package net.sf.freecol.common.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
 import java.util.Random;
@@ -111,7 +113,7 @@ public class Utils {
         try {
             ObjectInputStream ois = new ObjectInputStream(bis);
             return (Random) ois.readObject();
-        } catch (Exception e) {
+        } catch (IOException | ClassNotFoundException e) {
             logger.log(Level.WARNING, "Unable to restore random state.", e);
         }
         return null;
@@ -127,7 +129,7 @@ public class Utils {
         FileOutputStream fos;
         try {
             fos = new FileOutputStream(file);
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
             logger.log(Level.WARNING, "No FileOutputStream for "
                 + file.getName(), e);
             return null;
@@ -135,7 +137,7 @@ public class Utils {
         OutputStreamWriter osw;
         try {
             osw = new OutputStreamWriter(fos, "UTF-8");
-        } catch (Exception e) {
+        } catch (UnsupportedEncodingException e) {
             logger.log(Level.WARNING, "No OutputStreamWriter for "
                 + file.getName(), e);
             try {

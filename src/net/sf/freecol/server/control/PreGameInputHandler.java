@@ -21,6 +21,7 @@ package net.sf.freecol.server.control;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
@@ -63,11 +64,13 @@ public final class PreGameInputHandler extends InputHandler {
         super(freeColServer);
         // FIXME: move and simplify methods later, for now just delegate
         register("ready", new NetworkRequestHandler() {
+            @Override
             public Element handle(Connection connection, Element element) {
                 return ready(connection, element);
             }
         });
         register("requestLaunch", new NetworkRequestHandler() {
+            @Override
             public Element handle(Connection connection, Element element) {
                 Element reply = requestLaunch(connection, element);
                 if (reply != null) {
@@ -77,31 +80,37 @@ public final class PreGameInputHandler extends InputHandler {
             }
         });
         register("setColor", new NetworkRequestHandler() {
+            @Override
             public Element handle(Connection connection, Element element) {
                 return setColor(connection, element);
             }
         });
         register("setNation", new NetworkRequestHandler() {
+            @Override
             public Element handle(Connection connection, Element element) {
                 return setNation(connection, element);
             }
         });
         register("setNationType", new NetworkRequestHandler() {
+            @Override
             public Element handle(Connection connection, Element element) {
                 return setNationType(connection, element);
             }
         });
         register("setAvailable", new NetworkRequestHandler() {
+            @Override
             public Element handle(Connection connection, Element element) {
                 return setAvailable(connection, element);
             }
         });
         register("updateGameOptions", new NetworkRequestHandler() {
+            @Override
             public Element handle(Connection connection, Element element) {
                 return updateGameOptions(connection, element);
             }
         });
         register("updateMapGeneratorOptions", new NetworkRequestHandler() {
+            @Override
             public Element handle(Connection connection, Element element) {
                 return updateMapGeneratorOptions(connection, element);
             }
@@ -115,8 +124,9 @@ public final class PreGameInputHandler extends InputHandler {
      * @param element The <code>Element</code> containing the request.
      * @return A logout reply message.
      */
+    @Override
     protected Element logout(Connection connection, Element element) {
-        logger.info("Logout from: " + connection);
+        logger.log(Level.INFO, "Logout from: {0}", connection);
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         player.setConnected(false);
         getGame().removePlayer(player);

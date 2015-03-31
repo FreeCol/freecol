@@ -253,12 +253,13 @@ public final class Xml {
 
     private static boolean parseTruth( String truthAsString )
     {
-        if ( "yes".equals(truthAsString) ||
-             "true".equals(truthAsString) ) {
-            return true;
-        }
-        else if ( "no".equals(truthAsString) ) {
-            return false;
+        if ( null !=
+                truthAsString ) switch (truthAsString) {
+            case "yes":
+            case "true":
+                return true;
+            case "no":
+                return false;
         }
         throw new RuntimeException( "mus be 'yes' or 'no': " + truthAsString );
     }

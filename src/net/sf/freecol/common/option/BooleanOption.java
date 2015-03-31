@@ -65,6 +65,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public BooleanOption clone() {
         BooleanOption result = new BooleanOption(getId(), getSpecification());
         result.setValues(this);
@@ -74,6 +75,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Boolean getValue() {
         return value;
     }
@@ -81,6 +83,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setValue(Boolean value) {
         final boolean oldValue = this.value;
         this.value = value;
@@ -132,6 +135,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

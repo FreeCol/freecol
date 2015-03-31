@@ -73,6 +73,7 @@ public class DefaultNumberRule extends Number {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Category getCategory(double input) {
         for (Category number : Category.values()) {
             Rule r = rules.get(number);

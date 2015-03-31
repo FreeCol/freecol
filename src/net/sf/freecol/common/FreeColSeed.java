@@ -20,6 +20,7 @@
 package net.sf.freecol.common;
 
 import java.security.SecureRandom;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -44,7 +45,7 @@ public class FreeColSeed {
     public static long getFreeColSeed(boolean generate) {
         if (generate) {
             freeColSeed = new SecureRandom().nextLong();
-            logger.info("Using seed: " + freeColSeed);
+            logger.log(Level.INFO, "Using seed: {0}", freeColSeed);
         }
         return freeColSeed;
     }
@@ -65,6 +66,6 @@ public class FreeColSeed {
      */
     public static void incrementFreeColSeed() {
         freeColSeed = getFreeColSeed(false) + 1;
-        logger.info("Reseeded with: " + freeColSeed);
+        logger.log(Level.INFO, "Reseeded with: {0}", freeColSeed);
     }
 }

@@ -65,6 +65,7 @@ public class FreeColFileFilter extends FileFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean accept(File f) {
         if (allowSubdirs && f.isDirectory()) return true;
         if (!f.isFile()) return false;
@@ -78,6 +79,7 @@ public class FreeColFileFilter extends FileFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getDescription() {
         return description;
     }

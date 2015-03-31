@@ -20,6 +20,7 @@
 package net.sf.freecol.common.util;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -65,7 +66,7 @@ public class Introspector {
 
         try {
             return theClass.getMethod(methodName);
-        } catch (Exception e) {
+        } catch (NoSuchMethodException | SecurityException e) {
             throw new IllegalArgumentException(theClass.getName()
                                                + "." + methodName, e);
         }
@@ -84,7 +85,7 @@ public class Introspector {
 
         try {
             return theClass.getMethod(methodName, argType);
-        } catch (Exception e) {
+        } catch (NoSuchMethodException | SecurityException e) {
             throw new IllegalArgumentException(theClass.getName()
                                                + "." + methodName, e);
         }
@@ -122,14 +123,14 @@ public class Introspector {
         if (argType.isEnum()) {
             try {
                 method = argType.getMethod("name");
-            } catch (Exception e) {
+            } catch (NoSuchMethodException | SecurityException e) {
                 throw new IllegalArgumentException(argType.getName()
                                                    + ".getMethod(name())", e);
             }
         } else {
             try {
                 method = String.class.getMethod("valueOf", argType);
-            } catch (Exception e) {
+            } catch (NoSuchMethodException | SecurityException e) {
                 throw new IllegalArgumentException("String.getMethod(valueOf("
                                                    + argType.getName() + "))", e);
             }
@@ -152,7 +153,7 @@ public class Introspector {
         if (argType.isEnum()) {
             try {
                 method = Enum.class.getMethod("valueOf", Class.class, String.class);
-            } catch (Exception e) {
+            } catch (NoSuchMethodException | SecurityException e) {
                 throw new IllegalArgumentException("Enum.getMethod(valueOf(Class, String))", e);
             }
         } else {
@@ -173,7 +174,7 @@ public class Introspector {
             }
             try {
                 method = argType.getMethod("valueOf", String.class);
-            } catch (Exception e) {
+            } catch (NoSuchMethodException | SecurityException e) {
                 throw new IllegalArgumentException(argType.getName()
                                                    + ".getMethod(valueOf(String))", e);
             }
@@ -196,7 +197,8 @@ public class Introspector {
         if (fieldType == String.class) {
             try {
                 return (String) getMethod.invoke(obj);
-            } catch (Exception e) {
+            } catch (IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e) {
                 throw new IllegalArgumentException(getMethod.getName()
                                                    + "(obj)", e);
             }
@@ -204,7 +206,8 @@ public class Introspector {
             Object result = null;
             try {
                 result = getMethod.invoke(obj);
-            } catch (Exception e) {
+            } catch (IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e) {
                 throw new IllegalArgumentException(getMethod.getName()
                                                    + "(obj)", e);
             }
@@ -212,14 +215,16 @@ public class Introspector {
             if (Modifier.isStatic(convertMethod.getModifiers())) {
                 try {
                     return (String) convertMethod.invoke(null, result);
-                } catch (Exception e) {
+                } catch (IllegalAccessException | IllegalArgumentException
+                        | InvocationTargetException e) {
                     throw new IllegalArgumentException(convertMethod.getName()
                                                        + "(null, result)", e);
                 }
             } else {
                 try {
                     return (String) convertMethod.invoke(result);
-                } catch (Exception e) {
+                } catch (IllegalAccessException | IllegalArgumentException
+                        | InvocationTargetException e) {
                     throw new IllegalArgumentException(convertMethod.getName()
                                                        + "(result)", e);
                 }
@@ -242,7 +247,8 @@ public class Introspector {
         if (fieldType == String.class) {
             try {
                 setMethod.invoke(obj, value);
-            } catch (Exception e) {
+            } catch (IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e) {
                 throw new IllegalArgumentException(setMethod.getName()
                                                    + "(obj, " + value + ")", e);
             }
@@ -253,7 +259,8 @@ public class Introspector {
             if (fieldType.isEnum()) {
                 try {
                     result = convertMethod.invoke(null, fieldType, value);
-                } catch (Exception e) {
+                } catch (IllegalAccessException | IllegalArgumentException
+                        | InvocationTargetException e) {
                     throw new IllegalArgumentException(convertMethod.getName()
                                                        + "(null, " + fieldType.getName()
                                                        + ", " + value + ")", e);
@@ -261,14 +268,16 @@ public class Introspector {
             } else {
                 try {
                     result = convertMethod.invoke(null, value);
-                } catch (Exception e) {
+                } catch (IllegalAccessException | IllegalArgumentException
+                        | InvocationTargetException e) {
                     throw new IllegalArgumentException(convertMethod.getName()
                                                        + "(null, " + value + ")", e);
                 }
             }
             try {
                 setMethod.invoke(obj, result);
-            } catch (Exception e) {
+            } catch (IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e) {
                 throw new IllegalArgumentException(setMethod.getName()
                                                    + "(result)", e);
             }
@@ -291,13 +300,13 @@ public class Introspector {
         Class<?> messageClass;
         try {
             messageClass = Class.forName(tag);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("Unable to find class " + tag, e);
         }
         Constructor<?> constructor;
         try {
             constructor = messageClass.getDeclaredConstructor(types);
-        } catch (Exception e) {
+        } catch (NoSuchMethodException | SecurityException e) {
             String p = "Unable to find constructor " + tag + "(";
             for (Class type : types) p += " " + type;
             p += " )";
@@ -306,7 +315,8 @@ public class Introspector {
         Object instance;
         try {
             instance = constructor.newInstance(params);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | IllegalArgumentException
+                | InstantiationException | InvocationTargetException e) {
             throw new IllegalArgumentException("Failed to construct " + tag, e);
         }
         return instance;

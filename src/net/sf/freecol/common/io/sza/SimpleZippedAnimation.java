@@ -22,7 +22,6 @@ package net.sf.freecol.common.io.sza;
 import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.MediaTracker;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -110,7 +109,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
         } finally {
             try {
                 zipStream.close();
-            } catch (Exception e) {}
+            } catch (IOException e) {}
         }
         
         if (loadingDescriptor.isEmpty()) {
@@ -167,6 +166,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
      *      and other resources (support for sound may be
      *      added later).
      */
+    @Override
     public Iterator<AnimationEvent> iterator() {
         return Collections.unmodifiableList(events).iterator();
     }
@@ -202,10 +202,12 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
             this.durationInMs = durationInMs;
         }
         
+        @Override
         public Image getImage() {
             return image;
         }
         
+        @Override
         public int getDurationInMs() {
             return durationInMs;
         }

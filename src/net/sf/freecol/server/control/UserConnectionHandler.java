@@ -69,6 +69,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
      * @param element The message to be processed.
      * @return The reply.
      */
+    @Override
     public synchronized Element handle(Connection conn, Element element) {
         final String tag = element.getTagName();
         return ("disconnect".equals(tag)) 
@@ -276,7 +277,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
      * @return Null.
      */
     private Element unknown(String tag) {
-        logger.warning("Unknown user connection request: " + tag);
+        logger.log(Level.WARNING, "Unknown user connection request: {0}", tag);
         return null;
     }
 }
