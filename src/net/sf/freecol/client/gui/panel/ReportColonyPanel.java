@@ -172,7 +172,7 @@ public final class ReportColonyPanel extends ReportPanel
             JLabel buildableLabel = null;
             if (currentType != null) {
                 buildableLabel = new JLabel(new ImageIcon(ResourceManager.getImage(currentType.getId()
-                                                          + ".image", 0.66f)));
+                                                          + ".image", 2f/3f)));
                 GUI.localizeToolTip(buildableLabel, StringTemplate
                     .template("colonyPanel.currentlyBuilding")
                     .addNamed("%buildable%", currentType));
@@ -680,7 +680,7 @@ public final class ReportColonyPanel extends ReportPanel
             if (left <= 0) {
                 b = colourButton(cac, Integer.toString(0),
                     ImageLibrary.getUnitImageIcon(u.getType(),
-                        Specification.DEFAULT_ROLE_ID, true, 0.333f),
+                        Specification.DEFAULT_ROLE_ID, true, 1f/3f),
                     cAlarm,
                     stpl("report.colony.making.noteach.description")
                         .addName("%colony%", colony.getName())
@@ -689,7 +689,7 @@ public final class ReportColonyPanel extends ReportPanel
             } else {
                 b = colourButton(cac, Integer.toString(left),
                     ImageLibrary.getUnitImageIcon(u.getType(),
-                        Specification.DEFAULT_ROLE_ID, true, 0.333f),
+                        Specification.DEFAULT_ROLE_ID, true, 1f/3f),
                     Color.BLACK,
                     stpl("report.colony.making.educating.description")
                         .addName("%colony%", colony.getName())
@@ -749,7 +749,7 @@ public final class ReportColonyPanel extends ReportPanel
         final UnitType colonistType = getSpecification().getDefaultUnitType();
         ImageIcon colonistIcon
             = ImageLibrary.getUnitImageIcon(colonistType,
-                Specification.DEFAULT_ROLE_ID, true, 0.333f);
+                Specification.DEFAULT_ROLE_ID, true, 1f/3f);
         reportPanel.add(newLabel(null, colonistIcon, null,
                                  stpl("report.colony.birth.description")));
         reportPanel.add(newLabel("report.colony.making.header", null, null,
@@ -871,7 +871,7 @@ public final class ReportColonyPanel extends ReportPanel
             Suggestion suggestion = suggestions.get(type);
             String label = Integer.toString(suggestion.amount);
             ImageIcon ii = ImageLibrary.getUnitImageIcon(type,
-                Specification.DEFAULT_ROLE_ID, true, 0.333f);
+                Specification.DEFAULT_ROLE_ID, true, 1f/3f);
             StringTemplate tip = (suggestion.oldType == null)
                 ? stpl("report.colony.wanting.description")
                     .addName("%colony%", colony.getName())

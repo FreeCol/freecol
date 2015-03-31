@@ -27,7 +27,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -44,10 +43,10 @@ public final class EventPanel extends FreeColPanel {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param header The title.
-     * @param image A resource key for the image to display.
+     * @param key A resource key for the image to display.
      * @param footer Optional footer text.
      */
-    public EventPanel(FreeColClient freeColClient, String header, String image,
+    public EventPanel(FreeColClient freeColClient, String header, String key,
                       String footer) {
         super(freeColClient, new MigLayout("wrap 1", "[center]", "[]20"));
 
@@ -56,7 +55,7 @@ public final class EventPanel extends FreeColPanel {
             FontLibrary.FontSize.MEDIUM));
 
         JLabel imageLabel
-            = new JLabel(new ImageIcon(ResourceManager.getImage(image)));
+            = new JLabel(new ImageIcon(ResourceManager.getImage(key)));
 
         JLabel footerLabel = (footer == null) ? null : new JLabel(footer);
 

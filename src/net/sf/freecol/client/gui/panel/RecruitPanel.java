@@ -104,7 +104,7 @@ public final class RecruitPanel extends FreeColPanel {
         for (UnitType ut : europe.getRecruitables()) {
             boolean enable = player.checkGold(recruitPrice);
             person[i].setText(Messages.getName(ut));
-            person[i].setIcon(ImageLibrary.getUnitImageIcon(ut, 0.66f));
+            person[i].setIcon(ImageLibrary.getUnitImageIcon(ut, 2f/3f));
             person[i].setEnabled(enable);
             add(person[i], "growx");
             shouldEnable |= enable;

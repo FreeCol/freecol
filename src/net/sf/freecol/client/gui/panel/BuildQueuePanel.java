@@ -64,6 +64,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
 import net.sf.freecol.common.i18n.Messages;
@@ -469,9 +470,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             int size = required.size();
             for (int i = 0; i < size; i++) {
                 AbstractGoods goods = required.get(i);
-                String id = goods.getType().getId() + ".image";
-                ImageIcon icon = new ImageIcon(ResourceManager
-                    .getImage(id, 0.66f));
+                ImageIcon icon = new ImageIcon(ImageLibrary.getGoodsImage(goods.getType(),2f/3f));
                 JLabel goodsLabel = new JLabel(Integer.toString(goods.getAmount()),
                                                icon, SwingConstants.CENTER);
                 if (i == 0 && size > 1) {
@@ -1079,10 +1078,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     public void itemStateChanged(ItemEvent event) {
         if (event.getSource() == this.compactBox) {
             updateDetailView();
-            this.defaultCompact = this.compactBox.isSelected();
+            defaultCompact = this.compactBox.isSelected();
         } else if (event.getSource() == this.showAllBox) {
             updateAllLists();
-            this.defaultShowAll = this.showAllBox.isSelected();
+            defaultShowAll = this.showAllBox.isSelected();
         }
     }
 }

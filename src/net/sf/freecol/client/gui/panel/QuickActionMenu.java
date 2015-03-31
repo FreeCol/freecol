@@ -667,7 +667,7 @@ public final class QuickActionMenu extends JPopupMenu {
         if (newUnitType != null) {
             if (separatorNeeded) this.addSeparator();
             JMenuItem menuItem = GUI.localizedMenuItem("clearSpeciality",
-                ImageLibrary.getUnitImageIcon(newUnitType, 1.0f/3.0f));
+                ImageLibrary.getUnitImageIcon(newUnitType, 1f/3f));
             menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
             menuItem.addActionListener(unitLabel);
             this.add(menuItem);
