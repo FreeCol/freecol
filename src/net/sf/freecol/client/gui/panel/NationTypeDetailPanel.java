@@ -35,6 +35,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -44,7 +45,6 @@ import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -83,7 +83,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
         nations.addAll(getSpecification().getREFNationTypes());
         nations.addAll(getSpecification().getIndianNationTypes());
         for (NationType type : nations) {
-            ImageIcon icon = new ImageIcon(ResourceManager.getImage("model.goods.bells.image", getScale()));
+            ImageIcon icon = new ImageIcon(ImageLibrary.getBellsImage(getScale()));
             parent.add(buildItem(type, icon));
         }
         root.add(parent);

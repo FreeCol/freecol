@@ -608,6 +608,10 @@ public final class ImageLibrary {
             : ResourceManager.getImage(resource);
     }
 
+    public static Image getBellsImage(float scale) {
+        return ResourceManager.getImage("model.goods.bells.image", scale);
+    }
+
     /**
      * Returns the goods-image at the given index.
      *
