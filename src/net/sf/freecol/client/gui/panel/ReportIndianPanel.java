@@ -103,7 +103,7 @@ public final class ReportIndianPanel extends ReportPanel {
 
         ImageLibrary lib = getLibrary();
         JLabel villageLabel = new JLabel();
-        villageLabel.setIcon(new ImageIcon(ImageLibrary.getSettlementImage(opponent.getNationType().getCapitalType(), 0.66f)));
+        villageLabel.setIcon(new ImageIcon(ImageLibrary.getSettlementImage(opponent.getNationType().getCapitalType(), 2f/3f)));
         reportPanel.add(villageLabel, "span, split 2");
         JLabel headline = GUI.localizedLabel(opponent.getNationName());
         headline.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL));
@@ -206,7 +206,7 @@ public final class ReportIndianPanel extends ReportPanel {
                     if (visited && wantedGoods[i] != null) {
                         goodsLabel = new JLabel("");
                         goodsLabel.setIcon(new ImageIcon(ImageLibrary
-                                .getGoodsImage(wantedGoods[i], 0.66f)));
+                                .getGoodsImage(wantedGoods[i], 2f/3f)));
                         GUI.localizeToolTip(goodsLabel, Messages
                             .message(settlement.getWantedGoodsLabel(i, player)));
                     } else {
