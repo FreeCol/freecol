@@ -667,12 +667,12 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the appropriate ImageIcon for Object.
+     * Returns the appropriate Image for Object.
      *
      * @param display The Object to display.
-     * @return The appropriate ImageIcon.
+     * @return The appropriate Image.
      */
-    public ImageIcon getImageIcon(Object display) {
+    public Image getObjectImage(Object display) {
         try {
             Image image;
             if (display instanceof Goods)
@@ -703,7 +703,7 @@ public final class ImageLibrary {
                 logger.warning("could not find image for " + display);
                 return null;
             }
-            return new ImageIcon(image);
+            return image;
         } catch (Exception e) {
             logger.log(Level.WARNING, "could not find image", e);
             return null;
@@ -711,12 +711,12 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the appropriate small ImageIcon for Object.
+     * Returns the appropriate small Image for Object.
      *
      * @param display The Object to display.
-     * @return The appropriate ImageIcon.
+     * @return The appropriate Image.
      */
-    public ImageIcon getSmallImageIcon(Object display) {
+    public Image getSmallObjectImage(Object display) {
         try {
             Image image = null;
             if (display instanceof Goods)
@@ -752,7 +752,7 @@ public final class ImageLibrary {
                 logger.warning("could not find image for " + display);
                 return null;
             }
-            return new ImageIcon(image);
+            return image;
         } catch (Exception e) {
             logger.log(Level.WARNING, "could not find image", e);
             return null;

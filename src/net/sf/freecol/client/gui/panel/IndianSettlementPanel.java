@@ -81,7 +81,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         final Unit missionary = settlement.getMissionary();
         if (missionary != null) {
             add(GUI.localizedLabel(missionary.getLabel(Unit.UnitLabelType.NATIONAL),
-                    imageLibrary.getSmallImageIcon(missionary),
+                    new ImageIcon(imageLibrary.getSmallObjectImage(missionary)),
                     JLabel.CENTER));
         }
 
@@ -89,7 +89,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         final UnitType skillType = settlement.getLearnableSkill();
         add(GUI.localizedLabel(settlement.getLearnableSkillLabel(visited),
                 ((visited && skillType != null)
-                    ? imageLibrary.getSmallImageIcon(skillType)
+                    ? new ImageIcon(imageLibrary.getSmallObjectImage(skillType))
                     : null),
                 JLabel.CENTER));
 
@@ -97,7 +97,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         final Player mostHated = settlement.getMostHated();
         add(GUI.localizedLabel(settlement.getMostHatedLabel(contacted),
                 ((contacted && mostHated != null)
-                    ? imageLibrary.getSmallImageIcon(mostHated)
+                    ? new ImageIcon(imageLibrary.getSmallObjectImage(mostHated))
                     : null),
                 JLabel.CENTER));
 

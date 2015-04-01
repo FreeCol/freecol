@@ -582,13 +582,13 @@ public class GUI {
     }
 
     /**
-     * Simple delegation of image icon retrieval.
+     * Make image icon from an object.
      *
      * @param display The object to find an icon for.
      * @return The <code>ImageIcon</code> found.
      */
     public ImageIcon getImageIcon(Object display) {
-        return imageLibrary.getImageIcon(display);
+        return new ImageIcon(imageLibrary.getObjectImage(display));
     }
 
     /**
@@ -1527,7 +1527,7 @@ public class GUI {
 
         return canvas.showConfirmDialog(modal, tile,
                                         getDefaultTextArea(template),
-                                        imageLibrary.getImageIcon(obj),
+                                        getImageIcon(obj),
                                         okKey, cancelKey);
     }
 
@@ -2050,7 +2050,7 @@ public class GUI {
         if (canvas == null) return null;
 
         return canvas.showChoiceDialog(modal, tile, explain,
-                                       imageLibrary.getImageIcon(obj),
+                                       getImageIcon(obj),
                                        cancelKey, choices);
     }
 

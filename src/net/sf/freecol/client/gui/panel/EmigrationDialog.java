@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.ImageIcon;
 
 import javax.swing.JTextArea;
 import net.miginfocom.swing.MigLayout;
@@ -75,7 +76,7 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
                 .setIcon(ImageLibrary.getUnitImageIcon(ut, 2f/3f)));
         }
 
-        initializeChoiceDialog(false, panel, lib.getSmallImageIcon(europe), 
-                               null, c);
+        initializeChoiceDialog(false, panel,
+            new ImageIcon(lib.getSmallObjectImage(europe)), null, c);
     }
 }

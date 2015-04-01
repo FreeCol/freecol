@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JSpinner;
@@ -134,7 +135,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
             .cancelOption().defaultOption());
         initializeDialog(DialogType.QUESTION, true, panel,
-            getImageLibrary().getSmallImageIcon(settlement), c);
+            new ImageIcon(getImageLibrary().getSmallObjectImage(settlement)), c);
     }
 
     private Nation getOwnerNation() {
