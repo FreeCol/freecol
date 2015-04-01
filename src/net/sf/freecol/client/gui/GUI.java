@@ -80,7 +80,6 @@ import javax.swing.text.StyleContext;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
@@ -220,7 +219,7 @@ public class GUI {
 
     /** The space not being used in windowed mode. */
     private static final int DEFAULT_SCREEN_INSET_WIDTH  = 0;
-    private static final int DEFAULT_SCREEN_INSET_HEIGHT = 32;
+    private static final int DEFAULT_SCREEN_INSET_HEIGHT = 40;
     private static final int DEFAULT_WINDOW_INSET_WIDTH  = 16;
     private static final int DEFAULT_WINDOW_INSET_HEIGHT = 39;
 
@@ -920,12 +919,16 @@ public class GUI {
         try {
             Insets in = Toolkit.getDefaultToolkit()
                 .getScreenInsets(gd.getDefaultConfiguration());
-            height -= in.bottom + in.top;
             width -= in.left + in.right;
-            lb.add("  less insets: ", (in.left + in.right),
+            height -= in.bottom + in.top;
+            lb.add("  less screen insets: ", (in.left + in.right),
                 "x", (in.bottom + in.top), "\n");
         } catch (Exception e) {
             logger.log(Level.WARNING, "Unable to get screen insets", e);
+            width -= DEFAULT_SCREEN_INSET_WIDTH;
+            height -= DEFAULT_SCREEN_INSET_HEIGHT;
+            lb.add("  less faked screen insets: ", DEFAULT_SCREEN_INSET_WIDTH,
+                "x", DEFAULT_SCREEN_INSET_HEIGHT, "\n");
         }
 
         // FIXME: find better way to get size of window title and
