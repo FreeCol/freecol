@@ -628,7 +628,7 @@ public final class ColonyPanel extends PortPanel
             GoodsType goodsType = unit.getWorkType();
             Unit student = unit.getStudent();
 
-            unitIcon = ImageLibrary.getUnitImageIcon(unit, 0.5f);
+            unitIcon = new ImageIcon(ImageLibrary.getUnitImage(unit, 0.5f));
             StringBuilder sb = new StringBuilder(64);
             if (student != null) {
                 sb.append(unit.getDescription())
@@ -676,7 +676,7 @@ public final class ColonyPanel extends PortPanel
         colonyUnitsMenu.addSeparator();
         for (final Unit unit : colonyTile.getUnitList()) {
             if (unit.isCarrier()) {
-                unitIcon = ImageLibrary.getUnitImageIcon(unit, 0.5f);
+                unitIcon = new ImageIcon(ImageLibrary.getUnitImage(unit, 0.5f));
                 String menuTitle = unit.getDescription()
                     + " " + Messages.message("inPort.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
@@ -691,7 +691,7 @@ public final class ColonyPanel extends PortPanel
                 colonyUnitsMenu.add(subMenu);
                 if (unit.getUnitList() != null) {
                     for (final Unit innerUnit : unit.getUnitList()) {
-                        unitIcon = ImageLibrary.getUnitImageIcon(innerUnit, 0.5f);
+                        unitIcon = new ImageIcon(ImageLibrary.getUnitImage(innerUnit, 0.5f));
                         menuTitle = innerUnit.getDescription()
                             + " " + Messages.message("cargoOnCarrier")
                             + " " + unit.getDescription();
@@ -708,7 +708,7 @@ public final class ColonyPanel extends PortPanel
                     }
                 }
             } else if (!unit.isOnCarrier()) {
-                unitIcon = ImageLibrary.getUnitImageIcon(unit, 0.5f);
+                unitIcon = new ImageIcon(ImageLibrary.getUnitImage(unit, 0.5f));
                 String menuTitle = unit.getDescription()
                     + " " + Messages.message("outsideOfColony.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);

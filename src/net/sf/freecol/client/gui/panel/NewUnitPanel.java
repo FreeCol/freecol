@@ -110,8 +110,8 @@ public class NewUnitPanel extends FreeColPanel {
             boolean enable = player.checkGold(price);
             JButton newButton = new JButton();
             newButton.setLayout(new MigLayout("wrap 2", "[60]", "[30][30]"));
-            ImageIcon icon = ImageLibrary.getUnitImageIcon(ut,
-                Specification.DEFAULT_ROLE_ID, !enable, 2f/3f);
+            ImageIcon icon = new ImageIcon(ImageLibrary.getUnitImage(ut,
+                Specification.DEFAULT_ROLE_ID, !enable, 2f/3f));
             JLabel name = GUI.localizedLabel(ut);
             name.setEnabled(enable);
             JLabel gold = GUI.localizedLabel(StringTemplate

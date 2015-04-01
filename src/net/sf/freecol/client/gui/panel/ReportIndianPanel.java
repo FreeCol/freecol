@@ -184,8 +184,8 @@ public final class ReportIndianPanel extends ReportPanel {
                 JLabel skillLabel;
                 if (visited && skillType != null) {
                     skillLabel = new JLabel("");
-                    skillLabel.setIcon(ImageLibrary
-                        .getUnitImageIcon(skillType, 2f/3f));
+                    skillLabel.setIcon(new ImageIcon(ImageLibrary
+                        .getUnitImage(skillType, 2f/3f)));
                     GUI.localizeToolTip(skillLabel, Messages
                         .message(settlement.getLearnableSkillLabel(visited)));
                 } else {

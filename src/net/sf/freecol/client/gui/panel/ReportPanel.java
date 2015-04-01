@@ -128,8 +128,8 @@ public class ReportPanel extends FreeColPanel {
         UnitType unitType = au.getType(getSpecification());
         String roleId = au.getRoleId();
         int count = au.getNumber();
-        ImageIcon unitIcon = ImageLibrary.getUnitImageIcon(unitType, roleId,
-                                                           (count == 0), 2f/3f);
+        ImageIcon unitIcon = new ImageIcon(ImageLibrary.getUnitImage(
+            unitType, roleId, (count == 0), 2f/3f));
         JLabel unitLabel = new JLabel(unitIcon);
         unitLabel.setText(String.valueOf(count));
         if (count == 0) {

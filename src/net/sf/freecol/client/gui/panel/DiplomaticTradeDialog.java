@@ -930,9 +930,9 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             str = Messages.message("negotiationDialog.cancel");
             c.add(new ChoiceItem<>(str, bogus).cancelOption().defaultOption());
         }
-        ImageIcon icon = (otherColony != null)
-            ? new ImageIcon(getImageLibrary().getSettlementImage(otherColony))
-            : getImageLibrary().getUnitImageIcon(otherUnit);
+        ImageIcon icon = new ImageIcon((otherColony != null)
+            ? getImageLibrary().getSettlementImage(otherColony)
+            : getImageLibrary().getUnitImage(otherUnit));
         initializeDialog(DialogType.QUESTION, true, panel, icon, c);
 
         updateDialog();

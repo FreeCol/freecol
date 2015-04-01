@@ -117,7 +117,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
                                                       int index,
                                                       boolean isSelected,
                                                       boolean cellHasFocus) {
-            imageLabel.setIcon(ImageLibrary.getUnitImageIcon(value.unit, 0.5f));
+            imageLabel.setIcon(new ImageIcon(ImageLibrary.getUnitImage(value.unit, 0.5f)));
             nameLabel.setText(value.name);
             locationLabel.setText(value.location);
 

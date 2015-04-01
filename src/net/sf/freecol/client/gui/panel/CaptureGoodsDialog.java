@@ -27,6 +27,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -185,7 +186,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         c.add(new ChoiceItem<>(Messages.message("ok"), fake)
             .okOption().defaultOption());
         initializeDialog(DialogType.QUESTION, false, panel,
-            getImageLibrary().getUnitImageIcon(winner), c);
+            new ImageIcon(getImageLibrary().getUnitImage(winner)), c);
     }
 
 

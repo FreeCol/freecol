@@ -36,6 +36,7 @@ import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -70,8 +71,8 @@ public final class ReportLabourPanel extends ReportPanel {
             this.unitType = unitType;
             setOpaque(false);
             setLayout(new MigLayout("wrap 2", "[60, right][left]"));
-            add(new JLabel(ImageLibrary.getUnitImageIcon(unitType, roleId,
-                                                         (count == 0), 2f/3f)),
+            add(new JLabel(new ImageIcon(ImageLibrary.getUnitImage(
+                    unitType, roleId, (count == 0), 2f/3f))),
                 "spany 2");
             add(new JLabel(Messages.getName(unitType)));
             add(new JLabel(Integer.toString(count)));

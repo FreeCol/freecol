@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -84,7 +85,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
         c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
             .cancelOption());
         initializeDialog(DialogType.QUESTION, false, panel,
-                         getImageLibrary().getUnitImageIcon(unit), c);
+            new ImageIcon(getImageLibrary().getUnitImage(unit)), c);
     }
 
 

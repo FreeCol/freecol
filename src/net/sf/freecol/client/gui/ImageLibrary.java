@@ -1147,97 +1147,14 @@ public final class ImageLibrary {
             + (isEven(x, y) ? "0" : "1") + ".image", scale);
     }
 
-    /**
-     * Returns the ImageIcon that will represent the given unit.
-     *
-     * @param unit The unit whose graphics type is needed.
-     * @return an <code>ImageIcon</code> value
-     */
-    public ImageIcon getUnitImageIcon(Unit unit) {
-        return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
-            unit.hasNativeEthnicity(), false, scalingFactor);
-    }
-
-    public ImageIcon getUnitImageIcon(Unit unit, boolean grayscale) {
-        return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
-            unit.hasNativeEthnicity(), grayscale, scalingFactor);
-    }
-
-    public static ImageIcon getUnitImageIcon(Unit unit, boolean grayscale,
-                                      float scale) {
-        return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
-            unit.hasNativeEthnicity(), grayscale, scale);
-    }
-
-    public static ImageIcon getUnitImageIcon(Unit unit, float scale) {
-        return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
-            unit.hasNativeEthnicity(), false, scale);
-    }
-
-    public ImageIcon getSmallUnitImageIcon(Unit unit) {
-        return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
+    public Image getSmallUnitImage(Unit unit) {
+        return getUnitImage(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), false, scalingFactor * (2f/3f));
     }
 
-    public ImageIcon getSmallUnitImageIcon(Unit unit, boolean grayscale) {
-        return getUnitImageIcon(unit.getType(), unit.getRole().getId(),
+    public Image getSmallUnitImage(Unit unit, boolean grayscale) {
+        return getUnitImage(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), grayscale, scalingFactor * (2f/3f));
-    }
-
-    /**
-     * Returns the ImageIcon that will represent a unit of the given type.
-     *
-     * @param unitType an <code>UnitType</code> value
-     * @return an <code>ImageIcon</code> value
-     */
-    public ImageIcon getUnitImageIcon(UnitType unitType) {
-        return getUnitImageIcon(unitType, unitType.getDisplayRoleId(),
-                                false, false, scalingFactor);
-    }
-
-    public static ImageIcon getUnitImageIcon(UnitType unitType, float scale) {
-        return getUnitImageIcon(unitType, unitType.getDisplayRoleId(),
-                                false, false, scale);
-    }
-
-    public ImageIcon getUnitImageIcon(UnitType unitType, String roleId) {
-        return getUnitImageIcon(unitType, roleId,
-                                false, false, scalingFactor);
-    }
-
-    public ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
-                                      boolean grayscale) {
-        return getUnitImageIcon(unitType, roleId,
-                                false, grayscale, scalingFactor);
-    }
-
-    public static ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
-                                      boolean grayscale, float scale) {
-        return getUnitImageIcon(unitType, roleId,
-                                false, grayscale, scale);
-    }
-
-    public static ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
-                                      float scale) {
-        return getUnitImageIcon(unitType, roleId,
-                                false, false, scale);
-    }
-
-    /**
-     * Gets the image icon that will represent a given unit.
-     *
-     * @param unitType The type of unit to be represented.
-     * @param roleId The id of the unit role.
-     * @param nativeEthnicity If true the unit is a former native.
-     * @param grayscale If true draw in inactive/disabled-looking state.
-     * @param scale How much the image icon is scaled.
-     * @return A suitable <code>ImageIcon</code>.
-     */
-    public static ImageIcon getUnitImageIcon(UnitType unitType, String roleId,
-                                      boolean nativeEthnicity,
-                                      boolean grayscale, float scale) {
-        return new ImageIcon(getUnitImage(unitType,roleId,
-                                          nativeEthnicity,grayscale,scale));
     }
 
     public Image getUnitImage(Unit unit) {
@@ -1263,6 +1180,16 @@ public final class ImageLibrary {
     public static Image getUnitImage(UnitType unitType, float scale) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
             false, false, scale);
+    }
+
+    public static Image getUnitImage(UnitType unitType, String roleId,
+                                     float scale) {
+        return getUnitImage(unitType, roleId, false, false, scale);
+    }
+
+    public static Image getUnitImage(UnitType unitType, String roleId,
+                                     boolean grayscale, float scale) {
+        return getUnitImage(unitType, roleId, false, grayscale, scale);
     }
 
     /**

@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.swing.ImageIcon;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -81,7 +82,7 @@ public final class ReportLabourDetailPanel extends ReportPanel
 
 
         // summary
-        detailPanel.add(new JLabel(getLibrary().getUnitImageIcon(unitType)), "spany");
+        detailPanel.add(new JLabel(new ImageIcon(getLibrary().getUnitImage(unitType))), "spany");
         detailPanel.add(GUI.localizedLabel(unitType));
         detailPanel.add(new JLabel(String.valueOf(unitCount.getCount(unitType))), "wrap 10");
         boolean canTrain = false;

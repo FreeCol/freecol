@@ -147,7 +147,7 @@ public final class QuickActionMenu extends JPopupMenu {
         final Unit unit = unitLabel.getUnit();
 
         this.setLabel("Unit");
-        ImageIcon unitIcon = ImageLibrary.getUnitImageIcon(unit, 2f/3f);
+        ImageIcon unitIcon = new ImageIcon(ImageLibrary.getUnitImage(unit, 2f/3f));
         JMenuItem name = new JMenuItem(unit.getDescription(Unit.UnitLabelType.NATIONAL)
             + " (" + Messages.message("colopedia") + ")", unitIcon);
         name.setActionCommand(UnitAction.COLOPEDIA.toString());
@@ -402,7 +402,7 @@ public final class QuickActionMenu extends JPopupMenu {
             for (Unit teacher : unit.getColony().getTeachers()) {
                 if (unit.canBeStudent(teacher) && unit.isInColony()) {
                     JMenuItem menuItem = null;
-                    ImageIcon teacherIcon = ImageLibrary.getUnitImageIcon(teacher, 0.5f);
+                    ImageIcon teacherIcon = new ImageIcon(ImageLibrary.getUnitImage(teacher, 0.5f));
                     if (teacher.getStudent() != unit) {
                         menuItem = GUI.localizedMenuItem("assignToTeacher",
                                                          teacherIcon);
@@ -445,7 +445,8 @@ public final class QuickActionMenu extends JPopupMenu {
         int experience = unit.getExperience();
         GoodsType goods = unit.getExperienceType();
         if (experience > 0 && goods != null) {
-            UnitType expertType = freeColClient.getGame().getSpecification().getExpertForProducing(goods);
+            UnitType expertType = freeColClient.getGame()
+                .getSpecification().getExpertForProducing(goods);
             if (unit.getType().canBeUpgraded(expertType, ChangeType.EXPERIENCE)) {
                 int maxExperience = unit.getType().getMaximumExperience();
                 double probability = unit.getType().getUnitTypeChange(expertType)
@@ -453,8 +454,9 @@ public final class QuickActionMenu extends JPopupMenu {
                 String jobName = Messages.message(goods.getWorkingAsKey());
                 JPanel experiencePanel = new MigPanel();
                 experiencePanel.setLayout(new MigLayout("wrap 3"));
-                experiencePanel.add(new JLabel(ImageLibrary.getUnitImageIcon(expertType, 0.5f)),
-                                    "spany 2");
+                experiencePanel.add(new JLabel(new ImageIcon(
+                        ImageLibrary.getUnitImage(expertType, 0.5f))),
+                    "spany 2");
                 experiencePanel.add(GUI.localizedLabel(StringTemplate
                         .template("menu.unit.experience")
                         .addName("%job%", jobName)));
@@ -667,7 +669,7 @@ public final class QuickActionMenu extends JPopupMenu {
         if (newUnitType != null) {
             if (separatorNeeded) this.addSeparator();
             JMenuItem menuItem = GUI.localizedMenuItem("clearSpeciality",
-                ImageLibrary.getUnitImageIcon(newUnitType, 1f/3f));
+                new ImageIcon(ImageLibrary.getUnitImage(newUnitType, 1f/3f)));
             menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
             menuItem.addActionListener(unitLabel);
             this.add(menuItem);

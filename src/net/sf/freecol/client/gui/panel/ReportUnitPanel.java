@@ -204,8 +204,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
     }
 
     protected JButton getUnitButton(Unit unit) {
-        ImageIcon icon = getLibrary().getUnitImageIcon(unit.getType(),
-                                                       unit.getRole().getId());
+        ImageIcon icon = new ImageIcon(getLibrary().getUnitImage(unit));
         JButton button = GUI.getLinkButton("", icon, unit.getLocation().getId());
         button.addActionListener(this);
         StringTemplate tip;

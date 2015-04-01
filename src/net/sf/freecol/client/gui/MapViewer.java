@@ -583,12 +583,12 @@ public final class MapViewer {
             centerImage(g, image, tileWidth, tileHeight);
         }
 
-        ImageIcon image;
+        Image image;
         if (unit != null
-            && (image = ImageLibrary.getUnitImageIcon(unit, 0.5f)) != null) {
-            g.drawImage(image.getImage(),
-                        tileWidth/4 - image.getIconWidth() / 2,
-                        halfHeight - image.getIconHeight() / 2, null);
+            && (image = ImageLibrary.getUnitImage(unit, 0.5f)) != null) {
+            g.drawImage(image,
+                        tileWidth/4 - image.getWidth(null) / 2,
+                        halfHeight - image.getHeight(null) / 2, null);
             // Draw an occupation and nation indicator.
             boolean owner = freeColClient.getMyPlayer().owns(unit);
             String text = Messages.message(unit.getOccupationKey(owner));
