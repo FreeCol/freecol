@@ -491,16 +491,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the coat-of-arms image for the given Nation.
-     *
-     * @param nation The nation.
-     * @return the coat-of-arms of this nation
-     */
-    public static ImageIcon getCoatOfArmsImageIcon(Nation nation) {
-        return new ImageIcon(ResourceManager.getImage(nation.getId() + ".image"));
-    }
-
-    /**
      * Returns the scaled terrain-image for a terrain type (and position 0, 0).
      *
      * @param type The type of the terrain-image to return.
