@@ -25,7 +25,6 @@ import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GameOptions;
@@ -52,8 +51,8 @@ public final class GoodsLabel extends AbstractGoodsLabel
      *
      * @param goods The Goods that this JLabel will visually represent.
      */
-    public GoodsLabel(Goods goods) {
-        super(goods);
+    public GoodsLabel(ImageLibrary lib, Goods goods) {
+        super(lib, goods);
 
         initialize();
     }

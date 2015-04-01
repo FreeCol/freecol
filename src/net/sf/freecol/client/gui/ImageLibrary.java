@@ -621,16 +621,6 @@ public final class ImageLibrary {
         return ResourceManager.getImage(goodsType.getId() + ".image", size);
     }
 
-    /**
-     * Returns the goods-image for a goods type.
-     *
-     * @param goodsType The type of the goods-image to return.
-     * @return The goods-image at the given index.
-     */
-    public static ImageIcon getGoodsImageIcon(GoodsType goodsType) {
-        return new ImageIcon(ResourceManager.getImage(goodsType.getId() + ".image"));
-    }
-
     public Image getBuildingImage(Building building) {
         return getBuildingImage(building.getType(), building.getOwner(), scalingFactor);
     }

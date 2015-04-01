@@ -91,7 +91,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
 
         public CargoLabel(GoodsType type) {
-            super(ImageLibrary.getGoodsImageIcon(type));
+            super(new ImageIcon(getLibrary().getGoodsImage(type)));
 
             this.goodsType = type;
             setDisabledIcon(getDisabledIcon());
@@ -531,7 +531,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
         this.newRoute = newRoute;
         this.cargoHandler = new CargoHandler();
-        this.dragListener = new DragListener(getFreeColClient(), this);
+        this.dragListener = new DragListener(freeColClient, this);
         this.dropListener = new DropListener();
 
         this.stopListModel = new DefaultListModel<>();

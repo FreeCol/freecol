@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -43,8 +44,8 @@ public class AbstractGoodsLabel extends JLabel {
      * @param abstractGoods The <code>AbstractGoods</code> that this JLabel
      *     will visually represent.
      */
-    public AbstractGoodsLabel(AbstractGoods abstractGoods) {
-        super(ImageLibrary.getGoodsImageIcon(abstractGoods.getType()));
+    public AbstractGoodsLabel(ImageLibrary lib, AbstractGoods abstractGoods) {
+        super(new ImageIcon(lib.getGoodsImage(abstractGoods.getType())));
 
         this.abstractGoods = abstractGoods;
 

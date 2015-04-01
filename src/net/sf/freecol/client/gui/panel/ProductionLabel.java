@@ -31,13 +31,11 @@ import javax.swing.ImageIcon;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -111,7 +109,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      */
     public ProductionLabel(FreeColClient freeColClient, AbstractGoods ag,
                            int maximumProduction, int stockNumber) {
-        super(ag);
+        super(freeColClient.getGUI().getImageLibrary(), ag);
 
         if (getType() == null) {
             logger.warning("Bad production label (no type)\n"
@@ -132,8 +130,9 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             : options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         this.displayNumber = options
             .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
+        ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
         this.goodsIcon = (ag.getType() == null) ? null
-            : ImageLibrary.getGoodsImageIcon(ag.getType());
+            : new ImageIcon(lib.getGoodsImage(ag.getType()));
         this.compressedWidth = (this.goodsIcon == null) ? 0
             : this.goodsIcon.getIconWidth() * 2;
 

@@ -51,6 +51,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
@@ -347,9 +348,10 @@ public final class EuropePanel extends PortPanel {
             removeAll();
 
             final Market market = getMyPlayer().getMarket();
+            ImageLibrary lib = getLibrary();
             for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
                 if (goodsType.isStorable()) {
-                    MarketLabel label = new MarketLabel(goodsType, market);
+                    MarketLabel label = new MarketLabel(lib, goodsType, market);
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(pressListener);
                     MarketData md = market.getMarketData(goodsType);

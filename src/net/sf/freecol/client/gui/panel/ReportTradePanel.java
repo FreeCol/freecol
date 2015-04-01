@@ -35,6 +35,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
@@ -117,12 +118,13 @@ public final class ReportTradePanel extends ReportPanel {
         }
 
         int column = 0;
+        ImageLibrary lib = getLibrary();
         for (GoodsType goodsType : storableGoods) {
             column++;
             int sales = player.getSales(goodsType);
             int beforeTaxes = player.getIncomeBeforeTaxes(goodsType);
             int afterTaxes = player.getIncomeAfterTaxes(goodsType);
-            goodsHeader.add(new MarketLabel(goodsType, market).addBorder());
+            goodsHeader.add(new MarketLabel(lib, goodsType, market).addBorder());
 
             reportPanel.add(createNumberLabel(sales),
                             "cell " + column + " 0");

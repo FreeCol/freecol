@@ -189,7 +189,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
                 if (unit.isCarrier()) {
                     reportPanel.add(unitButton, "newline, sg");
                     for (Goods goods : unit.getGoodsList()) {
-                        GoodsLabel goodsLabel = new GoodsLabel(goods);
+                        GoodsLabel goodsLabel = new GoodsLabel(getLibrary(), goods);
                         reportPanel.add(goodsLabel);
                     }
                     for (Unit unitLoaded : unit.getUnitList()) {

@@ -24,6 +24,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -49,8 +50,8 @@ public final class MarketLabel extends AbstractGoodsLabel
      * @param type The <code>GoodsType</code> to represent.
      * @param market The <code>Market</code> in which to trade the goods.
      */
-    public MarketLabel(GoodsType type, Market market) {
-        super(new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
+    public MarketLabel(ImageLibrary lib, GoodsType type, Market market) {
+        super(lib, new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
 
         if (market == null) throw new IllegalArgumentException("Null market");
         this.market = market;
