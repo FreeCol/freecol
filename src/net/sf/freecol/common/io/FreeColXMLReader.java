@@ -304,8 +304,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             try {
                 result = Float.parseFloat(attrib);
             } catch (NumberFormatException e) {
-                logger.log(Level.WARNING, "{0} is not a float: {1}",
-                        new Object[]{attributeName, attrib});
+                logger.warning(attributeName + " is not a float: " + attrib);
             }
         }
         return result;
@@ -326,8 +325,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             try {
                 result = Integer.decode(attrib);
             } catch (NumberFormatException e) {
-                logger.log(Level.WARNING, "{0} is not an integer: {1}",
-                        new Object[]{attributeName, attrib});
+                logger.warning(attributeName + " is not an integer: " + attrib);
             }
         }
         return result;
@@ -348,8 +346,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             try {
                 result = Long.decode(attrib);
             } catch (NumberFormatException e) {
-                logger.log(Level.WARNING, "{0} is not a long: {1}",
-                        new Object[]{attributeName, attrib});
+                logger.warning(attributeName + " is not a long: " + attrib);
             }
         }
         return result;
@@ -388,15 +385,8 @@ public class FreeColXMLReader extends StreamReaderDelegate
                 result = Enum.valueOf(returnClass,
                                       attrib.toUpperCase(Locale.US));
             } catch (Exception e) {
-                logger.log(
-                        Level.WARNING,
-                        "{0} is not a {1}: {2}",
-                        new Object[]{
-                            attributeName,
-                            defaultValue.getClass().getName(),
-                            attrib
-                        }
-                );
+                logger.warning(attributeName + " is not a "
+                    + defaultValue.getClass().getName() + ": " + attrib);
             }
         }
         return result;
@@ -484,7 +474,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
                 }
             }
             if (fco instanceof Location) return (Location)fco;
-            logger.log(Level.WARNING, "Not a location: {0}", attrib);
+                logger.warning("Not a location: " + attrib);
         }
         return null;
     }
@@ -550,8 +540,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         List<T> list = new ArrayList<>(length);
         for (int x = 0; x < length; x++) {
             T value = getType(spec, "x" + x, type, (T)null); 
-            if (value == null) logger.log(Level.WARNING, "Null list value({0})",
-                    x);
+            if (value == null) logger.warning("Null list value(" + x + ")");
             list.add(value);
         }
 

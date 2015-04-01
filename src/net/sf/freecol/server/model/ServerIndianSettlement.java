@@ -21,7 +21,6 @@ package net.sf.freecol.server.model;
 
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Ability;
@@ -161,18 +160,9 @@ public class ServerIndianSettlement extends IndianSettlement
         float cAlarm = missionary.applyModifiers(alarm, turn,
             Modifier.CONVERSION_ALARM_RATE);
         convert += cMiss + (cAlarm - alarm);
-        logger.log(
-                Level.FINEST,
-                "Conversion at {0} alarm={1} {2} = {3} + {4} + {5}",
-                new Object[]{
-                    getName(),
-                    alarm,
-                    convert,
-                    getConvertProgress(),
-                    cMiss,
-                    cAlarm
-                }
-        );
+        logger.finest("Conversion at " + getName() + " alarm=" + alarm
+            + " " + convert
+            + " = " + getConvertProgress() + " + " + cMiss + " + " + cAlarm);
         Settlement colony = tile.getNearestSettlement(other,
             MAX_CONVERT_DISTANCE, true);
         if (convert < (float)getType().getConvertThreshold()
@@ -204,8 +194,8 @@ public class ServerIndianSettlement extends IndianSettlement
                         .addStringTemplate("%nation%", nation)
                         .addName("%colony%", colony.getName()));
                 other.invalidateCanSeeTiles();//+vis(other)
-                logger.log(Level.FINE, "Convert at {0} for {1}",
-                        new Object[]{getName(), colony.getName()});
+                logger.fine("Convert at " + getName()
+                    + " for " + colony.getName());
             }
         }
     }
@@ -448,16 +438,10 @@ public class ServerIndianSettlement extends IndianSettlement
             ((ServerPlayer)getOwner()).csModifyTension(player,
                 ((isCapital()) ? add : add/2), this, cs);
         }
-        logger.log(
-                Level.FINEST,
-                "Alarm at {0} toward {1} modified by {2} now = {3}",
-                new Object[]{
-                    getName(),
-                    player.getName(),
-                    add,
-                    getAlarm(player).getValue()
-                }
-        );
+        logger.finest("Alarm at " + getName()
+            + " toward " + player.getName()
+            + " modified by " + add
+            + " now = " + getAlarm(player).getValue());
         return change;
     }
 

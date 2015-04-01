@@ -45,8 +45,7 @@ public class RandomUtils {
                                 int range) {
         int ret = random.nextInt(range);
         if (logger != null) {
-            logger.log(Level.FINEST, "{0} random({1}) = {2}",
-                    new Object[]{logMe, range, ret});
+            logger.finest(logMe + " random(" + range + ") = " + ret);
         }
         return ret;
     }
@@ -87,8 +86,7 @@ public class RandomUtils {
                                     Random random) {
         float ret = random.nextFloat();
         if (logger != null && logger.isLoggable(Level.FINEST)) {
-            logger.log(Level.FINEST, "{0} random(1.0f) = {1}",
-                    new Object[]{logMe, ret});
+            logger.finest(logMe + " random(1.0f) = " + ret);
         }
         return ret;
     }
@@ -105,8 +103,7 @@ public class RandomUtils {
                                       Random random) {
         double ret = random.nextDouble();
         if (logger != null && logger.isLoggable(Level.FINEST)) {
-            logger.log(Level.FINEST, "{0} random(1.0) = {1}",
-                    new Object[]{logMe, ret});
+            logger.finest(logMe + " random(1.0) = " + ret);
         }
         return ret;
     }
@@ -144,7 +141,7 @@ public class RandomUtils {
     public static void randomShuffle(Logger logger, String logMe,
                                      List<?> list, Random random) {
         if (logger != null && logger.isLoggable(Level.FINEST)) {
-            logger.log(Level.FINEST, "{0} shuffle.", logMe);
+            logger.finest(logMe + " shuffle.");
         }
         Collections.shuffle(list, random);
     }

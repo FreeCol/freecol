@@ -88,7 +88,7 @@ public final class MetaRegister {
         long time = System.currentTimeMillis() - MetaServer.REMOVE_OLDER_THAN;
         for (int i=0; i<items.size(); i++) {
             if (items.get(i).getLastUpdated() < time) {
-                logger.log(Level.INFO, "Removing: {0}", items.get(i));
+                logger.info("Removing: " + items.get(i));
                 items.remove(i);
             }
         }
@@ -124,11 +124,7 @@ public final class MetaRegister {
             }
             items.add(new MetaItem(name, address, port, slotsAvailable,
                     currentlyPlaying, isGameStarted, version, gameState));
-            logger.log(
-                    Level.INFO,
-                    "Server added:{0}:{1}",
-                    new Object[]{address, port}
-            );
+            logger.info("Server added:" + address + ":" + port);
         } else {
             updateServer(mi, name, address, port, slotsAvailable,
                 currentlyPlaying, isGameStarted, version, gameState);
@@ -170,17 +166,9 @@ public final class MetaRegister {
         int index = indexOf(address, port);
         if (index >= 0) {
             items.remove(index);
-            logger.log(
-                    Level.INFO,
-                    "Removing server:{0}:{1}",
-                    new Object[]{address, port}
-            );
+            logger.info("Removing server:" + address + ":" + port);
         } else {
-            logger.log(
-                    Level.INFO,
-                    "Trying to remove non-existing server:{0}:{1}",
-                    new Object[]{address, port}
-            );
+            logger.info("Trying to remove non-existing server:" + address + ":" + port);
         }
     }
 
@@ -218,7 +206,7 @@ public final class MetaRegister {
     private void updateServer(MetaItem mi, String name, String address, int port, int slotsAvailable,
             int currentlyPlaying, boolean isGameStarted, String version, int gameState) {
         mi.update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
-        logger.log(Level.INFO, "Server updated:{0}", mi.toString());
+        logger.info("Server updated:" + mi.toString());
     }
 }
 

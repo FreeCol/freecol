@@ -369,11 +369,8 @@ public final class FreeColServer {
             port = firstPort;
             tries = 1;
         }
-        logger.log(
-                Level.FINEST,
-                "serverStart({0}) => {1} x {2}",
-                new Object[]{firstPort, port, tries}
-        );
+        logger.finest("serverStart(" + firstPort + ") => " + port
+            + " x " + tries);
         for (int i = tries; i > 0; i--) {
             try {
                 server = new Server(this, host, port);
@@ -858,8 +855,8 @@ public final class FreeColServer {
         try {
             g = FreeColServer.readGame(new FreeColSavegameFile(file),
                                        spec, server);
-            logger.log(Level.INFO, "Imported file {0}", file.getPath());
-        } catch (IOException | XMLStreamException | FreeColException e) {
+            logger.info("Imported file " + file.getPath());
+        } catch (Exception e) {
             logger.log(Level.WARNING, "Import failed for " + file.getPath(), e);
         }
 
@@ -895,7 +892,7 @@ public final class FreeColServer {
         if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
             throw new FreeColException("incompatibleVersions");
         }
-        logger.log(Level.INFO, "Found savegame version {0}", savegameVersion);
+        logger.info("Found savegame version " + savegameVersion);
 
         ServerGame game = null;
         try (
@@ -976,11 +973,8 @@ public final class FreeColServer {
         if (integrity < 0) {
             logger.warning("Game integrity test failed.");
         } else {
-            logger.log(
-                    Level.INFO,
-                    "Game integrity test {0}.",
-                    ((integrity > 0) ? "succeeded" : "failed, but fixed")
-            );
+            logger.info("Game integrity test "
+                + ((integrity > 0) ? "succeeded" : "failed, but fixed") + ".");
         }
 
         int savegameVersion = fis.getSavegameVersion();
@@ -1005,13 +999,11 @@ public final class FreeColServer {
                         // do not set the UnitState, as this clears
                         // workLeft.
                         if (u.getState() == Unit.UnitState.TO_EUROPE) {
-                            logger.log(Level.INFO,
-                                    "Found unit on way to europe: {0}", u);
+                            logger.info("Found unit on way to europe: " + u);
                             u.setLocation(p.getHighSeas());//-vis: safe!map
                             u.setDestination(p.getEurope());
                         } else if (u.getState() == Unit.UnitState.TO_AMERICA) {
-                            logger.log(Level.INFO,
-                                    "Found unit on way to new world: {0}", u);
+                            logger.info("Found unit on way to new world: " + u);
                             u.setLocation(p.getHighSeas());//-vis: safe!map
                             u.setDestination(game.getMap());
                         }
@@ -1050,10 +1042,8 @@ public final class FreeColServer {
             aiMain.findNewObjects(true);
             logger.warning("AI integrity test failed, replaced AIMain.");
         } else {
-            logger.log(Level.INFO,
-                    "AI integrity test {0}", 
-                    ((aiIntegrity > 0) ? "succeeded" : "failed, but fixed")
-            );
+            logger.info("AI integrity test "
+                + ((aiIntegrity > 0) ? "succeeded" : "failed, but fixed"));
         }
         game.setFreeColGameObjectListener(aiMain);
 

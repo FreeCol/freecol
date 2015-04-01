@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -210,8 +209,7 @@ public class ServerGame extends Game implements ServerModelObject {
 
         TransactionSession.completeAll(cs);
         setTurn(getTurn().next());
-        logger.log(Level.FINEST, "Turn is now {0}{1}",
-                new Object[]{getTurn(), duration});
+        logger.finest("Turn is now " + getTurn() + duration);
         cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
                       "turn", Integer.toString(getTurn().getNumber()));
     }

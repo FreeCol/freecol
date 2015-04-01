@@ -21,7 +21,6 @@ package net.sf.freecol.server.control;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
@@ -126,7 +125,7 @@ public final class PreGameInputHandler extends InputHandler {
      */
     @Override
     protected Element logout(Connection connection, Element element) {
-        logger.log(Level.INFO, "Logout from: {0}", connection);
+        logger.info("Logout from: " + connection);
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         player.setConnected(false);
         getGame().removePlayer(player);

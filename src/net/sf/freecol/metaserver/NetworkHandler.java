@@ -20,7 +20,6 @@
 package net.sf.freecol.metaserver;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
@@ -86,7 +85,7 @@ public final class NetworkHandler implements MessageHandler {
                 reply = disconnect(connection, element);
                 break;
             default:
-                logger.log(Level.WARNING, "Unkown request: {0}", type);
+                logger.warning("Unkown request: " + type);
                 break;
         }
 

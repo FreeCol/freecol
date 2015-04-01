@@ -131,8 +131,8 @@ public final class MetaServer extends Thread {
             Socket clientSocket = null;
             try {
                 clientSocket = serverSocket.accept();
-                logger.log(Level.INFO, "Client connection from: {0}",
-                        clientSocket.getInetAddress().toString());
+                logger.info("Client connection from: "
+                    + clientSocket.getInetAddress().toString());
                 Connection connection = new Connection(clientSocket,
                     getNetworkHandler(), FreeCol.METASERVER_THREAD);
                 connections.put(clientSocket, connection);

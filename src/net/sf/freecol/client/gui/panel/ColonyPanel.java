@@ -964,8 +964,7 @@ public final class ColonyPanel extends PortPanel
             try {
                 cmd = Integer.parseInt(command);
             } catch (NumberFormatException nfe) {
-                logger.log(Level.WARNING,
-                        "Invalid action number: {0}", command);
+                logger.warning("Invalid action number: " + command);
                 return;
             }
             switch (cmd) {
@@ -1033,16 +1032,9 @@ public final class ColonyPanel extends PortPanel
         final Colony colony = getColony();
         if (!isShowing() || colony == null) return;
         String property = event.getPropertyName();
-        logger.log(
-                Level.FINEST,
-                "{0} change {1}: {2} -> {3}",
-                new Object[]{
-                    colony.getName(),
-                    property,
-                    event.getOldValue(),
-                    event.getNewValue()
-                }
-        );
+        logger.finest(colony.getName() + " change " + property
+                      + ": " + event.getOldValue()
+                      + " -> " + event.getNewValue());
 
         if (property == null) {
             logger.warning("Null property change");
@@ -1086,11 +1078,8 @@ public final class ColonyPanel extends PortPanel
             // ColonyTiles and Buildings now have their own
             // propertyChangeListeners so {ColonyTile,Building}.UNIT_CHANGE
             // events should not arrive here.
-            logger.log(
-                    Level.WARNING,
-                    "Unknown property change event: {0}",
-                    event.getPropertyName()
-            );
+            logger.warning("Unknown property change event: "
+                           + event.getPropertyName());
         }
     }
 
@@ -1419,11 +1408,7 @@ public final class ColonyPanel extends PortPanel
                     initialize();
                     return comp;
                 } else {
-                    logger.log(
-                            Level.WARNING,
-                            "Invalid component: {0}",
-                            comp
-                    );
+                    logger.warning("Invalid component: " + comp);
                     return null;
                 }
             } else {
@@ -1628,11 +1613,7 @@ public final class ColonyPanel extends PortPanel
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof GoodsLabel)) {
-                    logger.log(
-                            Level.WARNING,
-                            "Invalid component: {0}",
-                            comp
-                    );
+                    logger.warning("Invalid component: " + comp);
                     return null;
                 }
                 comp.getParent().remove(comp);
@@ -1652,16 +1633,10 @@ public final class ColonyPanel extends PortPanel
         public void propertyChange(PropertyChangeEvent event) {
             final Colony colony = getColony();
             if (colony != null && event != null) {
-                logger.log(
-                        Level.FINEST,
-                        "{0}-warehouse change {1}: {2} -> {3}",
-                        new Object[]{
-                            colony.getName(),
-                            event.getPropertyName(),
-                            event.getOldValue(),
-                            event.getNewValue()
-                        }
-                );
+                logger.finest(colony.getName() + "-warehouse change "
+                    + event.getPropertyName()
+                    + ": " + event.getOldValue()
+                    + " -> " + event.getNewValue());
             }
             update();
         }
@@ -2174,25 +2149,13 @@ public final class ColonyPanel extends PortPanel
                     case NONE: case NATIVES:
                         if (igc().claimTile(tile, colony)
                             && tile.getOwningSettlement() == colony) {
-                            logger.log(
-                                    Level.INFO, 
-                                    "Colony {0} claims tile {1} with unit {2}", 
-                                    new Object[]{
-                                        colony.getName(),
-                                        tile,
-                                        unit.getId()
-                                    }
-                            );
+                            logger.info("Colony " + colony.getName()
+                                + " claims tile " + tile
+                                + " with unit " + unit.getId());
                         } else {
-                            logger.log(
-                                    Level.WARNING,
-                                    "Colony {0} did not claim {1} with unit {2}",
-                                    new Object[]{
-                                        colony.getName(),
-                                        tile,
-                                        unit.getId()
-                                    }
-                            );
+                            logger.warning("Colony " + colony.getName()
+                                + " did not claim " + tile
+                                + " with unit " + unit.getId());
                             return false;
                         }
                         break;
@@ -2284,15 +2247,9 @@ public final class ColonyPanel extends PortPanel
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 String property = event.getPropertyName();
-                logger.log(
-                        Level.FINEST,
-                        "{0} change {1}: {2} -> {3}",
-                        new Object[]{colonyTile.getId(),
-                            property,
-                            event.getOldValue(),
-                            event.getNewValue()
-                        }
-                );
+                logger.finest(colonyTile.getId() + " change " + property
+                              + ": " + event.getOldValue()
+                              + " -> " + event.getNewValue());
                 ColonyPanel.this.updateProduction();
             }
 

@@ -22,7 +22,6 @@ package net.sf.freecol.server.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.i18n.Messages;
@@ -580,8 +579,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                           .addStringTemplate("%unit%", unit.getLabel()));
         }
 
-        logger.log(Level.INFO, "New unit in {0}: {1}",
-                new Object[]{getName(), type.getSuffix()});
+        logger.info("New unit in " + getName() + ": " + type.getSuffix());
         return unit;
     }
 
@@ -658,8 +656,8 @@ public class ServerColony extends Colony implements ServerModelObject {
             if (owner.isAI()) {
                 firePropertyChange(REARRANGE_WORKERS, true, false);
             }
-            logger.log(Level.INFO, "New building in {0}: {1}",
-                    new Object[]{getName(), type.getSuffix()});
+            logger.info("New building in " + getName()
+                + ": " + type.getSuffix());
         }
         return success;
     }
@@ -711,15 +709,9 @@ public class ServerColony extends Colony implements ServerModelObject {
                         .addNamed("%building%", buildable));
                 break;
             default: // Are there other warnings to send?
-                logger.log(
-                        Level.WARNING,
-                        "Unexpected build failure at {0} for {1}: {2}",
-                        new Object[]{
-                            getName(),
-                            buildable,
-                            getNoBuildReason(buildable, null)
-                        }
-                );
+                logger.warning("Unexpected build failure at " + getName()
+                    + " for " + buildable
+                    + ": " + getNoBuildReason(buildable, null));
                 cs.addMessage(See.only(owner),
                     new ModelMessage(ModelMessage.MessageType.WARNING,
                                      "colonyPanel.unbuildable",

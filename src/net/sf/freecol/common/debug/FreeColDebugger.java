@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import java.util.Locale;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
@@ -170,8 +169,7 @@ public class FreeColDebugger {
                                               s.toUpperCase(Locale.US));
                 enableDebugMode(mode);
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Unrecognized debug mode: {0}",
-                        optionValue);
+                logger.warning("Unrecognized debug mode: " + optionValue);
                 return false;
             }
         }

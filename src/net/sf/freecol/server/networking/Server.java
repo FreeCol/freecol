@@ -188,7 +188,7 @@ public final class Server extends Thread {
                     logger.log(Level.WARNING, "Unable to send to: " + c, e);
                 }
             } else {
-                logger.log(Level.INFO, "Reap dead connection: {0}", c);
+                logger.log(Level.INFO, "Reap dead connection: " + c);
                 removeConnection(c);
             }
         }
@@ -231,14 +231,9 @@ public final class Server extends Thread {
                 try {
                     clientSocket = serverSocket.accept();
 
-                    logger.log(
-                            Level.INFO,
-                            "Got client connection from {0}:{1}",
-                            new Object[]{
-                                clientSocket.getInetAddress(),
-                                clientSocket.getPort()
-                            }
-                    );
+                    logger.info("Got client connection from "
+                        + clientSocket.getInetAddress()
+                        + ":" + clientSocket.getPort());
                     Connection connection =
                         new Connection(clientSocket,
                             freeColServer.getUserConnectionHandler(),

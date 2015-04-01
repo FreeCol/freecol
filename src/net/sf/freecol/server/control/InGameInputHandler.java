@@ -569,13 +569,9 @@ public final class InGameInputHandler extends InputHandler
                         Element reply = InGameInputHandler.this
                             .handle(connection, node);
                         if (reply != null) results.add(reply);
-                        logger.log(
-                                Level.FINEST, "multiple({0}): {1} -> {2}",
-                                new Object[]{
-                                    i, tag, 
-                                    (reply == null) 
-                                            ? "null"
-                                            : reply.getTagName()});
+                        logger.log(Level.FINEST, "multiple(" + i + "): " + tag
+                                + " -> " + ((reply == null) ? "null"
+                                    : reply.getTagName()));
                     } catch (Exception e) {
                         logger.log(Level.WARNING, "Crash in multiple " + i
                             + ", tag " + tag + ", continuing.", e);
@@ -705,14 +701,8 @@ public final class InGameInputHandler extends InputHandler
     @Override
     protected Element logout(Connection connection, Element logoutElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        logger.log(
-                Level.INFO,
-                "Logout by: {0}{1}",
-                new Object[]{
-                    connection,
-                    (player != null) ? " (" + player.getName() + ") " : ""
-                }
-        );
+        logger.info("Logout by: " + connection
+                    + ((player != null) ? " (" + player.getName() + ") " : ""));
         if (player == null) {
             return null;
         }

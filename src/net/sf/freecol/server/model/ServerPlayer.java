@@ -290,11 +290,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         setCurrentFather(ff);
         clearOfferedFathers();
         if (ff != null) {
-            logger.log(
-                    Level.FINEST,
-                    "{0} is recruiting {1} in {2}",
-                    new Object[]{getId(), ff.getId(), getGame().getTurn()}
-            );
+            logger.finest(getId() + " is recruiting " + ff.getId()
+                + " in " + getGame().getTurn());
         }
     }
 
@@ -368,11 +365,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
         if (changed) {
-            logger.log(
-                    Level.FINEST,
-                    "randomizeGame({0}) initial prices: {1}",
-                    new Object[]{getId(), sb.toString().substring(2)}
-            );
+            logger.finest("randomizeGame(" + getId() + ") initial prices: "
+                + sb.toString().substring(2));
         }
     }
 
@@ -443,20 +437,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
             Unit carrier;
             if ((carrier = unit.getCarrier()) != null) {
                 if (carrier.hasTile()) {
-                    logger.log(
-                            Level.INFO,
-                            "{0} alive, unit {1} (embarked) on map.",
-                            new Object[]{getName(), unit.getId()}
-                    );
+                    logger.info(getName() + " alive, unit " + unit.getId()
+                        + " (embarked) on map.");
                     return IS_ALIVE;
                 }
                 hasEmbarked = true;
             }
             if (unit.hasTile() && !unit.isInMission()) {
-                logger.log(Level.INFO,
-                        "{0} alive, unit {1} on map.",
-                        new Object[]{getName(), unit.getId()}
-                );
+                logger.info(getName() + " alive, unit " + unit.getId()
+                    + " on map.");
                 return IS_ALIVE;
             }
         }
@@ -466,21 +455,17 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (getGame().getTurn().getYear() >= mandatory) {
             // After the season cutover year there must be a presence
             // in the New World.
-            logger.log(
-                    Level.INFO,
-                    "{0} dead, no presence >= {1}",
-                    new Object[]{getName(), mandatory}
-            );
+            logger.info(getName() + " dead, no presence >= " + mandatory);
             return IS_DEAD;
         }
 
         // No problems, unit available on carrier but off map, or goods
         // available to be sold.
         if (hasEmbarked) {
-            logger.log(Level.INFO, "{0} alive, has embarked unit.", getName());
+            logger.info(getName() + " alive, has embarked unit.");
             return IS_ALIVE;
         } else if (hasGoods) {
-            logger.log(Level.INFO, "{0} alive, has cargo.", getName());
+            logger.info(getName() + " alive, has cargo.");
             return IS_ALIVE;
         }
 
@@ -497,7 +482,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
             }
             if (price == Integer.MAX_VALUE || !checkGold(price)) {
-                logger.log(Level.INFO, "{0} dead, can not buy carrier.", getName());
+                logger.info(getName() + " dead, can not buy carrier.");
                 return IS_DEAD;
             }
             goldNeeded += price;
@@ -505,10 +490,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // A colonist is required.
         if (hasColonist) {
-            logger.log(Level.INFO, "{0} alive, has waiting colonist.", getName());
+            logger.info(getName() + " alive, has waiting colonist.");
             return IS_ALIVE;
         } else if (europe == null) {
-            logger.log(Level.INFO, "{0} dead, can not recruit.", getName());
+            logger.info(getName() + " dead, can not recruit.");
             return IS_DEAD;
         }
         UnitType unitType = null;
@@ -519,13 +504,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         goldNeeded += price;
         if (checkGold(goldNeeded)) {
-            logger.log(Level.INFO, "{0} alive, can buy colonist.", getName());
+            logger.info(getName() + " alive, can buy colonist.");
             return IS_ALIVE;
         }
 
         // Col1 auto-recruits a unit in Europe if you run out before
         // the cutover year.
-        logger.log(Level.INFO, "{0} survives by autorecruit.", getName());
+        logger.info(getName() + " survives by autorecruit.");
         return AUTORECRUIT;
     }
 
@@ -1054,18 +1039,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
             } else {
                 if (!type.isAvailableTo(this)) {
-                    logger.log(Level.WARNING,
-                            "Ignoring abstract unit {0} unavailable to: {1}",
-                            new Object[]{au, getId()});
+                    logger.warning("Ignoring abstract unit " + au
+                        + " unavailable to: " + getId());
                     continue;
                 }
                 if (!role.isAvailableTo(this, type)) {
-                    logger.log(
-                            Level.WARNING, 
-                            "Ignoring abstract unit {0} with role {1}"
-                                    + " unavailable to: {2}",
-                            new Object[]{au, role, getId()}
-                    );
+                    logger.warning("Ignoring abstract unit " + au
+                        + " with role " + role
+                        + " unavailable to: " + getId());
                     continue;
                 }
             }
@@ -1193,10 +1174,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Market market = getMarket();
         int price = market.getBidPrice(type, amount);
         if (!checkGold(price)) return -1;
-        logger.log(Level.FINEST,
-                "{0} buys {1} {2} for {3}",
-                new Object[]{getName(), amount, type, price}
-        );
+        logger.finest(getName() + " buys " + amount + " " + type
+            + " for " + price);
 
         modifyGold(-price);
         market.modifySales(type, -amount);
@@ -1221,8 +1200,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public int sell(GoodsContainer container, GoodsType type, int amount) {
         Market market = getMarket();
         int price = market.getSalePrice(type, amount);
-        logger.log(Level.FINEST, "{0} sells {1} {2} for {3}",
-                new Object[]{getName(), amount, type, price});
+        logger.finest(getName() + " sells " + amount + " " + type
+            + " for " + price);
 
         final int tax = getTax();
         int incomeBeforeTaxes = price;
@@ -1271,15 +1250,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.addHistory(this, new HistoryEvent(getGame().getTurn(),
                     HistoryEvent.getEventTypeFromStance(stance), otherPlayer)
                 .addStringTemplate("%nation%", otherPlayer.getNationName()));
-            logger.log(Level.INFO,
-                    "Stance modification {0} {1} -> {2} wrt {3}",
-                    new Object[]{
-                        getName(),
-                        old,
-                        stance,
-                        otherPlayer.getName()
-                    }
-            );
+            logger.info("Stance modification " + getName()
+                + " " + old + " -> " + stance + " wrt " + otherPlayer.getName());
             this.addStanceChange(other);
             if (old != Stance.UNCONTACTED) {
                 cs.addMessage(See.only(other),
@@ -1300,16 +1272,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.addHistory(otherPlayer, new HistoryEvent(getGame().getTurn(),
                     HistoryEvent.getEventTypeFromStance(stance), this)
                 .addStringTemplate("%nation%", this.getNationName()));
-            logger.log(
-                    Level.INFO,
-                    "Stance modification {0} {1} -> {2} wrt {3} (symmetric)",
-                    new Object[]{
-                        otherPlayer.getName(),
-                        old, 
-                        stance,
-                        getName()
-                    }
-            );
+            logger.info("Stance modification " + otherPlayer.getName()
+                + " " + old + " -> " + stance
+                + " wrt " + getName() + " (symmetric)");
             other.addStanceChange(this);
             if (old != Stance.UNCONTACTED) {
                 cs.addMessage(See.only(this),
@@ -1469,8 +1434,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                                     random);//-vis(this)
                     for (Unit unit : leftOver) {
                         // no use for left over units
-                        logger.log(Level.WARNING,
-                                "Disposing of left over unit {0}", unit);
+                        logger.warning("Disposing of left over unit " + unit);
                         unit.setLocationNoUpdate(null);//-vis: safe, off map
                         unit.dispose();//-vis: safe, never sighted
                     }
@@ -1482,18 +1446,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         new ModelMessage(ModelMessage.MessageType.DEFAULT,
                             "declareIndependence.interventionForceArrives",
                             this));
-                    logger.log(
-                            Level.INFO, "Intervention force ({0} naval, {1}"
-                                    + " land, {2} left over) arrives at {3}"
-                                    + "(for {4})",
-                            new Object[]{
-                                navalUnits.size(),
-                                landUnits.size(),
-                                leftOver.size(),
-                                entry,
-                                port.getName()
-                            }
-                    );
+                    logger.info("Intervention force ("
+                        + navalUnits.size() + " naval, "
+                        + landUnits.size() + " land, "
+                        + leftOver.size() + " left over) arrives at " + entry
+                        + "(for " + port.getName() + ")");
                 }
             }
         }
@@ -1835,17 +1792,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                    random, amount);
                 if (!add) amount = -amount;
                 market.addGoodsToMarket(type, amount);
-                logger.log(
-                        Level.FINEST,
-                        "{0} adjust of {1} {2}, total: {3}, initial: {4}",
-                        new Object[]{
-                            getName(),
-                            amount,
-                            type,
-                            market.getAmountInMarket(type),
-                            type.getInitialAmount()
-                        }
-                );
+                logger.finest(getName() + " adjust of " + amount
+                              + " " + type
+                              + ", total: " + market.getAmountInMarket(type)
+                              + ", initial: " + type.getInitialAmount());
                 addExtraTrade(new AbstractGoods(type, amount));
             }
         }
@@ -2247,15 +2197,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                  true, cs);
             }
         }
-        logger.log(
-                Level.FINEST,
-                "{0} claimed {1} from {2}, price: {3}",
-                new Object[]{
-                    this.getName(), tile,
-                    (owner == null) ? "no-one" : owner.getName(),
-                    (price == 0) ? "free" : (price < 0) ? "stolen" : price
-                }
-        );
+        logger.finest(this.getName() + " claimed " + tile
+            + " from " + ((owner == null) ? "no-one" : owner.getName())
+            + ", price: " + ((price == 0) ? "free" : (price < 0) ? "stolen"
+                : price));
     }
 
 
@@ -2406,15 +2351,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (attackerTile == null
                     || attackerTile == defenderTile
                     || !attackerTile.isAdjacent(defenderTile)) {
-                    logger.log(
-                            Level.WARNING,
-                            "Bogus attack from {0} to {1}\n{2}",
-                            new Object[]{
-                                attackerTile,
-                                defenderTile,
-                                FreeColDebugger.stackTraceToString()
-                            }
-                    );
+                    logger.warning("Bogus attack from " + attackerTile
+                        + " to " + defenderTile
+                        + "\n" + FreeColDebugger.stackTraceToString());
                 } else {
                     cs.addAttack(vis, attackerUnit, defenderUnit, true);
                 }
@@ -2426,15 +2365,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (attackerTile == null
                     || attackerTile == defenderTile
                     || !attackerTile.isAdjacent(defenderTile)) {
-                    logger.log(
-                            Level.WARNING,
-                            "Bogus attack from {0} to {1}\n{2}",
-                            new Object[]{
-                                attackerTile,
-                                defenderTile,
-                                FreeColDebugger.stackTraceToString()
-                            }
-                    );
+                    logger.warning("Bogus attack from " + attackerTile
+                        + " to " + defenderTile
+                        + "\n" + FreeColDebugger.stackTraceToString());
                 } else {
                     cs.addAttack(vis, attackerUnit, defenderUnit, false);
                 }
@@ -3295,11 +3228,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         UnitType type = loser.getTypeChange(ChangeType.DEMOTION, loserPlayer);
         if (type == null || type == loser.getType()) {
-            logger.log(
-                    Level.WARNING,
-                    "Demotion failed, type={0}",
-                    ((type == null) ? "null" : "same type: " + type)
-            );
+            logger.warning("Demotion failed, type="
+                + ((type == null) ? "null" : "same type: " + type));
             return;
         }
         loser.changeType(type);//-vis(loserPlayer)
@@ -3460,8 +3390,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csDisposeSettlement(Settlement settlement, ChangeSet cs) {
-        logger.log(Level.FINEST,
-                "Disposing of {0}", settlement.getName());
+        logger.finest("Disposing of " + settlement.getName());
         ServerPlayer owner = (ServerPlayer)settlement.getOwner();
         Set<Tile> owned = settlement.getOwnedTiles();
         for (Tile t : owned) t.cacheUnseen();//+til
@@ -3838,15 +3767,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             for (WorkLocation wl : colony.getAllWorkLocations()) {
                 if (!wl.isEmpty() && !wl.canBeWorked()) {
                     changed |= colony.ejectUnits(wl, wl.getUnitList());//-til
-                    logger.log(
-                            Level.INFO,
-                            "Units ejected from workLocation {0}"
-                                    + " on loss of {1}",
-                            new Object[]{
-                                wl.getId(),
-                                building.getType().getSuffix()
-                            }
-                    );
+                    logger.info("Units ejected from workLocation "
+                        + wl.getId() + " on loss of "
+                        + building.getType().getSuffix());
                 }
             }
         } else if (building.canBeDamaged()) {
@@ -3876,8 +3799,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         UnitType type = winner.getTypeChange(ChangeType.PROMOTION,
                                              winnerPlayer);
         if (type == null || type == winner.getType()) {
-            logger.log(Level.WARNING, "Promotion failed, type={0}",
-                    ((type == null) ? "null" : "same type: " + type));
+            logger.warning("Promotion failed, type="
+                + ((type == null) ? "null" : "same type: " + type));
             return;
         }
         winner.changeType(type);//-vis(winnerPlayer)
@@ -4098,7 +4021,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         if (accepted) {
             csSetTax(tax, cs);
-            logger.log(Level.INFO, "Accepted tax raise to: {0}", tax);
+            logger.info("Accepted tax raise to: " + tax);
         } else if (colony.getGoodsCount(goodsType) < amount) {
             // Player has removed the goods from the colony,
             // so raise the tax anyway.
@@ -4109,8 +4032,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     StringTemplate.template("model.monarch.action.FORCE_TAX")
                     .addAmount("%amount%", tax + extraTax),
                     monarchKey));
-            logger.log(Level.INFO, "Forced tax raise to: {0}",
-                    (tax + extraTax));
+            logger.info("Forced tax raise to: " + (tax + extraTax));
         } else { // Tea party
             Specification spec = getGame().getSpecification();
             colony.getGoodsContainer().saveState();
@@ -4139,8 +4061,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .addAmount("%amount%", amount)
                 .addNamed("%goods%", goodsType));
             cs.addAttribute(See.only(this), "flush", Boolean.TRUE.toString());
-            logger.log(Level.INFO, "Goods party at {0} with: {1} arrears: {2}",
-                    new Object[]{colony.getName(), goods, arrears});
+            logger.info("Goods party at " + colony.getName()
+                + " with: " + goods + " arrears: " + arrears);
             if (isAI()) { // Reset the goods wishes
                 colony.firePropertyChange(Colony.REARRANGE_WORKERS,
                                           goodsType, null);
@@ -4216,8 +4138,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .addStringTemplate("%nation%", other.getNationName()));
         }
 
-        logger.log(Level.FINEST, "First contact between {0} and {1}",
-                new Object[]{this.getId(), other.getId()});
+        logger.finest("First contact between " + this.getId()
+            + " and " + other.getId());
         return true;
     }
 

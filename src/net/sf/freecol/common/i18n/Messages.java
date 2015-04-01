@@ -33,7 +33,6 @@ import java.util.Locale;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.UIManager;
@@ -930,8 +929,7 @@ public class Messages {
                 if (result.length() >= template.getId().length()) {
                     result = result.substring(template.getId().length());
                 } else {
-                    logger.log(Level.WARNING, "incorrect use of template {0}",
-                            template);
+                    logger.warning("incorrect use of template " + template);
                 }
             }
             break;
@@ -987,19 +985,19 @@ public class Messages {
             closeChoice = findMatchingBracket(input, openChoice + 2);
             if (closeChoice < 0) {
                 // no closing brackets found
-                logger.log(Level.WARNING, "Mismatched brackets: {0}", input);
+                logger.warning("Mismatched brackets: " + input);
                 return result.toString();
             }
             highWaterMark = closeChoice + 2;
             int colonIndex = input.indexOf(':', openChoice + 2);
             if (colonIndex < 0 || colonIndex > closeChoice) {
-                logger.log(Level.WARNING, "No tag found: {0}", input);
+                logger.warning("No tag found: " + input);
                 continue;
             }
             String tag = input.substring(openChoice + 2, colonIndex);
             int pipeIndex = input.indexOf('|', colonIndex + 1);
             if (pipeIndex < 0 || pipeIndex > closeChoice) {
-                logger.log(Level.WARNING, "No choices found: {0}", input);
+                logger.warning("No choices found: " + input);
                 continue;
             }
             String selector = input.substring(colonIndex + 1, pipeIndex);
@@ -1011,8 +1009,7 @@ public class Messages {
                 } else {
                     StringTemplate replacement = template.getReplacement(selector);
                     if (replacement == null) {
-                        logger.log(Level.WARNING,
-                                "Failed to find replacement for {0}", selector);
+                        logger.warning("Failed to find replacement for " + selector);
                         continue;
                     } else {
                         selector = message(replacement);
@@ -1036,8 +1033,7 @@ public class Messages {
                     && template != null) {
                     StringTemplate replacement = template.getReplacement(otherKey);
                     if (replacement == null) {
-                        logger.log(Level.WARNING,
-                                "Failed to find replacement for {0}", otherKey);
+                        logger.warning("Failed to find replacement for " + otherKey);
                         continue;
                     } else if (replacement.getTemplateType() == TemplateType.KEY) {
                         otherKey = messageBundle.get(replacement.getId());
@@ -1048,37 +1044,25 @@ public class Messages {
                         } else {
                             keyIndex = otherKey.indexOf(selector, keyIndex);
                             if (keyIndex < 0) {
-                                logger.log(
-                                        Level.WARNING,
-                                        "Failed to find key"
-                                                + " {0} in replacement {1}",
-                                        new Object[]{selector,
-                                            replacement.getId()});
+                                logger.warning("Failed to find key " + selector + " in replacement "
+                                               + replacement.getId());
                                 continue;
                             } else {
                                 result.append(getChoice(otherKey, selector));
                             }
                         }
                     } else {
-                        logger.log(
-                                Level.WARNING,
-                                "Choice substitution attempted,"
-                                        + " but template type was {0}",
-                                replacement.getTemplateType()
-                        );
+                        logger.warning("Choice substitution attempted, but template type was "
+                                       + replacement.getTemplateType());
                         continue;
                     }
                 } else if (containsKey(otherKey)) {
                     otherKey = getChoice(messageBundle.get(otherKey), selector);
                     result.append(otherKey);
                 } else {
-                    logger.log(
-                            Level.WARNING,
-                            "Unknown key or untagged choice: ''{0}'',"
-                                    + " selector was ''{1}'',"
-                                    + " trying ''default'' instead",
-                            new Object[]{otherKey, selector}
-                    );
+                    logger.warning("Unknown key or untagged choice: '" + otherKey
+                                   + "', selector was '" + selector
+                                   + "', trying 'default' instead");
                     int defaultStart = otherKey.indexOf("default=");
                     if (defaultStart >= 0) {
                         defaultStart += 8;
@@ -1134,12 +1118,8 @@ public class Messages {
             if (end < 0) {
                 end = input.indexOf("}}", start);
                 if (end < 0) {
-                    logger.log(
-                            Level.WARNING,
-                            "Failed to find end of choice for key {0}"
-                                    + " in input {1}",
-                            new Object[]{key, input}
-                    );
+                    logger.warning("Failed to find end of choice for key " + key
+                                   + " in input " + input);
                     return null;
                 }
             }

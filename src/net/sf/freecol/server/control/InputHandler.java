@@ -116,7 +116,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
         NetworkRequestHandler handler = _handlerMap.get(tagName);
         if (handler != null) {
             try {
-                logger.log(Level.FINEST, "Handling {0}", tagName);
+                logger.log(Level.FINEST, "Handling " + tagName);
                 return handler.handle(connection, element);
             } catch (Exception e) {
                 // FIXME: should we really catch Exception? The old code did.
@@ -125,7 +125,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
             }
         } else {
             // Should we return an error here? The old handler returned null.
-            logger.log(Level.WARNING, "No handler installed for {0}", tagName);
+            logger.warning("No handler installed for " + tagName);
         }
         return null;
     }
@@ -187,14 +187,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
         }
 
         private void logDisconnect(Connection connection, ServerPlayer player) {
-            logger.log(
-                    Level.INFO,
-                    "Disconnection by: {0}{1}",
-                    new Object[]{
-                        connection,
-                        (player != null) ? " (" + player.getName() + ") " : ""
-                    }
-            );
+            logger.info("Disconnection by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
         }
     }
 }

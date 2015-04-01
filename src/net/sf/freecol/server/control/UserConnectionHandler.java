@@ -277,7 +277,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
      * @return Null.
      */
     private Element unknown(String tag) {
-        logger.log(Level.WARNING, "Unknown user connection request: {0}", tag);
+        logger.warning("Unknown user connection request: " + tag);
         return null;
     }
 }

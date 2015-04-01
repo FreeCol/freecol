@@ -22,7 +22,6 @@ package net.sf.freecol.server.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Ability;
@@ -272,7 +271,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
-        logger.log(Level.FINEST, "ServerEurope.csNewTurn, for {0}", this);
+        logger.finest("ServerEurope.csNewTurn, for " + this);
 
         for (Unit unit : getUnitList()) {
             if (unit.isNaval() && unit.isDamaged()) {

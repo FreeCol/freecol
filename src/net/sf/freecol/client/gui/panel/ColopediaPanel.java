@@ -24,7 +24,6 @@ import java.awt.event.ActionEvent;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JPanel;
@@ -183,7 +182,7 @@ public final class ColopediaPanel extends FreeColPanel
     private void select(String id) {
         DefaultMutableTreeNode node = nodeMap.get(id);
         if (node == null) {
-            logger.log(Level.WARNING, "Unable to find node with id ''{0}''.", id);
+            logger.warning("Unable to find node with id '" + id + "'.");
         } else {
             TreePath oldPath = tree.getSelectionPath();
             if (oldPath != null && oldPath.getParentPath() != null) {

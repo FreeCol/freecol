@@ -187,7 +187,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             JList<? extends BuildableType> target = BuildQueuePanel.this
                 .convertJComp(comp);
             if (target == null) {
-                logger.log(Level.WARNING, "Build queue import failed to: {0}", comp);
+                logger.warning("Build queue import failed to: " + comp);
                 return false;
             }
 

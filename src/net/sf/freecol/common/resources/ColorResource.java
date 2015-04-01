@@ -96,8 +96,8 @@ public class ColorResource extends Resource {
                 int col = Integer.decode(colorName);
                 return new Color(col, colorName.length() > 8);
             } catch (NumberFormatException e) {
-                logger.log(Level.WARNING,
-                        "Failed to decode hex colour string: {0}", colorName);
+                logger.warning("Failed to decode hex colour string: "
+                    + colorName);
             }
         } else {
             try {

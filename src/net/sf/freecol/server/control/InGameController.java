@@ -687,7 +687,7 @@ public final class InGameController extends Controller {
         }
 
         for (;;) {
-            logger.log(Level.FINEST, "Ending turn for {0}", player.getName());
+            logger.finest("Ending turn for " + player.getName());
             player.clearModelMessages();
 
             // Check for new turn
@@ -721,14 +721,8 @@ public final class InGameController extends Controller {
             switch (player.checkForDeath()) {
             case ServerPlayer.IS_DEAD:
                 player.csWithdraw(cs);
-                logger.log(
-                        Level.INFO,
-                        "For {0}, {1} is dead.",
-                        new Object[]{
-                            serverPlayer.getSuffix(),
-                            player.getNation()
-                        }
-                );
+                logger.info("For " + serverPlayer.getSuffix()
+                    + ", " + player.getNation() + " is dead.");
                 sendToAll(cs, player);
                 continue;
             case ServerPlayer.IS_ALIVE:
@@ -737,8 +731,7 @@ public final class InGameController extends Controller {
                         csGiveIndependence(player, (ServerPlayer)p, cs);
                     }
                     player.csWithdraw(cs);
-                    logger.log(Level.INFO, "{0} is defeated.",
-                            player.getNation());
+                    logger.info(player.getNation() + " is defeated.");
                     sendToAll(cs, player);
                     continue;
                 }
@@ -813,7 +806,7 @@ public final class InGameController extends Controller {
                     action = debugMonarchAction;
                     debugMonarchAction = null;
                     debugMonarchPlayer = null;
-                    logger.log(Level.FINEST, "Debug monarch action: {0}", action);
+                    logger.finest("Debug monarch action: " + action);
                 } else {
                     action = RandomChoice.getWeightedRandom(logger,
                             "Choose monarch action",
@@ -821,11 +814,11 @@ public final class InGameController extends Controller {
                 }
                 if (action != null) {
                     if (monarch.actionIsValid(action)) {
-                        logger.log(Level.FINEST, "Monarch action: {0}", action);
+                        logger.finest("Monarch action: " + action);
                         csMonarchAction(player, action, cs);
                     } else {
-                        logger.log(Level.FINEST,
-                                "Skipping invalid monarch action: {0}", action);
+                        logger.finest("Skipping invalid monarch action: "
+                            + action);
                     }
                 }
             }
@@ -1159,7 +1152,7 @@ public final class InGameController extends Controller {
             new MonarchSession(serverPlayer, action, hessians, hessPrice);
             break;
         case DISPLEASURE: default:
-            logger.log(Level.WARNING, "Bogus action: {0}", action);
+            logger.warning("Bogus action: " + action);
             break;
         }
     }
@@ -1208,11 +1201,9 @@ public final class InGameController extends Controller {
         if (!getFreeColServer().isSinglePlayer()) {
             logger.warning("Can not continue playing in multiplayer!");
         } else if (serverPlayer != game.checkForWinner()) {
-            logger.log(
-                    Level.WARNING,
-                    "Can not continue playing, as {0} has not won the game!",
-                    serverPlayer.getName()
-            );
+            logger.warning("Can not continue playing, as "
+                           + serverPlayer.getName()
+                           + " has not won the game!");
         } else {
             final Specification spec = game.getSpecification();
             spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_REF)
@@ -1221,12 +1212,9 @@ public final class InGameController extends Controller {
                 .setValue(Boolean.FALSE);
             spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_HUMANS)
                 .setValue(Boolean.FALSE);
-            logger.log(
-                    Level.INFO,
-                    "Disabled victory conditions,"
-                            + " as {0} has won, but is continuing to play.",
-                    serverPlayer.getName()
-            );
+            logger.info("Disabled victory conditions, as "
+                        + serverPlayer.getName()
+                        + " has won, but is continuing to play.");
         }
         return null;
     }
@@ -1684,11 +1672,8 @@ public final class InGameController extends Controller {
         } else {
             // Dumping goods in Europe
             moveGoods(carrier, type, amount, null);
-            logger.log(
-                    Level.FINEST,
-                    "{0} dumped {1} {2} in Europe",
-                    new Object[]{carrier, amount, type.getSuffix()}
-            );
+            logger.finest(carrier + " dumped " + amount
+                + " " + type.getSuffix() + " in Europe");
         }
         carrier.setMovesLeft(0);
         cs.add(See.only(serverPlayer), carrier);
@@ -2555,17 +2540,8 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.setBuy();
-        logger.log(
-                Level.FINEST,
-                "{0} {1} buys {2} at {3} for {4}",
-                new Object[]{
-                    serverPlayer.getName(),
-                    unit,
-                    goods,
-                    settlement.getName(),
-                    amount
-                }
-        );
+        logger.finest(serverPlayer.getName() + " " + unit + " buys " + goods
+                      + " at " + settlement.getName() + " for " + amount);
 
         // Others can see the unit capacity.
         sendToOthers(serverPlayer, cs);
@@ -2620,17 +2596,8 @@ public final class InGameController extends Controller {
         session.setSell();
         cs.addSale(serverPlayer, settlement, goods.getType(),
                 Math.round((float) amount / goods.getAmount()));
-        logger.log(
-                Level.FINEST,
-                "{0} {1} sells {2} at {3} for {4}",
-                new Object[]{
-                    serverPlayer.getName(),
-                    unit,
-                    goods,
-                    settlement.getName(),
-                    amount
-                }
-        );
+        logger.finest(serverPlayer.getName() + " " + unit + " sells " + goods
+                      + " at " + settlement.getName() + " for " + amount);
 
         // Others can see the unit capacity.
         sendToOthers(serverPlayer, cs);
@@ -2688,11 +2655,8 @@ public final class InGameController extends Controller {
             cs.add(See.only(receiver), settlement);
             cs.addMessage(See.only(receiver), m);
         }
-        logger.log(
-                Level.INFO,
-                "Gift delivered by unit: {0} to settlement: {1}",
-                new Object[]{unit.getId(), settlement.getName()}
-        );
+        logger.info("Gift delivered by unit: " + unit.getId()
+                    + " to settlement: " + settlement.getName());
 
         // Others can see unit capacity, receiver gets it own items.
         sendToOthers(serverPlayer, cs);
@@ -2737,13 +2701,8 @@ public final class InGameController extends Controller {
 
         ChangeSet cs = new ChangeSet();
         moveGoods(gl, goodsType, amount, carrier);
-        logger.log(
-                Level.FINEST,
-                "{0} loaded {1} {2} onto {3}",
-                new Object[]{
-                    gl.getId(), amount, goodsType.getSuffix(), carrier
-                }
-        );
+        logger.finest(gl.getId() + " loaded " + amount
+            + " " + goodsType.getSuffix() + " onto " + carrier);
         cs.add(See.only(serverPlayer), gl.getGoodsContainer());
         cs.add(See.only(serverPlayer), carrier.getGoodsContainer());
         if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
@@ -2777,16 +2736,8 @@ public final class InGameController extends Controller {
         if (carrier.getSettlement() != null) {
             Settlement settlement = carrier.getSettlement();
             moveGoods(carrier, goodsType, amount, settlement);
-            logger.log(
-                    Level.FINEST,
-                    "{0} unloaded {1} {2} to {3}",
-                    new Object[]{
-                        carrier,
-                        amount,
-                        goodsType.getSuffix(),
-                        settlement.getName()
-                    }
-            );
+            logger.finest(carrier + " unloaded " + amount
+                + " " + goodsType.getSuffix() + " to " + settlement.getName());
             cs.add(See.only(serverPlayer), settlement.getGoodsContainer());
             cs.add(See.only(serverPlayer), carrier.getGoodsContainer());
             if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
@@ -2795,16 +2746,8 @@ public final class InGameController extends Controller {
             }
         } else { // Dump of goods onto a tile
             moveGoods(carrier, goodsType, amount, null);
-            logger.log(
-                    Level.FINEST,
-                    "{0} dumped {1} {2} to {3}",
-                    new Object[]{
-                        carrier,
-                        amount,
-                        goodsType.getSuffix(),
-                        carrier.getLocation()
-                    }
-            );
+            logger.finest(carrier + " dumped " + amount
+                + " " + goodsType.getSuffix() + " to " + carrier.getLocation());
             cs.add(See.perhaps(), (FreeColGameObject)carrier.getLocation());
             // Others might see a capacity change.
             sendToOthers(serverPlayer, cs);
@@ -3091,34 +3034,32 @@ public final class InGameController extends Controller {
             final ServerPlayer source = (ServerPlayer)tradeItem.getSource();
             final ServerPlayer dest = (ServerPlayer)tradeItem.getDestination();
             if (!tradeItem.isValid()) {
-                logger.log(Level.WARNING, "Trade with invalid tradeItem: {0}",
-                        tradeItem);
+                logger.warning("Trade with invalid tradeItem: " + tradeItem);
                 fail = true;
                 continue;
             }
             if (source != srcPlayer && source != dstPlayer) {
-                logger.log(Level.WARNING, "Trade with invalid source: {0}",
-                        ((source == null) ? "null" : source.getId()));
+                logger.warning("Trade with invalid source: "
+                               + ((source == null) ? "null" : source.getId()));
                 fail = true;
                 continue;
             }
             if (dest != srcPlayer && dest != dstPlayer) {
-                logger.log(Level.WARNING, "Trade with invalid destination: {0}",
-                        ((dest == null) ? "null" : dest.getId()));
+                logger.warning("Trade with invalid destination: "
+                               + ((dest == null) ? "null" : dest.getId()));
                 fail = true;
                 continue;
             }
 
             Colony colony = tradeItem.getColony(getGame());
             if (colony != null && !source.owns(colony)) {
-                logger.log(Level.WARNING,
-                        "Trade with invalid source owner: {0}", colony);
+                logger.warning("Trade with invalid source owner: " + colony);
                 fail = true;
                 continue;
             }
             int gold = tradeItem.getGold();
             if (gold > 0 && !source.checkGold(gold)) {
-                logger.log(Level.WARNING, "Trade with invalid gold: {0}", gold);
+                logger.warning("Trade with invalid gold: " + gold);
                 fail = true;
                 continue;
             }
@@ -3128,21 +3069,16 @@ public final class InGameController extends Controller {
                 Location loc = goods.getLocation();
                 if (loc instanceof Ownable
                     && !source.owns((Ownable)loc)) {
-                    logger.log(Level.WARNING,
-                            "Trade with invalid source owner: {0}", loc);
+                    logger.warning("Trade with invalid source owner: " + loc);
                     fail = true;
                 } else if (!(loc instanceof GoodsLocation
                         && loc.contains(goods))) {
-                    logger.log(Level.WARNING,
-                            "Trade of unavailable goods {0} at {1}",
-                            new Object[]{goods, loc}
-                    );
+                    logger.warning("Trade of unavailable goods " + goods
+                        + " at " + loc);
                     fail = true;
                 } else if (dest.owns(unit) && !unit.couldCarry(goods)) {
-                    logger.log(Level.WARNING,
-                            "Trade unit can not carry traded goods: {0}",
-                            goods
-                    );
+                    logger.warning("Trade unit can not carry traded goods: "
+                        + goods);
                     fail = true;
                 }
             }
@@ -3151,13 +3087,12 @@ public final class InGameController extends Controller {
             Unit u = tradeItem.getUnit();
             if (u != null) {
                 if (!source.owns(u)) {
-                    logger.log(Level.WARNING,
-                            "Trade with invalid source owner: {0}", u);
+                    logger.warning("Trade with invalid source owner: " + u);
                     fail = true;
                     continue;
                 } else if (dest.owns(unit) && !unit.couldCarry(u)) {
-                    logger.log(Level.WARNING,
-                            "Trade unit can not carry traded unit: {0}", u);
+                    logger.warning("Trade unit can not carry traded unit: "
+                        + u);
                     fail = true;
                 }
             }
@@ -3174,7 +3109,7 @@ public final class InGameController extends Controller {
             Stance stance = tradeItem.getStance();
             if (stance != null
                 && !source.csChangeStance(stance, dest, true, cs)) {
-                logger.log(Level.WARNING, "Stance trade failure: {0}", stance);
+                logger.warning("Stance trade failure: " + stance);
             }
             Colony colony = tradeItem.getColony(getGame());
             if (colony != null) {
@@ -3211,7 +3146,7 @@ public final class InGameController extends Controller {
             ServerPlayer victim = (ServerPlayer)tradeItem.getVictim();
             if (victim != null
                 && !source.csChangeStance(Stance.WAR, victim, true, cs)) {
-                logger.log(Level.WARNING, "Incite trade failure: {0}", victim);
+                logger.warning("Incite trade failure: " + victim);
             }                
             ServerUnit newUnit = (ServerUnit)tradeItem.getUnit();
             if (newUnit != null && settlement != null) {
@@ -3221,10 +3156,8 @@ public final class InGameController extends Controller {
                 if (unit.isOnCarrier()) {
                     Unit carrier = unit.getCarrier();
                     if (!carrier.couldCarry(newUnit)) {
-                        logger.log(Level.WARNING,
-                                "Can not add {0} to {1}",
-                                new Object[]{newUnit, carrier}
-                        );
+                        logger.warning("Can not add " + newUnit
+                            + " to " + carrier);
                         continue;
                     }
                     newLoc = carrier;
@@ -3809,19 +3742,9 @@ public final class InGameController extends Controller {
         boolean result = (reply instanceof IndianDemandMessage)
             ? ((IndianDemandMessage)reply).getResult()
             : false;
-        logger.log(
-                Level.INFO,
-                "{0} unit {1} demands {2} {3} from {4} accepted: {5}",
-                new Object[]{
-                    serverPlayer.getName(),
-                    unit,
-                    amount,
-                    (type == null)
-                            ? "gold" : type,
-                    colony.getName(),
-                    result
-                }
-        );
+        logger.info(serverPlayer.getName() + " unit " + unit
+            + " demands " + amount + " " + ((type == null) ? "gold" : type)
+            + " from " + colony.getName() + " accepted: " + result);
 
         IndianDemandMessage message = new IndianDemandMessage(unit, colony,
                                                               type, amount);
@@ -4389,11 +4312,7 @@ public final class InGameController extends Controller {
                 todo.add(todo.size(), uc);
                 break;
             default:
-                logger.log(
-                        Level.WARNING,
-                        "Bad move for {0} to {1}",
-                        new Object[]{uc.unit, wl}
-                );
+                logger.warning("Bad move for " + uc.unit + " to " + wl);
                 break;
             }
         }
