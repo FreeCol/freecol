@@ -71,7 +71,7 @@ public final class ReportLabourPanel extends ReportPanel {
             setOpaque(false);
             setLayout(new MigLayout("wrap 2", "[60, right][left]"));
             add(new JLabel(ImageLibrary.getUnitImageIcon(unitType, roleId,
-                                                         (count == 0), 0.8f)),
+                                                         (count == 0), 2f/3f)),
                 "spany 2");
             add(new JLabel(Messages.getName(unitType)));
             add(new JLabel(Integer.toString(count)));

@@ -147,7 +147,7 @@ public final class QuickActionMenu extends JPopupMenu {
         final Unit unit = unitLabel.getUnit();
 
         this.setLabel("Unit");
-        ImageIcon unitIcon = ImageLibrary.getUnitImageIcon(unit, 0.66f);
+        ImageIcon unitIcon = ImageLibrary.getUnitImageIcon(unit, 2f/3f);
         JMenuItem name = new JMenuItem(unit.getDescription(Unit.UnitLabelType.NATIONAL)
             + " (" + Messages.message("colopedia") + ")", unitIcon);
         name.setActionCommand(UnitAction.COLOPEDIA.toString());
