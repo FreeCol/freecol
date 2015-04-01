@@ -1625,20 +1625,17 @@ public final class Canvas extends JDesktopPane {
      * @see EuropePanel
      */
     public void showEuropePanel() {
-        if (freeColClient.getGame() == null) {
-            showErrorMessage("europe.noGame");
-        } else {
-            EuropePanel panel = getExistingFreeColPanel(EuropePanel.class);
-            if (panel == null) {
-                panel = new EuropePanel(freeColClient, this);
-                panel.addClosingCallback(new Runnable() {
-                        @Override
-                        public void run() {
-                            removeEuropeanSubpanels();
-                        }
-                    });
-                showSubPanel(panel, false);
-            }
+        if (freeColClient.getGame() == null) return;
+        EuropePanel panel = getExistingFreeColPanel(EuropePanel.class);
+        if (panel == null) {
+            panel = new EuropePanel(freeColClient, this);
+            panel.addClosingCallback(new Runnable() {
+                    @Override
+                    public void run() {
+                        removeEuropeanSubpanels();
+                    }
+                });
+            showSubPanel(panel, false);
         }
     }
 
