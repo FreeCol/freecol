@@ -143,8 +143,8 @@ public class DeliverGiftMessage extends DOMMessage {
 
         // Make sure we are trying to deliver something that is there
         if (goods.getLocation() != unit) {
-            return DOMMessage.createError("server.trade.noGoods",
-                "deliverGift of non-existent goods");
+            return DOMMessage.clientError("Gift " + goods.getId()
+                + " is not with unit " + unitId);
         }
 
         // Proceed to deliver.

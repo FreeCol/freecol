@@ -116,7 +116,7 @@ public class JoinColonyMessage extends DOMMessage {
     /**
      * The tag name of the root element representing this object.
      *
-     * @return "buildColony".
+     * @return "joinColony".
      */
     public static String getXMLElementTagName() {
         return "joinColony";

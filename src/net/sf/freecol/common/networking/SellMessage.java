@@ -130,8 +130,8 @@ public class SellMessage extends DOMMessage {
 
         // Make sure we are trying to sell something that is there
         if (goods.getLocation() != unit) {
-            return DOMMessage.createError("server.trade.noGoods", "Goods "
-                + goods.getId() + " is not with unit " + unitId);
+            return DOMMessage.clientError("Goods " + goods.getId()
+                + " is not with unit " + unitId);
         }
 
         int gold = getGold();

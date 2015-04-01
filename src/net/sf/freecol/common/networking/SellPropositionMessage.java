@@ -129,8 +129,8 @@ public class SellPropositionMessage extends DOMMessage {
 
         // Make sure we are trying to sell something that is there
         if (goods.getLocation() != unit) {
-            return DOMMessage.createError("server.trade.noGoods", "Goods "
-                + goods.getId() + " are not with unit " + unitId);
+            return DOMMessage.clientError("Goods " + goods.getId()
+                + " are not with unit " + unitId);
         }
 
         // Proceed to price.

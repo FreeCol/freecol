@@ -134,8 +134,8 @@ public class BuyPropositionMessage extends DOMMessage {
         }
         // Make sure we are trying to buy something that is there
         if (goods.getLocation() != settlement) {
-            return DOMMessage.createError("server.trade.noGoods", "Goods "
-                + goods.getId() + " are not in settlement " + settlementId);
+            return DOMMessage.clientError("Goods " + goods.getId()
+                + " are not in settlement " + settlementId);
         }
  
         // Proceed to price.
