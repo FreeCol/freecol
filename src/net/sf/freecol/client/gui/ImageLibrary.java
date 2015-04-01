@@ -35,7 +35,6 @@ import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
 import java.util.HashMap;
@@ -771,16 +770,6 @@ public final class ImageLibrary {
 
     public static Image getMiscImage(String id, float scale) {
         return ResourceManager.getImage(id, scale);
-    }
-
-    /**
-     * Returns the image with the given identifier.
-     *
-     * @param id The object identifier.
-     * @return The image.
-     */
-    public ImageIcon getMiscImageIcon(String id) {
-        return new ImageIcon(getMiscImage(id));
     }
 
     /**

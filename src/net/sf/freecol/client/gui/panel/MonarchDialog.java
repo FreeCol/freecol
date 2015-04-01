@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import javax.swing.ImageIcon;
 
 import javax.swing.JButton;
 import javax.swing.JTextArea;
@@ -107,6 +108,6 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
             .cancelOption().defaultOption());
 
         initializeDialog(DialogType.QUESTION, false, panel,
-                         lib.getMiscImageIcon(monarchKey), c);
+                         new ImageIcon(lib.getMiscImage(monarchKey)), c);
     }
 }

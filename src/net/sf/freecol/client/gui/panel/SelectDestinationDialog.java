@@ -128,7 +128,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                     new Dimension(-1, CELL_HEIGHT)));
             } else if (location instanceof Map) {
                 name = Messages.message(location.getLocationLabelFor(player));
-                this.icon = lib.getMiscImageIcon(ImageLibrary.LOST_CITY_RUMOUR);
+                this.icon = new ImageIcon(lib.getMiscImage(
+                    ImageLibrary.LOST_CITY_RUMOUR));
             } else if (location instanceof Settlement) {
                 Settlement settlement = (Settlement) location;
                 name = Messages.message(settlement.getLocationLabelFor(player));

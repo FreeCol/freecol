@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
@@ -242,8 +243,8 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
          * @param number The upkeep cost.
          */
         public UpkeepLabel(int number) {
-            super(freeColClient.getGUI().getImageLibrary()
-                .getMiscImageIcon("coin"));
+            super(new ImageIcon(freeColClient.getGUI().getImageLibrary()
+                .getMiscImage("coin")));
 
             image = ImageLibrary.getStringImage(
                 freeColClient.getGUI().getCanvas().getGraphics(),
