@@ -386,7 +386,8 @@ public final class ImageLibrary {
                                        ? "indianSettlement.contacted"
                                        : "indianSettlement.scouted");
         String key = "dynamic.alarm." + text + "." + ownerColor.getRGB()
-            + "." + amount + "." + enemyColor.getRGB();
+            + "." + amount + "." + enemyColor.getRGB()
+            + "." + Float.toHexString(scalingFactor);
         Image img = ResourceManager.getImage(key);
         if (img == null) {
             img = createFilledChip(text, Color.BLACK, ownerColor, amount/4.0,
@@ -665,8 +666,9 @@ public final class ImageLibrary {
      */
     public Image getIndianSettlementChip(IndianSettlement is, String text) {
         Color background = is.getOwner().getNationColor();
-        String key = "dynamic.indianSettlement." + text + "."
-             + Integer.toHexString(background.getRGB());
+        String key = "dynamic.indianSettlement." + text
+            + "." + Integer.toHexString(background.getRGB())
+            + "." + Float.toHexString(scalingFactor);
         Image img = ResourceManager.getImage(key);
         if (img == null) {
             img = createChip(text, Color.BLACK, background,
@@ -811,8 +813,9 @@ public final class ImageLibrary {
     public Image getMissionChip(Player owner, boolean expert) {
         Color background = owner.getNationColor();
         String key = "dynamic.mission." + ((expert) ? "expert" : "normal")
-            + "." + Integer.toHexString(background.getRGB());
-        Image img = ResourceManager.getImage(key, 1.0f);
+            + "." + Integer.toHexString(background.getRGB())
+            + "." + Float.toHexString(scalingFactor);
+        Image img = ResourceManager.getImage(key);
         if (img == null) {
             Color foreground = ResourceManager.getColor("mission."
                 + ((expert) ? "expert" : "normal") + ".foreground.color");
@@ -848,8 +851,9 @@ public final class ImageLibrary {
         Color foregroundColor = (unit.getState() == Unit.UnitState.FORTIFIED)
             ? Color.GRAY : getForegroundColor(backgroundColor);
         String key = "dynamic.occupationIndicator." + text
-            + "." + Integer.toHexString(backgroundColor.getRGB());
-        Image img = ResourceManager.getImage(key, scalingFactor);
+            + "." + Integer.toHexString(backgroundColor.getRGB())
+            + "." + Float.toHexString(scalingFactor);
+        Image img = ResourceManager.getImage(key);
         if (img == null) {
             img = createChip(text, Color.BLACK,
                              backgroundColor, foregroundColor);
@@ -1062,7 +1066,7 @@ public final class ImageLibrary {
             + "." + font.getFontName().replace(' ', '-')
             + "." + Integer.toString(font.getSize())
             + "." + Integer.toHexString(color.getRGB());
-        Image img = ResourceManager.getImage(key);// ,scalingFactor);
+        Image img = ResourceManager.getImage(key);
         if (img == null) {
             // create an image of the appropriate size
             FontMetrics fm = g.getFontMetrics(font);
@@ -1138,7 +1142,7 @@ public final class ImageLibrary {
             big.drawString(text, 2, fm.getMaxAscent());
 
             ResourceManager.addGameMapping(key, new ImageResource(bi));
-            img = ResourceManager.getImage(key);//, scalingFactor);
+            img = ResourceManager.getImage(key);
         }
         return img;
     }

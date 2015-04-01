@@ -1199,6 +1199,9 @@ public final class MapViewer {
      */
     private Image createCapitalLabel(int extent, int padding,
                                      Color backgroundColor) {
+        // TODO: Improve image quality by separately drawing the imgage
+        //       for all scaling factors, using different key values and
+        //       not using scaling on the getImage calls
         String key = "dynamic.label.nativeCapital"
             + "." + Integer.toHexString(backgroundColor.getRGB());
         Image image = ResourceManager.getImage(key, lib.getScalingFactor());
@@ -1314,6 +1317,9 @@ public final class MapViewer {
      * native village.
      */
     private Image createReligiousMissionLabel(int extent, int padding,
+        // TODO: Improve image quality by separately drawing the imgage
+        //       for all scaling factors, using different key values and
+        //       not using scaling on the getImage calls
         Color backgroundColor, boolean expertMissionary) {
         String key = "dynamic.label.religiousMission"
             + (expertMissionary ? ".expert" : "")
