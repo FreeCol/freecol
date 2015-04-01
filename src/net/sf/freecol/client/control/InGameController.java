@@ -3752,9 +3752,9 @@ public final class InGameController implements NetworkConstants {
             .getAccelerator());
         player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
                 "tutorial.buildColony", player)
-            .addName("%build_colony_key%", key)
-            .add("%build_colony_menu_item%", "buildColonyAction.name")
-            .add("%orders_menu_item%", "menuBar.orders"));
+            .addName("%colonyKey%", key)
+            .add("%colonyMenuItem%", "buildColonyAction.name")
+            .add("%ordersMenuItem%", "menuBar.orders"));
         displayModelMessages(false, false);
         return true;
     }
