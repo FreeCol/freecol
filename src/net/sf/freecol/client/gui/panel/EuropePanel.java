@@ -130,10 +130,8 @@ public final class EuropePanel extends PortPanel {
                 }
             }
 
-            GUI.localizeBorder(this, StringTemplate.template("goingTo")
-                .add("%type%", "ship")
-                .addStringTemplate("%location%",
-                    destination.getLocationLabelFor(getMyPlayer())));
+            GUI.localizeBorder(this, Unit.getDestinationLabel("ship",
+                    destination, getMyPlayer()));
             revalidate();
         }
 

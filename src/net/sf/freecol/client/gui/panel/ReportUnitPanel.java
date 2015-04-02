@@ -216,11 +216,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
                 : "other";
             tip = StringTemplate.template("report.unit.goingTo")
                 .addStringTemplate("%unit%", unit.getLabel())
-                .addStringTemplate("%going%", StringTemplate
-                    .template("goingTo")
-                    .add("%type%", type)
-                    .addStringTemplate("%location%", unit.getDestination()
-                        .getLocationLabelFor(getMyPlayer())));
+                .addStringTemplate("%going%", unit.getDestinationLabel());
         }
         GUI.localizeToolTip(button, tip);
         return button;

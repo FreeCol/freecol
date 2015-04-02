@@ -388,6 +388,36 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get a destination label for this unit.
+     *
+     * @return A <code>StringTemplate</code> describing where this unit
+     *     is going.
+     */
+    public StringTemplate getDestinationLabel() {
+        // Create the right tag for the tagged "goingTo" message.
+        String type = (isPerson()) ? "person"
+            : (isNaval()) ? "ship"
+            : "other";
+        return getDestinationLabel(type, getDestination(), getOwner());
+    }
+
+    /**
+     * Get a destination label for a given unit tag, destination and player.
+     *
+     * @param tag The unit tag for the "goingTo" message.
+     * @param destination The destination <code>Location</code>.
+     * @param player The <code>Player</code> viewpoint.
+     * @return A <code>StringTemplate</code> describing the unit movement.
+     */
+    public static StringTemplate getDestinationLabel(String tag,
+        Location destination, Player player) {
+        return StringTemplate.template("goingTo")
+            .add("%type%", tag)
+            .addStringTemplate("%location%",
+                destination.getLocationLabelFor(player));
+    }
+
+    /**
      * Get a string template describing the repair state of this unit.
      *
      * @return A repair label.
