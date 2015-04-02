@@ -78,8 +78,6 @@ public final class ImageLibrary {
 
     private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());
 
-    public static final String CROSS = "\u271D";
-
     public static final String UNIT_SELECT = "unitSelect.image",
                                DELETE = "delete.image",
                                PLOWED = "model.improvement.plow.image",
@@ -381,9 +379,9 @@ public final class ImageLibrary {
             if (amount == 0) amount = 1; // Show *something*!
         }
         Color foreground = getForegroundColor(enemyColor);
-        String text = Messages.message((is.worthScouting(player))
-                                       ? "indianSettlement.contacted"
-                                       : "indianSettlement.scouted");
+        String text = ResourceManager.getString((is.worthScouting(player))
+                                       ? "indianAlarmChip.contacted"
+                                       : "indianAlarmChip.scouted");
         String key = "dynamic.alarm." + text + "." + ownerColor.getRGB()
             + "." + amount + "." + enemyColor.getRGB()
             + "." + Float.toHexString(scalingFactor);
@@ -640,10 +638,11 @@ public final class ImageLibrary {
      * Gets the owner chip for the settlement.
      *
      * @param is The <code>IndianSettlement</code> to check.
-     * @param text The text for the chip.
      * @return A chip.
      */
-    public Image getIndianSettlementChip(IndianSettlement is, String text) {
+    public Image getIndianSettlementChip(IndianSettlement is) {
+        String text = ResourceManager.getString("indianSettlementChip."
+            + ((is.getType().isCapital()) ? "capital" : "normal"));
         Color background = is.getOwner().getNationColor();
         String key = "dynamic.indianSettlement." + text
             + "." + Integer.toHexString(background.getRGB())
@@ -791,7 +790,8 @@ public final class ImageLibrary {
             if (foreground == null) {
                 foreground = (expert) ? Color.BLACK : Color.GRAY;
             }
-            img = createChip(CROSS, Color.BLACK, background, foreground);
+            img = createChip(ResourceManager.getString("cross"),
+                             Color.BLACK, background, foreground);
             ResourceManager.addGameMapping(key, new ImageResource(img));
         }
         return img;

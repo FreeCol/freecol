@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -156,10 +157,10 @@ public final class ReportIndianPanel extends ReportPanel {
                 String locationName
                     = Messages.message(settlement.getLocationLabelFor(player));
                 if (known && settlement.isCapital()) {
-                    locationName += Messages.message("indianSettlement.capital");
+                    locationName += ResourceManager.getString("indianSettlementChip.capital");
                 }
                 if (settlement.worthScouting(player)) {
-                    locationName += Messages.message("indianSettlement.unscouted");
+                    locationName += ResourceManager.getString("unscoutedIndianSettlement");
                 }
                 JButton settlementButton = GUI.getLinkButton(locationName,
                     null, settlement.getTile().getId());

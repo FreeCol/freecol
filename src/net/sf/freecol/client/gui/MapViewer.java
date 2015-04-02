@@ -2048,10 +2048,7 @@ public final class MapViewer {
                     .getInteger(ClientOptions.COLONY_LABELS);
                 if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
                     // Draw the settlement chip
-                    chip = lib.getIndianSettlementChip(is,
-                        Messages.message("indianSettlement."
-                            + ((is.getType().isCapital()) ? "capital"
-                                : "normal")));
+                    chip = lib.getIndianSettlementChip(is);
                     g.drawImage(chip, (int)xOffset, (int)yOffset, null);
                     xOffset += chip.getWidth(null) + 2;
 

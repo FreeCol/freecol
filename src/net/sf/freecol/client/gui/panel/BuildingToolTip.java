@@ -52,11 +52,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class BuildingToolTip extends JToolTip {
 
-    private static final JLabel arrow = new JLabel("\u2192");
-    static {
-        arrow.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.SMALL, Font.BOLD));
-    }
+    private static JLabel arrow = null;
 
 
     /**
@@ -73,6 +69,12 @@ public class BuildingToolTip extends JToolTip {
         // FIXME: consider several outputs
         final GoodsType output = (outputs.isEmpty()) ? null
             : outputs.get(0).getType();
+
+        if (arrow == null) {
+            arrow = new JLabel(ResourceManager.getString("arrow.E"));
+            arrow.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+                    FontLibrary.FontSize.SMALL, Font.BOLD));
+        }
 
         String columns = "[align center]";
         for (int index = 0; index < workplaces; index++) {

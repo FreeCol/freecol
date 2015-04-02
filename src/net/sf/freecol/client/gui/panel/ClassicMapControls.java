@@ -29,6 +29,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -67,21 +68,24 @@ public final class ClassicMapControls extends MapControls {
         panel.add(miniMapZoomInButton, "newline 10");
         panel.add(miniMapZoomOutButton, "skip");
 
-        panel.add(makeButton("NW", "\u2196"), "newline 20");
-        panel.add(makeButton("N",  "\u2191"));
-        panel.add(makeButton("NE", "\u2197"));
-        panel.add(makeButton("W",  "\u2190"));
-        panel.add(makeButton("E",  "\u2192"), "skip");
-        panel.add(makeButton("SW", "\u2199"));
-        panel.add(makeButton("S",  "\u2193"));
-        panel.add(makeButton("SE", "\u2198"), "wrap 20");
+        panel.add(makeButton("NW", ResourceManager.getString("arrow.NW")),
+                  "newline 20");
+        panel.add(makeButton("N",  ResourceManager.getString("arrow.N")));
+        panel.add(makeButton("NE", ResourceManager.getString("arrow.NE")));
+        panel.add(makeButton("W",  ResourceManager.getString("arrow.W")));
+        panel.add(makeButton("E",  ResourceManager.getString("arrow.E")),
+                  "skip");
+        panel.add(makeButton("SW", ResourceManager.getString("arrow.SW")));
+        panel.add(makeButton("S",  ResourceManager.getString("arrow.S")));
+        panel.add(makeButton("SE", ResourceManager.getString("arrow.SE")),
+                  "wrap 20");
 
         for (UnitButton button : unitButtons) {
             panel.add(button);
         }
 
-        panel.add(infoPanel, "newline push, span, width " + infoPanel.getWidth()
-                             + ", height " + infoPanel.getHeight());
+        panel.add(infoPanel, "newline push, span, width "
+            + infoPanel.getWidth() + ", height " + infoPanel.getHeight());
     }
 
     /**

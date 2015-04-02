@@ -73,6 +73,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders.MultipleAdjacentDecider;
 import net.sf.freecol.common.util.LogBuilder;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -166,7 +167,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             // units to bring, and/or goods.
             if (loc instanceof IndianSettlement
                 && ((IndianSettlement)loc).hasMissionary(owner)) {
-                lb.add(ImageLibrary.CROSS);
+                lb.add(ResourceManager.getString("cross"));
             }
 
             if (loc instanceof Europe && !goodsTypes.isEmpty()) {

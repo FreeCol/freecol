@@ -432,4 +432,15 @@ public class ResourceManager {
         final AudioResource r = getResource(resource, AudioResource.class);
         return (r == null) ? null : r.getAudio();
     }
+
+    /**
+     * Gets a string resource with the given name.
+     *
+     * @param resource The name of the resource to query.
+     * @return The string value.
+     */
+    public static String getString(final String resource) {
+        final StringResource r = getResource(resource, StringResource.class);
+        return (r == null) ? null : r.getString();
+    }
 }

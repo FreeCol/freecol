@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -72,7 +73,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         String messageId = settlement.getShortAlarmLevelMessageId(player);
         text += " (" + Messages.message(messageId);
         if (settlement.worthScouting(player)) {
-            text += "," + Messages.message("indianSettlement.unscouted");
+            text += "," + ResourceManager.getString("unscoutedIndianSettlement");
         }
         text += ")";
         settlementLabel.setText(text);
