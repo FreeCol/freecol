@@ -101,6 +101,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
@@ -1535,6 +1536,43 @@ public class GUI {
     }
 
     /**
+     * Confirm that a unit should abandon its educational activity.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @param leaveColony True if the unit is about to leave the colony,
+     *     not just the education building.
+     * @return True if the unit can proceed.
+     */
+    public boolean confirmAbandonEducation(Unit unit, boolean leaveColony) {
+        if (!unit.isInColony()) return true;
+        boolean teacher = unit.getStudent() != null;
+        // if leaving the colony, the student loses learning spot, so
+        // check with player
+        boolean student = leaveColony && unit.getTeacher() != null;
+        if (!teacher && !student) return true;
+
+        Building school = (Building)((teacher) ? unit.getLocation()
+            : unit.getTeacher().getLocation());
+        StringTemplate label = unit.getLabel(Unit.UnitLabelType.NATIONAL);
+        StringTemplate template = (leaveColony) ? StringTemplate
+            .template("abandonEducation.text")
+            .addStringTemplate("%unit%", label)
+            .addName("%colony%", school.getColony().getName())
+            .addNamed("%building%", school)
+            .addStringTemplate("%action%", (teacher)
+                ? StringTemplate.key("abandonEducation.action.teaching")
+                : StringTemplate.key("abandonEducation.action.studying"))
+            : (teacher)
+            ? StringTemplate.template("abandonTeaching.text")
+                .addStringTemplate("%unit%", label)
+                .addNamed("%building%", school)
+            : null;
+        return template == null
+            || confirm(true, unit.getTile(), template, unit,
+                       "abandonEducation.yes", "abandonEducation.no");
+    }
+
+    /**
      * If a unit has a trade route, get confirmation that it is
      * ok to clear it and set a destination.
      *
@@ -1670,10 +1708,7 @@ public class GUI {
             showInformationMessage(message);
             return false;
         }
-        StringTemplate template = unit.getAbandonEducationMessage(true);
-        return template == null
-            || confirm(true, unit.getTile(), template, unit,
-                       "abandonEducation.yes", "abandonEducation.no");
+        return confirmAbandonEducation(unit, true);
     }
 
     /**

@@ -4554,10 +4554,7 @@ public final class InGameController implements NetworkConstants {
 
         StringTemplate template;
         if (unit.getStudent() != null
-            && (template = unit.getAbandonEducationMessage(false)) != null
-            && !gui.confirm(true, unit.getTile(), template,
-                            unit, "abandonTeaching.yes", "abandonTeaching.no"))
-            return false;
+            && !gui.confirmAbandonEducation(unit, false)) return false;
 
         Colony colony = workLocation.getColony();
         if (workLocation instanceof ColonyTile) {
