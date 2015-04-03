@@ -91,14 +91,9 @@ public class WorkProductionPanel extends FreeColPanel {
             final TileType tileType = tile.getType();
             shortName = Messages.getName(tileType);
             longName = Messages.message(colonyTile.getLabel());
-            Image terrain = lib.getTerrainImage(tileType,
-                                                tile.getX(), tile.getY());
-            image = new BufferedImage(terrain.getWidth(null),
-                                      terrain.getHeight(null),
-                                      BufferedImage.TYPE_INT_ARGB);
-            getGUI().getColonyTileMapViewer().displayColonyTile(
-                (Graphics2D)image.getGraphics(), tile, colony);
-            
+            image = getGUI().getColonyTileMapViewer()
+                .createColonyTileImage(tile, colony);
+
         } else if (wl instanceof Building) {
             final Building building = (Building)wl;
             shortName = Messages.getName(building.getType());

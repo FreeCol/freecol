@@ -542,6 +542,34 @@ public final class MapViewer {
     }
 
     /**
+     * Create a <code>BufferedImage</code> and draw a <code>Tile</code> on it.
+     * The visualization of the <code>Tile</code> also includes information
+     * from the corresponding <code>ColonyTile</code> of the given
+     * <code>Colony</code>.
+     *
+     * @param tile The <code>Tile</code> to draw.
+     * @param colony The <code>Colony</code> to create the visualization
+     *      of the <code>Tile</code> for. This object is also used to
+     *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
+     * @return The image.
+     */
+    public BufferedImage createColonyTileImage(Tile tile, Colony colony) {
+        final TileType tileType = tile.getType();
+        final Image terrain = lib.getTerrainImage(
+            tileType, tile.getX(), tile.getY());
+        final int width = terrain.getWidth(null);
+        final int height = terrain.getHeight(null);
+        final int compoundHeight = lib.getCompoundTerrainImageHeight(tileType);
+        BufferedImage image = new BufferedImage(
+            width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        g.translate(0, compoundHeight - height);
+        displayColonyTile(g, tile, colony);
+        g.dispose();
+        return image;
+    }
+
+    /**
      * Get a tile size for displaying the colony tiles.
      * 
      * @param tile The <code>Tile</code> to get the size for.

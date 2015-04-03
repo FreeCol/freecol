@@ -94,14 +94,7 @@ public final class TilePanel extends FreeColPanel {
 
         final MapViewer mapViewer = getGUI().getColonyTileMapViewer();
         final ImageLibrary lib = getImageLibrary();
-        final Image terrain = lib.getTerrainImage(tileType, tile.getX(), tile.getY());
-        final int width = terrain.getWidth(null);
-        final int height = terrain.getHeight(null);
-        final int compoundHeight = lib.getCompoundTerrainImageHeight(tileType);
-        BufferedImage image = new BufferedImage(width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = image.createGraphics();
-        g.translate(0, compoundHeight - height);
-        mapViewer.displayColonyTile(g, tile, null);
+        BufferedImage image = mapViewer.createColonyTileImage(tile, null);
         add(new JLabel(new ImageIcon(image)), "span, center");
 
         if (tile.getRegion() != null) {
@@ -205,8 +198,6 @@ public final class TilePanel extends FreeColPanel {
         add(colopediaButton, "tag help");
 
         setSize(getPreferredSize());
-
-        g.dispose();
     }
 
 
