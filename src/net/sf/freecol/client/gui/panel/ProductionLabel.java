@@ -109,7 +109,36 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      */
     public ProductionLabel(FreeColClient freeColClient, AbstractGoods ag,
                            int maximumProduction, int stockNumber) {
-        super(freeColClient.getGUI().getImageLibrary(), ag);
+        this(freeColClient,freeColClient.getGUI().getImageLibrary(), ag,
+            maximumProduction, stockNumber);
+    }
+
+    /**
+     * Creates a new production label.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param lib The <code>ImageLibrary</code> to use for the label.
+     * @param ag The <code>AbstractGoods</code> to create a label for.
+     * @param maximumProduction The maximum production.
+     */
+    public ProductionLabel(FreeColClient freeColClient, ImageLibrary lib,
+                           AbstractGoods ag, int maximumProduction) {
+        this(freeColClient, lib, ag, maximumProduction, -1);
+    }
+
+    /**
+     * Creates a new production label.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param lib The <code>ImageLibrary</code> to use for the label.
+     * @param ag The <code>AbstractGoods</code> to create a label for.
+     * @param maximumProduction The maximum production.
+     * @param stockNumber The lower bound on number of items to display.
+     */
+    public ProductionLabel(FreeColClient freeColClient, ImageLibrary lib,
+                           AbstractGoods ag,
+                           int maximumProduction, int stockNumber) {
+        super(lib, ag);
 
         if (getType() == null) {
             logger.warning("Bad production label (no type)\n"
@@ -118,7 +147,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             logger.warning("Bad production label (bad amount)\n"
                 + FreeColDebugger.stackTraceToString());
         }
-            
+
         this.maximumProduction = maximumProduction;
         this.stockNumber = stockNumber;
         final ClientOptions options = freeColClient.getClientOptions();
@@ -130,7 +159,6 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             : options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         this.displayNumber = options
             .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
-        ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
         this.goodsIcon = (ag.getType() == null) ? null
             : new ImageIcon(lib.getGoodsImage(ag.getType()));
         this.compressedWidth = (this.goodsIcon == null) ? 0
