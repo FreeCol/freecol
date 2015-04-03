@@ -1800,7 +1800,8 @@ public class GUI {
      */
     public BoycottAction getBoycottChoice(Goods goods, Europe europe) {
         int arrears = europe.getOwner().getArrears(goods.getType());
-        StringTemplate template = StringTemplate.template("boycottedGoods.text")
+        StringTemplate template = StringTemplate
+            .template("boycottedGoods.text")
             .addNamed("%goods%", goods)
             .addNamed("%europe%", europe)
             .addAmount("%amount%", arrears);
@@ -1839,7 +1840,7 @@ public class GUI {
                                      BuyAction.HAGGLE));
 
         return getChoice(true, unit.getTile(), getDefaultTextArea(template),
-                         goods, "buyProposition.cancel", choices);
+                         goods, "cancel", choices);
     }
 
     /**
@@ -1908,7 +1909,7 @@ public class GUI {
 
         return getChoice(true, settlement.getTile(),
                          getDefaultTextArea(template), settlement,
-                         "tradeProposition.cancel", choices);
+                         "cancel", choices);
     }
 
     /**
@@ -2096,7 +2097,7 @@ public class GUI {
                 SellAction.GIFT));
 
         return getChoice(true, unit.getTile(), getDefaultTextArea(template),
-                         goods, "sellProposition.cancel", choices);
+                         goods, "cancel", choices);
     }
 
 
