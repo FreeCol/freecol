@@ -469,6 +469,10 @@ public final class ImageLibrary {
                                         + ".image", scalingFactor);
     }
 
+    public Image getSmallerCoatOfArmsImage(Nation nation) {
+        return getCoatOfArmsImage(nation, scalingFactor * 0.5f);
+    }
+
     /**
      * Returns the coat-of-arms image for the given Nation.
      *

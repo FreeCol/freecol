@@ -304,7 +304,8 @@ public final class PlayersTable extends JTable {
             int row, int column) {
             Nation nation = (Nation) value;
             setText(Messages.getName(nation));
-            setIcon(new ImageIcon(ImageLibrary.getCoatOfArmsImage(nation, 0.5f)));
+            setIcon(new ImageIcon(
+                gui.getImageLibrary().getSmallerCoatOfArmsImage(nation)));
             return this;
         }
     }
@@ -614,8 +615,8 @@ public final class PlayersTable extends JTable {
         Messages.message("player")
     };
 
-    /** A link to the image library. */
-    private final ImageLibrary library;
+    /** A link to the gui. */
+    private final GUI gui;
 
 
     /**
@@ -629,9 +630,8 @@ public final class PlayersTable extends JTable {
                         NationOptions nationOptions, Player myPlayer) {
         super();
 
-        final GUI gui = freeColClient.getGUI();
+        gui = freeColClient.getGUI();
         final Specification spec = freeColClient.getGame().getSpecification();
-        this.library = gui.getImageLibrary();
 
         setModel(new PlayersTableModel(freeColClient.getPreGameController(),
                  nationOptions, myPlayer));

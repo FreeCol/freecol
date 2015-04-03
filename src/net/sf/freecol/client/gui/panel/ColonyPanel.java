@@ -1207,6 +1207,7 @@ public final class ColonyPanel extends PortPanel
          */
         public void update() {
             final Colony colony = getColony();
+            ImageLibrary lib = getLibrary();
             if (colony == null) return;
             final int uc = colony.getUnitCount();
             final int solPercent = colony.getSoL();
@@ -1218,8 +1219,8 @@ public final class ColonyPanel extends PortPanel
 
             removeAll();
 
-            rebelShield.setIcon(new ImageIcon(ImageLibrary
-                    .getCoatOfArmsImage(nation, 0.5f)));
+            rebelShield.setIcon(new ImageIcon(
+                lib.getSmallerCoatOfArmsImage(nation)));
             add(rebelShield, "bottom");
 
             t = StringTemplate.template("colonyPanel.rebelLabel")
@@ -1254,8 +1255,8 @@ public final class ColonyPanel extends PortPanel
                 ? nation.getRebelNation()
                 : nation.getREFNation();
             try {
-                royalistShield.setIcon(new ImageIcon(ImageLibrary
-                        .getCoatOfArmsImage(other, 0.5f)));
+                royalistShield.setIcon(new ImageIcon(
+                    lib.getSmallerCoatOfArmsImage(other)));
                 add(royalistShield, "bottom");
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Shield: " + nation + "/" + other, e);
