@@ -2611,37 +2611,17 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Get and check the name.
-        boolean ret = true;
-        String suggested = player.getSettlementName(null);
-        String name = gui.getInput(true, tile,
-            StringTemplate.key("nameColony.text"), suggested,
-            "nameColony.yes", "nameColony.no");
-        if (name == null) {
-            ret = false;
-        } else if (name.isEmpty()) {
-            gui.showErrorMessage("enterSomeText");
-            ret = false; // 0-length invalid.
-        } else if (player.getSettlementByName(name) != null) {
-            // Must be unique
-            gui.showInformationMessage(tile, StringTemplate
-                .template("nameColony.notUnique")
-                .addName("%name%", name));
-            ret = false;
-        }
-        if (!ret) {
-            player.putSettlementName(suggested);
-            return false;
-        }
+        String name = gui.getNewColonyName(player, tile);
+        if (name == null) return false;
 
         // Claim tile from other owners before founding a settlement.
         // Only native owners that we can steal, buy from, or use a
         // bonus center tile exception should be possible by this point.
         UnitWas unitWas = new UnitWas(unit);
-        if (tile.getOwner() != null && !player.owns(tile)
-            && (!askClaimTile(player, tile, unit, player.getLandPrice(tile))
-                || !player.canClaimToFoundSettlement(tile))) {
-            ret = false;
-        }
+        boolean ret = (tile.getOwner() == null
+            || player.owns(tile)
+            || player.canClaimToFoundSettlement(tile))
+            && askClaimTile(player, tile, unit, player.getLandPrice(tile));
 
         ret = ret && askServer().buildColony(name, unit)
             && tile.hasSettlement();
@@ -2654,7 +2634,6 @@ public final class InGameController implements NetworkConstants {
             // at a colony.
             for (Unit u : tile.getUnitList()) checkCashInTreasureTrain(u);
         }
-        if (!ret) player.putSettlementName(suggested);
         unitWas.fireChanges();
         updateControls();
         return ret;

@@ -1952,6 +1952,35 @@ public class GUI {
     }
 
     /**
+     * Get a name for a new colony for a player.
+     *
+     * @param player The <code>Player</code> to get the colony name for.
+     * @param tile The <code>Tile</code> for the new colony.
+     * @return A colony name, or null if the user has reconsidered.
+     */
+    public String getNewColonyName(Player player, Tile tile) {
+        boolean ret = true;
+        String suggested = player.getSettlementName(null);
+        String name = getInput(true, tile, StringTemplate
+            .template("nameColony.text"), suggested,
+            "accept", "cancel");
+        if (name == null) {
+            ; // Cancelled
+        } else if (name.isEmpty()) {
+            showErrorMessage("enterSomeText"); // 0-length is invalid
+        } else if (player.getSettlementByName(name) != null) {
+            // Must be unique
+            showInformationMessage(tile, StringTemplate
+                .template("nameColony.notUnique")
+                .addName("%name%", name));
+        } else {
+            return name;
+        }
+        player.putSettlementName(suggested);
+        return null;
+    }
+
+    /**
      * Get the user choice for what to do with a scout at a foreign colony.
      *
      * @param colony The <code>Colony</code> to be scouted.
