@@ -542,6 +542,20 @@ public final class MapViewer {
     }
 
     /**
+     * Get a tile size for displaying the colony tiles.
+     * 
+     * @param tile The <code>Tile</code> to get the size for.
+     * @return The tile size.
+     */
+    public Dimension getTileSize(Tile tile) {
+        final TileType tileType = tile.getType();
+        final Image image = lib.getTerrainImage(tileType,
+            tile.getX(), tile.getY());
+        return new Dimension(
+            image.getWidth(null) / 2, image.getHeight(null) / 2);
+    }
+
+    /**
      * Displays the 3x3 tiles for the TilesPanel in ColonyPanel.
      * 
      * @param g The <code>Graphics2D</code> object on which to draw
@@ -552,16 +566,12 @@ public final class MapViewer {
      */
     public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
         final Tile tile = colony.getTile();
-        final TileType tileType = tile.getType();
-        final Image image = lib.getTerrainImage(tileType,
-            tile.getX(), tile.getY());
-        int tileWidth = image.getWidth(null) / 2;
-        int tileHeight = image.getHeight(null) / 2;
+        Dimension tileSize = getTileSize(tile);
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 if (tiles[x][y] != null) {
-                    int xx = ((2 - x) + y) * tileWidth;
-                    int yy = (x + y) * tileHeight;
+                    int xx = ((2 - x) + y) * tileSize.width;
+                    int yy = (x + y) * tileSize.height;
                     g.translate(xx, yy);
                     displayColonyTile(g, tiles[x][y], colony);
                     g.translate(-xx, -yy);

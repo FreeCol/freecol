@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -1993,6 +1994,8 @@ public final class ColonyPanel extends PortPanel
          */
         public final class ASingleTilePanel extends JPanel
             implements DropTarget, PropertyChangeListener {
+            // TODO: Fix ASingleTilePanel class to use the ImageLibrary inside 
+            //       getGUI().getColonyTileMapViewer() for everything
 
             /** The colony tile to monitor. */
             private final ColonyTile colonyTile;
@@ -2010,15 +2013,12 @@ public final class ColonyPanel extends PortPanel
 
                 setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 setOpaque(false);
-                final Tile tile = colonyTile.getTile();
-                final TileType tileType = tile.getType();
-                final Image image = getImageLibrary().getTerrainImage(tileType,
-                    tile.getX(), tile.getY());
                 // Size and position:
-                final int width = image.getWidth(null);
-                final int height = image.getHeight(null);
-                setSize(width, height);
-                setLocation(((2 - x) + y) * width / 2, (x + y) * height / 2);
+                Dimension size = getGUI().getColonyTileMapViewer()
+                    .getTileSize(colonyTile.getTile());
+                setSize(size.width, size.height);
+                setLocation(((2 - x) + y) * size.width / 2,
+                    (x + y) * size.height / 2);
             }
 
 
