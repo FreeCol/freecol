@@ -82,7 +82,7 @@ public final class ReportLabourDetailPanel extends ReportPanel
 
 
         // summary
-        detailPanel.add(new JLabel(new ImageIcon(getLibrary().getUnitImage(unitType))), "spany");
+        detailPanel.add(new JLabel(new ImageIcon(getImageLibrary().getUnitImage(unitType))), "spany");
         detailPanel.add(GUI.localizedLabel(unitType));
         detailPanel.add(new JLabel(String.valueOf(unitCount.getCount(unitType))), "wrap 10");
         boolean canTrain = false;

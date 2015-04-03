@@ -91,7 +91,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
 
         public CargoLabel(GoodsType type) {
-            super(new ImageIcon(getLibrary().getGoodsImage(type)));
+            super(new ImageIcon(getImageLibrary().getGoodsImage(type)));
 
             this.goodsType = type;
             setDisabledIcon(getDisabledIcon());
@@ -449,7 +449,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             panel.setForeground(list.getForeground());
             panel.setFont(list.getFont());
             Location location = value.getLocation();
-            ImageLibrary lib = getLibrary();
+            ImageLibrary lib = getImageLibrary();
             JLabel icon, name;
             if (location instanceof Europe) {
                 Europe europe = (Europe) location;

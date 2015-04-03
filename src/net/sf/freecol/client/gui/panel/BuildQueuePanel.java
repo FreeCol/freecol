@@ -466,7 +466,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 panel.add(lockLabel, "wrap");
             }
 
-            ImageLibrary lib = getLibrary();
+            ImageLibrary lib = getImageLibrary();
             List<AbstractGoods> required = value.getRequiredGoods();
             int size = required.size();
             for (int i = 0; i < size; i++) {

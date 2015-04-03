@@ -115,7 +115,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         final Specification spec = getSpecification();
         List<TileType> tileList = spec.getTileTypeList();
         for (TileType type : tileList) {
-            listPanel.add(buildButton(getLibrary().getCompoundTerrainImage(type, 0.5f),
+            listPanel.add(buildButton(getImageLibrary().getCompoundTerrainImage(type, 0.5f),
                                       Messages.getName(type),
                                       new TileTypeTransform(type)));
         }

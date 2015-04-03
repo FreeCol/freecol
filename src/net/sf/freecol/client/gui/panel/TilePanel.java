@@ -93,7 +93,7 @@ public final class TilePanel extends FreeColPanel {
         add(GUI.localizedLabel(template), "span, center");
 
         final MapViewer mapViewer = getGUI().getColonyTileMapViewer();
-        final ImageLibrary lib = getLibrary();
+        final ImageLibrary lib = getImageLibrary();
         final Image terrain = lib.getTerrainImage(tileType, tile.getX(), tile.getY());
         final int width = terrain.getWidth(null);
         final int height = terrain.getHeight(null);

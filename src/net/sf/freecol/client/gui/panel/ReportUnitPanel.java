@@ -189,7 +189,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
                 if (unit.isCarrier()) {
                     reportPanel.add(unitButton, "newline, sg");
                     for (Goods goods : unit.getGoodsList()) {
-                        GoodsLabel goodsLabel = new GoodsLabel(getLibrary(), goods);
+                        GoodsLabel goodsLabel = new GoodsLabel(getImageLibrary(), goods);
                         reportPanel.add(goodsLabel);
                     }
                     for (Unit unitLoaded : unit.getUnitList()) {
@@ -204,7 +204,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
     }
 
     protected JButton getUnitButton(Unit unit) {
-        ImageIcon icon = new ImageIcon(getLibrary().getUnitImage(unit));
+        ImageIcon icon = new ImageIcon(getImageLibrary().getUnitImage(unit));
         JButton button = GUI.getLinkButton("", icon, unit.getLocation().getId());
         button.addActionListener(this);
         StringTemplate tip;

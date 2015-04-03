@@ -241,7 +241,7 @@ public final class ReportColonyPanel extends ReportPanel
                 if(building.getType().isAutomaticBuild()) {
                     continue;
                 }
-                JLabel buildingLabel = new JLabel(new ImageIcon(getLibrary().
+                JLabel buildingLabel = new JLabel(new ImageIcon(getImageLibrary().
                         getSmallBuildingImage(building)));
                 buildingLabel.setToolTipText(Messages.getName(building));
                 buildingsPanel.add(buildingLabel);
@@ -674,7 +674,7 @@ public final class ReportColonyPanel extends ReportPanel
         reportPanel.add(b, layout);
         layout = null;
         Collections.sort(teachers, teacherComparator);
-        ImageLibrary lib = getLibrary();
+        ImageLibrary lib = getImageLibrary();
         for (Unit u : teachers) {
             int left = u.getNeededTurnsOfTraining()
                 - u.getTurnsOfTraining();
@@ -739,7 +739,7 @@ public final class ReportColonyPanel extends ReportPanel
                                  stpl("report.colony.plow.description")));
         reportPanel.add(newLabel("report.colony.road.header", null, null,
                                  stpl("report.colony.road.description")));
-        ImageLibrary lib = getLibrary();
+        ImageLibrary lib = getImageLibrary();
         for (GoodsType g : goodsTypes) {
             ImageIcon icon = new ImageIcon(lib.getSmallGoodsImage(g));
             JLabel l = newLabel(null, icon, null,

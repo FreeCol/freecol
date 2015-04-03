@@ -146,7 +146,7 @@ public final class ReportTurnPanel extends ReportPanel {
             if (messageDisplay != null) {
                 // FIXME: Scale icons relative to font size.
                 ImageIcon icon = new ImageIcon(
-                    getLibrary().getObjectImage(messageDisplay));
+                    getImageLibrary().getObjectImage(messageDisplay));
                 if (icon != null && icon.getIconHeight() > 40) {
                     Image image = icon.getImage();
                     int newWidth = (int)((double)image.getWidth(null)

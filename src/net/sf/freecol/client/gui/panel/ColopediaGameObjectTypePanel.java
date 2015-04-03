@@ -162,7 +162,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     }
 
     protected JButton getResourceButton(final ResourceType resourceType) {
-        return getButton(resourceType, null, new ImageIcon(getLibrary().getBonusImage(resourceType)));
+        return getButton(resourceType, null, new ImageIcon(getImageLibrary().getBonusImage(resourceType)));
     }
 
     protected JButton getGoodsButton(final GoodsType goodsType) {
@@ -179,7 +179,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
 
     protected JButton getGoodsButton(final GoodsType goodsType, String text) {
         JButton result = getButton(goodsType, text,
-            new ImageIcon(getLibrary().getGoodsImage(goodsType)));
+            new ImageIcon(getImageLibrary().getGoodsImage(goodsType)));
         result.setToolTipText(Messages.getName(goodsType));
         return result;
     }
@@ -190,7 +190,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
 
     protected JButton getUnitButton(final UnitType unitType, String roleId) {
         ImageIcon unitIcon = new ImageIcon(
-            getLibrary().getSmallUnitImage(unitType, roleId));
+            getImageLibrary().getSmallUnitImage(unitType, roleId));
         JButton unitButton = getButton(unitType, null, unitIcon);
         unitButton.setHorizontalAlignment(JButton.LEFT);
         return unitButton;

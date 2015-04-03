@@ -118,7 +118,7 @@ public final class ReportTradePanel extends ReportPanel {
         }
 
         int column = 0;
-        ImageLibrary lib = getLibrary();
+        ImageLibrary lib = getImageLibrary();
         for (GoodsType goodsType : storableGoods) {
             column++;
             int sales = player.getSales(goodsType);

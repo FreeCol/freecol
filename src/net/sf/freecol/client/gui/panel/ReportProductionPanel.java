@@ -161,7 +161,7 @@ public final class ReportProductionPanel extends ReportPanel {
                     int newValue = colony.getNetProductionOf(goodsType);
                     totalProduction[index] += newValue;
                     Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
-                    GoodsLabel goodsLabel = new GoodsLabel(getLibrary(), goods);
+                    GoodsLabel goodsLabel = new GoodsLabel(getImageLibrary(), goods);
                     goodsLabel.setHorizontalAlignment(JLabel.LEADING);
                     goodsLabel.setBorder(GUI.CELLBORDER);
                     reportPanel.add(goodsLabel);

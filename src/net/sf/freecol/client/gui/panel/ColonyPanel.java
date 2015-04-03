@@ -612,7 +612,7 @@ public final class ColonyPanel extends PortPanel
      */
     private void generateColonyUnitsMenu() {
         final FreeColClient freeColClient = getFreeColClient();
-        ImageLibrary lib = getLibrary();
+        ImageLibrary lib = getImageLibrary();
         final Colony colony = getColony();
         JPopupMenu colonyUnitsMenu
             = new JPopupMenu(Messages.message("colonyPanel.colonyUnits"));
@@ -1207,7 +1207,7 @@ public final class ColonyPanel extends PortPanel
          */
         public void update() {
             final Colony colony = getColony();
-            ImageLibrary lib = getLibrary();
+            ImageLibrary lib = getImageLibrary();
             if (colony == null) return;
             final int uc = colony.getUnitCount();
             final int solPercent = colony.getSoL();
@@ -1576,7 +1576,7 @@ public final class ColonyPanel extends PortPanel
                 int count = colony.getGoodsCount(goodsType);
                 if (count >= threshold) {
                     Goods goods = new Goods(game, colony, goodsType, count);
-                    GoodsLabel goodsLabel = new GoodsLabel(getLibrary(), goods);
+                    GoodsLabel goodsLabel = new GoodsLabel(getImageLibrary(), goods);
                     if (ColonyPanel.this.isEditable()) {
                         goodsLabel.setTransferHandler(defaultTransferHandler);
                         goodsLabel.addMouseListener(pressListener);
@@ -1984,7 +1984,7 @@ public final class ColonyPanel extends PortPanel
 
             final Tile tile = colony.getTile();
             final TileType tileType = tile.getType();
-            final Image image = getLibrary().getTerrainImage(tileType,
+            final Image image = getImageLibrary().getTerrainImage(tileType,
                 tile.getX(), tile.getY());
             int tileWidth = image.getWidth(null) / 2;
             int tileHeight = image.getHeight(null) / 2;
@@ -2027,7 +2027,7 @@ public final class ColonyPanel extends PortPanel
                 setOpaque(false);
                 final Tile tile = colonyTile.getTile();
                 final TileType tileType = tile.getType();
-                final Image image = getLibrary().getTerrainImage(tileType,
+                final Image image = getImageLibrary().getTerrainImage(tileType,
                     tile.getX(), tile.getY());
                 // Size and position:
                 final int width = image.getWidth(null);

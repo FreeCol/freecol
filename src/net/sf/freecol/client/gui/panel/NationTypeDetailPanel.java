@@ -196,7 +196,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
 
         panel.add(GUI.localizedLabel("colopedia.nationType.typeOfSettlements"));
         panel.add(new JLabel(Messages.getName(nationType.getCapitalType()),
-            new ImageIcon(getLibrary().getSettlementImage(nationType.getCapitalType())),
+            new ImageIcon(getImageLibrary().getSettlementImage(nationType.getCapitalType())),
             SwingConstants.CENTER));
 
         List<String> regionNames = new ArrayList<>();

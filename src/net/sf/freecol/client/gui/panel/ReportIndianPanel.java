@@ -101,7 +101,7 @@ public final class ReportIndianPanel extends ReportPanel {
         String numSettlements = String.valueOf(nativeSettlements.size())
             + " / " + String.valueOf(ns.getNumberOfSettlements());
 
-        ImageLibrary lib = getLibrary();
+        ImageLibrary lib = getImageLibrary();
         JLabel villageLabel = new JLabel();
         villageLabel.setIcon(new ImageIcon(ImageLibrary.getSettlementImage(
             opponent.getNationType().getCapitalType(),

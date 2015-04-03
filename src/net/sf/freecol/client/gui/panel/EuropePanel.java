@@ -346,7 +346,7 @@ public final class EuropePanel extends PortPanel {
             removeAll();
 
             final Market market = getMyPlayer().getMarket();
-            ImageLibrary lib = getLibrary();
+            ImageLibrary lib = getImageLibrary();
             for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
                 if (goodsType.isStorable()) {
                     MarketLabel label = new MarketLabel(lib, goodsType, market);

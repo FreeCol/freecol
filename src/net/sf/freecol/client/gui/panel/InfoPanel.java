@@ -136,7 +136,7 @@ public final class InfoPanel extends FreeColPanel {
             if (tile != null) {
                 TileType tileType = tile.getType();
                 final MapViewer mapViewer = getGUI().getMapViewer();
-                final ImageLibrary lib = getLibrary();
+                final ImageLibrary lib = getImageLibrary();
                 final Image terrain = lib.getTerrainImage(tileType, tile.getX(), tile.getY());
                 final int width = terrain.getWidth(null);
                 final int height = terrain.getHeight(null);
@@ -257,7 +257,7 @@ public final class InfoPanel extends FreeColPanel {
         public void update() {
             removeAll();
 
-            final ImageLibrary lib = getLibrary();
+            final ImageLibrary lib = getImageLibrary();
             if (unit != null) {
                 add(new JLabel(new ImageIcon(lib.getUnitImage(unit))),
                     "spany, gapafter 5px");
