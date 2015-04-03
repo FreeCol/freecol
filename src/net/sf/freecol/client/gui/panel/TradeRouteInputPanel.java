@@ -449,6 +449,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             panel.setForeground(list.getForeground());
             panel.setFont(list.getFont());
             Location location = value.getLocation();
+            ImageLibrary lib = getLibrary();
             JLabel icon, name;
             if (location instanceof Europe) {
                 Europe europe = (Europe) location;
@@ -458,8 +459,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
                 name = GUI.localizedLabel(europe);
             } else if (location instanceof Colony) {
                 Colony colony = (Colony) location;
-                icon = new JLabel(new ImageIcon(ImageLibrary
-                        .getSettlementImage(colony, 0.5f)));
+                icon = new JLabel(new ImageIcon(ImageLibrary.getSettlementImage(
+                    colony, lib.getScalingFactor()* 0.5f)));
                 name = new JLabel(colony.getName());
             } else {
                 throw new IllegalStateException("Bogus location: " + location);
