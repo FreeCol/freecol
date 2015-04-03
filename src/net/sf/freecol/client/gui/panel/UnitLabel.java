@@ -90,6 +90,8 @@ public final class UnitLabel extends JLabel
     private boolean isSmall = false;
 
     private boolean ignoreLocation;
+    
+    private boolean useMapImageLibrary;
 
 
     /**
@@ -124,6 +126,24 @@ public final class UnitLabel extends JLabel
      */
     public UnitLabel(FreeColClient freeColClient, Unit unit,
                      boolean isSmall, boolean ignoreLocation) {
+        this(freeColClient, unit, isSmall, ignoreLocation, false);
+    }
+
+
+    /**
+     * Creates a JLabel to display a unit.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param unit The <code>Unit</code> to display.
+     * @param isSmall The image will be smaller if set to <code>true</code>.
+     * @param ignoreLocation The image will not include production or state
+     *            information if set to <code>true</code>.
+     * @param useMapImageLibrary If false use ImageLibrary in gui.
+     *              If true use ImageLibrary in gui.getColonyTileMapViewer().
+     */
+    public UnitLabel(FreeColClient freeColClient, Unit unit,
+                     boolean isSmall, boolean ignoreLocation,
+                     boolean useMapImageLibrary) {
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
         this.unit = unit;
@@ -131,6 +151,7 @@ public final class UnitLabel extends JLabel
         selected = false;
         this.isSmall = isSmall;
         this.ignoreLocation = ignoreLocation;
+        this.useMapImageLibrary = useMapImageLibrary;
 
         updateIcon();
     }
@@ -171,7 +192,9 @@ public final class UnitLabel extends JLabel
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
     public void setSmall(boolean isSmall) {
-        final ImageLibrary lib = gui.getImageLibrary();
+        final ImageLibrary lib = useMapImageLibrary
+            ? gui.getColonyTileMapViewer().getImageLibrary()
+            : gui.getImageLibrary();
         if (isSmall) {
             ImageIcon imageIcon = new ImageIcon(lib.getSmallUnitImage(unit));
             ImageIcon disabledImageIcon = new ImageIcon(lib.getSmallUnitImage(unit, true));
@@ -235,6 +258,9 @@ public final class UnitLabel extends JLabel
      */
     public void paintComponent(Graphics g) {
         final Player player = freeColClient.getMyPlayer();
+        final ImageLibrary lib = useMapImageLibrary
+            ? gui.getColonyTileMapViewer().getImageLibrary()
+            : gui.getImageLibrary();
         if (ignoreLocation || selected
             || (!unit.isCarrier() && unit.getState() != Unit.UnitState.SENTRY)) {
             setEnabled(true);
@@ -254,7 +280,7 @@ public final class UnitLabel extends JLabel
             if (workType != null) {
                 int production = ((ColonyTile)unit.getLocation())
                     .getTotalProductionOf(workType);
-                ProductionLabel pl = new ProductionLabel(freeColClient,
+                ProductionLabel pl = new ProductionLabel(freeColClient, lib,
                     new AbstractGoods(workType, production));
                 g.translate(0, 10);
                 pl.paintComponent(g);
@@ -265,7 +291,6 @@ public final class UnitLabel extends JLabel
                    getParent() instanceof EuropePanel.DocksPanel ||
                    getParent().getParent() instanceof ReportPanel) {
             String text = Messages.message(unit.getOccupationKey(player.owns(unit)));
-            ImageLibrary lib = gui.getImageLibrary();
             g.drawImage(lib.getOccupationIndicatorChip(unit, text), 0, 0, null);
 
             if (unit.isDamaged()) {

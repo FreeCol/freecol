@@ -1895,6 +1895,8 @@ public final class ColonyPanel extends PortPanel
 
     /**
      * A panel that displays the tiles in the immediate area around the colony.
+     * TilesPanel class must use the ImageLibrary inside
+     * getGUI().getColonyTileMapViewer() for everything.
      */
     public final class TilesPanel extends JPanel {
 
@@ -1994,8 +1996,6 @@ public final class ColonyPanel extends PortPanel
          */
         public final class ASingleTilePanel extends JPanel
             implements DropTarget, PropertyChangeListener {
-            // TODO: Fix ASingleTilePanel class to use the ImageLibrary inside 
-            //       getGUI().getColonyTileMapViewer() for everything
 
             /** The colony tile to monitor. */
             private final ColonyTile colonyTile;
@@ -2067,7 +2067,8 @@ public final class ColonyPanel extends PortPanel
 
                 UnitLabel label = null;
                 for (Unit unit : colonyTile.getUnitList()) {
-                    label = new UnitLabel(getFreeColClient(), unit);
+                    label = new UnitLabel(
+                        getFreeColClient(), unit, false, false, true);
                     if (ColonyPanel.this.isEditable()) {
                         label.setTransferHandler(defaultTransferHandler);
                         label.addMouseListener(pressListener);
