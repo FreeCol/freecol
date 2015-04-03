@@ -121,7 +121,7 @@ public class CargoPanel extends FreeColPanel
             while (goodsIterator.hasNext()) {
                 Goods g = goodsIterator.next();
 
-                GoodsLabel label = new GoodsLabel(getImageLibrary(), g);
+                GoodsLabel label = new GoodsLabel(getGUI(), g);
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(dl);

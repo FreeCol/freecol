@@ -46,14 +46,17 @@ import net.sf.freecol.common.resources.ResourceManager;
 public final class GoodsLabel extends AbstractGoodsLabel
     implements Draggable {
 
+    GUI gui;
+ 
     /**
      * Initializes this JLabel with the given goods data.
      *
      * @param goods The Goods that this JLabel will visually represent.
      */
-    public GoodsLabel(ImageLibrary lib, Goods goods) {
-        super(lib, goods);
+    public GoodsLabel(GUI gui, Goods goods) {
+        super(gui.getImageLibrary(), goods);
 
+        this.gui = gui;
         initialize();
     }
 
@@ -120,8 +123,10 @@ public final class GoodsLabel extends AbstractGoodsLabel
     @Override
     public void setPartialChosen(boolean partialChosen) {
         super.setPartialChosen(partialChosen);
-        Image image = ImageLibrary
-            .getGoodsImage(getType(), partialChosen ? 0.75f : 1f);
+        ImageLibrary lib = gui.getImageLibrary();
+        Image image = partialChosen
+            ? lib.getSmallGoodsImage(getType())
+            : lib.getGoodsImage(getType());
         setIcon(new ImageIcon(image));
     }
 

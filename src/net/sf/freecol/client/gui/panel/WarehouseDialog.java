@@ -140,7 +140,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
             Goods goods = new Goods(colony.getGame(), colony, goodsType,
                                     colony.getGoodsCount(goodsType));
             GoodsLabel goodsLabel = new GoodsLabel(
-                freeColClient.getGUI().getImageLibrary(), goods);
+                freeColClient.getGUI(), goods);
             goodsLabel.setHorizontalAlignment(JLabel.LEADING);
             add(goodsLabel, "span 1 2");
 
