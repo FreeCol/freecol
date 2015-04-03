@@ -585,7 +585,7 @@ public final class MapViewer {
 
         Image image;
         if (unit != null
-            && (image = ImageLibrary.getUnitImage(unit, 0.5f)) != null) {
+            && (image = lib.getSmallerUnitImage(unit)) != null) {
             g.drawImage(image,
                         tileWidth/4 - image.getWidth(null) / 2,
                         halfHeight - image.getHeight(null) / 2, null);

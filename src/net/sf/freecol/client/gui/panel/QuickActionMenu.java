@@ -147,7 +147,7 @@ public final class QuickActionMenu extends JPopupMenu {
         final Unit unit = unitLabel.getUnit();
 
         this.setLabel("Unit");
-        ImageIcon unitIcon = new ImageIcon(ImageLibrary.getUnitImage(unit, 2f/3f));
+        ImageIcon unitIcon = new ImageIcon(gui.getImageLibrary().getSmallUnitImage(unit));
         JMenuItem name = new JMenuItem(unit.getDescription(Unit.UnitLabelType.NATIONAL)
             + " (" + Messages.message("colopedia") + ")", unitIcon);
         name.setActionCommand(UnitAction.COLOPEDIA.toString());
@@ -398,11 +398,12 @@ public final class QuickActionMenu extends JPopupMenu {
         boolean separatorNeeded = false;
         Unit unit = unitLabel.getUnit();
 
+        ImageLibrary lib = gui.getImageLibrary();
         if (unit.getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
             for (Unit teacher : unit.getColony().getTeachers()) {
                 if (unit.canBeStudent(teacher) && unit.isInColony()) {
                     JMenuItem menuItem = null;
-                    ImageIcon teacherIcon = new ImageIcon(ImageLibrary.getUnitImage(teacher, 0.5f));
+                    ImageIcon teacherIcon = new ImageIcon(lib.getSmallerUnitImage(teacher));
                     if (teacher.getStudent() != unit) {
                         menuItem = GUI.localizedMenuItem("assignToTeacher",
                                                          teacherIcon);
@@ -455,7 +456,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 JPanel experiencePanel = new MigPanel();
                 experiencePanel.setLayout(new MigLayout("wrap 3"));
                 experiencePanel.add(new JLabel(new ImageIcon(
-                        ImageLibrary.getUnitImage(expertType, 0.5f))),
+                        lib.getSmallerUnitImage(expertType))),
                     "spany 2");
                 experiencePanel.add(GUI.localizedLabel(StringTemplate
                         .template("menu.unit.experience")
@@ -669,7 +670,8 @@ public final class QuickActionMenu extends JPopupMenu {
         if (newUnitType != null) {
             if (separatorNeeded) this.addSeparator();
             JMenuItem menuItem = GUI.localizedMenuItem("clearSpeciality",
-                new ImageIcon(ImageLibrary.getUnitImage(newUnitType, 1f/3f)));
+                new ImageIcon(
+                    gui.getImageLibrary().getTinyUnitImage(newUnitType)));
             menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
             menuItem.addActionListener(unitLabel);
             this.add(menuItem);

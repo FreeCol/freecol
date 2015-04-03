@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
-import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -185,8 +184,8 @@ public final class ReportIndianPanel extends ReportPanel {
                 JLabel skillLabel;
                 if (visited && skillType != null) {
                     skillLabel = new JLabel("");
-                    skillLabel.setIcon(new ImageIcon(ImageLibrary
-                        .getUnitImage(skillType, 2f/3f)));
+                    skillLabel.setIcon(new ImageIcon(
+                        lib.getSmallUnitImage(skillType)));
                     GUI.localizeToolTip(skillLabel, Messages
                         .message(settlement.getLearnableSkillLabel(visited)));
                 } else {

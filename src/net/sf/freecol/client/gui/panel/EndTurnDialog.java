@@ -42,7 +42,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Player;
@@ -117,7 +116,8 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
                                                       int index,
                                                       boolean isSelected,
                                                       boolean cellHasFocus) {
-            imageLabel.setIcon(new ImageIcon(ImageLibrary.getUnitImage(value.unit, 0.5f)));
+            imageLabel.setIcon(new ImageIcon(
+                getImageLibrary().getSmallerUnitImage(value.unit)));
             nameLabel.setText(value.name);
             locationLabel.setText(value.location);
 

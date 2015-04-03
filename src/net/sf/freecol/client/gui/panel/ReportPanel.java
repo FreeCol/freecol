@@ -35,7 +35,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
@@ -128,8 +127,8 @@ public class ReportPanel extends FreeColPanel {
         UnitType unitType = au.getType(getSpecification());
         String roleId = au.getRoleId();
         int count = au.getNumber();
-        ImageIcon unitIcon = new ImageIcon(ImageLibrary.getUnitImage(
-            unitType, roleId, (count == 0), 2f/3f));
+        ImageIcon unitIcon = new ImageIcon(getLibrary().getSmallUnitImage(
+            unitType, roleId, (count == 0)));
         JLabel unitLabel = new JLabel(unitIcon);
         unitLabel.setText(String.valueOf(count));
         if (count == 0) {

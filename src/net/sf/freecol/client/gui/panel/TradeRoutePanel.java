@@ -43,7 +43,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
@@ -203,7 +202,7 @@ public final class TradeRoutePanel extends FreeColPanel {
             JLabel unitLabel
                 = new JLabel(unit.getDescription(Unit.UnitLabelType.NATIONAL));
             unitLabel.setIcon(new ImageIcon(
-                ImageLibrary.getUnitImage(this.unit, 0.5f)));
+                getLibrary().getSmallerUnitImage(this.unit)));
             add(unitLabel);
             Location loc = this.unit.getLocation();
             JLabel locLabel = GUI.localizedLabel(loc.getLocationLabelFor(player));

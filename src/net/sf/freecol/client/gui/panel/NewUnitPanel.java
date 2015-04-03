@@ -33,7 +33,6 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
@@ -110,8 +109,8 @@ public class NewUnitPanel extends FreeColPanel {
             boolean enable = player.checkGold(price);
             JButton newButton = new JButton();
             newButton.setLayout(new MigLayout("wrap 2", "[60]", "[30][30]"));
-            ImageIcon icon = new ImageIcon(ImageLibrary.getUnitImage(ut,
-                Specification.DEFAULT_ROLE_ID, !enable, 2f/3f));
+            ImageIcon icon = new ImageIcon(getLibrary().getSmallUnitImage(ut,
+                Specification.DEFAULT_ROLE_ID, !enable));
             JLabel name = GUI.localizedLabel(ut);
             name.setEnabled(enable);
             JLabel gold = GUI.localizedLabel(StringTemplate

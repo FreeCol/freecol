@@ -612,6 +612,7 @@ public final class ColonyPanel extends PortPanel
      */
     private void generateColonyUnitsMenu() {
         final FreeColClient freeColClient = getFreeColClient();
+        ImageLibrary lib = getLibrary();
         final Colony colony = getColony();
         JPopupMenu colonyUnitsMenu
             = new JPopupMenu(Messages.message("colonyPanel.colonyUnits"));
@@ -628,7 +629,7 @@ public final class ColonyPanel extends PortPanel
             GoodsType goodsType = unit.getWorkType();
             Unit student = unit.getStudent();
 
-            unitIcon = new ImageIcon(ImageLibrary.getUnitImage(unit, 0.5f));
+            unitIcon = new ImageIcon(lib.getSmallerUnitImage(unit));
             StringBuilder sb = new StringBuilder(64);
             if (student != null) {
                 sb.append(unit.getDescription())
@@ -676,7 +677,7 @@ public final class ColonyPanel extends PortPanel
         colonyUnitsMenu.addSeparator();
         for (final Unit unit : colonyTile.getUnitList()) {
             if (unit.isCarrier()) {
-                unitIcon = new ImageIcon(ImageLibrary.getUnitImage(unit, 0.5f));
+                unitIcon = new ImageIcon(lib.getSmallerUnitImage(unit));
                 String menuTitle = unit.getDescription()
                     + " " + Messages.message("inPort.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
@@ -691,7 +692,7 @@ public final class ColonyPanel extends PortPanel
                 colonyUnitsMenu.add(subMenu);
                 if (unit.getUnitList() != null) {
                     for (final Unit innerUnit : unit.getUnitList()) {
-                        unitIcon = new ImageIcon(ImageLibrary.getUnitImage(innerUnit, 0.5f));
+                        unitIcon = new ImageIcon(lib.getSmallerUnitImage(innerUnit));
                         menuTitle = innerUnit.getDescription()
                             + " " + Messages.message("cargoOnCarrier")
                             + " " + unit.getDescription();
@@ -708,7 +709,7 @@ public final class ColonyPanel extends PortPanel
                     }
                 }
             } else if (!unit.isOnCarrier()) {
-                unitIcon = new ImageIcon(ImageLibrary.getUnitImage(unit, 0.5f));
+                unitIcon = new ImageIcon(lib.getSmallerUnitImage(unit));
                 String menuTitle = unit.getDescription()
                     + " " + Messages.message("outsideOfColony.name");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
