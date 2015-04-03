@@ -600,6 +600,14 @@ public final class ImageLibrary {
         return ResourceManager.getImage("model.goods.bells.image", scale);
     }
 
+    public Image getSmallerGoodsImage(GoodsType goodsType) {
+        return getGoodsImage(goodsType, scalingFactor * 0.5f);
+    }
+
+    public Image getSmallGoodsImage(GoodsType goodsType) {
+        return getGoodsImage(goodsType, scalingFactor * (2f/3f));
+    }
+
     /**
      * Returns the goods-image at the given index.
      *

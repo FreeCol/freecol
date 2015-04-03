@@ -292,7 +292,7 @@ public final class QuickActionMenu extends JPopupMenu {
             t.addName("%claim%", "");
         }
         JMenuItem menuItem = GUI.localizedMenuItem(t,
-            new ImageIcon(ImageLibrary.getGoodsImage(type, 2f/3f)));
+            new ImageIcon(gui.getImageLibrary().getSmallGoodsImage(type)));
         menuItem.setActionCommand(UnitLabel.getWorkLabel(wl)
             + "/" + wl.getId() + "/" + type.getId()
             + "/" + ((claim) ? "!" : ""));
@@ -605,8 +605,8 @@ public final class QuickActionMenu extends JPopupMenu {
             }
             break;
         }
-        Icon icon = (change == null) ? null
-            : new ImageIcon(ImageLibrary.getGoodsImage(change.getType(), 2f/3f));
+        Icon icon = (change == null) ? null : new ImageIcon(
+            gui.getImageLibrary().getSmallGoodsImage(change.getType()));
 
         JMenuItem item = new JMenuItem(text, icon);
         final InGameController igc = freeColClient.getInGameController();
@@ -696,7 +696,8 @@ public final class QuickActionMenu extends JPopupMenu {
         this.setLabel(Messages.message("cargo"));
         JMenuItem name = new JMenuItem(
             Messages.getName(goods) + " (" + Messages.message("colopedia") + ")",
-            new ImageIcon(ImageLibrary.getGoodsImage(goods.getType(), 2f/3f)));
+            new ImageIcon(
+                gui.getImageLibrary().getSmallGoodsImage(goods.getType())));
         name.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     gui.showColopediaPanel(goods.getType().getId());
@@ -803,7 +804,8 @@ public final class QuickActionMenu extends JPopupMenu {
         this.setLabel(Messages.message("cargo"));
         JMenuItem name = new JMenuItem(
             Messages.getName(ag) + " (" + Messages.message("colopedia") + ")",
-            new ImageIcon(ImageLibrary.getGoodsImage(ag.getType(), 2f/3f)));
+            new ImageIcon(
+                gui.getImageLibrary().getSmallGoodsImage(ag.getType())));
         name.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     gui.showColopediaPanel(ag.getType().getId());

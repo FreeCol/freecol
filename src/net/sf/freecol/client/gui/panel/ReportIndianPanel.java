@@ -207,8 +207,8 @@ public final class ReportIndianPanel extends ReportPanel {
                     JLabel goodsLabel;
                     if (visited && wantedGoods[i] != null) {
                         goodsLabel = new JLabel("");
-                        goodsLabel.setIcon(new ImageIcon(ImageLibrary
-                                .getGoodsImage(wantedGoods[i], 2f/3f)));
+                        goodsLabel.setIcon(new ImageIcon(
+                            lib.getSmallGoodsImage(wantedGoods[i])));
                         GUI.localizeToolTip(goodsLabel, Messages
                             .message(settlement.getWantedGoodsLabel(i, player)));
                     } else {

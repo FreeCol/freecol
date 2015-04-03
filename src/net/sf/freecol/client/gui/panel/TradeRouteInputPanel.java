@@ -468,8 +468,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
             panel.add(icon, "spany");
             panel.add(name, "span, wrap");
             for (GoodsType cargo : value.getCargo()) {
-                panel.add(new JLabel(new ImageIcon(ImageLibrary
-                            .getGoodsImage(cargo, 0.5f))));
+                panel.add(new JLabel(new ImageIcon(
+                    lib.getSmallerGoodsImage(cargo))));
             }
             return panel;
         }

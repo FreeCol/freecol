@@ -739,9 +739,10 @@ public final class ReportColonyPanel extends ReportPanel
                                  stpl("report.colony.plow.description")));
         reportPanel.add(newLabel("report.colony.road.header", null, null,
                                  stpl("report.colony.road.description")));
+        ImageLibrary lib = getLibrary();
         for (GoodsType g : goodsTypes) {
-            ImageIcon ii = new ImageIcon(ImageLibrary.getGoodsImage(g, 2f/3f));
-            JLabel l = newLabel(null, ii, null,
+            ImageIcon icon = new ImageIcon(lib.getSmallGoodsImage(g));
+            JLabel l = newLabel(null, icon, null,
                 stpl("report.colony.production.header")
                     .addNamed("%goods%", g));
             l.setEnabled(market == null || market.getArrears(g) <= 0);
@@ -749,7 +750,7 @@ public final class ReportColonyPanel extends ReportPanel
         }
         final UnitType colonistType = getSpecification().getDefaultUnitType();
         ImageIcon colonistIcon
-            = new ImageIcon(getLibrary().getTinyUnitImage(colonistType,
+            = new ImageIcon(lib.getTinyUnitImage(colonistType,
                 Specification.DEFAULT_ROLE_ID, true));
         reportPanel.add(newLabel(null, colonistIcon, null,
                                  stpl("report.colony.birth.description")));
