@@ -1982,23 +1982,8 @@ public final class ColonyPanel extends PortPanel
             g.fillRect(0, 0, getWidth(), getHeight());
             if (colony == null) return;
 
-            final Tile tile = colony.getTile();
-            final TileType tileType = tile.getType();
-            final Image image = getImageLibrary().getTerrainImage(tileType,
-                tile.getX(), tile.getY());
-            int tileWidth = image.getWidth(null) / 2;
-            int tileHeight = image.getHeight(null) / 2;
-            for (int x = 0; x < 3; x++) {
-                for (int y = 0; y < 3; y++) {
-                    if (tiles[x][y] == null) continue;
-                    int xx = ((2 - x) + y) * tileWidth;
-                    int yy = (x + y) * tileHeight;
-                    g.translate(xx, yy);
-                    getGUI().getColonyTileMapViewer().displayColonyTile(
-                        (Graphics2D)g, tiles[x][y], colony);
-                    g.translate(-xx, -yy);
-                }
-            }
+            getGUI().getColonyTileMapViewer().displayColonyTiles(
+                (Graphics2D)g, tiles, colony);
         }
 
         /**

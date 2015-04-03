@@ -81,6 +81,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItem;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -535,6 +536,35 @@ public final class MapViewer {
                 } else {
                     g.setColor(Color.BLACK);
                     g.fillRect(0, 0, size.width, size.height);
+                }
+            }
+        }
+    }
+
+    /**
+     * Displays the 3x3 tiles for the TilesPanel in ColonyPanel.
+     * 
+     * @param g The <code>Graphics2D</code> object on which to draw
+     *      the <code>Tile</code>.
+     * @param tiles The array containing the <code>Tile</code> objects to draw.
+     * @param colony The <code>Colony</code> to create the visualization
+     *      of the <code>Tile</code> objects for.
+     */
+    public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
+        final Tile tile = colony.getTile();
+        final TileType tileType = tile.getType();
+        final Image image = lib.getTerrainImage(tileType,
+            tile.getX(), tile.getY());
+        int tileWidth = image.getWidth(null) / 2;
+        int tileHeight = image.getHeight(null) / 2;
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                if (tiles[x][y] != null) {
+                    int xx = ((2 - x) + y) * tileWidth;
+                    int yy = (x + y) * tileHeight;
+                    g.translate(xx, yy);
+                    displayColonyTile(g, tiles[x][y], colony);
+                    g.translate(-xx, -yy);
                 }
             }
         }
