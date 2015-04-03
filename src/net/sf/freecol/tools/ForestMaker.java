@@ -302,6 +302,7 @@ public class ForestMaker {
                     }
 
                 }
+                g.dispose();
 
                 ImageIO.write(base, "png", new File(destinationDirectory,
                                                     sourceDirectory.getName() + counter + ".png"));

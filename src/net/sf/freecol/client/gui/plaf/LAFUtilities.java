@@ -46,13 +46,14 @@ public final class LAFUtilities {
      * @param c The component to get the properties from.
      */
     public static void setProperties(Graphics g, JComponent c) {
+        Graphics2D g2 = (Graphics2D) g;
         if (c.getFont().getSize() >= AA_TEXT_SIZE) {
-            ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         }
         Object textAA = c.getClientProperty(RenderingHints.KEY_TEXT_ANTIALIASING);
         if (textAA != null) {
-            ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, textAA);
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, textAA);
         }
     }
 }

@@ -20,9 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.List;
 

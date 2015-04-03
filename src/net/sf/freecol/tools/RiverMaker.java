@@ -142,6 +142,7 @@ public class RiverMaker {
             //path.lineTo(SW.x, SW.y);
             g.draw(path);
             */
+            g.dispose();
             ImageIO.write(result, "png", new File(riverDir, "river" + name + ".png"));
             branches = nextBranch(branches);
         }

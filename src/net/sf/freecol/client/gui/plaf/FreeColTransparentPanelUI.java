@@ -50,11 +50,12 @@ public class FreeColTransparentPanelUI extends BasicPanelUI {
         int width = c.getWidth();
         int height = c.getHeight();
 
-        Composite oldComposite = ((Graphics2D) g).getComposite();
-        ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
-        g.setColor(Color.WHITE);
-        g.fillRect(0, 0, width, height);
-        ((Graphics2D) g).setComposite(oldComposite);
+        Graphics2D g2 = (Graphics2D)g;
+        Composite oldComposite = g2.getComposite();
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
+        g2.setColor(Color.WHITE);
+        g2.fillRect(0, 0, width, height);
+        g2.setComposite(oldComposite);
     }
 
 }

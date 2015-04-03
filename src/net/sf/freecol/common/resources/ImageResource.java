@@ -193,7 +193,9 @@ public class ImageResource extends Resource implements Resource.Preloadable {
             int height = im.getHeight(null);
             ColorConvertOp filter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
             BufferedImage srcImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            srcImage.createGraphics().drawImage(im, 0, 0, null);
+            Graphics2D g = srcImage.createGraphics();
+            g.drawImage(im, 0, 0, null);
+            g.dispose();
             final Image grayscaleImage = filter.filter(srcImage, null);
             grayscaleImages.put(d, grayscaleImage);
             return grayscaleImage;

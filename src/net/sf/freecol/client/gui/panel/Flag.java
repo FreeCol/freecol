@@ -605,6 +605,7 @@ public class Flag {
             g.setColor(starColor);
             g.fill(starShape);
         }
+        g.dispose();
         return image;
     }
 

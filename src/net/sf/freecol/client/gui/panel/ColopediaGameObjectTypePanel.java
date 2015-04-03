@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -130,7 +131,9 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
             if (image == null) continue;
             int x = (width - image.getWidth(null)) / 2;
             int y = (height - image.getHeight(null)) / 2;
-            centeredImage.getGraphics().drawImage(image, x, y, null);
+            Graphics2D g = centeredImage.createGraphics();
+            g.drawImage(image, x, y, null);
+            g.dispose();
             node.add(buildItem(type, new ImageIcon(centeredImage)));
         }
         root.add(node);

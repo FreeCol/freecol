@@ -247,7 +247,7 @@ public final class ImageLibrary {
         int w = img.getWidth(null);
         int h = img.getHeight(null);
         BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = bi.getGraphics();
+        Graphics2D g = bi.createGraphics();
         g.drawImage(img, 0, 0, null);
 
         float offset = target * (1.0f - fade);
@@ -255,8 +255,7 @@ public final class ImageLibrary {
         float[] offsets = { offset, offset, offset, 0.0f };
         RescaleOp rop = new RescaleOp(scales, offsets, null);
 
-        Graphics2D g2d = (Graphics2D)g;
-        g2d.drawImage(bi, rop, 0, 0);
+        g.drawImage(bi, rop, 0, 0);
 
         g.dispose();
         return bi;
@@ -1034,10 +1033,10 @@ public final class ImageLibrary {
                 fm.getMaxAscent() + fm.getMaxDescent(),
                 BufferedImage.TYPE_INT_ARGB);
             // draw the string with selected color
-            Graphics2D big = bi.createGraphics();
-            big.setColor(getStringBorderColor(color));
-            big.setFont(font);
-            big.drawString(text, 2, fm.getMaxAscent());
+            Graphics2D g2 = bi.createGraphics();
+            g2.setColor(getStringBorderColor(color));
+            g2.setFont(font);
+            g2.drawString(text, 2, fm.getMaxAscent());
 
             // draw the border around letters
             int borderWidth = 1;
@@ -1098,8 +1097,9 @@ public final class ImageLibrary {
                 }
             }
 
-            big.setColor(color);
-            big.drawString(text, 2, fm.getMaxAscent());
+            g2.setColor(color);
+            g2.drawString(text, 2, fm.getMaxAscent());
+            g2.dispose();
 
             ResourceManager.addGameMapping(key, new ImageResource(bi));
             img = ResourceManager.getImage(key);

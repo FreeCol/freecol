@@ -98,7 +98,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
         g.fillOval(0, 0, 9, 9);
         g.setColor(Color.BLACK);
         g.drawOval(0, 0, 9, 9);
-
+        g.dispose();
         return new ImageIcon(bi);
     }
 
@@ -119,7 +119,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
         g.setColor(Color.RED);
         g.drawLine(0, 0, 8, 8);
         g.drawLine(8, 0, 0, 8);
-
+        g.dispose();
         return new ImageIcon(bi);
     }
 

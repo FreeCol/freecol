@@ -25,7 +25,6 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
@@ -1343,6 +1342,7 @@ public final class MapViewer {
         g.draw(path);
         g.setColor(Color.WHITE);
         g.fill(path);
+        g.dispose();
         ResourceManager.addGameMapping(key, new ImageResource(bi));
         return ResourceManager.getImage(key, lib.getScalingFactor());
     }
@@ -1417,6 +1417,7 @@ public final class MapViewer {
             float y = labels[i].getAscent() + offset + vPadding/2;
             labels[i].draw(g2, x, y);
         }
+        g2.dispose();
         return bi;
     }
 
@@ -1476,6 +1477,7 @@ public final class MapViewer {
             g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         }
         g.draw(cross);
+        g.dispose();
         ResourceManager.addGameMapping(key, new ImageResource(bi));
         return ResourceManager.getImage(key, lib.getScalingFactor());
     }
@@ -2707,7 +2709,7 @@ public final class MapViewer {
 
         BufferedImage img = new BufferedImage(width, height,
                                               BufferedImage.TYPE_INT_ARGB);
-        Graphics g = img.getGraphics();
+        Graphics2D g = img.createGraphics();
 
         final int unitX = (width - unitImg.getWidth(null)) / 2;
         g.drawImage(unitImg, unitX, 0, null);
