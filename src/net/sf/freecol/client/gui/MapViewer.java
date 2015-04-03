@@ -551,8 +551,7 @@ public final class MapViewer {
         final TileType tileType = tile.getType();
         final Image image = lib.getTerrainImage(tileType,
             tile.getX(), tile.getY());
-        return new Dimension(
-            image.getWidth(null) / 2, image.getHeight(null) / 2);
+        return new Dimension(image.getWidth(null), image.getHeight(null));
     }
 
     /**
@@ -570,8 +569,8 @@ public final class MapViewer {
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 if (tiles[x][y] != null) {
-                    int xx = ((2 - x) + y) * tileSize.width;
-                    int yy = (x + y) * tileSize.height;
+                    int xx = (((2 - x) + y) * tileSize.width) / 2;
+                    int yy = ((x + y) * tileSize.height) / 2;
                     g.translate(xx, yy);
                     displayColonyTile(g, tiles[x][y], colony);
                     g.translate(-xx, -yy);
