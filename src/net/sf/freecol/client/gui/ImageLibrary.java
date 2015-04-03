@@ -618,12 +618,14 @@ public final class ImageLibrary {
         return ResourceManager.getImage(goodsType.getId() + ".image", size);
     }
 
-    public Image getBuildingImage(Building building) {
-        return getBuildingImage(building.getType(), building.getOwner(), scalingFactor);
+    public Image getSmallBuildingImage(Building building) {
+        return getBuildingImage(building.getType(), building.getOwner(),
+            scalingFactor * (2f/3f));
     }
 
-    public static Image getBuildingImage(Building building, float scale) {
-        return getBuildingImage(building.getType(), building.getOwner(), scale);
+    public Image getBuildingImage(Building building) {
+        return getBuildingImage(building.getType(), building.getOwner(),
+            scalingFactor);
     }
 
     public static Image getBuildingImage(BuildingType buildingType, Player player, float scale) {

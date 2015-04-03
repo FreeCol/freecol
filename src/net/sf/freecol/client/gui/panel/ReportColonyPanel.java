@@ -241,8 +241,8 @@ public final class ReportColonyPanel extends ReportPanel
                 if(building.getType().isAutomaticBuild()) {
                     continue;
                 }
-                JLabel buildingLabel = new JLabel(new ImageIcon(ImageLibrary.
-                        getBuildingImage(building, 2f/3f)));
+                JLabel buildingLabel = new JLabel(new ImageIcon(getLibrary().
+                        getSmallBuildingImage(building)));
                 buildingLabel.setToolTipText(Messages.getName(building));
                 buildingsPanel.add(buildingLabel);
             }
