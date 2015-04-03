@@ -46,7 +46,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -100,15 +99,7 @@ public final class UnitLabel extends JLabel
      * @param unit The <code>Unit</code> to display.
      */
     public UnitLabel(FreeColClient freeColClient, Unit unit) {
-        this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
-        this.unit = unit;
-
-        selected = false;
-        setSmall(false);
-        setIgnoreLocation(false);
-
-        updateIcon();
+        this(freeColClient, unit, false);
     }
 
     /**
@@ -119,10 +110,7 @@ public final class UnitLabel extends JLabel
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
     public UnitLabel(FreeColClient freeColClient, Unit unit, boolean isSmall) {
-        this(freeColClient, unit);
-
-        setSmall(isSmall);
-        setIgnoreLocation(false);
+        this(freeColClient, unit, isSmall, false);
     }
 
     /**
@@ -136,10 +124,15 @@ public final class UnitLabel extends JLabel
      */
     public UnitLabel(FreeColClient freeColClient, Unit unit,
                      boolean isSmall, boolean ignoreLocation) {
-        this(freeColClient, unit);
+        this.freeColClient = freeColClient;
+        this.gui = freeColClient.getGUI();
+        this.unit = unit;
 
-        setSmall(isSmall);
-        setIgnoreLocation(ignoreLocation);
+        selected = false;
+        this.isSmall = isSmall;
+        this.ignoreLocation = ignoreLocation;
+
+        updateIcon();
     }
 
 
@@ -301,9 +294,6 @@ public final class UnitLabel extends JLabel
      * Update the icon for this unit label.
      */
     public void updateIcon() {
-        ImageLibrary lib = gui.getImageLibrary();
-        setIcon(new ImageIcon(lib.getUnitImage(unit)));
-        setDisabledIcon(new ImageIcon(lib.getUnitImage(unit, true)));
         setDescriptionLabel(unit.getDescription(Unit.UnitLabelType.FULL));
         setSmall(isSmall);
         // repaint(0, 0, getWidth(), getHeight());
