@@ -538,29 +538,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the height of the terrain-image including overlays and
-     * forests for the given terrain type.
-     *
-     * @param type The type of the terrain-image.
-     * @return The height of the terrain-image at the given index.
-     */
-    public int getCompoundTerrainImageHeight(TileType type) {
-        // TODO: Simplify method to not uselessly create images
-        Image terrain = getTerrainImage(type, 0, 0);
-        int height = terrain.getHeight(null);
-        if (type != null) {
-            Image overlayImage = getOverlayImage(type, type.getId(), scalingFactor);
-            if (overlayImage != null) {
-                height = Math.max(height, overlayImage.getHeight(null));
-            }
-            if (type.isForested()) {
-                height = Math.max(height, getForestImage(type).getHeight(null));
-            }
-        }
-        return height;
-    }
-
-    /**
      * Returns the forest image for a terrain type.
      *
      * @param type The type of the terrain-image to return.

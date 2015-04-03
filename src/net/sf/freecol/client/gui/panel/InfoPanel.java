@@ -134,17 +134,9 @@ public final class InfoPanel extends FreeColPanel {
             removeAll();
 
             if (tile != null) {
-                TileType tileType = tile.getType();
-                final MapViewer mapViewer = getGUI().getMapViewer();
+                final MapViewer mapViewer = getGUI().getColonyTileMapViewer();
                 final ImageLibrary lib = getImageLibrary();
-                final Image terrain = lib.getTerrainImage(tileType, tile.getX(), tile.getY());
-                final int width = terrain.getWidth(null);
-                final int height = terrain.getHeight(null);
-                final int compoundHeight = lib.getCompoundTerrainImageHeight(tileType);
-                BufferedImage image = new BufferedImage(width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
-                Graphics2D g = image.createGraphics();
-                g.translate(0, compoundHeight - height);
-                mapViewer.displayTerrain(g, tile);
+                BufferedImage image = mapViewer.createTerrainImage(tile);
                 if (tile.isExplored()) {
                     StringTemplate items = StringTemplate.label(", ");
                     items.addNamed(tile);

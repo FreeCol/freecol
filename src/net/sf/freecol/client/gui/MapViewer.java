@@ -541,6 +541,54 @@ public final class MapViewer {
         }
     }
 
+    private int getCompoundHeight(TileType tileType, int height) {
+        int compoundHeight = height;
+        if (tileType != null) {
+            Image overlayImage = lib.getOverlayImage(
+                tileType, tileType.getId(), lib.getScalingFactor());
+            int tmpHeight;
+            if (overlayImage != null) {
+                tmpHeight = overlayImage.getHeight(null);
+                if(tmpHeight > compoundHeight)
+                    compoundHeight = tmpHeight;
+            }
+            if (tileType.isForested()) {
+                tmpHeight = lib.getForestImage(tileType).getHeight(null);
+                if(tmpHeight > compoundHeight)
+                    compoundHeight = tmpHeight;
+            }
+        }
+        return compoundHeight;
+    }
+
+    /**
+     * Displays the given Tile onto the given Graphics2D object at the
+     * location specified by the coordinates. Draws the terrain and
+     * improvements.  Doesn't draw settlements, lost city rumours, fog
+     * of war, optional values neither units.
+     *
+     * The same as calling <code>displayTile(g, map, tile, x, y, true);</code>.
+     *
+     * @param tile The Tile to draw.
+     * @return The image.
+     */
+    public BufferedImage createTerrainImage(Tile tile) {
+        final TileType tileType = tile.getType();
+        final Image terrain = lib.getTerrainImage(
+            tileType, tile.getX(), tile.getY());
+        final int width = terrain.getWidth(null);
+        final int height = terrain.getHeight(null);
+        final int compoundHeight = getCompoundHeight(tileType, height);
+        BufferedImage image = new BufferedImage(
+            width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        g.translate(0, compoundHeight - height);
+        displayBaseTile(g, lib, tile, true);
+        displayTileItems(g, tile);
+        g.dispose();
+        return image;
+    }
+
     /**
      * Create a <code>BufferedImage</code> and draw a <code>Tile</code> on it.
      * The visualization of the <code>Tile</code> also includes information
@@ -559,7 +607,7 @@ public final class MapViewer {
             tileType, tile.getX(), tile.getY());
         final int width = terrain.getWidth(null);
         final int height = terrain.getHeight(null);
-        final int compoundHeight = lib.getCompoundTerrainImageHeight(tileType);
+        final int compoundHeight = getCompoundHeight(tileType, height);
         BufferedImage image = new BufferedImage(
             width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
@@ -663,22 +711,6 @@ public final class MapViewer {
                         (int)(STATE_OFFSET_X * lib.getScalingFactor()),
                         0, null);
         }
-    }
-
-    /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Draws the terrain and
-     * improvements.  Doesn't draw settlements, lost city rumours, fog
-     * of war, optional values neither units.
-     *
-     * The same as calling <code>displayTile(g, map, tile, x, y, true);</code>.
-     *
-     * @param g The Graphics2D object on which to draw the Tile.
-     * @param tile The Tile to draw.
-     */
-    public void displayTerrain(Graphics2D g, Tile tile) {
-        displayBaseTile(g, lib, tile, true);
-        displayTileItems(g, tile);
     }
 
     /**
