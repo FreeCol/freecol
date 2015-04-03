@@ -1833,8 +1833,7 @@ public final class InGameController implements NetworkConstants {
             }
             goods = gui.getChoice(true, unit.getTile(),
                                   Messages.message("buyProposition.text"),
-                                  settlement, "buyProposition.nothing",
-                                  choices);
+                                  settlement, "nothing", choices);
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
@@ -1890,8 +1889,7 @@ public final class InGameController implements NetworkConstants {
             }
             goods = gui.getChoice(true, unit.getTile(),
                                   Messages.message("sellProposition.text"),
-                                  settlement, "sellProposition.nothing",
-                                  choices);
+                                  settlement, "nothing", choices);
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
