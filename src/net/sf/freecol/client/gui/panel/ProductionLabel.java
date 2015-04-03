@@ -119,11 +119,10 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param lib The <code>ImageLibrary</code> to use for the label.
      * @param ag The <code>AbstractGoods</code> to create a label for.
-     * @param maximumProduction The maximum production.
      */
     public ProductionLabel(FreeColClient freeColClient, ImageLibrary lib,
-                           AbstractGoods ag, int maximumProduction) {
-        this(freeColClient, lib, ag, maximumProduction, -1);
+                           AbstractGoods ag) {
+        this(freeColClient, lib, ag, -1, -1);
     }
 
     /**

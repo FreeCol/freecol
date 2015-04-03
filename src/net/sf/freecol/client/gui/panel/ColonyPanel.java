@@ -2081,7 +2081,10 @@ public final class ColonyPanel extends PortPanel
                     if (info != null) {
                         for (AbstractGoods ag : info.getProduction()) {
                             ProductionLabel productionLabel
-                                = new ProductionLabel(getFreeColClient(), ag);
+                                = new ProductionLabel(getFreeColClient(),
+                                    getGUI().getColonyTileMapViewer()
+                                        .getImageLibrary(),
+                                    ag);
                             productionLabel.addMouseListener(pressListener);
                             add(productionLabel);
                         }

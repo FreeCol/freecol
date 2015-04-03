@@ -731,6 +731,15 @@ public final class MapViewer {
     }
 
     /**
+     * Gets the contained <code>ImageLibrary</code>.
+     * 
+     * @return The image library;
+     */
+    public ImageLibrary getImageLibrary() {
+        return lib;
+    }
+
+    /**
      * Get the current scale of the map.
      *
      * @return The current map scale.
