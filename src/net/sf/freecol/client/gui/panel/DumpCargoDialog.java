@@ -25,11 +25,9 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Goods;

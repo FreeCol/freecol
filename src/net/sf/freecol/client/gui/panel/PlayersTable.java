@@ -50,7 +50,6 @@ import javax.swing.table.TableColumn;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;

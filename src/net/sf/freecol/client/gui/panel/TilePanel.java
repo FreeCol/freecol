@@ -19,10 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.logging.Logger;

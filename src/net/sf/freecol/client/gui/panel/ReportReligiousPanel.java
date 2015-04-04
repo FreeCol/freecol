@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.util.List;
 
 import net.miginfocom.swing.MigLayout;
 

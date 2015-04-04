@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.option.OptionGroup;
