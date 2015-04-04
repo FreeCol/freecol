@@ -32,11 +32,9 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
-import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.StringTemplate;
 
@@ -143,11 +141,8 @@ public class ConstructionPanel extends MigPanel
             }
         } else {
             int turns = colony.getTurnsToComplete(buildable);
-            // FIXME: distinguish national unit types
-            Image image = (buildable instanceof BuildingType)
-                ? ImageLibrary.getBuildingImage(
-                    (BuildingType) buildable, colony.getOwner(), 0.75f)
-                : ImageLibrary.getImage(buildable, 0.75f);
+            Image image = freeColClient.getGUI().getImageLibrary()
+                .getSmallBuildableImage(buildable, colony.getOwner());
             add(new JLabel(new ImageIcon(image)), "spany");
             add(GUI.localizedLabel(StringTemplate
                     .template("colonyPanel.currentlyBuilding")

@@ -153,6 +153,7 @@ public final class ReportColonyPanel extends ReportPanel
 
     // Standard pretty version
     private void classicColonyPanel(List<Colony> colonies) {
+        ImageLibrary lib = getImageLibrary();
         final int COLONISTS_PER_ROW = 20;
         final int UNITS_PER_ROW = 14;
         final int GOODS_PER_ROW = 10;
@@ -174,8 +175,8 @@ public final class ReportColonyPanel extends ReportPanel
             BuildableType currentType = colony.getCurrentlyBuilding();
             JLabel buildableLabel = null;
             if (currentType != null) {
-                buildableLabel = new JLabel(new ImageIcon(ResourceManager.getImage(currentType.getId()
-                                                          + ".image", 2f/3f)));
+                buildableLabel = new JLabel(new ImageIcon(lib
+                    .getSmallBuildableImage(currentType, colony.getOwner())));
                 GUI.localizeToolTip(buildableLabel, StringTemplate
                     .template("colonyPanel.currentlyBuilding")
                     .addNamed("%buildable%", currentType));
@@ -853,7 +854,7 @@ public final class ReportColonyPanel extends ReportPanel
     private void addUnits(final HashMap<UnitType, Suggestion> suggestions,
                           List<UnitType> have, Colony colony) {
         final String action = colony.getId();
-        final ImageLibrary lib = getGUI().getImageLibrary();
+        final ImageLibrary lib = getImageLibrary();
 
         String layout = (suggestions.size() <= 1) ? null
             : "split " + Integer.toString(suggestions.size());
