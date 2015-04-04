@@ -222,6 +222,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             }
         }
 
+        @Override
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
             for (DataFlavor flavor : flavors) {
                 if (flavor.equals(DefaultTransferHandler.flavor)) {
@@ -242,6 +243,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component getListCellRendererComponent(JList<? extends String> list,
                                                       String value,
                                                       int index,
@@ -312,6 +314,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         /**
          * {@inheritDoc}
          */
+        @Override
         public Object getTransferData(DataFlavor flavor) {
             return (flavor == STOP_FLAVOR) ? stops : null;
         }
@@ -319,6 +322,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         /**
          * {@inheritDoc}
          */
+        @Override
         public DataFlavor[] getTransferDataFlavors() {
             return new DataFlavor[] { STOP_FLAVOR };
         }
@@ -326,6 +330,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean isDataFlavorSupported(DataFlavor flavor) {
             return flavor == STOP_FLAVOR;
         }
@@ -438,6 +443,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component getListCellRendererComponent(JList<? extends TradeRouteStop> list,
                                                       TradeRouteStop value,
                                                       int index,
@@ -583,6 +589,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             = new JCheckBox(Messages.message("tradeRouteInputPanel.silence"));
         this.messagesBox.setSelected(tradeRoute.isSilent());
         this.messagesBox.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     tradeRoute.setSilent(messagesBox.isSelected());
                 }
@@ -590,6 +597,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
         this.addStopButton = GUI.localizedButton("tradeRouteInputPanel.addStop");
         this.addStopButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     addSelectedStops();
                 }
@@ -597,6 +605,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
         this.removeStopButton = GUI.localizedButton("tradeRouteInputPanel.removeStop");
         this.removeStopButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     deleteCurrentlySelectedStops();
                 }
@@ -774,6 +783,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         if (OK.equals(command)) {
@@ -802,6 +812,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void valueChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting()) return;
         int[] idx = this.stopList.getSelectedIndices();

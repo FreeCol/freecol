@@ -503,6 +503,7 @@ public class ModelMessage extends StringTemplate {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

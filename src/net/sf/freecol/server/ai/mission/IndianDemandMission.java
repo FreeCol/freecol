@@ -302,6 +302,7 @@ public class IndianDemandMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTarget() {
         return (this.demanded) ? getUnit().getHomeIndianSettlement()
             : this.colony;
@@ -310,6 +311,7 @@ public class IndianDemandMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTarget(Location target) {
         if (target instanceof Colony) {
             this.colony = (Colony)target;
@@ -319,6 +321,7 @@ public class IndianDemandMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location findTarget() {
         return getTarget();
     }
@@ -326,6 +329,7 @@ public class IndianDemandMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
     }
@@ -333,6 +337,7 @@ public class IndianDemandMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
@@ -476,6 +481,7 @@ public class IndianDemandMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

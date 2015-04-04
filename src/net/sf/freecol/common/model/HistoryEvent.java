@@ -307,6 +307,7 @@ public class HistoryEvent extends StringTemplate {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

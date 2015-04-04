@@ -204,6 +204,7 @@ public final class TilePanel extends FreeColPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         if (OK.equals(command)) {

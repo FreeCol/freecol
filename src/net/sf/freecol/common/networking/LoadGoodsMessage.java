@@ -143,6 +143,7 @@ public class LoadGoodsMessage extends DOMMessage {
      *
      * @return The XML representation of this message.
      */
+    @Override
     public Element toXMLElement() {
         return createMessage(getXMLElementTagName(),
             "location", locationId,

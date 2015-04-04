@@ -74,6 +74,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
      *
      * @param root a <code>DefaultMutableTreeNode</code>
      */
+    @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         DefaultMutableTreeNode parent =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
@@ -95,6 +96,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
      * @param id The object identifier to display.
      * @param panel the detail panel to build
      */
+    @Override
     public void buildDetail(String id, JPanel panel) {
         if (getId().equals(id)) {
             return;

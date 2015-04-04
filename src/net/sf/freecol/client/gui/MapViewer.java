@@ -125,6 +125,7 @@ public final class MapViewer {
 
         // Implement Comparable<SortableImage>
 
+        @Override
         public int compareTo(SortableImage other) {
             return other.index - this.index;
         }
@@ -1199,6 +1200,7 @@ public final class MapViewer {
      */
     public void startCursorBlinking() {
         ActionListener taskPerformer = new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent event) {
                 if (!blinkingMarqueeEnabled) return;
                 Unit unit = getActiveUnit();

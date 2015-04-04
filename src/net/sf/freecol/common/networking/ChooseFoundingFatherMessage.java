@@ -152,6 +152,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      *
      * @return The XML representation of this message.
      */
+    @Override
     public Element toXMLElement() {
         Element result = createMessage(getXMLElementTagName());
         for (FoundingFather f : getFathers()) {

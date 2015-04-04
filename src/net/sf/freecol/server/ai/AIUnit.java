@@ -415,6 +415,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Locatable getTransportLocatable() {
         return unit;
     }
@@ -422,6 +423,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTransportSource() {
         return (getUnit() == null || getUnit().isDisposed()) ? null
             : getUnit().getLocation();
@@ -430,6 +432,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTransportDestination() {
         return (getUnit() == null || getUnit().isDisposed() || !hasMission())
             ? null
@@ -439,6 +442,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public PathNode getDeliveryPath(Unit carrier, Location dst) {
         if (dst == null) {
             dst = getTransportDestination();
@@ -469,6 +473,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public PathNode getIntermediatePath(Unit carrier, Location dst) {
         return null; // NYI
     }
@@ -476,6 +481,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTransportDestination(Location destination) {
         throw new RuntimeException("AI unit transport destination set by mission.");
     }
@@ -483,6 +489,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean carriableBy(Unit carrier) {
         return carrier.couldCarry(getUnit());
     }
@@ -490,6 +497,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean canMove() {
         return getUnit().getMovesLeft() > 0;
     }
@@ -497,6 +505,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean leaveTransport() {
         final Unit unit = getUnit();
         if (!unit.isOnCarrier()) return true; // Harmless error
@@ -576,6 +585,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean leaveTransport(Direction direction) {
         if (!unit.isOnCarrier()) return false;
         final Unit carrier = unit.getCarrier();
@@ -594,6 +604,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean joinTransport(Unit carrier, Direction direction) {
         AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
         if (aiCarrier == null) return false;
@@ -610,6 +621,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String invalidReason() {
         String reason = Mission.invalidTransportableReason(this);
         return (reason != null) ? reason
@@ -789,6 +801,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

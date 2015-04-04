@@ -44,6 +44,7 @@ public class TileItemContainer extends FreeColGameObject {
     /** A comparator to sort by ascending zIndex. */
     private static final Comparator<TileItem> tileItemComparator
         = new Comparator<TileItem>() {
+            @Override
             public int compare(TileItem tileItem1, TileItem tileItem2) {
                 int cmp = tileItem1.getZIndex() - tileItem2.getZIndex();
                 if (cmp == 0) {
@@ -534,6 +535,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Removes all references to this object.
      */
+    @Override
     public void disposeResources() {
         tileItems.clear();
         super.disposeResources();
@@ -667,6 +669,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

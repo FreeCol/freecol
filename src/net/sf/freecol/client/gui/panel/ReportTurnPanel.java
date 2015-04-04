@@ -187,6 +187,7 @@ public final class ReportTurnPanel extends ReportPanel {
                     new StringTemplate("model.message.ignore", message));
                 final ModelMessage m = message;
                 ignoreButton.addActionListener(new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent event) {
                             boolean flag = label.isEnabled();
                             igc().ignoreMessage(m, flag);
@@ -224,6 +225,7 @@ public final class ReportTurnPanel extends ReportPanel {
                 final ModelMessage m = message;
                 filterButton.addActionListener(new ActionListener() {
                         
+                        @Override
                         public void actionPerformed(ActionEvent event) {
                             boolean flag = filterOption.getValue();
                             filterOption.setValue(!flag);
@@ -433,6 +435,7 @@ public final class ReportTurnPanel extends ReportPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         super.actionPerformed(event);
     }

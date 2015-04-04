@@ -71,6 +71,7 @@ public final class SaveDialog extends FreeColDialog<File> {
         fileChooser.setFileHidingEnabled(false);
         fileChooser.setSelectedFile(new File(defaultName));
         fileChooser.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     final String cmd = event.getActionCommand();
                     if (JFileChooser.APPROVE_SELECTION.equals(cmd)) {
@@ -93,6 +94,7 @@ public final class SaveDialog extends FreeColDialog<File> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public File getResponse() {
         if (responded()) {
             File value = (File)getValue();

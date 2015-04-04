@@ -95,6 +95,7 @@ public class MessagesTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.veteranSoldier");
 
 
+    @Override
     public void tearDown(){
         Messages.setMessageBundle(Locale.US);
     }

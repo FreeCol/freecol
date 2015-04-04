@@ -33,6 +33,7 @@ import java.util.Set;
 public interface Consumer {
 
     public static final Comparator<Consumer> COMPARATOR = new Comparator<Consumer>() {
+        @Override
         public int compare(Consumer c1, Consumer c2) {
             return c2.getPriority() - c1.getPriority();
         }

@@ -481,6 +481,7 @@ public class MarketData extends FreeColGameObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

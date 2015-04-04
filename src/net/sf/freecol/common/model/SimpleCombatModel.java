@@ -71,6 +71,7 @@ public class SimpleCombatModel extends CombatModel {
      * @param defender The defender.
      * @return The combat odds.
      */
+    @Override
     public CombatOdds calculateCombatOdds(FreeColGameObject attacker,
                                           FreeColGameObject defender) {
         return calculateCombatOdds(attacker, defender, null);
@@ -112,6 +113,7 @@ public class SimpleCombatModel extends CombatModel {
      * @param defender The defender.
      * @return The offensive power.
      */
+    @Override
     public float getOffencePower(FreeColGameObject attacker,
                                  FreeColGameObject defender) {
         return getOffencePower(attacker, defender, null);
@@ -181,6 +183,7 @@ public class SimpleCombatModel extends CombatModel {
      * @param defender The defender.
      * @return The defensive power.
      */
+    @Override
     public float getDefencePower(FreeColGameObject attacker,
                                  FreeColGameObject defender) {
         return getDefencePower(attacker, defender, null);
@@ -223,6 +226,7 @@ public class SimpleCombatModel extends CombatModel {
      * @param defender The defender.
      * @return All the applicable offensive modifiers.
      */
+    @Override
     public Set<Modifier> getOffensiveModifiers(FreeColGameObject attacker,
                                                FreeColGameObject defender) {
         Set<Modifier> result = new HashSet<>();
@@ -419,6 +423,7 @@ public class SimpleCombatModel extends CombatModel {
      * @param defender The defender.
      * @return All the applicable defensive modifiers.
      */
+    @Override
     public Set<Modifier> getDefensiveModifiers(FreeColGameObject attacker,
                                                FreeColGameObject defender) {
         Set<Modifier> result = new HashSet<>();
@@ -584,6 +589,7 @@ public class SimpleCombatModel extends CombatModel {
      * @param defender The defender.
      * @return The results of the combat.
      */
+    @Override
     public List<CombatResult> generateAttackResult(Random random,
         FreeColGameObject attacker, FreeColGameObject defender) {
         LogBuilder lb = new LogBuilder(256);

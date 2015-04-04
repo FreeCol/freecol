@@ -600,6 +600,7 @@ public class StringTemplate extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

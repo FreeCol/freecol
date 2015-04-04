@@ -139,6 +139,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Unit unit) {
             return unit.isNaval() && !unit.isDamaged();
         }
@@ -146,6 +147,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Goods goods) {
             return false;
         }
@@ -153,6 +155,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof UnitLabel)) {
@@ -216,10 +219,12 @@ public final class EuropePanel extends PortPanel {
         }
 
 
+        @Override
         public void addPropertyChangeListeners() {
             europe.addPropertyChangeListener(this);
         }
 
+        @Override
         public void removePropertyChangeListeners() {
             europe.removePropertyChangeListener(this);
         }
@@ -230,6 +235,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Unit unit) {
             return !unit.isNaval();
         }
@@ -237,6 +243,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Goods goods) {
             return false;
         }
@@ -244,6 +251,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component add(Component comp, boolean editState) {
             Component c = add(comp);
             update();
@@ -311,6 +319,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Unit unit) {
             if (!unit.isNaval()) return false;
             switch (unit.getState()) {
@@ -368,6 +377,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Unit unit) {
             return false;
         }
@@ -375,6 +385,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean accepts(Goods goods) {
             return true;
         }
@@ -382,6 +393,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof GoodsLabel)) {
@@ -479,6 +491,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void logPurchase(GoodsType goodsType, int amount, int price) {
             int total = amount * price;
             StringTemplate t1 = StringTemplate.template("transaction.purchase")
@@ -493,6 +506,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void logSale(GoodsType goodsType, int amount,
                             int price, int tax) {
             int totalBeforeTax = amount * price;
@@ -712,6 +726,7 @@ public final class EuropePanel extends PortPanel {
     /**
      * What to do when requesting focus.
      */
+    @Override
     public void requestFocus() {
         exitButton.requestFocus();
     }
@@ -729,6 +744,7 @@ public final class EuropePanel extends PortPanel {
      * @param unitLabel The <code>UnitLabel</code> for the unit that
      *     is being selected.
      */
+    @Override
     public void setSelectedUnitLabel(UnitLabel unitLabel) {
         if (selectedUnitLabel != unitLabel) {
             if (selectedUnitLabel != null) {
@@ -801,6 +817,7 @@ public final class EuropePanel extends PortPanel {
      *
      * @return A list of units in Europe.
      */
+    @Override
     public List<Unit> getUnitList() {
         return europe.getUnitList();
     }
@@ -811,6 +828,7 @@ public final class EuropePanel extends PortPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         EuropeAction act = EuropeAction.valueOf(command);

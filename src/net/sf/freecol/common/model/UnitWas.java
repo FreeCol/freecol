@@ -170,6 +170,7 @@ public class UnitWas implements Comparable<UnitWas> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int compareTo(UnitWas uw) {
         // Order by decreasing capacity of the location the unit is to
         // be moved to, so that if we traverse a sorted list of

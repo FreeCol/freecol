@@ -123,6 +123,7 @@ public class RearrangeColonyMessage extends DOMMessage {
             return "x" + i + "count";
         }
 
+        @Override
         public String toString() {
             return "[UnitChange " + unit.getId() + " at " + loc.getId()
                 + " " + role.getRoleSuffix() + "." + roleCount
@@ -133,6 +134,7 @@ public class RearrangeColonyMessage extends DOMMessage {
     /** A comparator for UnitChanges, favouring simplest roles first. */
     public static final Comparator<UnitChange> roleComparator
         = new Comparator<UnitChange>() {
+            @Override
             public int compare(UnitChange uc1, UnitChange uc2) {
                 int cmp = uc1.role.compareTo(uc2.role);
                 if (cmp == 0) cmp = uc1.roleCount - uc2.roleCount;
@@ -258,6 +260,7 @@ public class RearrangeColonyMessage extends DOMMessage {
      *
      * @return The XML representation of this message.
      */
+    @Override
     public Element toXMLElement() {
         Element result = createMessage(getXMLElementTagName(),
             "colony", colonyId,

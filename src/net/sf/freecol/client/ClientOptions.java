@@ -431,6 +431,7 @@ public class ClientOptions extends OptionGroup {
      */
     private static final Comparator<Colony> colonyAgeComparator
         = new Comparator<Colony>() {
+            @Override
             public int compare(Colony s1, Colony s2) {
                 return s1.getEstablished().getNumber()
                     - s2.getEstablished().getNumber();
@@ -439,6 +440,7 @@ public class ClientOptions extends OptionGroup {
 
     private static final Comparator<Colony> colonyNameComparator
         = new Comparator<Colony>() {
+            @Override
             public int compare(Colony s1, Colony s2) {
                 return s1.getName().compareTo(s2.getName());
             }
@@ -446,6 +448,7 @@ public class ClientOptions extends OptionGroup {
 
     private static final Comparator<Colony> colonySizeComparator
         = new Comparator<Colony>() {
+            @Override
             public int compare(Colony s1, Colony s2) {
                 // sort size descending, then SoL descending
                 int dsize = s2.getUnitCount() - s1.getUnitCount();
@@ -459,6 +462,7 @@ public class ClientOptions extends OptionGroup {
 
     private static final Comparator<Colony> colonySoLComparator
         = new Comparator<Colony>() {
+            @Override
             public int compare(Colony s1, Colony s2) {
                 // sort SoL descending, then size descending
                 int dsol = s2.getSoL() - s1.getSoL();
@@ -472,6 +476,7 @@ public class ClientOptions extends OptionGroup {
 
     private static final Comparator<Colony> colonyPositionComparator
         = new Comparator<Colony>() {
+            @Override
             public int compare(Colony s1, Colony s2) {
                 // sort north to south, then west to east
                 int dy = s1.getTile().getY() - s2.getTile().getY();
@@ -493,6 +498,7 @@ public class ClientOptions extends OptionGroup {
             this.game = game;
         }
 
+        @Override
         public int compare(ModelMessage message1, ModelMessage message2) {
             String sourceId1 = message1.getSourceId();
             String sourceId2 = message2.getSourceId();
@@ -531,6 +537,7 @@ public class ClientOptions extends OptionGroup {
     private final Comparator<ModelMessage> messageTypeComparator
         = new Comparator<ModelMessage>() {
             // sort according to message type
+            @Override
             public int compare(ModelMessage message1, ModelMessage message2) {
                 return message1.getMessageType().ordinal() - message2.getMessageType().ordinal();
             }

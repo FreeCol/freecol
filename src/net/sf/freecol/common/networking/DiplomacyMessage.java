@@ -364,6 +364,7 @@ public class DiplomacyMessage extends DOMMessage {
      *
      * @return The XML representation of this message.
      */
+    @Override
     public Element toXMLElement() {
         Element result = createMessage(getXMLElementTagName(),
             "ourId", ourId,

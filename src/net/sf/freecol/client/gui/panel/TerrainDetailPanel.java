@@ -67,6 +67,7 @@ public class TerrainDetailPanel
      *
      * @param root a <code>DefaultMutableTreeNode</code>
      */
+    @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         DefaultMutableTreeNode node =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
@@ -83,6 +84,7 @@ public class TerrainDetailPanel
      * @param id The object identifier.
      * @param panel the detail panel to build
      */
+    @Override
     public void buildDetail(String id, JPanel panel) {
         if (getId().equals(id)) {
             return;

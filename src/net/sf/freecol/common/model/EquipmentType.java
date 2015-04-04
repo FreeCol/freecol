@@ -348,6 +348,7 @@ public class EquipmentType extends BuildableType {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

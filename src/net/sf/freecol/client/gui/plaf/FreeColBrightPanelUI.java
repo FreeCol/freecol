@@ -41,6 +41,7 @@ public class FreeColBrightPanelUI extends BasicPanelUI {
         return sharedInstance;
     }
 
+    @Override
     public void paint(java.awt.Graphics g, javax.swing.JComponent c) {
         if (c.isOpaque()) {
             ImageLibrary.drawTiledImage("background.FreeColBrightPanel", g, c, null);

@@ -118,6 +118,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             return true;
         }
 
+        @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append("[Occupation ").append(workLocation)
@@ -2002,6 +2003,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @param goodsType <code>GoodsType</code> values
      * @return an <code>int</code> value
      */
+    @Override
     public int getConsumptionOf(GoodsType goodsType) {
         final Specification spec = getSpecification();
         int result = super.getConsumptionOf(goodsType);
@@ -2575,6 +2577,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toShortString() {
         return getName();
     }
@@ -2594,6 +2597,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getGoodsCapacity() {
         return (int)applyModifiers(0f, getGame().getTurn(),
                                    Modifier.WAREHOUSE_STORAGE);
@@ -2645,6 +2649,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getImageKey() {
         if (isUndead()) return "undead";
 
@@ -2660,6 +2665,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Unit getDefendingUnit(Unit attacker) {
         if (displayUnitCount > 0) {
             // There are units, but we don't see them
@@ -2698,6 +2704,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getDefenceRatio() {
         return getTotalDefencePower() / (1 + getUnitCount());
     }
@@ -2705,6 +2712,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isBadlyDefended() {
         return getTotalDefencePower() < 0.95f * getUnitCount() - 2.5f;
     }
@@ -2712,6 +2720,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public RandomRange getPlunderRange(Unit attacker) {
         if (canBePlundered()) {
             int upper = (owner.getGold() * (getUnitCount() + 1))
@@ -2724,6 +2733,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getSoL() {
         return sonsOfLiberty;
     }
@@ -2731,6 +2741,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getUpkeep() {
         int upkeep = 0;
         for (Building building : buildingMap.values()) {
@@ -2742,6 +2753,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getTotalProductionOf(GoodsType goodsType) {
         int amount = 0;
         for (WorkLocation workLocation : getCurrentWorkLocations()) {
@@ -2779,6 +2791,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getAlarmLevelMessage(Player player) {
         Stance stance = getOwner().getStance(player);
         return StringTemplate.template("colony.tension." + stance.getKey())
@@ -2792,6 +2805,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getExportAmount(GoodsType goodsType, int turns) {
         final int present = Math.max(0, getGoodsCount(goodsType)
             + turns * getNetProductionOf(goodsType));
@@ -2802,6 +2816,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImportAmount(GoodsType goodsType, int turns) {
         if (goodsType.limitIgnored()) return GoodsContainer.HUGE_CARGO_SIZE;
 
@@ -3085,6 +3100,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

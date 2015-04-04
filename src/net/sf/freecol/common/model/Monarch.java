@@ -875,6 +875,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNameKey() {
         return this.player.getNation().getRulerNameKey();
     }
@@ -938,6 +939,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
@@ -954,6 +956,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
@@ -1044,6 +1047,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

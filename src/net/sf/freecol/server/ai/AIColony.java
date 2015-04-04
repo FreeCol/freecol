@@ -131,6 +131,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 return (unit == null) ? -1000 : unit.getPioneerScore();
             }
 
+            @Override
             public int compare(Unit u1, Unit u2) {
                 return score(u2) - score(u1);
             }
@@ -146,6 +147,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 return (unit == null) ? -1000 : unit.getScoutScore();
             }
 
+            @Override
             public int compare(Unit u1, Unit u2) {
                 return score(u2) - score(u1);
             }
@@ -1132,6 +1134,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
         Collections.sort(producing, new Comparator<GoodsType>() {
+                @Override
                 public int compare(GoodsType g1, GoodsType g2) {
                     return colony.getAdjustedNetProductionOf(g1)
                         - colony.getAdjustedNetProductionOf(g2);
@@ -1440,6 +1443,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *
      * @param event The <code>PropertyChangeEvent</code>.
      */
+    @Override
     public void propertyChange(PropertyChangeEvent event) {
         logger.finest("Property change REARRANGE_WORKERS fired.");
         requestRearrange();
@@ -1655,6 +1659,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

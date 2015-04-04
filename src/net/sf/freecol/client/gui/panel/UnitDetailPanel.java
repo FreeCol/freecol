@@ -79,6 +79,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
      *
      * @param root a <code>DefaultMutableTreeNode</code>
      */
+    @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         List<UnitType> units = new ArrayList<>();
         List<UnitType> skills = new ArrayList<>();
@@ -99,6 +100,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
      * @param id The object identifier.
      * @param panel the detail panel to build
      */
+    @Override
     public void buildDetail(String id, JPanel panel) {
         if (getId().equals(id) || ("colopediaAction." + PanelType.SKILLS).equals(id)) {
             return;

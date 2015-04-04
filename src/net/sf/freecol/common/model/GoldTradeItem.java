@@ -65,6 +65,7 @@ public class GoldTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isValid() {
         return gold >= 0 && getSource().checkGold(gold);
     }
@@ -72,6 +73,7 @@ public class GoldTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isUnique() {
         return true;
     }
@@ -79,6 +81,7 @@ public class GoldTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLabel() {
         return StringTemplate.template("tradeItem.gold.long")
             .addAmount("%amount%", gold);
@@ -139,6 +142,7 @@ public class GoldTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

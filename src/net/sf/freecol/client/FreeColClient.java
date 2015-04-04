@@ -254,6 +254,7 @@ public final class FreeColClient {
         if (savedGame != null) {
             gui.playSound("sound.intro.general");
             SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         if (!connectController.startSavedGame(savedGame,
                                                               userMsg)) {
@@ -264,6 +265,7 @@ public final class FreeColClient {
         } else if (spec != null) { // Debug or fast start
             gui.playSound("sound.intro.general");
             SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         if (!connectController.startSinglePlayerGame(spec,
                                                                      true)) {
@@ -273,6 +275,7 @@ public final class FreeColClient {
                 });
         } else if (showOpeningVideo) {
             SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         gui.showOpeningVideoPanel(userMsg);
                     }
@@ -280,6 +283,7 @@ public final class FreeColClient {
         } else {
             gui.playSound("sound.intro.general");
             SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         gui.showMainPanel(userMsg);
                     }

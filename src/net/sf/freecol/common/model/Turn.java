@@ -59,6 +59,7 @@ public class Turn {
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getNameKey() {
             return "season." + toString();
         }

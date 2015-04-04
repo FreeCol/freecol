@@ -128,6 +128,7 @@ public class GoToMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MissionState doMission() {
         // FIXME: do we need access to the InGameController?
         return MissionState.OK;
@@ -139,6 +140,7 @@ public class GoToMission extends AbstractMission {
      *
      * @return a <code>boolean</code> value
      */
+    @Override
     public boolean isValid() {
         return super.isValid()
             && destination != null
@@ -167,6 +169,7 @@ public class GoToMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
@@ -178,6 +181,7 @@ public class GoToMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
@@ -190,6 +194,7 @@ public class GoToMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

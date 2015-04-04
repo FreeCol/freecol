@@ -79,6 +79,7 @@ public class ColonyTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isValid() {
         return colonyId != null;
     }
@@ -86,6 +87,7 @@ public class ColonyTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isUnique() {
         return false;
     }
@@ -93,6 +95,7 @@ public class ColonyTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLabel() {
         return StringTemplate.template("tradeItem.colony.long")
             .addName("%colony%", colonyName);
@@ -151,6 +154,7 @@ public class ColonyTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

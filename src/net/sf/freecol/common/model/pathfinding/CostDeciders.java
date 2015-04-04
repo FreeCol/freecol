@@ -47,6 +47,7 @@ public final class CostDeciders {
      * the legality of the move.
      */
     private static final CostDecider trivialCostDecider = new CostDecider() {
+            @Override
             public int getCost(Unit unit, Location oldLocation,
                                Location newLocation, int movesLeft) {
                 return (newLocation == null) ? ILLEGAL_MOVE
@@ -54,7 +55,9 @@ public final class CostDeciders {
                     : (newLocation.getTile() == null) ? ILLEGAL_MOVE
                     : 1;
             }
+            @Override
             public int getMovesLeft() { return 0; }
+            @Override
             public int getNewTurns() { return 0; }
         };
 
@@ -65,6 +68,7 @@ public final class CostDeciders {
      * trivialCostDecider in checking the legality of the move.
      */
     private static final CostDecider tileCostDecider = new CostDecider() {
+            @Override
             public int getCost(Unit unit, Location oldLocation,
                                Location newLocation, int movesLeft) {
                 return (newLocation == null) ? ILLEGAL_MOVE
@@ -73,7 +77,9 @@ public final class CostDeciders {
                     : (unit.isTileAccessible(newLocation.getTile())) ? 1
                     : ILLEGAL_MOVE;
             }
+            @Override
             public int getMovesLeft() { return 0; }
+            @Override
             public int getNewTurns() { return 1; }
         };
 
@@ -224,6 +230,7 @@ public final class CostDeciders {
             private int ret = -1;
             private int index = -1;
 
+            @Override
             public int getCost(Unit unit, Location oldLocation,
                                Location newLocation, int movesLeft) {
                 for (int i = 0; i < costDeciders.length; i++) {
@@ -241,10 +248,12 @@ public final class CostDeciders {
                 return ret;
             }
 
+            @Override
             public int getMovesLeft() {
                 return (index < 0) ? 0 : costDeciders[index].getMovesLeft();
             }
 
+            @Override
             public int getNewTurns() {
                 return (index < 0) ? 0 : costDeciders[index].getNewTurns();
             }

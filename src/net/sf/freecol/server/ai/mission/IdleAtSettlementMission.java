@@ -98,6 +98,7 @@ public class IdleAtSettlementMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTarget() {
         return (isSafe()) ? null : findTarget();
     }
@@ -105,11 +106,13 @@ public class IdleAtSettlementMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTarget(Location target) {}
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location findTarget() {
         if (isSafe()) return null;
 
@@ -129,6 +132,7 @@ public class IdleAtSettlementMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String invalidReason() {
         return invalidAIUnitReason(getAIUnit());
     }
@@ -136,6 +140,7 @@ public class IdleAtSettlementMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
@@ -181,6 +186,7 @@ public class IdleAtSettlementMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

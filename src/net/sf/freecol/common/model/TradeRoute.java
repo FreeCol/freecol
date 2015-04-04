@@ -116,6 +116,7 @@ public class TradeRoute extends FreeColGameObject
      *
      * @return The name of this trade route.
      */
+    @Override
     public final String getName() {
         return name;
     }
@@ -125,6 +126,7 @@ public class TradeRoute extends FreeColGameObject
      *
      * @param newName The new trade route name.
      */
+    @Override
     public final void setName(final String newName) {
         this.name = newName;
     }
@@ -273,6 +275,7 @@ public class TradeRoute extends FreeColGameObject
      *
      * @return The owning player.
      */
+    @Override
     public final Player getOwner() {
         return owner;
     }
@@ -282,6 +285,7 @@ public class TradeRoute extends FreeColGameObject
      *
      * @param newOwner The new owner.
      */
+    @Override
     public final void setOwner(final Player newOwner) {
         this.owner = newOwner;
     }
@@ -377,6 +381,7 @@ public class TradeRoute extends FreeColGameObject
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

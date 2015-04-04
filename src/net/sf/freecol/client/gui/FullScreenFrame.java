@@ -62,6 +62,7 @@ public final class FullScreenFrame extends FreeColFrame {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateBounds(Rectangle rectangle) {}
 }
 

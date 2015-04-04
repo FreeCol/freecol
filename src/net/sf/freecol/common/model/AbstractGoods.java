@@ -40,6 +40,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     /** A comparator to sort by descending goods amount. */
     public static final Comparator<AbstractGoods> goodsAmountComparator
         = new Comparator<AbstractGoods>() {
+            @Override
             public int compare(AbstractGoods o, AbstractGoods p) {
                 return p.getAmount() - o.getAmount();
             }
@@ -175,6 +176,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNameKey() {
         return getType().getNameKey();
     }
@@ -273,6 +275,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

@@ -74,11 +74,13 @@ public final class DeclarationPanel extends FreeColPanel {
         setOpaque(false);
         setBorder(null);
         addKeyListener(new KeyAdapter() {
+                @Override
                 public void keyPressed(KeyEvent k) {
                     getGUI().removeFromCanvas(DeclarationPanel.this);
                 }
             });
         addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     getGUI().removeFromCanvas(DeclarationPanel.this);
                 }
@@ -93,6 +95,7 @@ public final class DeclarationPanel extends FreeColPanel {
         add(signaturePanel);
     
         Timer t = new Timer(START_DELAY, new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     signaturePanel.startAnimation();
                 }
@@ -107,10 +110,12 @@ public final class DeclarationPanel extends FreeColPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         if (ANIMATION_STOPPED.equals(command)) {
             Timer t = new Timer(FINISH_DELAY, new ActionListener() {
+                @Override
                     public void actionPerformed(ActionEvent e) {
                         getGUI().removeFromCanvas(DeclarationPanel.this);
                     }
@@ -253,6 +258,7 @@ public final class DeclarationPanel extends FreeColPanel {
          */
         public void startAnimation() {
             ActionListener taskPerformer = new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent evt) {
                     if (counter < points.length - 1) {
                         counter += 20;

@@ -81,6 +81,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             if (mapDirectory.isDirectory()) {
                 File[] files = mapDirectory.listFiles(FreeCol.freeColSaveFileFilter);
                 Arrays.sort(files, new Comparator<File>() {
+                        @Override
                         public int compare(File f1, File f2) {
                             return f1.getName().compareTo(f2.getName());
                         }
@@ -90,6 +91,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                     JButton mapButton = makeMapButton(file);
                     if (mapButton == null) continue;
                     mapButton.addActionListener(new ActionListener() {
+                            @Override
                             public void actionPerformed(ActionEvent e) {
                                 updateFile(file);
                             }

@@ -52,6 +52,7 @@ class BaseCostDecider implements CostDecider {
      * @return The cost of moving the given unit from the
      *      <code>oldLocation</code> to the <code>newLocation</code>.
      */    
+    @Override
     public int getCost(final Unit unit, final Location oldLocation,
                        final Location newLocation, int movesLeftBefore) {
         int cost = 0;
@@ -132,6 +133,7 @@ class BaseCostDecider implements CostDecider {
      * 
      * @return The number of moves left.
      */
+    @Override
     public int getMovesLeft() {
         return movesLeft;
     }
@@ -142,6 +144,7 @@ class BaseCostDecider implements CostDecider {
      * 
      * @return The number of turns consumed.
      */      
+    @Override
     public int getNewTurns() {
         return newTurns;
     }

@@ -129,6 +129,7 @@ public class ChatMessage extends DOMMessage {
      *
      * @return The XML representation of this message.
      */
+    @Override
     public Element toXMLElement() {
         return createMessage(getXMLElementTagName(),
             "sender", sender,

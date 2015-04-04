@@ -58,6 +58,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     // goods first, then by price, then amount.
     private final Comparator<Goods> exportGoodsComparator
         = new Comparator<Goods>() {
+            @Override
             public int compare(Goods goods1, Goods goods2) {
                 int cmp;
                 GoodsType t1 = goods1.getType();
@@ -987,6 +988,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             prices.put(gt, getNormalGoodsPriceToBuy(gt, GoodsContainer.CARGO_SIZE));
         }
         Collections.sort(goodsTypes, new Comparator<GoodsType>() {
+                @Override
                 public int compare(GoodsType goodsType1, GoodsType goodsType2) {
                     return prices.get(goodsType2) - prices.get(goodsType1);
                 }
@@ -1152,6 +1154,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toShortString() {
         return getName();
     }
@@ -1174,6 +1177,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getGoodsCapacity() {
         return getType().getWarehouseCapacity();
     }
@@ -1184,6 +1188,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getImageKey() {
         return getOwner().getNationId()
             + (isCapital() ? ".capital" : ".settlement")
@@ -1194,6 +1199,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Unit getDefendingUnit(Unit attacker) {
         Unit defender = null;
         float defencePower = -1.0f;
@@ -1212,6 +1218,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getDefenceRatio() {
         return getUnitCount() * 2.0f / (getType().getMinimumSize()
             + getType().getMaximumSize());
@@ -1220,6 +1227,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isBadlyDefended() {
         return getUnitCount() < getRequiredDefenders();
     }
@@ -1227,6 +1235,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public RandomRange getPlunderRange(Unit attacker) {
         return getType().getPlunderRange(attacker);
     }
@@ -1234,6 +1243,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getSoL() {
         // Native settlements do not generate SoL.
         return 0;
@@ -1242,6 +1252,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getUpkeep() {
         // Native settlements do not require upkeep.
         return 0;
@@ -1250,6 +1261,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getTotalProductionOf(GoodsType type) {
         if (type.isRefined()) {
             if (type != goodsToMake()) return 0;
@@ -1291,6 +1303,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getAlarmLevelMessage(Player player) {
         Tension alarm = (hasContacted(player)) ? getAlarm(player)
             : new Tension(Tension.TENSION_MIN);
@@ -1305,6 +1318,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getExportAmount(GoodsType goodsType, int turns) {
         int present = Math.max(0, getGoodsCount(goodsType)
             + turns * getTotalProductionOf(goodsType));
@@ -1315,6 +1329,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImportAmount(GoodsType goodsType, int turns) {
         if (goodsType.limitIgnored()) return Integer.MAX_VALUE;
 
@@ -1330,6 +1345,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int checkIntegrity(boolean fix) {
         return super.checkIntegrity(fix);
     }
@@ -1587,6 +1603,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

@@ -161,6 +161,7 @@ public class FirstContactMessage extends DOMMessage {
      *
      * @return The XML representation of this message.
      */
+    @Override
     public Element toXMLElement() {
         Element element = createMessage(getXMLElementTagName(),
             "player", this.playerId,

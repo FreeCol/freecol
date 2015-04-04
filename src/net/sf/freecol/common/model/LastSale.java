@@ -155,6 +155,7 @@ public final class LastSale extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
@@ -179,6 +180,7 @@ public final class LastSale extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

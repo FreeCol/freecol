@@ -93,6 +93,7 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
         panel.setSize(panel.getPreferredSize());
         
         final ActionListener al = new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     ParametersDialog.this.checkFields();
                 }
@@ -130,6 +131,7 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Parameters getResponse() {
         Object value = getValue();
         if (options.get(0).equals(value)) {

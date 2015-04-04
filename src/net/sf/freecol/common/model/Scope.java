@@ -437,6 +437,7 @@ public class Scope extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

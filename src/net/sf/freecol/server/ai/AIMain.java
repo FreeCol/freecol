@@ -372,6 +372,7 @@ public class AIMain extends FreeColObject
      * @see FreeColGameObject
      * @see FreeColGameObject#getId
      */
+    @Override
     public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
         if (getAIObject(id) != null || !shouldHaveAIObject(fcgo)) return;
         if (!id.equals(fcgo.getId())) {
@@ -407,6 +408,7 @@ public class AIMain extends FreeColObject
      *
      * @param id The object identifier.
      */
+    @Override
     public void removeFreeColGameObject(String id) {
         AIObject o = getAIObject(id);
         if (o != null) o.dispose();
@@ -420,6 +422,7 @@ public class AIMain extends FreeColObject
      * @param oldOwner The old owning <code>Player</code>.
      * @param newOwner The new owning <code>Player</code>.
      */
+    @Override
     public void ownerChanged(FreeColGameObject source, Player oldOwner,
                              Player newOwner) {
         AIObject ao = getAIObject(source);
@@ -445,6 +448,7 @@ public class AIMain extends FreeColObject
     /**
      * {@inheritDoc}
      */
+    @Override
     public Specification getSpecification() {
         return getGame().getSpecification();
     }
@@ -621,6 +625,7 @@ public class AIMain extends FreeColObject
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

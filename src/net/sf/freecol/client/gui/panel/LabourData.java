@@ -46,18 +46,21 @@ import net.sf.freecol.common.model.WorkLocation;
 public class LabourData {
 
     private static final LocationData.Getter UNITS_IN_EUROPE_GETTER = new LocationData.Getter() {
+        @Override
         public LocationData getLocationData(UnitData unitData) {
             return unitData.unitsInEurope;
         }
     };
 
     private static final LocationData.Getter UNITS_AT_SEA_GETTER = new LocationData.Getter() {
+        @Override
         public LocationData getLocationData(UnitData unitData) {
             return unitData.unitsAtSea;
         }
     };
 
     private static final LocationData.Getter UNITS_ON_LAND_GETTER = new LocationData.Getter() {
+        @Override
         public LocationData getLocationData(UnitData unitData) {
             return unitData.unitsOnLand;
         }
@@ -466,6 +469,7 @@ public class LabourData {
 
             for (final Colony colony : unitData.details.keySet()) {
                 summarize(unitData, new LocationData.Getter() {
+                    @Override
                     public LocationData getLocationData(UnitData data) {
                         return data.getLocationData(colony);
                     }
@@ -516,6 +520,7 @@ public class LabourData {
     private void incrementColonyCount(final Colony colony, Unit unit, UnitData unitData) {
         if (!unit.isInColony()) {
             incrementOutsideWorker(unitData, unit, new LocationData.Getter() {
+                    @Override
                     public LocationData getLocationData(UnitData data) {
                         return data.getLocationData(colony);
                     }

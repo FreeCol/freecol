@@ -405,6 +405,7 @@ public class FoundingFather extends FreeColGameObjectType {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

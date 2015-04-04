@@ -52,9 +52,11 @@ public final class DifficultyDialog extends OptionsDialog
 
     private static final FileFilter[] filters = {
         new FileFilter() {
+            @Override
             public boolean accept(File file) {
                 return file.isDirectory() || file.getName().endsWith(".xml");
             }
+            @Override
             public String getDescription() {
                 return Messages.message("filter.xml");
             }
@@ -134,6 +136,7 @@ public final class DifficultyDialog extends OptionsDialog
      */
     private void addResetAction(JButton button) {
         button.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     getOptionUI().reset();
                 }
@@ -147,6 +150,7 @@ public final class DifficultyDialog extends OptionsDialog
      */
     private void addLoadAction(JButton button) {
         button.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     File dir = FreeColDirectories.getOptionsDirectory();
                     File file = getGUI().showLoadDialog(dir, filters);
@@ -166,6 +170,7 @@ public final class DifficultyDialog extends OptionsDialog
      */
     private void addSaveAction(JButton button) {
         button.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     File dir = FreeColDirectories.getOptionsDirectory();
                     File file = getGUI().showSaveDialog(dir, filters,
@@ -181,6 +186,7 @@ public final class DifficultyDialog extends OptionsDialog
 
     // Implement TreeSelectionListener
 
+    @Override
     public void valueChanged(TreeSelectionEvent event) {
         TreePath path = event.getPath();
         if (path.getPathCount() >= 2) {

@@ -244,6 +244,7 @@ public class WorkerWish extends Wish {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

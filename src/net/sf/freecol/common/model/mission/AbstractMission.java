@@ -60,6 +60,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      *
      * @return an <code>Unit</code> value
      */
+    @Override
     public final Unit getUnit() {
         return unit;
     }
@@ -159,6 +160,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      *
      * @return a <code>boolean</code> value
      */
+    @Override
     public boolean isValid() {
         return unit != null
             && !unit.isDisposed()

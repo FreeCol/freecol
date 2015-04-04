@@ -159,6 +159,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         button.setOpaque(false);
         group.add(button);
         button.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     MapEditorController ctlr = getFreeColClient().getMapEditorController();
                     MapTransform newMapTransform = null;
@@ -240,6 +241,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             return tileType;
         }
 
+        @Override
         public void transform(Tile t) {
             t.changeType(tileType);
             t.removeLostCityRumour();
@@ -253,6 +255,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             this.magnitude = magnitude;
         }
 
+        @Override
         public void transform(Tile tile) {
             TileImprovementType riverType =
                 tile.getSpecification().getTileImprovementType("model.improvement.river");
@@ -279,6 +282,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * next valid, or removes if end of list.
      */
     private class ResourceTransform extends MapTransform {
+        @Override
         public void transform(Tile t) {
             // Check if there is a resource already
             Resource resource = null;
@@ -317,6 +321,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     }
 
     private class LostCityRumourTransform extends MapTransform {
+        @Override
         public void transform(Tile t) {
             if (t.isLand()) {
                 LostCityRumour rumour = t.getLostCityRumour();
@@ -330,6 +335,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     }
 
     private class SettlementTransform extends MapTransform {
+        @Override
         public void transform(Tile t) {
             if (!t.isLand()
                 || t.hasSettlement()

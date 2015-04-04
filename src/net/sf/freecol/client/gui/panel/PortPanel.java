@@ -138,6 +138,7 @@ public abstract class PortPanel extends FreeColPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public TransferHandler getTransferHandler() {
         return defaultTransferHandler;
     }

@@ -179,6 +179,7 @@ public abstract class UnitPanel extends MigPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void propertyChange(PropertyChangeEvent event) {
         logger.finest(getName() + " change " + event.getPropertyName()
                       + ": " + event.getOldValue()

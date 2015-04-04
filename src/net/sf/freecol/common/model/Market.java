@@ -459,6 +459,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      *
      * @return The owner of this <code>Market</code>.
      */
+    @Override
     public Player getOwner() {
         return owner;
     }
@@ -468,6 +469,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      *
      * @param owner The <code>Player</code> to own this <code>Market</code>.
      */
+    @Override
     public void setOwner(Player owner) {
         this.owner = owner;
     }
@@ -560,6 +562,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

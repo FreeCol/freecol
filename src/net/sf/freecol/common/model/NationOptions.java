@@ -50,6 +50,7 @@ public class NationOptions extends FreeColObject {
         /**
          * {@inheritDoc}
          */
+        @Override
         public final String getNameKey() {
             return Messages.nameKey("playerOptions." + this);
         }
@@ -292,6 +293,7 @@ public class NationOptions extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

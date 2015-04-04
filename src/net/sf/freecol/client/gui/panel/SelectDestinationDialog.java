@@ -253,6 +253,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             this.owner = player;
         }
 
+        @Override
         public int compare(Destination choice1, Destination choice2) {
             int score1 = choice1.score;
             int score2 = choice2.score;
@@ -367,6 +368,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         this.destinationList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.destinationList.addListSelectionListener(this);
         this.destinationList.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() != 2) return;
                     Destination d = destinationList.getSelectedValue();
@@ -381,6 +383,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         String omcb = Messages.message("selectDestination.onlyMyColonies");
         this.onlyMyColoniesBox = new JCheckBox(omcb, showOnlyMyColonies);
         this.onlyMyColoniesBox.addChangeListener(new ChangeListener() {
+                @Override
                 public void stateChanged(ChangeEvent event) {
                     showOnlyMyColonies = onlyMyColoniesBox.isSelected();
                     updateDestinationList();
@@ -393,6 +396,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 Messages.message("selectDestination.sortByDistance")
             });
         this.comparatorBox.addItemListener(new ItemListener() {
+                @Override
                 public void itemStateChanged(ItemEvent event) {
                     updateDestinationComparator();
                     Collections.sort(SelectDestinationDialog.this.destinations,
@@ -567,6 +571,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     /**
      * {@inheritDoc}
      */
+    @Override
     public void valueChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting()) return;
         recenter(this.destinationList.getSelectedValue());
@@ -578,6 +583,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getResponse() {
         Object value = getValue();
         if (options.get(0).equals(value)) {

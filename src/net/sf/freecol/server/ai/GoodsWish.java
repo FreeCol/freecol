@@ -271,6 +271,7 @@ public class GoodsWish extends Wish {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

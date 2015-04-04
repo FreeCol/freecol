@@ -60,7 +60,9 @@ public final class GoalDeciders {
             private int winner = gds.length;
             private PathNode goal = null;
 
+            @Override
             public PathNode getGoal() { return goal; }
+            @Override
             public boolean hasSubGoals() {
                 for (int i = 0; i < gds.length; i++) {
                     if (!all && i > this.winner) break;
@@ -72,6 +74,7 @@ public final class GoalDeciders {
                 }
                 return !all;
             }
+            @Override
             public boolean check(Unit u, PathNode path) {
                 for (int i = 0; i < gds.length; i++) {
                     if (!all && i > this.winner) break;
@@ -108,8 +111,11 @@ public final class GoalDeciders {
             private PathNode bestPath = null;
             private float bestValue = 0.0f;
 
+            @Override
             public PathNode getGoal() { return bestPath; }
+            @Override
             public boolean hasSubGoals() { return true; }
+            @Override
             public boolean check(Unit u, PathNode path) {
                 Location loc = path.getLastNode().getLocation();
                 Settlement settlement = loc.getSettlement();
@@ -137,8 +143,11 @@ public final class GoalDeciders {
         return new GoalDecider() {
             private PathNode best = null;
             
+            @Override
             public PathNode getGoal() { return best; }
+            @Override
             public boolean hasSubGoals() { return false; }
+            @Override
             public boolean check(Unit u, PathNode path) {
                 Tile tile = path.getTile();
                 if (tile != null
@@ -166,8 +175,11 @@ public final class GoalDeciders {
         return new GoalDecider() {
             private PathNode first = null;
 
+            @Override
             public PathNode getGoal() { return first; }
+            @Override
             public boolean hasSubGoals() { return false; }
+            @Override
             public boolean check(Unit u, PathNode path) {
                 Tile tile = path.getTile();
                 if (tile != null
@@ -192,8 +204,11 @@ public final class GoalDeciders {
             private PathNode best = null;
             private int bestCost = FreeColObject.INFINITY;
 
+            @Override
             public PathNode getGoal() { return best; }
+            @Override
             public boolean hasSubGoals() { return false; }
+            @Override
             public boolean check(Unit u, PathNode path) {
                 int cost;
                 if (Map.isSameLocation(path.getLocation(), target)) {
@@ -222,8 +237,11 @@ public final class GoalDeciders {
         return new GoalDecider() {
             private PathNode best = null;
 
+            @Override
             public PathNode getGoal() { return best; }
+            @Override
             public boolean hasSubGoals() { return false; }
+            @Override
             public boolean check(Unit u, PathNode path) {
                 Tile t = path.getTile();
                 if (t != null && t.isAdjacent(tile)) {
@@ -246,8 +264,11 @@ public final class GoalDeciders {
         return new GoalDecider() {
             private PathNode best = null;
                         
+            @Override
             public PathNode getGoal() { return best; }
+            @Override
             public boolean hasSubGoals() { return false; }
+            @Override
             public boolean check(Unit u, PathNode path) {
                 Tile t = path.getTile();
                 if (t == null || !t.isLand()) return false;
@@ -282,8 +303,11 @@ public final class GoalDeciders {
             private boolean goalDangerous = true;
             private PathNode goal = null;
 
+            @Override
             public PathNode getGoal() { return goal; }
+            @Override
             public boolean hasSubGoals() { return true; }
+            @Override
             public boolean check(Unit u, PathNode pathNode) {
                 Tile tile = pathNode.getTile();
                 if (tile == null || !tile.isLand() || !tile.isEmpty()
@@ -339,8 +363,11 @@ public final class GoalDeciders {
         return new GoalDecider() {
             private PathNode goal = null;
 
+            @Override
             public PathNode getGoal() { return goal; }
+            @Override
             public boolean hasSubGoals() { return true; }
+            @Override
             public boolean check(Unit u, PathNode pathNode) {
                 Tile tile = pathNode.getTile();
                 if (enemy.canSee(tile)) return false;
@@ -363,8 +390,11 @@ public final class GoalDeciders {
             private PathNode goal = null;
             private int score = unit.getTile().getHighSeasCount();
 
+            @Override
             public PathNode getGoal() { return goal; }
+            @Override
             public boolean hasSubGoals() { return true; }
+            @Override
             public boolean check(Unit u, PathNode pathNode) {
                 Tile tile = pathNode.getTile();
                 if (tile.getHighSeasCount() < score) {
@@ -393,8 +423,11 @@ public final class GoalDeciders {
             private PathNode goal = null;
             private int score = Integer.MAX_VALUE;
 
+            @Override
             public PathNode getGoal() { return goal; }
+            @Override
             public boolean hasSubGoals() { return true; }
+            @Override
             public boolean check(Unit u, PathNode pathNode) {
                 Tile tile = pathNode.getTile();
                 if (tile.getHighSeasCount() < score && tile.isRiverCorner()) {
@@ -428,8 +461,11 @@ public final class GoalDeciders {
         public MultipleAdjacentDecider(final List<Location> locs) {
             this.gd = new GoalDecider() {
 
+                    @Override
                     public PathNode getGoal() { return null; }
+                    @Override
                     public boolean hasSubGoals() { return true; }
+                    @Override
                     public boolean check(Unit u, PathNode path) {
                         Tile tile = path.getTile();
                         if (tile == null) return false;

@@ -75,6 +75,7 @@ public abstract class AIPlayer extends AIObject {
     /** A comparator to sort AI units by location. */
     private static final Comparator<AIUnit> aiUnitLocationComparator
         = new Comparator<AIUnit>() {
+            @Override
             public int compare(AIUnit a1, AIUnit a2) {
                 Location l1 = (a1 == null) ? null
                     : (a1.getUnit() == null) ? null

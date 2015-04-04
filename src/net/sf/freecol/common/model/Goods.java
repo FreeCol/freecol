@@ -155,6 +155,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getLocation() {
         return location;
     }
@@ -162,6 +163,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean setLocation(Location location) {
         this.location = location;
         return true;
@@ -170,6 +172,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isInEurope() {
         return (location instanceof Europe)
             || (location instanceof Unit && ((Unit)location).isInEurope());
@@ -178,6 +181,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Tile getTile() {
         return (location == null) ? null : location.getTile();
     }
@@ -185,6 +189,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getSpaceTaken() {
         return 1;
     }
@@ -195,6 +200,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Player getOwner() {
         return (location instanceof Ownable) ? ((Ownable)location).getOwner()
             : null;
@@ -203,6 +209,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setOwner(Player p) {
         throw new UnsupportedOperationException();
     }
@@ -262,6 +269,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

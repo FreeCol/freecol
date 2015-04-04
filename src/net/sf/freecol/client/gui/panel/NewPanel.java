@@ -217,6 +217,7 @@ public final class NewPanel extends FreeColPanel
         this.serverPortField
             = new JTextField(Integer.toString(FreeCol.getServerPort()));
         this.serverPortField.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     getSelectedPort(NewPanel.this.serverPortField);
                 }
@@ -263,6 +264,7 @@ public final class NewPanel extends FreeColPanel
         this.joinPortField
             = new JTextField(Integer.toString(FreeCol.getServerPort()));
         this.joinPortField.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     getSelectedPort(NewPanel.this.joinPortField);
                 }
@@ -500,6 +502,7 @@ public final class NewPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final ConnectController cc = getFreeColClient().getConnectController();
         final GUI gui = getGUI();
@@ -566,6 +569,7 @@ public final class NewPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource() == this.rulesBox) {
             updateSpecification();

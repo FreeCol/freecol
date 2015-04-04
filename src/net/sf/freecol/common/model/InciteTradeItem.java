@@ -67,6 +67,7 @@ public class InciteTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isValid() {
         return victim != null && victim != getSource()
             && victim != getDestination();
@@ -75,6 +76,7 @@ public class InciteTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isUnique() {
         return true;
     }
@@ -82,6 +84,7 @@ public class InciteTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLabel() {
         return StringTemplate.template("inciteTradeItem.description")
             .addStringTemplate("%nation%", victim.getNationName());
@@ -136,6 +139,7 @@ public class InciteTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

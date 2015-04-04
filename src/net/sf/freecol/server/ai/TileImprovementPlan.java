@@ -378,6 +378,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

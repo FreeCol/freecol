@@ -290,6 +290,7 @@ public abstract class Feature extends FreeColObject implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNameKey() {
         return Messages.nameKey(getId());
     }

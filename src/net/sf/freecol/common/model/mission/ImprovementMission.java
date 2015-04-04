@@ -107,6 +107,7 @@ public class ImprovementMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MissionState doMission() {
         // FIXME: get rid of magic numbers: either add a pioneerWork
         // attribute to UnitType, or introduce an expertRole ability
@@ -124,6 +125,7 @@ public class ImprovementMission extends AbstractMission {
      *
      * @return a <code>boolean</code> value
      */
+    @Override
     public boolean isValid() {
         return super.isValid()
             && improvement != null
@@ -156,6 +158,7 @@ public class ImprovementMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
@@ -166,6 +169,7 @@ public class ImprovementMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
@@ -176,6 +180,7 @@ public class ImprovementMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

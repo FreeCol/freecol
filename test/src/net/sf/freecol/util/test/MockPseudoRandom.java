@@ -65,6 +65,7 @@ public class MockPseudoRandom extends Random {
         return -1;
     }
 
+    @Override
     public int nextInt(int n) {
         int number = getNext();
         if (number < 0 || number >= n) {
@@ -74,6 +75,7 @@ public class MockPseudoRandom extends Random {
         return number;
     }
 
+    @Override
     public float nextFloat() {
         int number = getNext();
         return (number < 0) ? random.nextFloat() : number * scale;

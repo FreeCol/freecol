@@ -47,8 +47,10 @@ public final class ReportCargoPanel extends ReportUnitPanel {
     }
 
 
+    @Override
     protected void addREFUnits() {}
 
+    @Override
     protected void addOwnUnits() {
         final Player player = getMyPlayer();
         reportPanel.add(GUI.localizedLabel(StringTemplate
@@ -68,6 +70,7 @@ public final class ReportCargoPanel extends ReportUnitPanel {
         }
     }
 
+    @Override
     protected void gatherData() {
         for (Unit unit : getMyPlayer().getUnits()) {
             if (unit.isCarrier()) {

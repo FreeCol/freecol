@@ -170,6 +170,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
             JButton b = newButtons[initialIndex];
             this.initialFocusComponent = b;
             b.addHierarchyListener(new HierarchyListener() {
+                    @Override
                     public void hierarchyChanged(HierarchyEvent e) {
                         if ((e.getChangeFlags()
                                 & HierarchyEvent.PARENT_CHANGED) != 0) {

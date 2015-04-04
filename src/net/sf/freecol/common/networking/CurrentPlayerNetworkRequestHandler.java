@@ -64,6 +64,7 @@ public abstract class CurrentPlayerNetworkRequestHandler
     /**
      * {@inheritDoc}
      */
+    @Override
     public final Element handle(Connection conn, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(conn);
         if (!isCurrentPlayer(player)) {

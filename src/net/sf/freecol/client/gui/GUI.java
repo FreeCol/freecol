@@ -798,6 +798,7 @@ public class GUI {
                 + pmoffscreenValue);
         }
         usePixmaps.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
                 public void propertyChange(PropertyChangeEvent e) {
                     String newValue = e.getNewValue().toString();
                     System.setProperty(pmoffscreen, newValue);
@@ -838,6 +839,7 @@ public class GUI {
         LanguageOption o = (LanguageOption)freeColClient.getClientOptions()
             .getOption(ClientOptions.LANGUAGE);
         o.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
                 public void propertyChange(PropertyChangeEvent e) {
                     Language language = (Language)e.getNewValue();
                     logger.info("Set language to: " + language);
@@ -2287,6 +2289,7 @@ public class GUI {
         if (canvas == null) return;
         canvas.showCaptureGoodsDialog(unit, gl,
             new DialogHandler<List<Goods>>() {
+                @Override
                 public void handle(List<Goods> gl) {
                     igc().lootCargo(unit, gl, defenderId);
                 }
@@ -2302,6 +2305,7 @@ public class GUI {
         if (canvas == null) return;
         canvas.showChooseFoundingFatherDialog(ffs,
             new DialogHandler<FoundingFather>() {
+                @Override
                 public void handle(FoundingFather ff) {
                     igc().chooseFoundingFather(ffs, ff);
                 }
@@ -2360,6 +2364,7 @@ public class GUI {
         if (canvas == null) return;
         canvas.showDumpCargoDialog(unit,
             new DialogHandler<List<Goods>>() {
+                @Override
                 public void handle(List<Goods> goodsList) {
                     for (Goods g : goodsList) igc().unloadCargo(g, true);
                 }
@@ -2376,6 +2381,7 @@ public class GUI {
         if (canvas == null) return;
         canvas.showEmigrationDialog(player, fountainOfYouth,
             new DialogHandler<Integer>() {
+                @Override
                 public void handle(Integer value) {
                     // Value should be a valid slot
                     igc().emigrate(player,
@@ -2391,6 +2397,7 @@ public class GUI {
         if (canvas == null) return;
         canvas.showEndTurnDialog(units,
             new DialogHandler<Boolean>() {
+                @Override
                 public void handle(Boolean value) {
                     if (value != null && value.booleanValue()) {
                         igc().endTurn(false);
@@ -2517,6 +2524,7 @@ public class GUI {
         if (canvas == null) return;
         canvas.showMonarchDialog(action, template, monarchKey,
             new DialogHandler<Boolean>() {
+                @Override
                 public void handle(Boolean b) {
                     igc().monarchAction(action, b.booleanValue());
                     updateMenuBar();
@@ -2529,6 +2537,7 @@ public class GUI {
         if (canvas == null) return;
         canvas.showNameNewLandDialog(key, defaultName, unit,
             new DialogHandler<String>() {
+                @Override
                 public void handle(String name) {
                     if (name == null || name.isEmpty()) name = defaultName;
                     igc().nameNewLand(unit, name);
@@ -2543,6 +2552,7 @@ public class GUI {
         if (canvas == null) return;
         canvas.showNameNewRegionDialog(template, defaultName, unit,
             new DialogHandler<String>() {
+                @Override
                 public void handle(String name) {
                     if (name == null || name.isEmpty()) name = defaultName;
                     igc().nameNewRegion(tile, unit, region, name);
@@ -2555,6 +2565,7 @@ public class GUI {
         if (canvas == null) return;
         canvas.showFirstContactDialog(player, other, tile, settlementCount,
             new DialogHandler<Boolean>() {
+                @Override
                 public void handle(Boolean b) {
                     igc().firstContact(player, other, tile, b);
                 }
@@ -2786,6 +2797,7 @@ public class GUI {
     public void showVictoryDialog() {
         if (canvas == null) return;
         canvas.showVictoryDialog(new DialogHandler<Boolean>() {
+                @Override
                 public void handle(Boolean result) {
                     igc().victory(result);
                 }

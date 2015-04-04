@@ -119,6 +119,7 @@ public class TransportMission extends Mission {
     /**
      * Disposes of this <code>Mission</code>.
      */
+    @Override
     public void dispose() {
         logger.finest(tag + " disposing (" + clearCargoes() + "): " + this
             //+ "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString()
@@ -1348,6 +1349,7 @@ public class TransportMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTarget() {
         return target;
     }
@@ -1355,6 +1357,7 @@ public class TransportMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTarget(Location target) {
         this.target = target;
     }
@@ -1362,6 +1365,7 @@ public class TransportMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location findTarget() {
         // A noop.  The target is defined by the cargoes.
         return null;
@@ -1370,6 +1374,7 @@ public class TransportMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String invalidReason() {
         final AIUnit aiUnit = getAIUnit();
         String reason = invalidReason(aiUnit, getTarget());
@@ -1382,6 +1387,7 @@ public class TransportMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         checkCargoes(lb);
@@ -1543,6 +1549,7 @@ public class TransportMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

@@ -105,6 +105,7 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int compareTo(TileTypeChange other) {
         int cmp;
         cmp = (from == null) ? ((other.from == null) ? 0 : -1)

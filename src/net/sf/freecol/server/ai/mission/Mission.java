@@ -929,6 +929,7 @@ public abstract class Mission extends AIObject {
     /**
      * Disposes this mission by removing any references to it.
      */
+    @Override
     public void dispose() {
         // Nothing to do yet.
     }

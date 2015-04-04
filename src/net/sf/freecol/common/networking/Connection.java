@@ -249,6 +249,7 @@ public class Connection implements Closeable {
      *
      * Failure is expected if the other end has closed already.
      */
+    @Override
     public void close() {
         try {
             send(DOMMessage.createMessage(DISCONNECT_TAG));

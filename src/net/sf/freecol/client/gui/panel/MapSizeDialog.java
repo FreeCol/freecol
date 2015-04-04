@@ -72,6 +72,7 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Dimension getInputValue() {
         int width, height;
         try {

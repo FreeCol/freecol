@@ -209,6 +209,7 @@ public final class StartGamePanel extends FreeColPanel {
      * @param enabled 'true' if this component and its children should be
      *            enabled, 'false' otherwise.
      */
+    @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
 
@@ -288,6 +289,7 @@ public final class StartGamePanel extends FreeColPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         final FreeColClient fcc = getFreeColClient();

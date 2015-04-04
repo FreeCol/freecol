@@ -150,6 +150,7 @@ public class ColonyPlan {
      */
     private static final Comparator<BuildPlan> buildPlanComparator
         = new Comparator<BuildPlan>() {
+            @Override
             public int compare(BuildPlan b1, BuildPlan b2) {
                 double d = b1.getValue() - b2.getValue();
                 return (d > 0.0) ? -1 : (d < 0.0) ? 1 : 0;
@@ -891,6 +892,7 @@ public class ColonyPlan {
         // not on the produce list, then make sure such plans sort to
         // the end, except for food plans.
         Collections.sort(workPlans, new Comparator<WorkLocationPlan>() {
+                @Override
                 public int compare(WorkLocationPlan w1, WorkLocationPlan w2) {
                     GoodsType g1 = w1.getGoodsType();
                     GoodsType g2 = w2.getGoodsType();
@@ -916,6 +918,7 @@ public class ColonyPlan {
     private void updateProductionList(final Map<GoodsType, Map<WorkLocation, Integer>> production) {
         final Comparator<GoodsType> productionComparator
             = new Comparator<GoodsType>() {
+                @Override
                 public int compare(GoodsType g1, GoodsType g2) {
                     int p1 = 0;
                     for (Integer i : production.get(g1).values()) {
@@ -952,6 +955,7 @@ public class ColonyPlan {
             }
         }
         Collections.sort(toAdd, new Comparator<GoodsType>() {
+                @Override
                 public int compare(GoodsType g1, GoodsType g2) {
                     int i1 = rawBuildingGoodsTypes.indexOf(g1.getInputType());
                     int i2 = rawBuildingGoodsTypes.indexOf(g2.getInputType());
@@ -1260,6 +1264,7 @@ public class ColonyPlan {
         // Favour low-skill/experience units for defenders, order experts
         // in reverse order of their production on the produce-list.
         Comparator<Unit> soldierComparator = new Comparator<Unit>() {
+            @Override
             public int compare(Unit u1, Unit u2) {
                 int cmp = u1.getSkillLevel() - u2.getSkillLevel();
                 if (cmp == 0) {

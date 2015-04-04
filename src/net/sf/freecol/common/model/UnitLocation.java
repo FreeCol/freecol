@@ -291,6 +291,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public Tile getTile() {
         return null; // Override this where it becomes meaningful.
     }
@@ -298,6 +299,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLocationLabel() {
         return StringTemplate.key(getId());
     }
@@ -305,6 +307,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLocationLabelFor(Player player) {
         return getLocationLabel();
     }
@@ -312,6 +315,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean add(Locatable locatable) {
         if (locatable instanceof Unit) {
             Unit unit = (Unit) locatable;
@@ -340,6 +344,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             Unit unit = (Unit)locatable;
@@ -358,6 +363,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(Locatable locatable) {
         if (!(locatable instanceof Unit)) return false;
         synchronized (units) {
@@ -368,6 +374,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean canAdd(Locatable locatable) {
         return getNoAddReason(locatable) == NoAddReason.NONE;
     }
@@ -375,6 +382,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getUnitCount() {
         synchronized (units) {
             return units.size();
@@ -384,6 +392,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Unit> getUnitList() {
         synchronized (units) {
             return new ArrayList<>(units);
@@ -393,6 +402,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public final Iterator<Unit> getUnitIterator() {
         // Marked final as this will always work if getUnitList() does.
         return getUnitList().iterator();
@@ -401,6 +411,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public GoodsContainer getGoodsContainer() {
         return null;
     }
@@ -408,6 +419,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public Settlement getSettlement() {
         return null;
     }
@@ -415,6 +427,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public final Colony getColony() {
         // Final as this will always work if getSettlement() does.
         Settlement settlement = getSettlement();
@@ -424,6 +437,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     public final IndianSettlement getIndianSettlement() {
         // Final as this will always work if getSettlement() does.
         Settlement settlement = getSettlement();

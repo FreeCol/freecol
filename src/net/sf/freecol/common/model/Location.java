@@ -38,6 +38,7 @@ public interface Location extends ObjectWithId {
      * @return The object identifier.
      * @see FreeColGameObject#getId
      */
+    @Override
     public String getId();
 
     /**

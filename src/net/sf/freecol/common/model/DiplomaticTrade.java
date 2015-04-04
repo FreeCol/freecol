@@ -532,6 +532,7 @@ public class DiplomaticTrade extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

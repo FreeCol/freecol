@@ -163,6 +163,7 @@ public abstract class FreeColGameObjectType extends FreeColObject
     /**
      * {@inheritDoc}
      */
+    @Override
     public final String getNameKey() {
         return Messages.nameKey(getId());
     }

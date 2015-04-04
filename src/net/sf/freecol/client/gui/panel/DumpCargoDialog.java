@@ -90,6 +90,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Goods> getResponse() {
         Object value = getValue();
         List<Goods> gl = new ArrayList<>();

@@ -421,6 +421,7 @@ public class Game extends FreeColGameObject {
             private FcgoState fcgoState = FcgoState.INVALID;
 
 
+            @Override
             public boolean hasNext() {
                 if (this.fcgoState == FcgoState.VALID) return true;
                 while (this.it.hasNext()) {
@@ -435,6 +436,7 @@ public class Game extends FreeColGameObject {
                 return false;
             }
 
+            @Override
             public FreeColGameObject next() {
                 if (!hasNext()) throw new NoSuchElementException();
                 FreeColGameObject fcgo = this.readAhead.getValue().get();
@@ -442,6 +444,7 @@ public class Game extends FreeColGameObject {
                 return fcgo;
             }
 
+            @Override
             public void remove() {
                 if (this.fcgoState == FcgoState.INVALID) {
                     throw new IllegalStateException("No current entry");
@@ -462,6 +465,7 @@ public class Game extends FreeColGameObject {
      */
     public Iterable<FreeColGameObject> getFreeColGameObjects() {
         return new Iterable<FreeColGameObject>() {
+            @Override
             public Iterator<FreeColGameObject> iterator() {
                 return getFreeColGameObjectIterator();
             }
@@ -1336,6 +1340,7 @@ public class Game extends FreeColGameObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

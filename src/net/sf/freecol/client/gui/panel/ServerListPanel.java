@@ -84,6 +84,7 @@ public final class ServerListPanel extends FreeColPanel {
         table = new JTable(tableModel);
 
         DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer() {
+            @Override
             public Component getTableCellRendererComponent(JTable t, Object o, boolean isSelected, boolean hasFocus,
                     int row, int column) {
                 setOpaque(isSelected);
@@ -120,6 +121,7 @@ public final class ServerListPanel extends FreeColPanel {
     }
 
 
+    @Override
     public void requestFocus() {
         connect.requestFocus();
     }
@@ -157,6 +159,7 @@ public final class ServerListPanel extends FreeColPanel {
      * @param enabled 'true' if this component and its children should be
      *            enabled, 'false' otherwise.
      */
+    @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
 
@@ -181,6 +184,7 @@ public final class ServerListPanel extends FreeColPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
 
@@ -244,6 +248,7 @@ class ServerListTableModel extends AbstractTableModel {
      * 
      * @return The amount of columns in this statesTable.
      */
+    @Override
     public int getColumnCount() {
         return columnNames.length;
     }
@@ -253,6 +258,7 @@ class ServerListTableModel extends AbstractTableModel {
      * 
      * @return The name of the specified column.
      */
+    @Override
     public String getColumnName(int column) {
         return columnNames[column];
     }
@@ -262,6 +268,7 @@ class ServerListTableModel extends AbstractTableModel {
      * 
      * @return The amount of rows in this statesTable.
      */
+    @Override
     public int getRowCount() {
         return items.size();
     }
@@ -273,6 +280,7 @@ class ServerListTableModel extends AbstractTableModel {
      * @param column The requested column.
      * @return The value at the requested location.
      */
+    @Override
     public Object getValueAt(int row, int column) {
         if ((row < getRowCount()) && (column < getColumnCount()) && (row >= 0) && (column >= 0)) {
             ServerInfo si = items.get(row);

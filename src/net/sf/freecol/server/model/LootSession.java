@@ -44,6 +44,7 @@ public class LootSession extends TransactionSession {
     }
 
 
+    @Override
     public void complete(ChangeSet cs) {
         super.complete(cs);
     }

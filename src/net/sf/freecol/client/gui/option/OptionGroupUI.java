@@ -144,6 +144,7 @@ public final class OptionGroupUI extends MigPanel
      *
      * @param event The incoming TreeSelectionEvent.
      */
+    @Override
     public void valueChanged(TreeSelectionEvent event) {
         detailPanel.removeAll();
         DefaultMutableTreeNode node
@@ -213,6 +214,7 @@ public final class OptionGroupUI extends MigPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateOption() {
         for (OptionUpdater optionUpdater : optionUpdaters) {
             optionUpdater.updateOption();
@@ -222,6 +224,7 @@ public final class OptionGroupUI extends MigPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void reset() {
         for (OptionUpdater optionUpdater : optionUpdaters) {
             optionUpdater.reset();

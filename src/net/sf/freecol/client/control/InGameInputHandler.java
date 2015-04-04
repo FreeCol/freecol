@@ -93,26 +93,31 @@ public final class InGameInputHandler extends InputHandler {
 
     // A bunch of predefined non-closure runnables.
     private final Runnable closeMenusRunnable = new Runnable() {
+            @Override
             public void run() {
                 getGUI().closeMenus();
             }
         };
     private final Runnable deselectActiveUnitRunnable = new Runnable() {
+            @Override
             public void run() {
                 getGUI().setActiveUnit(null);
             }
         };
     private final Runnable displayModelMessagesRunnable = new Runnable() {
+            @Override
             public void run() {
                 igc().displayModelMessages(false);
             }
         };
     private final Runnable reconnectRunnable = new Runnable() {
+            @Override
             public void run() {
                 igc().reconnect();
             }
         };
     private final Runnable updateMenuBarRunnable = new Runnable() {
+            @Override
             public void run() {
                 getGUI().updateMenuBar();
             }
@@ -164,6 +169,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private void refreshCanvas(final boolean focus) {
         SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     getGUI().refresh();
 
@@ -460,6 +466,7 @@ public final class InGameInputHandler extends InputHandler {
         final boolean focus = lastAnimatedUnit != attacker;
         lastAnimatedUnit = attacker;
         invokeAndWait(new Runnable() {
+                @Override
                 public void run() {
                     if (focus || !getGUI().onScreen(attackerTile)
                         || !getGUI().onScreen(defenderTile)) {
@@ -537,6 +544,7 @@ public final class InGameInputHandler extends InputHandler {
         final boolean focus = unit != lastAnimatedUnit;
         lastAnimatedUnit = unit;
         invokeAndWait(new Runnable() {
+                @Override
                 public void run() {
                     if (getGUI().getAnimationSpeed(unit) > 0) {
                         // All is well, queue the animation.  Use
@@ -574,6 +582,7 @@ public final class InGameInputHandler extends InputHandler {
         final ChatMessage chatMessage = new ChatMessage(game, element);
 
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 getGUI().displayChatMessage(chatMessage.getPlayer(game),
                                             chatMessage.getMessage(),
@@ -643,6 +652,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         invokeAndWait(new Runnable() {
+                @Override
                 public void run() {
                     message.setAgreement(igc().diplomacy(our, other,
                                                          agreement));
@@ -694,6 +704,7 @@ public final class InGameInputHandler extends InputHandler {
         final String message = element.getAttribute("message");
 
         SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     getGUI().showErrorMessage(messageId, message);
                 }
@@ -815,6 +826,7 @@ public final class InGameInputHandler extends InputHandler {
 
         if (winner == freeColClient.getMyPlayer()) {
             SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         igc().displayHighScores(highScore);
                     }
@@ -855,6 +867,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         invokeAndWait(new Runnable() {
+                @Override
                 public void run() {
                     boolean accepted = igc().indianDemand(unit, colony,
                         message.getType(game), message.getAmount());
@@ -982,6 +995,7 @@ public final class InGameInputHandler extends InputHandler {
         final int n = getIntegerAttribute(element, "turn");
 
         SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     igc().newTurn(n);
                 }
@@ -1114,6 +1128,7 @@ public final class InGameInputHandler extends InputHandler {
             .getFreeColGameObject(element.getAttribute("player"),Player.class);
 
         SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     igc().setDead(player);
                 }
@@ -1138,6 +1153,7 @@ public final class InGameInputHandler extends InputHandler {
             .getFreeColGameObject(element.getAttribute("second"),Player.class);
 
         SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     igc().setStance(stance, p1, p2);
                 }
@@ -1181,9 +1197,11 @@ public final class InGameInputHandler extends InputHandler {
         final Element fullElement = (Element)nodeList.item(0);
         final Element normalElement = (Element)nodeList.item(1);
         SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     tile.readFromXMLElement(fullElement);
                     getGUI().showSpyColonyPanel(tile, new Runnable() {
+                        @Override
                             public void run() {
                                 tile.readFromXMLElement(normalElement);
                             }

@@ -160,6 +160,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
         this.unitList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"),
                                         "select");
         this.unitList.getActionMap().put("select", new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     selectUnit();
                 }
@@ -167,11 +168,13 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
         this.unitList.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"),
                                         "quit");
         this.unitList.getActionMap().put("quit", new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     EndTurnDialog.this.setValue(options.get(1));
                 }
             });
         this.unitList.addListSelectionListener(new ListSelectionListener() {
+                @Override
                 public void valueChanged(ListSelectionEvent e) {
                     if (e.getValueIsAdjusting()) return;
                     selectUnit();

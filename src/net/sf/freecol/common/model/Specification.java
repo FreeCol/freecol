@@ -107,6 +107,7 @@ public final class Specification {
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getXMLTagName() { return "source"; }
     };
 
@@ -731,6 +732,7 @@ public final class Specification {
 
     private class ModifierReader implements ChildReader {
 
+        @Override
         public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 Modifier modifier = new Modifier(xr, Specification.this);
@@ -752,6 +754,7 @@ public final class Specification {
             this.type = type;
         }
 
+        @Override
         public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 final String tag = xr.getLocalName();
@@ -800,6 +803,7 @@ public final class Specification {
 
         private static final String RECURSIVE_TAG = "recursive";
 
+        @Override
         public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 readChild(xr);

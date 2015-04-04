@@ -470,6 +470,7 @@ public abstract class Settlement extends GoodsLocation
      *
      * @return The settlement name.
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -481,6 +482,7 @@ public abstract class Settlement extends GoodsLocation
      *
      * @param newName The new name.
      */
+    @Override
     public void setName(String newName) {
         this.name = newName;
     }
@@ -491,6 +493,7 @@ public abstract class Settlement extends GoodsLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public Player getOwner() {
         return owner;
     }
@@ -501,6 +504,7 @@ public abstract class Settlement extends GoodsLocation
      * -vis: Changes visibility.
      * -til: Changes tile appearance.
      */
+    @Override
     public void setOwner(Player player) {
         this.owner = player;
     }

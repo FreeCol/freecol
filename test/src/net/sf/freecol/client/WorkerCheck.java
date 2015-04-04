@@ -54,6 +54,7 @@ public final class WorkerCheck {
         textArea.setEditable( false );
 
         final Runnable  workerJob = new Runnable() {
+            @Override
             public void run() {
                 try {
                     SwingUtilities.invokeLater( new TestJob("starting the job\n", false) );
@@ -68,6 +69,7 @@ public final class WorkerCheck {
         };
 
         workAction = new AbstractAction("work") {
+            @Override
             public void actionPerformed( ActionEvent event ) {
                 setEnabled( false );
                 worker.schedule( workerJob );
@@ -84,11 +86,13 @@ public final class WorkerCheck {
         window.pack();
         window.addWindowListener(new WindowAdapter() {
                 // for when the window is closed by the OS
+                @Override
                 public void windowClosing(WindowEvent event) {
                     worker.askToStop();
                 }
 
                 // for when the window is closed by Java
+                @Override
                 public void windowClosed(WindowEvent event) {
                     windowClosing(event);
                 }
@@ -113,6 +117,7 @@ public final class WorkerCheck {
         }
 
         /** This method is invoked on the AWT thread */
+        @Override
         public void run() {
 
             textArea.setText( textArea.getText() + message);

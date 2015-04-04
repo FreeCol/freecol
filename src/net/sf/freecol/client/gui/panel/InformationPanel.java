@@ -91,6 +91,7 @@ public class InformationPanel extends FreeColPanel {
                 .addStringTemplate("%object%", disp));
             final FreeColObject fco = fcos[i];
             button.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         gui.displayObject(fco);
                     }

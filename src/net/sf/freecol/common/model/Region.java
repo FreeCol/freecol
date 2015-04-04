@@ -82,6 +82,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getNameKey() {
             return Messages.nameKey("model.region." + getKey());
         }
@@ -422,6 +423,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName() {
         return this.name;
     }
@@ -429,6 +431,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setName(final String newName) {
         this.name = newName;
     }
@@ -439,6 +442,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final String getNameKey() {
         return this.nameKey;
     }
@@ -589,6 +593,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

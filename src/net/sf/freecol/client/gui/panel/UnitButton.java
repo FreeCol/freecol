@@ -66,6 +66,7 @@ public final class UnitButton extends JButton {
     }
 
 
+    @Override
     protected void configurePropertiesFromAction(Action a) {
         super.configurePropertiesFromAction(a);
 
@@ -89,6 +90,7 @@ public final class UnitButton extends JButton {
         }
     }
 
+    @Override
     protected PropertyChangeListener createActionPropertyChangeListener(Action a) {
         return new UnitButtonActionPropertyChangeListener(this);
     }
@@ -100,6 +102,7 @@ public final class UnitButton extends JButton {
             this.button = button;
         }
 
+        @Override
         public void propertyChange(PropertyChangeEvent e) {
             String propertyName = e.getPropertyName();
             if (Action.NAME.equals(e.getPropertyName())

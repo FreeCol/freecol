@@ -110,6 +110,7 @@ public final class FindSettlementPanel extends FreeColPanel
         this.settlementList.addListSelectionListener(this);
         this.settlementList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         Action selectAction = new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     selectSettlement();
                 }
@@ -118,6 +119,7 @@ public final class FindSettlementPanel extends FreeColPanel
                                               "select");
         this.settlementList.getActionMap().put("select", selectAction);
         Action quitAction = new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     getGUI().removeFromCanvas(FindSettlementPanel.this);
                 }
@@ -126,6 +128,7 @@ public final class FindSettlementPanel extends FreeColPanel
                                              "quit");
         this.settlementList.getActionMap().put("quit", quitAction);
         this.settlementList.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() == 2) {
                         selectSettlement();
@@ -202,6 +205,7 @@ public final class FindSettlementPanel extends FreeColPanel
 
     // Interface ItemListener
 
+    @Override
     public void itemStateChanged(ItemEvent event) {
         switch (this.displayOptionBox.getSelectedIndex()) {
         case 0:
@@ -222,6 +226,7 @@ public final class FindSettlementPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void valueChanged(ListSelectionEvent e) {
         Settlement settlement = this.settlementList.getSelectedValue();
         if (settlement != null) {

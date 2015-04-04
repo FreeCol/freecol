@@ -109,6 +109,7 @@ public final class CompactLabourReport extends ReportPanel {
     }
 
 
+    @Override
     public JButton createColonyButton(final Colony colony) {
         String text = colony.getName();
         if (!unitData.isSummary()) {
@@ -126,6 +127,7 @@ public final class CompactLabourReport extends ReportPanel {
         }
 
         return createButton(text, new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 getGUI().showColonyPanel(colony, null);
             }
@@ -411,6 +413,7 @@ public final class CompactLabourReport extends ReportPanel {
         if (europe.getRowCount() > 0) {
             JButton button = createButton(Messages.getName(getMyPlayer().getEurope()),
                                           new ActionListener() {
+                                              @Override
                                               public void actionPerformed(ActionEvent e) {
                                                   getGUI().showEuropePanel();
                                               }
@@ -602,6 +605,7 @@ public final class CompactLabourReport extends ReportPanel {
 
     private JButton createUnitNameButton(String name, final LabourData.UnitData unitData) {
         JButton button = createButton(name, new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 getGUI().showCompactLabourReport(unitData);
             }

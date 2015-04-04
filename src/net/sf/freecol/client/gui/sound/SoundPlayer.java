@@ -67,12 +67,14 @@ public class SoundPlayer {
             throw new IllegalStateException("Mixer unavailable.");
         }
         mixerOption.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
                 public void propertyChange(PropertyChangeEvent e) {
                     setMixer((MixerWrapper)e.getNewValue());
                 }
             });
         setVolume(volumeOption.getValue());
         volumeOption.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
                 public void propertyChange(PropertyChangeEvent e) {
                     setVolume((Integer)e.getNewValue());
                 }
@@ -201,6 +203,7 @@ public class SoundPlayer {
             playList.add(ais);
         }
 
+        @Override
         public void run() {
             for (;;) {
                 if (playList.isEmpty()) {

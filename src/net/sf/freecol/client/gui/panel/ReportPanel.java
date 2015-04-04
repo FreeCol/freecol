@@ -56,6 +56,7 @@ public class ReportPanel extends FreeColPanel {
 
     private static final Comparator<Unit> unitTypeComparator
         = new Comparator<Unit>() {
+            @Override
             public int compare(Unit unit1, Unit unit2) {
                 int deltaType = unit2.getType().compareTo(unit1.getType());
                 if (deltaType == 0) {
@@ -160,6 +161,7 @@ public class ReportPanel extends FreeColPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         if (OK.equals(command)) {

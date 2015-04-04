@@ -121,6 +121,7 @@ public class WorkInsideColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTarget() {
         return colony;
     }
@@ -128,6 +129,7 @@ public class WorkInsideColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTarget(Location target) {
         if (target instanceof Colony) {
             this.colony = (Colony)target;
@@ -137,6 +139,7 @@ public class WorkInsideColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location findTarget() {
         return getTarget();
     }
@@ -144,6 +147,7 @@ public class WorkInsideColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
     }
@@ -151,6 +155,7 @@ public class WorkInsideColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
@@ -209,6 +214,7 @@ public class WorkInsideColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

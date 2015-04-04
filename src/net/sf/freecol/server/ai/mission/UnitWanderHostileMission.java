@@ -123,6 +123,7 @@ public class UnitWanderHostileMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTarget() {
         return null;
     }
@@ -130,11 +131,13 @@ public class UnitWanderHostileMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTarget(Location target) {}
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location findTarget() {
         return null;
     }
@@ -150,6 +153,7 @@ public class UnitWanderHostileMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String invalidReason() {
         return invalidReason(getAIUnit(), null);
     }
@@ -157,6 +161,7 @@ public class UnitWanderHostileMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
@@ -191,6 +196,7 @@ public class UnitWanderHostileMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

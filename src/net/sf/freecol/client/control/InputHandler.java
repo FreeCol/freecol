@@ -86,6 +86,7 @@ public abstract class InputHandler implements MessageHandler {
      * @param element The root <code>Element</code> of the message.
      * @return The reply.
      */
+    @Override
     public abstract Element handle(Connection connection, Element element);
 
 

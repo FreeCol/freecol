@@ -196,6 +196,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void paintComponent(Graphics g) {
         int stringWidth = (this.stringImage == null) ? 0
             : stringImage.getWidth(null);
@@ -241,6 +242,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Dimension getPreferredSize() {
         if (this.goodsIcon == null) return new Dimension(0, 0);
        

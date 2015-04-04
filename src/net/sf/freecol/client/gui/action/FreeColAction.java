@@ -291,6 +291,7 @@ public abstract class FreeColAction extends AbstractAction
      *
      * @return An unique identifier for this action.
      */
+    @Override
     public final String getId() {
         return (String) getValue(ACTION_ID);
     }

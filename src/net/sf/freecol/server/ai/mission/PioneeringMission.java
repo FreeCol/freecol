@@ -176,6 +176,7 @@ public class PioneeringMission extends Mission {
     /**
      * Disposes of this pioneering mission.
      */
+    @Override
     public void dispose() {
         abandonTileImprovementPlan();
         super.dispose();
@@ -256,8 +257,11 @@ public class PioneeringMission extends Mission {
                 private PathNode bestPath = null;
                 private int bestValue = Integer.MIN_VALUE;
 
+                @Override
                 public PathNode getGoal() { return bestPath; }
+                @Override
                 public boolean hasSubGoals() { return true; }
+                @Override
                 public boolean check(Unit u, PathNode path) {
                     int value = scorePath(aiUnit, path);
                     if (bestValue < value) {
@@ -475,6 +479,7 @@ public class PioneeringMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTarget() {
         return target;
     }
@@ -482,6 +487,7 @@ public class PioneeringMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTarget(Location target) {
         if (target == null
             || target instanceof Colony || target instanceof Tile) {
@@ -495,6 +501,7 @@ public class PioneeringMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location findTarget() {
         return findTarget(getAIUnit(), 10, true);
     }
@@ -502,6 +509,7 @@ public class PioneeringMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String invalidReason() {
         // Prevent invalidation for improvements that are just completing.
         if (tileImprovementPlan != null) {
@@ -527,6 +535,7 @@ public class PioneeringMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         final AIUnit aiUnit = getAIUnit();
@@ -776,6 +785,7 @@ public class PioneeringMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

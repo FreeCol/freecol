@@ -104,6 +104,7 @@ public class ConstructionPanel extends MigPanel
                 
             if (openBuildQueue) {
                 addMouseListener(new MouseAdapter() {
+                        @Override
                         public void mousePressed(MouseEvent e) {
                             freeColClient.getGUI().showBuildQueuePanel(colony);
                         }
@@ -194,6 +195,7 @@ public class ConstructionPanel extends MigPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void propertyChange(PropertyChangeEvent event) {
         update();
     }

@@ -295,6 +295,7 @@ public final class InfoPanel extends FreeColPanel {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void propertyChange(PropertyChangeEvent event) {
             update();
         }

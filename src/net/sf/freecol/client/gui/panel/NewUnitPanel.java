@@ -79,6 +79,7 @@ public class NewUnitPanel extends FreeColPanel {
         this.question = new JLabel(label);
         this.units.addAll(units);
         this.priceComparator = new Comparator<UnitType>() {
+            @Override
             public int compare(final UnitType u1, final UnitType u2) {
                 return europe.getUnitPrice(u1) - europe.getUnitPrice(u2);
             }

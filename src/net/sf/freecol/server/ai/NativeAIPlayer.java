@@ -328,6 +328,7 @@ public class NativeAIPlayer extends AIPlayer {
         final Tile isTile = is.getTile();
         final Comparator<Unit> isComparator
             = new Comparator<Unit>() {
+                @Override
                 public int compare(Unit u1, Unit u2) {
                     Tile t1 = u1.getTile();
                     int s1 = t1.getDistanceTo(isTile);
@@ -364,6 +365,7 @@ public class NativeAIPlayer extends AIPlayer {
         // Sort threat tiles by threat value.
         List<Tile> threatTiles = new ArrayList<>(threats.keySet());
         Collections.sort(threatTiles, new Comparator<Tile>() {
+                @Override
                 public int compare(Tile t1, Tile t2) {
                     return Float.compare(threats.get(t2).floatValue(),
                         threats.get(t1).floatValue());
@@ -730,6 +732,7 @@ public class NativeAIPlayer extends AIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void startWorking() {
         final Player player = getPlayer();
         final Turn turn = getGame().getTurn();
@@ -773,6 +776,7 @@ public class NativeAIPlayer extends AIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
                              int value) {
         if (type == DefendSettlementMission.class) {
@@ -802,6 +806,7 @@ public class NativeAIPlayer extends AIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void registerSellGoods(Goods goods) {
         String goldKey = "tradeGold#" + goods.getType().getId()
             + "#" + goods.getAmount() + "#" + goods.getLocation().getId();
@@ -811,6 +816,7 @@ public class NativeAIPlayer extends AIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int buyProposition(Unit unit, Settlement settlement,
                               Goods goods, int gold) {
         logger.finest("Entering method buyProposition");
@@ -871,6 +877,7 @@ public class NativeAIPlayer extends AIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int sellProposition(Unit unit, Settlement settlement,
                                Goods goods, int gold) {
         logger.finest("Entering method sellProposition");
@@ -938,5 +945,6 @@ public class NativeAIPlayer extends AIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 }

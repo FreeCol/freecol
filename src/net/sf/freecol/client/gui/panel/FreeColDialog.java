@@ -192,11 +192,13 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         WindowAdapter adapter = new WindowAdapter() {
                 private boolean gotFocus = false;
 
+                @Override
                 public void windowClosing(WindowEvent we) {
                     if (!FreeColDialog.this.responded()) {
                         FreeColDialog.this.setValue(null);
                     }
                 }
+                @Override
                 public void windowGainedFocus(WindowEvent we) {
                     if (!gotFocus) { // Once window gets focus, initialize.
                         FreeColDialog.this.pane.selectInitialValue();
@@ -208,6 +210,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         addWindowFocusListener(adapter);
 
         addComponentListener(new ComponentAdapter() {
+                @Override
                 public void componentShown(ComponentEvent ce) {
                     // Reset value to ensure closing works properly.
                     FreeColDialog.this.pane
@@ -360,6 +363,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      *
      * @return True if this is a modal dialog.
      */
+    @Override
     public boolean isModal() {
         return modal;
     }
@@ -379,6 +383,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
         // Let the defaultCloseOperation handle the closing if the
         // user closed the window without selecting a button (in which
@@ -399,6 +404,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setVisible(boolean val) {
         if (val) this.pane.selectInitialValue();
         super.setVisible(val); // This is where the thread blocks when modal.

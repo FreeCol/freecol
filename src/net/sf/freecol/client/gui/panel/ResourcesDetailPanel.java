@@ -67,6 +67,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
      *
      * @param root a <code>DefaultMutableTreeNode</code>
      */
+    @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         super.addSubTrees(root, getSpecification().getResourceTypeList());
     }
@@ -78,6 +79,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
      * @param id The object identifier.
      * @param panel the detail panel to build
      */
+    @Override
     public void buildDetail(String id, JPanel panel) {
         if (getId().equals(id)) {
             return;

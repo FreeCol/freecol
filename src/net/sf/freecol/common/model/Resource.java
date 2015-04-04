@@ -180,6 +180,7 @@ public class Resource extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNameKey() {
         return getType().getNameKey();
     }
@@ -190,6 +191,7 @@ public class Resource extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final int getZIndex() {
         return RESOURCE_ZINDEX;
     }
@@ -197,6 +199,7 @@ public class Resource extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isTileTypeAllowed(TileType tileType) {
         return tileType.canHaveResourceType(getType());
     }
@@ -204,6 +207,7 @@ public class Resource extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int applyBonus(GoodsType goodsType, UnitType unitType,
                           int potential) {
         Set<Modifier> bonus = type.getModifiers(goodsType.getId(), unitType);
@@ -216,6 +220,7 @@ public class Resource extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         if (goodsType == null) return false;
         // The presence of a resource can give a tile the ability to
@@ -227,6 +232,7 @@ public class Resource extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
         return (goodsType == null) ? Collections.<Modifier>emptyList()
@@ -237,6 +243,7 @@ public class Resource extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isNatural() {
         return true;
     }
@@ -244,6 +251,7 @@ public class Resource extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isComplete() {
         return true;
     }
@@ -311,6 +319,7 @@ public class Resource extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

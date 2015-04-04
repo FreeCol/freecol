@@ -235,8 +235,11 @@ public class UnitSeekAndDestroyMission extends Mission {
                 private PathNode bestPath = null;
                 private int bestValue = Integer.MIN_VALUE;
             
+                @Override
                 public PathNode getGoal() { return bestPath; }
+                @Override
                 public boolean hasSubGoals() { return true; }
+                @Override
                 public boolean check(Unit u, PathNode path) {
                     int value = scorePath(aiUnit, path);
                     if (bestValue < value) {
@@ -400,6 +403,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTarget() {
         return target;
     }
@@ -407,6 +411,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTarget(Location target) {
         if (target == null
             || target instanceof Unit || target instanceof Settlement) {
@@ -433,6 +438,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location findTarget() {
         return findTarget(getAIUnit(), 4, false);
     }
@@ -440,6 +446,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
     }
@@ -559,6 +566,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

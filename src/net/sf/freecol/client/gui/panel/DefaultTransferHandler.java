@@ -85,6 +85,7 @@ public final class DefaultTransferHandler extends TransferHandler {
         /**
          * A Drag gesture has been recognized.
          */
+        @Override
         public void dragGestureRecognized(DragGestureEvent dge) {
             JComponent c = (JComponent)dge.getComponent();
             DefaultTransferHandler th
@@ -149,21 +150,25 @@ public final class DefaultTransferHandler extends TransferHandler {
         /**
          * As the hotspot enters a platform dependent drop site.
          */
+        @Override
         public void dragEnter(DragSourceDragEvent dsde) {}
 
         /**
          * As the hotspot moves over a platform dependent drop site.
          */
+        @Override
         public void dragOver(DragSourceDragEvent dsde) {}
 
         /**
          * As the hotspot exits a platform dependent drop site.
          */
+        @Override
         public void dragExit(DragSourceEvent dsde) {}
 
         /**
          * As the operation completes.
          */
+        @Override
         public void dragDropEnd(DragSourceDropEvent dsde) {
             DragSourceContext dsc = dsde.getDragSourceContext();
             JComponent c = (JComponent)dsc.getComponent();
@@ -178,6 +183,7 @@ public final class DefaultTransferHandler extends TransferHandler {
             c.setAutoscrolls(scrolls);
         }
 
+        @Override
         public void dropActionChanged(DragSourceDragEvent dsde) {
             DragSourceContext dsc = dsde.getDragSourceContext();
             JComponent comp = (JComponent)dsc.getComponent();
@@ -209,6 +215,7 @@ public final class DefaultTransferHandler extends TransferHandler {
          * Register this DragGestureRecognizer's Listeners with the
          * Component.
          */
+        @Override
         protected void registerListeners() {}
 
         /**
@@ -217,6 +224,7 @@ public final class DefaultTransferHandler extends TransferHandler {
          *
          * subclasses must override this method
          */
+        @Override
         protected void unregisterListeners() {}
     }
 
@@ -254,6 +262,7 @@ public final class DefaultTransferHandler extends TransferHandler {
      * @return The action that can be done to an ImageSelection on the
      *     given component.
      */
+    @Override
     public int getSourceActions(JComponent comp) {
         return COPY_OR_MOVE;
     }
@@ -267,6 +276,7 @@ public final class DefaultTransferHandler extends TransferHandler {
      * @return True if the given component can import a selection of
      *     the flavor that is indicated by the second parameter.
      */
+    @Override
     public boolean canImport(JComponent comp, DataFlavor[] flavor) {
         if (comp instanceof JPanel || comp instanceof JLabel) {
             for (DataFlavor aFlavor : flavor) {
@@ -286,6 +296,7 @@ public final class DefaultTransferHandler extends TransferHandler {
      * @param comp The component to create a Transferable of.
      * @return The resulting Transferable (an ImageSelection object).
      */
+    @Override
     public Transferable createTransferable(JComponent comp) {
         if (comp instanceof JLabel && comp instanceof Draggable) {
             return new ImageSelection((JLabel) comp);
@@ -302,6 +313,7 @@ public final class DefaultTransferHandler extends TransferHandler {
      * @param t The Transferable that holds the data.
      * @return True if the import succeeded.
      */
+    @Override
     public boolean importData(JComponent comp, Transferable t) {
         try {
             JLabel data;
@@ -504,6 +516,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                                           needToPay);
     }
 
+    @Override
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
         int srcActions = getSourceActions(comp);
         int dragAction = srcActions & action;

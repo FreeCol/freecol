@@ -256,6 +256,7 @@ public final class UnitLabel extends JLabel
      *
      * @param g The graphics context in which to do the painting.
      */
+    @Override
     public void paintComponent(Graphics g) {
         final Player player = freeColClient.getMyPlayer();
         final ImageLibrary lib = useMapImageLibrary
@@ -354,6 +355,7 @@ public final class UnitLabel extends JLabel
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isOnCarrier() {
         return unit != null && unit.isOnCarrier();
     }
@@ -364,6 +366,7 @@ public final class UnitLabel extends JLabel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final Game game = freeColClient.getGame();
         final Specification spec = game.getSpecification();

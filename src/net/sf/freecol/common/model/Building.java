@@ -375,6 +375,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLocationLabel() {
         return StringTemplate.template("inLocation")
             .addNamed("%location%", this);
@@ -383,6 +384,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toShortString() {
         return getColony().getName() + "-" + getType().getSuffix();
     }
@@ -424,6 +426,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLabel() {
         return (buildingType == null) ? null
             : StringTemplate.key(buildingType);
@@ -432,6 +435,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public NoAddReason getNoWorkReason() {
         return NoAddReason.NONE;
     }
@@ -439,6 +443,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean canAutoProduce() {
         return hasAbility(Ability.AUTO_PRODUCTION);
     }
@@ -446,6 +451,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         final BuildingType type = getType();
         return type != null && type.canProduce(goodsType, unitType);
@@ -454,6 +460,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getBaseProduction(ProductionType productionType,
                                  GoodsType goodsType, UnitType unitType) {
         final BuildingType type = getType();
@@ -464,6 +471,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
         final BuildingType type = getType();
@@ -494,6 +502,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
         return (buildingType == null) ? Collections.<ProductionType>emptyList()
             : getType().getAvailableProductionTypes(unattended);
@@ -505,6 +514,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<AbstractGoods> getConsumedGoods() {
         return getInputs();
     }
@@ -512,6 +522,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getPriority() {
         return getType().getPriority();
     }
@@ -522,6 +533,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNameKey() {
         return getType().getNameKey();
     }
@@ -609,6 +621,7 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

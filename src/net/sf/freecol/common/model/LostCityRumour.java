@@ -237,6 +237,7 @@ public class LostCityRumour extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNameKey() {
         return Messages.nameKey("lostCityRumour");
     }
@@ -247,6 +248,7 @@ public class LostCityRumour extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final int getZIndex() {
         return RUMOUR_ZINDEX;
     }
@@ -254,6 +256,7 @@ public class LostCityRumour extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isTileTypeAllowed(TileType tileType) {
         return !tileType.isWater();
     }
@@ -261,6 +264,7 @@ public class LostCityRumour extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int applyBonus(GoodsType goodsType, UnitType unitType, int potential) {
         // Just return the given potential, since lost cities do not
         // provide any production bonuses.  FIXME: maybe we should
@@ -271,6 +275,7 @@ public class LostCityRumour extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         return false;
     }
@@ -278,6 +283,7 @@ public class LostCityRumour extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
         return Collections.<Modifier>emptyList();
@@ -286,6 +292,7 @@ public class LostCityRumour extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isNatural() {
         return false;
     }
@@ -293,6 +300,7 @@ public class LostCityRumour extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isComplete() {
         return true;
     }
@@ -358,6 +366,7 @@ public class LostCityRumour extends TileItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

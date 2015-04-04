@@ -94,6 +94,7 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
         panel.setSize(panel.getPreferredSize());
 
         final ActionListener al = new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     ScaleMapSizeDialog.this.checkFields();
                 }
@@ -131,6 +132,7 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Dimension getResponse() {
         Object value = getValue();
         if (options.get(0).equals(value)) {

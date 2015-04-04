@@ -89,6 +89,7 @@ public class ProductionCache {
      */
     private static final Comparator<Entry> marketValueComparator =
         new CacheEntryComparator() {
+            @Override
             public int compareProduction(Entry entry1, Entry entry2) {
                 int production = entry2.getProduction() - entry1.getProduction();
                 Market market = entry1.getUnit().getOwner().getMarket();

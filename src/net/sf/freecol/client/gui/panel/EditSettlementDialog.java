@@ -180,6 +180,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     /**
      * {@inheritDoc}
      */
+    @Override
     public void itemStateChanged(ItemEvent e) {
         Player player = getOwnerPlayer();
         if (player != null) {

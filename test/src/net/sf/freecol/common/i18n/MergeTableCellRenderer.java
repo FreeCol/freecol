@@ -29,6 +29,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 public final class MergeTableCellRenderer extends DefaultTableCellRenderer
 {
 
+    @Override
     public Component getTableCellRendererComponent( JTable   table,
                                                     Object   value,
                                                     boolean  isSelected,

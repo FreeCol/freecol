@@ -61,6 +61,7 @@ public class IndianNationType extends NationType {
      *
      * @return False.
      */
+    @Override
     public boolean isEuropean() {
         return false;
     }
@@ -70,6 +71,7 @@ public class IndianNationType extends NationType {
      *
      * @return True.
      */
+    @Override
     public boolean isIndian() {
         return true;
     }
@@ -79,6 +81,7 @@ public class IndianNationType extends NationType {
      *
      * @return False.
      */
+    @Override
     public boolean isREF() {
         return false;
     }
@@ -292,6 +295,7 @@ public class IndianNationType extends NationType {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

@@ -67,6 +67,7 @@ public class StanceTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isValid() {
         return stance != null;
     }
@@ -74,6 +75,7 @@ public class StanceTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isUnique() {
         return true;
     }
@@ -81,6 +83,7 @@ public class StanceTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLabel() {
         return stance.getLabel();
     }
@@ -141,6 +144,7 @@ public class StanceTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

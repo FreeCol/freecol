@@ -94,6 +94,7 @@ public final class ReportProductionPanel extends ReportPanel {
 
         JButton selectButton = GUI.localizedButton("report.production.update");
         selectButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     update();
                 }

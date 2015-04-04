@@ -58,6 +58,7 @@ public class TranslationReport {
         }
         final String localeKey = args.length > 1 ? args[1] : "";
         String[] languageFiles = directory.list(new FilenameFilter() {
+                @Override
                 public boolean accept(File dir, String name) {
                     return name.matches("FreeColMessages_" + localeKey + ".*\\.properties");
                 }

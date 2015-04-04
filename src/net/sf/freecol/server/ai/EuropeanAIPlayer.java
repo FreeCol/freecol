@@ -161,6 +161,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 return base;
             }
 
+            @Override
             public int compare(AIUnit a1, AIUnit a2) {
                 return score(a2) - score(a1);
             }
@@ -180,6 +181,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     : unit.getPioneerScore();
             }
 
+            @Override
             public int compare(AIUnit a1, AIUnit a2) {
                 return score(a2) - score(a1);
             }
@@ -199,6 +201,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     : unit.getScoutScore();
             }
 
+            @Override
             public int compare(AIUnit a1, AIUnit a2) {
                 return score(a2) - score(a1);
             }
@@ -2364,6 +2367,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void startWorking() {
         final Player player = getPlayer();
         final Turn turn = getGame().getTurn();
@@ -2508,6 +2512,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
                              int value) {
         if (value > 0) {
@@ -2547,6 +2552,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public TradeStatus acceptDiplomaticTrade(DiplomaticTrade agreement) {
         final Player player = getPlayer();
         final Player other = agreement.getOtherPlayer(player);
@@ -2732,6 +2738,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             // if none are left.
             List<TradeItem> items = new ArrayList<>(agreement.getTradeItems());
             Collections.sort(items, new Comparator<TradeItem>() {
+                @Override
                     public int compare(TradeItem t1, TradeItem t2) {
                         return scores.get(t1) - scores.get(t2);
                     }
@@ -2760,6 +2767,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void registerSellGoods(Goods goods) {
         String goldKey = "tradeGold#" + goods.getType().getId()
             + "#" + goods.getAmount() + "#" + goods.getLocation().getId();
@@ -2769,6 +2777,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int buyProposition(Unit unit, Settlement settlement, Goods goods,
                               int gold) {
         logger.finest("Entering method buyProposition");
@@ -2820,6 +2829,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int sellProposition(Unit unit, Settlement settlement, Goods goods, 
                                int gold) {
         logger.finest("Entering method sellProposition");
@@ -2947,5 +2957,6 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 }

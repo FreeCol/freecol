@@ -631,6 +631,7 @@ public final class TileType extends FreeColGameObjectType {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

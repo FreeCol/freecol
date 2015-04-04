@@ -39,6 +39,7 @@ public final class ReportExplorationPanel extends ReportPanel {
 
     // only use this for regions that have already been discovered!
     private static final Comparator<Region> regionComparator = new Comparator<Region>() {
+        @Override
         public int compare(Region region1, Region region2) {
             int number1 = region1.getDiscoveredIn().getNumber();
             int number2 = region2.getDiscoveredIn().getNumber();

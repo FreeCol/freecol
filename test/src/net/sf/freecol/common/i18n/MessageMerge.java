@@ -66,6 +66,7 @@ public final class MessageMerge {
 
         Action  insertInRightAction = new AbstractAction( "insert in right" )
         {
+            @Override
             public void actionPerformed( ActionEvent event )
             {
                 int  from = mergeTable.getSelectionModel().getMinSelectionIndex();
@@ -76,6 +77,7 @@ public final class MessageMerge {
 
         Action  deleteFromRightAction = new AbstractAction( "delete from right" )
         {
+            @Override
             public void actionPerformed( ActionEvent event )
             {
                 int  from = mergeTable.getSelectionModel().getMinSelectionIndex();
@@ -86,6 +88,7 @@ public final class MessageMerge {
 
         Action  saveRightAction = new AbstractAction( "save right" )
         {
+            @Override
             public void actionPerformed( ActionEvent event )
             {
                 saveLinesToFile( mergeTableModel.merge.lineFromFile2, pathToFile2 );
@@ -107,11 +110,13 @@ public final class MessageMerge {
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
                 // for when the window is closed by the OS
+                @Override
                 public void windowClosing(WindowEvent event) {
                     System.exit(0);
                 }
 
                 // for when the window is closed by Java
+                @Override
                 public void windowClosed(WindowEvent event) {
                     windowClosing(event);
                 }

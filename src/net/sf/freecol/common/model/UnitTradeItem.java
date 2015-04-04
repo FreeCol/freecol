@@ -66,6 +66,7 @@ public class UnitTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isValid() {
         return unit.getOwner() == getSource()
             && unit.getType().isAvailableTo(getDestination());
@@ -74,6 +75,7 @@ public class UnitTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isUnique() {
         return false;
     }
@@ -81,6 +83,7 @@ public class UnitTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLabel() {
         return unit.getLabel();
     }
@@ -141,6 +144,7 @@ public class UnitTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

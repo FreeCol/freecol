@@ -206,6 +206,7 @@ public final class QuickActionMenu extends JPopupMenu {
                         unit.getLabel(Unit.UnitLabelType.NATIONAL));
                 JMenuItem menuItem = GUI.localizedMenuItem(template);
                 menuItem.addActionListener(new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             igc.boardShip(tempUnit, unit);
                         }
@@ -229,6 +230,7 @@ public final class QuickActionMenu extends JPopupMenu {
                         unit.getLabel(Unit.UnitLabelType.NATIONAL));
                 JMenuItem menuItem = GUI.localizedMenuItem(template);
                 menuItem.addActionListener(new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
                                 promptForGoods(goods);
@@ -268,6 +270,7 @@ public final class QuickActionMenu extends JPopupMenu {
     private List<JMenuItem> descendingList(final Map<JMenuItem, Integer> map) {
         List<JMenuItem> ret = new ArrayList<>(map.keySet());
         Collections.sort(ret, new Comparator<JMenuItem>() {
+                @Override
                 public int compare(JMenuItem m1, JMenuItem m2) {
                     Integer i1 = map.get(m1);
                     Integer i2 = map.get(m2);
@@ -385,6 +388,7 @@ public final class QuickActionMenu extends JPopupMenu {
         if (current != null && unit.getWorkType() != null) {
             JMenuItem ji = GUI.localizedMenuItem("showProduction");
             ji.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent event) {
                         gui.showWorkProductionPanel(unit);
                     }
@@ -482,6 +486,7 @@ public final class QuickActionMenu extends JPopupMenu {
 
         JMenuItem menuItem = GUI.localizedMenuItem("activateUnit");
         menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (tempUnit.getState() != Unit.UnitState.ACTIVE) {
                         freeColClient.getInGameController()
@@ -531,6 +536,7 @@ public final class QuickActionMenu extends JPopupMenu {
         if (tempUnit.canCarryTreasure() && tempUnit.canCashInTreasureTrain()) {
             menuItem = GUI.localizedMenuItem("cashInTreasureTrain.order");
             menuItem.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         freeColClient.getInGameController()
                             .checkCashInTreasureTrain(tempUnit);
@@ -611,6 +617,7 @@ public final class QuickActionMenu extends JPopupMenu {
         JMenuItem item = new JMenuItem(text, icon);
         final InGameController igc = freeColClient.getInGameController();
         item.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     igc.equipUnitForRole(unitLabel.getUnit(), to, toCount);
                     unitLabel.updateIcon();
@@ -699,6 +706,7 @@ public final class QuickActionMenu extends JPopupMenu {
             new ImageIcon(
                 gui.getImageLibrary().getSmallGoodsImage(goods.getType())));
         name.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     gui.showColopediaPanel(goods.getType().getId());
                 }
@@ -735,6 +743,7 @@ public final class QuickActionMenu extends JPopupMenu {
                     && player.canTrade(goods.getType()))) {
                 JMenuItem unload = GUI.localizedMenuItem("unload");
                 unload.addActionListener(new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
                                 promptForGoods(goods);
@@ -751,6 +760,7 @@ public final class QuickActionMenu extends JPopupMenu {
 
                 JMenuItem dump = GUI.localizedMenuItem("dumpCargo");
                 dump.addActionListener(new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
                                 promptForGoods(goods);
@@ -778,6 +788,7 @@ public final class QuickActionMenu extends JPopupMenu {
 
         JMenuItem menuItem = GUI.localizedMenuItem("boycottedGoods.payArrears");
         menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     igc.payArrears(goodsType);
                     // FIXME: fix pcls so this hackery can go away
@@ -807,6 +818,7 @@ public final class QuickActionMenu extends JPopupMenu {
             new ImageIcon(
                 gui.getImageLibrary().getSmallGoodsImage(ag.getType())));
         name.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     gui.showColopediaPanel(ag.getType().getId());
                 }
@@ -834,6 +846,7 @@ public final class QuickActionMenu extends JPopupMenu {
                         unit.getLabel(Unit.UnitLabelType.NATIONAL));
                 JMenuItem menuItem = GUI.localizedMenuItem(template);
                 menuItem.addActionListener(new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
                                 promptForGoods(ag);
@@ -884,6 +897,7 @@ public final class QuickActionMenu extends JPopupMenu {
         if (tile != null) {
             JMenuItem menuItem = new JMenuItem(Messages.getName(tile));
             menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     gui.showTilePanel(tile);
                 }

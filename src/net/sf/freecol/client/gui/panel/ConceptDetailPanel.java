@@ -60,6 +60,7 @@ public class ConceptDetailPanel extends FreeColPanel
 
     private static final Comparator<DefaultMutableTreeNode> nodeComparator
         = new Comparator<DefaultMutableTreeNode>() {
+        @Override
         public int compare(DefaultMutableTreeNode node1, DefaultMutableTreeNode node2) {
             return ((ColopediaTreeItem) node1.getUserObject()).getText()
             .compareTo(((ColopediaTreeItem) node2.getUserObject()).getText());
@@ -82,6 +83,7 @@ public class ConceptDetailPanel extends FreeColPanel
     }
 
 
+    @Override
     public String getName() {
         return Messages.getName(id);
     }
@@ -93,6 +95,7 @@ public class ConceptDetailPanel extends FreeColPanel
      *
      * @param root a <code>DefaultMutableTreeNode</code>
      */
+    @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         DefaultMutableTreeNode node =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, id, getName(), null));
@@ -115,6 +118,7 @@ public class ConceptDetailPanel extends FreeColPanel
      * @param id The object identifier to display.
      * @param panel the detail panel to build
      */
+    @Override
     public void buildDetail(String id, JPanel panel) {
         if (ConceptDetailPanel.id.equals(id)) {
             return;

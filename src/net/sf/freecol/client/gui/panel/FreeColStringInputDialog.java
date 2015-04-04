@@ -70,6 +70,7 @@ public final class FreeColStringInputDialog extends FreeColInputDialog<String> {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected String getInputValue() {
         return textField.getText();
     }

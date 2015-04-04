@@ -44,6 +44,7 @@ class TrivialMessage extends DOMMessage {
     }
 
 
+    @Override
     public Element toXMLElement() {
         return DOMMessage.createMessage(tag, attributes);
     }

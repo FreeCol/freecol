@@ -152,6 +152,7 @@ public class RebelToolTip extends JToolTip {
     }
 
 
+    @Override
     public final Dimension getPreferredSize() {
         return new Dimension(350, 250);
     }

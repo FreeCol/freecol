@@ -328,6 +328,7 @@ public final class BuildingType extends BuildableType {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int compareTo(FreeColObject other) {
         int cmp = 0;
         if (other instanceof BuildingType) {
@@ -479,6 +480,7 @@ public final class BuildingType extends BuildableType {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

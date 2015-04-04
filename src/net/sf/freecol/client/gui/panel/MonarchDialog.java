@@ -86,6 +86,7 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
             || action == MonarchAction.RAISE_TAX_WAR) {
             JButton helpButton = GUI.localizedButton("help");
             helpButton.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         getGUI().showColopediaPanel("colopedia.concepts.taxes");
                     }

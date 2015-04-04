@@ -499,6 +499,7 @@ public final class ConnectController {
                 this.message = message;
             }
 
+            @Override
             public void run() {
                 gui.closeMenus();
                 gui.showErrorMessage(message);
@@ -583,6 +584,7 @@ public final class ConnectController {
 
         final File theFile = file;
         Runnable loadGameJob = new Runnable() {
+            @Override
             public void run() {
                 FreeColServer freeColServer = null;
                 String err = null;
@@ -598,6 +600,7 @@ public final class ConnectController {
                     if (login(FreeCol.getName(), freeColServer.getHost(), 
                               freeColServer.getPort())) {
                         SwingUtilities.invokeLater(new Runnable() {
+                            @Override
                             public void run() {
                                 ResourceManager.setScenarioMapping(saveGame.getResourceMapping());
                                 if (userMsg != null) gui.showInformationMessage(userMsg);
@@ -631,6 +634,7 @@ public final class ConnectController {
                         FreeCol.fatal(Messages.message(err));
                     }
                     SwingUtilities.invokeLater(new Runnable() {
+                        @Override
                             public void run() {
                                 gui.closeMainPanel();
                                 gui.showMainPanel(null);

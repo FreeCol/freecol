@@ -66,6 +66,7 @@ public class GoodsTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isValid() {
         return goods != null && goods.getType() != null
             && goods.getAmount() > 0
@@ -76,6 +77,7 @@ public class GoodsTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isUnique() {
         return false;
     }
@@ -83,6 +85,7 @@ public class GoodsTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLabel() {
         return goods.getLabel(true);
     }
@@ -158,6 +161,7 @@ public class GoodsTradeItem extends TradeItem {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

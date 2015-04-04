@@ -187,8 +187,11 @@ public class CashInTreasureTrainMission extends Mission {
                 private PathNode bestPath = null;
                 private int bestValue = Integer.MIN_VALUE;
                 
+                @Override
                 public PathNode getGoal() { return bestPath; }
+                @Override
                 public boolean hasSubGoals() { return true; }
+                @Override
                 public boolean check(Unit u, PathNode path) {
                     Location loc = extractTarget(aiUnit, path);
                     if ((loc instanceof Colony
@@ -363,6 +366,7 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTarget() {
         return target;
     }
@@ -370,6 +374,7 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTarget(Location target) {
         if (target == null
             || target instanceof Europe || target instanceof Colony) {
@@ -380,6 +385,7 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location findTarget() {
         return findTarget(getAIUnit(), 20, true);
     }
@@ -387,6 +393,7 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String invalidReason() {
         return invalidReason(getAIUnit(), target);
     }
@@ -394,6 +401,7 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
@@ -479,6 +487,7 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

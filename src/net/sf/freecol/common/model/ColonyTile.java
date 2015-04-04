@@ -204,6 +204,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLocationLabel() {
         String name = getColony().getName();
         return (isColonyCenterTile())
@@ -216,6 +217,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toShortString() {
         return getColony().getName()
             + "-" + getWorkTile().getType().getSuffix()
@@ -253,6 +255,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLabel() {
         return (workTile == null) ? null : workTile.getLabel();
     }
@@ -260,6 +263,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public NoAddReason getNoWorkReason() {
         Tile tile = getWorkTile();
         NoClaimReason claim;
@@ -296,6 +300,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean canAutoProduce() {
         return isColonyCenterTile();
     }
@@ -303,6 +308,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         final Tile workTile = getWorkTile();
         return workTile != null && workTile.canProduce(goodsType, unitType);
@@ -311,6 +317,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getBaseProduction(ProductionType productionType,
                                  GoodsType goodsType, UnitType unitType) {
         Tile tile = getWorkTile();
@@ -321,6 +328,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
         if (!canProduce(goodsType, unitType)) {
@@ -359,6 +367,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
         return (workTile == null || workTile.getType() == null
             || unattended != isColonyCenterTile())
@@ -419,6 +428,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

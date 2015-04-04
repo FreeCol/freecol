@@ -90,6 +90,7 @@ public abstract class FreeColObject
      *
      * @return The identifier.
      */
+    @Override
     public String getId() {
         return id;
     }
@@ -233,6 +234,7 @@ public abstract class FreeColObject
      * @param other The other <code>FreeColObject</code> subclass to compare.
      * @return The comparison result.
      */
+    @Override
     public int compareTo(FreeColObject other) {
         return compareIds(this, other);
     }

@@ -118,6 +118,7 @@ public final class MarketLabel extends AbstractGoodsLabel
      *
      * @return False.
      */
+    @Override
     public boolean isOnCarrier() {
         return false;
     }
@@ -128,6 +129,7 @@ public final class MarketLabel extends AbstractGoodsLabel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void propertyChange(PropertyChangeEvent event) {
         update(); // Just update the text and tool tip.
     }

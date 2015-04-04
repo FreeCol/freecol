@@ -136,6 +136,7 @@ public final class GoodsLabel extends AbstractGoodsLabel
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isOnCarrier() {
         Goods goods = getGoods();
         return goods != null && goods.getLocation() instanceof Unit;

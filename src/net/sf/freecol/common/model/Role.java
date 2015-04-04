@@ -65,6 +65,7 @@ public class Role extends BuildableType {
      */
     public static final Comparator<Role> militaryComparator
         = new Comparator<Role>() {
+            @Override
             public int compare(Role role1, Role role2) {
                 float amount1 = role1.getOffence() + role1.getDefence();
                 float amount2 = role2.getOffence() + role2.getDefence();
@@ -77,6 +78,7 @@ public class Role extends BuildableType {
     /** A comparator to sort roles by descending defensive power. */
     public static final Comparator<Role> defensiveComparator
         = new Comparator<Role>() {
+            @Override
             public int compare(Role role1, Role role2) {
                 float defence1 = role1.getDefence();
                 float defence2 = role2.getDefence();
@@ -89,6 +91,7 @@ public class Role extends BuildableType {
     /** A comparator to sort roles by descending offensive power. */
     public static final Comparator<Role> offensiveComparator
         = new Comparator<Role>() {
+            @Override
             public int compare(Role role1, Role role2) {
                 float offence1 = role1.getOffence();
                 float offence2 = role2.getOffence();
@@ -543,6 +546,7 @@ public class Role extends BuildableType {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

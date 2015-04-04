@@ -349,6 +349,7 @@ public class PlayerExploredTile extends FreeColGameObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

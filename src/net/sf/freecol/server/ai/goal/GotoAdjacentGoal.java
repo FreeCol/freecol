@@ -48,16 +48,19 @@ public class GotoAdjacentGoal extends Goal {
         target = t;
     }
 
+    @Override
     protected Iterator<AIUnit> getOwnedAIUnitsIterator() {
         //we're keeping units on the availableUnitsList,
         //so all our own units at any moment are these
         return availableUnitsList.iterator();
     }
 
+    @Override
     protected Iterator<Goal> getSubGoalIterator() {
         return null;
     }
     
+    @Override
     protected void removeUnit(AIUnit u) {
         Iterator<AIUnit> uit = availableUnitsList.iterator();
         while (uit.hasNext()) {
@@ -68,6 +71,7 @@ public class GotoAdjacentGoal extends Goal {
         }
     }
     
+    @Override
     protected void plan() {
         isFinished = false;
         
@@ -115,6 +119,7 @@ public class GotoAdjacentGoal extends Goal {
         }
     }
 
+    @Override
     public String getGoalDescription() {
         String descr = super.getGoalDescription();
         if (target!=null) {
@@ -126,14 +131,17 @@ public class GotoAdjacentGoal extends Goal {
     }
     
 
+    @Override
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
     }
     
+    @Override
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 }

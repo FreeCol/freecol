@@ -131,6 +131,7 @@ public class CompoundMission extends AbstractMission {
      *
      * @return a <code>boolean</code> value
      */
+    @Override
     public boolean isValid() {
         if (super.isValid() && !missions.isEmpty()) {
             for (Mission mission : missions) {
@@ -144,6 +145,7 @@ public class CompoundMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MissionState doMission() {
         MissionState state = missions.get(index).doMission();
         if (state == MissionState.COMPLETED) {
@@ -171,6 +173,7 @@ public class CompoundMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
@@ -180,6 +183,7 @@ public class CompoundMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
@@ -191,6 +195,7 @@ public class CompoundMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
@@ -201,6 +206,7 @@ public class CompoundMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         missions.clear();
@@ -214,5 +220,6 @@ public class CompoundMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return "TODO!"; }
 }

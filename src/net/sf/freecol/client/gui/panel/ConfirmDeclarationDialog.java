@@ -394,6 +394,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
         ColorButton button = (ColorButton)e.getSource();
         Color color = JColorChooser.showDialog(this, this.label.getText(),
@@ -409,6 +410,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
     /**
      * {@inheritDoc}
      */
+    @Override
     public void itemStateChanged(ItemEvent e) {
         Background newBackground
             = (Background)this.background.getSelectedItem();

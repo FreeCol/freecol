@@ -31,6 +31,7 @@ public class CacheEntryComparator implements Comparator<ProductionCache.Entry> {
         return entry2.getProduction() - entry1.getProduction();
     }
 
+    @Override
     public int compare(ProductionCache.Entry entry1, ProductionCache.Entry entry2) {
 
         int production = compareProduction(entry1, entry2);

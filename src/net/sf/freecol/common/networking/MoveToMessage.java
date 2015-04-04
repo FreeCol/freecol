@@ -106,6 +106,7 @@ public class MoveToMessage extends DOMMessage {
      *
      * @return The XML representation of this message.
      */
+    @Override
     public Element toXMLElement() {
         return DOMMessage.createMessage(getXMLElementTagName(),
             "unit", unitId,

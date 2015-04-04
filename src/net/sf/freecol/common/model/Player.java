@@ -83,6 +83,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // A_GOODS must be last, the spec is entitled to require checks on
         // as many goods types as it likes
 
+        @Override
         public String toString() {
             return super.toString().substring(2);
         }
@@ -127,6 +128,7 @@ public class Player extends FreeColGameObject implements Nameable {
          *
          * @return True if the unit can be moved.
          */
+        @Override
         public boolean obtains(Unit unit) {
             return unit.couldMove()
                 && unit.getState() != Unit.UnitState.SKIPPED;
@@ -159,6 +161,7 @@ public class Player extends FreeColGameObject implements Nameable {
          *
          * @return True if the unit has orders to go somewhere.
          */
+        @Override
         public boolean obtains(Unit unit) {
             return !unit.isDisposed()
                 && unit.getOwner() == player
@@ -258,6 +261,7 @@ public class Player extends FreeColGameObject implements Nameable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean hasNext() {
             // Try to find a unit that still satisfies the predicate.
             while (!units.isEmpty()) {
@@ -275,6 +279,7 @@ public class Player extends FreeColGameObject implements Nameable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Unit next() {
             return (hasNext()) ? units.remove(0) : null;
         }
@@ -282,6 +287,7 @@ public class Player extends FreeColGameObject implements Nameable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void remove() {
             next(); // Ignore value
         }
@@ -433,6 +439,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     private static final Comparator<Unit> xyComparator
         = new Comparator<Unit>() {
+            @Override
             public int compare(Unit unit1, Unit unit2) {
                 Tile tile1 = unit1.getTile();
                 Tile tile2 = unit2.getTile();
@@ -447,6 +454,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /** A comparator for ordering players. */
     public static final Comparator<Player> playerComparator
         = new Comparator<Player>() {
+            @Override
             public int compare(Player player1, Player player2) {
                 int counter1 = 0;
                 int counter2 = 0;
@@ -704,6 +712,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return The name of this player.
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -713,6 +722,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @param newName The new name value.
      */
+    @Override
     public void setName(String newName) {
         this.name = newName;
     }
@@ -4389,6 +4399,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

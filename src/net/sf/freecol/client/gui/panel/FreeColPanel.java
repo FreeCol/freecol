@@ -221,6 +221,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      */
     public void addClosingCallback(final Runnable runnable) {
         addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
                 public void propertyChange(PropertyChangeEvent e) {
                     if ("closing".equals(e.getPropertyName())) {
                         runnable.run();
@@ -235,6 +236,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         if (OK.equals(command)) {

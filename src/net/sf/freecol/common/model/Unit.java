@@ -69,6 +69,7 @@ public class Unit extends GoodsLocation
     /** A comparator to order units by skill level. */
     private static final Comparator<Unit> skillLevelComp
         = new Comparator<Unit>() {
+            @Override
             public int compare(Unit u1, Unit u2) {
                 return u1.getSkillLevel() - u2.getSkillLevel();
             }
@@ -243,6 +244,7 @@ public class Unit extends GoodsLocation
      *
      * @return The individual name.
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -252,6 +254,7 @@ public class Unit extends GoodsLocation
      *
      * @param newName The new name.
      */
+    @Override
     public void setName(String newName) {
         this.name = newName;
     }
@@ -1021,6 +1024,7 @@ public class Unit extends GoodsLocation
      *
      * @return The number of moves this <code>Unit</code> has left.
      */
+    @Override
     public int getMovesLeft() {
         return movesLeft;
     }
@@ -1857,6 +1861,7 @@ public class Unit extends GoodsLocation
      */
     public static final Comparator<Unit> getMilitaryStrengthComparator(final CombatModel cm) {
         return new Comparator<Unit>() {
+                @Override
                 public int compare(Unit u1, Unit u2) {
                     float cmp = cm.calculateCombatOdds(u1, u2).win
                         - cm.calculateCombatOdds(u2, u1).win;
@@ -2336,6 +2341,7 @@ public class Unit extends GoodsLocation
      * @return The amount of moves this unit has at the beginning of
      *     each turn.
      */
+    @Override
     public int getInitialMovesLeft() {
         Turn turn = getGame().getTurn();
         return (int)applyModifiers(unitType.getMovement(), turn,
@@ -2781,8 +2787,11 @@ public class Unit extends GoodsLocation
                 private int bestValue = Integer.MAX_VALUE;
                 private PathNode best = null;
 
+                @Override
                 public PathNode getGoal() { return best; }
+                @Override
                 public boolean hasSubGoals() { return true; }
+                @Override
                 public boolean check(Unit u, PathNode path) {
                     Tile t = path.getTile();
                     if (t == null
@@ -2995,8 +3004,11 @@ public class Unit extends GoodsLocation
         final GoalDecider threatDecider = new GoalDecider() {
                 private PathNode found = null;
 
+                @Override
                 public PathNode getGoal() { return found; }
+                @Override
                 public boolean hasSubGoals() { return false; }
+                @Override
                 public boolean check(Unit unit, PathNode path) {
                     Tile tile = path.getTile();
                     if (tile == null) return false;
@@ -3606,6 +3618,7 @@ public class Unit extends GoodsLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<AbstractGoods> getConsumedGoods() {
         return unitType.getConsumedGoods();
     }
@@ -3613,6 +3626,7 @@ public class Unit extends GoodsLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getPriority() {
         return unitType.getPriority();
     }
@@ -3623,6 +3637,7 @@ public class Unit extends GoodsLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public Player getOwner() {
         return owner;
     }
@@ -3632,6 +3647,7 @@ public class Unit extends GoodsLocation
      *
      * -vis: This routine has visibility implications.
      */
+    @Override
     public void setOwner(Player player) {
         this.owner = player;
     }
@@ -3645,6 +3661,7 @@ public class Unit extends GoodsLocation
      *
      * @return The location of this <code>Unit</code>.
      */
+    @Override
     public Location getLocation() {
         return location;
     }
@@ -3659,6 +3676,7 @@ public class Unit extends GoodsLocation
      * @param newLocation The new <code>Location</code>.
      * @return True if the location change succeeds.
      */
+    @Override
     public boolean setLocation(Location newLocation) {
         // It is possible to add a unit to a non-specific location
         // within a colony by specifying the colony as the new
@@ -3731,6 +3749,7 @@ public class Unit extends GoodsLocation
      *
      * @return True if in <code>Europe</code>.
      */
+    @Override
     public boolean isInEurope() {
         return (location instanceof Unit) ? ((Unit)location).isInEurope()
             : getLocation() instanceof Europe;
@@ -3832,6 +3851,7 @@ public class Unit extends GoodsLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toShortString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append(getId()).append("-").append(getType().getSuffix());
@@ -4444,6 +4464,7 @@ public class Unit extends GoodsLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

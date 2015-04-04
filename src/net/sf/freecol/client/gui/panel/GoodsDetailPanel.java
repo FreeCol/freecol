@@ -70,6 +70,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
      *
      * @param root a <code>DefaultMutableTreeNode</code>
      */
+    @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         super.addSubTrees(root, getSpecification().getGoodsTypeList());
     }
@@ -80,6 +81,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
      * @param id The object identifier.
      * @param panel the detail panel to build
      */
+    @Override
     public void buildDetail(String id, JPanel panel) {
         if (getId().equals(id)) {
             return;

@@ -326,6 +326,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     <code>Tile</code>, or null if none is present.
      * @see #setSettlement
      */
+    @Override
     public Settlement getSettlement() {
         return settlement;
     }
@@ -1264,6 +1265,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         }
         Collections.sort(tiles, new Comparator<Tile>() {
+                @Override
                 public int compare(Tile t1, Tile t2) {
                     float f = t2.getDefenceValue() - t1.getDefenceValue();
                     return (f < 0.0f) ? -1 : (f > 0.0f) ? 1 : 0;
@@ -1651,6 +1653,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public Comparator<AbstractGoods> getMarketGoodsComparator(final Market market) {
         return new Comparator<AbstractGoods>() {
+            @Override
             public int compare(AbstractGoods o, AbstractGoods p) {
                 return market.getSalePrice(p.getType(), p.getAmount())
                     - market.getSalePrice(o.getType(), o.getAmount());
@@ -2021,6 +2024,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Tile getTile() {
         return this;
     }
@@ -2028,6 +2032,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLocationLabel() {
         if (settlement != null) return settlement.getLocationLabel();
 
@@ -2061,6 +2066,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLocationLabelFor(Player player) {
         if (settlement != null) return settlement.getLocationLabelFor(player);
 
@@ -2096,6 +2102,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance with TileItems.
      */
+    @Override
     public boolean add(Locatable locatable) {
         if (locatable instanceof TileItem) {
             return addTileItem((TileItem) locatable);//-til
@@ -2117,6 +2124,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance with TileItems.
      */
+    @Override
     public boolean remove(Locatable locatable) {
         if (locatable instanceof TileItem) {
             return removeTileItem((TileItem)locatable)
@@ -2130,6 +2138,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(Locatable locatable) {
         if (locatable instanceof TileItem) {
             return tileItemContainer != null
@@ -2142,6 +2151,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean canAdd(Locatable locatable) {
         if (locatable instanceof Unit) {
             return ((Unit)locatable).isTileAccessible(this);
@@ -2156,6 +2166,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toShortString() {
         StringBuilder sb = new StringBuilder(16);
         TileType type = getType();
@@ -2170,6 +2181,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNameKey() {
         if (getGame().isInClient()) {
             return (isExplored()) ? getType().getNameKey() : "unexplored";
@@ -2191,6 +2203,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Player getOwner() {
         return owner;
     }
@@ -2200,6 +2213,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      */
+    @Override
     public void setOwner(Player owner) {
         this.owner = owner;
     }
@@ -2437,6 +2451,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
@@ -2653,6 +2668,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

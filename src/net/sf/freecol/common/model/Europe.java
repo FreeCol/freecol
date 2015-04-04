@@ -313,6 +313,7 @@ public class Europe extends UnitLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toShortString() {
         return "Europe";
     }
@@ -361,6 +362,7 @@ public class Europe extends UnitLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNameKey() {
         return getOwner().getEuropeNameKey();
     }
@@ -371,6 +373,7 @@ public class Europe extends UnitLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public Player getOwner() {
         return owner;
     }
@@ -378,6 +381,7 @@ public class Europe extends UnitLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setOwner(Player p) {
         throw new UnsupportedOperationException();
     }
@@ -388,6 +392,7 @@ public class Europe extends UnitLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getGoodsCount(GoodsType goodsType) {
         return GoodsContainer.HUGE_CARGO_SIZE;
     }
@@ -395,6 +400,7 @@ public class Europe extends UnitLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getExportAmount(GoodsType goodsType, int turns) {
         return (getOwner().canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
             : 0;
@@ -403,6 +409,7 @@ public class Europe extends UnitLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImportAmount(GoodsType goodsType, int turns) {
         return (getOwner().canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
             : 0;
@@ -431,6 +438,7 @@ public class Europe extends UnitLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<Ability> getAbilities(String id, FreeColGameObjectType fcgot,
                                      Turn turn) {
         Set<Ability> result = super.getAbilities(id, fcgot, turn);
@@ -620,6 +628,7 @@ public class Europe extends UnitLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

@@ -122,6 +122,7 @@ public class HighSeas extends UnitLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toShortString() {
         return "HighSeas";
     }
@@ -208,6 +209,7 @@ public class HighSeas extends UnitLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

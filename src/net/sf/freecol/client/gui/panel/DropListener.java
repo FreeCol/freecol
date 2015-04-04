@@ -46,6 +46,7 @@ public final class DropListener extends MouseAdapter {
      *
      * @param e The event that holds the information about the mouse click.
      */
+    @Override
     public void mouseReleased(MouseEvent e) {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         Transferable clipData = clipboard.getContents(clipboard);

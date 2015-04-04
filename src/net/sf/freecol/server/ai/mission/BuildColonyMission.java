@@ -160,8 +160,11 @@ public class BuildColonyMission extends Mission {
                 private PathNode bestPath = null;
                 private float bestValue = 0f;
 
+                @Override
                 public PathNode getGoal() { return bestPath; }
+                @Override
                 public boolean hasSubGoals() { return true; }
+                @Override
                 public boolean check(Unit u, PathNode path) {
                     Location loc = extractTarget(aiUnit, path);
                     if (loc instanceof Tile) {
@@ -301,6 +304,7 @@ public class BuildColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getBaseTransportPriority() {
         return NORMAL_TRANSPORT_PRIORITY + 10;
     }
@@ -308,6 +312,7 @@ public class BuildColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTarget() {
         return target;
     }
@@ -315,6 +320,7 @@ public class BuildColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTarget(Location target) {
         if (target == null
             || target instanceof Colony || target instanceof Tile) {
@@ -328,6 +334,7 @@ public class BuildColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location findTarget() {
         return findTarget(getAIUnit(), 5, true);
     }
@@ -335,6 +342,7 @@ public class BuildColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String invalidReason() {
         return invalidReason(getAIUnit(), target);
     }
@@ -342,6 +350,7 @@ public class BuildColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         final AIMain aiMain = getAIMain();
@@ -548,6 +557,7 @@ public class BuildColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

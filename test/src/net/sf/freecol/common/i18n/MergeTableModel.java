@@ -80,24 +80,28 @@ public final class MergeTableModel extends AbstractTableModel {
 
     // ----------------------------------------------------- overridden methods
 
+    @Override
     public int getRowCount()
     {
         return Math.max( merge.lineFromFile1.size(), merge.lineFromFile2.size() );
     }
 
 
+    @Override
     public int getColumnCount()
     {
         return COLUMN_NAME_ARRAY.length;
     }
 
 
+    @Override
     public String getColumnName( int columnIndex )
     {
         return COLUMN_NAME_ARRAY[ columnIndex ];
     }
 
 
+    @Override
     public Object getValueAt( int rowIndex, int columnIndex )
     {
         if ( 0 == columnIndex )

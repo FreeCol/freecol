@@ -70,6 +70,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
      *
      * @param root a <code>DefaultMutableTreeNode</code>
      */
+    @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         DefaultMutableTreeNode parent =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
@@ -104,6 +105,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
      * @param id The object identifier.
      * @param panel the detail panel to build
      */
+    @Override
     public void buildDetail(String id, JPanel panel) {
         try {
             FoundingFather father = getSpecification().getFoundingFather(id);

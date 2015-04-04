@@ -138,6 +138,7 @@ public class WishRealizationMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTarget() {
         return (this.wish == null) ? null : this.wish.getDestination();
     }
@@ -145,6 +146,7 @@ public class WishRealizationMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTarget(Location target) {
         // Ignored, target is set by wish
     }
@@ -152,6 +154,7 @@ public class WishRealizationMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location findTarget() {
         return getTarget();
     }
@@ -159,6 +162,7 @@ public class WishRealizationMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String invalidReason() {
         return (this.wish == null) ? "wish-null"
             : invalidReason(getAIUnit(), getTarget());
@@ -167,6 +171,7 @@ public class WishRealizationMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         String reason = invalidReason();
@@ -274,6 +279,7 @@ public class WishRealizationMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

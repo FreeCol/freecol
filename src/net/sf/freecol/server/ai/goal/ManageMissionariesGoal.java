@@ -62,17 +62,20 @@ public class ManageMissionariesGoal extends Goal {
         subGoalList = new ArrayList<>();
     }
 
+    @Override
     protected Iterator<AIUnit> getOwnedAIUnitsIterator() {
         //we're managing units by directly putting them to individual subgoals,
         //so all our own units at any moment are the unused ones
         return availableUnitsList.iterator();
     }
 
+    @Override
     protected Iterator<Goal> getSubGoalIterator() {
         //all our subgoals are on the subGoalList
         return subGoalList.iterator();
     }
 
+    @Override
     protected void removeUnit(AIUnit u) {
         Iterator<AIUnit> uit = availableUnitsList.iterator();
         while (uit.hasNext()) {
@@ -88,6 +91,7 @@ public class ManageMissionariesGoal extends Goal {
      * NOTE: This goal currently does not send unit requests, but only deals
      * with the units it gets passively.
      */
+    @Override
     protected void plan() {
         isFinished = false;
 
@@ -146,6 +150,7 @@ public class ManageMissionariesGoal extends Goal {
         }
     }
 
+    @Override
     public String getGoalDescription() {
         String descr = super.getGoalDescription();
         return descr + ":" + availableUnitsList.size();
@@ -176,10 +181,12 @@ public class ManageMissionariesGoal extends Goal {
     }
 
 
+    @Override
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         //FIXME
     }
 
+    @Override
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
         //FIXME
     }
@@ -187,5 +194,6 @@ public class ManageMissionariesGoal extends Goal {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 }

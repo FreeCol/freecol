@@ -64,6 +64,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         JButton browse = GUI.localizedButton("browse");
         if (editable) {
             browse.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
                         if (file == null) {
@@ -81,6 +82,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         JButton remove = GUI.localizedButton("remove");
         if (editable) {
             remove.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         setValue(null);
                     }
@@ -124,6 +126,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JPanel getComponent() {
         return panel;
     }
@@ -131,6 +134,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateOption() {
         File f = (fileField.getText() == null
             || fileField.getText().isEmpty()) ? null
@@ -141,6 +145,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void reset() {
         File file = getOption().getValue();
         String text = (file == null) ? "" : file.getAbsolutePath();

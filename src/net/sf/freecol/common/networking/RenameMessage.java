@@ -104,6 +104,7 @@ public class RenameMessage extends DOMMessage {
      *
      * @return The XML representation of this message.
      */
+    @Override
     public Element toXMLElement() {
         return createMessage(getXMLElementTagName(),
             "nameable", id,

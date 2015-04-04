@@ -426,6 +426,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         }
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
 
     }
@@ -435,31 +436,37 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * to center on the tile that he clicked on
      * @param e a <code>MouseEvent</code> value
      */
+    @Override
     public void mousePressed(MouseEvent e) {
         focus(e);
     }
 
 
+    @Override
     public void mouseReleased(MouseEvent e) {
 
     }
 
 
+    @Override
     public void mouseEntered(MouseEvent e) {
 
     }
 
 
+    @Override
     public void mouseExited(MouseEvent e) {
 
     }
 
 
+    @Override
     public void mouseDragged(MouseEvent e) {
         focus(e);
     }
 
 
+    @Override
     public void mouseMoved(MouseEvent e) {
 
     }

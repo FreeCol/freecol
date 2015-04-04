@@ -82,6 +82,7 @@ public final class ReportColonyPanel extends ReportPanel
                     : -1;
             }
 
+            @Override
             public int compare(GoodsType g1, GoodsType g2) {
                 int r1 = rank(g1);
                 int r2 = rank(g2);
@@ -92,6 +93,7 @@ public final class ReportColonyPanel extends ReportPanel
 
     private static final Comparator<AbstractGoods> abstractGoodsComparator
         = new Comparator<AbstractGoods>() {
+            @Override
             public int compare(AbstractGoods a1, AbstractGoods a2) {
                 int cmp = a2.getAmount() - a1.getAmount();
                 return (cmp != 0) ? cmp
@@ -101,6 +103,7 @@ public final class ReportColonyPanel extends ReportPanel
 
     private static final Comparator<Unit> teacherComparator
         = new Comparator<Unit>() {
+        @Override
         public int compare(Unit u1, Unit u2) {
             int l1 = u1.getNeededTurnsOfTraining() - u1.getTurnsOfTraining();
             int l2 = u2.getNeededTurnsOfTraining() - u2.getTurnsOfTraining();
@@ -857,6 +860,7 @@ public final class ReportColonyPanel extends ReportPanel
         List<UnitType> types = new ArrayList<>();
         types.addAll(suggestions.keySet());
         Collections.sort(types, new Comparator<UnitType>() {
+                @Override
                 public int compare(UnitType t1, UnitType t2) {
                     int cmp = suggestions.get(t2).amount
                         - suggestions.get(t1).amount;
@@ -918,6 +922,7 @@ public final class ReportColonyPanel extends ReportPanel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         if (useCompact) {
             String command = event.getActionCommand();
@@ -926,6 +931,7 @@ public final class ReportColonyPanel extends ReportPanel
                 Colony colony = getGame().getFreeColGameObject(command, Colony.class);
                 if (colony != null) {
                     getGUI().showBuildQueuePanel(colony, new Runnable() {
+                        @Override
                         public void run() {
                             updateCompactColonyPanel();
                         }
@@ -937,6 +943,7 @@ public final class ReportColonyPanel extends ReportPanel
                 if (colony != null) {
                     getGUI().showColonyPanel(colony, null)
                         .addClosingCallback(new Runnable() {
+                        @Override
                                 public void run() {
                                     updateCompactColonyPanel();
                                 }

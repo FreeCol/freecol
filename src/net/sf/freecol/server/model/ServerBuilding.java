@@ -70,6 +70,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
      * @param lb A <code>LogBuilder</code> to log to.
      * @param cs A <code>ChangeSet</code> to update.
      */
+    @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
         BuildingType type = getType();
 

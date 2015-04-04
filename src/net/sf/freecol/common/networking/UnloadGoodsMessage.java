@@ -130,6 +130,7 @@ public class UnloadGoodsMessage extends DOMMessage {
      *
      * @return The XML representation of this message.
      */
+    @Override
     public Element toXMLElement() {
         return createMessage(getXMLElementTagName(),
             "type", goodsTypeId,

@@ -118,6 +118,7 @@ public final class ResourceType extends FreeColGameObjectType {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

@@ -184,8 +184,11 @@ public class PrivateerMission extends Mission {
                 private PathNode bestPath = null;
                 private int bestValue = Integer.MIN_VALUE;
 
+                @Override
                 public PathNode getGoal() { return bestPath; }
+                @Override
                 public boolean hasSubGoals() { return true; }
+                @Override
                 public boolean check(Unit u, PathNode path) {
                     int value = scorePath(aiUnit, path);
                     if (bestValue < value) {
@@ -344,6 +347,7 @@ public class PrivateerMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTarget() {
         return target;
     }
@@ -351,6 +355,7 @@ public class PrivateerMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTarget(Location target) {
         if (target == null
             || target instanceof Colony || target instanceof Europe
@@ -362,6 +367,7 @@ public class PrivateerMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location findTarget() {
         return findTarget(getAIUnit(), 8, true);
     }
@@ -369,6 +375,7 @@ public class PrivateerMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
     }
@@ -376,6 +383,7 @@ public class PrivateerMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
         final AIUnit aiUnit = getAIUnit();
@@ -479,6 +487,7 @@ public class PrivateerMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

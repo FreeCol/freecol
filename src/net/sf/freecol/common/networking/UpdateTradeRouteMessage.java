@@ -100,6 +100,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      *
      * @return The XML representation of this message.
      */
+    @Override
     public Element toXMLElement() {
         Element result = createMessage(getXMLElementTagName());
         result.appendChild(tradeRoute.toXMLElement(result.getOwnerDocument()));

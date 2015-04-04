@@ -78,6 +78,7 @@ public final class ReportLabourPanel extends ReportPanel {
         }
 
 
+        @Override
         public void paint(Graphics g) {
             if (selected) {
                 Graphics2D g2d = (Graphics2D) g;
@@ -172,11 +173,13 @@ public final class ReportLabourPanel extends ReportPanel {
             }
         }
         Action selectAction = new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     showDetails();
                 }
             };
         Action quitAction = new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     getGUI().removeFromCanvas(ReportLabourPanel.this);
                 }
@@ -191,6 +194,7 @@ public final class ReportLabourPanel extends ReportPanel {
             .put(KeyStroke.getKeyStroke("ESCAPE"), "quit");
         this.panelList.getActionMap().put("quit", quitAction);
         this.panelList.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() == 2) {
                         showDetails();
@@ -219,6 +223,7 @@ public final class ReportLabourPanel extends ReportPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {

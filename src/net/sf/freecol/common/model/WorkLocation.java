@@ -406,6 +406,7 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLocationLabelFor(Player player) {
         return (getOwner() == player) ? getLocationLabel()
             : getColony().getLocationLabelFor(player);
@@ -591,6 +592,7 @@ public abstract class WorkLocation extends UnitLocation
      * @return The <code>Player</code> controlling this
      *         {@link Ownable}.
      */
+    @Override
     public Player getOwner() {
         return colony.getOwner();
     }
@@ -605,6 +607,7 @@ public abstract class WorkLocation extends UnitLocation
      * @exception UnsupportedOperationException is always thrown by
      *     this method.
      */
+    @Override
     public void setOwner(Player p) {
         throw new UnsupportedOperationException();
     }

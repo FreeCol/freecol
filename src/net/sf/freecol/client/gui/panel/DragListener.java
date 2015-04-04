@@ -68,6 +68,7 @@ public final class DragListener extends MouseAdapter {
      *
      * @param e The event that holds the information about the mouse click.
      */
+    @Override
     public void mousePressed(MouseEvent e) {
         JComponent comp = (JComponent)e.getSource();
         // Does not work on some platforms:

@@ -104,6 +104,7 @@ public final class ErrorPanel extends FreeColPanel {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         if (SHOW.equals(command)) {

@@ -211,6 +211,7 @@ public final class MapEditorController {
                         freeColClient.getFreeColServer()
                             .saveMapEditorGame(file, thumb);
                         SwingUtilities.invokeLater(new Runnable() {
+                                @Override
                                 public void run() {
                                     gui.closeStatusPanel();
                                     gui.requestFocusInWindow();
@@ -218,6 +219,7 @@ public final class MapEditorController {
                             });
                     } catch (IOException e) {
                         SwingUtilities.invokeLater(new Runnable() {
+                                @Override
                                 public void run() {
                                     gui.showErrorMessage("couldNotSaveGame");
                                 }
@@ -276,6 +278,7 @@ public final class MapEditorController {
                 this.message = message;
             }
 
+            @Override
             public void run() {
                 gui.closeMenus();
                 gui.showErrorMessage(message);
@@ -285,6 +288,7 @@ public final class MapEditorController {
         gui.showStatusPanel(Messages.message("status.loadingGame"));
 
         Runnable loadGameJob = new Runnable() {
+                @Override
                 public void run() {
                     FreeColServer freeColServer
                         = freeColClient.getFreeColServer();
@@ -295,6 +299,7 @@ public final class MapEditorController {
                         freeColClient.setGame(game);
                         requireNativeNations(game);
                         SwingUtilities.invokeLater(new Runnable() {
+                            @Override
                                 public void run() {
                                     gui.closeStatusPanel();
                                     gui.setFocus(freeColClient.getGame()
@@ -323,6 +328,7 @@ public final class MapEditorController {
 
     private void reloadMainPanel () {
         SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     gui.closeMainPanel();
                     gui.showMainPanel(null);

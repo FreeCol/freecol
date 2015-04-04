@@ -65,6 +65,7 @@ public final class TradeRoutePanel extends FreeColPanel {
     /** Compare trade routes by name. */
     private static final Comparator<TradeRoute> tradeRouteComparator
         = new Comparator<TradeRoute>() {
+            @Override
             public int compare(TradeRoute r1, TradeRoute r2) {
                 return r1.getName().compareTo(r2.getName());
             }
@@ -107,11 +108,13 @@ public final class TradeRoutePanel extends FreeColPanel {
         this.unit = unit;
         this.tradeRoutes = new JList<>(listModel);
         this.tradeRoutes.addListSelectionListener(new ListSelectionListener() {
+                @Override
                 public void valueChanged(ListSelectionEvent e) {
                     updateButtons();
                 }
             });
         this.tradeRoutes.setCellRenderer(new DefaultListCellRenderer() {
+                @Override
                 public Component getListCellRendererComponent(JList list,
                     Object value, int index, boolean selected, boolean focus) {
                     Component ret = super.getListCellRendererComponent(list,
@@ -138,6 +141,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         this.newRouteButton = GUI.localizedButton("tradeRoutePanel.newRoute");
         GUI.localizeToolTip(this.newRouteButton, "tradeRoutePanel.new.tooltip");
         this.newRouteButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     newRoute();
                 }
@@ -146,12 +150,14 @@ public final class TradeRoutePanel extends FreeColPanel {
         this.editRouteButton = GUI.localizedButton("tradeRoutePanel.editRoute");
         GUI.localizeToolTip(this.editRouteButton, "tradeRoutePanel.edit.tooltip");
         this.editRouteButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     final TradeRoute selected
                         = tradeRoutes.getSelectedValue();
                     final String name = selected.getName();
                     getGUI().showTradeRouteInputPanel(selected,
                         new Runnable() {
+                        @Override
                             public void run() {
                                 StringTemplate template = null;
                                 if (selected.getName() == null) { // Cancelled
@@ -170,6 +176,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         this.deleteRouteButton = GUI.localizedButton("tradeRoutePanel.deleteRoute");
         GUI.localizeToolTip(this.deleteRouteButton, "tradeRoutePanel.delete.tooltip");
         this.deleteRouteButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     TradeRoute route = getRoute();
                     if (route != null) {
@@ -237,6 +244,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         final TradeRoute newRoute = igc().getNewTradeRoute(player);
         getGUI().showTradeRouteInputPanel(newRoute,
             new Runnable() {
+                @Override
                 public void run() {
                     StringTemplate template = null;
                     if (newRoute.getName() == null) { // Cancelled

@@ -124,6 +124,7 @@ final class ReceivingThread extends Thread {
          * @see #read(byte[], int, int)
          * @exception IOException is thrown by the underlying read.
          */
+        @Override
         public int read() throws IOException {
             if (this.wait) return -1;
 
@@ -153,6 +154,7 @@ final class ReceivingThread extends Thread {
          * @return The actual number of bytes read, or -1 if the 
          *     message has ended ({@link #END_OF_STREAM} was encountered).
          */
+        @Override
         public int read(byte[] b, int off, int len) throws IOException {
             if (this.wait) return -1;
 
@@ -330,6 +332,7 @@ final class ReceivingThread extends Thread {
      * invoked when the thread starts and the thread will stop when
      * this method returns.
      */
+    @Override
     public void run() {
         int timesFailed = 0;
 

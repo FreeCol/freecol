@@ -101,6 +101,7 @@ public class FreeColImageBorder extends AbstractBorder {
      * @param c The <code>Component</code> having the border.
      * @return The <code>Insets</code>.
      */    
+    @Override
     public Insets getBorderInsets(Component c) {
         return getBorderInsets(c, null);
     }
@@ -113,6 +114,7 @@ public class FreeColImageBorder extends AbstractBorder {
      * @return The given instance of <code>Insets</code> if not
      *      <code>null</code>, or a new instance otherwise.
      */
+    @Override
     public Insets getBorderInsets(Component c, Insets insets) {        
         int top = Math.max(Math.max(getHeight(topImage), getHeight(topLeftCornerImage)), getHeight(topRightCornerImage));
         int left = Math.max(Math.max(getWidth(leftImage), getWidth(topLeftCornerImage)), getWidth(bottomLeftCornerImage));
@@ -171,6 +173,7 @@ public class FreeColImageBorder extends AbstractBorder {
      * @param width The width of the border.
      * @param height The height of the border.
      */
+    @Override
     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
         Insets insets = getBorderInsets(c);
         Graphics2D g2 = (Graphics2D) g;

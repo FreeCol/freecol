@@ -158,6 +158,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<AbstractGoods> getConsumedGoods() {
         T current = getCurrentlyBuilding();
         return (current == null) ? new ArrayList<AbstractGoods>()
@@ -207,6 +208,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
      *
      * @return an <code>int</code> value
      */
+    @Override
     public int getPriority() {
         return priority;
     }
@@ -225,6 +227,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     * @param id The object identifier.
     * @return a <code>boolean</code> value
     */
+    @Override
     public boolean hasAbility(String id) {
         return Ability.CONSUME_ALL_OR_NOTHING.equals(id);
     }
@@ -232,6 +235,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<Modifier> getModifiers(String id) {
         return Collections.<Modifier>emptySet();
     }

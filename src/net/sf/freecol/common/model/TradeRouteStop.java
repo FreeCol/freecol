@@ -211,6 +211,7 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getGoodsCount(GoodsType goodsType) {
         return (location instanceof TradeLocation)
             ? ((TradeLocation)location).getGoodsCount(goodsType)
@@ -220,6 +221,7 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getExportAmount(GoodsType goodsType, int turns) {
         return (location instanceof TradeLocation)
             ? ((TradeLocation)location).getExportAmount(goodsType, turns)
@@ -229,6 +231,7 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImportAmount(GoodsType goodsType, int turns) {
         return (location instanceof TradeLocation)
             ? ((TradeLocation)location).getImportAmount(goodsType, turns)
@@ -324,6 +327,7 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
      *
      * @return What getXMLElementTagName does.
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

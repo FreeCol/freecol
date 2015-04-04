@@ -31,6 +31,7 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class FontTest extends FreeColTestCase {
 
     private static FileFilter ttfFilter = new FileFilter() {
+            @Override
             public boolean accept(File pathname) {
                 return pathname.getName().endsWith(".ttf");
             }

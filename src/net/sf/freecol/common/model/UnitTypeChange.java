@@ -267,6 +267,7 @@ public class UnitTypeChange extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // UnitTypeChange do not have ids, no super.readAttributes().
         // However, they might in future.
@@ -336,6 +337,7 @@ public class UnitTypeChange extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

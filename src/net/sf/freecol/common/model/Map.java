@@ -278,6 +278,7 @@ public class Map extends FreeColGameObject implements Location {
         /**
          * {@inheritDoc}
          */
+        @Override
         public String getNameKey() {
             return "direction." + this;
         }
@@ -922,6 +923,7 @@ public class Map extends FreeColGameObject implements Location {
     private SearchHeuristic getManhattenHeuristic(final Tile endTile) {
         return new SearchHeuristic() {
             // Manhatten distance to the end tile.
+            @Override
             public int getValue(Tile tile) {
                 return tile.getDistanceTo(endTile);
             }
@@ -1595,6 +1597,7 @@ public class Map extends FreeColGameObject implements Location {
         final HashMap<String, Integer> f = new HashMap<>();
         final PriorityQueue<PathNode> openMapQueue = new PriorityQueue<>(1024,
                 new Comparator<PathNode>() {
+                    @Override
                     public int compare(PathNode p1, PathNode p2) {
                         return (f.get(p1.getLocation().getId()).intValue()
                             - f.get(p2.getLocation().getId()).intValue());
@@ -2004,6 +2007,7 @@ public class Map extends FreeColGameObject implements Location {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean hasNext() {
             return x != UNDEFINED && y != UNDEFINED;
         }
@@ -2056,6 +2060,7 @@ public class Map extends FreeColGameObject implements Location {
                                          final boolean isFilled,
                                          final int radius) {
         return new Iterable<Tile>() {
+            @Override
             public Iterator<Tile> iterator() {
                 return getCircleIterator(center, isFilled, radius);
             }
@@ -2129,6 +2134,7 @@ public class Map extends FreeColGameObject implements Location {
      */
     public Iterable<Tile> getAllTiles() {
         return new Iterable<Tile>() {
+            @Override
             public Iterator<Tile> iterator() {
                 return new WholeMapIterator();
             }
@@ -2457,6 +2463,7 @@ public class Map extends FreeColGameObject implements Location {
      *
      * @return Null.
      */
+    @Override
     public Tile getTile() {
         return null;
     }
@@ -2464,6 +2471,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLocationLabel() {
         return StringTemplate.key("NewWorld");
     }
@@ -2471,6 +2479,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getLocationLabelFor(Player player) {
         String name = player.getNewLandName();
         return (name == null) ? getLocationLabel() : StringTemplate.name(name);
@@ -2479,6 +2488,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean add(Locatable locatable) {
         // Used to add units to their entry location.  Dropped as this
         // is handled explicitly in the server.
@@ -2491,6 +2501,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             Tile tile = locatable.getTile();
@@ -2502,6 +2513,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(Locatable locatable) {
         return locatable instanceof Unit
             && locatable.getLocation() != null
@@ -2511,6 +2523,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean canAdd(Locatable locatable) {
         return locatable instanceof Unit;
     }
@@ -2518,6 +2531,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getUnitCount() {
         return -1;
     }
@@ -2525,6 +2539,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Unit> getUnitList() {
         return Collections.<Unit>emptyList();
     }
@@ -2532,6 +2547,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Iterator<Unit> getUnitIterator() {
         return getUnitList().iterator();
     }
@@ -2539,6 +2555,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public GoodsContainer getGoodsContainer() {
         return null; // Obviously irrelevant for a Map.
     }
@@ -2546,6 +2563,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Settlement getSettlement() {
         return null; // Obviously irrelevant for a Map.
     }
@@ -2553,6 +2571,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Colony getColony() {
         return null; // Obviously irrelevant for a Map.
     }
@@ -2560,6 +2579,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IndianSettlement getIndianSettlement() {
         return null; // Obviously irrelevant for a Map.
     }
@@ -2567,6 +2587,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toShortString() {
         return "Map";
     }
@@ -2605,6 +2626,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
@@ -2622,6 +2644,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
@@ -2735,6 +2758,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

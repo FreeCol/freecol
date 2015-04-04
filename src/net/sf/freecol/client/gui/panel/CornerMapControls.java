@@ -175,6 +175,7 @@ public final class CornerMapControls extends MapControls {
      *
      * @param canvas The parent <code>Canvas</code>.
      */
+    @Override
     public void addToComponent(Canvas canvas) {
         if (freeColClient.getGame() == null
             || freeColClient.getGame().getMap() == null) {
@@ -230,6 +231,7 @@ public final class CornerMapControls extends MapControls {
      *
      * @return True if the map controls are showing.
      */
+    @Override
     public boolean isShowing() {
         return infoPanel.getParent() != null;
     }
@@ -239,6 +241,7 @@ public final class CornerMapControls extends MapControls {
      *
      * @param canvas The parent <code>Canvas</code>.
      */
+    @Override
     public void removeFromComponent(Canvas canvas) {
         canvas.removeFromCanvas(infoPanel);
         canvas.removeFromCanvas(miniMapPanel);
@@ -249,6 +252,7 @@ public final class CornerMapControls extends MapControls {
         }
     }
 
+    @Override
     public void repaint() {
         miniMapPanel.repaint();
     }

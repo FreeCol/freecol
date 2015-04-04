@@ -427,6 +427,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNameKey() {
         return (type == null) ? null : type.getNameKey();
     }
@@ -437,6 +438,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final int getZIndex() {
         return type.getZIndex();
     }
@@ -444,6 +446,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isTileTypeAllowed(TileType tileType) {
         return type.isTileTypeAllowed(tileType);
     }
@@ -451,6 +454,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int applyBonus(GoodsType goodsType, UnitType unitType,
                           int potential) {
         // Applies the production bonuses of this tile improvement to
@@ -472,6 +476,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         // TileImprovements provide bonuses, but do *not* allow a tile
         // that can not produce some goods to produce due to the bonus.
@@ -481,6 +486,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
         if (goodsType != null) {
@@ -497,6 +503,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isNatural() {
         return type.isNatural();
     }
@@ -504,6 +511,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isComplete() {
         return turnsToComplete <= 0;
     }
@@ -666,6 +674,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

@@ -100,6 +100,7 @@ public class FreeColComboBoxRenderer<T>
      * @param hasFocus <code>false</code> if the given list cell has the focus.
      * @return The <code>ListCellRenderer</code>
      */
+    @Override
     public Component getListCellRendererComponent(JList<? extends T> list,
                                                   T value, int index,
                                                   boolean isSelected,
@@ -161,6 +162,7 @@ public class FreeColComboBoxRenderer<T>
             setOpaque(false);
         }
 
+        @Override
         public void paintComponent(Graphics g) {
             Graphics2D g2d = (Graphics2D) g;
             Composite oldComposite = g2d.getComposite();

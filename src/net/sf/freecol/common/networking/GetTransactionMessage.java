@@ -110,6 +110,7 @@ public class GetTransactionMessage extends DOMMessage {
      *
      * @return The XML representation of this message.
      */
+    @Override
     public Element toXMLElement() {
         return createMessage(getXMLElementTagName(),
             "unit", unitId,

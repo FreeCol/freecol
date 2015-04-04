@@ -68,6 +68,7 @@ public final class LoadDialog extends FreeColDialog<File> {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setFileHidingEnabled(false);
         fileChooser.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     final String cmd = event.getActionCommand();
                     File value = (JFileChooser.APPROVE_SELECTION.equals(cmd))
@@ -85,6 +86,7 @@ public final class LoadDialog extends FreeColDialog<File> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public File getResponse() {
         File value = (File)getValue();
         return (value == cancelFile) ? null : value;

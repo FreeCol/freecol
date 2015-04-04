@@ -647,6 +647,7 @@ public final class UnitType extends BuildableType implements Consumer {
      *
      * @return The goods consumed by this unit type.
      */
+    @Override
     public List<AbstractGoods> getConsumedGoods() {
         List<AbstractGoods> result = new ArrayList<>();
         if (consumption != null) {
@@ -665,6 +666,7 @@ public final class UnitType extends BuildableType implements Consumer {
      *
      * @return The priority of this unit type.
      */
+    @Override
     public int getPriority() {
         // FIXME: make this configurable
         return UNIT_PRIORITY;
@@ -979,6 +981,7 @@ public final class UnitType extends BuildableType implements Consumer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

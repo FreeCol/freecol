@@ -473,6 +473,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Player getOwner() {
         return (parent instanceof Ownable) ? ((Ownable)parent).getOwner()
             : null;
@@ -481,6 +482,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setOwner(Player p) {
         throw new UnsupportedOperationException("Can not set GoodsContainer owner");
     }
@@ -612,6 +614,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append("[").append(getId()).append(" [");
@@ -634,6 +637,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

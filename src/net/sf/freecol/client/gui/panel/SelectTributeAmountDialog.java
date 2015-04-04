@@ -75,6 +75,7 @@ public final class SelectTributeAmountDialog
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Integer getInputValue() {
         int result;
         try {

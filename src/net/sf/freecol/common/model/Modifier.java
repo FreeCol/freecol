@@ -659,6 +659,7 @@ public class Modifier extends Feature {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

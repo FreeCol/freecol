@@ -70,6 +70,7 @@ public final class PreGameInputHandler extends InputHandler {
      * @param element The root <code>Element</code> of the message.
      * @return The reply.
      */
+    @Override
     public synchronized Element handle(Connection connection,
                                        Element element) {
         String type = (element == null) ? "(null)" : element.getTagName();
@@ -285,6 +286,7 @@ public final class PreGameInputHandler extends InputHandler {
                     }
                     
                     SwingUtilities.invokeLater(new Runnable() {
+                            @Override
                             public void run() {
                                 getFreeColClient().getPreGameController()
                                     .startGame();

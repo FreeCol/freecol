@@ -137,6 +137,7 @@ public class WorkLocationPlan extends AIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

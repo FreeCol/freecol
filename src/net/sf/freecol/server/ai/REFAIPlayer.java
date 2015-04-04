@@ -101,6 +101,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
         // Implement Comparable<TargetTuple>
 
+        @Override
         public int compareTo(TargetTuple other) {
             double cmp = other.score - score;
             return (cmp < 0.0) ? -1 : (cmp > 0.0) ? 1 : 0;
@@ -412,8 +413,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         // for the targets.
         final List<Unit> rebelNavy = new ArrayList<>();
         final GoalDecider navyGD = new GoalDecider() {
+                @Override
                 public PathNode getGoal() { return null; }
+                @Override
                 public boolean hasSubGoals() { return true; }
+                @Override
                 public boolean check(Unit unit, PathNode pathNode) {
                     Tile tile = pathNode.getTile();
                     if (tile != null && !tile.isEmpty()
@@ -499,6 +503,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         if (transports.size() < nt) {
             // Sort by longest distance to target
             Collections.sort(naval, new Comparator<AIUnit>() {
+                    @Override
                     public int compare(AIUnit a1, AIUnit a2) {
                         int d1 = a1.getMission(PrivateerMission.class)
                             .getDistanceToTarget();
@@ -813,6 +818,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 // Send transports to the idle ports, preferring the ones
                 // with the most units.
                 Collections.sort(idlePorts, new Comparator<Location>() {
+                        @Override
                         public int compare(Location l1, Location l2) {
                             return idlers.get(l1).size() - idlers.get(l2).size();
                         }
@@ -853,6 +859,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void startWorking() {
         final Player player = getPlayer();
         if (!player.isWorkForREF()) {
@@ -885,6 +892,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
                              int value) {
         if (value > 0) {

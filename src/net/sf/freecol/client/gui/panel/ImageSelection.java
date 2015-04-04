@@ -56,6 +56,7 @@ public final class ImageSelection implements Transferable {
      * @return The data that this Transferable represents, or null if
      *     the data is not of the given flavor.
      */
+    @Override
     public Object getTransferData(DataFlavor flavor) {
         if (isDataFlavorSupported(flavor)) {
             return label;
@@ -68,6 +69,7 @@ public final class ImageSelection implements Transferable {
      *
      * @return The flavors that are supported by this Transferable.
      */
+    @Override
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[] { DefaultTransferHandler.flavor };
     }
@@ -79,6 +81,7 @@ public final class ImageSelection implements Transferable {
      * @return True if the given data flavor is supported by this Transferable.
      * 'false' otherwise.
      */
+    @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
         return flavor.equals(DefaultTransferHandler.flavor);
     }

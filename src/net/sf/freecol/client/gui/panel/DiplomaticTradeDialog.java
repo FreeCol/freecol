@@ -96,6 +96,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             agreement.remove(item);
             updateDialog();
@@ -188,6 +189,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
             if (ADD.equals(command)) {
@@ -259,6 +261,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
             if (ADD.equals(command)) {
@@ -380,6 +383,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
             if (ADD.equals(command)) {
@@ -493,6 +497,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
             if (ADD.equals(command)) {
@@ -611,6 +616,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
             if (ADD.equals(command)) {
@@ -725,6 +731,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
             if (ADD.equals(command)) {

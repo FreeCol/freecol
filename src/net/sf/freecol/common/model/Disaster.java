@@ -217,6 +217,7 @@ public class Disaster extends FreeColGameObjectType {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

@@ -195,6 +195,7 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Locatable getTransportLocatable() {
         return getGoods();
     }
@@ -202,6 +203,7 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTransportSource() {
         return (goods == null) ? null : goods.getLocation();
     }
@@ -209,6 +211,7 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getTransportDestination() {
         return this.destination;
     }
@@ -216,6 +219,7 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTransportDestination(Location destination) {
         this.destination = destination;
     }
@@ -223,6 +227,7 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public PathNode getDeliveryPath(Unit carrier, Location dst) {
         if (dst == null) dst = upLoc(getTransportDestination());
 
@@ -236,6 +241,7 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public PathNode getIntermediatePath(Unit carrier, Location dst) {
         return null; // NYI
     }
@@ -243,6 +249,7 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean carriableBy(Unit carrier) {
         return carrier.couldCarry(getGoods());
     }
@@ -250,6 +257,7 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean canMove() {
         return false;
     }
@@ -257,6 +265,7 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean leaveTransport() {
         return leaveTransport(null);
     }
@@ -264,6 +273,7 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean leaveTransport(Direction direction) {
         if (direction != null) return false;
         return leaveTransport(goods.getAmount());
@@ -272,6 +282,7 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean joinTransport(Unit carrier, Direction direction) {
         if (direction != null) return false;
         final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
@@ -307,6 +318,7 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String invalidReason() {
         String reason = Mission.invalidTransportableReason(this);
         Settlement s;
@@ -466,6 +478,7 @@ public class AIGoods extends TransportableAIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

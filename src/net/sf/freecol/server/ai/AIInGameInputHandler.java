@@ -129,6 +129,7 @@ public final class AIInGameInputHandler implements MessageHandler {
      * @param element The root element of the message.
      * @return The reply.
      */
+    @Override
     public synchronized Element handle(Connection connection, Element element) {
         if (element == null) return null;
         final String tag = element.getTagName();
@@ -324,6 +325,7 @@ public final class AIInGameInputHandler implements MessageHandler {
         Unit unit = message.getUnit(game);
         List<Goods> goods = message.getGoods();
         Collections.sort(goods, new Comparator<Goods>() {
+                @Override
                 public int compare(Goods g1, Goods g2) {
                     int p1 = market.getPaidForSale(g1.getType())
                         * g1.getAmount();
@@ -453,6 +455,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             String nam = FreeCol.SERVER_THREAD + "AIPlayer ("
                 + serverPlayer.getName() + ")";
             new Thread(nam) {
+                @Override
                 public void run() {
                     try {
                         getAIPlayer().startWorking();

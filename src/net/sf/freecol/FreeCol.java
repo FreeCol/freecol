@@ -85,6 +85,7 @@ public final class FreeCol {
     /** A file filter to select the saved game files. */
     public static final FileFilter freeColSaveFileFilter
         = new FileFilter() {
+                @Override
                 public boolean accept(File f) {
                     return f.isFile()
                         && f.getName().endsWith(FREECOL_SAVE_EXTENSION)
@@ -268,6 +269,7 @@ public final class FreeCol {
             e.printStackTrace();
         }
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+                @Override
                 public void uncaughtException(Thread thread, Throwable e) {
                     baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
                 }
@@ -1217,6 +1219,7 @@ public final class FreeCol {
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
                 public void run() {
                     freeColServer.getController().shutdown();
                 }

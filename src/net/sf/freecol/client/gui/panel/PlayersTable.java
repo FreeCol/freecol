@@ -131,6 +131,7 @@ public final class PlayersTable extends JTable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component getTableCellRendererComponent(JTable table,
             Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
@@ -179,6 +180,7 @@ public final class PlayersTable extends JTable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component getTableCellRendererComponent(JTable table,
             Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
@@ -200,6 +202,7 @@ public final class PlayersTable extends JTable {
         private JComboBox activeBox;
 
         private final ActionListener listener = new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     stopCellEditing();
                 }
@@ -219,6 +222,7 @@ public final class PlayersTable extends JTable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component getTableCellEditorComponent(JTable table,
             Object value, boolean isSelected, int row, int column) {
             NationType nationType = ((Nation) getValueAt(row, NATION_COLUMN))
@@ -229,6 +233,7 @@ public final class PlayersTable extends JTable {
             return activeBox;
         }
 
+        @Override
         public Object getCellEditorValue() {
             return activeBox.getSelectedItem();
         }
@@ -246,12 +251,14 @@ public final class PlayersTable extends JTable {
             this.renderer = renderer;
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
             int col = header.columnAtPoint(e.getPoint());
             renderer.setPressedColumn(col);
             header.repaint();
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             renderer.setPressedColumn(HeaderRenderer.NO_COLUMN);
             header.repaint();
@@ -274,6 +281,7 @@ public final class PlayersTable extends JTable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component getTableCellRendererComponent(JTable table,
             Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
@@ -298,6 +306,7 @@ public final class PlayersTable extends JTable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component getTableCellRendererComponent(JTable table,
             Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
@@ -317,6 +326,7 @@ public final class PlayersTable extends JTable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component getListCellRendererComponent(JList<? extends NationState> list,
                                                       NationState value,
                                                       int index,
@@ -344,6 +354,7 @@ public final class PlayersTable extends JTable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component getTableCellRendererComponent(JTable table,
             Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
@@ -375,6 +386,7 @@ public final class PlayersTable extends JTable {
 
         public PlayerCellEditor() {
             button.addActionListener(new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         fireEditingStopped();
                     }
@@ -385,11 +397,13 @@ public final class PlayersTable extends JTable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Component getTableCellEditorComponent(JTable table,
             Object value, boolean isSelected, int row, int column) {
             return button;
         }
 
+        @Override
         public Object getCellEditorValue() {
             return Boolean.TRUE;
         }
@@ -454,6 +468,7 @@ public final class PlayersTable extends JTable {
          * @param column The column to return the class of.
          * @return The <code>Class</code> of the objects in the given column.
          */
+        @Override
         public Class<?> getColumnClass(int column) {
             switch (column) {
             case NATION_COLUMN:
@@ -475,6 +490,7 @@ public final class PlayersTable extends JTable {
          *
          * @return The number of columns.
          */
+        @Override
         public int getColumnCount() {
             return columnNames.length;
         }
@@ -485,6 +501,7 @@ public final class PlayersTable extends JTable {
          * @param column The column number to look up.
          * @return The name of the specified column.
          */
+        @Override
         public String getColumnName(int column) {
             return columnNames[column];
         }
@@ -494,6 +511,7 @@ public final class PlayersTable extends JTable {
          *
          * @return The number of rows.
          */
+        @Override
         public int getRowCount() {
             return nations.size();
         }
@@ -505,6 +523,7 @@ public final class PlayersTable extends JTable {
          * @param column The requested column.
          * @return The value at the requested location.
          */
+        @Override
         public Object getValueAt(int row, int column) {
             if (row >= 0 && row < getRowCount()
                 && column >= 0 && column < getColumnCount()) {
@@ -533,6 +552,7 @@ public final class PlayersTable extends JTable {
          * @param column The specified column.
          * @return True if the specified cell is editable.
          */
+        @Override
         public boolean isCellEditable(int row, int column) {
             if (row >= 0 && row < getRowCount()) {
                 Nation nation = nations.get(row);
@@ -566,6 +586,7 @@ public final class PlayersTable extends JTable {
          * @param row The specified row.
          * @param column The specified column.
          */
+        @Override
         public void setValueAt(Object value, int row, int column) {
             if (row >= 0 && row < getRowCount()
                 && column > 0 && column < getColumnCount()) {
@@ -638,6 +659,7 @@ public final class PlayersTable extends JTable {
 
         JButton nationButton = GUI.localizedButton("nation");
         nationButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     gui.showColopediaPanel(PanelType.NATIONS.toString());
                 }
@@ -646,6 +668,7 @@ public final class PlayersTable extends JTable {
         JLabel availabilityLabel = GUI.localizedLabel("availability");
         JButton advantageButton = GUI.localizedButton("advantage");
         advantageButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     gui.showColopediaPanel(PanelType.NATION_TYPES.toString());
                 }

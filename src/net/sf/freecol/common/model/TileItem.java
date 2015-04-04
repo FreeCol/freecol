@@ -149,6 +149,7 @@ public abstract class TileItem extends FreeColGameObject
     /**
      * {@inheritDoc}
      */
+    @Override
     public Location getLocation() {
         return tile;
     }
@@ -156,6 +157,7 @@ public abstract class TileItem extends FreeColGameObject
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean setLocation(Location newLocation) {
         if (newLocation == null || newLocation instanceof Tile) {
             tile = (Tile)newLocation;
@@ -167,6 +169,7 @@ public abstract class TileItem extends FreeColGameObject
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isInEurope() {
         return false;
     }
@@ -174,6 +177,7 @@ public abstract class TileItem extends FreeColGameObject
     /**
      * {@inheritDoc}
      */
+    @Override
     public Tile getTile() {
         return tile;
     }
@@ -181,6 +185,7 @@ public abstract class TileItem extends FreeColGameObject
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getSpaceTaken() {
         return 0;
     }
@@ -190,5 +195,6 @@ public abstract class TileItem extends FreeColGameObject
     /**
      * {@inheritDoc}
      */
+    @Override
     public abstract String getNameKey();
 }

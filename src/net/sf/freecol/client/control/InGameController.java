@@ -243,6 +243,7 @@ public final class InGameController implements NetworkConstants {
      */
     private void updateControls() {
         SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     freeColClient.updateActions();
                     gui.updateMenuBar();
@@ -606,12 +607,14 @@ public final class InGameController implements NetworkConstants {
             if (endOfTurn) {
                 turnReportMessages.addAll(messages);
                 uiTask = new Runnable() {
+                        @Override
                         public void run() {
                             displayTurnReportMessages();
                         }
                     };
             } else {
                 uiTask = new Runnable() {
+                        @Override
                         public void run() {
                             gui.showModelMessages(messages);
                         }
