@@ -422,10 +422,6 @@ public class GUI {
         return windowed;
     }
 
-    public Rectangle getWindowBounds() {
-        return windowBounds;
-    }
-
 
     // Non-trivial public routines.
 
@@ -479,35 +475,36 @@ public class GUI {
     public void changeWindowedMode(boolean windowed) {
         // Clean up the old frame
         JMenuBar menuBar = null;
-        if (this.frame != null) {
-            menuBar = this.frame.getJMenuBar();
-            if (this.frame instanceof WindowedFrame) {
-                this.windowBounds = this.frame.getBounds();
+        if (frame != null) {
+            menuBar = frame.getJMenuBar();
+            if (frame instanceof WindowedFrame) {
+                windowBounds = frame.getBounds();
             }
-            this.frame.setVisible(false);
-            this.frame.dispose();
+            frame.setVisible(false);
+            frame.dispose();
         }
         this.windowed = windowed;
 
         // User might have moved window to new screen in a
         // multi-screen setup, so make this.gd point to the current screen.
-        this.frame = (windowed) ? new WindowedFrame(freeColClient, graphicsDevice)
+        frame = windowed
+            ? new WindowedFrame(freeColClient, graphicsDevice)
             : new FullScreenFrame(freeColClient, graphicsDevice);
-        this.frame.setJMenuBar(menuBar);
-        this.frame.setCanvas(canvas);
-        this.frame.updateBounds(getWindowBounds());
+        frame.setJMenuBar(menuBar);
+        frame.setCanvas(canvas);
+        frame.updateBounds(windowBounds);
         if (windowed) {
-            this.frame.addComponentListener(new ComponentAdapter() {
-                    @Override
-                    public void componentResized(ComponentEvent e) {
-                        logger.info("Window size changes to " + canvas.getSize());
-                    }
-                });
+            frame.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    logger.info("Window size changes to " + canvas.getSize());
+                }
+            });
         }
 
         mapViewer.forceReposition();
         canvas.updateSizes();
-        this.frame.setVisible(true);
+        frame.setVisible(true);
     }
 
     /**
