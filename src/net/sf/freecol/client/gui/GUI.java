@@ -422,10 +422,6 @@ public class GUI {
         return windowed;
     }
 
-    public void setWindowed(boolean windowed) {
-        this.windowed = windowed;
-    }
-
     public Rectangle getWindowBounds() {
         return windowBounds;
     }
@@ -491,7 +487,7 @@ public class GUI {
             this.frame.setVisible(false);
             this.frame.dispose();
         }
-        setWindowed(windowed);
+        this.windowed = windowed;
 
         // User might have moved window to new screen in a
         // multi-screen setup, so make this.gd point to the current screen.
@@ -810,17 +806,17 @@ public class GUI {
         Dimension windowSize;
         if (desiredWindowSize == null) {
             if(graphicsDevice.isFullScreenSupported()) {
-                setWindowed(false);
+                windowed = false;
                 windowSize = determineFullScreenSize(graphicsDevice);
                 logger.info("Full screen window size is " + windowSize);
             } else {
-                setWindowed(true);
+                windowed = true;
                 windowSize = new Dimension(-1, -1);
                 logger.warning("Full screen not supported.");
                 System.err.println(Messages.message("client.fullScreen"));
             }
         } else {
-            setWindowed(true);
+            windowed = true;
             windowSize = desiredWindowSize;
             logger.info("Desired window size is " + windowSize);
         }
@@ -832,7 +828,7 @@ public class GUI {
         this.canvas = new Canvas(freeColClient, windowSize, mapViewer);
         this.colonyTileMapViewer = new MapViewer(freeColClient, windowSize);
 
-        changeWindowedMode(isWindowed());
+        changeWindowedMode(windowed);
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
 
         // Now that there is a canvas, prepare for language changes.
