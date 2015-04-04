@@ -513,22 +513,24 @@ public class GUI {
     public BufferedImage createMiniMapThumbNail() {
         MiniMap miniMap = new MiniMap(freeColClient);
         miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
-        int width = freeColClient.getGame().getMap().getWidth()
-            * MiniMap.MAX_TILE_SIZE + MiniMap.MAX_TILE_SIZE/2;
-        int height = freeColClient.getGame().getMap().getHeight()
-            * MiniMap.MAX_TILE_SIZE / 4;
-        BufferedImage image = new BufferedImage(width, height,
-                                                BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = image.createGraphics();
-        miniMap.paintMap(g2d);
+        Game game = freeColClient.getGame();
+        int width = game.getMap().getWidth() * MiniMap.MAX_TILE_SIZE
+            + MiniMap.MAX_TILE_SIZE / 2;
+        int height = game.getMap().getHeight() * MiniMap.MAX_TILE_SIZE / 4;
+        BufferedImage image = new BufferedImage(
+            width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g1 = image.createGraphics();
+        miniMap.paintMap(g1);
+        g1.dispose();
 
         // FIXME: this can probably done more efficiently by applying
         // a suitable AffineTransform to the Graphics2D
         int scaledWidth = Math.min((int)((64 * width) / (float)height), 128);
         BufferedImage scaledImage = new BufferedImage(scaledWidth, 64,
             BufferedImage.TYPE_INT_ARGB);
-        scaledImage.createGraphics().drawImage(image, 0, 0,
-            scaledWidth, 64, null);
+        Graphics2D g2 = scaledImage.createGraphics();
+        g2.drawImage(image, 0, 0, scaledWidth, 64, null);
+        g2.dispose();
         return scaledImage;
     }
 
