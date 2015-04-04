@@ -192,13 +192,18 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         @Override
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
-            if (ADD.equals(command)) {
-                DiplomaticTradeDialog.this.addColonyTradeItem(source,
-                    (Colony)colonyBox.getSelectedItem());
-            } else if (CLEAR.equals(command)) {
-                DiplomaticTradeDialog.this.removeTradeItems(ColonyTradeItem.class);
-            } else {
-                logger.warning("Bad command: " + command);
+            if (null != command) switch (command) {
+                case ADD:
+                    DiplomaticTradeDialog.this.addColonyTradeItem(source,
+                            (Colony)colonyBox.getSelectedItem());
+                    break;
+                case CLEAR:
+                    DiplomaticTradeDialog.this
+                            .removeTradeItems(ColonyTradeItem.class);
+                    break;
+                default:
+                    logger.warning("Bad command: " + command);
+                    break;
             }
         }
     }
@@ -264,13 +269,18 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         @Override
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
-            if (ADD.equals(command)) {
-                int amount = ((Integer)spinner.getValue()).intValue();
-                DiplomaticTradeDialog.this.addGoldTradeItem(source, amount);
-            } else if (CLEAR.equals(command)) {
-                DiplomaticTradeDialog.this.removeTradeItems(GoldTradeItem.class);
-            } else {
-                logger.warning("Bad command: " + command);
+            if (null != command) switch (command) {
+                case ADD:
+                    int amount = ((Integer)spinner.getValue()).intValue();
+                    DiplomaticTradeDialog.this.addGoldTradeItem(source, amount);
+                    break;
+                case CLEAR:
+                    DiplomaticTradeDialog.this
+                            .removeTradeItems(GoldTradeItem.class);
+                    break;
+                default:
+                    logger.warning("Bad command: " + command);
+                    break;
             }
         }
     }
@@ -386,13 +396,18 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         @Override
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
-            if (ADD.equals(command)) {
-                DiplomaticTradeDialog.this.addGoodsTradeItem(source,
-                    (Goods)goodsBox.getSelectedItem());
-            } else if (CLEAR.equals(command)) {
-                DiplomaticTradeDialog.this.removeTradeItems(GoodsTradeItem.class);
-            } else {
-                logger.warning("Bad command: " + command);
+            if (null != command) switch (command) {
+                case ADD:
+                    DiplomaticTradeDialog.this.addGoodsTradeItem(source,
+                            (Goods)goodsBox.getSelectedItem());
+                    break;
+                case CLEAR:
+                    DiplomaticTradeDialog.this
+                            .removeTradeItems(GoodsTradeItem.class);
+                    break;
+                default:
+                    logger.warning("Bad command: " + command);
+                    break;
             }
         }
     }
@@ -500,16 +515,20 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         @Override
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
-            if (ADD.equals(command)) {
-                Player victim = (Player)victimBox.getSelectedItem();
-                if (victim != null) {
-                    DiplomaticTradeDialog.this.addInciteTradeItem(source, victim);
-                }
-            } else if (CLEAR.equals(command)) {
-                DiplomaticTradeDialog.this
-                    .removeTradeItems(InciteTradeItem.class);
-            } else {
-                logger.warning("Bad command: " + command);
+            if (null != command) switch (command) {
+                case ADD:
+                    Player victim = (Player)victimBox.getSelectedItem();
+                    if (victim != null) {
+                        DiplomaticTradeDialog.this
+                                .addInciteTradeItem(source, victim);
+                    }   break;
+                case CLEAR:
+                    DiplomaticTradeDialog.this
+                            .removeTradeItems(InciteTradeItem.class);
+                    break;
+                default:
+                    logger.warning("Bad command: " + command);
+                    break;
             }
         }
     }
@@ -619,13 +638,18 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         @Override
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
-            if (ADD.equals(command)) {
-                Stance stance = (Stance)stanceBox.getSelectedItem();
-                DiplomaticTradeDialog.this.addStanceTradeItem(stance);
-            } else if (CLEAR.equals(command)) {
-                DiplomaticTradeDialog.this.removeTradeItems(StanceTradeItem.class);
-            } else {
-                logger.warning("Bad command: " + command);
+            if (null != command) switch (command) {
+                case ADD:
+                    Stance stance = (Stance)stanceBox.getSelectedItem();
+                    DiplomaticTradeDialog.this.addStanceTradeItem(stance);
+                    break;
+                case CLEAR:
+                    DiplomaticTradeDialog.this
+                            .removeTradeItems(StanceTradeItem.class);
+                    break;
+                default:
+                    logger.warning("Bad command: " + command);
+                    break;
             }
         }
     }
@@ -734,13 +758,18 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         @Override
         public void actionPerformed(ActionEvent event) {
             final String command = event.getActionCommand();
-            if (ADD.equals(command)) {
-                DiplomaticTradeDialog.this.addUnitTradeItem(source,
-                    (Unit)unitBox.getSelectedItem());
-            } else if (CLEAR.equals(command)) {
-                DiplomaticTradeDialog.this.removeTradeItems(UnitTradeItem.class);
-            } else {
-                logger.warning("Bad command: " + command);
+            if (null != command) switch (command) {
+                case ADD:
+                    DiplomaticTradeDialog.this.addUnitTradeItem(source,
+                            (Unit)unitBox.getSelectedItem());
+                    break;
+                case CLEAR:
+                    DiplomaticTradeDialog.this
+                            .removeTradeItems(UnitTradeItem.class);
+                    break;
+                default:
+                    logger.warning("Bad command: " + command);
+                    break;
             }
         }
     }

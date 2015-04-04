@@ -786,23 +786,24 @@ public final class TradeRouteInputPanel extends FreeColPanel
     @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            if (!verifyNewTradeRoute()) return;
-            this.newRoute.setName(tradeRouteName.getText());
-            this.newRoute.clearStops();
-            for (int index = 0; index < this.stopListModel.getSize(); index++) {
-                this.newRoute.addStop(this.stopListModel.get(index));
-            }
-            this.newRoute.setSilent(this.messagesBox.isSelected());
-            // Return to TradeRoutePanel, which will add the route
-            // if needed, and it is valid.
-            super.actionPerformed(event);
-
-        } else if (CANCEL.equals(command)) {
-            cancelTradeRoute();
-
-        } else {
-            super.actionPerformed(event);
+        if (null != command) switch (command) {
+            case OK:
+                if (!verifyNewTradeRoute()) return;
+                this.newRoute.setName(tradeRouteName.getText());
+                this.newRoute.clearStops();
+                for (int index = 0; index < this.stopListModel.getSize(); index++) {
+                    this.newRoute.addStop(this.stopListModel.get(index));
+                }   this.newRoute.setSilent(this.messagesBox.isSelected());
+                // Return to TradeRoutePanel, which will add the route
+                // if needed, and it is valid.
+                super.actionPerformed(event);
+                break;
+            case CANCEL:
+                cancelTradeRoute();
+                break;
+            default:
+                super.actionPerformed(event);
+                break;
         }
     }
 

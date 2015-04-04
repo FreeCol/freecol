@@ -122,7 +122,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                     TradeRoute tradeRoute = (TradeRoute)value;
                     String name = tradeRoute.getName();
                     Integer n = TradeRoutePanel.this.counts.get(tradeRoute);
-                    if (n == null || n.intValue() <= 0) {
+                    if (n == null || n <= 0) {
                         setText(name);
                     } else {
                         setText(name + "  (" + n + ")");
@@ -157,7 +157,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                     final String name = selected.getName();
                     getGUI().showTradeRouteInputPanel(selected,
                         new Runnable() {
-                        @Override
+                            @Override
                             public void run() {
                                 StringTemplate template = null;
                                 if (selected.getName() == null) { // Cancelled
@@ -337,28 +337,27 @@ public final class TradeRoutePanel extends FreeColPanel {
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         final TradeRoute route = getRoute();
-        if (DEASSIGN.equals(command)) {
-            if (unit != null && route == unit.getTradeRoute()) {
-                igc().clearOrders(unit);
-            }
-            getGUI().removeFromCanvas(this);
-
-        } else if (OK.equals(command)) {
-            List<TradeRoute> routes = new ArrayList<>();
-            for (int index = 0; index < listModel.getSize(); index++) {
-                routes.add(listModel.getElementAt(index));
-            }
-            igc().setTradeRoutes(routes);
-            if (unit != null && route != null) {
-                igc().assignTradeRoute(unit, route);
-            }
-            super.actionPerformed(event);
-
-        } else if (CANCEL.equals(command)) {
-            getGUI().removeTradeRoutePanel(this);
-
-        } else {
-            super.actionPerformed(event);
+        if (null != command) switch (command) {
+            case DEASSIGN:
+                if (unit != null && route == unit.getTradeRoute()) {
+                    igc().clearOrders(unit);
+                }   getGUI().removeFromCanvas(this);
+                break;
+            case OK:
+                List<TradeRoute> routes = new ArrayList<>();
+                for (int index = 0; index < listModel.getSize(); index++) {
+                    routes.add(listModel.getElementAt(index));
+                }   igc().setTradeRoutes(routes);
+                if (unit != null && route != null) {
+                    igc().assignTradeRoute(unit, route);
+            }   super.actionPerformed(event);
+                break;
+            case CANCEL:
+                getGUI().removeTradeRoutePanel(this);
+                break;
+            default:
+                super.actionPerformed(event);
+                break;
         }
     }
 

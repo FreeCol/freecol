@@ -153,7 +153,8 @@ public class BuildingToolTip extends JToolTip {
 
         int diff = building.getUnitCapacity() - building.getUnitCount();
         for (int index = 0; index < diff; index++) {
-            add(new JLabel(new ImageIcon(ResourceManager.getImage("placeholder.image"))), "span 2");
+            add(new JLabel(new ImageIcon(ResourceManager
+                    .getImage("placeholder.image"))), "span 2");
         }
 
         int breedingNumber = (output == null) ? GoodsType.INFINITY
@@ -174,7 +175,7 @@ public class BuildingToolTip extends JToolTip {
             Collections.sort(modifiers);
             for (Modifier m : modifiers) {
                 JLabel[] mLabels = ModifierFormat.getModifierLabels(m, null,
-                                                                    game.getTurn());
+                        game.getTurn());
                 for (int i = 0; i < mLabels.length; i++) {
                     if (mLabels[i] != null) {
                         if (i == 0) {

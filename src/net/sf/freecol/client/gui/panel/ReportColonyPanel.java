@@ -943,7 +943,7 @@ public final class ReportColonyPanel extends ReportPanel
                 if (colony != null) {
                     getGUI().showColonyPanel(colony, null)
                         .addClosingCallback(new Runnable() {
-                        @Override
+                                @Override
                                 public void run() {
                                     updateCompactColonyPanel();
                                 }

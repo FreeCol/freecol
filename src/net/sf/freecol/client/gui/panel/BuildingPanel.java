@@ -220,8 +220,8 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     @Override
     public void paintComponent(Graphics g) {
         ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
-        g.drawImage(ImageLibrary.fadeImage(lib.getBuildingImage(building), 0.6f, 192.0f),
-                    0, 0, this);
+        g.drawImage(ImageLibrary.fadeImage(lib.getBuildingImage(building),
+                0.6f, 192.0f), 0, 0, this);
     }
 
 
