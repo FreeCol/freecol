@@ -19,12 +19,15 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Font;
+
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.NationSummary;
@@ -64,8 +67,13 @@ public final class ReportForeignAffairPanel extends ReportPanel {
                 coatLabel.setIcon(coatOfArms);
             }
             enemyPanel.add(coatLabel, "spany, aligny top");
-            enemyPanel.add(GUI.localizedLabel(enemy.getNationName()), "wrap 12");
-
+            
+            JLabel label = GUI.localizedLabel(enemy.getNationName());
+            Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALL, Font.BOLD);
+            label.setFont(font);
+            enemyPanel.add(label, "wrap 12");
+            
+            //TODO: Get stance only if not player's Nation.
             enemyPanel.add(GUI.localizedLabel("report.stance"), "newline");
             enemyPanel.add(GUI.localizedLabel(ns.getStance().getLabel()));
 
