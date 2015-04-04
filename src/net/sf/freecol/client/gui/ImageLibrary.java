@@ -44,6 +44,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.FoundingFather;
@@ -603,6 +604,16 @@ public final class ImageLibrary {
 
     public static Image getGoodsImage(GoodsType goodsType, Dimension size) {
         return ResourceManager.getImage(goodsType.getId() + ".image", size);
+    }
+
+    public Image getSmallBuildableImage(BuildableType buildable, Player player) {
+        // FIXME: distinguish national unit types
+        float scale = scalingFactor * (2f/3f);
+        Image image = (buildable instanceof BuildingType)
+            ? ImageLibrary.getBuildingImage(
+                (BuildingType) buildable, player, scale)
+            : ImageLibrary.getImage(buildable, scale);
+        return image;
     }
 
     public Image getSmallBuildingImage(Building building) {
