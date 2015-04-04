@@ -690,7 +690,7 @@ public final class EuropePanel extends PortPanel {
 
         setSelectedUnitLabel(null);
 
-        getGUI().restoreSavedSize(this, 1000, 700);
+        getGUI().restoreSavedSize(this, 950, 650);
     }
 
     /**
