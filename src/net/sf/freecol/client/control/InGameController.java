@@ -1303,7 +1303,7 @@ public final class InGameController implements NetworkConstants {
             // other special handling.
             Unit u = gui.getChoice(true, unit.getTile(),
                                    Messages.message("disembark.text"), unit,
-                                   "disembark.cancel", choices);
+                                   "none", choices);
             if (u == null) { // Cancelled, done.
                 break;
             } else if (u == unit) { // Disembark all.
@@ -1355,7 +1355,7 @@ public final class InGameController implements NetworkConstants {
         } else {
             carrier = gui.getChoice(true, unit.getTile(),
                                     Messages.message("embark.text"), unit,
-                                    "embark.cancel", choices);
+                                    "none", choices);
             if (carrier == null) return true; // User cancelled
         }
 
@@ -3061,7 +3061,7 @@ public final class InGameController implements NetworkConstants {
 
         Tile tile = (gui.isShowingSubPanel()) ? null : unit.getTile();
         if (!gui.confirm(true, tile, StringTemplate.key("disbandUnit.text"),
-                         unit, "disbandUnit.yes", "disbandUnit.no"))
+                         unit, "disbandUnit.yes", "cancel"))
             return false;
 
         // Try to disband
@@ -3376,7 +3376,7 @@ public final class InGameController implements NetworkConstants {
                     .addName("%nation%", nation)
                     .addName("%colony%", colony.getName())
                     .addAmount("%amount%", amount),
-                    unit, "indianDemand.gold.yes", "indianDemand.gold.no");
+                    unit, "accept", "indianDemand.gold.no");
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
                 m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
@@ -3414,7 +3414,7 @@ public final class InGameController implements NetworkConstants {
                         .addName("%colony%", colony.getName())
                         .addAmount("%amount%", amount)
                         .addNamed("%goods%", type),
-                        unit, "indianDemand.other.yes", "indianDemand.other.no");
+                        unit, "accept", "indianDemand.other.no");
                 }
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
@@ -3871,7 +3871,7 @@ public final class InGameController implements NetworkConstants {
         if (!gui.confirm(true, null, StringTemplate
                 .template("payForBuilding.text")
                 .addAmount("%amount%", price),
-                colony, "payForBuilding.yes", "payForBuilding.no")) {
+                colony, "yes", "no")) {
             return false;
         }
 
@@ -3975,8 +3975,7 @@ public final class InGameController implements NetworkConstants {
             Colony colony = (Colony) object;
             name = gui.getInput(true, colony.getTile(),
                                 StringTemplate.key("renameColony.text"),
-                                colony.getName(),
-                                "renameColony.yes", "renameColony.no");
+                                colony.getName(), "rename", "cancel");
             if (name == null) { // User cancelled
                 return false;
             } else if (name.isEmpty()) { // Zero length invalid
@@ -3995,8 +3994,7 @@ public final class InGameController implements NetworkConstants {
             Unit unit = (Unit) object;
             name = gui.getInput(true, unit.getTile(),
                                 StringTemplate.key("renameUnit.text"),
-                                unit.getName(),
-                                "renameUnit.yes", "renameUnit.no");
+                                unit.getName(), "rename", "cancel");
             if (name == null) return false; // User cancelled
         } else {
             logger.warning("Tried to rename an unsupported Nameable: "
