@@ -30,7 +30,7 @@
             </folders>
             <ide-actions>
                 <action name="build">
-                    <target>build</target>
+                    <target>package</target>
                 </action>
                 <action name="clean">
                     <target>clean</target>
@@ -46,18 +46,18 @@
                 </action>
                 <action name="rebuild">
                     <target>clean</target>
-                    <target>build</target>
+                    <target>package</target>
                 </action>
             </ide-actions>
             <export>
                 <type>folder</type>
                 <location>build</location>
-                <build-target>build</build-target>
+                <build-target>package</build-target>
             </export>
             <export>
                 <type>folder</type>
                 <location>.</location>
-                <build-target>build</build-target>
+                <build-target>package</build-target>
             </export>
             <view>
                 <items>
