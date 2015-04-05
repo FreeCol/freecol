@@ -251,9 +251,7 @@ public class TradeRoute extends FreeColGameObject
         boolean empty = true;
         for (TradeRouteStop stop : stops) {
             if (!TradeRoute.isStopValid(owner, stop)) {
-                return StringTemplate.template("tradeRoute.invalidStop")
-                    .addStringTemplate("%name%",
-                        stop.getLocation().getLocationLabelFor(owner));
+                return stop.invalidStopLabel(owner);
             }
             if (!stop.getCargo().isEmpty()) empty = false;
             always.retainAll(stop.getCargo());

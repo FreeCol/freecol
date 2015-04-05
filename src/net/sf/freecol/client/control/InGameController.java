@@ -2087,8 +2087,7 @@ public final class InGameController implements NetworkConstants {
             stop = unit.getStop();
             // Complain and return if the stop is no longer valid.
             if (!TradeRoute.isStopValid(unit, stop)) {
-                lb.add(" ", Messages.message(stop
-                        .getLabelFor("tradeRoute.invalidStop", player)));
+                lb.add(" ", Messages.message(stop.invalidStopLabel(player)));
                 clearOrders(unit);
                 result = true;
                 break;
@@ -2132,8 +2131,7 @@ public final class InGameController implements NetworkConstants {
                     stop = stops.get(next);
                     if (!TradeRoute.isStopValid(unit, stop)) {
                         // Invalid stop found, throw the unit off the route.
-                        lb.add(" ", Messages.message(stop
-                                .getLabelFor("tradeRoute.invalidStop", player)));
+                        lb.add(" ", Messages.message(stop.invalidStopLabel(player)));
                         clearOrders(unit);
                         result = true;
                         break outer;

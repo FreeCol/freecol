@@ -177,6 +177,16 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
     }
 
     /**
+     * Create an invalid trade route stop label.
+     *
+     * @param player The <code>Player</code> who will see the message.
+     * @return A <code>StringTemplate</code> for this stop.
+     */
+    public StringTemplate invalidStopLabel(Player player) {
+        return getLabelFor("tradeRoute.invalidStop", player);
+    }
+
+    /**
      * Is there work for a unit to do at this stop?
      *
      * @param unit The <code>Unit</code> to test.
