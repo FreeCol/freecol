@@ -1116,7 +1116,7 @@ public final class Canvas extends JDesktopPane {
         repaint();
     }
 
-    public void setupMouseListeners(MapViewer mapViewer) {
+    public void setupMouseListeners() {
         addMouseListener(new CanvasMouseListener(freeColClient, this,
                                                  mapViewer));
         addMouseMotionListener(new CanvasMouseMotionListener(freeColClient));
@@ -1432,7 +1432,7 @@ public final class Canvas extends JDesktopPane {
         } else {
             panel.requestFocus();
         }
-        if (panel != null && unit != null) panel.setSelectedUnit(unit);
+        if (unit != null) panel.setSelectedUnit(unit);
         return panel;
     }
 
@@ -1544,6 +1544,7 @@ public final class Canvas extends JDesktopPane {
      * Display the EditOptionDialog.
      *
      * @param option The <code>Option</code> to edit.
+     * @return The response returned by the dialog.
      */
     public boolean showEditOptionDialog(Option option) {
         return showFreeColDialog(new EditOptionDialog(freeColClient, option),
@@ -1896,6 +1897,8 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Display the map size dialog.
+     * 
+     * @return The response returned by the dialog.
      */
     public Dimension showMapSizeDialog() {
         return showFreeColDialog(new MapSizeDialog(freeColClient), null);
@@ -2000,11 +2003,9 @@ public final class Canvas extends JDesktopPane {
                                                      FreeColGameObject other,
                                                      DiplomaticTrade agreement,
                                                      StringTemplate comment) {
-        if ((our instanceof Unit || our instanceof Colony)
-            && (other instanceof Unit || other instanceof Colony)
-            && !(our instanceof Colony && other instanceof Colony)) {
-            ; // ok
-        } else {
+        if ((!(our instanceof Unit) && !(our instanceof Colony))
+            || (!(other instanceof Unit) && !(other instanceof Colony))
+            || (our instanceof Colony && other instanceof Colony)) {
             throw new RuntimeException("Bad DTD args: " + our + ", " + other);
         }
         DiplomaticTradeDialog dtd = new DiplomaticTradeDialog(freeColClient,
@@ -2120,6 +2121,8 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Display the parameters dialog.
+     * 
+     * @return The response returned by the dialog.
      */
     public Parameters showParametersDialog() {
         return showFreeColDialog(new ParametersDialog(freeColClient),
@@ -2184,6 +2187,7 @@ public final class Canvas extends JDesktopPane {
      * Display the river style dialog.
      *
      * @param tile An optional tile to make visible (not under the dialog).
+     * @return The response returned by the dialog.
      */
     public String showRiverStyleDialog(Tile tile) {
         return showFreeColDialog(new RiverStyleDialog(freeColClient), tile);
@@ -2228,6 +2232,8 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Display the scale map size dialog.
+     * 
+     * @return The response returned by the dialog.
      */
     public Dimension showScaleMapSizeDialog() {
         return showFreeColDialog(new ScaleMapSizeDialog(freeColClient),
@@ -2249,7 +2255,7 @@ public final class Canvas extends JDesktopPane {
             = new SelectAmountDialog(freeColClient, goodsType, available,
                                      defaultAmount, needToPay);
         Integer result = showFreeColDialog(fcd, null);
-        return (result == null) ? -1 : result.intValue();
+        return (result == null) ? -1 : result;
     }
 
     /**
@@ -2265,7 +2271,7 @@ public final class Canvas extends JDesktopPane {
         FreeColDialog<Integer> fcd
             = new SelectTributeAmountDialog(freeColClient, question, maximum);
         Integer result = showFreeColDialog(fcd, null);
-        return (result == null) ? -1 : result.intValue();
+        return (result == null) ? -1 : result;
     }
 
     /**
@@ -2455,6 +2461,7 @@ public final class Canvas extends JDesktopPane {
      * Run out of ColonyPanel, so the tile is already displayed.
      *
      * @param colony The <code>Colony</code> to display.
+     * @return The response returned by the dialog.
      */
     public boolean showWarehouseDialog(Colony colony) {
         return showFreeColDialog(new WarehouseDialog(freeColClient, colony),

@@ -438,8 +438,8 @@ public class GUI {
      * Set up the mouse listeners for the canvas and map viewer.
      */
     public void setupMouseListeners() {
-        if (canvas == null || mapViewer == null) return;
-        canvas.setupMouseListeners(mapViewer);
+        if (canvas == null) return;
+        canvas.setupMouseListeners();
     }
 
     /**
