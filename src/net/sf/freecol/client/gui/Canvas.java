@@ -263,6 +263,8 @@ public final class Canvas extends JDesktopPane {
 
     private final ChatPanel chatPanel;
 
+    private final ChatDisplay chatDisplay;
+
     private final MapViewer mapViewer;
 
     private final ServerListPanel serverListPanel;
@@ -295,6 +297,7 @@ public final class Canvas extends JDesktopPane {
                   MapViewer mapViewer) {
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
+        chatDisplay = new ChatDisplay();
         this.mapViewer = mapViewer;
 
         this.initialSize = size;
@@ -909,6 +912,16 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Tells that a chat message was received.
+     *
+     * @param message The chat message.
+     */
+    public void displayChatMessage(GUIMessage message) {
+        chatDisplay.addMessage(message);
+        repaint(0, 0, getWidth(), getHeight());
+    }
+
+    /**
      * Add a dialog to the current dialog list.
      *
      * @param fcd The dialog to add.
@@ -1145,7 +1158,8 @@ public final class Canvas extends JDesktopPane {
     public void paintComponent(Graphics g) {
         updateSizes();
         Graphics2D g2d = (Graphics2D) g;
-        mapViewer.display(g2d);
+        chatDisplay.removeOldMessages();
+        mapViewer.display(g2d, chatDisplay);
     }
 
 

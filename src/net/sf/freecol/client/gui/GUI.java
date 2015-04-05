@@ -881,10 +881,9 @@ public class GUI {
      */
     public void displayChatMessage(Player player, String message,
                                    boolean privateChat) {
-        if (mapViewer == null || canvas == null) return;
-        mapViewer.addMessage(new GUIMessage(player.getName() + ": " + message,
-                                            player.getNationColor()));
-        canvas.repaint(0, 0, canvas.getWidth(), canvas.getHeight());
+        if (canvas == null) return;
+        canvas.displayChatMessage(new GUIMessage(
+            player.getName() + ": " + message, player.getNationColor()));
     }
 
     /**
