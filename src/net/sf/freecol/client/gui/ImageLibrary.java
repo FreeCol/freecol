@@ -163,117 +163,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Create a "chip" with the given text and colors.
-     *
-     * @param text The text to display.
-     * @param border The border <code>Color</code>.
-     * @param background The background <code>Color</code>.
-     * @param foreground The foreground <code>Color</code>.
-     * @return A chip.
-     */
-    private Image createChip(String text, Color border,
-                             Color background, Color foreground) {
-        // Draw it and put it in the cache
-        Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
-        // hopefully, this is big enough
-        BufferedImage bi = new BufferedImage(100, 100,
-                                             BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = bi.createGraphics();
-        TextLayout label = new TextLayout(text, font,
-                                          g2.getFontRenderContext());
-        float padding = 6 * scalingFactor;
-        int width = (int)(label.getBounds().getWidth() + padding);
-        int height = (int)(label.getAscent() + label.getDescent() + padding);
-        g2.setColor(border);
-        g2.fillRect(0, 0, width, height);
-        g2.setColor(background);
-        g2.fillRect(1, 1, width - 2, height - 2);
-        g2.setColor(foreground);
-        label.draw(g2, (float)(padding/2 - label.getBounds().getX()),
-                   label.getAscent() + padding/2);
-        g2.dispose();
-        return bi.getSubimage(0, 0, width, height);
-    }
-
-    /**
-     * Create a filled "chip" with the given text and colors.
-     *
-     * @param text The text to display.
-     * @param border The border <code>Color</code>.
-     * @param background The background <code>Color</code>.
-     * @param amount How much to fill the chip with the fill color
-     * @param fill The fill <code>Color</code>.
-     * @param foreground The foreground <code>Color</code>.
-     * @return A chip.
-     */
-    private Image createFilledChip(String text, Color border, Color background,
-                                   double amount, Color fill,
-                                   Color foreground) {
-        // Draw it and put it in the cache
-        Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
-        // hopefully, this is big enough
-        BufferedImage bi = new BufferedImage(100, 100,
-                                             BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = bi.createGraphics();
-        TextLayout label = new TextLayout(text, font,
-                                          g2.getFontRenderContext());
-        float padding = 6 * scalingFactor;
-        int width = (int)(label.getBounds().getWidth() + padding);
-        int height = (int)(label.getAscent() + label.getDescent() + padding);
-        g2.setColor(border);
-        g2.fillRect(0, 0, width, height);
-        g2.setColor(background);
-        g2.fillRect(1, 1, width - 2, height - 2);
-        if (amount > 0.0 && amount <= 1.0) {
-            g2.setColor(fill);
-            g2.fillRect(1, 1, width - 2, (int)((height - 2) * amount));
-        }
-        g2.setColor(foreground);
-        label.draw(g2, (float)(padding/2 - label.getBounds().getX()),
-                   label.getAscent() + padding/2);
-        g2.dispose();
-        return bi.getSubimage(0, 0, width, height);
-    }
-
-    /**
-     * Create a faded version of an image.
-     *
-     * @param img The <code>Image</code> to fade.
-     * @param fade The amount of fading.
-     * @param target The offset.
-     * @return The faded image.
-     */
-    public static BufferedImage fadeImage(Image img, float fade, float target) {
-        int w = img.getWidth(null);
-        int h = img.getHeight(null);
-        BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = bi.createGraphics();
-        g.drawImage(img, 0, 0, null);
-
-        float offset = target * (1.0f - fade);
-        float[] scales = { fade, fade, fade, 1.0f };
-        float[] offsets = { offset, offset, offset, 0.0f };
-        RescaleOp rop = new RescaleOp(scales, offsets, null);
-
-        g.drawImage(bi, rop, 0, 0);
-
-        g.dispose();
-        return bi;
-    }
-
-    public static BufferedImage createResizedImage(Image image,
-                                                  int width, int height) {
-        BufferedImage scaled = new BufferedImage(width, height,
-            BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = scaled.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-            RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g.drawImage(image, 0, 0, width, height, null);
-        g.dispose();
-        return scaled;
-    }
-
-    /**
      * Gets a suitable foreground color given a background color.
      *
      * Our eyes have different sensitivity towards red, green and
@@ -306,92 +195,8 @@ public final class ImageLibrary {
             : Color.BLACK;
     }
 
-    /**
-     * Draw a (usually small) background image into a (usually larger)
-     * space specified by a component, tiling the image to fill up the
-     * space.  If the image is not available, just fill with the background
-     * colour.
-     *
-     * @param resource The name of the <code>ImageResource</code> to tile with.
-     * @param g The <code>Graphics</code> to draw to.
-     * @param c The <code>JComponent</code> that defines the space.
-     * @param insets Optional <code>Insets</code> to apply.
-     */
-    public static void drawTiledImage(String resource, Graphics g,
-                                      JComponent c, Insets insets) {
-        int width = c.getWidth();
-        int height = c.getHeight();
-        Image image = ResourceManager.getImage(resource);
-        int dx, dy, xmin, ymin;
 
-        if (insets == null) {
-            xmin = 0;
-            ymin = 0;
-        } else {
-            xmin = insets.left;
-            ymin = insets.top;
-            width -= insets.left + insets.right;
-            height -= insets.top + insets.bottom;
-        }
-        if (image != null && (dx = image.getWidth(null)) > 0
-            && (dy = image.getHeight(null)) > 0) {
-            int xmax, ymax;
-            xmax = xmin + width;
-            ymax = ymin + height;
-            for (int x = xmin; x < xmax; x += dx) {
-                for (int y = ymin; y < ymax; y += dy) {
-                    g.drawImage(image, x, y, null);
-                }
-            }
-        } else {
-            g.setColor(c.getBackground());
-            g.fillRect(xmin, ymin, width, height);
-        }
-    }
-
-
-    /**
-     * Gets a chip image for the alarm at an Indian settlement.
-     * The background is either the native owner's, or that of the
-     * most hated nation if any.
-     *
-     * @param is The <code>IndianSettlement</code> to check.
-     * @param player The observing <code>Player</code>.
-     * @return An alarm chip, or null if none suitable.
-     */
-    public Image getAlarmChip(IndianSettlement is, Player player) {
-        if (player == null || !is.hasContacted(player)) return null;
-        Color ownerColor = is.getOwner().getNationColor();
-        Player enemy = is.getMostHated();
-        Color enemyColor = (enemy == null) ? Nation.UNKNOWN_NATION_COLOR
-            : enemy.getNationColor();
-        // Set amount to [0-4] corresponding to HAPPY, CONTENT,
-        // DISPLEASED, ANGRY, HATEFUL but only if the player is the
-        // most hated, because other nation alarm is not nor should be
-        // serialized to the client.
-        int amount = 4;
-        if (enemy == null) {
-            amount = 0;
-        } else if (player == enemy) {
-            Tension alarm = is.getAlarm(enemy);
-            amount = (alarm == null) ? 4 : alarm.getLevel().ordinal();
-            if (amount == 0) amount = 1; // Show *something*!
-        }
-        Color foreground = getForegroundColor(enemyColor);
-        String text = ResourceManager.getString((is.worthScouting(player))
-                                       ? "indianAlarmChip.contacted"
-                                       : "indianAlarmChip.scouted");
-        String key = "dynamic.alarm." + text + "." + ownerColor.getRGB()
-            + "." + amount + "." + enemyColor.getRGB()
-            + "." + Float.toHexString(scalingFactor);
-        Image img = ResourceManager.getImage(key);
-        if (img == null) {
-            img = createFilledChip(text, Color.BLACK, ownerColor, amount/4.0,
-                                   enemyColor, foreground);
-            ResourceManager.addGameMapping(key, new ImageResource(img));
-        }
-        return img;
-    }
+    // Simple Image retrieval methods
 
     /**
      * Returns true if the tile with the given coordinates is to be
@@ -488,52 +293,6 @@ public final class ImageLibrary {
 
     public static Image getCoatOfArmsImage(Nation nation, Dimension size) {
         return ResourceManager.getImage(nation.getId() + ".image", size);
-    }
-
-    /**
-     * Returns the scaled terrain-image for a terrain type (and position 0, 0).
-     *
-     * @param type The type of the terrain-image to return.
-     * @param scale The scale of the terrain image to return.
-     * @return The terrain-image
-     */
-    public Image getCompoundTerrainImage(TileType type, float scale) {
-        // Currently used for hills and mountains
-        Image terrainImage = getTerrainImage(type, 0, 0, scale);
-        Image overlayImage = getOverlayImage(type, type.getId(), scale);
-        Image forestImage = type.isForested() ? getForestImage(type, scale)
-            : null;
-        if (overlayImage == null && forestImage == null) {
-            return terrainImage;
-        } else {
-            GraphicsConfiguration gc
-                = GraphicsEnvironment.getLocalGraphicsEnvironment()
-                    .getDefaultScreenDevice().getDefaultConfiguration();
-            int width = terrainImage.getWidth(null);
-            int height = terrainImage.getHeight(null);
-            if (overlayImage != null) {
-                height = Math.max(height, overlayImage.getHeight(null));
-            }
-            if (forestImage != null) {
-                height = Math.max(height, forestImage.getHeight(null));
-            }
-            BufferedImage compositeImage
-                = gc.createCompatibleImage(width, height,
-                                           Transparency.TRANSLUCENT);
-            Graphics2D g = compositeImage.createGraphics();
-            g.drawImage(terrainImage, 0,
-                        height - terrainImage.getHeight(null), null);
-            if (overlayImage != null) {
-                g.drawImage(overlayImage, 0,
-                            height - overlayImage.getHeight(null), null);
-            }
-            if (forestImage != null) {
-                g.drawImage(forestImage, 0,
-                            height - forestImage.getHeight(null), null);
-            }
-            g.dispose();
-            return compositeImage;
-        }
     }
 
     /**
@@ -634,78 +393,12 @@ public final class ImageLibrary {
         return ResourceManager.getImage(key, scale);
     }
 
-    /**
-     * Gets the owner chip for the settlement.
-     *
-     * @param is The <code>IndianSettlement</code> to check.
-     * @return A chip.
-     */
-    public Image getIndianSettlementChip(IndianSettlement is) {
-        String text = ResourceManager.getString("indianSettlementChip."
-            + ((is.getType().isCapital()) ? "capital" : "normal"));
-        Color background = is.getOwner().getNationColor();
-        String key = "dynamic.indianSettlement." + text
-            + "." + Integer.toHexString(background.getRGB())
-            + "." + Float.toHexString(scalingFactor);
-        Image img = ResourceManager.getImage(key);
-        if (img == null) {
-            img = createChip(text, Color.BLACK, background,
-                             getForegroundColor(background));
-            ResourceManager.addGameMapping(key, new ImageResource(img));
-        }
-        return img;
-    }
-
     public Image getImage(FreeColGameObjectType type) {
         return ResourceManager.getImage(type.getId() + ".image", scalingFactor);
     }
 
     public static Image getImage(FreeColGameObjectType type, float scale) {
         return ResourceManager.getImage(type.getId() + ".image", scale);
-    }
-
-    /**
-     * Returns the appropriate Image for Object.
-     *
-     * @param display The Object to display.
-     * @return The appropriate Image.
-     */
-    public Image getObjectImage(Object display) {
-        try {
-            Image image;
-            if (display instanceof Goods)
-                display = ((Goods)display).getType();
-
-            if (display instanceof GoodsType) {
-                GoodsType goodsType = (GoodsType)display;
-                image = getGoodsImage(goodsType);
-            } else if (display instanceof Unit) {
-                Unit unit = (Unit)display;
-                image = getUnitImage(unit);
-            } else if (display instanceof UnitType) {
-                UnitType unitType = (UnitType)display;
-                image = getUnitImage(unitType);
-            } else if (display instanceof Settlement) {
-                Settlement settlement = (Settlement)display;
-                image = getSettlementImage(settlement);
-            } else if (display instanceof LostCityRumour) {
-                image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
-            } else if (display instanceof Player) {
-                image = getCoatOfArmsImage(((Player)display).getNation());
-            } else {
-                logger.warning("could not find image of unknown type for " + display);
-                return null;
-            }
-
-            if (image == null) {
-                logger.warning("could not find image for " + display);
-                return null;
-            }
-            return image;
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "could not find image", e);
-            return null;
-        }
     }
 
     /**
@@ -758,6 +451,50 @@ public final class ImageLibrary {
     }
 
     /**
+     * Returns the appropriate Image for Object.
+     *
+     * @param display The Object to display.
+     * @return The appropriate Image.
+     */
+    public Image getObjectImage(Object display) {
+        try {
+            Image image;
+            if (display instanceof Goods)
+                display = ((Goods)display).getType();
+
+            if (display instanceof GoodsType) {
+                GoodsType goodsType = (GoodsType)display;
+                image = getGoodsImage(goodsType);
+            } else if (display instanceof Unit) {
+                Unit unit = (Unit)display;
+                image = getUnitImage(unit);
+            } else if (display instanceof UnitType) {
+                UnitType unitType = (UnitType)display;
+                image = getUnitImage(unitType);
+            } else if (display instanceof Settlement) {
+                Settlement settlement = (Settlement)display;
+                image = getSettlementImage(settlement);
+            } else if (display instanceof LostCityRumour) {
+                image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
+            } else if (display instanceof Player) {
+                image = getCoatOfArmsImage(((Player)display).getNation());
+            } else {
+                logger.warning("could not find image of unknown type for " + display);
+                return null;
+            }
+
+            if (image == null) {
+                logger.warning("could not find image for " + display);
+                return null;
+            }
+            return image;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "could not find image", e);
+            return null;
+        }
+    }
+
+    /**
      * Returns the image with the given identifier.
      *
      * @param id The object identifier.
@@ -772,32 +509,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Gets the mission chip for a native settlement.
-     *
-     * @param owner The player that owns the mission.
-     * @param expert True if the unit is an expert.
-     * @return A suitable chip, or null if no mission is present.
-     */
-    public Image getMissionChip(Player owner, boolean expert) {
-        Color background = owner.getNationColor();
-        String key = "dynamic.mission." + ((expert) ? "expert" : "normal")
-            + "." + Integer.toHexString(background.getRGB())
-            + "." + Float.toHexString(scalingFactor);
-        Image img = ResourceManager.getImage(key);
-        if (img == null) {
-            Color foreground = ResourceManager.getColor("mission."
-                + ((expert) ? "expert" : "normal") + ".foreground.color");
-            if (foreground == null) {
-                foreground = (expert) ? Color.BLACK : Color.GRAY;
-            }
-            img = createChip(ResourceManager.getString("cross"),
-                             Color.BLACK, background, foreground);
-            ResourceManager.addGameMapping(key, new ImageResource(img));
-        }
-        return img;
-    }
-
-    /**
      * Returns the monarch-image for the given tile.
      *
      * @param nation The nation this monarch rules.
@@ -805,30 +516,6 @@ public final class ImageLibrary {
      */
     public static Image getMonarchImage(Nation nation) {
         return ResourceManager.getImage(nation.getId() + ".monarch.image");
-    }
-
-    /**
-     * Gets a chip for an occupation indicator, i.e. a small image with a
-     * single letter or symbol that indicates the Unit's state.
-     *
-     * @param unit The <code>Unit</code> with the occupation.
-     * @param text The text for the chip.
-     * @return A suitable chip.
-     */
-    public Image getOccupationIndicatorChip(Unit unit, String text) {
-        Color backgroundColor = unit.getOwner().getNationColor();
-        Color foregroundColor = (unit.getState() == Unit.UnitState.FORTIFIED)
-            ? Color.GRAY : getForegroundColor(backgroundColor);
-        String key = "dynamic.occupationIndicator." + text
-            + "." + Integer.toHexString(backgroundColor.getRGB())
-            + "." + Float.toHexString(scalingFactor);
-        Image img = ResourceManager.getImage(key);
-        if (img == null) {
-            img = createChip(text, Color.BLACK,
-                             backgroundColor, foregroundColor);
-            ResourceManager.addGameMapping(key, new ImageResource(img));
-        }
-        return img;
     }
 
     /**
@@ -1014,110 +701,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Gets an image with a string of a given color and with
-     * a black border around the glyphs.
-     *
-     * @param g A <code>Graphics</code>-object for getting the font metrics.
-     * @param text The <code>String</code> to make an image of.
-     * @param color The <code>Color</code> to use for the text.
-     * @param font The <code>Font</code> to display the text with.
-     * @return The image that was created.
-     */
-    public static Image getStringImage(Graphics g, String text, Color color,
-                                Font font) {
-        if (color == null) {
-            logger.warning("createStringImage called with color null");
-            color = Color.WHITE;
-        }
-
-        // Lookup in the cache if the image has been generated already
-        String key = "dynamic.stringImage." + text
-            + "." + font.getFontName().replace(' ', '-')
-            + "." + Integer.toString(font.getSize())
-            + "." + Integer.toHexString(color.getRGB());
-        Image img = ResourceManager.getImage(key);
-        if (img == null) {
-            // create an image of the appropriate size
-            FontMetrics fm = g.getFontMetrics(font);
-            BufferedImage bi = new BufferedImage(fm.stringWidth(text) + 4,
-                fm.getMaxAscent() + fm.getMaxDescent(),
-                BufferedImage.TYPE_INT_ARGB);
-            // draw the string with selected color
-            Graphics2D g2 = bi.createGraphics();
-            g2.setColor(getStringBorderColor(color));
-            g2.setFont(font);
-            g2.drawString(text, 2, fm.getMaxAscent());
-
-            // draw the border around letters
-            int borderWidth = 1;
-            int borderColor = getStringBorderColor(color).getRGB();
-            int srcRGB, dstRGB, srcA;
-            for (int biY = 0; biY < bi.getHeight(); biY++) {
-                for (int biX = borderWidth; biX < bi.getWidth() - borderWidth; biX++) {
-                    int biXI = bi.getWidth() - biX - 1;
-                    for (int d = 1; d <= borderWidth; d++) {
-                        // left to right
-                        srcRGB = bi.getRGB(biX, biY);
-                        srcA = (srcRGB >> 24) & 0xFF;
-                        dstRGB = bi.getRGB(biX - d, biY);
-                        if (dstRGB != borderColor) {
-                            if (srcA > 0) {
-                                bi.setRGB(biX, biY, borderColor);
-                                bi.setRGB(biX - d, biY, srcRGB);
-                            }
-                        }
-                        // right to left
-                        srcRGB = bi.getRGB(biXI, biY);
-                        srcA = (srcRGB >> 24) & 0xFF;
-                        dstRGB = bi.getRGB(biXI + d, biY);
-                        if (dstRGB != borderColor) {
-                            if (srcA > 0) {
-                                bi.setRGB(biXI, biY, borderColor);
-                                bi.setRGB(biXI + d, biY, srcRGB);
-                            }
-                        }
-                    }
-                }
-            }
-            for (int biX = 0; biX < bi.getWidth(); biX++) {
-                for (int biY = borderWidth; biY < bi.getHeight() - borderWidth; biY++) {
-                    int biYI = bi.getHeight() - biY - 1;
-                    for (int d = 1; d <= borderWidth; d++) {
-                        // top to bottom
-                        srcRGB = bi.getRGB(biX, biY);
-                        srcA = (srcRGB >> 24) & 0xFF;
-                        dstRGB = bi.getRGB(biX, biY - d);
-                        if (dstRGB != borderColor) {
-                            if (srcA > 0) {
-                                bi.setRGB(biX, biY, borderColor);
-                                bi.setRGB(biX, biY - d, srcRGB);
-                            }
-                        }
-                        // bottom to top
-                        srcRGB = bi.getRGB(biX, biYI);
-                        srcA = (srcRGB >> 24) & 0xFF;
-                        dstRGB = bi.getRGB(biX, biYI + d);
-                        if (dstRGB != borderColor) {
-                            if (srcA > 0) {
-                                bi.setRGB(biX, biYI, borderColor);
-                                bi.setRGB(biX, biYI + d, srcRGB);
-                            }
-                        }
-                    }
-                }
-            }
-
-            g2.setColor(color);
-            g2.drawString(text, 2, fm.getMaxAscent());
-            g2.dispose();
-
-            ResourceManager.addGameMapping(key, new ImageResource(bi));
-            img = ResourceManager.getImage(key);
-        }
-        return img;
-    }
-
-    /**
      * Returns the terrain-image for the given type.
      *
      * @param type The type of the terrain-image to return.
@@ -1260,4 +843,430 @@ public final class ImageLibrary {
         }
         return image;
     }
+
+
+    // Methods for dynamically drawing images
+
+    /**
+     * Draw a (usually small) background image into a (usually larger)
+     * space specified by a component, tiling the image to fill up the
+     * space.  If the image is not available, just fill with the background
+     * colour.
+     *
+     * @param resource The name of the <code>ImageResource</code> to tile with.
+     * @param g The <code>Graphics</code> to draw to.
+     * @param c The <code>JComponent</code> that defines the space.
+     * @param insets Optional <code>Insets</code> to apply.
+     */
+    public static void drawTiledImage(String resource, Graphics g,
+                                      JComponent c, Insets insets) {
+        int width = c.getWidth();
+        int height = c.getHeight();
+        Image image = ResourceManager.getImage(resource);
+        int dx, dy, xmin, ymin;
+
+        if (insets == null) {
+            xmin = 0;
+            ymin = 0;
+        } else {
+            xmin = insets.left;
+            ymin = insets.top;
+            width -= insets.left + insets.right;
+            height -= insets.top + insets.bottom;
+        }
+        if (image != null && (dx = image.getWidth(null)) > 0
+            && (dy = image.getHeight(null)) > 0) {
+            int xmax, ymax;
+            xmax = xmin + width;
+            ymax = ymin + height;
+            for (int x = xmin; x < xmax; x += dx) {
+                for (int y = ymin; y < ymax; y += dy) {
+                    g.drawImage(image, x, y, null);
+                }
+            }
+        } else {
+            g.setColor(c.getBackground());
+            g.fillRect(xmin, ymin, width, height);
+        }
+    }
+
+    public static BufferedImage createResizedImage(Image image,
+                                                  int width, int height) {
+        BufferedImage scaled = new BufferedImage(width, height,
+            BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = scaled.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+            RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.drawImage(image, 0, 0, width, height, null);
+        g.dispose();
+        return scaled;
+    }
+
+    /**
+     * Create a faded version of an image.
+     *
+     * @param img The <code>Image</code> to fade.
+     * @param fade The amount of fading.
+     * @param target The offset.
+     * @return The faded image.
+     */
+    public static BufferedImage fadeImage(Image img, float fade, float target) {
+        int w = img.getWidth(null);
+        int h = img.getHeight(null);
+        BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = bi.createGraphics();
+        g.drawImage(img, 0, 0, null);
+
+        float offset = target * (1.0f - fade);
+        float[] scales = { fade, fade, fade, 1.0f };
+        float[] offsets = { offset, offset, offset, 0.0f };
+        RescaleOp rop = new RescaleOp(scales, offsets, null);
+
+        g.drawImage(bi, rop, 0, 0);
+
+        g.dispose();
+        return bi;
+    }
+
+    /**
+     * Returns the scaled terrain-image for a terrain type (and position 0, 0).
+     *
+     * @param type The type of the terrain-image to return.
+     * @param scale The scale of the terrain image to return.
+     * @return The terrain-image
+     */
+    public Image getCompoundTerrainImage(TileType type, float scale) {
+        // Currently used for hills and mountains
+        Image terrainImage = getTerrainImage(type, 0, 0, scale);
+        Image overlayImage = getOverlayImage(type, type.getId(), scale);
+        Image forestImage = type.isForested() ? getForestImage(type, scale)
+            : null;
+        if (overlayImage == null && forestImage == null) {
+            return terrainImage;
+        } else {
+            GraphicsConfiguration gc
+                = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                    .getDefaultScreenDevice().getDefaultConfiguration();
+            int width = terrainImage.getWidth(null);
+            int height = terrainImage.getHeight(null);
+            if (overlayImage != null) {
+                height = Math.max(height, overlayImage.getHeight(null));
+            }
+            if (forestImage != null) {
+                height = Math.max(height, forestImage.getHeight(null));
+            }
+            BufferedImage compositeImage
+                = gc.createCompatibleImage(width, height,
+                                           Transparency.TRANSLUCENT);
+            Graphics2D g = compositeImage.createGraphics();
+            g.drawImage(terrainImage, 0,
+                        height - terrainImage.getHeight(null), null);
+            if (overlayImage != null) {
+                g.drawImage(overlayImage, 0,
+                            height - overlayImage.getHeight(null), null);
+            }
+            if (forestImage != null) {
+                g.drawImage(forestImage, 0,
+                            height - forestImage.getHeight(null), null);
+            }
+            g.dispose();
+            return compositeImage;
+        }
+    }
+
+    /**
+     * Create a "chip" with the given text and colors.
+     *
+     * @param text The text to display.
+     * @param border The border <code>Color</code>.
+     * @param background The background <code>Color</code>.
+     * @param foreground The foreground <code>Color</code>.
+     * @return A chip.
+     */
+    private Image createChip(String text, Color border,
+                             Color background, Color foreground) {
+        // Draw it and put it in the cache
+        Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
+        // hopefully, this is big enough
+        BufferedImage bi = new BufferedImage(100, 100,
+                                             BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = bi.createGraphics();
+        TextLayout label = new TextLayout(text, font,
+                                          g2.getFontRenderContext());
+        float padding = 6 * scalingFactor;
+        int width = (int)(label.getBounds().getWidth() + padding);
+        int height = (int)(label.getAscent() + label.getDescent() + padding);
+        g2.setColor(border);
+        g2.fillRect(0, 0, width, height);
+        g2.setColor(background);
+        g2.fillRect(1, 1, width - 2, height - 2);
+        g2.setColor(foreground);
+        label.draw(g2, (float)(padding/2 - label.getBounds().getX()),
+                   label.getAscent() + padding/2);
+        g2.dispose();
+        return bi.getSubimage(0, 0, width, height);
+    }
+
+    /**
+     * Create a filled "chip" with the given text and colors.
+     *
+     * @param text The text to display.
+     * @param border The border <code>Color</code>.
+     * @param background The background <code>Color</code>.
+     * @param amount How much to fill the chip with the fill color
+     * @param fill The fill <code>Color</code>.
+     * @param foreground The foreground <code>Color</code>.
+     * @return A chip.
+     */
+    private Image createFilledChip(String text, Color border, Color background,
+                                   double amount, Color fill,
+                                   Color foreground) {
+        // Draw it and put it in the cache
+        Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
+        // hopefully, this is big enough
+        BufferedImage bi = new BufferedImage(100, 100,
+                                             BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = bi.createGraphics();
+        TextLayout label = new TextLayout(text, font,
+                                          g2.getFontRenderContext());
+        float padding = 6 * scalingFactor;
+        int width = (int)(label.getBounds().getWidth() + padding);
+        int height = (int)(label.getAscent() + label.getDescent() + padding);
+        g2.setColor(border);
+        g2.fillRect(0, 0, width, height);
+        g2.setColor(background);
+        g2.fillRect(1, 1, width - 2, height - 2);
+        if (amount > 0.0 && amount <= 1.0) {
+            g2.setColor(fill);
+            g2.fillRect(1, 1, width - 2, (int)((height - 2) * amount));
+        }
+        g2.setColor(foreground);
+        label.draw(g2, (float)(padding/2 - label.getBounds().getX()),
+                   label.getAscent() + padding/2);
+        g2.dispose();
+        return bi.getSubimage(0, 0, width, height);
+    }
+
+
+    // Methods for dynamically drawing images and adding them to ResourceManager
+
+    /**
+     * Gets a chip image for the alarm at an Indian settlement.
+     * The background is either the native owner's, or that of the
+     * most hated nation if any.
+     *
+     * @param is The <code>IndianSettlement</code> to check.
+     * @param player The observing <code>Player</code>.
+     * @return An alarm chip, or null if none suitable.
+     */
+    public Image getAlarmChip(IndianSettlement is, Player player) {
+        if (player == null || !is.hasContacted(player)) return null;
+        Color ownerColor = is.getOwner().getNationColor();
+        Player enemy = is.getMostHated();
+        Color enemyColor = (enemy == null) ? Nation.UNKNOWN_NATION_COLOR
+            : enemy.getNationColor();
+        // Set amount to [0-4] corresponding to HAPPY, CONTENT,
+        // DISPLEASED, ANGRY, HATEFUL but only if the player is the
+        // most hated, because other nation alarm is not nor should be
+        // serialized to the client.
+        int amount = 4;
+        if (enemy == null) {
+            amount = 0;
+        } else if (player == enemy) {
+            Tension alarm = is.getAlarm(enemy);
+            amount = (alarm == null) ? 4 : alarm.getLevel().ordinal();
+            if (amount == 0) amount = 1; // Show *something*!
+        }
+        Color foreground = getForegroundColor(enemyColor);
+        String text = ResourceManager.getString((is.worthScouting(player))
+                                       ? "indianAlarmChip.contacted"
+                                       : "indianAlarmChip.scouted");
+        String key = "dynamic.alarm." + text + "." + ownerColor.getRGB()
+            + "." + amount + "." + enemyColor.getRGB()
+            + "." + Float.toHexString(scalingFactor);
+        Image img = ResourceManager.getImage(key);
+        if (img == null) {
+            img = createFilledChip(text, Color.BLACK, ownerColor, amount/4.0,
+                                   enemyColor, foreground);
+            ResourceManager.addGameMapping(key, new ImageResource(img));
+        }
+        return img;
+    }
+
+    /**
+     * Gets the owner chip for the settlement.
+     *
+     * @param is The <code>IndianSettlement</code> to check.
+     * @return A chip.
+     */
+    public Image getIndianSettlementChip(IndianSettlement is) {
+        String text = ResourceManager.getString("indianSettlementChip."
+            + ((is.getType().isCapital()) ? "capital" : "normal"));
+        Color background = is.getOwner().getNationColor();
+        String key = "dynamic.indianSettlement." + text
+            + "." + Integer.toHexString(background.getRGB())
+            + "." + Float.toHexString(scalingFactor);
+        Image img = ResourceManager.getImage(key);
+        if (img == null) {
+            img = createChip(text, Color.BLACK, background,
+                             getForegroundColor(background));
+            ResourceManager.addGameMapping(key, new ImageResource(img));
+        }
+        return img;
+    }
+
+    /**
+     * Gets the mission chip for a native settlement.
+     *
+     * @param owner The player that owns the mission.
+     * @param expert True if the unit is an expert.
+     * @return A suitable chip, or null if no mission is present.
+     */
+    public Image getMissionChip(Player owner, boolean expert) {
+        Color background = owner.getNationColor();
+        String key = "dynamic.mission." + ((expert) ? "expert" : "normal")
+            + "." + Integer.toHexString(background.getRGB())
+            + "." + Float.toHexString(scalingFactor);
+        Image img = ResourceManager.getImage(key);
+        if (img == null) {
+            Color foreground = ResourceManager.getColor("mission."
+                + ((expert) ? "expert" : "normal") + ".foreground.color");
+            if (foreground == null) {
+                foreground = (expert) ? Color.BLACK : Color.GRAY;
+            }
+            img = createChip(ResourceManager.getString("cross"),
+                             Color.BLACK, background, foreground);
+            ResourceManager.addGameMapping(key, new ImageResource(img));
+        }
+        return img;
+    }
+
+    /**
+     * Gets a chip for an occupation indicator, i.e. a small image with a
+     * single letter or symbol that indicates the Unit's state.
+     *
+     * @param unit The <code>Unit</code> with the occupation.
+     * @param text The text for the chip.
+     * @return A suitable chip.
+     */
+    public Image getOccupationIndicatorChip(Unit unit, String text) {
+        Color backgroundColor = unit.getOwner().getNationColor();
+        Color foregroundColor = (unit.getState() == Unit.UnitState.FORTIFIED)
+            ? Color.GRAY : getForegroundColor(backgroundColor);
+        String key = "dynamic.occupationIndicator." + text
+            + "." + Integer.toHexString(backgroundColor.getRGB())
+            + "." + Float.toHexString(scalingFactor);
+        Image img = ResourceManager.getImage(key);
+        if (img == null) {
+            img = createChip(text, Color.BLACK,
+                             backgroundColor, foregroundColor);
+            ResourceManager.addGameMapping(key, new ImageResource(img));
+        }
+        return img;
+    }
+
+    /**
+     * Gets an image with a string of a given color and with
+     * a black border around the glyphs.
+     *
+     * @param g A <code>Graphics</code>-object for getting the font metrics.
+     * @param text The <code>String</code> to make an image of.
+     * @param color The <code>Color</code> to use for the text.
+     * @param font The <code>Font</code> to display the text with.
+     * @return The image that was created.
+     */
+    public static Image getStringImage(Graphics g, String text, Color color,
+                                Font font) {
+        if (color == null) {
+            logger.warning("createStringImage called with color null");
+            color = Color.WHITE;
+        }
+
+        // Lookup in the cache if the image has been generated already
+        String key = "dynamic.stringImage." + text
+            + "." + font.getFontName().replace(' ', '-')
+            + "." + Integer.toString(font.getSize())
+            + "." + Integer.toHexString(color.getRGB());
+        Image img = ResourceManager.getImage(key);
+        if (img == null) {
+            // create an image of the appropriate size
+            FontMetrics fm = g.getFontMetrics(font);
+            BufferedImage bi = new BufferedImage(fm.stringWidth(text) + 4,
+                fm.getMaxAscent() + fm.getMaxDescent(),
+                BufferedImage.TYPE_INT_ARGB);
+            // draw the string with selected color
+            Graphics2D g2 = bi.createGraphics();
+            g2.setColor(getStringBorderColor(color));
+            g2.setFont(font);
+            g2.drawString(text, 2, fm.getMaxAscent());
+
+            // draw the border around letters
+            int borderWidth = 1;
+            int borderColor = getStringBorderColor(color).getRGB();
+            int srcRGB, dstRGB, srcA;
+            for (int biY = 0; biY < bi.getHeight(); biY++) {
+                for (int biX = borderWidth; biX < bi.getWidth() - borderWidth; biX++) {
+                    int biXI = bi.getWidth() - biX - 1;
+                    for (int d = 1; d <= borderWidth; d++) {
+                        // left to right
+                        srcRGB = bi.getRGB(biX, biY);
+                        srcA = (srcRGB >> 24) & 0xFF;
+                        dstRGB = bi.getRGB(biX - d, biY);
+                        if (dstRGB != borderColor) {
+                            if (srcA > 0) {
+                                bi.setRGB(biX, biY, borderColor);
+                                bi.setRGB(biX - d, biY, srcRGB);
+                            }
+                        }
+                        // right to left
+                        srcRGB = bi.getRGB(biXI, biY);
+                        srcA = (srcRGB >> 24) & 0xFF;
+                        dstRGB = bi.getRGB(biXI + d, biY);
+                        if (dstRGB != borderColor) {
+                            if (srcA > 0) {
+                                bi.setRGB(biXI, biY, borderColor);
+                                bi.setRGB(biXI + d, biY, srcRGB);
+                            }
+                        }
+                    }
+                }
+            }
+            for (int biX = 0; biX < bi.getWidth(); biX++) {
+                for (int biY = borderWidth; biY < bi.getHeight() - borderWidth; biY++) {
+                    int biYI = bi.getHeight() - biY - 1;
+                    for (int d = 1; d <= borderWidth; d++) {
+                        // top to bottom
+                        srcRGB = bi.getRGB(biX, biY);
+                        srcA = (srcRGB >> 24) & 0xFF;
+                        dstRGB = bi.getRGB(biX, biY - d);
+                        if (dstRGB != borderColor) {
+                            if (srcA > 0) {
+                                bi.setRGB(biX, biY, borderColor);
+                                bi.setRGB(biX, biY - d, srcRGB);
+                            }
+                        }
+                        // bottom to top
+                        srcRGB = bi.getRGB(biX, biYI);
+                        srcA = (srcRGB >> 24) & 0xFF;
+                        dstRGB = bi.getRGB(biX, biYI + d);
+                        if (dstRGB != borderColor) {
+                            if (srcA > 0) {
+                                bi.setRGB(biX, biYI, borderColor);
+                                bi.setRGB(biX, biYI + d, srcRGB);
+                            }
+                        }
+                    }
+                }
+            }
+
+            g2.setColor(color);
+            g2.drawString(text, 2, fm.getMaxAscent());
+            g2.dispose();
+
+            ResourceManager.addGameMapping(key, new ImageResource(bi));
+            img = ResourceManager.getImage(key);
+        }
+        return img;
+    }
+
 }
