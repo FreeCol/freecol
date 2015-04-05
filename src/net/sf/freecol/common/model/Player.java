@@ -2407,14 +2407,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Get a unique name for a new trade route.
      */
     public String getNewTradeRouteName() {
-        String base = Messages.message("tradeRoute.newRoute");
-        if (getTradeRoute(base) == null) return base;
-        String name;
-        int i = 1;
-        while (getTradeRoute(name = base + Integer.toString(i)) != null) {
-            i++;
-        }
-        return name;
+        return Messages.getTradeRouteName(this);
     }
 
     /**

@@ -882,6 +882,25 @@ public class Messages {
         return names;
     }
 
+    /**
+     * Get a new default trade route name for a player.
+     *
+     * @param player The <code>Player</code> to get the name for.
+     * @return A new trade route name.
+     */
+    public static String getTradeRouteName(Player player) {
+        String base = message("tradeRoute.newRoute");
+        if (player.getTradeRoute(base) == null) return base;
+        int i = 1;
+        String name;
+        for (;;) {
+            name = base + Integer.toString(i);
+            if (player.getTradeRoute(name) == null) break;
+            i++;
+        }
+        return name;
+    }
+
 
     // message().  The fundamental i18n routine, and its support.
 
