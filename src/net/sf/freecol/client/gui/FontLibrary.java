@@ -25,18 +25,45 @@ import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * Wraps anything Font related.
- *
+ * 
+ * Changes can be made with <code>FontType</code and <code>FontSize</code><br>
+ * <br>
+ * FontType Sets the typeface. Choices are: NORMAL, SIMPLE or HEADER.<br>
+ * FontSize Sets the font size. Choices are: TINY, SMALLER, SMALL, MEDIUM or BIG
  */
 public class FontLibrary {
 
     private static final Logger logger = Logger.getLogger(FontLibrary.class.getName());
 
+    /**
+     * Sets the typeface of the font.
+     * 
+     * Choices are:
+     * <ul>
+     * <li>NORMAL -- Sets the typeface to be the normal system typeface.</li>
+     * <li>SIMPLE</li>
+     * <li>HEADER -- Sets the typeface to be the stylized Blackletter typeface.</li>
+     * </ul>
+     */
     public static enum FontType {
         NORMAL,
         SIMPLE,
         HEADER
     }
 
+    /**
+     * Sets the size of the font. This size is later multiplied by the
+     * ScaleFactor, currently set to "1".
+     * 
+     * Choices are:
+     * <ul>
+     * <li>TINY sets the font to be 12px</li>
+     * <li>SMALLER sets the font to be 16px</li>
+     * <li>SMALL sets the font to be 24px</li>
+     * <li>MEDIUM sets the font to be 36px</li>
+     * <li>BIG sets the font to be 48px</li>
+     * </ul>
+     */
     public static enum FontSize {
         TINY,
         SMALLER,
