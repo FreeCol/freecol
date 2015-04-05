@@ -400,6 +400,8 @@ public class GUI {
 
     /** 
      * Swing system and look-and-feel initialization.
+     * 
+     * @param fontName An optional font name to be used.
      */
     public static void installLookAndFeel(String fontName) throws FreeColException {
         Font font = FontLibrary.createMainFont(fontName);
@@ -841,6 +843,8 @@ public class GUI {
 
     /**
      * Create a thumbnail for the minimap.
+     * 
+     * @return The created image.
      */
     public BufferedImage createMiniMapThumbNail() {
         MiniMap miniMap = new MiniMap(freeColClient);
@@ -1672,7 +1676,7 @@ public class GUI {
             enemy = defender.getOwner();
         }
 
-        String messageId = null;
+        String messageId;
         switch (attacker.getOwner().getStance(enemy)) {
         case WAR:
             logger.finest("Player at war, no confirmation needed");
@@ -1960,13 +1964,12 @@ public class GUI {
      * @return A colony name, or null if the user has reconsidered.
      */
     public String getNewColonyName(Player player, Tile tile) {
-        boolean ret = true;
         String suggested = player.getSettlementName(null);
         String name = getInput(true, tile, StringTemplate
             .template("nameColony.text"), suggested,
             "accept", "cancel");
         if (name == null) {
-            ; // Cancelled
+            // Cancelled
         } else if (name.isEmpty()) {
             showErrorMessage("enterSomeText"); // 0-length is invalid
         } else if (player.getSettlementByName(name) != null) {
@@ -2042,7 +2045,7 @@ public class GUI {
         }
         GoodsType[] wantedGoods = settlement.getWantedGoods();
         int present = 0;
-        for (present = 0; present < wantedGoods.length; present++) {
+        for (; present < wantedGoods.length; present++) {
             if (wantedGoods[present] == null) break;
         }
         if (present > 0) {
@@ -2397,7 +2400,7 @@ public class GUI {
             new DialogHandler<Boolean>() {
                 @Override
                 public void handle(Boolean value) {
-                    if (value != null && value.booleanValue()) {
+                    if (value != null && value) {
                         igc().endTurn(false);
                     }
                 }
@@ -2524,7 +2527,7 @@ public class GUI {
             new DialogHandler<Boolean>() {
                 @Override
                 public void handle(Boolean b) {
-                    igc().monarchAction(action, b.booleanValue());
+                    igc().monarchAction(action, b);
                     updateMenuBar();
                 }
             });
@@ -2661,8 +2664,8 @@ public class GUI {
     }
 
     public void showReportLabourDetailPanel(UnitType unitType,
-        Map<UnitType, Map<Location, Integer>> data,
-        TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
+            Map<UnitType, Map<Location, Integer>> data,
+            TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
         if (canvas == null) return;
         canvas.showReportLabourDetailPanel(unitType, data, unitCount,
                                            colonies);
@@ -2771,9 +2774,9 @@ public class GUI {
 
     public void showTilePopUpAtSelectedTile() {
         if (canvas == null || mapViewer == null) return;
-        canvas.showTilePopup(getSelectedTile(),
-                mapViewer.getCursor().getCanvasX(),
-                mapViewer.getCursor().getCanvasY());
+        TerrainCursor cursor = mapViewer.getCursor();
+        canvas.showTilePopup(mapViewer.getSelectedTile(),
+            cursor.getCanvasX(), cursor.getCanvasY());
     }
 
     public void showTradeRoutePanel(Unit unit) {
