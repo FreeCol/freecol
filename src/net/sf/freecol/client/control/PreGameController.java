@@ -28,7 +28,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;

@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.LandMap;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Resource;
@@ -879,7 +879,7 @@ public class TerrainGenerator {
                 mountainRegion.setClaimable(true);
                 map.putRegion(mountainRegion);
                 Direction direction = Direction.getRandomDirection("getLand",
-                                                                   random);
+                    logger, random);
                 int length = maximumLength
                     - randomInt(logger, "MLen", random, maximumLength/2);
                 for (int index = 0; index < length; index++) {

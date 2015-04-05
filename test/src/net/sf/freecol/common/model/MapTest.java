@@ -27,7 +27,7 @@ import java.util.Set;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
@@ -201,7 +201,7 @@ public class MapTest extends FreeColTestCase {
         MapBuilder builder = new MapBuilder(game);
         builder.setDimensions(10, 15).build();
         Direction[] dirs = Direction.getRandomDirections("testRandomDirection",
-            new Random(1));
+            null, new Random(1));
         assertNotNull(dirs);
     }
 

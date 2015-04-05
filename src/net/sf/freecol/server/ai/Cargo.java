@@ -36,7 +36,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.LogBuilder;

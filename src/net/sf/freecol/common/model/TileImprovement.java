@@ -30,7 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 
 
 /**
@@ -288,8 +288,7 @@ public class TileImprovement extends TileItem implements Named {
     public Map<Direction, Integer> getConnections() {
         List<Direction> dirns = getConnectionDirections();
         if (dirns == null) return Collections.<Direction, Integer>emptyMap();
-        Map<Direction, Integer> result
-            = new EnumMap<>(Direction.class);
+        Map<Direction, Integer> result = new EnumMap<>(Direction.class);
         for (Direction d : dirns) {
             if (isConnectedTo(d)) result.put(d, magnitude);
         }

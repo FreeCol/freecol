@@ -71,7 +71,7 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
@@ -453,7 +453,7 @@ public final class MapViewer {
                       + ". Preliminary focus is " + newCol + ", " + newRow + ".");
         // Now, we check whether the central diamond of the calculated
         // rectangle was clicked, and adjust rows and columns
-        // accordingly. See Map.Direction.
+        // accordingly. See Direction.
         Direction direction = null;
         if (x > px) {
             // right half of the rectangle

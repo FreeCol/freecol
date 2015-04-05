@@ -25,7 +25,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -173,7 +173,7 @@ public class UnitWanderHostileMission extends Mission {
         final AIUnit aiUnit = getAIUnit();
         int check = 0, checkTurns = randomInt(logger, "Hostile",
                                               getAIRandom(), 4);
-        Direction d = Direction.getRandomDirection(tag, getAIRandom());
+        Direction d = Direction.getRandomDirection(tag, logger, getAIRandom());
         while (unit.getMovesLeft() > 0) {
             // Every checkTurns, look for a target of opportunity.
             if (check == 0) {

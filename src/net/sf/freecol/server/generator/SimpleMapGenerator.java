@@ -48,7 +48,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LandMap;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
@@ -646,7 +646,8 @@ public class SimpleMapGenerator implements MapGenerator {
     private Tile findFreeNeighbouringTile(IndianSettlement is,
                                           List<Tile> tiles) {
         for (Tile tile : tiles) {
-            for (Direction d : Direction.getRandomDirections("freeTile", random)) {
+            for (Direction d : Direction.getRandomDirections("freeTile",
+                    logger, random)) {
                 Tile t = tile.getNeighbourOrNull(d);
                 if ((t != null)
                     && (t.getOwningSettlement() == null)

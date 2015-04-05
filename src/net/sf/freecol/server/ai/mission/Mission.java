@@ -33,7 +33,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -567,11 +567,11 @@ public abstract class Mission extends AIObject {
 
         Random aiRandom = getAIRandom();
         if (direction == null) {
-            direction = Direction.getRandomDirection(logMe, aiRandom);
+            direction = Direction.getRandomDirection(logMe, logger, aiRandom);
         }
 
         Direction[] directions
-            = direction.getClosestDirections(logMe, aiRandom);
+            = direction.getClosestDirections(logMe, logger, aiRandom);
         for (Direction d : directions) {
             Tile moveTo = unit.getTile().getNeighbourOrNull(d);
             if (moveTo != null

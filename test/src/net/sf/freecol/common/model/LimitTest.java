@@ -122,7 +122,7 @@ public class LimitTest extends FreeColTestCase {
         colony.updateSoL();
         assertTrue(rebelLimit.evaluate(dutch));
 
-        Tile tile = colony.getTile().getNeighbourOrNull(Map.Direction.N);
+        Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
         tile.setType(spec().getTileType("model.tile.ocean"));
         tile.setHighSeasCount(5);
         tile.setExplored(dutch, true);

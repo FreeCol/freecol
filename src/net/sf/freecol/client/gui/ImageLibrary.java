@@ -51,7 +51,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Nation;

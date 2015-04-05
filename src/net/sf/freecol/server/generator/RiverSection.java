@@ -23,7 +23,7 @@ package net.sf.freecol.server.generator;
 
 import java.util.EnumMap;
 
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 
@@ -48,8 +48,8 @@ public class RiverSection {
     /**
      * River magnitude (size) for each direction toward the edges of the tile
      */
-    private java.util.Map<Direction, Integer> branches =
-        new EnumMap<>(Direction.class);
+    private java.util.Map<Direction, Integer> branches
+        = new EnumMap<>(Direction.class);
 
     /**
      * River magnitude (size) at the center of the tile

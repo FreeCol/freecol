@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
@@ -275,7 +276,7 @@ public class InGameControllerTest extends FreeColTestCase {
         ServerIndianSettlement camp = (ServerIndianSettlement)builder.build();
         camp.setContacted(dutch);
         camp.setContacted(french);
-        Tile tile = camp.getTile().getNeighbourOrNull(Map.Direction.N);
+        Tile tile = camp.getTile().getNeighbourOrNull(Direction.N);
         ServerUnit dutchJesuit = new ServerUnit(game, tile, dutch, missionaryType);
         dutch.exploreForUnit(dutchJesuit);
         Unit frenchJesuit = new ServerUnit(game, tile, french, missionaryType);

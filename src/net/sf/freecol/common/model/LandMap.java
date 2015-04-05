@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;

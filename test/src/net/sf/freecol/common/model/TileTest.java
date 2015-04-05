@@ -676,7 +676,7 @@ public class TileTest extends FreeColTestCase {
         game.setMap(map);
 
         Colony colony = getStandardColony();
-        Tile tile = colony.getTile().getNeighbourOrNull(Map.Direction.N);
+        Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
         ColonyTile colonyTile = colony.getColonyTile(tile);
         tile.addResource(new Resource(game, tile, mineralsResource));
         for (Unit u : colonyTile.getUnitList()) {

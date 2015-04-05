@@ -29,7 +29,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -384,7 +384,7 @@ public class DefendSettlementMission extends Mission {
         float bestDifference = Float.MIN_VALUE;
         Direction bestDirection = null;
         for (Direction d : Direction.getRandomDirections("defendSettlements",
-                                                         getAIRandom())) {
+                logger, getAIRandom())) {
             Tile t = unit.getTile().getNeighbourOrNull(d);
             if (t == null) continue;
             Unit defender = t.getFirstUnit();

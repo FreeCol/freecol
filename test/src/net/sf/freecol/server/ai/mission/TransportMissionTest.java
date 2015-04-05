@@ -22,6 +22,7 @@ package net.sf.freecol.server.ai.mission;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -302,7 +303,7 @@ public class TransportMissionTest extends FreeColTestCase {
         Location dest = mission.getTarget();
         assertEquals("Destination should be colony one.", one, dest);
 
-        wagonTrain.setLocation(one.getTile().getNeighbourOrNull(Map.Direction.NE));
+        wagonTrain.setLocation(one.getTile().getNeighbourOrNull(Direction.NE));
         dest = mission.getTarget();
         assertEquals("Destination should still be colony one.", one, dest);
 

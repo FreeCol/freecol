@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 
 
 /**

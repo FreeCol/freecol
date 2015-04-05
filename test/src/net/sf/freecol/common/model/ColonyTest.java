@@ -19,7 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.model.Role;

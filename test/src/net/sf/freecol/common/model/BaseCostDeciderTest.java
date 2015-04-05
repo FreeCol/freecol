@@ -69,7 +69,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         Tile start = game.getMap().getTile(5, 5);
         Unit unit = new ServerUnit(game, start, game.getCurrentPlayer(),
                                    pioneerType);
-        for (Map.Direction dir : Map.Direction.values()) {
+        for (Direction dir : Direction.values()) {
             Tile end = start.getNeighbourOrNull(dir);
             assertNotNull(end);
             int cost = decider.getCost(unit, start, game.getMap().getTile(5, 6),

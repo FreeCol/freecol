@@ -154,11 +154,11 @@ public class MovementTest extends FreeColTestCase {
         Map map = getTestMap(plains);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
-        Tile tile2 = tile1.getNeighbourOrNull(Map.Direction.NE);
+        Tile tile2 = tile1.getNeighbourOrNull(Direction.NE);
         tile1.setExplored(dutch, true);
         tile2.setExplored(dutch, true);
-        assertEquals(Map.Direction.NE, map.getDirection(tile1, tile2));
-        assertEquals(Map.Direction.SW, map.getDirection(tile2, tile1));
+        assertEquals(Direction.NE, map.getDirection(tile1, tile2));
+        assertEquals(Direction.SW, map.getDirection(tile2, tile1));
 
         TileImprovement river1 = tile1.addRiver(1, "0101");
         assertTrue(river1.isRiver());
@@ -170,14 +170,14 @@ public class MovementTest extends FreeColTestCase {
         assertTrue(river2.isComplete());
         assertTrue(tile2.hasRiver());
 
-        assertFalse(river1.isConnectedTo(Map.Direction.NE));
-        assertTrue (river1.isConnectedTo(Map.Direction.SE));
-        assertFalse(river1.isConnectedTo(Map.Direction.SW));
-        assertTrue (river1.isConnectedTo(Map.Direction.NW));
-        assertFalse(river2.isConnectedTo(Map.Direction.NE));
-        assertTrue (river2.isConnectedTo(Map.Direction.SE));
-        assertFalse(river2.isConnectedTo(Map.Direction.SW));
-        assertTrue (river2.isConnectedTo(Map.Direction.NW));
+        assertFalse(river1.isConnectedTo(Direction.NE));
+        assertTrue (river1.isConnectedTo(Direction.SE));
+        assertFalse(river1.isConnectedTo(Direction.SW));
+        assertTrue (river1.isConnectedTo(Direction.NW));
+        assertFalse(river2.isConnectedTo(Direction.NE));
+        assertTrue (river2.isConnectedTo(Direction.SE));
+        assertFalse(river2.isConnectedTo(Direction.SW));
+        assertTrue (river2.isConnectedTo(Direction.NW));
 
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
 
@@ -191,14 +191,14 @@ public class MovementTest extends FreeColTestCase {
         river1.updateRiverConnections("1000");
         river2.updateRiverConnections("0010");
 
-        assertTrue (river1.isConnectedTo(Map.Direction.NE));
-        assertFalse(river1.isConnectedTo(Map.Direction.SE));
-        assertFalse(river1.isConnectedTo(Map.Direction.SW));
-        assertFalse(river1.isConnectedTo(Map.Direction.NW));
-        assertFalse(river2.isConnectedTo(Map.Direction.NE));
-        assertFalse(river2.isConnectedTo(Map.Direction.SE));
-        assertTrue (river2.isConnectedTo(Map.Direction.SW));
-        assertFalse(river2.isConnectedTo(Map.Direction.NW));
+        assertTrue (river1.isConnectedTo(Direction.NE));
+        assertFalse(river1.isConnectedTo(Direction.SE));
+        assertFalse(river1.isConnectedTo(Direction.SW));
+        assertFalse(river1.isConnectedTo(Direction.NW));
+        assertFalse(river2.isConnectedTo(Direction.NE));
+        assertFalse(river2.isConnectedTo(Direction.SE));
+        assertTrue (river2.isConnectedTo(Direction.SW));
+        assertFalse(river2.isConnectedTo(Direction.NW));
 
         moveCost = 1;
         assertEquals(moveCost, colonist.getMoveCost(tile2));
