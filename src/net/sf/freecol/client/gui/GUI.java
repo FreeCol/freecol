@@ -320,8 +320,8 @@ public class GUI {
 
     private final GraphicsDevice graphicsDevice;
 
-    /** The canvas that implements much of the functionality. */
-    private Canvas canvas;
+    /** An image library to use. */
+    private final ImageLibrary imageLibrary;
 
     /**
      * This is the MapViewer instance used to paint the colony tiles
@@ -330,17 +330,17 @@ public class GUI {
      */
     private MapViewer colonyTileMapViewer;
 
-    /** The parent frame, either a window or the full screen. */
-    private FreeColFrame frame;
-
-    /** An image library to use. */
-    private final ImageLibrary imageLibrary;
-
     /**
      * The MapViewer instance used to paint the main map.
      * This does need to be scaled.
      */
     private MapViewer mapViewer;
+
+    /** The canvas that implements much of the functionality. */
+    private Canvas canvas;
+
+    /** The parent frame, either a window or the full screen. */
+    private FreeColFrame frame;
 
     private MapControls mapControls;
 
@@ -392,163 +392,54 @@ public class GUI {
         return colonyTileMapViewer;
     }
 
-    /**
-     * Can this client play sounds?
-     *
-     * @return True if there is a sound player present.
-     */
-    public boolean canPlaySound() {
-        return soundPlayer != null;
-    }
-
-    /**
-     * Get the label text for the sound player mixer.
-     *
-     * Needed by the audio mixer option UI.
-     *
-     * @return The text.
-     */
-    public String getSoundMixerLabelText() {
-        Mixer mixer;
-        String text = (soundPlayer == null)
-            ? Messages.message("nothing")
-            : ((mixer = soundPlayer.getMixer()) == null)
-            ? Messages.message("none")
-            : mixer.getMixerInfo().getName();
-        return Messages.message("Current") + ":  " + text;
-    }
-
     public boolean isWindowed() {
         return windowed;
     }
 
+    // Initialization related methods
 
-    // Non-trivial public routines.
+    /** 
+     * Swing system and look-and-feel initialization.
+     */
+    public static void installLookAndFeel(String fontName) throws FreeColException {
+        Font font = FontLibrary.createMainFont(fontName);
+        FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
+        FreeColLookAndFeel.install(fclaf, font);
+    }
 
     /**
-     * Start/stop the goto path display.
+     * Quit the GUI.  All that is required is to exit the full screen.
      */
-    public void activateGotoPath() {
-        Unit unit = getActiveUnit();
-
-        // Action should be disabled if there is no active unit, but make sure
-        if (unit == null || mapViewer == null) return;
-
-        // Enter "goto mode" if not already activated; otherwise cancel it
-        if (mapViewer.isGotoStarted()) {
-            mapViewer.stopGoto();
-        } else {
-            mapViewer.startGoto();
-
-            // Draw the path to the current mouse position, if the
-            // mouse is over the screen; see also
-            // CanvasMouseMotionListener.
-            Point pt = canvas.getMousePosition();
-            if (pt != null) {
-                Tile tile = mapViewer.convertToMapTile(pt.x, pt.y);
-                if (tile != null && unit.getTile() != tile) {
-                    mapViewer.setGotoPath(unit.findPath(tile));
-                }
-            }
+    public void quit() throws Exception {
+        if (this.frame != null) {
+            GraphicsConfiguration GraphicsConf = this.frame.getGraphicsConfiguration();
+            GraphicsDevice gd = GraphicsConf.getDevice();
+            if (!isWindowed()) gd.setFullScreenWindow(null);
         }
-
     }
 
     /**
-     * Stop the goto path display.
-     */
-    public void clearGotoPath() {
-        Unit unit = getActiveUnit();
-
-        // Action should be disabled if there is no active unit, but make sure
-        if (unit == null || mapViewer == null) return;
-        mapViewer.stopGoto();
-        refresh();
-    }
-
-    /**
-     * Change the windowed mode.
+     * In game initializations.
+     * Called from PreGameController.startGame().
      *
-     * @param windowed Use <code>true</code> for windowed mode
-     *     and <code>false</code> for fullscreen mode.
+     * @param tile An initial <code>Tile</code> to select.
      */
-    public void changeWindowedMode(boolean windowed) {
-        // Clean up the old frame
-        JMenuBar menuBar = null;
-        if (frame != null) {
-            menuBar = frame.getJMenuBar();
-            if (frame instanceof WindowedFrame) {
-                windowBounds = frame.getBounds();
-            }
-            frame.setVisible(false);
-            frame.dispose();
-        }
-        this.windowed = windowed;
+    public void initializeInGame(Tile tile) {
+        if (frame == null || canvas == null) return;
 
-        // User might have moved window to new screen in a
-        // multi-screen setup, so make this.gd point to the current screen.
-        frame = windowed
-            ? new WindowedFrame(freeColClient, graphicsDevice)
-            : new FullScreenFrame(freeColClient, graphicsDevice);
-        frame.setJMenuBar(menuBar);
-        frame.setCanvas(canvas);
-        frame.updateBounds(windowBounds);
-        if (windowed) {
-            frame.addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    logger.info("Window size changes to " + canvas.getSize());
-                }
-            });
-        }
-
-        mapViewer.forceReposition();
-        canvas.updateSizes();
-        frame.setVisible(true);
+        frame.setJMenuBar(new InGameMenuBar(freeColClient));
+        frame.paintAll(canvas.getGraphics());
+        enableMapControls(freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
+        setSelectedTile(tile, false);
     }
 
     /**
-     * Create a thumbnail for the minimap.
+     * Set up the mouse listeners for the canvas and map viewer.
      */
-    public BufferedImage createMiniMapThumbNail() {
-        MiniMap miniMap = new MiniMap(freeColClient);
-        miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
-        Game game = freeColClient.getGame();
-        int width = game.getMap().getWidth() * MiniMap.MAX_TILE_SIZE
-            + MiniMap.MAX_TILE_SIZE / 2;
-        int height = game.getMap().getHeight() * MiniMap.MAX_TILE_SIZE / 4;
-        BufferedImage image = new BufferedImage(
-            width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g1 = image.createGraphics();
-        miniMap.paintMap(g1);
-        g1.dispose();
-
-        // FIXME: this can probably done more efficiently by applying
-        // a suitable AffineTransform to the Graphics2D
-        int scaledWidth = Math.min((int)((64 * width) / (float)height), 128);
-        BufferedImage scaledImage = new BufferedImage(scaledWidth, 64,
-            BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = scaledImage.createGraphics();
-        g2.drawImage(image, 0, 0, scaledWidth, 64, null);
-        g2.dispose();
-        return scaledImage;
-    }
-
-    /**
-     * Tells the map controls that a chat message was received.
-     *
-     * @param player The player who sent the chat message.
-     * @param message The chat message.
-     * @param privateChat 'true' if the message is a private one, 'false'
-     *            otherwise.
-     * @see GUIMessage
-     */
-    public void displayChatMessage(Player player, String message,
-                                   boolean privateChat) {
-        if (mapViewer == null || canvas == null) return;
-        mapViewer.addMessage(new GUIMessage(player.getName() + ": " + message,
-                                            player.getNationColor()));
-        canvas.repaint(0, 0, canvas.getWidth(), canvas.getHeight());
+    public void setupMouseListeners() {
+        if (canvas == null || mapViewer == null) return;
+        canvas.setupMouseListeners(mapViewer);
     }
 
     /**
@@ -577,16 +468,6 @@ public class GUI {
     }
 
     /**
-     * Make image icon from an object.
-     *
-     * @param display The object to find an icon for.
-     * @return The <code>ImageIcon</code> found.
-     */
-    public ImageIcon getImageIcon(Object display) {
-        return new ImageIcon(imageLibrary.getObjectImage(display));
-    }
-
-    /**
      * Hide the splash screen.
      */
     public void hideSplashScreen() {
@@ -597,139 +478,24 @@ public class GUI {
         }
     }
 
-    /** 
-     * Swing system and look-and-feel initialization.
-     */
-    public static void installLookAndFeel(String fontName) throws FreeColException {
-        Font font = FontLibrary.createMainFont(fontName);
-        FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
-        FreeColLookAndFeel.install(fclaf, font);
-    }
-
     /**
-     * In game initializations.
-     * Called from PreGameController.startGame().
+     * Get a good screen device for starting FreeCol.
      *
-     * @param tile An initial <code>Tile</code> to select.
+     * @return A screen device, or null if none available
+     *     (as in headless mode).
      */
-    public void initializeInGame(Tile tile) {
-        if (frame == null || canvas == null) return;
+    private static GraphicsDevice getGoodGraphicsDevice() {
+        try {
+            return MouseInfo.getPointerInfo().getDevice();
+        } catch (HeadlessException he) {}
 
-        frame.setJMenuBar(new InGameMenuBar(freeColClient));
-        frame.paintAll(canvas.getGraphics());
-        enableMapControls(freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
-        setSelectedTile(tile, false);
-    }
+        try {
+            final GraphicsEnvironment lge
+                = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            return lge.getDefaultScreenDevice();
+        } catch (HeadlessException he) {}
 
-    /**
-     * Play a sound.
-     *
-     * @param sound The sound resource to play, or if null stop playing.
-     */
-    public void playSound(String sound) {
-        if (!canPlaySound()) return;
-        if (sound == null) {
-            soundPlayer.stop();
-        } else {
-            File file = ResourceManager.getAudio(sound);
-            if (file != null) {
-                soundPlayer.playOnce(file);
-            }
-            logger.finest(((file == null) ? "Could not load" : "Playing")
-                + " sound: " + sound);
-        }
-    }
-
-    /**
-     * Quit the GUI.  All that is required is to exit the full screen.
-     */
-    public void quit() throws Exception {
-        if (this.frame != null) {
-            GraphicsConfiguration GraphicsConf = this.frame.getGraphicsConfiguration();
-            GraphicsDevice gd = GraphicsConf.getDevice();
-            if (!isWindowed()) gd.setFullScreenWindow(null);
-        }
-    }
-
-    /**
-     * Refresh the GUI.
-     */
-    public void refresh() {
-        if (mapViewer == null || canvas == null) return;
-        mapViewer.forceReposition();
-        canvas.refresh();
-    }
-
-    /**
-     * Refreshes the screen at the specified Tile.
-     *
-     * @param tile The <code>Tile</code> to refresh.
-     */
-    public void refreshTile(Tile tile) {
-        if (mapViewer == null || canvas == null) return;
-        if (tile.getX() >= 0 && tile.getY() >= 0) {
-            canvas.repaint(mapViewer.getTileBounds(tile));
-        }
-    }
-
-    /**
-     * Reset the menu bar.
-     */
-    public void resetMenuBar() {
-        if (frame == null) return;
-        JMenuBar menuBar = frame.getJMenuBar();
-        if (menuBar != null) {
-            ((FreeColMenuBar)menuBar).reset();
-        }
-    }
-
-    private void resetMapZoom() {
-        mapViewer.resetMapScale();
-        refresh();
-    }
-
-    public boolean canZoomInMap() {
-        return !mapViewer.isAtMaxMapScale();
-    }
-
-    public boolean canZoomOutMap() {
-        return !mapViewer.isAtMinMapScale();
-    }
-
-    public void zoomInMap() {
-        if (mapViewer == null) return;
-        mapViewer.increaseMapScale();
-        refresh();
-    }
-
-    public void zoomOutMap() {
-        if (mapViewer == null) return;
-        mapViewer.decreaseMapScale();
-        refresh();
-    }
-
-    /**
-     * Set the active unit.
-     *
-     * @param unit The <code>Unit</code> to activate.
-     */
-    public void setActiveUnit(Unit unit) {
-        if (mapViewer == null || canvas == null) return;
-        mapViewer.setActiveUnit(unit);
-        updateMapControls();
-        if (unit != null && !freeColClient.getMyPlayer().owns(unit)) {
-            canvas.refresh();
-        }
-        updateMenuBar();
-    }
-
-    /**
-     * Set up the mouse listeners for the canvas and map viewer.
-     */
-    public void setupMouseListeners() {
-        if (canvas == null || mapViewer == null) return;
-        canvas.setupMouseListeners(mapViewer);
+        return null;
     }
 
     /**
@@ -855,36 +621,6 @@ public class GUI {
     }
 
     /**
-     * Start the GUI for the map editor.
-     */
-    public void startMapEditorGUI() {
-        if (frame == null || canvas == null) return;
-
-        // We may need to reset the zoom value to the default value
-        resetMapZoom();
-
-        frame.setJMenuBar(new MapEditorMenuBar(freeColClient));
-        canvas.showMapEditorTransformPanel();
-
-        CanvasMapEditorMouseListener listener
-            = new CanvasMapEditorMouseListener(freeColClient, canvas);
-        canvas.addMouseListener(listener);
-        canvas.addMouseMotionListener(listener);
-    }
-
-    /**
-     * Update the menu bar.
-     */
-    public void updateMenuBar() {
-        if (frame != null && frame.getJMenuBar() != null) {
-            ((FreeColMenuBar)frame.getJMenuBar()).update();
-        }
-    }
-
-
-    // Static utilities.
-
-    /**
      * Estimate size of client area when using the full screen.
      *
      * @return A suitable window size.
@@ -944,24 +680,292 @@ public class GUI {
     }
 
     /**
-     * Get a good screen device for starting FreeCol.
+     * Change the windowed mode.
      *
-     * @return A screen device, or null if none available
-     *     (as in headless mode).
+     * @param windowed Use <code>true</code> for windowed mode
+     *     and <code>false</code> for fullscreen mode.
      */
-    private static GraphicsDevice getGoodGraphicsDevice() {
-        try {
-            return MouseInfo.getPointerInfo().getDevice();
-        } catch (HeadlessException he) {}
+    public void changeWindowedMode(boolean windowed) {
+        // Clean up the old frame
+        JMenuBar menuBar = null;
+        if (frame != null) {
+            menuBar = frame.getJMenuBar();
+            if (frame instanceof WindowedFrame) {
+                windowBounds = frame.getBounds();
+            }
+            frame.setVisible(false);
+            frame.dispose();
+        }
+        this.windowed = windowed;
 
-        try {
-            final GraphicsEnvironment lge
-                = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            return lge.getDefaultScreenDevice();
-        } catch (HeadlessException he) {}
+        // User might have moved window to new screen in a
+        // multi-screen setup, so make this.gd point to the current screen.
+        frame = windowed
+            ? new WindowedFrame(freeColClient, graphicsDevice)
+            : new FullScreenFrame(freeColClient, graphicsDevice);
+        frame.setJMenuBar(menuBar);
+        frame.setCanvas(canvas);
+        frame.updateBounds(windowBounds);
+        if (windowed) {
+            frame.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    logger.info("Window size changes to " + canvas.getSize());
+                }
+            });
+        }
 
-        return null;
+        mapViewer.forceReposition();
+        canvas.updateSizes();
+        frame.setVisible(true);
     }
+
+    /**
+     * Start the GUI for the map editor.
+     */
+    public void startMapEditorGUI() {
+        if (frame == null || canvas == null) return;
+
+        // We may need to reset the zoom value to the default value
+        resetMapZoom();
+
+        frame.setJMenuBar(new MapEditorMenuBar(freeColClient));
+        canvas.showMapEditorTransformPanel();
+
+        CanvasMapEditorMouseListener listener
+            = new CanvasMapEditorMouseListener(freeColClient, canvas);
+        canvas.addMouseListener(listener);
+        canvas.addMouseMotionListener(listener);
+    }
+
+    // Sound related methods
+
+    /**
+     * Can this client play sounds?
+     *
+     * @return True if there is a sound player present.
+     */
+    public boolean canPlaySound() {
+        return soundPlayer != null;
+    }
+
+    /**
+     * Play a sound.
+     *
+     * @param sound The sound resource to play, or if null stop playing.
+     */
+    public void playSound(String sound) {
+        if (!canPlaySound()) return;
+        if (sound == null) {
+            soundPlayer.stop();
+        } else {
+            File file = ResourceManager.getAudio(sound);
+            if (file != null) {
+                soundPlayer.playOnce(file);
+            }
+            logger.finest(((file == null) ? "Could not load" : "Playing")
+                + " sound: " + sound);
+        }
+    }
+
+    /**
+     * Get the label text for the sound player mixer.
+     *
+     * Needed by the audio mixer option UI.
+     *
+     * @return The text.
+     */
+    public String getSoundMixerLabelText() {
+        Mixer mixer;
+        String text = (soundPlayer == null)
+            ? Messages.message("nothing")
+            : ((mixer = soundPlayer.getMixer()) == null)
+            ? Messages.message("none")
+            : mixer.getMixerInfo().getName();
+        return Messages.message("Current") + ":  " + text;
+    }
+
+
+    // Non-trivial public routines.
+
+    /**
+     * Start/stop the goto path display.
+     */
+    public void activateGotoPath() {
+        Unit unit = getActiveUnit();
+
+        // Action should be disabled if there is no active unit, but make sure
+        if (unit == null || mapViewer == null) return;
+
+        // Enter "goto mode" if not already activated; otherwise cancel it
+        if (mapViewer.isGotoStarted()) {
+            mapViewer.stopGoto();
+        } else {
+            mapViewer.startGoto();
+
+            // Draw the path to the current mouse position, if the
+            // mouse is over the screen; see also
+            // CanvasMouseMotionListener.
+            Point pt = canvas.getMousePosition();
+            if (pt != null) {
+                Tile tile = mapViewer.convertToMapTile(pt.x, pt.y);
+                if (tile != null && unit.getTile() != tile) {
+                    mapViewer.setGotoPath(unit.findPath(tile));
+                }
+            }
+        }
+
+    }
+
+    /**
+     * Stop the goto path display.
+     */
+    public void clearGotoPath() {
+        Unit unit = getActiveUnit();
+
+        // Action should be disabled if there is no active unit, but make sure
+        if (unit == null || mapViewer == null) return;
+        mapViewer.stopGoto();
+        refresh();
+    }
+
+    /**
+     * Make image icon from an object.
+     *
+     * @param display The object to find an icon for.
+     * @return The <code>ImageIcon</code> found.
+     */
+    public ImageIcon getImageIcon(Object display) {
+        return new ImageIcon(imageLibrary.getObjectImage(display));
+    }
+
+    /**
+     * Create a thumbnail for the minimap.
+     */
+    public BufferedImage createMiniMapThumbNail() {
+        MiniMap miniMap = new MiniMap(freeColClient);
+        miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
+        Game game = freeColClient.getGame();
+        int width = game.getMap().getWidth() * MiniMap.MAX_TILE_SIZE
+            + MiniMap.MAX_TILE_SIZE / 2;
+        int height = game.getMap().getHeight() * MiniMap.MAX_TILE_SIZE / 4;
+        BufferedImage image = new BufferedImage(
+            width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g1 = image.createGraphics();
+        miniMap.paintMap(g1);
+        g1.dispose();
+
+        // FIXME: this can probably done more efficiently by applying
+        // a suitable AffineTransform to the Graphics2D
+        int scaledWidth = Math.min((int)((64 * width) / (float)height), 128);
+        BufferedImage scaledImage = new BufferedImage(scaledWidth, 64,
+            BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = scaledImage.createGraphics();
+        g2.drawImage(image, 0, 0, scaledWidth, 64, null);
+        g2.dispose();
+        return scaledImage;
+    }
+
+    /**
+     * Tells the map controls that a chat message was received.
+     *
+     * @param player The player who sent the chat message.
+     * @param message The chat message.
+     * @param privateChat 'true' if the message is a private one, 'false'
+     *            otherwise.
+     * @see GUIMessage
+     */
+    public void displayChatMessage(Player player, String message,
+                                   boolean privateChat) {
+        if (mapViewer == null || canvas == null) return;
+        mapViewer.addMessage(new GUIMessage(player.getName() + ": " + message,
+                                            player.getNationColor()));
+        canvas.repaint(0, 0, canvas.getWidth(), canvas.getHeight());
+    }
+
+    /**
+     * Refresh the GUI.
+     */
+    public void refresh() {
+        if (mapViewer == null || canvas == null) return;
+        mapViewer.forceReposition();
+        canvas.refresh();
+    }
+
+    /**
+     * Refreshes the screen at the specified Tile.
+     *
+     * @param tile The <code>Tile</code> to refresh.
+     */
+    public void refreshTile(Tile tile) {
+        if (mapViewer == null || canvas == null) return;
+        if (tile.getX() >= 0 && tile.getY() >= 0) {
+            canvas.repaint(mapViewer.getTileBounds(tile));
+        }
+    }
+
+    /**
+     * Reset the menu bar.
+     */
+    public void resetMenuBar() {
+        if (frame == null) return;
+        JMenuBar menuBar = frame.getJMenuBar();
+        if (menuBar != null) {
+            ((FreeColMenuBar)menuBar).reset();
+        }
+    }
+
+    private void resetMapZoom() {
+        mapViewer.resetMapScale();
+        refresh();
+    }
+
+    public boolean canZoomInMap() {
+        return !mapViewer.isAtMaxMapScale();
+    }
+
+    public boolean canZoomOutMap() {
+        return !mapViewer.isAtMinMapScale();
+    }
+
+    public void zoomInMap() {
+        if (mapViewer == null) return;
+        mapViewer.increaseMapScale();
+        refresh();
+    }
+
+    public void zoomOutMap() {
+        if (mapViewer == null) return;
+        mapViewer.decreaseMapScale();
+        refresh();
+    }
+
+    /**
+     * Set the active unit.
+     *
+     * @param unit The <code>Unit</code> to activate.
+     */
+    public void setActiveUnit(Unit unit) {
+        if (mapViewer == null || canvas == null) return;
+        mapViewer.setActiveUnit(unit);
+        updateMapControls();
+        if (unit != null && !freeColClient.getMyPlayer().owns(unit)) {
+            canvas.refresh();
+        }
+        updateMenuBar();
+    }
+
+    /**
+     * Update the menu bar.
+     */
+    public void updateMenuBar() {
+        if (frame != null && frame.getJMenuBar() != null) {
+            ((FreeColMenuBar)frame.getJMenuBar()).update();
+        }
+    }
+
+
+    // Static utilities.
 
     /**
      * Return a button suitable for linking to another panel
@@ -1086,7 +1090,6 @@ public class GUI {
         textPane.setText(text);
         return textPane;
     }
-
 
     /**
      * Get a border consisting of empty space.
