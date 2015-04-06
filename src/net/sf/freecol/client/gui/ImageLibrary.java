@@ -34,12 +34,11 @@ import java.awt.Transparency;
 import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+import java.util.ArrayList;
 
 import javax.swing.JComponent;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -132,8 +131,6 @@ public final class ImageLibrary {
      * this object is not a result of a scaling operation.
      */
     private final float scalingFactor;
-
-    private final Map<String, Integer> imageCounts = new HashMap<>();
 
 
     /**
@@ -542,27 +539,18 @@ public final class ImageLibrary {
     }
 
     private Image getRandomizedImage(String prefix, String id, float scale) {
-        // TODO: Fix this brittle way of randomly choosing. Would be better to
-        // keep the list of image names, sort and choose one available string.
-        int count = getImageCount(prefix);
-        if (count > 0) {
-            String key = prefix + Math.abs(id.hashCode() % count) + ".image";
-            if (ResourceManager.hasResource(key)) {
-                return ResourceManager.getImage(key, scale);
-            }
+        ArrayList<String> keys = ResourceManager.getKeys(prefix, ".image");
+        int count = keys.size();
+        switch(count) {
+            case 0:
+                return null;
+            case 1:
+                return ResourceManager.getImage(keys.get(0), scale);
+            default:
+                keys.sort(null);
+                return ResourceManager.getImage(
+                    keys.get(Math.abs(id.hashCode() % count)), scale);
         }
-        return null;
-    }
-
-    private int getImageCount(String prefix) {
-        // TODO: Remove method after getRandomizedImage got changed. If its not
-        // removed fix inefficient usage of getKeys discarding a result list
-        // and then try to remove imageCounts cache, which may get outdated
-        // when the ResourceMapping changes.
-        if (!imageCounts.containsKey(prefix)) {
-            imageCounts.put(prefix, ResourceManager.getKeys(prefix).size());
-        }
-        return imageCounts.get(prefix);
     }
 
     /**

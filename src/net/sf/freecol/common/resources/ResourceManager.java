@@ -24,6 +24,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -222,8 +223,20 @@ public class ResourceManager {
      * @param prefix the prefix
      * @return a list of all keys starting with the given prefix
      */
-    public static synchronized List<String> getKeys(String prefix) {
+    public static synchronized ArrayList<String> getKeys(String prefix) {
         return mergedContainer.getKeys(prefix);
+    }
+
+    /**
+     * Returns a list of all keys starting with the given prefix.
+     *
+     * @param prefix the prefix
+     * @param suffix the suffix
+     * @return a list of all keys starting with the given prefix
+     */
+    public static synchronized ArrayList<String> getKeys(String prefix,
+                                                         String suffix) {
+        return mergedContainer.getKeys(prefix, suffix);
     }
 
     /**

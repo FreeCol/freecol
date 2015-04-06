@@ -22,7 +22,6 @@ package net.sf.freecol.common.resources;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -96,13 +95,30 @@ public class ResourceMapping {
     /**
      * Get the keys in this mapping with a given prefix.
      *
-     * @param prefix The prefix to check.
+     * @param prefix The prefix to check for.
      * @return A list of keys.
      */
-    public List<String> getKeys(String prefix) {
-        List<String> result = new ArrayList<>();
+    public ArrayList<String> getKeys(String prefix) {
+        ArrayList<String> result = new ArrayList<>();
         for (String key : resources.keySet()) {
             if (key.startsWith(prefix)) {
+                result.add(key);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Get the keys in this mapping with a given prefix and suffix.
+     *
+     * @param prefix The prefix to check for.
+     * @param suffix The suffix to check for.
+     * @return A list of keys.
+     */
+    public ArrayList<String> getKeys(String prefix, String suffix) {
+        ArrayList<String> result = new ArrayList<>();
+        for (String key : resources.keySet()) {
+            if (key.startsWith(prefix) && key.endsWith(suffix)) {
                 result.add(key);
             }
         }
