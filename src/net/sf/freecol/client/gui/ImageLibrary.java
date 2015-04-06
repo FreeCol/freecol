@@ -25,12 +25,9 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.RenderingHints;
-import java.awt.Transparency;
 import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
@@ -528,6 +525,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the overlay-image for the given type and scale.
+     * Currently used for hills and mountains.
      *
      * @param type The type of the terrain-image to return.
      * @param id A string used to get a random image.
@@ -925,7 +923,6 @@ public final class ImageLibrary {
      * @return The terrain-image
      */
     public Image getCompoundTerrainImage(TileType type, float scale) {
-        // Currently used for hills and mountains
         Image terrainImage = getTerrainImage(type, 0, 0, scale);
         Image overlayImage = getOverlayImage(type, type.getId(), scale);
         Image forestImage = type.isForested() ? getForestImage(type, scale)
@@ -933,9 +930,6 @@ public final class ImageLibrary {
         if (overlayImage == null && forestImage == null) {
             return terrainImage;
         } else {
-            GraphicsConfiguration gc
-                = GraphicsEnvironment.getLocalGraphicsEnvironment()
-                    .getDefaultScreenDevice().getDefaultConfiguration();
             int width = terrainImage.getWidth(null);
             int height = terrainImage.getHeight(null);
             if (overlayImage != null) {
@@ -944,9 +938,8 @@ public final class ImageLibrary {
             if (forestImage != null) {
                 height = Math.max(height, forestImage.getHeight(null));
             }
-            BufferedImage compositeImage
-                = gc.createCompatibleImage(width, height,
-                                           Transparency.TRANSLUCENT);
+            BufferedImage compositeImage = new BufferedImage(
+                width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = compositeImage.createGraphics();
             g.drawImage(terrainImage, 0,
                         height - terrainImage.getHeight(null), null);
