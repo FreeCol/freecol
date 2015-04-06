@@ -844,10 +844,10 @@ public class GUI {
     /**
      * Make image icon from an object.
      *
-     * @param display The object to find an icon for.
+     * @param display The FreeColObject to find an icon for.
      * @return The <code>ImageIcon</code> found.
      */
-    public ImageIcon getImageIcon(Object display) {
+    public ImageIcon getImageIcon(FreeColObject display) {
         return (display == null) ? null
             : createImageIcon(imageLibrary.getObjectImage(display));
     }
@@ -1539,7 +1539,7 @@ public class GUI {
      * @return True if the "ok" button was selected.
      */
     public boolean confirm(boolean modal, Tile tile,
-                           StringTemplate template, Object obj,
+                           StringTemplate template, FreeColObject obj,
                            String okKey, String cancelKey) {
         if (canvas == null) return false;
 
@@ -2126,7 +2126,7 @@ public class GUI {
      * @return The selected value of the selected <code>ChoiceItem</code>,
      *     or null if cancelled.
      */
-    public <T> T getChoice(boolean modal, Tile tile, Object explain, Object obj,
+    public <T> T getChoice(boolean modal, Tile tile, Object explain, FreeColObject obj,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         if (canvas == null) return null;
 

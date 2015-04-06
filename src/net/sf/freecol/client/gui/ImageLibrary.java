@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Nation;
@@ -402,12 +403,12 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the appropriate small Image for Object.
+     * Returns the appropriate small Image for a FreeColObject.
      *
-     * @param display The Object to display.
+     * @param display The FreeColObject to display.
      * @return The appropriate Image.
      */
-    public Image getSmallObjectImage(Object display) {
+    public Image getSmallObjectImage(FreeColObject display) {
         try {
             Image image = null;
             if (display instanceof Goods)
@@ -451,12 +452,12 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the appropriate Image for Object.
+     * Returns the appropriate Image for a FreeColObject.
      *
-     * @param display The Object to display.
+     * @param display The FreeColObject to display.
      * @return The appropriate Image.
      */
-    public Image getObjectImage(Object display) {
+    public Image getObjectImage(FreeColObject display) {
         try {
             Image image;
             if (display instanceof Goods)
