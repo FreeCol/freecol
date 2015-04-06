@@ -838,7 +838,8 @@ public class GUI {
      * @return The <code>ImageIcon</code> found.
      */
     public ImageIcon getImageIcon(Object display) {
-        return new ImageIcon(imageLibrary.getObjectImage(display));
+        return (display == null) ? null
+            : new ImageIcon(imageLibrary.getObjectImage(display));
     }
 
     /**
