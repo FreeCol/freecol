@@ -57,9 +57,9 @@ public final class IndianSettlementPanel extends FreeColPanel {
                                  IndianSettlement settlement) {
         super(freeColClient, new MigLayout("wrap 2, gapx 20", "", ""));
 
-        ImageLibrary imageLibrary = getImageLibrary();
+        ImageLibrary lib = getImageLibrary();
         JLabel settlementLabel = new JLabel(new ImageIcon(
-            imageLibrary.getSettlementImage(settlement)));
+            lib.getSettlementImage(settlement)));
         Player indian = settlement.getOwner();
         Player player = getMyPlayer();
         boolean contacted = settlement.hasContacted(player);
@@ -82,15 +82,15 @@ public final class IndianSettlementPanel extends FreeColPanel {
         final Unit missionary = settlement.getMissionary();
         if (missionary != null) {
             add(GUI.localizedLabel(missionary.getLabel(Unit.UnitLabelType.NATIONAL),
-                    new ImageIcon(imageLibrary.getSmallObjectImage(missionary)),
-                    JLabel.CENTER));
+                GUI.createImageIcon(lib.getSmallObjectImage(missionary)),
+                JLabel.CENTER));
         }
 
         add(GUI.localizedLabel("indianSettlement.learnableSkill"), "newline");
         final UnitType skillType = settlement.getLearnableSkill();
         add(GUI.localizedLabel(settlement.getLearnableSkillLabel(visited),
                 ((visited && skillType != null)
-                    ? new ImageIcon(imageLibrary.getSmallObjectImage(skillType))
+                    ? GUI.createImageIcon(lib.getSmallObjectImage(skillType))
                     : null),
                 JLabel.CENTER));
 
@@ -98,7 +98,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         final Player mostHated = settlement.getMostHated();
         add(GUI.localizedLabel(settlement.getMostHatedLabel(contacted),
                 ((contacted && mostHated != null)
-                    ? new ImageIcon(imageLibrary.getSmallObjectImage(mostHated))
+                    ? GUI.createImageIcon(lib.getSmallObjectImage(mostHated))
                     : null),
                 JLabel.CENTER));
 
@@ -107,7 +107,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         add(GUI.localizedLabel("indianSettlement.highlyWanted"), "newline");
         add(GUI.localizedLabel(settlement.getWantedGoodsLabel(0, player),
                 ((visited && wantedGoods[0] != null)
-                    ? new ImageIcon(imageLibrary.getGoodsImage(wantedGoods[0]))
+                    ? new ImageIcon(lib.getGoodsImage(wantedGoods[0]))
                     : null),
                 JLabel.CENTER));
         add(GUI.localizedLabel("indianSettlement.otherWanted"), "newline");
@@ -115,7 +115,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         for (int i = 1; i < n; i++) {
             add(GUI.localizedLabel(settlement.getWantedGoodsLabel(i, player),
                     ((visited && wantedGoods[i] != null)
-                        ? new ImageIcon(imageLibrary.getGoodsImage(wantedGoods[i]))
+                        ? new ImageIcon(lib.getGoodsImage(wantedGoods[i]))
                         : null),
                     JLabel.CENTER),
                 x);

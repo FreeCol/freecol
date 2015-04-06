@@ -423,8 +423,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 (Location)null).okOption());
         c.add(new ChoiceItem<>(Messages.message("selectDestination.cancel"),
                 (Location)null).cancelOption().defaultOption());
-        initializeDialog(DialogType.QUESTION, true, panel,
-            new ImageIcon(getImageLibrary().getSmallObjectImage(unit)), c);
+        initializeDialog(DialogType.QUESTION, true, panel, GUI.createImageIcon(
+            getImageLibrary().getSmallObjectImage(unit)), c);
     }
 
 

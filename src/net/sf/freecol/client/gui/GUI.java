@@ -832,6 +832,16 @@ public class GUI {
     }
 
     /**
+     * Make image icon from an image.
+     *
+     * @param image The <code>Image</code> to create an icon for.
+     * @return The <code>ImageIcon</code>.
+     */
+    public static ImageIcon createImageIcon(Image image) {
+        return (image==null) ? null : new ImageIcon(image);
+    }
+
+    /**
      * Make image icon from an object.
      *
      * @param display The object to find an icon for.
@@ -839,7 +849,7 @@ public class GUI {
      */
     public ImageIcon getImageIcon(Object display) {
         return (display == null) ? null
-            : new ImageIcon(imageLibrary.getObjectImage(display));
+            : createImageIcon(imageLibrary.getObjectImage(display));
     }
 
     /**
