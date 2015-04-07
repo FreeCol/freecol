@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -44,6 +45,7 @@ import javax.swing.SpinnerNumberModel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -315,7 +317,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         /**
          * Creates a new <code>GoodsTradeItemPanel</code> instance.
          *
-         * @param source The <code>Player</code> nominally in posession of the
+         * @param source The <code>Player</code> nominally in possession of the
          *     goods (this may be totally fictional).
          * @param allGoods The <code>Goods</code> to trade.
          */
@@ -893,7 +895,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.goodsOfferPanel = new GoodsTradeItemPanel(player, goods);
             this.inciteOfferPanel = this.inciteDemandPanel = null;
             this.unitDemandPanel = new UnitTradeItemPanel(otherPlayer,
-                                                          getUnitUnitList(null));
+                    getUnitUnitList(null));
             this.unitOfferPanel = new UnitTradeItemPanel(player,
                 ((ourUnit != null) ? getUnitUnitList(ourUnit)
                     : ourColony.getUnitList()));
@@ -910,24 +912,46 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             throw new IllegalStateException("Bogus trade context: " + context);
         }
 
-        JTextArea tutArea = Utility.getDefaultTextArea(tutorial);
-
         this.summary = new MigPanel(new MigLayout("wrap 2", "[20px][]"));
         this.summary.setOpaque(false);
         this.summary.add(Utility.getDefaultTextArea(comment), "center, span 2");
 
+        /**
+         * Build Layout of Diplomatic Trade Dialog
+         */
         MigPanel panel = new MigPanel(new MigLayout("wrap 3",
                 "[200, fill][300, fill][200, fill]", ""));
+        // Main Panel Header
         panel.add(Utility.localizedHeader("negotiationDialog.title."
-                + agreement.getContext().getKey(), false),
+                + agreement.getContext().getKey(), false), 
                   "span 3, center");
-        panel.add(Utility.getDefaultTextArea(this.demandMessage), "center");
-        panel.add(tutArea, "center");
-        panel.add(Utility.getDefaultTextArea(this.offerMessage), "center");
+        
+        // Panel contents Header row
+        JTextArea labelDemandMessage = Utility.getDefaultTextArea(this.demandMessage);
+        Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, 
+                FontLibrary.FontSize.TINY, Font.BOLD);
+        labelDemandMessage.setFont(font);
+        panel.add(labelDemandMessage, "aligny bottom");
+        JTextArea blank = new JTextArea(" ");
+        panel.add(blank, "center");
+        JTextArea labelOfferMessage = Utility.getDefaultTextArea(this.offerMessage);
+        labelOfferMessage.setFont(font);
+        panel.add(labelOfferMessage, "aligny bottom");
 
-        panel.add(this.goldDemandPanel);
-        panel.add(this.summary, "spany, top");
-        panel.add(this.goldOfferPanel);
+        // Panel contents
+        // TODO: Expand center panel so that contents fill cell horizontally. 
+        panel.add(this.goldDemandPanel); // Left pane
+            JPanel centerPanel = new MigPanel();
+            centerPanel.setLayout(new MigLayout("wrap 1"));
+            if (!tutorial.equals("")) {
+                // Display only if tutorial variable contents overriden
+                //      Can only occur if: First Contact with a forgeign Nation
+                JTextArea tutArea = Utility.getDefaultTextArea(tutorial);
+                centerPanel.add(tutArea, "center");
+            }
+            centerPanel.add(this.summary, "top");
+        panel.add(centerPanel, "spany, top"); // Center pane
+        panel.add(this.goldOfferPanel); // Right pane
 
         if (this.colonyDemandPanel != null) {
             panel.add(this.colonyDemandPanel);
