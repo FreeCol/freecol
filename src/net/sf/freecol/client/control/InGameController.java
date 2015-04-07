@@ -3018,12 +3018,12 @@ public final class InGameController implements NetworkConstants {
             if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
             t = StringTemplate.template("negotiationDialog.offerAccepted")
                 .addStringTemplate("%nation%", nation);
-            gui.showInformationMessage(null, t);
+            gui.showInformationMessage(t);
             break;
         case REJECT_TRADE:
             t = StringTemplate.template("negotiationDialog.offerRejected")
                 .addStringTemplate("%nation%", nation);
-            gui.showInformationMessage(null, t);
+            gui.showInformationMessage(t);
             break;
         case PROPOSE_TRADE:
             String messageId = "negotiationDialog.receive."

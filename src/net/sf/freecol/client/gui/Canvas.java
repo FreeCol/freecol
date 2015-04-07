@@ -1748,6 +1748,34 @@ public final class Canvas extends JDesktopPane {
     /**
      * Shows a message with some information and an "OK"-button.
      *
+     * @param messageId The messageId of the message to display.
+     */
+    public void showInformationMessage(String messageId) {
+        showInformationMessage(null, null, null, StringTemplate.key(messageId));
+    }
+
+    /**
+     * Shows a message with some information and an "OK"-button.
+     *
+     * @param template The <code>StringTemplate</code> to display.
+     */
+    public void showInformationMessage(StringTemplate template) {
+        showInformationMessage(null, null, null, template);
+    }
+
+    /**
+     * Show an information message using a model message.
+     *
+     * @param message The <code>ModelMessage</code> to display.
+     */
+    public void showInformationMessage(ModelMessage message) {
+        showInformationMessage(freeColClient.getGame()
+            .getMessageDisplay(message), message);
+    }
+
+    /**
+     * Shows a message with some information and an "OK"-button.
+     *
      * @param displayObject Optional object for displaying an icon.
      * @param messageId The messageId of the message to display.
      */
@@ -1764,12 +1792,27 @@ public final class Canvas extends JDesktopPane {
      */
     public void showInformationMessage(FreeColObject displayObject,
                                        StringTemplate template) {
-        String text = Messages.message(template);
         ImageIcon icon = (displayObject == null) ? null
             : gui.getImageIcon(displayObject);
         Tile tile = (displayObject instanceof Location)
             ? ((Location)displayObject).getTile()
             : null;
+
+        showInformationMessage(displayObject, tile, icon, template);
+    }
+
+    /**
+     * Shows a message with some information and an "OK"-button.
+     *
+     * @param displayObject Optional object for displaying.
+     * @param tile The Tile the object is at.
+     * @param icon The icon to display for the object.
+     * @param template The <code>StringTemplate</code> to display.
+     */
+    public void showInformationMessage(FreeColObject displayObject,
+                                       Tile tile, ImageIcon icon,
+                                       StringTemplate template) {
+        String text = Messages.message(template);
 
         // Plays an alert sound on each information message if the
         // option for it is turned on
@@ -1781,34 +1824,6 @@ public final class Canvas extends JDesktopPane {
         showFreeColPanel(new InformationPanel(freeColClient, text, 
                                               displayObject, icon),
                          tile, true);
-    }
-
-    /**
-     * Show an information message using a model message.
-     *
-     * @param message The <code>ModelMessage</code> to display.
-     */
-    public void showInformationMessage(ModelMessage message) {
-        showInformationMessage(freeColClient.getGame()
-            .getMessageDisplay(message), message);
-    }
-
-    /**
-     * Shows a message with some information and an "OK"-button.
-     *
-     * @param messageId The messageId of the message to display.
-     */
-    public void showInformationMessage(String messageId) {
-        showInformationMessage(null, StringTemplate.key(messageId));
-    }
-
-    /**
-     * Shows a message with some information and an "OK"-button.
-     *
-     * @param template The <code>StringTemplate</code> to display.
-     */
-    public void showInformationMessage(StringTemplate template) {
-        showInformationMessage(null, template);
     }
 
     /**
