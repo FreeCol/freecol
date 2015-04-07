@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,6 +29,7 @@ import javax.swing.JLabel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Region;
 
@@ -72,13 +74,32 @@ public final class ReportExplorationPanel extends ReportPanel {
 
         reportPanel.setLayout(new MigLayout("wrap 5, fillx", "", ""));
 
-        // headline
-        reportPanel.add(GUI.localizedLabel("report.exploration.nameOfRegion"));
-        reportPanel.add(GUI.localizedLabel("report.exploration.typeOfRegion"));
-        reportPanel.add(GUI.localizedLabel("report.exploration.discoveredIn"));
-        reportPanel.add(GUI.localizedLabel("report.exploration.discoveredBy"));
-        reportPanel.add(GUI.localizedLabel("report.exploration.valueOfRegion"));
-
+        /**
+         * Header Row
+         */
+        Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.TINY, Font.BOLD);
+        JLabel nameOfRegion = GUI.localizedLabel("report.exploration.nameOfRegion");
+        nameOfRegion.setFont(font);
+        reportPanel.add(nameOfRegion);
+        JLabel typeOfRegion = GUI.localizedLabel("report.exploration.typeOfRegion");
+        typeOfRegion.setFont(font);
+        reportPanel.add(typeOfRegion);
+        JLabel discoveredIn = GUI.localizedLabel("report.exploration.discoveredIn");
+        discoveredIn.setFont(font);
+        reportPanel.add(discoveredIn);
+        JLabel discoveredBy = GUI.localizedLabel("report.exploration.discoveredBy");
+        discoveredBy.setFont(font);
+        reportPanel.add(discoveredBy);
+        JLabel valueOfRegion = GUI.localizedLabel("report.exploration.valueOfRegion");
+        valueOfRegion.setFont(font);
+        reportPanel.add(valueOfRegion);
+        
+        /**
+         * Content Rows
+         * 
+         * TODO: Display "None" if no contents, though this would be rare.
+         */
         for (Region region : regions) {
             reportPanel.add(new JLabel(region.getName()));
             reportPanel.add(GUI.localizedLabel(region.getType()));

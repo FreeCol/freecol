@@ -108,17 +108,20 @@ public final class ReportIndianPanel extends ReportPanel {
             lib.getScalingFactor() * (2f/3f))));
         reportPanel.add(villageLabel, "span, split 2");
         JLabel headline = GUI.localizedLabel(opponent.getNationName());
-        headline.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL));
-        reportPanel.add(headline, "wrap 20");
+        headline.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.SMALL, Font.BOLD));
+        reportPanel.add(headline, "wrap 20, aligny center");
         JLabel label = GUI.localizedLabel("report.indian.chieftain");
-        Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY, Font.BOLD);
+        Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.TINY, Font.BOLD);
         label.setFont(font);
         reportPanel.add(label);
         reportPanel.add(GUI.localizedLabel(opponent.getName()), "left, wrap");
         label = GUI.localizedLabel("report.indian.typeOfSettlements");
         label.setFont(font);
         reportPanel.add(label);
-        reportPanel.add(GUI.localizedLabel(Messages.nameKey(opponent.getNationType().getCapitalType().getId())), "left, wrap");
+        reportPanel.add(GUI.localizedLabel(Messages.nameKey(opponent
+                .getNationType().getCapitalType().getId())), "left, wrap");
         label = GUI.localizedLabel("report.indian.numberOfSettlements");
         reportPanel.add(label);
         label.setFont(font);
@@ -129,11 +132,13 @@ public final class ReportIndianPanel extends ReportPanel {
         reportPanel.add(GUI.localizedLabel(StringTemplate
                 .template("report.indian.tensionStance")
                 .add("%tension%", opponent.getTension(player).getKey())
-                .addStringTemplate("%stance%", opponent.getStance(player).getLabel())),
+                .addStringTemplate("%stance%", opponent.getStance(player)
+                        .getLabel())),
             "left, wrap 20");
 
         if (nativeSettlements.isEmpty()) {
-            reportPanel.add(GUI.localizedLabel("report.indian.noKnownSettlements"));
+            reportPanel.add(GUI
+                    .localizedLabel("report.indian.noKnownSettlements"));
         } else {
             for (String key : headlines) {
                 JLabel head = GUI.localizedLabel(key);
@@ -158,10 +163,12 @@ public final class ReportIndianPanel extends ReportPanel {
                 String locationName
                     = Messages.message(settlement.getLocationLabelFor(player));
                 if (known && settlement.isCapital()) {
-                    locationName += ResourceManager.getString("indianSettlementChip.capital");
+                    locationName += ResourceManager
+                            .getString("indianSettlementChip.capital");
                 }
                 if (settlement.worthScouting(player)) {
-                    locationName += ResourceManager.getString("unscoutedIndianSettlement");
+                    locationName += ResourceManager
+                            .getString("unscoutedIndianSettlement");
                 }
                 JButton settlementButton = GUI.getLinkButton(locationName,
                     null, settlement.getTile().getId());
@@ -173,9 +180,11 @@ public final class ReportIndianPanel extends ReportPanel {
                 if (missionary != null) {
                     missionLabel.setIcon(new ImageIcon(lib
                             .getMissionChip(missionary.getOwner(),
-                                missionary.hasAbility(Ability.EXPERT_MISSIONARY))));
+                                missionary.hasAbility(Ability
+                                        .EXPERT_MISSIONARY))));
                     GUI.localizeToolTip(missionLabel, Messages
-                        .message(missionary.getLabel(Unit.UnitLabelType.NATIONAL)));
+                        .message(missionary.getLabel(Unit.UnitLabelType
+                                .NATIONAL)));
                 }
                 reportPanel.add(missionLabel);
 
