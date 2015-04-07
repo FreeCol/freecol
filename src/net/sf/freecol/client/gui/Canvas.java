@@ -1792,12 +1792,14 @@ public final class Canvas extends JDesktopPane {
      */
     public void showInformationMessage(FreeColObject displayObject,
                                        StringTemplate template) {
-        ImageIcon icon = (displayObject == null) ? null
-            : gui.getImageIcon(displayObject);
-        Tile tile = (displayObject instanceof Location)
-            ? ((Location)displayObject).getTile()
-            : null;
-
+        ImageIcon icon = null;
+        Tile tile = null;
+        if(displayObject != null) {
+            icon = gui.getImageIcon(displayObject);
+            tile = (displayObject instanceof Location)
+                ? ((Location)displayObject).getTile()
+                : null;
+        }
         showInformationMessage(displayObject, tile, icon, template);
     }
 

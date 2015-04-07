@@ -2462,6 +2462,66 @@ public class GUI {
         canvas.showIndianSettlementPanel(indianSettlement);
     }
 
+    public void showInformationMessage(String messageId) {
+        if (canvas == null) return;
+        canvas.showInformationMessage(messageId);
+    }
+
+    public void showInformationMessage(StringTemplate template) {
+        if (canvas == null) return;
+        canvas.showInformationMessage(template);
+    }
+
+    public void showInformationMessage(ModelMessage message) {
+        if (canvas == null) return;
+        canvas.showInformationMessage(message);
+    }
+
+    public void showInformationMessage(Settlement displayObject,
+                                       String messageId) {
+        showInformationMessage(displayObject, StringTemplate.key(messageId));
+    }
+
+    public void showInformationMessage(Settlement displayObject,
+                                       StringTemplate template) {
+        if (canvas == null) return;
+        ImageIcon icon = null;
+        Tile tile = null;
+        if(displayObject != null) {
+            icon = createImageIcon(imageLibrary.getSettlementImage(displayObject));
+            tile = displayObject.getTile();
+        }
+        canvas.showInformationMessage(displayObject, tile, icon, template);
+    }
+
+    public void showInformationMessage(Unit displayObject,
+                                       String messageId) {
+        showInformationMessage(displayObject, StringTemplate.key(messageId));
+    }
+
+    public void showInformationMessage(Unit displayObject,
+                                       StringTemplate template) {
+        if (canvas == null) return;
+        ImageIcon icon = null;
+        Tile tile = null;
+        if(displayObject != null) {
+            icon = createImageIcon(imageLibrary.getUnitImage(displayObject));
+            tile = displayObject.getTile();
+        }
+        canvas.showInformationMessage(displayObject, tile, icon, template);
+    }
+
+    public void showInformationMessage(Tile displayObject,
+                                       String messageId) {
+        showInformationMessage(displayObject, StringTemplate.key(messageId));
+    }
+
+    public void showInformationMessage(Tile displayObject,
+                                       StringTemplate template) {
+        if (canvas == null) return;
+        canvas.showInformationMessage(displayObject, displayObject, null, template);
+    }
+
     public void showInformationMessage(FreeColObject displayObject,
                                        String messageId) {
         if (canvas == null) return;
@@ -2472,21 +2532,6 @@ public class GUI {
                                        StringTemplate template) {
         if (canvas == null) return;
         canvas.showInformationMessage(displayObject, template);
-    }
-
-    public void showInformationMessage(ModelMessage message) {
-        if (canvas == null) return;
-        canvas.showInformationMessage(message);
-    }
-
-    public void showInformationMessage(String messageId) {
-        if (canvas == null) return;
-        canvas.showInformationMessage(messageId);
-    }
-
-    public void showInformationMessage(StringTemplate template) {
-        if (canvas == null) return;
-        canvas.showInformationMessage(template);
     }
 
     public File showLoadDialog(File directory) {
