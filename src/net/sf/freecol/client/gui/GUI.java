@@ -1533,19 +1533,61 @@ public class GUI {
      * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param template The <code>StringTemplate</code> explaining the choice.
-     * @param obj An optional object to make an icon for the dialog with.
      * @param okKey A key for the "ok" button.
      * @param cancelKey A key for the "cancel" button.
      * @return True if the "ok" button was selected.
      */
     public boolean confirm(boolean modal, Tile tile,
-                           StringTemplate template, FreeColObject obj,
+                           StringTemplate template,
+                           String okKey, String cancelKey) {
+        if (canvas == null) return false;
+
+        return canvas.showConfirmDialog(modal, tile,
+                                        getDefaultTextArea(template), null,
+                                        okKey, cancelKey);
+    }
+
+    /**
+     * General confirmation dialog.
+     *
+     * @param modal Is this a modal dialog?
+     * @param tile An optional <code>Tile</code> to expose.
+     * @param template The <code>StringTemplate</code> explaining the choice.
+     * @param obj An optional unit to make an icon for the dialog from.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    public boolean confirm(boolean modal, Tile tile,
+                           StringTemplate template, Unit obj,
                            String okKey, String cancelKey) {
         if (canvas == null) return false;
 
         return canvas.showConfirmDialog(modal, tile,
                                         getDefaultTextArea(template),
-                                        getImageIcon(obj),
+                                        createImageIcon(
+                                            imageLibrary.getUnitImage(obj)),
+                                        okKey, cancelKey);
+    }
+
+    /**
+     * General confirmation dialog.
+     *
+     * @param modal Is this a modal dialog?
+     * @param tile An optional <code>Tile</code> to expose.
+     * @param template The <code>StringTemplate</code> explaining the choice.
+     * @param icon An optional icon for the dialog.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    public boolean confirm(boolean modal, Tile tile,
+                           StringTemplate template, ImageIcon icon,
+                           String okKey, String cancelKey) {
+        if (canvas == null) return false;
+
+        return canvas.showConfirmDialog(modal, tile,
+                                        getDefaultTextArea(template), icon,
                                         okKey, cancelKey);
     }
 

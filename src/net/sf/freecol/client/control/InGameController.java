@@ -3837,7 +3837,8 @@ public final class InGameController implements NetworkConstants {
         boolean ret = gui.confirm(true, null, StringTemplate
             .template("model.europe.payArrears")
             .addAmount("%amount%", arrears),
-            type, "ok", "cancel")
+            GUI.createImageIcon(gui.getImageLibrary().getGoodsImage(type)),
+            "ok", "cancel")
             && askServer().payArrears(type)
             && player.canTrade(type);
         updateControls();
@@ -3871,7 +3872,9 @@ public final class InGameController implements NetworkConstants {
         if (!gui.confirm(true, null, StringTemplate
                 .template("payForBuilding.text")
                 .addAmount("%amount%", price),
-                colony, "yes", "no")) {
+                GUI.createImageIcon(
+                    gui.getImageLibrary().getSettlementImage(colony)),
+                "yes", "no")) {
             return false;
         }
 

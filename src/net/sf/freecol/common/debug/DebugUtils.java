@@ -1076,7 +1076,7 @@ public class DebugUtils {
             more = gui.confirm(true, null, StringTemplate
                 .template("prompt.stepRNG")
                 .addAmount("%value%", val),
-                null, "more", "cancel");
+                "more", "cancel");
         }
     }
 
