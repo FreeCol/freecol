@@ -1842,7 +1842,8 @@ public class GUI {
 
         return getChoice(true, settlement.getTile(),
             getDefaultTextArea(settlement.getAlarmLevelMessage(player)),
-            settlement, "cancel", choices);
+            GUI.createImageIcon(imageLibrary.getSettlementImage(settlement)),
+            "cancel", choices);
     }
 
     /**
@@ -1869,7 +1870,9 @@ public class GUI {
                 BoycottAction.DUMP_CARGO));
 
         return getChoice(true, null, getDefaultTextArea(template),
-                         goods, "cancel", choices);
+                         GUI.createImageIcon(
+                             imageLibrary.getGoodsImage(goods.getType())),
+                         "cancel", choices);
     }
 
     /**
@@ -1896,7 +1899,9 @@ public class GUI {
                                      BuyAction.HAGGLE));
 
         return getChoice(true, unit.getTile(), getDefaultTextArea(template),
-                         goods, "cancel", choices);
+                         GUI.createImageIcon(
+                             imageLibrary.getGoodsImage(goods.getType())),
+                         "cancel", choices);
     }
 
     /**
@@ -1928,7 +1933,9 @@ public class GUI {
                                      ClaimAction.STEAL));
 
         return getChoice(true, tile, getDefaultTextArea(template),
-                         owner, "indianLand.cancel", choices);
+                         GUI.createImageIcon(
+                             imageLibrary.getCoatOfArmsImage(owner.getNation())),
+                         "indianLand.cancel", choices);
     }
 
     /**
@@ -1964,7 +1971,9 @@ public class GUI {
         if (choices.isEmpty()) return null;
 
         return getChoice(true, settlement.getTile(),
-                         getDefaultTextArea(template), settlement,
+                         getDefaultTextArea(template),
+                         GUI.createImageIcon(
+                             imageLibrary.getSettlementImage(settlement)),
                          "cancel", choices);
     }
 
@@ -2005,7 +2014,9 @@ public class GUI {
                                      MissionaryAction.INCITE_INDIANS));
 
         return getChoice(true, unit.getTile(), getDefaultTextArea(sb.toString()),
-                         settlement, "cancel", choices);
+                         GUI.createImageIcon(
+                             imageLibrary.getSettlementImage(settlement)),
+                         "cancel", choices);
     }
 
     /**
@@ -2061,7 +2072,9 @@ public class GUI {
                                      ScoutColonyAction.FOREIGN_COLONY_ATTACK));
 
         return getChoice(true, unit.getTile(), getDefaultTextArea(template),
-                         colony, "cancel", choices);
+                         GUI.createImageIcon(
+                             imageLibrary.getSettlementImage(colony)),
+                         "cancel", choices);
     }
 
     /**
@@ -2121,7 +2134,9 @@ public class GUI {
 
         return getChoice(true, settlement.getTile(),
                          getDefaultTextArea(sb.toString()),
-                         settlement, "cancel", choices);
+                         GUI.createImageIcon(
+                             imageLibrary.getSettlementImage(settlement)),
+                         "cancel", choices);
     }
 
     /**
@@ -2152,7 +2167,9 @@ public class GUI {
                 SellAction.GIFT));
 
         return getChoice(true, unit.getTile(), getDefaultTextArea(template),
-                         goods, "cancel", choices);
+                         GUI.createImageIcon(
+                             imageLibrary.getGoodsImage(goods.getType())),
+                         "cancel", choices);
     }
 
 
@@ -2162,18 +2179,18 @@ public class GUI {
      * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param explain An object explaining the choice.
-     * @param obj An optional object to make an icon for the dialog with.
+     * @param icon An optional icon for the dialog.
      * @param cancelKey A key for the "cancel" button.
      * @param choices A list a <code>ChoiceItem</code>s to choose from.
      * @return The selected value of the selected <code>ChoiceItem</code>,
      *     or null if cancelled.
      */
-    public <T> T getChoice(boolean modal, Tile tile, Object explain, FreeColObject obj,
+    public <T> T getChoice(boolean modal, Tile tile, Object explain,
+                           ImageIcon icon,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         if (canvas == null) return null;
 
-        return canvas.showChoiceDialog(modal, tile, explain,
-                                       getImageIcon(obj),
+        return canvas.showChoiceDialog(modal, tile, explain, icon,
                                        cancelKey, choices);
     }
 

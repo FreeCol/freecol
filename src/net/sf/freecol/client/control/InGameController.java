@@ -1302,7 +1302,9 @@ public final class InGameController implements NetworkConstants {
             // units or settlements, it may have a rumour or need
             // other special handling.
             Unit u = gui.getChoice(true, unit.getTile(),
-                                   Messages.message("disembark.text"), unit,
+                                   Messages.message("disembark.text"),
+                                   GUI.createImageIcon(gui.getImageLibrary()
+                                       .getUnitImage(unit)),
                                    "none", choices);
             if (u == null) { // Cancelled, done.
                 break;
@@ -1354,7 +1356,9 @@ public final class InGameController implements NetworkConstants {
             // Use the default
         } else {
             carrier = gui.getChoice(true, unit.getTile(),
-                                    Messages.message("embark.text"), unit,
+                                    Messages.message("embark.text"),
+                                    GUI.createImageIcon(gui.getImageLibrary()
+                                        .getUnitImage(unit)),
                                     "none", choices);
             if (carrier == null) return true; // User cancelled
         }
@@ -1834,7 +1838,9 @@ public final class InGameController implements NetworkConstants {
             }
             goods = gui.getChoice(true, unit.getTile(),
                                   Messages.message("buyProposition.text"),
-                                  settlement, "nothing", choices);
+                                  GUI.createImageIcon(gui.getImageLibrary()
+                                       .getSettlementImage(settlement)),
+                                  "nothing", choices);
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
@@ -1890,7 +1896,9 @@ public final class InGameController implements NetworkConstants {
             }
             goods = gui.getChoice(true, unit.getTile(),
                                   Messages.message("sellProposition.text"),
-                                  settlement, "nothing", choices);
+                                  GUI.createImageIcon(gui.getImageLibrary()
+                                      .getSettlementImage(settlement)),
+                                  "nothing", choices);
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
@@ -1944,7 +1952,9 @@ public final class InGameController implements NetworkConstants {
             choices.add(new ChoiceItem<>(label, g));
         }
         Goods goods = gui.getChoice(true, unit.getTile(),
-                                    Messages.message("gift.text"), settlement,
+                                    Messages.message("gift.text"),
+                                    GUI.createImageIcon(gui.getImageLibrary()
+                                        .getSettlementImage(settlement)),
                                     "cancel", choices);
         if (goods != null
             && askServer().deliverGiftToSettlement(unit, settlement, goods)) {
@@ -2023,7 +2033,8 @@ public final class InGameController implements NetworkConstants {
                 choices.add(new ChoiceItem<>(label, p));
             }
             Player enemy = gui.getChoice(true, unit.getTile(),
-                Messages.message("missionarySettlement.inciteQuestion"), unit,
+                Messages.message("missionarySettlement.inciteQuestion"),
+                GUI.createImageIcon(gui.getImageLibrary().getUnitImage(unit)),
                 "missionarySettlement.cancel", choices);
             if (enemy == null) return true;
             int gold = askServer().incite(unit, direction, enemy, -1);
