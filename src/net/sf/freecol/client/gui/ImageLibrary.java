@@ -272,6 +272,10 @@ public final class ImageLibrary {
         return getCoatOfArmsImage(nation, scalingFactor * 0.5f);
     }
 
+    public Image getSmallCoatOfArmsImage(Nation nation) {
+        return getCoatOfArmsImage(nation, scalingFactor * (2f/3f));
+    }
+
     /**
      * Returns the coat-of-arms image for the given Nation.
      *
@@ -401,7 +405,9 @@ public final class ImageLibrary {
      *
      * @param display The FreeColObject to display.
      * @return The appropriate Image.
+     * @deprecated Please use a more specific method.
      */
+    @Deprecated
     public Image getSmallObjectImage(FreeColObject display) {
         try {
             Image image = null;
@@ -447,6 +453,7 @@ public final class ImageLibrary {
 
     /**
      * Returns the appropriate Image for a FreeColObject.
+     * Please use a more specific method.
      *
      * @param display The FreeColObject to display.
      * @return The appropriate Image.
@@ -643,6 +650,10 @@ public final class ImageLibrary {
         String key = "model.tile.delta_" + direction
             + (magnitude == 1 ? "_small" : "_large");
         return ResourceManager.getImage(key, scalingFactor);
+    }
+
+    public Image getSmallSettlementImage(Settlement settlement) {
+        return getSettlementImage(settlement, scalingFactor * (2f/3f));
     }
 
     /**

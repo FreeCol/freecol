@@ -135,7 +135,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
             .cancelOption().defaultOption());
         initializeDialog(DialogType.QUESTION, true, panel, GUI.createImageIcon(
-            getImageLibrary().getSmallObjectImage(settlement)), c);
+            getImageLibrary().getSmallSettlementImage(settlement)), c);
     }
 
     private Nation getOwnerNation() {
