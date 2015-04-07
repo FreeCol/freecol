@@ -34,7 +34,6 @@ import javax.swing.SpinnerNumberModel;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.i18n.Messages;
 
 

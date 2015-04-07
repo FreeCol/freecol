@@ -25,7 +25,6 @@ import javax.swing.JTextField;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.StringTemplate;
 
 

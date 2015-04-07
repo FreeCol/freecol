@@ -26,7 +26,6 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.StringTemplate;
 
 

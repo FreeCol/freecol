@@ -28,7 +28,6 @@ import java.awt.RenderingHints;
 
 import javax.swing.JPanel;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;

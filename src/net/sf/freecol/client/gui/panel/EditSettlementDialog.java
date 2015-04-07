@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JSpinner;

@@ -25,7 +25,6 @@ import java.awt.Dimension;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.option.Option;
 
