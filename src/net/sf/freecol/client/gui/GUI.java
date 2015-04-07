@@ -841,13 +841,25 @@ public class GUI {
         return (image==null) ? null : new ImageIcon(image);
     }
 
+    public ImageIcon createUnitImageIcon(Unit unit) {
+        return GUI.createImageIcon(imageLibrary.getUnitImage(unit));
+    }
+
+    public ImageIcon createSettlementImageIcon(Settlement settlement) {
+        return GUI.createImageIcon(imageLibrary.getSettlementImage(settlement));
+    }
+
+    public ImageIcon createGoodsImageIcon(GoodsType goodsType) {
+        return GUI.createImageIcon(imageLibrary.getGoodsImage(goodsType));
+    }
+
     /**
      * Make image icon from an object.
      *
      * @param display The FreeColObject to find an icon for.
      * @return The <code>ImageIcon</code> found.
      */
-    public ImageIcon getImageIcon(FreeColObject display) {
+    public ImageIcon createObjectImageIcon(FreeColObject display) {
         return (display == null) ? null
             : createImageIcon(imageLibrary.getObjectImage(display));
     }

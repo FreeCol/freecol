@@ -1303,8 +1303,7 @@ public final class InGameController implements NetworkConstants {
             // other special handling.
             Unit u = gui.getChoice(true, unit.getTile(),
                                    Messages.message("disembark.text"),
-                                   GUI.createImageIcon(gui.getImageLibrary()
-                                       .getUnitImage(unit)),
+                                   gui.createUnitImageIcon(unit),
                                    "none", choices);
             if (u == null) { // Cancelled, done.
                 break;
@@ -1357,8 +1356,7 @@ public final class InGameController implements NetworkConstants {
         } else {
             carrier = gui.getChoice(true, unit.getTile(),
                                     Messages.message("embark.text"),
-                                    GUI.createImageIcon(gui.getImageLibrary()
-                                        .getUnitImage(unit)),
+                                    gui.createUnitImageIcon(unit),
                                     "none", choices);
             if (carrier == null) return true; // User cancelled
         }
@@ -1838,8 +1836,7 @@ public final class InGameController implements NetworkConstants {
             }
             goods = gui.getChoice(true, unit.getTile(),
                                   Messages.message("buyProposition.text"),
-                                  GUI.createImageIcon(gui.getImageLibrary()
-                                       .getSettlementImage(settlement)),
+                                  gui.createSettlementImageIcon(settlement),
                                   "nothing", choices);
             if (goods == null) break; // Trade aborted by the player
 
@@ -1896,8 +1893,7 @@ public final class InGameController implements NetworkConstants {
             }
             goods = gui.getChoice(true, unit.getTile(),
                                   Messages.message("sellProposition.text"),
-                                  GUI.createImageIcon(gui.getImageLibrary()
-                                      .getSettlementImage(settlement)),
+                                  gui.createSettlementImageIcon(settlement),
                                   "nothing", choices);
             if (goods == null) break; // Trade aborted by the player
 
@@ -1953,8 +1949,7 @@ public final class InGameController implements NetworkConstants {
         }
         Goods goods = gui.getChoice(true, unit.getTile(),
                                     Messages.message("gift.text"),
-                                    GUI.createImageIcon(gui.getImageLibrary()
-                                        .getSettlementImage(settlement)),
+                                    gui.createSettlementImageIcon(settlement),
                                     "cancel", choices);
         if (goods != null
             && askServer().deliverGiftToSettlement(unit, settlement, goods)) {
@@ -2034,7 +2029,7 @@ public final class InGameController implements NetworkConstants {
             }
             Player enemy = gui.getChoice(true, unit.getTile(),
                 Messages.message("missionarySettlement.inciteQuestion"),
-                GUI.createImageIcon(gui.getImageLibrary().getUnitImage(unit)),
+                gui.createUnitImageIcon(unit),
                 "missionarySettlement.cancel", choices);
             if (enemy == null) return true;
             int gold = askServer().incite(unit, direction, enemy, -1);
@@ -3848,7 +3843,7 @@ public final class InGameController implements NetworkConstants {
         boolean ret = gui.confirm(true, null, StringTemplate
             .template("model.europe.payArrears")
             .addAmount("%amount%", arrears),
-            GUI.createImageIcon(gui.getImageLibrary().getGoodsImage(type)),
+            gui.createGoodsImageIcon(type),
             "ok", "cancel")
             && askServer().payArrears(type)
             && player.canTrade(type);
@@ -3883,8 +3878,7 @@ public final class InGameController implements NetworkConstants {
         if (!gui.confirm(true, null, StringTemplate
                 .template("payForBuilding.text")
                 .addAmount("%amount%", price),
-                GUI.createImageIcon(
-                    gui.getImageLibrary().getSettlementImage(colony)),
+                gui.createSettlementImageIcon(colony),
                 "yes", "no")) {
             return false;
         }

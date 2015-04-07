@@ -1795,7 +1795,7 @@ public final class Canvas extends JDesktopPane {
         ImageIcon icon = null;
         Tile tile = null;
         if(displayObject != null) {
-            icon = gui.getImageIcon(displayObject);
+            icon = gui.createObjectImageIcon(displayObject);
             tile = (displayObject instanceof Location)
                 ? ((Location)displayObject).getTile()
                 : null;
@@ -1952,7 +1952,7 @@ public final class Canvas extends JDesktopPane {
             ModelMessage m = messages.get(i);
             texts[i] = Messages.message(m);
             fcos[i] = game.getMessageSource(m);
-            icons[i] = gui.getImageIcon(game.getMessageDisplay(m));
+            icons[i] = gui.createObjectImageIcon(game.getMessageDisplay(m));
             if (tile == null && fcos[i] instanceof Location) {
                 tile = ((Location)fcos[i]).getTile();
             }
