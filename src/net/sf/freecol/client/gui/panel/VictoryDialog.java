@@ -44,7 +44,7 @@ public final class VictoryDialog extends FreeColConfirmDialog {
         super(freeColClient);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
-        panel.add(GUI.localizedHeader("victory.text", false),
+        panel.add(Utility.localizedHeader("victory.text", false),
                   "align center, wrap 20");
         Image image = ResourceManager.getImage("VictoryImage");
         panel.add(new JLabel(new ImageIcon(image)),

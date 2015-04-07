@@ -41,6 +41,7 @@ import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.action.SelectableAction;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
+import net.sf.freecol.client.gui.panel.Utility;
 
 
 /**
@@ -218,7 +219,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
     protected void buildColopediaMenu() {
         // --> Colopedia
 
-        JMenu menu = GUI.localizedMenu("menuBar.colopedia");
+        JMenu menu = Utility.localizedMenu("menuBar.colopedia");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_C);
 

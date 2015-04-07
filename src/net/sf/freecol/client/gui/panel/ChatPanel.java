@@ -52,7 +52,7 @@ public final class ChatPanel extends FreeColPanel {
     public ChatPanel(FreeColClient freeColClient) {
         super(freeColClient, new BorderLayout(10, 10));
 
-        JLabel label = GUI.localizedLabel("message");
+        JLabel label = Utility.localizedLabel("message");
 
         field = new JTextField("", 40);
         field.setActionCommand(String.valueOf(CHAT));

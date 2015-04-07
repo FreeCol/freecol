@@ -188,32 +188,32 @@ public final class CompactLabourReport extends ReportPanel {
     private void addHeader() {
 
         JLabel empty = new JLabel();
-        empty.setBorder(GUI.TOPLEFTCELLBORDER);
+        empty.setBorder(Utility.TOPLEFTCELLBORDER);
         headerRow.add(empty, "cell " + COLONY_COLUMN + " 1");
 
         if (isOverview() || !unitData.isSummary()) {
-            JLabel unitType = GUI.localizedLabel("model.unit.type");
-            unitType.setBorder(GUI.TOPCELLBORDER);
+            JLabel unitType = Utility.localizedLabel("model.unit.type");
+            unitType.setBorder(Utility.TOPCELLBORDER);
             headerRow.add(unitType, "cell " + UNIT_TYPE_COLUMN + " 1");
         }
 
-        JLabel workingAs = GUI.localizedLabel("model.unit.workingAs");
-        workingAs.setBorder(GUI.TOPCELLBORDER);
+        JLabel workingAs = Utility.localizedLabel("model.unit.workingAs");
+        workingAs.setBorder(Utility.TOPCELLBORDER);
         headerRow.add(workingAs, "cell " + WORKING_COLUMN + " 1");
 
         if (showBuildings) {
-            JLabel building = GUI.localizedLabel("building");
-            building.setBorder(GUI.TOPCELLBORDER);
+            JLabel building = Utility.localizedLabel("building");
+            building.setBorder(Utility.TOPCELLBORDER);
             headerRow.add(building, "cell " + BUILDING_COLUMN + " 1");
         }
 
-        JLabel colonists = GUI.localizedLabel("colonists");
-        colonists.setBorder(GUI.TOPCELLBORDER);
+        JLabel colonists = Utility.localizedLabel("colonists");
+        colonists.setBorder(Utility.TOPCELLBORDER);
         headerRow.add(colonists, "cell " + COLONIST_COLUMN + " 1 2 1");
 
         if (isOverview()) {
-            JLabel production = GUI.localizedLabel("report.production");
-            production.setBorder(GUI.TOPCELLBORDER);
+            JLabel production = Utility.localizedLabel("report.production");
+            production.setBorder(Utility.TOPCELLBORDER);
             headerRow.add(production, "cell " + PRODUCTION_SYMBOL_COLUMN + " 1 " + (COLUMNS - PRODUCTION_SYMBOL_COLUMN) + " 1");
         } else if (showProduction) {
             LabourData.UnitData unit = unitData;
@@ -221,13 +221,13 @@ public final class CompactLabourReport extends ReportPanel {
 
             ImageLibrary lib = getImageLibrary();
             JLabel production = new JLabel(new ImageIcon(lib.getGoodsImage(goods)));
-            production.setBorder(GUI.TOPCELLBORDER);
+            production.setBorder(Utility.TOPCELLBORDER);
 
             headerRow.add(production, "cell " + PRODUCTION_SYMBOL_COLUMN + " 1 " + (COLUMNS - PRODUCTION_SYMBOL_COLUMN + (showNetProduction && goods.isStoredAs() ? 1 : 0)) + " 1");
 
             if (showNetProduction && goods.isStoredAs()) {
                 JLabel netProduction = new JLabel(new ImageIcon(lib.getGoodsImage(goods.getStoredAs())));
-                netProduction.setBorder(GUI.TOPCELLBORDER);
+                netProduction.setBorder(Utility.TOPCELLBORDER);
                 headerRow.add(netProduction, "cell " + NETPRODUCTION_SUMMARY_COLUMN + " 1");
             }
         }
@@ -294,8 +294,8 @@ public final class CompactLabourReport extends ReportPanel {
 
         if (showBuildings) {
             if (productionWL != null && row > buildingStartRow) {
-                JLabel buildingLabel = GUI.localizedLabel(productionWL.getLabel());
-                buildingLabel.setBorder(GUI.CELLBORDER);
+                JLabel buildingLabel = Utility.localizedLabel(productionWL.getLabel());
+                buildingLabel.setBorder(Utility.CELLBORDER);
                 reportPanel.add(buildingLabel, "cell " + BUILDING_COLUMN + " " + buildingStartRow + " 1 " + (row - buildingStartRow));
                 buildingStartRow = row;
             } else {
@@ -376,7 +376,7 @@ public final class CompactLabourReport extends ReportPanel {
         if (showBuildings && row > buildingStartRow) {
             JLabel buildingLabel = new JLabel((school == null) ? ""
                 : Messages.message(school.getLabel()));
-            buildingLabel.setBorder(GUI.CELLBORDER);
+            buildingLabel.setBorder(Utility.CELLBORDER);
             reportPanel.add(buildingLabel, "cell " + BUILDING_COLUMN
                 + " " + buildingStartRow
                 + " 1 " + (row - buildingStartRow));
@@ -395,8 +395,8 @@ public final class CompactLabourReport extends ReportPanel {
         LabourData.LocationData unitTotal = unitData.getTotal();
 
         int row = 1;
-        JLabel summaryLabel = GUI.localizedLabel("report.labour.summary");
-        summaryLabel.setBorder(GUI.LEFTCELLBORDER);
+        JLabel summaryLabel = Utility.localizedLabel("report.labour.summary");
+        summaryLabel.setBorder(Utility.LEFTCELLBORDER);
         reportPanel.add(summaryLabel, "cell " + COLONY_COLUMN + " " + row + " 1 " + unitTotal.getRowCount());
 
         row = addLocationData(unitTotal, null, row);
@@ -424,7 +424,7 @@ public final class CompactLabourReport extends ReportPanel {
         row = addNonLinkedLocation(unitData.getUnitsOnLand(), "report.onLand", row);
         row = addNonLinkedLocation(unitData.getUnitsAtSea(), "report.atSea", row);
 
-        reportPanel.add(GUI.localizedLabel("report.labour.canTrain"),
+        reportPanel.add(Utility.localizedLabel("report.labour.canTrain"),
                         "cell 1 " + row + " " + COLUMNS + " 1");
     }
 
@@ -459,7 +459,7 @@ public final class CompactLabourReport extends ReportPanel {
                 reportPanel.add(createEmptyLabel(), "cell " + UNIT_TYPE_COLUMN + " " + row + " 1 " + rows);
             }
         } else {
-            GUI.localizeToolTip(colonistsLabel, StringTemplate
+            Utility.localizeToolTip(colonistsLabel, StringTemplate
                 .template("report.labour.unitTotal.tooltip")
                 .addName("%unit%", data.getUnitData().getUnitName()));
         }
@@ -497,7 +497,7 @@ public final class CompactLabourReport extends ReportPanel {
 
         if (showProductionSymbols) {
             JLabel icon = new JLabel();
-            icon.setBorder(GUI.CELLBORDER);
+            icon.setBorder(Utility.CELLBORDER);
             GoodsType goods = data.getUnitData().getExpertProduction();
             if (goods != null) {
                 icon.setIcon(new ImageIcon(getImageLibrary().getGoodsImage(goods)));
@@ -509,8 +509,8 @@ public final class CompactLabourReport extends ReportPanel {
     private int addNonLinkedLocation(LabourData.LocationData data, String messageKey, int row) {
         int rows = data.getRowCount();
         if (rows > 0) {
-            JLabel label = GUI.localizedLabel(messageKey);
-            label.setBorder(GUI.LEFTCELLBORDER);
+            JLabel label = Utility.localizedLabel(messageKey);
+            label.setBorder(Utility.LEFTCELLBORDER);
             label.setForeground(Color.GRAY);
             reportPanel.add(label, "cell " + COLONY_COLUMN + " " + row + " 1 " + rows);
             return addLocationData(data, null, row);
@@ -529,12 +529,12 @@ public final class CompactLabourReport extends ReportPanel {
     private void addRow(LabourData.LocationData data, String typeName, String activity, JLabel colonistLabel, int production, int row) {
         if (!data.getUnitData().isSummary()) {
             JLabel typeLabel = new JLabel(typeName);
-            typeLabel.setBorder(GUI.CELLBORDER);
+            typeLabel.setBorder(Utility.CELLBORDER);
             reportPanel.add(typeLabel, "cell " + UNIT_TYPE_COLUMN + " " + row);
         }
 
         JLabel activityLabel = new JLabel(activity);
-        activityLabel.setBorder(GUI.CELLBORDER);
+        activityLabel.setBorder(Utility.CELLBORDER);
         reportPanel.add(activityLabel, "cell " + WORKING_COLUMN + " " + row);
 
         reportPanel.add(colonistLabel, "cell " + COLONIST_COLUMN + " " + row);
@@ -577,15 +577,15 @@ public final class CompactLabourReport extends ReportPanel {
         button.setMargin(new Insets(0, 0, 0, 0));
         button.setOpaque(false);
         button.setHorizontalAlignment(SwingConstants.LEADING);
-        button.setForeground(GUI.LINK_COLOR);
-        button.setBorder(GUI.LEFTCELLBORDER);
+        button.setForeground(Utility.LINK_COLOR);
+        button.setBorder(Utility.LEFTCELLBORDER);
         button.addActionListener(listener);
         return button;
     }
 
     private JLabel createEmptyLabel() {
         JLabel empty = new JLabel();
-        empty.setBorder(GUI.CELLBORDER);
+        empty.setBorder(Utility.CELLBORDER);
         return empty;
     }
 
@@ -598,8 +598,8 @@ public final class CompactLabourReport extends ReportPanel {
     private JLabel createNumberLabel(int number, String toolTipKey) {
         JLabel label = new JLabel(String.valueOf(number));
         label.setHorizontalAlignment(SwingConstants.TRAILING);
-        label.setBorder(GUI.CELLBORDER);
-        if (toolTipKey != null) GUI.localizeToolTip(this, toolTipKey);
+        label.setBorder(Utility.CELLBORDER);
+        if (toolTipKey != null) Utility.localizeToolTip(this, toolTipKey);
         return label;
     }
 

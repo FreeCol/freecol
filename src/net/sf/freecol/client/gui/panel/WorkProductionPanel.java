@@ -113,25 +113,25 @@ public class WorkProductionPanel extends FreeColPanel {
 
         result = wl.getPotentialProduction(workType, unitType);
         if (result < 0.0f) {
-            add(GUI.localizedLabel("model.source.zeroThreshold.name"), "newline");
+            add(Utility.localizedLabel("model.source.zeroThreshold.name"), "newline");
             add(new JLabel(ModifierFormat.format(-result)), "wrap 30");
             result = 0.0f;
         }
 
         Font bigFont = getFont().deriveFont(Font.BOLD, 16);
-        JLabel finalLabel = GUI.localizedLabel("model.source.finalResult.name");
+        JLabel finalLabel = Utility.localizedLabel("model.source.finalResult.name");
         finalLabel.setFont(bigFont);
         add(finalLabel, "newline");
 
         JLabel finalResult = new JLabel(ModifierFormat.format(result));
         finalResult.setFont(bigFont);
-        finalResult.setBorder(GUI.PRODUCTION_BORDER);
+        finalResult.setBorder(Utility.PRODUCTION_BORDER);
         add(finalResult, "wrap 30");
 
         if (wl instanceof Building) { // Unattended production also applies.
             result = wl.getBaseProduction(null, workType, null);
             if (result > 0) {
-                add(GUI.localizedLabel(wl.getLabel()));
+                add(Utility.localizedLabel(wl.getLabel()));
                 add(new JLabel(ModifierFormat.format(result)), "wrap 30");
                 Collections.sort(unattendedModifiers);
                 output(unattendedModifiers, unitType);

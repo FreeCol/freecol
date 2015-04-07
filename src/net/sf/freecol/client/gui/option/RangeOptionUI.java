@@ -27,6 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JSlider;
 
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.option.RangeOption;
 
 
@@ -57,7 +58,7 @@ public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {
         int index = 0;
         for (String string : option.getItemValues().values()) {
             if (option.localizeLabels()) {
-                labels.put(index, GUI.localizedLabel(string));
+                labels.put(index, Utility.localizedLabel(string));
             } else {
                 labels.put(index, new JLabel(string));
             }

@@ -81,9 +81,9 @@ public final class GoodsLabel extends AbstractGoodsLabel
             || (location instanceof Colony
                 && spec.getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
                 && ((Colony)location).hasAbility(Ability.EXPORT))) {
-            GUI.localizeToolTip(this, goods.getLabel(true));
+            Utility.localizeToolTip(this, goods.getLabel(true));
         } else {
-            GUI.localizeToolTip(this, goods.getLabel(false));
+            Utility.localizeToolTip(this, goods.getLabel(false));
             setIcon(getDisabledIcon());
         }
 

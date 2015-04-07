@@ -123,7 +123,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
         this.maxCargo = winner.getSpaceLeft();
 
-        this.allButton = GUI.localizedButton("All");
+        this.allButton = Utility.localizedButton("All");
         this.allButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -139,7 +139,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         this.allButton.setMnemonic('a');
         this.allButton.setActionCommand(this.allButton.getText());
  
-        this.noneButton = GUI.localizedButton("None");
+        this.noneButton = Utility.localizedButton("None");
         this.noneButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -175,7 +175,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1", "[center]",
                                                     "[]20[]20[]"));
-        panel.add(GUI.localizedHeader("lootCargo.header", true));
+        panel.add(Utility.localizedHeader("lootCargo.header", true));
         panel.add(this.allButton, "split 2");
         panel.add(this.noneButton);
         panel.add(this.goodsList);

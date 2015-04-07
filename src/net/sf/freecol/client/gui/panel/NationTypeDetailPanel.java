@@ -127,12 +127,12 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
 
         panel.setLayout(new MigLayout("wrap 2, gapx 20"));
 
-        JLabel label = GUI.localizedLabel(nationType);
+        JLabel label = Utility.localizedLabel(nationType);
         label.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.SMALL));
         panel.add(label, "span, align center, wrap 40");
 
-        label = GUI.localizedLabel("colopedia.nationType.units");
+        label = Utility.localizedLabel("colopedia.nationType.units");
         label.setFont(boldFont);
         panel.add(label, "wrap");
 
@@ -152,7 +152,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
         }
 
         if (!abilities.isEmpty()) {
-            label = GUI.localizedLabel("abilities");
+            label = Utility.localizedLabel("abilities");
             label.setFont(boldFont);
             panel.add(label, "newline 20, span");
             for (Ability ability : abilities) {
@@ -161,7 +161,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
         }
 
         if (!modifiers.isEmpty()) {
-            label = GUI.localizedLabel("modifiers");
+            label = Utility.localizedLabel("modifiers");
             label.setFont(boldFont);
             panel.add(label, "newline 20, span");
             for (Modifier modifier : modifiers) {
@@ -183,20 +183,20 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
 
         panel.setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
 
-        JLabel name = GUI.localizedLabel(nationType);
+        JLabel name = Utility.localizedLabel(nationType);
         name.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.SMALL));
         panel.add(name, "span, align center, wrap 40");
 
-        panel.add(GUI.localizedLabel("colopedia.nationType.aggression"));
-        panel.add(GUI.localizedLabel("colopedia.nationType.aggression."
+        panel.add(Utility.localizedLabel("colopedia.nationType.aggression"));
+        panel.add(Utility.localizedLabel("colopedia.nationType.aggression."
                 + nationType.getAggression().getKey()));
 
-        panel.add(GUI.localizedLabel("colopedia.nationType.numberOfSettlements"));
-        panel.add(GUI.localizedLabel("colopedia.nationType.numberOfSettlements."
+        panel.add(Utility.localizedLabel("colopedia.nationType.numberOfSettlements"));
+        panel.add(Utility.localizedLabel("colopedia.nationType.numberOfSettlements."
                 + nationType.getNumberOfSettlements().getKey()));
 
-        panel.add(GUI.localizedLabel("colopedia.nationType.typeOfSettlements"));
+        panel.add(Utility.localizedLabel("colopedia.nationType.typeOfSettlements"));
         panel.add(new JLabel(Messages.getName(nationType.getCapitalType()),
             new ImageIcon(getImageLibrary().getSettlementImage(nationType.getCapitalType())),
             SwingConstants.CENTER));
@@ -205,10 +205,10 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
         for (String regionName : nationType.getRegionNames()) {
             regionNames.add(Messages.getName(regionName));
         }
-        panel.add(GUI.localizedLabel("colopedia.nationType.regions"));
+        panel.add(Utility.localizedLabel("colopedia.nationType.regions"));
         panel.add(new JLabel(join(", ", regionNames)));
 
-        panel.add(GUI.localizedLabel("colopedia.nationType.skills"), "top, newline 20");
+        panel.add(Utility.localizedLabel("colopedia.nationType.skills"), "top, newline 20");
         GridLayout gridLayout = new GridLayout(0, 2);
         gridLayout.setHgap(10);
         JPanel unitPanel = new JPanel(gridLayout);

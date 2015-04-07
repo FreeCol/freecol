@@ -117,15 +117,15 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         spinnerModel.setValue(unitCount);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 2, gapx 20"));
-        panel.add(GUI.localizedLabel("name"));
+        panel.add(Utility.localizedLabel("name"));
         panel.add(this.name);
-        panel.add(GUI.localizedLabel("nation"));
+        panel.add(Utility.localizedLabel("nation"));
         panel.add(this.owner);
-        panel.add(GUI.localizedLabel("capital"));
+        panel.add(Utility.localizedLabel("capital"));
         panel.add(this.capital);
-        panel.add(GUI.localizedLabel("report.indian.skillTaught"));
+        panel.add(Utility.localizedLabel("report.indian.skillTaught"));
         panel.add(this.skill);
-        panel.add(GUI.localizedLabel("report.units"));
+        panel.add(Utility.localizedLabel("report.units"));
         panel.add(this.units);
 
         final IndianSettlement fake = null;

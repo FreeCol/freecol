@@ -34,6 +34,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
@@ -88,7 +89,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
     private void buildGameMenu() {
         // --> Game
-        JMenu menu = GUI.localizedMenu("menuBar.game");
+        JMenu menu = Utility.localizedMenu("menuBar.game");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_G);
 
@@ -99,7 +100,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
         menu.add(getMenuItem(OpenAction.id));
         menu.add(getMenuItem(SaveAction.id));
-        JMenuItem playItem = GUI.localizedMenuItem("startGame");
+        JMenuItem playItem = Utility.localizedMenuItem("startGame");
         playItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {
@@ -134,7 +135,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
     private void buildViewMenu() {
         // --> View
-        JMenu menu = GUI.localizedMenu("menuBar.view");
+        JMenu menu = Utility.localizedMenu("menuBar.view");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_V);
 
@@ -158,7 +159,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
     private void buildToolsMenu() {
         // --> Tools
-        JMenu menu = GUI.localizedMenu("menuBar.tools");
+        JMenu menu = Utility.localizedMenu("menuBar.tools");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_T);
 

@@ -172,7 +172,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         if (location == null) {
             component = new JLabel(locationName);
         } else {
-            JButton button = GUI.getLinkButton(locationName, null, location.getId());
+            JButton button = Utility.getLinkButton(locationName, null, location.getId());
             button.addActionListener(this);
             component = button;
         }
@@ -181,7 +181,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
         if (unitList == null || unitList.isEmpty()) {
-            reportPanel.add(GUI.localizedLabel("none"), "sg");
+            reportPanel.add(Utility.localizedLabel("none"), "sg");
         } else {
             Collections.sort(unitList, ReportPanel.getUnitTypeComparator());
             for (Unit unit : unitList) {
@@ -205,7 +205,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
 
     protected JButton getUnitButton(Unit unit) {
         ImageIcon icon = new ImageIcon(getImageLibrary().getUnitImage(unit));
-        JButton button = GUI.getLinkButton("", icon, unit.getLocation().getId());
+        JButton button = Utility.getLinkButton("", icon, unit.getLocation().getId());
         button.addActionListener(this);
         StringTemplate tip;
         if (unit.getDestination() == null) {
@@ -218,7 +218,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
                 .addStringTemplate("%unit%", unit.getLabel())
                 .addStringTemplate("%going%", unit.getDestinationLabel());
         }
-        GUI.localizeToolTip(button, tip);
+        Utility.localizeToolTip(button, tip);
         return button;
     }
 

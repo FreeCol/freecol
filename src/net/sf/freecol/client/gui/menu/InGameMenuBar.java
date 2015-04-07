@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.menu.DebugMenu;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.StringTemplate;
@@ -110,7 +111,7 @@ public class InGameMenuBar extends FreeColMenuBar {
 
     private void buildGameMenu() {
         // --> Game
-        JMenu menu = GUI.localizedMenu("menuBar.game");
+        JMenu menu = Utility.localizedMenu("menuBar.game");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_G);
 
@@ -142,7 +143,7 @@ public class InGameMenuBar extends FreeColMenuBar {
 
     private void buildViewMenu() {
         // --> View
-        JMenu menu = GUI.localizedMenu("menuBar.view");
+        JMenu menu = Utility.localizedMenu("menuBar.view");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_V);
 
@@ -175,7 +176,7 @@ public class InGameMenuBar extends FreeColMenuBar {
 
     private void buildOrdersMenu() {
         // --> Orders
-        JMenu menu = GUI.localizedMenu("menuBar.orders");
+        JMenu menu = Utility.localizedMenu("menuBar.orders");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_O);
 
@@ -222,7 +223,7 @@ public class InGameMenuBar extends FreeColMenuBar {
     private void buildReportMenu() {
         // --> Report
 
-        JMenu menu = GUI.localizedMenu("menuBar.report");
+        JMenu menu = Utility.localizedMenu("menuBar.report");
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_R);
 

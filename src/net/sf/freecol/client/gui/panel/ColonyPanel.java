@@ -123,19 +123,19 @@ public final class ColonyPanel extends PortPanel
 
     // Buttons
     private JButton unloadButton
-        = GUI.localizedButton("unload");
+        = Utility.localizedButton("unload");
 
     private JButton fillButton
-        = GUI.localizedButton("fill");
+        = Utility.localizedButton("fill");
 
     private JButton warehouseButton
-        = GUI.localizedButton("colonyPanel.warehouse");
+        = Utility.localizedButton("colonyPanel.warehouse");
 
     private JButton buildQueueButton
-        = GUI.localizedButton("colonyPanel.buildQueue");
+        = Utility.localizedButton("colonyPanel.buildQueue");
 
     private JButton colonyUnitsButton
-        = GUI.localizedButton("colonyPanel.colonyUnits");
+        = Utility.localizedButton("colonyPanel.colonyUnits");
 
     // Only present in debug mode
     private JButton setGoodsButton = null;
@@ -199,8 +199,8 @@ public final class ColonyPanel extends PortPanel
         // Only enable the set goods button in debug mode when not spying
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && editable) {
-            setGoodsButton = GUI.localizedButton("colonyPanel.setGoods");
-            traceWorkButton = GUI.localizedButton("colonyPanel.traceWork");
+            setGoodsButton = Utility.localizedButton("colonyPanel.setGoods");
+            traceWorkButton = Utility.localizedButton("colonyPanel.traceWork");
         }
 
         // Use ESCAPE for closing the ColonyPanel:
@@ -297,27 +297,27 @@ public final class ColonyPanel extends PortPanel
         buildingsScroll.getVerticalScrollBar().setUnitIncrement(16);
         buildingsScroll.getViewport().setOpaque(false);
         buildingsPanel.setOpaque(false);
-        buildingsScroll.setBorder(GUI.ETCHED_BORDER);
+        buildingsScroll.setBorder(Utility.ETCHED_BORDER);
 
         cargoPanel = new ColonyCargoPanel(freeColClient);
         cargoScroll = new JScrollPane(cargoPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        cargoScroll.setBorder(GUI.ETCHED_BORDER);
+        cargoScroll.setBorder(Utility.ETCHED_BORDER);
 
         constructionPanel = new ConstructionPanel(freeColClient, colony, true);
 
         inPortPanel = new ColonyInPortPanel();
         inPortScroll = new JScrollPane(inPortPanel);
         inPortScroll.getVerticalScrollBar().setUnitIncrement(16);
-        inPortScroll.setBorder(GUI.ETCHED_BORDER);
+        inPortScroll.setBorder(Utility.ETCHED_BORDER);
 
         outsideColonyPanel = new OutsideColonyPanel();
         outsideColonyScroll = new JScrollPane(outsideColonyPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         outsideColonyScroll.getVerticalScrollBar().setUnitIncrement(16);
-        outsideColonyScroll.setBorder(GUI.ETCHED_BORDER);
+        outsideColonyScroll.setBorder(Utility.ETCHED_BORDER);
 
         populationPanel = new PopulationPanel();
 
@@ -325,13 +325,13 @@ public final class ColonyPanel extends PortPanel
         tilesScroll = new JScrollPane(tilesPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        tilesScroll.setBorder(GUI.BEVEL_BORDER);
+        tilesScroll.setBorder(Utility.BEVEL_BORDER);
 
         warehousePanel = new WarehousePanel();
         warehouseScroll = new JScrollPane(warehousePanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        warehouseScroll.setBorder(GUI.ETCHED_BORDER);
+        warehouseScroll.setBorder(Utility.ETCHED_BORDER);
 
         InputMap nameIM = new ComponentInputMap(this.nameBox);
         nameIM.put(KeyStroke.getKeyStroke("LEFT"), "selectPrevious2");
@@ -1310,7 +1310,7 @@ public final class ColonyPanel extends PortPanel
             super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
 
             setLayout(new MigLayout("wrap 3, fill, insets 0"));
-            setBorder(GUI.localizedBorder("outsideColony"));
+            setBorder(Utility.localizedBorder("outsideColony"));
         }
 
 
@@ -1442,7 +1442,7 @@ public final class ColonyPanel extends PortPanel
         public ColonyInPortPanel() {
             super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
 
-            setBorder(GUI.localizedBorder("inPort"));
+            setBorder(Utility.localizedBorder("inPort"));
             setLayout(new MigLayout("wrap 3, fill, insets 0"));
         }
 

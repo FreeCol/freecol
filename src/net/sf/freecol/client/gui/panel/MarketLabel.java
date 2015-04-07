@@ -65,7 +65,7 @@ public final class MarketLabel extends AbstractGoodsLabel
      * @return This <code>MarketLabel</code>.
      */
     public MarketLabel addBorder() {
-        setBorder(GUI.TOPCELLBORDER);
+        setBorder(Utility.TOPCELLBORDER);
         setVerticalTextPosition(JLabel.BOTTOM);
         setHorizontalTextPosition(JLabel.CENTER);
         return this;

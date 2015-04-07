@@ -43,7 +43,7 @@ public class ColorCellRenderer extends JLabel implements TableCellRenderer {
      * @param useBorder Indicated whether or not a border should be drawn.
      */
     public ColorCellRenderer(boolean useBorder) {
-        if (useBorder) setBorder(GUI.COLOR_CELL_BORDER);
+        if (useBorder) setBorder(Utility.COLOR_CELL_BORDER);
         // This must be done because the background displays the actual color:
         setOpaque(true);
     }
@@ -56,7 +56,7 @@ public class ColorCellRenderer extends JLabel implements TableCellRenderer {
         boolean isSelected, boolean hasFocus, int row, int column) {
         final Color myColor = (Color)color;
         setBackground(myColor);
-        GUI.localizeToolTip(this, StringTemplate
+        Utility.localizeToolTip(this, StringTemplate
             .template("info.rgb")
             .addAmount("%red%", myColor.getRed())
             .addAmount("%green%", myColor.getGreen())

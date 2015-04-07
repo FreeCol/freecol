@@ -56,7 +56,7 @@ public final class ColorChooserPanel extends FreeColPanel {
         add(okButton, "newline 20, split 2, tag ok");
         okButton.addActionListener(l);
 
-        JButton cancelButton = GUI.localizedButton("cancel");
+        JButton cancelButton = Utility.localizedButton("cancel");
         add(cancelButton, "tag cancel");
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(l);

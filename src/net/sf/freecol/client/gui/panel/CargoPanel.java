@@ -64,7 +64,7 @@ public class CargoPanel extends FreeColPanel
         this.defaultTransferHandler
             = new DefaultTransferHandler(getFreeColClient(), this);
 
-        if (withTitle) setBorder(GUI.localizedBorder("cargoOnCarrier"));
+        if (withTitle) setBorder(Utility.localizedBorder("cargoOnCarrier"));
     }
 
 
@@ -170,7 +170,7 @@ public class CargoPanel extends FreeColPanel
      * Update the title of this CargoPanel.
      */
     private void updateTitle() {
-        GUI.localizeBorder(this, (carrier == null)
+        Utility.localizeBorder(this, (carrier == null)
             ? StringTemplate.key("cargoOnCarrier")
             : StringTemplate.template("cargoOnCarrierLong")
                 .addStringTemplate("%name%",

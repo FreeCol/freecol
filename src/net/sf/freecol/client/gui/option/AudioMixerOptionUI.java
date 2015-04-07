@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
 
@@ -91,11 +92,11 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
         panel.add(currentMixerLabel, BorderLayout.EAST);
         updateMixerLabel();
 
-        button1 = GUI.localizedButton("Test");
+        button1 = Utility.localizedButton("Test");
         panel.add(button1);
         button1.addActionListener(aHandler);
 
-        button2 = GUI.localizedButton("Music");
+        button2 = Utility.localizedButton("Music");
         panel.add(button2);
         button2.addActionListener(aHandler);
 

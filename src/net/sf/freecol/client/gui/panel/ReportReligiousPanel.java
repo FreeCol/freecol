@@ -53,7 +53,7 @@ public final class ReportReligiousPanel extends ReportPanel {
         reportPanel.setLayout(new MigLayout("wrap 5, gap 20 20", "", ""));
 
         for (GoodsType gt : spec.getImmigrationGoodsTypeList()) {
-            JLabel crosses = GUI.localizedLabel(gt);
+            JLabel crosses = Utility.localizedLabel(gt);
             crosses.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                     FontLibrary.FontSize.SMALLER, Font.BOLD));
             reportPanel.add(crosses, "growx, align right");

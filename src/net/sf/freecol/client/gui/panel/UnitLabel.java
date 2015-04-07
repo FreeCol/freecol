@@ -202,7 +202,7 @@ public final class UnitLabel extends JLabel
 
             setIcon(imageIcon);
             setDisabledIcon(disabledImageIcon);
-            setBorder(GUI.blankBorder(0, 2, 0, 0));
+            setBorder(Utility.blankBorder(0, 2, 0, 0));
             this.isSmall = true;
         } else {
             ImageIcon imageIcon = new ImageIcon(lib.getUnitImage(unit));
@@ -221,8 +221,8 @@ public final class UnitLabel extends JLabel
             setIcon(imageIcon);
             setDisabledIcon(disabledImageIcon);
             setBorder((unit.getLocation() instanceof ColonyTile)
-                ? GUI.blankBorder(0, 15, 0, 15)
-                : GUI.blankBorder(0, 5, 0, 5));
+                ? Utility.blankBorder(0, 15, 0, 15)
+                : Utility.blankBorder(0, 5, 0, 5));
             this.isSmall = false;
         }
     }

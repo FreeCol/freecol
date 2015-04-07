@@ -70,25 +70,25 @@ public final class AboutPanel extends FreeColPanel {
         }
         
         // version and links
-        add(GUI.localizedLabel("aboutPanel.version"), "newline 20");
+        add(Utility.localizedLabel("aboutPanel.version"), "newline 20");
         add(new JLabel(FreeCol.getRevision()), "newline");
 
-        add(GUI.localizedLabel("aboutPanel.officialSite"), "newline 10");
-        JButton site = GUI.getLinkButton(SITE_URL, null, SITE_URL);
+        add(Utility.localizedLabel("aboutPanel.officialSite"), "newline 10");
+        JButton site = Utility.getLinkButton(SITE_URL, null, SITE_URL);
         site.addActionListener(this);
         add(site, "newline");
 
-        add(GUI.localizedLabel("aboutPanel.sfProject"), "newline 10");
-        JButton project = GUI.getLinkButton(PROJECT_URL, null, PROJECT_URL);
+        add(Utility.localizedLabel("aboutPanel.sfProject"), "newline 10");
+        JButton project = Utility.getLinkButton(PROJECT_URL, null, PROJECT_URL);
         project.addActionListener(this);
         add(project, "newline");
 
         // license disclaimer
-        add(GUI.getDefaultTextArea(Messages.message("aboutPanel.legalDisclaimer")),
+        add(Utility.getDefaultTextArea(Messages.message("aboutPanel.legalDisclaimer")),
             "newline 20, width 300px");
 
         // copyright
-        add(GUI.localizedLabel("aboutPanel.copyright"), "newline 10");
+        add(Utility.localizedLabel("aboutPanel.copyright"), "newline 10");
 
         add(okButton, "newline 20, tag ok");
     }

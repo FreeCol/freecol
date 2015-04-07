@@ -93,7 +93,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
 
         panel.setLayout(new MigLayout("wrap 3, fillx, gapx 20", "", ""));
 
-        JLabel name = GUI.localizedLabel(nation);
+        JLabel name = Utility.localizedLabel(nation);
         name.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.SMALL));
         panel.add(name, "span, align center, wrap 40");
@@ -101,13 +101,13 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
         JLabel artLabel = new JLabel(new ImageIcon(ImageLibrary.getMonarchImage(nation)));
         panel.add(artLabel, "spany, gap 40, top");
 
-        panel.add(GUI.localizedLabel("colopedia.nation.ruler"));
+        panel.add(Utility.localizedLabel("colopedia.nation.ruler"));
         panel.add(new JLabel(nation.getRulerName()));
 
-        panel.add(GUI.localizedLabel("colopedia.nation.defaultAdvantage"));
+        panel.add(Utility.localizedLabel("colopedia.nation.defaultAdvantage"));
         panel.add(getButton(nation.getType()));
 
-        panel.add(GUI.localizedLabel("colopedia.nation.currentAdvantage"));
+        panel.add(Utility.localizedLabel("colopedia.nation.currentAdvantage"));
         panel.add(getButton(currentNationType), "wrap push");
     }
 }

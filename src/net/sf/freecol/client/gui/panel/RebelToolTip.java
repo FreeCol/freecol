@@ -61,7 +61,7 @@ public class RebelToolTip extends JToolTip {
 
         setLayout(new MigLayout("fillx, wrap 3", "[][right][right]", ""));
 
-        add(GUI.localizedLabel(StringTemplate
+        add(Utility.localizedLabel(StringTemplate
                 .template("colonyPanel.rebelLabel")
                 .addName("%number%", "")));
 
@@ -69,7 +69,7 @@ public class RebelToolTip extends JToolTip {
 
         add(new JLabel(solPercent + "%"));
 
-        add(GUI.localizedLabel(StringTemplate
+        add(Utility.localizedLabel(StringTemplate
                 .template("colonyPanel.royalistLabel")
                 .addName("%number%", "")));
 
@@ -129,24 +129,24 @@ public class RebelToolTip extends JToolTip {
         }
 
         final String na = Messages.message("notApplicable.short");
-        add(GUI.localizedLabel("report.nextMember"));
+        add(Utility.localizedLabel("report.nextMember"));
         add(new JLabel((turnsNext < 0) ? na
                 : Integer.toString((int)Math.ceil(turnsNext))), "skip");
 
-        add(GUI.localizedLabel("report.50percent"));
+        add(Utility.localizedLabel("report.50percent"));
         add(new JLabel((turns50 < 0) ? na
                 : Integer.toString((int)Math.ceil(turns50))), "skip");
 
-        add(GUI.localizedLabel("report.100percent"));
+        add(Utility.localizedLabel("report.100percent"));
         add(new JLabel((turns100 < 0) ? na
                 : Integer.toString((int)Math.ceil(turns100))), "skip");
 
         final int grow = colony.getPreferredSizeChange();
         if (grow > 0) {
-            add(GUI.localizedLabel("report.changeMore"));
+            add(Utility.localizedLabel("report.changeMore"));
             add(new JLabel(Integer.toString(grow)), "skip");
         } else if (grow < 0) {
-            add(GUI.localizedLabel("report.changeLess"));
+            add(Utility.localizedLabel("report.changeLess"));
             add(new JLabel(Integer.toString(-grow)), "skip");
         }
     }

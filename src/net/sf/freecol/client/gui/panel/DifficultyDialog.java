@@ -99,13 +99,13 @@ public final class DifficultyDialog extends OptionsDialog
         if (isEditable()) {
             loadDefaultOptions();
 
-            JButton resetButton = GUI.localizedButton("reset");
+            JButton resetButton = Utility.localizedButton("reset");
             addResetAction(resetButton);
             
-            JButton loadButton = GUI.localizedButton("load");
+            JButton loadButton = Utility.localizedButton("load");
             addLoadAction(loadButton);
                     
-            JButton saveButton = GUI.localizedButton("save");
+            JButton saveButton = Utility.localizedButton("save");
             addSaveAction(saveButton);
 
             this.panel.add(resetButton, "span, split 3");

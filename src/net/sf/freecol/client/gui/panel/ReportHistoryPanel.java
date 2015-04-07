@@ -50,8 +50,8 @@ public final class ReportHistoryPanel extends ReportPanel {
         reportPanel.setLayout(new MigLayout("wrap 2", "[]20[fill]", ""));
 
         for (HistoryEvent event : history) {
-            reportPanel.add(GUI.localizedLabel(event.getTurn().getLabel()));
-            reportPanel.add(GUI.getDefaultTextArea(event, 40));
+            reportPanel.add(Utility.localizedLabel(event.getTurn().getLabel()));
+            reportPanel.add(Utility.getDefaultTextArea(event, 40));
         }
     }
 }

@@ -68,52 +68,52 @@ public final class ReportForeignAffairPanel extends ReportPanel {
             }
             enemyPanel.add(coatLabel, "spany, aligny top");
             
-            JLabel label = GUI.localizedLabel(enemy.getNationName());
+            JLabel label = Utility.localizedLabel(enemy.getNationName());
             Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALL, Font.BOLD);
             label.setFont(font);
             enemyPanel.add(label, "wrap 12");
             
             //TODO: Get stance only if not player's Nation.
-            enemyPanel.add(GUI.localizedLabel("report.stance"), "newline");
-            enemyPanel.add(GUI.localizedLabel(ns.getStance().getLabel()));
+            enemyPanel.add(Utility.localizedLabel("report.stance"), "newline");
+            enemyPanel.add(Utility.localizedLabel(ns.getStance().getLabel()));
 
             n = ns.getNumberOfSettlements();
-            enemyPanel.add(GUI.localizedLabel("report.numberOfColonies"), "newline");
+            enemyPanel.add(Utility.localizedLabel("report.numberOfColonies"), "newline");
             enemyPanel.add(new JLabel(Integer.toString(n)));
 
             n = ns.getNumberOfUnits();
-            enemyPanel.add(GUI.localizedLabel("report.numberOfUnits"), "newline");
+            enemyPanel.add(Utility.localizedLabel("report.numberOfUnits"), "newline");
             enemyPanel.add(new JLabel(Integer.toString(n)));
 
             n = ns.getMilitaryStrength();
-            enemyPanel.add(GUI.localizedLabel("report.militaryStrength"), "newline");
+            enemyPanel.add(Utility.localizedLabel("report.militaryStrength"), "newline");
             enemyPanel.add(new JLabel(Integer.toString(n)));
 
             n = ns.getNavalStrength();
-            enemyPanel.add(GUI.localizedLabel("report.navalStrength"), "newline");
+            enemyPanel.add(Utility.localizedLabel("report.navalStrength"), "newline");
             enemyPanel.add(new JLabel(Integer.toString(n)));
 
             n = ns.getGold();
-            enemyPanel.add(GUI.localizedLabel("goldTitle"), "newline");
+            enemyPanel.add(Utility.localizedLabel("goldTitle"), "newline");
             enemyPanel.add(new JLabel(Integer.toString(n)));
 
             n = ns.getFoundingFathers();
             if (n >= 0) {
-                enemyPanel.add(GUI.localizedLabel("report.continentalCongress.title"),
+                enemyPanel.add(Utility.localizedLabel("report.continentalCongress.title"),
                                "newline 8");
                 enemyPanel.add(new JLabel(Integer.toString(n)));
             }
 
             n = ns.getTax();
             if (n >= 0) {
-                enemyPanel.add(GUI.localizedLabel("tax"), "newline");
+                enemyPanel.add(Utility.localizedLabel("tax"), "newline");
                 enemyPanel.add(new JLabel(Integer.toString(n)));
                 enemyPanel.add(new JLabel("%"));
             }
 
             n = ns.getSoL();
             if (n >= 0) {
-                enemyPanel.add(GUI.localizedLabel("report.sonsOfLiberty"), "newline");
+                enemyPanel.add(Utility.localizedLabel("report.sonsOfLiberty"), "newline");
                 enemyPanel.add(new JLabel(Integer.toString(n)));
                 enemyPanel.add(new JLabel("%"));
             }
@@ -121,7 +121,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
             reportPanel.add(enemyPanel);
         }
 
-        reportPanel.add(GUI.getDefaultTextArea(Messages.message("report.foreignAffairs.notice"), 40),
+        reportPanel.add(Utility.getDefaultTextArea(Messages.message("report.foreignAffairs.notice"), 40),
                         "newline 20, span 8");
 
         reportPanel.doLayout();

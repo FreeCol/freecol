@@ -164,7 +164,7 @@ public final class StatisticsPanel extends FreeColPanel {
         // Title
         JPanel header = new JPanel();
         this.add(header, BorderLayout.NORTH);
-        header.add(GUI.localizedLabel("statistics"), JPanel.CENTER_ALIGNMENT);
+        header.add(Utility.localizedLabel("statistics"), JPanel.CENTER_ALIGNMENT);
 
         // Actual stats panel
         JPanel statsPanel = new JPanel(new GridLayout(1,2));
@@ -188,7 +188,7 @@ public final class StatisticsPanel extends FreeColPanel {
     private JPanel displayStatsMessage(String title,
                                        Map<String, String> stats) {
         JPanel panel = new JPanel();
-        panel.setBorder(GUI.localizedBorder(title));
+        panel.setBorder(Utility.localizedBorder(title));
         Box b = new Box(BoxLayout.Y_AXIS);
         panel.add(b);
         Map<String, String> memory = new HashMap<>();

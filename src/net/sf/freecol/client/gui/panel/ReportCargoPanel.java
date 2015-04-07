@@ -53,7 +53,7 @@ public final class ReportCargoPanel extends ReportUnitPanel {
     @Override
     protected void addOwnUnits() {
         final Player player = getMyPlayer();
-        reportPanel.add(GUI.localizedLabel(StringTemplate
+        reportPanel.add(Utility.localizedLabel(StringTemplate
                 .template("report.military.forces")
                 .addStringTemplate("%nation%", player.getNationName())),
             "newline, span, split 2");

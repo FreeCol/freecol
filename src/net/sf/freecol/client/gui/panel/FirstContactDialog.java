@@ -69,7 +69,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
             headerKey = BASE_KEY + NATIVES_KEY;
             imageKey = IMAGE_BASE_KEY + NATIVES_KEY;
         }
-        JLabel header = GUI.localizedLabel(headerKey);
+        JLabel header = Utility.localizedLabel(headerKey);
         header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.MEDIUM));
         JLabel image
@@ -77,7 +77,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
 
         JTextArea tutorial = null;
         if (!player.hasContactedIndians() && freeColClient.tutorialMode()) {
-            tutorial = GUI.getDefaultTextArea(Messages.message(TUTORIAL_KEY));
+            tutorial = Utility.getDefaultTextArea(Messages.message(TUTORIAL_KEY));
         }
 
         String messageId = (tile != null) ? "welcomeOffer.text"
@@ -88,7 +88,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
             .addStringTemplate("%nation%", other.getNationName())
             .addName("%camps%", Integer.toString(settlementCount))
             .add("%settlementType%", type);
-        JTextArea text = GUI.getDefaultTextArea(template);
+        JTextArea text = Utility.getDefaultTextArea(template);
 
         // Resize the text areas to better match the image.
         int columns = (int)Math.floor(text.getColumns()

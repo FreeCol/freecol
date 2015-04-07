@@ -56,7 +56,7 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
             = new ArrayList<>(europe.getRecruitables());
 
         String hdr = Messages.message("chooseImmigrant");
-        JTextArea header = GUI.getDefaultTextArea(hdr);
+        JTextArea header = Utility.getDefaultTextArea(hdr);
         if (foy) {
             header.insert(Messages.message("lostCityRumour.fountainOfYouth")
                           + "\n\n", 0);

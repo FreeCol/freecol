@@ -411,7 +411,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
                                                     "[align center]", ""));
-        panel.add(GUI.localizedHeader("selectDestination.text", true));
+        panel.add(Utility.localizedHeader("selectDestination.text", true));
 
         panel.add(listScroller, "newline 30, growx, growy");
         panel.add(this.onlyMyColoniesBox, "left");

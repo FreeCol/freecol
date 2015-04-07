@@ -161,7 +161,7 @@ public class BuildingToolTip extends JToolTip {
             : output.getBreedingNumber();
         if (breedingNumber < GoodsType.INFINITY
             && breedingNumber > building.getColony().getGoodsCount(output)) {
-            add(GUI.localizedLabel(StringTemplate
+            add(Utility.localizedLabel(StringTemplate
                     .template("buildingToolTip.breeding")
                     .addAmount("%number%", breedingNumber)
                     .addNamed("%goods%", output)));

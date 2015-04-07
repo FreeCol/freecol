@@ -105,7 +105,7 @@ public final class ReportNavalPanel extends ReportUnitPanel {
         final Specification spec = getSpecification();
         final Player player = getMyPlayer();
 
-        reportPanel.add(GUI.localizedLabel(StringTemplate
+        reportPanel.add(Utility.localizedLabel(StringTemplate
                 .template("report.military.forces")
                 .addStringTemplate("%nation%", player.getNationName())),
             "newline, span, split 2");

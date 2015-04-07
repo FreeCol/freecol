@@ -80,13 +80,13 @@ public class InformationPanel extends FreeColPanel {
         for (int i = 0; i < texts.length; i++) {
             if (images != null && images[i] != null) {
                 textPanel.add(new JLabel(images[i]));
-                textPanel.add(GUI.getDefaultTextArea(texts[i], 30));
+                textPanel.add(Utility.getDefaultTextArea(texts[i], 30));
             } else {
-                textPanel.add(GUI.getDefaultTextArea(texts[i], 30), "skip");
+                textPanel.add(Utility.getDefaultTextArea(texts[i], 30), "skip");
             }
             StringTemplate disp = displayLabel(fcos[i]);
             if (disp == null) continue;
-            JButton button = GUI.localizedButton(StringTemplate
+            JButton button = Utility.localizedButton(StringTemplate
                 .template("informationPanel.display")
                 .addStringTemplate("%object%", disp));
             final FreeColObject fco = fcos[i];

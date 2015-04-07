@@ -144,10 +144,10 @@ public class ConstructionPanel extends MigPanel
             Image image = freeColClient.getGUI().getImageLibrary()
                 .getSmallBuildableImage(buildable, colony.getOwner());
             add(new JLabel(new ImageIcon(image)), "spany");
-            add(GUI.localizedLabel(StringTemplate
+            add(Utility.localizedLabel(StringTemplate
                     .template("colonyPanel.currentlyBuilding")
                     .addName("%buildable%", buildable)));
-            add(GUI.localizedLabel(StringTemplate
+            add(Utility.localizedLabel(StringTemplate
                     .template("turnsToComplete.long")
                     .addName("%number%", Messages.getTurnsText(turns))));
 

@@ -100,18 +100,18 @@ public class TerrainDetailPanel
             defenseBonus = ModifierFormat.getModifierAsString(defenceModifiers.iterator().next());
         }
 
-        JLabel nameLabel = GUI.localizedLabel(tileType);
+        JLabel nameLabel = Utility.localizedLabel(tileType);
         nameLabel.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.SMALL));
         panel.add(nameLabel, "span, align center");
 
-        panel.add(GUI.localizedLabel("colopedia.terrain.terrainImage"), "spany 3");
+        panel.add(Utility.localizedLabel("colopedia.terrain.terrainImage"), "spany 3");
         Image terrainImage = getImageLibrary().getCompoundTerrainImage(tileType, 1);
         panel.add(new JLabel(new ImageIcon(terrainImage)), "spany 3");
 
         List<ResourceType> resourceList = tileType.getResourceTypes();
         if (!resourceList.isEmpty()) {
-            panel.add(GUI.localizedLabel("colopedia.terrain.resource"));
+            panel.add(Utility.localizedLabel("colopedia.terrain.resource"));
             if (resourceList.size() > 1) {
                 panel.add(getResourceButton(resourceList.get(0)), "split " + resourceList.size());
                 for (int index = 1; index < resourceList.size(); index++) {
@@ -124,20 +124,20 @@ public class TerrainDetailPanel
             panel.add(new JLabel(), "wrap");
         }
 
-        panel.add(GUI.localizedLabel("colopedia.terrain.movementCost"));
+        panel.add(Utility.localizedLabel("colopedia.terrain.movementCost"));
         panel.add(new JLabel(movementCost));
 
-        panel.add(GUI.localizedLabel("colopedia.terrain.defenseBonus"));
+        panel.add(Utility.localizedLabel("colopedia.terrain.defenseBonus"));
         panel.add(new JLabel(defenseBonus));
 
-        panel.add(GUI.localizedLabel("colopedia.terrain.unattendedProduction"));
+        panel.add(Utility.localizedLabel("colopedia.terrain.unattendedProduction"));
         addProduction(panel, tileType.getPossibleProduction(true));
 
-        panel.add(GUI.localizedLabel("colopedia.terrain.colonistProduction"));
+        panel.add(Utility.localizedLabel("colopedia.terrain.colonistProduction"));
         addProduction(panel, tileType.getPossibleProduction(false));
 
-        panel.add(GUI.localizedLabel("colopedia.terrain.description"));
-        panel.add(GUI.getDefaultTextArea(Messages.getDescription(tileType)),
+        panel.add(Utility.localizedLabel("colopedia.terrain.description"));
+        panel.add(Utility.getDefaultTextArea(Messages.getDescription(tileType)),
                   "span, growx");
     }
 

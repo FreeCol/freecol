@@ -82,7 +82,7 @@ public final class ChooseFoundingFatherDialog
         tb.setSelectedIndex(0);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1", "align center"));
-        panel.add(GUI.localizedHeader("foundingFatherDialog.nominate", false));
+        panel.add(Utility.localizedHeader("foundingFatherDialog.nominate", false));
         panel.add(helpButton, "tag help");
         panel.add(tb, "width 100%");
         panel.setPreferredSize(panel.getPreferredSize());

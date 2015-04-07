@@ -66,7 +66,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
     protected boolean editable = true;
 
-    protected JButton okButton = GUI.localizedButton("ok");
+    protected JButton okButton = Utility.localizedButton("ok");
 
 
     /**
@@ -190,7 +190,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      * @return The new button.
      */
     public JButton createColonyButton(Colony colony) {
-        JButton button = GUI.getLinkButton(colony.getName(), null,
+        JButton button = Utility.getLinkButton(colony.getName(), null,
                                            colony.getId());
         button.addActionListener(this);
         return button;

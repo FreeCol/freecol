@@ -145,7 +145,7 @@ public final class FindSettlementPanel extends FreeColPanel
             });
         this.displayOptionBox.addItemListener(this);
 
-        add(GUI.localizedHeader(Messages.nameKey("findSettlementPanel"), true));
+        add(Utility.localizedHeader(Messages.nameKey("findSettlementPanel"), true));
         add(listScroller, "width max(300, 100%), height max(300, 100%)");
         add(this.displayOptionBox);
         add(okButton, "tag ok");

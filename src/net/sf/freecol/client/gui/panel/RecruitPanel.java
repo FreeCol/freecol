@@ -62,7 +62,7 @@ public final class RecruitPanel extends FreeColPanel {
         super(freeColClient, new MigLayout("wrap 1", "", ""));
 
         person = new JButton[getMyPlayer().getEurope().getRecruitables().size()];
-        question = GUI.getDefaultTextArea("");
+        question = Utility.getDefaultTextArea("");
         for (int i = 0; i < person.length; i++) {
             person[i] = new JButton();
             person[i].setActionCommand(String.valueOf(i));

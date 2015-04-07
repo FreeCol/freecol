@@ -169,7 +169,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 if (addWorkItems(unitLabel)) this.addSeparator();
                 if (addEducationItems(unitLabel)) this.addSeparator();
                 if (unit.isInColony() && colony.canReducePopulation()) {
-                    JMenuItem menuItem = GUI.localizedMenuItem("leaveTown");
+                    JMenuItem menuItem = Utility.localizedMenuItem("leaveTown");
                     menuItem.setActionCommand(UnitAction.LEAVE_TOWN.toString());
                     menuItem.addActionListener(unitLabel);
                     this.add(menuItem);
@@ -204,7 +204,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 StringTemplate template = StringTemplate.template("board")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL));
-                JMenuItem menuItem = GUI.localizedMenuItem(template);
+                JMenuItem menuItem = Utility.localizedMenuItem(template);
                 menuItem.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -228,7 +228,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 StringTemplate template = StringTemplate.template("loadOnTo")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL));
-                JMenuItem menuItem = GUI.localizedMenuItem(template);
+                JMenuItem menuItem = Utility.localizedMenuItem(template);
                 menuItem.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -249,7 +249,7 @@ public final class QuickActionMenu extends JPopupMenu {
         final Unit unit = unitLabel.getUnit();
         if (!unit.isCarrier() || !unit.hasCargo()) return false;
 
-        JMenuItem cargo = GUI.localizedMenuItem("cargoOnCarrier");
+        JMenuItem cargo = Utility.localizedMenuItem("cargoOnCarrier");
         this.add(cargo);
 
         for (Unit passenger : unit.getUnitList()) {
@@ -294,7 +294,7 @@ public final class QuickActionMenu extends JPopupMenu {
         } else {
             t.addName("%claim%", "");
         }
-        JMenuItem menuItem = GUI.localizedMenuItem(t,
+        JMenuItem menuItem = Utility.localizedMenuItem(t,
             new ImageIcon(gui.getImageLibrary().getSmallGoodsImage(type)));
         menuItem.setActionCommand(UnitLabel.getWorkLabel(wl)
             + "/" + wl.getId() + "/" + type.getId()
@@ -373,7 +373,7 @@ public final class QuickActionMenu extends JPopupMenu {
             }
         }
 
-        JMenu container = GUI.localizedMenu("model.unit.changeWork");
+        JMenu container = Utility.localizedMenu("model.unit.changeWork");
         List<JMenuItem> owned = descendingList(items);
         if (expertOwned != null) owned.add(0, expertOwned);
         for (JMenuItem j : owned) container.add(j);
@@ -386,7 +386,7 @@ public final class QuickActionMenu extends JPopupMenu {
         if (container.getItemCount() > 0) this.add(container);
 
         if (current != null && unit.getWorkType() != null) {
-            JMenuItem ji = GUI.localizedMenuItem("showProduction");
+            JMenuItem ji = Utility.localizedMenuItem("showProduction");
             ji.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent event) {
@@ -409,7 +409,7 @@ public final class QuickActionMenu extends JPopupMenu {
                     JMenuItem menuItem = null;
                     ImageIcon teacherIcon = new ImageIcon(lib.getSmallerUnitImage(teacher));
                     if (teacher.getStudent() != unit) {
-                        menuItem = GUI.localizedMenuItem("assignToTeacher",
+                        menuItem = Utility.localizedMenuItem("assignToTeacher",
                                                          teacherIcon);
                         if (teacher.getStudent() != null) {
                             menuItem.setText(menuItem.getText()
@@ -420,7 +420,7 @@ public final class QuickActionMenu extends JPopupMenu {
                         menuItem.setActionCommand(UnitAction.ASSIGN + "/" + teacher.getId());
                         menuItem.addActionListener(unitLabel);
                     } else {
-                        menuItem = GUI.localizedMenuItem(StringTemplate
+                        menuItem = Utility.localizedMenuItem(StringTemplate
                             .template("menu.unit.apprentice")
                             .addName("%unit%",
                                 Messages.getName(teacher.getType())),
@@ -437,7 +437,7 @@ public final class QuickActionMenu extends JPopupMenu {
         }
         if (unit.getStudent() != null) {
             Unit student = unit.getStudent();
-            JMenuItem menuItem = GUI.localizedMenuItem(StringTemplate
+            JMenuItem menuItem = Utility.localizedMenuItem(StringTemplate
                 .template("menuBar.teacher")
                 .addName("%unit%", Messages.getName(student.getType())));
             menuItem.setText(menuItem.getText() 
@@ -462,15 +462,15 @@ public final class QuickActionMenu extends JPopupMenu {
                 experiencePanel.add(new JLabel(new ImageIcon(
                         lib.getSmallerUnitImage(expertType))),
                     "spany 2");
-                experiencePanel.add(GUI.localizedLabel(StringTemplate
+                experiencePanel.add(Utility.localizedLabel(StringTemplate
                         .template("menu.unit.experience")
                         .addName("%job%", jobName)));
-                experiencePanel.add(GUI.localizedLabel(StringTemplate
+                experiencePanel.add(Utility.localizedLabel(StringTemplate
                         .template("fraction")
                         .addAmount("%numerator%", experience)
                         .addAmount("%denominator%", maxExperience)),
                     "align right");
-                experiencePanel.add(GUI.localizedLabel("menu.unit.upgrade"));
+                experiencePanel.add(Utility.localizedLabel("menu.unit.upgrade"));
                 experiencePanel.add(new JLabel(ModifierFormat.format(probability) + "%"),
                                     "align right");
                 this.add(experiencePanel);
@@ -484,7 +484,7 @@ public final class QuickActionMenu extends JPopupMenu {
         final Unit tempUnit = unitLabel.getUnit();
         final boolean isUnitAtSea = tempUnit.isAtSea();
 
-        JMenuItem menuItem = GUI.localizedMenuItem("activateUnit");
+        JMenuItem menuItem = Utility.localizedMenuItem("activateUnit");
         menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -499,7 +499,7 @@ public final class QuickActionMenu extends JPopupMenu {
         this.add(menuItem);
 
         if (!(tempUnit.getLocation() instanceof Europe)) {
-            menuItem = GUI.localizedMenuItem("fortifyUnit");
+            menuItem = Utility.localizedMenuItem("fortifyUnit");
             menuItem.setActionCommand(UnitAction.FORTIFY.toString());
             menuItem.addActionListener(unitLabel);
             menuItem.setEnabled((tempUnit.getMovesLeft() > 0)
@@ -509,7 +509,7 @@ public final class QuickActionMenu extends JPopupMenu {
         }
 
         UnitState unitState = tempUnit.getState();
-        menuItem = GUI.localizedMenuItem("sentryUnit");
+        menuItem = Utility.localizedMenuItem("sentryUnit");
         menuItem.setActionCommand(UnitAction.SENTRY.toString());
         menuItem.addActionListener(unitLabel);
         menuItem.setEnabled(unitState != Unit.UnitState.SENTRY
@@ -517,7 +517,7 @@ public final class QuickActionMenu extends JPopupMenu {
         this.add(menuItem);
 
         boolean hasTradeRoute = tempUnit.getTradeRoute() != null;
-        menuItem = GUI.localizedMenuItem("clearUnitOrders");
+        menuItem = Utility.localizedMenuItem("clearUnitOrders");
         menuItem.setActionCommand(UnitAction.CLEAR_ORDERS.toString());
         menuItem.addActionListener(unitLabel);
         menuItem.setEnabled((unitState != Unit.UnitState.ACTIVE
@@ -526,7 +526,7 @@ public final class QuickActionMenu extends JPopupMenu {
         this.add(menuItem);
 
         if (tempUnit.isCarrier()) {
-            menuItem = GUI.localizedMenuItem("assignTradeRoute");
+            menuItem = Utility.localizedMenuItem("assignTradeRoute");
             menuItem.setActionCommand(UnitAction.ASSIGN_TRADE_ROUTE.toString());
             menuItem.addActionListener(unitLabel);
             menuItem.setEnabled(!hasTradeRoute);
@@ -534,7 +534,7 @@ public final class QuickActionMenu extends JPopupMenu {
         }
 
         if (tempUnit.canCarryTreasure() && tempUnit.canCashInTreasureTrain()) {
-            menuItem = GUI.localizedMenuItem("cashInTreasureTrain.order");
+            menuItem = Utility.localizedMenuItem("cashInTreasureTrain.order");
             menuItem.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -547,7 +547,7 @@ public final class QuickActionMenu extends JPopupMenu {
         }
 
         if (tempUnit.getLocation() instanceof Unit) {
-            menuItem = GUI.localizedMenuItem("leaveShip");
+            menuItem = Utility.localizedMenuItem("leaveShip");
             menuItem.setActionCommand(UnitAction.LEAVE_SHIP.toString());
             menuItem.addActionListener(unitLabel);
             menuItem.setEnabled(true);
@@ -555,7 +555,7 @@ public final class QuickActionMenu extends JPopupMenu {
         }
 
         if (tempUnit.isCarrier()) {
-            menuItem = GUI.localizedMenuItem("unload");
+            menuItem = Utility.localizedMenuItem("unload");
             menuItem.setActionCommand(UnitAction.UNLOAD.toString());
             menuItem.addActionListener(unitLabel);
             menuItem.setEnabled(tempUnit.hasCargo() && !isUnitAtSea);
@@ -676,7 +676,7 @@ public final class QuickActionMenu extends JPopupMenu {
             .getTargetType(ChangeType.CLEAR_SKILL, unit.getOwner());
         if (newUnitType != null) {
             if (separatorNeeded) this.addSeparator();
-            JMenuItem menuItem = GUI.localizedMenuItem("clearSpeciality",
+            JMenuItem menuItem = Utility.localizedMenuItem("clearSpeciality",
                 new ImageIcon(
                     gui.getImageLibrary().getTinyUnitImage(newUnitType)));
             menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
@@ -718,7 +718,7 @@ public final class QuickActionMenu extends JPopupMenu {
                                               goods.getAmount());
         if (amount > 0) amount -= amount * player.getTax() / 100;
         if (amount > 0) {
-            JMenuItem price = GUI.localizedMenuItem(StringTemplate
+            JMenuItem price = Utility.localizedMenuItem(StringTemplate
                 .template("quickActionMenu.profit")
                 .addAmount("%amount%", amount));
             this.add(price);
@@ -741,7 +741,7 @@ public final class QuickActionMenu extends JPopupMenu {
             if (carrier.getLocation().getColony() != null
                 || (carrier.isInEurope()
                     && player.canTrade(goods.getType()))) {
-                JMenuItem unload = GUI.localizedMenuItem("unload");
+                JMenuItem unload = Utility.localizedMenuItem("unload");
                 unload.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -758,7 +758,7 @@ public final class QuickActionMenu extends JPopupMenu {
                     addPayArrears(goods.getType());
                 }
 
-                JMenuItem dump = GUI.localizedMenuItem("dumpCargo");
+                JMenuItem dump = Utility.localizedMenuItem("dumpCargo");
                 dump.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -786,7 +786,7 @@ public final class QuickActionMenu extends JPopupMenu {
     private void addPayArrears(final GoodsType goodsType) {
         final InGameController igc = freeColClient.getInGameController();
 
-        JMenuItem menuItem = GUI.localizedMenuItem("boycottedGoods.payArrears");
+        JMenuItem menuItem = Utility.localizedMenuItem("boycottedGoods.payArrears");
         menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -844,7 +844,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 StringTemplate template = StringTemplate.template("loadOnTo")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL));
-                JMenuItem menuItem = GUI.localizedMenuItem(template);
+                JMenuItem menuItem = Utility.localizedMenuItem(template);
                 menuItem.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {

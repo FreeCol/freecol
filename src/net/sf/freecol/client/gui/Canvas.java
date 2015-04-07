@@ -136,6 +136,7 @@ import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TradeRoutePanel;
 import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
 import net.sf.freecol.client.gui.panel.TrainPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.panel.VictoryDialog;
 import net.sf.freecol.client.gui.panel.WarehouseDialog;
 import net.sf.freecol.client.gui.panel.WorkProductionPanel;
@@ -351,10 +352,10 @@ public final class Canvas extends JDesktopPane {
 
         if (comp.getBorder() != null) {
             if (comp.getBorder() instanceof EmptyBorder) {
-                f.setBorder(GUI.blankBorder(10, 10, 10, 10));
+                f.setBorder(Utility.blankBorder(10, 10, 10, 10));
             } else {
                 f.setBorder(comp.getBorder());
-                comp.setBorder(GUI.blankBorder(5, 5, 5, 5));
+                comp.setBorder(Utility.blankBorder(5, 5, 5, 5));
             }
         } else {
             f.setBorder(null);

@@ -39,6 +39,7 @@ import javax.swing.Timer;
 
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.FreeColAction;
+import net.sf.freecol.client.gui.panel.Utility;
 
 
 /**
@@ -192,7 +193,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
             super(getHumanKeyStrokeText(keyStroke), JLabel.CENTER);
 
             setOpaque(false);
-            setBorder(GUI.TRIVIAL_LINE_BORDER);
+            setBorder(Utility.TRIVIAL_LINE_BORDER);
             addKeyListener(this);
             addMouseListener(this);
         }

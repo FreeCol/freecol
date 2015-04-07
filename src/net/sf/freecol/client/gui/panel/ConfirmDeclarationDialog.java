@@ -283,12 +283,12 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         // Create the main panel
         MigPanel panel = new MigPanel(new MigLayout("wrap 2", "[][fill]",
                                                     "[fill]"));
-        panel.add(GUI.getDefaultTextArea(sure), "span");
-        panel.add(GUI.getDefaultTextArea(cPrompt), "span");
+        panel.add(Utility.getDefaultTextArea(sure), "span");
+        panel.add(Utility.getDefaultTextArea(cPrompt), "span");
         panel.add(this.countryField, "span");
-        panel.add(GUI.getDefaultTextArea(nPrompt), "span");
+        panel.add(Utility.getDefaultTextArea(nPrompt), "span");
         panel.add(this.nationField, "span");
-        panel.add(GUI.getDefaultTextArea(flagPrompt), "span");
+        panel.add(Utility.getDefaultTextArea(flagPrompt), "span");
 
         panel.add(this.label, "skip, width 200, height 100");
 
@@ -303,32 +303,32 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
         this.stars.setSelectedIndex(this.flag.getStars() - 1);
         this.stars.addItemListener(this);
-        panel.add(GUI.localizedLabel("flag.stars.label"));
+        panel.add(Utility.localizedLabel("flag.stars.label"));
         panel.add(this.stars);
 
         this.stripes.setSelectedIndex(this.flag.getStripes() - 1);
         this.stripes.addItemListener(this);
-        panel.add(GUI.localizedLabel("flag.stripes.label"));
+        panel.add(Utility.localizedLabel("flag.stripes.label"));
         panel.add(this.stripes);
 
         this.unionColor.setColor(this.flag.getUnionColor());
         this.unionColor.addActionListener(this);
-        panel.add(GUI.localizedLabel("flag.unionColor.label"));
+        panel.add(Utility.localizedLabel("flag.unionColor.label"));
         panel.add(this.unionColor, "sg colorButton");
 
         this.decorationColor.setColor(this.flag.getDecorationColor());
         this.decorationColor.addActionListener(this);
-        panel.add(GUI.localizedLabel("flag.decorationColor.label"));
+        panel.add(Utility.localizedLabel("flag.decorationColor.label"));
         panel.add(this.decorationColor);
 
         this.starColor.setColor(this.flag.getStarColor());
         this.starColor.addActionListener(this);
-        panel.add(GUI.localizedLabel("flag.starColor.label"));
+        panel.add(Utility.localizedLabel("flag.starColor.label"));
         panel.add(this.starColor);
 
         List<Color> flagColors = this.flag.getBackgroundColors();
         int colors = flagColors.size();
-        panel.add(GUI.localizedLabel("flag.backgroundColors.label"));
+        panel.add(Utility.localizedLabel("flag.backgroundColors.label"));
         for (int index = 0; index < this.backgroundColors.length; index++) {
             ColorButton button = this.backgroundColors[index];
             if (index < colors) button.setColor(flagColors.get(index));
@@ -363,7 +363,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         box.setRenderer(new EnumRenderer<T>(prefix));
         box.setSelectedItem(value);
         box.addItemListener(this);
-        panel.add(GUI.localizedLabel(prefix + "label"));
+        panel.add(Utility.localizedLabel(prefix + "label"));
         panel.add(box);
     }
 

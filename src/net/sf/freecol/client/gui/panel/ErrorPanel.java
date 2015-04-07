@@ -55,11 +55,11 @@ public final class ErrorPanel extends FreeColPanel {
     public ErrorPanel(FreeColClient freeColClient, String message) {
         super(freeColClient, new MigLayout());
 
-        JButton showButton = GUI.localizedButton("errorMessage.showLogFile");
+        JButton showButton = Utility.localizedButton("errorMessage.showLogFile");
         showButton.setActionCommand(SHOW);
         showButton.addActionListener(this);
 
-        add(GUI.getDefaultTextArea(message, 40), "wrap 20");
+        add(Utility.getDefaultTextArea(message, 40), "wrap 20");
         add(okButton, "split 2, tag ok");
         add(showButton);
     }
@@ -85,7 +85,7 @@ public final class ErrorPanel extends FreeColPanel {
             ;// ignore
         }
 
-        JTextArea textArea = GUI.getDefaultTextArea(message, 40);
+        JTextArea textArea = Utility.getDefaultTextArea(message, 40);
         textArea.setFocusable(true);
         textArea.setEditable(false);
         

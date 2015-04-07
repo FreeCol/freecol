@@ -79,19 +79,19 @@ public final class ReportExplorationPanel extends ReportPanel {
          */
         Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                 FontLibrary.FontSize.TINY, Font.BOLD);
-        JLabel nameOfRegion = GUI.localizedLabel("report.exploration.nameOfRegion");
+        JLabel nameOfRegion = Utility.localizedLabel("report.exploration.nameOfRegion");
         nameOfRegion.setFont(font);
         reportPanel.add(nameOfRegion);
-        JLabel typeOfRegion = GUI.localizedLabel("report.exploration.typeOfRegion");
+        JLabel typeOfRegion = Utility.localizedLabel("report.exploration.typeOfRegion");
         typeOfRegion.setFont(font);
         reportPanel.add(typeOfRegion);
-        JLabel discoveredIn = GUI.localizedLabel("report.exploration.discoveredIn");
+        JLabel discoveredIn = Utility.localizedLabel("report.exploration.discoveredIn");
         discoveredIn.setFont(font);
         reportPanel.add(discoveredIn);
-        JLabel discoveredBy = GUI.localizedLabel("report.exploration.discoveredBy");
+        JLabel discoveredBy = Utility.localizedLabel("report.exploration.discoveredBy");
         discoveredBy.setFont(font);
         reportPanel.add(discoveredBy);
-        JLabel valueOfRegion = GUI.localizedLabel("report.exploration.valueOfRegion");
+        JLabel valueOfRegion = Utility.localizedLabel("report.exploration.valueOfRegion");
         valueOfRegion.setFont(font);
         reportPanel.add(valueOfRegion);
         
@@ -102,10 +102,10 @@ public final class ReportExplorationPanel extends ReportPanel {
          */
         for (Region region : regions) {
             reportPanel.add(new JLabel(region.getName()));
-            reportPanel.add(GUI.localizedLabel(region.getType()));
-            reportPanel.add(GUI.localizedLabel(region.getDiscoveredIn()
+            reportPanel.add(Utility.localizedLabel(region.getType()));
+            reportPanel.add(Utility.localizedLabel(region.getDiscoveredIn()
                     .getLabel()));
-            reportPanel.add(GUI.localizedLabel(region.getDiscoveredBy()
+            reportPanel.add(Utility.localizedLabel(region.getDiscoveredBy()
                     .getNationName()));
             reportPanel.add(new JLabel(String.valueOf(region.getScoreValue())));
         }

@@ -77,9 +77,9 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
         str = Integer.toString(oldMap.getHeight());
         inputHeight = new JTextField(str, COLUMNS);
 
-        JLabel widthLabel = GUI.localizedLabel("width");
+        JLabel widthLabel = Utility.localizedLabel("width");
         widthLabel.setLabelFor(inputWidth);
-        JLabel heightLabel = GUI.localizedLabel("height");
+        JLabel heightLabel = Utility.localizedLabel("height");
         heightLabel.setLabelFor(inputHeight);
 
         widthPanel.setOpaque(false);

@@ -113,12 +113,12 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
         } catch (IllegalArgumentException e) {
             // this is not a founding father
             panel.setLayout(new MigLayout("wrap 1, align center", "align center"));
-            JLabel header = GUI.localizedLabel(Messages.nameKey(id));
+            JLabel header = Utility.localizedLabel(Messages.nameKey(id));
             header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
                 FontLibrary.FontSize.SMALL));
             panel.add(header, "align center, wrap 20");
             if (getId().equals(id)) {
-                panel.add(GUI.getDefaultTextArea(
+                panel.add(Utility.getDefaultTextArea(
                     Messages.message("colopedia.foundingFather.description"), 40));
             } else {
                 Image image = ResourceManager.getImage(id + ".image");
@@ -161,7 +161,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
             text.append(" ");
             text.append(Messages.message(turn.getLabel()));
         }
-        JTextArea description = GUI.getDefaultTextArea(text.toString(), 20);
+        JTextArea description = Utility.getDefaultTextArea(text.toString(), 20);
 
         panel.add(header, "span, align center, wrap 40");
         panel.add(label, "top");

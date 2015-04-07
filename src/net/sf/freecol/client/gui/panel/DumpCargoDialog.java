@@ -72,7 +72,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
         }
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
-        panel.add(GUI.localizedHeader("dumpCargo", true));
+        panel.add(Utility.localizedHeader("dumpCargo", true));
         for (JCheckBox c : checkBoxes) panel.add(c);
         panel.setSize(panel.getPreferredSize());
 

@@ -128,7 +128,7 @@ public final class EuropePanel extends PortPanel {
                 }
             }
 
-            GUI.localizeBorder(this, Unit.getDestinationLabel("ship",
+            Utility.localizeBorder(this, Unit.getDestinationLabel("ship",
                     destination, getMyPlayer()));
             revalidate();
         }
@@ -645,12 +645,12 @@ public final class EuropePanel extends PortPanel {
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         logScroll.getVerticalScrollBar().setUnitIncrement(16);
 
-        toAmericaPanel.setBorder(GUI.localizedBorder("goingToAmerica"));
-        toEuropePanel.setBorder(GUI.localizedBorder("goingToEurope"));
-        docksPanel.setBorder(GUI.localizedBorder("docks"));
-        inPortPanel.setBorder(GUI.localizedBorder("inPort"));
-        marketPanel.setBorder(GUI.blankBorder(10, 10, 10, 10));
-        log.setBorder(GUI.localizedBorder("sales"));
+        toAmericaPanel.setBorder(Utility.localizedBorder("goingToAmerica"));
+        toEuropePanel.setBorder(Utility.localizedBorder("goingToEurope"));
+        docksPanel.setBorder(Utility.localizedBorder("docks"));
+        inPortPanel.setBorder(Utility.localizedBorder("inPort"));
+        marketPanel.setBorder(Utility.blankBorder(10, 10, 10, 10));
+        log.setBorder(Utility.localizedBorder("sales"));
 
         toAmericaScroll.getViewport().setOpaque(false);
         toAmericaPanel.setOpaque(false);
@@ -670,7 +670,7 @@ public final class EuropePanel extends PortPanel {
         initialize(europe);
 
         if (canvas.getHeight() > 780) {
-            add(GUI.localizedHeader(europe.getNameKey(), false),
+            add(Utility.localizedHeader(europe.getNameKey(), false),
                 "span, top, center");
         }
         add(toAmericaScroll, "sg, height 124:, grow");

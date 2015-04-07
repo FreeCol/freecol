@@ -138,8 +138,8 @@ public final class TradeRoutePanel extends FreeColPanel {
         // listeners.  The ok, cancel and deassign actions do close
         // the dialog, so they are handled in the class-level action
         // listener below.
-        this.newRouteButton = GUI.localizedButton("tradeRoutePanel.newRoute");
-        GUI.localizeToolTip(this.newRouteButton, "tradeRoutePanel.new.tooltip");
+        this.newRouteButton = Utility.localizedButton("tradeRoutePanel.newRoute");
+        Utility.localizeToolTip(this.newRouteButton, "tradeRoutePanel.new.tooltip");
         this.newRouteButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -147,8 +147,8 @@ public final class TradeRoutePanel extends FreeColPanel {
                 }
             });
 
-        this.editRouteButton = GUI.localizedButton("tradeRoutePanel.editRoute");
-        GUI.localizeToolTip(this.editRouteButton, "tradeRoutePanel.edit.tooltip");
+        this.editRouteButton = Utility.localizedButton("tradeRoutePanel.editRoute");
+        Utility.localizeToolTip(this.editRouteButton, "tradeRoutePanel.edit.tooltip");
         this.editRouteButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -173,8 +173,8 @@ public final class TradeRoutePanel extends FreeColPanel {
                 }
             });
 
-        this.deleteRouteButton = GUI.localizedButton("tradeRoutePanel.deleteRoute");
-        GUI.localizeToolTip(this.deleteRouteButton, "tradeRoutePanel.delete.tooltip");
+        this.deleteRouteButton = Utility.localizedButton("tradeRoutePanel.deleteRoute");
+        Utility.localizeToolTip(this.deleteRouteButton, "tradeRoutePanel.delete.tooltip");
         this.deleteRouteButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -189,12 +189,12 @@ public final class TradeRoutePanel extends FreeColPanel {
                 }
             });
 
-        this.deassignRouteButton = GUI.localizedButton("tradeRoutePanel.deassignRoute");
-        GUI.localizeToolTip(this.deassignRouteButton, "tradeRoutePanel.deassign.tooltip");
+        this.deassignRouteButton = Utility.localizedButton("tradeRoutePanel.deassignRoute");
+        Utility.localizeToolTip(this.deassignRouteButton, "tradeRoutePanel.deassign.tooltip");
         this.deassignRouteButton.setActionCommand(DEASSIGN);
         this.deassignRouteButton.addActionListener(this);
 
-        JButton cancelButton = GUI.localizedButton("cancel");
+        JButton cancelButton = Utility.localizedButton("cancel");
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);
         setCancelComponent(cancelButton);
@@ -203,7 +203,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         updateList((unit == null || unit.getTradeRoute() == null) ? null
             : unit.getTradeRoute());
 
-        add(GUI.localizedHeader(Messages.nameKey("tradeRoutePanel"), false),
+        add(Utility.localizedHeader(Messages.nameKey("tradeRoutePanel"), false),
             "span, align center");
         if (this.unit != null && this.unit.getLocation() != null) {
             JLabel unitLabel
@@ -212,7 +212,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                 getImageLibrary().getSmallerUnitImage(this.unit)));
             add(unitLabel);
             Location loc = this.unit.getLocation();
-            JLabel locLabel = GUI.localizedLabel(loc.getLocationLabelFor(player));
+            JLabel locLabel = Utility.localizedLabel(loc.getLocationLabelFor(player));
             //locLabel.setIcon(GUI.createImageIcon(getImageLibrary().getObjectImage(loc)));
             add(locLabel);
         }

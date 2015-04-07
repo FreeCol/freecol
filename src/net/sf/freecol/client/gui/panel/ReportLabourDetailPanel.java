@@ -84,7 +84,7 @@ public final class ReportLabourDetailPanel extends ReportPanel
 
         // summary
         detailPanel.add(new JLabel(new ImageIcon(getImageLibrary().getUnitImage(unitType))), "spany");
-        detailPanel.add(GUI.localizedLabel(unitType));
+        detailPanel.add(Utility.localizedLabel(unitType));
         detailPanel.add(new JLabel(String.valueOf(unitCount.getCount(unitType))), "wrap 10");
         boolean canTrain = false;
         Map<Location, Integer> unitLocations = data.get(unitType);
@@ -95,12 +95,12 @@ public final class ReportLabourDetailPanel extends ReportPanel
                     canTrain = true;
                     colonyName += "*";
                 }
-                JButton colonyButton = GUI.getLinkButton(colonyName, null,
+                JButton colonyButton = Utility.getLinkButton(colonyName, null,
                     colony.getId());
                 colonyButton.addActionListener(this);
                 detailPanel.add(colonyButton);
                 JLabel countLabel = new JLabel(unitLocations.get(colony).toString());
-                countLabel.setForeground(GUI.LINK_COLOR);
+                countLabel.setForeground(Utility.LINK_COLOR);
                 detailPanel.add(countLabel);
             }
         }
@@ -108,17 +108,17 @@ public final class ReportLabourDetailPanel extends ReportPanel
             if (!(entry.getKey() instanceof Colony)) {
                 String locationName
                     = Messages.message(entry.getKey().getLocationLabel());
-                JButton linkButton = GUI.getLinkButton(locationName, null,
+                JButton linkButton = Utility.getLinkButton(locationName, null,
                     entry.getKey().getId());
                 linkButton.addActionListener(this);
                 detailPanel.add(linkButton);
                 JLabel countLabel = new JLabel(entry.getValue().toString());
-                countLabel.setForeground(GUI.LINK_COLOR);
+                countLabel.setForeground(Utility.LINK_COLOR);
                 detailPanel.add(countLabel);
             }
         }
         if (canTrain) {
-            detailPanel.add(GUI.localizedLabel("report.labour.canTrain"),
+            detailPanel.add(Utility.localizedLabel("report.labour.canTrain"),
                             "newline 20, span");
         }
         reportPanel.add(detailPanel);

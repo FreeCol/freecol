@@ -126,7 +126,7 @@ public class ConceptDetailPanel extends FreeColPanel
 
         panel.setLayout(new MigLayout("wrap 1, center"));
 
-        JLabel header = GUI.localizedLabel(Messages.nameKey(id));
+        JLabel header = Utility.localizedLabel(Messages.nameKey(id));
         header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.SMALL));
         panel.add(header, "align center, wrap 20");

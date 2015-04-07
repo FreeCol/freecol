@@ -75,7 +75,7 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
             ? "monarchDialog.header.fromHessians"
             : "monarchDialog.header.fromCrown";
         String hdr = Messages.message(hdrKey);
-        JTextArea header = GUI.getDefaultTextArea(hdr);
+        JTextArea header = Utility.getDefaultTextArea(hdr);
         header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.MEDIUM));
 
@@ -84,7 +84,7 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
         panel.add(header, "span, align center, wrap 20");
         if (action == MonarchAction.RAISE_TAX_ACT
             || action == MonarchAction.RAISE_TAX_WAR) {
-            JButton helpButton = GUI.localizedButton("help");
+            JButton helpButton = Utility.localizedButton("help");
             helpButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -93,7 +93,7 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
                 });
             panel.add(helpButton, "tag help");
         }
-        JTextArea text = GUI.getDefaultTextArea((template == null)
+        JTextArea text = Utility.getDefaultTextArea((template == null)
             ? Messages.message(messageId)
             : Messages.message(new StringTemplate(messageId, template)),
             30);

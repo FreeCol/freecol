@@ -93,7 +93,7 @@ public final class ReportTradePanel extends ReportPanel {
         goodsHeader.setOpaque(true);
 
         JLabel emptyLabel = new JLabel();
-        emptyLabel.setBorder(GUI.TOPLEFTCELLBORDER);
+        emptyLabel.setBorder(Utility.TOPLEFTCELLBORDER);
         goodsHeader.add(emptyLabel, "cell 0 0");
         
         /**
@@ -156,8 +156,8 @@ public final class ReportTradePanel extends ReportPanel {
                 column++;
                 int amount = colony.getGoodsCount(goodsType);
                 JLabel goodsLabel = new JLabel(String.valueOf(amount), JLabel.TRAILING);
-                goodsLabel.setBorder(colonyIndex == 0 ? GUI.TOPCELLBORDER
-                    : GUI.CELLBORDER);
+                goodsLabel.setBorder(colonyIndex == 0 ? Utility.TOPCELLBORDER
+                    : Utility.CELLBORDER);
                 if (colony.getExportData(goodsType).getExported()) {
                     goodsLabel.setText("*" + String.valueOf(amount));
                 }
@@ -183,7 +183,7 @@ public final class ReportTradePanel extends ReportPanel {
         }
 
         row++;
-        reportPanel.add(GUI.localizedLabel("report.trade.hasCustomHouse"),
+        reportPanel.add(Utility.localizedLabel("report.trade.hasCustomHouse"),
                         "cell 0 " + row + ", span");
 
         column = 0;
@@ -197,8 +197,8 @@ public final class ReportTradePanel extends ReportPanel {
     }
 
     private JLabel createLeftLabel(String key) {
-        JLabel result = GUI.localizedLabel(key, JLabel.TRAILING);
-        result.setBorder(GUI.LEFTCELLBORDER);
+        JLabel result = Utility.localizedLabel(key, JLabel.TRAILING);
+        result.setBorder(Utility.LEFTCELLBORDER);
         return result;
     }
 
@@ -208,7 +208,7 @@ public final class ReportTradePanel extends ReportPanel {
 
     private JLabel createNumberLabel(int value, boolean alwaysAddSign) {
         JLabel result = new JLabel(String.valueOf(value), JLabel.TRAILING);
-        result.setBorder(GUI.CELLBORDER);
+        result.setBorder(Utility.CELLBORDER);
         if (value < 0) {
             result.setForeground(Color.RED);
         } else if (alwaysAddSign && value > 0) {
@@ -227,11 +227,11 @@ public final class ReportTradePanel extends ReportPanel {
         }
         button.setText(name);
         button.setOpaque(false);
-        button.setForeground(GUI.LINK_COLOR);
+        button.setForeground(Utility.LINK_COLOR);
         button.setHorizontalAlignment(SwingConstants.LEADING);
         button.setAlignmentY(0.8f);
-            button.setBorder((index == 0) ? GUI.TOPLEFTCELLBORDER
-                : GUI.LEFTCELLBORDER);
+            button.setBorder((index == 0) ? Utility.TOPLEFTCELLBORDER
+                : Utility.LEFTCELLBORDER);
 
         button.setActionCommand(colony.getId());
         button.addActionListener(this);

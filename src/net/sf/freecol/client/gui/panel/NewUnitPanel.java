@@ -112,9 +112,9 @@ public class NewUnitPanel extends FreeColPanel {
             newButton.setLayout(new MigLayout("wrap 2", "[60]", "[30][30]"));
             ImageIcon icon = new ImageIcon(getImageLibrary().getSmallUnitImage(ut,
                 Specification.DEFAULT_ROLE_ID, !enable));
-            JLabel name = GUI.localizedLabel(ut);
+            JLabel name = Utility.localizedLabel(ut);
             name.setEnabled(enable);
-            JLabel gold = GUI.localizedLabel(StringTemplate
+            JLabel gold = Utility.localizedLabel(StringTemplate
                 .template("goldAmount")
                 .addAmount("%amount%", price));
             gold.setEnabled(enable);

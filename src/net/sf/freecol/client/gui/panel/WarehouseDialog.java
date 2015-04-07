@@ -78,7 +78,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
         scrollPane.setBorder(null);
 
         MigPanel panel = new MigPanel(new MigLayout("fill, wrap 1", "", ""));
-        panel.add(GUI.localizedHeader(Messages.nameKey("warehouseDialog"), false),
+        panel.add(Utility.localizedHeader(Messages.nameKey("warehouseDialog"), false),
                   "align center");
         panel.add(scrollPane, "grow");
         panel.setSize(panel.getPreferredSize());
@@ -131,8 +131,8 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
 
             setLayout(new MigLayout("wrap 2", "", ""));
             setOpaque(false);
-            setBorder(GUI.localizedBorder(goodsType));
-            GUI.padBorder(this, 6,6,6,6);
+            setBorder(Utility.localizedBorder(goodsType));
+            Utility.padBorder(this, 6,6,6,6);
 
             ExportData exportData = colony.getExportData(goodsType);
 
@@ -149,7 +149,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
             SpinnerNumberModel lowLevelModel
                 = new SpinnerNumberModel(exportData.getLowLevel(), 0, 100, 1);
             lowLevel = new JSpinner(lowLevelModel);
-            GUI.localizeToolTip(lowLevel,
+            Utility.localizeToolTip(lowLevel,
                 "warehouseDialog.lowLevel.shortDescription");
             add(lowLevel);
 
@@ -157,14 +157,14 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
             SpinnerNumberModel highLevelModel
                 = new SpinnerNumberModel(exportData.getHighLevel(), 0, 100, 1);
             highLevel = new JSpinner(highLevelModel);
-            GUI.localizeToolTip(highLevel,
+            Utility.localizeToolTip(highLevel,
                 "warehouseDialog.highLevel.shortDescription");
             add(highLevel);
 
             // export checkbox
             export = new JCheckBox(Messages.message("warehouseDialog.export"),
                                    exportData.getExported());
-            GUI.localizeToolTip(export,
+            Utility.localizeToolTip(export,
                 "warehouseDialog.export.shortDescription");
             if (!colony.hasAbility(Ability.EXPORT)) {
                 export.setEnabled(false);
@@ -176,7 +176,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
                 = new SpinnerNumberModel(exportData.getExportLevel(), 0,
                                          colony.getWarehouseCapacity(), 1);
             exportLevel = new JSpinner(exportLevelModel);
-            GUI.localizeToolTip(exportLevel,
+            Utility.localizeToolTip(exportLevel,
                 "warehouseDialog.exportLevel.shortDescription");
             add(exportLevel);
 

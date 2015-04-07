@@ -74,7 +74,7 @@ public final class TilePanel extends FreeColPanel {
                                            "[right, sg][left, sg]"));
 
         TileType tileType = tile.getType();
-        JButton colopediaButton = GUI.localizedButton("colopedia");
+        JButton colopediaButton = Utility.localizedButton("colopedia");
         colopediaButton.setActionCommand(tile.getType().getId());
         colopediaButton.addActionListener(this);
 
@@ -88,7 +88,7 @@ public final class TilePanel extends FreeColPanel {
             .addStringTemplate("%label%", tile.getLabel())
             .addAmount("%x%", tile.getX())
             .addAmount("%y%", tile.getY());
-        add(GUI.localizedLabel(template), "span, center");
+        add(Utility.localizedLabel(template), "span, center");
 
         final MapViewer mapViewer = getGUI().getColonyTileMapViewer();
         final ImageLibrary lib = getImageLibrary();
@@ -96,18 +96,18 @@ public final class TilePanel extends FreeColPanel {
         add(new JLabel(new ImageIcon(image)), "span, center");
 
         if (tile.getRegion() != null) {
-            add(GUI.localizedLabel("tilePanel.region"));
-            add(GUI.localizedLabel(tile.getRegion().getLabel()));
+            add(Utility.localizedLabel("tilePanel.region"));
+            add(Utility.localizedLabel(tile.getRegion().getLabel()));
         }
         if (tile.getOwner() != null) {
             StringTemplate ownerName = tile.getOwner().getNationName();
             if (ownerName != null) {
-                add(GUI.localizedLabel("tilePanel.owner"));
-                add(GUI.localizedLabel(ownerName));
+                add(Utility.localizedLabel("tilePanel.owner"));
+                add(Utility.localizedLabel(ownerName));
             }
         }
         if (tile.getOwningSettlement() != null) {
-            add(GUI.localizedLabel("tilePanel.settlement"));
+            add(Utility.localizedLabel("tilePanel.settlement"));
             add(new JLabel(tile.getOwningSettlement().getName()));
         }
 

@@ -117,7 +117,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             super();
 
             setOpaque(false);
-            setBorder(GUI.localizedBorder("cargoOnCarrier"));
+            setBorder(Utility.localizedBorder("cargoOnCarrier"));
             addMouseListener(TradeRouteInputPanel.this.dropListener);
         }
 
@@ -278,7 +278,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
                 }
             }
             setOpaque(false);
-            setBorder(GUI.localizedBorder("goods"));
+            setBorder(Utility.localizedBorder("goods"));
             addMouseListener(TradeRouteInputPanel.this.dropListener);
         }
 
@@ -462,7 +462,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
                 Image image = lib.getSmallerCoatOfArmsImage(
                     europe.getOwner().getNation());
                 icon = new JLabel(new ImageIcon(image));
-                name = GUI.localizedLabel(europe);
+                name = Utility.localizedLabel(europe);
             } else if (location instanceof Colony) {
                 Colony colony = (Colony) location;
                 icon = new JLabel(new ImageIcon(ImageLibrary.getSettlementImage(
@@ -569,11 +569,11 @@ public final class TradeRouteInputPanel extends FreeColPanel
         this.stopList.addListSelectionListener(this);
         JScrollPane tradeRouteView = new JScrollPane(stopList);
 
-        JLabel nameLabel = GUI.localizedLabel("tradeRouteInputPanel.nameLabel");
+        JLabel nameLabel = Utility.localizedLabel("tradeRouteInputPanel.nameLabel");
         this.tradeRouteName = new JTextField(tradeRoute.getName());
 
         JLabel destinationLabel
-            = GUI.localizedLabel("tradeRouteInputPanel.destinationLabel");
+            = Utility.localizedLabel("tradeRouteInputPanel.destinationLabel");
         this.destinationSelector = new JComboBox<>();
         this.destinationSelector.setRenderer(new DestinationCellRenderer());
         StringTemplate template = StringTemplate.template("report.allColonies");
@@ -595,7 +595,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
                 }
             });
 
-        this.addStopButton = GUI.localizedButton("tradeRouteInputPanel.addStop");
+        this.addStopButton = Utility.localizedButton("tradeRouteInputPanel.addStop");
         this.addStopButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -603,7 +603,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
                 }
             });
 
-        this.removeStopButton = GUI.localizedButton("tradeRouteInputPanel.removeStop");
+        this.removeStopButton = Utility.localizedButton("tradeRouteInputPanel.removeStop");
         this.removeStopButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -617,12 +617,12 @@ public final class TradeRouteInputPanel extends FreeColPanel
         this.cargoPanel = new CargoPanel();
         this.cargoPanel.setTransferHandler(this.cargoHandler);
 
-        JButton cancelButton = GUI.localizedButton("cancel");
+        JButton cancelButton = Utility.localizedButton("cancel");
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);
         setCancelComponent(cancelButton);
 
-        add(GUI.localizedHeader("tradeRouteInputPanel.editRoute", false),
+        add(Utility.localizedHeader("tradeRouteInputPanel.editRoute", false),
             "span, align center");
         add(tradeRouteView, "span 1 5, grow");
         add(nameLabel);

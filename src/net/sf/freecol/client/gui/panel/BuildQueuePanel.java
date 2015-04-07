@@ -574,7 +574,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             };
 
         // Create the components
-        JLabel header = GUI.localizedLabel("colonyPanel.buildQueue");
+        JLabel header = Utility.localizedLabel("colonyPanel.buildQueue");
         header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.BIG));
 
@@ -623,7 +623,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             .put(KeyStroke.getKeyStroke("ENTER"), "add");
         this.buildingList.getActionMap().put("add", addAction);
 
-        this.buyBuildable = GUI.localizedButton("colonyPanel.buyBuilding");
+        this.buyBuildable = Utility.localizedButton("colonyPanel.buyBuilding");
         this.buyBuildable.setActionCommand(BUY);
         this.buyBuildable.addActionListener(this);
 
@@ -642,9 +642,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
         // Add all the components
         add(header, "span 3, align center, wrap 40");
-        add(GUI.localizedLabel("colonyPanel.units"), "align center");
-        add(GUI.localizedLabel("colonyPanel.buildQueue"), "align center");
-        add(GUI.localizedLabel("colonyPanel.buildings"), "align center");
+        add(Utility.localizedLabel("colonyPanel.units"), "align center");
+        add(Utility.localizedLabel("colonyPanel.buildQueue"), "align center");
+        add(Utility.localizedLabel("colonyPanel.buildings"), "align center");
         add(new JScrollPane(this.unitList), "grow");
         add(this.constructionPanel, "split 2, flowy");
         add(new JScrollPane(this.buildQueueList), "grow");

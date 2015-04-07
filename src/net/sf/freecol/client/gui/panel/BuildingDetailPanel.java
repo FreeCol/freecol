@@ -137,13 +137,13 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
         BuildingType buildingType = getSpecification().getBuildingType(id);
         panel.setLayout(new MigLayout("wrap 7, gapx 20", "", ""));
 
-        JLabel name = GUI.localizedLabel(buildingType);
+        JLabel name = Utility.localizedLabel(buildingType);
         name.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.SMALL));
         panel.add(name, "span, align center, wrap 40");
 
         // Requires - prerequisites to build
-        JTextPane textPane = GUI.getDefaultTextPane();
+        JTextPane textPane = Utility.getDefaultTextPane();
         StyledDocument doc = textPane.getStyledDocument();
 
         try {
@@ -161,16 +161,16 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
             }
             appendRequiredAbilities(doc, buildingType);
 
-            panel.add(GUI.localizedLabel("colopedia.buildings.requires"), "top");
+            panel.add(Utility.localizedLabel("colopedia.buildings.requires"), "top");
             panel.add(textPane, "span, growx");
         } catch (BadLocationException e) {
             //logger.warning(e.toString());
         }
 
         // Costs to build - Hammers & Tools
-        panel.add(GUI.localizedLabel("colopedia.buildings.cost"));
+        panel.add(Utility.localizedLabel("colopedia.buildings.cost"));
         if (!buildingType.needsGoodsToBuild()) {
-            panel.add(GUI.localizedLabel("colopedia.buildings.autoBuilt"), "span");
+            panel.add(Utility.localizedLabel("colopedia.buildings.autoBuilt"), "span");
         } else {
             List<AbstractGoods> required = buildingType.getRequiredGoods();
             AbstractGoods goodsRequired = required.get(0);
@@ -189,7 +189,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
 
         // Production - Needs & Produces
         if (buildingType.hasAbility(Ability.TEACH)) {
-            panel.add(GUI.localizedLabel("colopedia.buildings.teaches"), "newline, top");
+            panel.add(Utility.localizedLabel("colopedia.buildings.teaches"), "newline, top");
             int count = 0;
             for (UnitType unitType2 : getSpecification().getUnitTypeList()) {
                 if (buildingType.canAdd(unitType2)) {
@@ -207,7 +207,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
                      : buildingType.getAvailableProductionTypes(false)) {
                 List<AbstractGoods> inputs = pt.getInputs();
                 List<AbstractGoods> outputs = pt.getOutputs();
-                panel.add(GUI.localizedLabel("colopedia.buildings.production"), "newline");
+                panel.add(Utility.localizedLabel("colopedia.buildings.production"), "newline");
                 // for the moment, we assume only a single input
                 // and output type
                 if (!inputs.isEmpty()) {
@@ -224,16 +224,16 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
         }
 
         int workplaces = buildingType.getWorkPlaces();
-        panel.add(GUI.localizedLabel("colopedia.buildings.workplaces"), "newline");
+        panel.add(Utility.localizedLabel("colopedia.buildings.workplaces"), "newline");
         panel.add(new JLabel(Integer.toString(workplaces)), "span");
 
         // Specialist
         if (workplaces > 0) {
-            panel.add(GUI.localizedLabel("colopedia.buildings.specialist"), "newline");
+            panel.add(Utility.localizedLabel("colopedia.buildings.specialist"), "newline");
             final UnitType unitType = getSpecification()
                 .getExpertForProducing(buildingType.getProducedGoodsType());
             if (unitType == null) {
-                panel.add(GUI.localizedLabel("none"), "span");
+                panel.add(Utility.localizedLabel("none"), "span");
             } else {
                 panel.add(getUnitButton(unitType), "span");
             }
@@ -257,7 +257,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
         }
 
         if (!labels.isEmpty()) {
-            panel.add(GUI.localizedLabel(StringTemplate
+            panel.add(Utility.localizedLabel(StringTemplate
                     .template("colopedia.buildings.modifiers")
                     .addAmount("%number%", labels.size())),
                 "newline, top");
@@ -273,9 +273,9 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
         }
 
         // Notes
-        panel.add(GUI.localizedLabel("colopedia.buildings.notes"),
+        panel.add(Utility.localizedLabel("colopedia.buildings.notes"),
                   "newline 20, top");
-        panel.add(GUI.getDefaultTextArea(Messages.getDescription(buildingType)),
+        panel.add(Utility.getDefaultTextArea(Messages.getDescription(buildingType)),
                   "span, growx");
     }
 

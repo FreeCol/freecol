@@ -31,6 +31,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MigPanel;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -97,21 +98,21 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         boolean numberEditable = editable
             && (numberOption.getMaximumValue() > numberOption.getMinimumValue());
         numberUI = new IntegerOptionUI(numberOption, numberEditable);
-        GUI.localizeToolTip(numberUI.getComponent(), "report.numberOfUnits");
+        Utility.localizeToolTip(numberUI.getComponent(), "report.numberOfUnits");
         panel.add(numberUI.getComponent(), "width 30%");
 
         boolean typeEditable = editable
             && typeOption.getChoices().size() > 1;
         typeUI = new UnitTypeOptionUI(typeOption, typeEditable);
 
-        GUI.localizeToolTip(typeUI.getComponent(), "model.unit.type");
+        Utility.localizeToolTip(typeUI.getComponent(), "model.unit.type");
         typeUI.getComponent().addItemListener(this);
         panel.add(typeUI.getComponent(), "width 35%");
 
         roleEditable = editable
             && roleOption.getChoices().size() > 1;
         roleUI = new StringOptionUI(roleOption, roleEditable);
-        GUI.localizeToolTip(roleUI.getComponent(), "model.role.name");
+        Utility.localizeToolTip(roleUI.getComponent(), "model.role.name");
         roleUI.getComponent().setRenderer(new RoleRenderer());
         panel.add(roleUI.getComponent(), "width 35%");
 

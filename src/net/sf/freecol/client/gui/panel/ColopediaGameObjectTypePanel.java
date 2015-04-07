@@ -147,14 +147,14 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
 
 
     protected JButton getButton(FreeColGameObjectType type, String text, ImageIcon icon) {
-        JButton button = GUI.getLinkButton((text != null) ? text
+        JButton button = Utility.getLinkButton((text != null) ? text
             : Messages.getName(type), icon, type.getId());
         button.addActionListener(colopediaPanel);
         return button;
     }
 
     protected JButton getButton(PanelType panelType, String text, ImageIcon icon) {
-        JButton button = GUI.getLinkButton(text, icon,
+        JButton button = Utility.getLinkButton(text, icon,
             "colopediaAction." + panelType);
         button.addActionListener(colopediaPanel);
         return button;

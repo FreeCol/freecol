@@ -122,17 +122,17 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         public ColonyTradeItemPanel(Player source) {
             this.source = source;
             this.colonyBox = new JComboBox<>();
-            this.clearButton = GUI.localizedButton("negotiationDialog.clear");
+            this.clearButton = Utility.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);
             this.clearButton.setActionCommand(CLEAR);
-            this.addButton = GUI.localizedButton("negotiationDialog.add");
+            this.addButton = Utility.localizedButton("negotiationDialog.add");
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
-            this.label = GUI.localizedLabel("tradeItem.colony");
+            this.label = Utility.localizedLabel("tradeItem.colony");
             this.allColonies = source.getColonies();
 
             setLayout(new MigLayout("wrap 1", "", ""));
-            setBorder(GUI.SIMPLE_LINE_BORDER);
+            setBorder(Utility.SIMPLE_LINE_BORDER);
 
             add(this.label);
             add(this.colonyBox);
@@ -224,20 +224,20 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         public GoldTradeItemPanel(Player source, int gold) {
             this.source = source;
             this.spinner = new JSpinner(new SpinnerNumberModel(0, 0, gold, 1));
-            JButton clearButton = GUI.localizedButton("negotiationDialog.clear");
+            JButton clearButton = Utility.localizedButton("negotiationDialog.clear");
             clearButton.addActionListener(this);
             clearButton.setActionCommand(CLEAR);
-            JButton addButton = GUI.localizedButton("negotiationDialog.add");
+            JButton addButton = Utility.localizedButton("negotiationDialog.add");
             addButton.addActionListener(this);
             addButton.setActionCommand(ADD);
             // adjust entry size
             ((JSpinner.DefaultEditor)this.spinner.getEditor())
                 .getTextField().setColumns(5);
 
-            setBorder(GUI.SIMPLE_LINE_BORDER);
+            setBorder(Utility.SIMPLE_LINE_BORDER);
             setLayout(new MigLayout("wrap 1", "", ""));
 
-            add(GUI.localizedLabel("tradeItem.gold"));
+            add(Utility.localizedLabel("tradeItem.gold"));
             add(this.spinner);
             add(clearButton, "split 2");
             add(addButton);
@@ -323,17 +323,17 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.source = source;
             this.goodsBox = new JComboBox<>(new DefaultComboBoxModel<Goods>());
             this.goodsBox.setRenderer(new GoodsBoxRenderer());
-            this.clearButton = GUI.localizedButton("negotiationDialog.clear");
+            this.clearButton = Utility.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);
             this.clearButton.setActionCommand(CLEAR);
-            this.addButton = GUI.localizedButton("negotiationDialog.add");
+            this.addButton = Utility.localizedButton("negotiationDialog.add");
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
-            this.label = GUI.localizedLabel("tradeItem.goods");
+            this.label = Utility.localizedLabel("tradeItem.goods");
             this.allGoods = allGoods;
 
             setLayout(new MigLayout("wrap 1", "", ""));
-            setBorder(GUI.SIMPLE_LINE_BORDER);
+            setBorder(Utility.SIMPLE_LINE_BORDER);
 
             add(this.label);
             add(this.goodsBox);
@@ -451,15 +451,15 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.other = other;
             this.victimBox = new JComboBox<>(new DefaultComboBoxModel<Player>());
             this.victimBox.setRenderer(new InciteBoxRenderer());
-            this.clearButton = GUI.localizedButton("negotiationDialog.clear");
+            this.clearButton = Utility.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);
             this.clearButton.setActionCommand(CLEAR);
-            this.addButton = GUI.localizedButton("negotiationDialog.add");
+            this.addButton = Utility.localizedButton("negotiationDialog.add");
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
-            this.label = GUI.localizedLabel("tradeItem.incite");
+            this.label = Utility.localizedLabel("tradeItem.incite");
 
-            setBorder(GUI.SIMPLE_LINE_BORDER);
+            setBorder(Utility.SIMPLE_LINE_BORDER);
             setLayout(new MigLayout("wrap 1", "", ""));
 
             available.clear();
@@ -574,17 +574,17 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.target = target;
             this.stanceBox = new JComboBox<>(new DefaultComboBoxModel<Stance>());
             this.stanceBox.setRenderer(new StanceBoxRenderer());
-            this.clearButton = GUI.localizedButton("negotiationDialog.clear");
+            this.clearButton = Utility.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);
             this.clearButton.setActionCommand(CLEAR);
-            this.addButton = GUI.localizedButton("negotiationDialog.add");
+            this.addButton = Utility.localizedButton("negotiationDialog.add");
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
 
-            setBorder(GUI.SIMPLE_LINE_BORDER);
+            setBorder(Utility.SIMPLE_LINE_BORDER);
             setLayout(new MigLayout("wrap 1", "", ""));
 
-            add(GUI.localizedLabel("tradeItem.stance"));
+            add(Utility.localizedLabel("tradeItem.stance"));
             add(this.stanceBox);
             add(this.clearButton, "split 2");
             add(this.addButton);
@@ -691,17 +691,17 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.source = source;
             this.unitBox = new JComboBox<>(new DefaultComboBoxModel<Unit>());
             this.unitBox.setRenderer(new UnitBoxRenderer());
-            this.clearButton = GUI.localizedButton("negotiationDialog.clear");
+            this.clearButton = Utility.localizedButton("negotiationDialog.clear");
             this.clearButton.addActionListener(this);
             this.clearButton.setActionCommand(CLEAR);
-            this.addButton = GUI.localizedButton("negotiationDialog.add");
+            this.addButton = Utility.localizedButton("negotiationDialog.add");
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
-            this.label = GUI.localizedLabel("tradeItem.unit");
+            this.label = Utility.localizedLabel("tradeItem.unit");
             this.allUnits = allUnits;
 
             setLayout(new MigLayout("wrap 1", "", ""));
-            setBorder(GUI.SIMPLE_LINE_BORDER);
+            setBorder(Utility.SIMPLE_LINE_BORDER);
 
             add(this.label);
             add(this.unitBox);
@@ -910,20 +910,20 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             throw new IllegalStateException("Bogus trade context: " + context);
         }
 
-        JTextArea tutArea = GUI.getDefaultTextArea(tutorial);
+        JTextArea tutArea = Utility.getDefaultTextArea(tutorial);
 
         this.summary = new MigPanel(new MigLayout("wrap 2", "[20px][]"));
         this.summary.setOpaque(false);
-        this.summary.add(GUI.getDefaultTextArea(comment), "center, span 2");
+        this.summary.add(Utility.getDefaultTextArea(comment), "center, span 2");
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 3",
                 "[200, fill][300, fill][200, fill]", ""));
-        panel.add(GUI.localizedHeader("negotiationDialog.title."
+        panel.add(Utility.localizedHeader("negotiationDialog.title."
                 + agreement.getContext().getKey(), false),
                   "span 3, center");
-        panel.add(GUI.getDefaultTextArea(this.demandMessage), "center");
+        panel.add(Utility.getDefaultTextArea(this.demandMessage), "center");
         panel.add(tutArea, "center");
-        panel.add(GUI.getDefaultTextArea(this.offerMessage), "center");
+        panel.add(Utility.getDefaultTextArea(this.offerMessage), "center");
 
         panel.add(this.goldDemandPanel);
         panel.add(this.summary, "spany, top");
@@ -1078,10 +1078,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
     private JButton getTradeItemButton(TradeItem item) {
         JButton button = new JButton(new RemoveAction(item));
         button.setText(Messages.message(item.getLabel()));
-        button.setMargin(GUI.EMPTY_MARGIN);
+        button.setMargin(Utility.EMPTY_MARGIN);
         button.setOpaque(false);
-        button.setForeground(GUI.LINK_COLOR);
-        button.setBorder(GUI.blankBorder(0, 0, 0, 0));
+        button.setForeground(Utility.LINK_COLOR);
+        button.setBorder(Utility.blankBorder(0, 0, 0, 0));
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return button;
     }
@@ -1094,7 +1094,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
         summary.removeAll();
 
-        summary.add(GUI.getDefaultTextArea(comment), "center, span 2");
+        summary.add(Utility.getDefaultTextArea(comment), "center, span 2");
 
         List<TradeItem> offers = agreement.getItemsGivenBy(player);
         if (!offers.isEmpty()) {

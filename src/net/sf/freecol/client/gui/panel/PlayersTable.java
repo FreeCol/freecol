@@ -142,15 +142,15 @@ public final class PlayersTable extends JTable {
             JLabel label;
             switch (advantages) {
             case SELECTABLE:
-                return GUI.localizedLabel(Messages.nameKey((player == null)
+                return Utility.localizedLabel(Messages.nameKey((player == null)
                         ? nationType
                         : player.getNationType()));
             case FIXED:
-                label = GUI.localizedLabel(Messages.nameKey(nationType));
+                label = Utility.localizedLabel(Messages.nameKey(nationType));
                 break;
             case NONE:
             default:
-                label = GUI.localizedLabel("none");
+                label = Utility.localizedLabel("none");
                 break;
             }
             label.setForeground((player != null && player.isReady())
@@ -340,12 +340,12 @@ public final class PlayersTable extends JTable {
     private static class PlayerCellRenderer implements TableCellRenderer {
 
         private final JLabel label = new JLabel();
-        private final JButton button = GUI.localizedButton("select");
+        private final JButton button = Utility.localizedButton("select");
 
 
         public PlayerCellRenderer() {
             label.setHorizontalAlignment(JLabel.CENTER);
-            GUI.padBorder(button, 5, 10, 5, 10);
+            Utility.padBorder(button, 5, 10, 5, 10);
         }
 
 
@@ -381,7 +381,7 @@ public final class PlayersTable extends JTable {
     private final class PlayerCellEditor extends AbstractCellEditor
         implements TableCellEditor {
 
-        private final JButton button = GUI.localizedButton("select");
+        private final JButton button = Utility.localizedButton("select");
 
 
         public PlayerCellEditor() {
@@ -657,7 +657,7 @@ public final class PlayersTable extends JTable {
                  nationOptions, myPlayer));
         setRowHeight(47);
 
-        JButton nationButton = GUI.localizedButton("nation");
+        JButton nationButton = Utility.localizedButton("nation");
         nationButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {
@@ -665,8 +665,8 @@ public final class PlayersTable extends JTable {
                 }
             });
 
-        JLabel availabilityLabel = GUI.localizedLabel("availability");
-        JButton advantageButton = GUI.localizedButton("advantage");
+        JLabel availabilityLabel = Utility.localizedLabel("availability");
+        JButton advantageButton = Utility.localizedButton("advantage");
         advantageButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {
@@ -674,8 +674,8 @@ public final class PlayersTable extends JTable {
                 }
             });
 
-        JLabel colorLabel = GUI.localizedLabel("color");
-        JLabel playerLabel = GUI.localizedLabel("player");
+        JLabel colorLabel = Utility.localizedLabel("color");
+        JLabel playerLabel = Utility.localizedLabel("player");
 
         DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
         dtcr.setOpaque(false);

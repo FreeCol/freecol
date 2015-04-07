@@ -131,7 +131,7 @@ public final class ReportTurnPanel extends ReportPanel {
             case ClientOptions.MESSAGES_GROUP_BY_TYPE:
                 if (message.getMessageType() != type) {
                     type = message.getMessageType();
-                    JLabel headline = GUI.localizedLabel(message.getMessageTypeName());
+                    JLabel headline = Utility.localizedLabel(message.getMessageTypeName());
                     headline.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
                         FontLibrary.FontSize.SMALL));
                     reportPanel.add(headline, "newline 20, skip, span");
@@ -160,12 +160,12 @@ public final class ReportTurnPanel extends ReportPanel {
 
                 if (messageDisplay instanceof Colony
                     || messageDisplay instanceof Europe) {
-                    JButton button = GUI.getLinkButton(null, icon,
+                    JButton button = Utility.getLinkButton(null, icon,
                                                        messageDisplay.getId());
                     button.addActionListener(this);
                     component = button;
                 } else if (messageDisplay instanceof Unit) {
-                    JButton button = GUI.getLinkButton(null, icon,
+                    JButton button = Utility.getLinkButton(null, icon,
                         upLoc(((Unit)messageDisplay).getLocation()).getId());
                     button.addActionListener(this);
                     component = button;
@@ -176,7 +176,7 @@ public final class ReportTurnPanel extends ReportPanel {
 
             reportPanel.add(component, "newline");
             
-            final JTextPane textPane = GUI.getDefaultTextPane();
+            final JTextPane textPane = Utility.getDefaultTextPane();
             insertMessage(textPane.getStyledDocument(), message,
                           getMyPlayer());
             reportPanel.add(textPane);
@@ -186,7 +186,7 @@ public final class ReportTurnPanel extends ReportPanel {
             switch (message.getMessageType()) {
             case WAREHOUSE_CAPACITY:
                 JButton ignoreButton = new JButton("x");
-                GUI.localizeToolTip(ignoreButton, 
+                Utility.localizeToolTip(ignoreButton, 
                     new StringTemplate("model.message.ignore", message));
                 final ModelMessage m = message;
                 ignoreButton.addActionListener(new ActionListener() {
@@ -222,7 +222,7 @@ public final class ReportTurnPanel extends ReportPanel {
             // Message type can be filtered
             if (filterOption != null) {
                 JButton filterButton = new JButton("X");
-                GUI.localizeToolTip(filterButton, StringTemplate
+                Utility.localizeToolTip(filterButton, StringTemplate
                     .template("model.message.filter")
                     .add("%type%", message.getMessageTypeName()));
                 final ModelMessage m = message;
@@ -268,7 +268,7 @@ public final class ReportTurnPanel extends ReportPanel {
             return new JLabel();
         } else if (source instanceof Player) {
             Player player = (Player) source;
-            headline = GUI.localizedLabel(StringTemplate
+            headline = Utility.localizedLabel(StringTemplate
                 .template("playerNation")
                 .addName("%player%", player.getName())
                 .addStringTemplate("%nation%", player.getNationName()));
@@ -280,7 +280,7 @@ public final class ReportTurnPanel extends ReportPanel {
             headline = button;
         } else if (source instanceof Market) {
             Market market = (Market) source;
-            JButton button = GUI.localizedButton(market.getOwner().getMarketName());
+            JButton button = Utility.localizedButton(market.getOwner().getMarketName());
             button.addActionListener(this);
             button.setActionCommand(getMyPlayer().getEurope().getId());
             headline = button;
@@ -299,7 +299,7 @@ public final class ReportTurnPanel extends ReportPanel {
             headline = button;
         } else if (source instanceof Tile) {
             final Tile tile = (Tile) source;
-            JButton button = GUI.localizedButton(tile.getLocationLabelFor(getMyPlayer()));
+            JButton button = Utility.localizedButton(tile.getLocationLabelFor(getMyPlayer()));
             button.addActionListener(this);
             button.setActionCommand(tile.getId());
             headline = button;
@@ -312,8 +312,8 @@ public final class ReportTurnPanel extends ReportPanel {
         headline.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.SMALL));
         headline.setOpaque(false);
-        headline.setForeground(GUI.LINK_COLOR);
-        headline.setBorder(GUI.blankBorder(5, 0, 0, 0));
+        headline.setForeground(Utility.LINK_COLOR);
+        headline.setBorder(Utility.blankBorder(5, 0, 0, 0));
         return headline;
     }
 
@@ -419,7 +419,7 @@ public final class ReportTurnPanel extends ReportPanel {
     private void insertLinkButton(StyledDocument document,
                                   FreeColGameObject object, String name)
         throws BadLocationException {
-        JButton button = GUI.getLinkButton(name, null, object.getId());
+        JButton button = Utility.getLinkButton(name, null, object.getId());
         button.addActionListener(this);
         StyleConstants.setComponent(document.getStyle("button"), button);
         document.insertString(document.getLength(), " ",

@@ -38,6 +38,7 @@ import javax.swing.event.ListSelectionListener;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.Option;
@@ -57,11 +58,11 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     private final JList<AbstractOption<T>> list;
     private final DefaultListModel<AbstractOption<T>> model;
 
-    private final JButton editButton = GUI.localizedButton("list.edit");
-    private final JButton addButton = GUI.localizedButton("list.add");
-    private final JButton removeButton = GUI.localizedButton("list.remove");
-    private final JButton upButton = GUI.localizedButton("list.up");
-    private final JButton downButton = GUI.localizedButton("list.down");
+    private final JButton editButton = Utility.localizedButton("list.edit");
+    private final JButton addButton = Utility.localizedButton("list.add");
+    private final JButton removeButton = Utility.localizedButton("list.remove");
+    private final JButton upButton = Utility.localizedButton("list.up");
+    private final JButton downButton = Utility.localizedButton("list.down");
 
 
     /**
@@ -77,8 +78,8 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         super(option, editable);
 
         this.panel = new JPanel();
-        this.panel.setBorder(GUI.localizedBorder(super.getJLabel().getText(),
-                                                 GUI.BORDER_COLOR));
+        this.panel.setBorder(Utility.localizedBorder(super.getJLabel().getText(),
+                                                 Utility.BORDER_COLOR));
         this.panel.setLayout(new MigLayout("wrap 2, fill", "[fill, grow]20[fill]"));
 
         this.model = new DefaultListModel<>();
