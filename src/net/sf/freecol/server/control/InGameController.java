@@ -4112,8 +4112,8 @@ public final class InGameController extends Controller {
                     if (roleMap == null) roleMap = new HashMap<>();
                     String roleId = unit.getRole().getId();
                     Integer count = roleMap.get(roleId);
-                    roleMap.put(roleId, Integer.valueOf((count == null) ? 1
-                            : count.intValue() + 1));
+                    roleMap.put(roleId, (count == null) ? 1
+                            : count + 1);
                     unitHash.put(unitType, roleMap);
                 }
             }

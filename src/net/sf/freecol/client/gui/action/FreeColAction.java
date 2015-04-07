@@ -69,7 +69,7 @@ public abstract class FreeColAction extends AbstractAction
 
 
         public InnerMenuKeyListener() {
-            mnemonic = ((Integer) getValue(MNEMONIC_KEY)).intValue();
+            mnemonic = ((Integer) getValue(MNEMONIC_KEY));
         }
 
         @Override

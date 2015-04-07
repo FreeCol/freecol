@@ -418,7 +418,7 @@ public class ColonyPlan {
                         m = new HashMap<>();
                         production.put(g, m);
                     }
-                    m.put(wl, Integer.valueOf(p));
+                    m.put(wl, p);
                 }
             }
         }
@@ -507,7 +507,7 @@ public class ColonyPlan {
             int value = 0;
             for (Entry<WorkLocation, Integer> e
                      : production.get(g).entrySet()) {
-                value += e.getValue().intValue();
+                value += e.getValue();
             }
             if (value <= LOW_PRODUCTION_THRESHOLD) {
                 production.remove(g);
@@ -922,11 +922,11 @@ public class ColonyPlan {
                 public int compare(GoodsType g1, GoodsType g2) {
                     int p1 = 0;
                     for (Integer i : production.get(g1).values()) {
-                        p1 += i.intValue();
+                        p1 += i;
                     }
                     int p2 = 0;
                     for (Integer i : production.get(g2).values()) {
-                        p2 += i.intValue();
+                        p2 += i;
                     }
                     return p2 - p1;
                 }

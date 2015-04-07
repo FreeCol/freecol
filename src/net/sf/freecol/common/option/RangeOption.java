@@ -64,7 +64,7 @@ public class RangeOption extends SelectOption {
         int rank = 0;
         Iterator<Integer> iterator = getItemValues().keySet().iterator();
         while (iterator.hasNext()
-            && iterator.next().intValue() != getValue().intValue()) {
+            && iterator.next() != getValue()) {
             rank++;
         }
         return rank;

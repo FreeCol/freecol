@@ -1328,7 +1328,7 @@ public class Map extends FreeColGameObject implements Location {
             if (sh != null && dst.getTile() != null) {
                 fcost += sh.getValue(dst.getTile());
             }
-            f.put(dst.getId(), Integer.valueOf(fcost));
+            f.put(dst.getId(), fcost);
             openMap.put(dst.getId(), path);
             openMapQueue.offer(path);
         }
@@ -1398,8 +1398,8 @@ public class Map extends FreeColGameObject implements Location {
                 new Comparator<PathNode>() {
                     @Override
                     public int compare(PathNode p1, PathNode p2) {
-                        return (f.get(p1.getLocation().getId()).intValue()
-                            - f.get(p2.getLocation().getId()).intValue());
+                        return (f.get(p1.getLocation().getId())
+                            - f.get(p2.getLocation().getId()));
                     }
                 });
         final Europe europe = (unit == null) ? null
@@ -1420,9 +1420,8 @@ public class Map extends FreeColGameObject implements Location {
         final PathNode firstNode = new PathNode(start,
             ((currentUnit != null) ? currentUnit.getMovesLeft() : -1),
             0, carrier != null && currentUnit == carrier, null, null);
-        f.put(start.getId(),
-            Integer.valueOf((searchHeuristic == null) ? 0
-                : searchHeuristic.getValue(start)));
+        f.put(start.getId(), (searchHeuristic == null) ? 0
+                : searchHeuristic.getValue(start));
         openMap.put(start.getId(), firstNode);
         openMapQueue.offer(firstNode);
 

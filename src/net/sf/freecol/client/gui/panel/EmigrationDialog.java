@@ -69,10 +69,10 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
         List<ChoiceItem<Integer>> c = choices();
         int i = Europe.MigrationType.getDefaultSlot();
         UnitType u0 = recruitables.remove(0);
-        c.add(new ChoiceItem<>(Messages.getName(u0), Integer.valueOf(i++))
+        c.add(new ChoiceItem<>(Messages.getName(u0), i++)
             .defaultOption().setIcon(new ImageIcon(lib.getSmallUnitImage(u0))));
         for (UnitType ut : recruitables) {
-            c.add(new ChoiceItem<>(Messages.getName(ut), Integer.valueOf(i++))
+            c.add(new ChoiceItem<>(Messages.getName(ut), i++)
                 .setIcon(new ImageIcon(lib.getSmallUnitImage(ut))));
         }
 

@@ -125,7 +125,7 @@ public class LogBuilder {
      */
     public void mark() {
         if (sb != null) {
-            this.points.add(0, Integer.valueOf(sb.length()));
+            this.points.add(0, sb.length());
         }
     }
 

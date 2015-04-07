@@ -3089,7 +3089,7 @@ public final class InGameController implements NetworkConstants {
     public boolean displayHighScores(Boolean high) {
         List<HighScore> scores = askServer().getHighScores();
         gui.showHighScoresPanel((high == null) ? null
-            : (high.booleanValue()) ? "highscores.yes" : "highscores.no",
+            : (high) ? "highscores.yes" : "highscores.no",
             scores);
         return true;
     }

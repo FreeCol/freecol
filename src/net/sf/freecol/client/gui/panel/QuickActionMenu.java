@@ -358,7 +358,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 if (type == expertGoods) {
                     expertOwned = ji;
                 } else {
-                    items.put(ji, Integer.valueOf(bestOwnedProd));
+                    items.put(ji, bestOwnedProd);
                 }
             }
             if (bestUnowned != null && bestUnownedProd > bestOwnedProd
@@ -368,7 +368,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 if (type == expertGoods) {
                     expertUnowned = ji;
                 } else {
-                    extras.put(ji, Integer.valueOf(bestUnownedProd));
+                    extras.put(ji, bestUnownedProd);
                 }
             }
         }

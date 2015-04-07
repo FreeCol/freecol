@@ -191,7 +191,7 @@ public class IndianNationType extends NationType {
         for (Tile t: tile.getSurroundingTiles(1)) {
             for (Entry<GoodsType, Integer> entry : scale.entrySet()) {
                 GoodsType goodsType = entry.getKey();
-                scale.put(goodsType, entry.getValue().intValue()
+                scale.put(goodsType, entry.getValue()
                           + t.getPotentialProduction(goodsType, null));
             }
         }
@@ -199,7 +199,7 @@ public class IndianNationType extends NationType {
         List<RandomChoice<UnitType>> scaledSkills = new ArrayList<>();
         for (RandomChoice<UnitType> skill : skills) {
             UnitType unitType = skill.getObject();
-            int scaleValue = scale.get(unitType.getExpertProduction()).intValue();
+            int scaleValue = scale.get(unitType.getExpertProduction());
             scaledSkills.add(new RandomChoice<>(unitType,
                     skill.getProbability() * scaleValue));
         }

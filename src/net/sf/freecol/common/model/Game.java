@@ -1031,7 +1031,7 @@ public class Game extends FreeColGameObject {
                 count++;
                 objStats.put(className, count);
             } else {
-                Long count = new Long(1);
+                Long count = (long) 1;
                 objStats.put(className, count);
             }
             if (fcgo.isDisposed()) disposed++;

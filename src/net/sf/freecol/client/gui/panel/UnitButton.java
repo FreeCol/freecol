@@ -111,7 +111,7 @@ public final class UnitButton extends JButton {
                 button.setToolTipText(text);
             } else if ("enabled".equals(propertyName)) {
                 Boolean enabledState = (Boolean) e.getNewValue();
-                button.setEnabled(enabledState.booleanValue());
+                button.setEnabled(enabledState);
                 button.repaint();
             } else if (Action.SMALL_ICON.equals(e.getPropertyName())) {
                 Icon icon = (Icon) e.getNewValue();
@@ -135,7 +135,7 @@ public final class UnitButton extends JButton {
                 button.repaint();
             } else if (Action.MNEMONIC_KEY.equals(e.getPropertyName())) {
                 Integer mn = (Integer) e.getNewValue();
-                button.setMnemonic(mn.intValue());
+                button.setMnemonic(mn);
                 button.repaint();
             } else if (Action.ACTION_COMMAND_KEY.equals(e.getPropertyName())) {
                 button.setActionCommand((String)e.getNewValue());

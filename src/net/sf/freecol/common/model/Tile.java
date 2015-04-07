@@ -485,7 +485,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if a unit can move to high seas from this tile.
      */
     public boolean isDirectlyHighSeasConnected() {
-        return (moveToEurope != null) ? moveToEurope.booleanValue()
+        return (moveToEurope != null) ? moveToEurope
             : (type == null) ? false
             : type.isDirectlyHighSeasConnected();
     }
@@ -1462,7 +1462,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         int food = 0;
         for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
             if (entry.getKey().isFoodType()) {
-                food += entry.getValue().intValue();
+                food += entry.getValue();
             }
         }
 
@@ -1476,7 +1476,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
         for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
             if (!entry.getKey().isFoodType()
-                && entry.getValue().intValue() < LOW_PRODUCTION_WARNING_VALUE) {
+                && entry.getValue() < LOW_PRODUCTION_WARNING_VALUE) {
                 lb.add(Messages.message(StringTemplate
                         .template("buildColony.noBuildingMaterials")
                         .addNamed("%goods%", entry.getKey())),
@@ -2508,7 +2508,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                                           Region.class, (Region)null, false);
         
         moveToEurope = (xr.hasAttribute(MOVE_TO_EUROPE_TAG))
-            ? Boolean.valueOf(xr.getAttribute(MOVE_TO_EUROPE_TAG, false))
+            ? xr.getAttribute(MOVE_TO_EUROPE_TAG, false)
             : null;
 
         contiguity = xr.getAttribute(CONTIGUITY_TAG, -1);

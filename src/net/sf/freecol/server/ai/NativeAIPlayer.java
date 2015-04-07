@@ -317,7 +317,7 @@ public class NativeAIPlayer extends AIPlayer {
                     float offence = cm.getOffencePower(u, is);
                     if (offence > threshold) value += offence + bonus;
                 }
-                if (value > 0.0f) threats.put(t, new Float(value));
+                if (value > 0.0f) threats.put(t, value);
             }
         }
 
@@ -367,8 +367,8 @@ public class NativeAIPlayer extends AIPlayer {
         Collections.sort(threatTiles, new Comparator<Tile>() {
                 @Override
                 public int compare(Tile t1, Tile t2) {
-                    return Float.compare(threats.get(t2).floatValue(),
-                        threats.get(t1).floatValue());
+                    return Float.compare(threats.get(t2),
+                            threats.get(t1));
                 }
             });
 
@@ -850,27 +850,27 @@ public class NativeAIPlayer extends AIPlayer {
             }
             price = (int)FeatureContainer.applyModifiers((float)price,
                 getGame().getTurn(), modifiers);
-            sessionRegister.put(goldKey, Integer.valueOf(price));
+            sessionRegister.put(goldKey, price);
             return price;
         }
-        price = registered.intValue();
+        price = registered;
         if (price < 0 || price == gold) return price;
         if (gold < (price * 9) / 10) {
             logger.warning("Cheating attempt: sending offer too low");
-            sessionRegister.put(goldKey, Integer.valueOf(-1));
+            sessionRegister.put(goldKey, -1);
             return NetworkConstants.NO_TRADE;
         }
 
         int haggling = 1;
         if (sessionRegister.containsKey(hagglingKey)) {
-            haggling = sessionRegister.get(hagglingKey).intValue();
+            haggling = sessionRegister.get(hagglingKey);
         }
         if (randomInt(logger, "Haggle-buy", getAIRandom(), 3 + haggling) >= 3) {
-            sessionRegister.put(goldKey, Integer.valueOf(-1));
+            sessionRegister.put(goldKey, -1);
             return NetworkConstants.NO_TRADE_HAGGLE;
         }
-        sessionRegister.put(goldKey, Integer.valueOf(gold));
-        sessionRegister.put(hagglingKey, Integer.valueOf(haggling + 1));
+        sessionRegister.put(goldKey, gold);
+        sessionRegister.put(hagglingKey, haggling + 1);
         return gold;
     }
 
@@ -889,7 +889,7 @@ public class NativeAIPlayer extends AIPlayer {
         String hagglingKey = "tradeHaggling#" + unit.getId();
         int price;
         if (sessionRegister.containsKey(goldKey)) {
-            price = sessionRegister.get(goldKey).intValue();
+            price = sessionRegister.get(goldKey);
         } else {
             price = is.getPriceToBuy(goods);
             switch (is.getAlarm(seller).getLevel()) {
@@ -918,24 +918,24 @@ public class NativeAIPlayer extends AIPlayer {
             price = (int)FeatureContainer.applyModifiers((float)price,
                 getGame().getTurn(), modifiers);
             if (price <= 0) return 0;
-            sessionRegister.put(goldKey, Integer.valueOf(price));
+            sessionRegister.put(goldKey, price);
         }
         if (gold < 0 || price == gold) return price;
         if (gold > (price * 11) / 10) {
             logger.warning("Cheating attempt: haggling request too high");
-            sessionRegister.put(goldKey, Integer.valueOf(-1));
+            sessionRegister.put(goldKey, -1);
             return NetworkConstants.NO_TRADE;
         }
         int haggling = 1;
         if (sessionRegister.containsKey(hagglingKey)) {
-            haggling = sessionRegister.get(hagglingKey).intValue();
+            haggling = sessionRegister.get(hagglingKey);
         }
         if (randomInt(logger, "Haggle-sell", getAIRandom(), 3 + haggling) >= 3) {
-            sessionRegister.put(goldKey, Integer.valueOf(-1));
+            sessionRegister.put(goldKey, -1);
             return NetworkConstants.NO_TRADE_HAGGLE;
         }
-        sessionRegister.put(goldKey, Integer.valueOf(gold));
-        sessionRegister.put(hagglingKey, Integer.valueOf(haggling + 1));
+        sessionRegister.put(goldKey, gold);
+        sessionRegister.put(hagglingKey, haggling + 1);
         return gold;
     }
 

@@ -644,7 +644,7 @@ public class FreeColTestCase extends TestCase {
                 throw new IllegalStateException("f out of range: "
                                                 + Float.toString(f));
             }
-            number.set(0, Integer.valueOf((int)(Integer.MAX_VALUE * f)));
+            number.set(0, (int)(Integer.MAX_VALUE * f));
             mr.setNextNumbers(number, true);
             crs = combatModel.generateAttackResult(mr, attacker, defender);
         } while (crs.get(0) != result);

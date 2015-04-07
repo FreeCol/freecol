@@ -40,13 +40,13 @@ public class TypeCountMap<T extends FreeColGameObjectType> {
 
     public int getCount(T key) {
         Integer value = values.get(key);
-        return value == null ? 0 : value.intValue();
+        return value == null ? 0 : value;
     }
 
     public Integer incrementCount(T key, int newCount) {
         Integer oldValue = values.get(key);
         if (oldValue == null) {
-            return values.put(key, Integer.valueOf(newCount));
+            return values.put(key, newCount);
         } else if (oldValue == -newCount) {
             values.remove(key);
             return null;

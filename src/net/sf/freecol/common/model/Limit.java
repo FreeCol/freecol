@@ -284,11 +284,11 @@ public final class Limit extends FreeColGameObjectType {
     private boolean evaluate(Integer lhs, Integer rhs) {
         if (lhs == null || rhs == null) return true;
         switch (operator) {
-        case EQ: return lhs.intValue() == rhs.intValue();
-        case LT: return lhs.intValue() <  rhs.intValue();
-        case GT: return lhs.intValue() >  rhs.intValue();
-        case LE: return lhs.intValue() <= rhs.intValue();
-        case GE: return lhs.intValue() >= rhs.intValue();
+        case EQ: return lhs == rhs;
+        case LT: return lhs <  rhs;
+        case GT: return lhs >  rhs;
+        case LE: return lhs <= rhs;
+        case GE: return lhs >= rhs;
         default: break;
         }
         return false;

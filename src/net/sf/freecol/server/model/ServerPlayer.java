@@ -961,9 +961,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             == prefer.isEuropean()) ? 2
                         : 1;
                     if (votes.get(claimant) != null) {
-                        value += votes.get(claimant).intValue();
+                        value += votes.get(claimant);
                     }
-                    votes.put(claimant, Integer.valueOf(value));
+                    votes.put(claimant, value);
                 }
             }
             boolean lastResort = false;
@@ -1864,7 +1864,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             for (IndianSettlement settlement : allSettlements) {
                 java.util.Map<Player, Integer> extra = new HashMap<>();
                 for (Player enemy : game.getLiveEuropeanPlayers(this)) {
-                    extra.put(enemy, Integer.valueOf(0));
+                    extra.put(enemy, 0);
                 }
 
                 // Look at the uses of tiles surrounding the settlement.
@@ -1886,13 +1886,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         }
                     } else if (colony != null) { // Colonies
                         Player enemy = colony.getOwner();
-                        extra.put(enemy, extra.get(enemy).intValue()
+                        extra.put(enemy, extra.get(enemy)
                                   + ALARM_TILE_IN_USE
                                   + colony.getUnitCount());
                     } else if (tile.getOwningSettlement() != null) { // Control
                         Player enemy = tile.getOwningSettlement().getOwner();
                         if (enemy != null && enemy.isEuropean()) {
-                            extra.put(enemy, extra.get(enemy).intValue()
+                            extra.put(enemy, extra.get(enemy)
                                       + ALARM_TILE_IN_USE);
                         }
                     }
@@ -1906,12 +1906,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     }
                     Player enemy = missionary.getOwner();
                     extra.put(enemy,
-                              extra.get(enemy).intValue() + missionAlarm);
+                              extra.get(enemy) + missionAlarm);
                 }
                 // Apply modifiers, and commit the total change.
                 for (Entry<Player, Integer> entry : extra.entrySet()) {
                     Player player = entry.getKey();
-                    int change = entry.getValue().intValue();
+                    int change = entry.getValue();
                     if (change != 0) {
                         change = (int)player.applyModifiers((float)change,
                             game.getTurn(), Modifier.NATIVE_ALARM_MODIFIER);

@@ -1000,7 +1000,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             int contig = tile.getContiguity();
             if (contig > 0) {
                 Integer i = wagonsNeeded.get(contig);
-                if (i != null) return i.intValue();
+                if (i != null) return i;
             }
         }
         return 0;
@@ -1021,9 +1021,9 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (contig > 0) {
             Integer i = wagonsNeeded.get(contig);
             if (i == null) {
-                if (amount == 0) wagonsNeeded.put(contig, Integer.valueOf(0));
+                if (amount == 0) wagonsNeeded.put(contig, 0);
             } else {
-                wagonsNeeded.put(contig, Integer.valueOf(i.intValue() + amount));
+                wagonsNeeded.put(contig, i + amount);
             }
         }
     }
@@ -2688,7 +2688,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
 
             if (value == Integer.MIN_VALUE) unacceptable++;
-            scores.put(item, Integer.valueOf(value));
+            scores.put(item, value);
             lb.add(" ", Messages.message(item.getLabel()), " = ", value);
         }
 
@@ -2797,29 +2797,28 @@ public class EuropeanAIPlayer extends AIPlayer {
                 price = (int)FeatureContainer.applyModifiers(price,
                     getGame().getTurn(), u.getMissionaryTradeModifiers(false));
             }
-            sessionRegister.put(goldKey, Integer.valueOf(price));
+            sessionRegister.put(goldKey, price);
             return price;
         } else {
-            int price = registered.intValue();
+            int price = registered;
             if (price < 0 || price == gold) {
                 return price;
             } else if (gold < (price * 9) / 10) {
                 logger.warning("Cheating attempt: sending a offer too low");
-                sessionRegister.put(goldKey, Integer.valueOf(-1));
+                sessionRegister.put(goldKey, -1);
                 return NetworkConstants.NO_TRADE;
             } else {
                 int haggling = 1;
                 if (sessionRegister.containsKey(hagglingKey)) {
-                    haggling = sessionRegister.get(hagglingKey).intValue();
+                    haggling = sessionRegister.get(hagglingKey);
                 }
                 if (randomInt(logger, "Buy gold", getAIRandom(),
                               3 + haggling) <= 3) {
-                    sessionRegister.put(goldKey, Integer.valueOf(gold));
-                    sessionRegister.put(hagglingKey,
-                        Integer.valueOf(haggling + 1));
+                    sessionRegister.put(goldKey, gold);
+                    sessionRegister.put(hagglingKey, haggling + 1);
                     return gold;
                 } else {
-                    sessionRegister.put(goldKey, Integer.valueOf(-1));
+                    sessionRegister.put(goldKey, -1);
                     return NetworkConstants.NO_TRADE_HAGGLE;
                 }
             }

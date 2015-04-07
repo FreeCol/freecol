@@ -119,7 +119,7 @@ public final class NetworkHandler implements MessageHandler {
         int port = Integer.parseInt(element.getAttribute("port"));
         int slotsAvailable = Integer.parseInt(element.getAttribute("slotsAvailable"));
         int currentlyPlaying = Integer.parseInt(element.getAttribute("currentlyPlaying"));
-        boolean isGameStarted = Boolean.valueOf(element.getAttribute("isGameStarted")).booleanValue();
+        boolean isGameStarted = Boolean.valueOf(element.getAttribute("isGameStarted"));
         String version = element.getAttribute("version");
         int gameState = Integer.parseInt(element.getAttribute("gameState"));
 
@@ -146,7 +146,7 @@ public final class NetworkHandler implements MessageHandler {
         int port = Integer.parseInt(element.getAttribute("port"));
         int slotsAvailable = Integer.parseInt(element.getAttribute("slotsAvailable"));
         int currentlyPlaying = Integer.parseInt(element.getAttribute("currentlyPlaying"));
-        boolean isGameStarted = Boolean.valueOf(element.getAttribute("isGameStarted")).booleanValue();
+        boolean isGameStarted = Boolean.valueOf(element.getAttribute("isGameStarted"));
         String version = element.getAttribute("version");
         int gameState = Integer.parseInt(element.getAttribute("gameState"));
 

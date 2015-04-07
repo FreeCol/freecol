@@ -133,7 +133,7 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
      * @return The port number.
      */
     public int getPort() {
-        return ((Integer) portField.getValue()).intValue();
+        return ((Integer) portField.getValue());
     }
 
     /**

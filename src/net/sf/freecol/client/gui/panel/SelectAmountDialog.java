@@ -89,7 +89,7 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
         if (defaultAmount > 0 && defaultIndex < 0) {
             for (int index = 0; index < values.size(); index++) {
                 if (defaultAmount < values.get(index)) {
-                    values.add(index, Integer.valueOf(defaultAmount));
+                    values.add(index, defaultAmount);
                     defaultIndex = index;
                     break;
                 }

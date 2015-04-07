@@ -152,7 +152,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     public int getGoodsCount(GoodsType type) {
         synchronized (storedGoods) {
             return (storedGoods.containsKey(type)) 
-                ? storedGoods.get(type).intValue()
+                ? storedGoods.get(type)
                 : 0;
         }
     }
@@ -168,7 +168,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         synchronized (storedGoods) {
             synchronized (oldStoredGoods) {
                 return (oldStoredGoods.containsKey(type))
-                    ? oldStoredGoods.get(type).intValue()
+                    ? oldStoredGoods.get(type)
                     : 0;
             }
         }
@@ -601,7 +601,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
                 int amount = xr.getAttribute(AMOUNT_TAG, 0);
 
-                storage.put(goodsType, Integer.valueOf(amount));
+                storage.put(goodsType, amount);
 
             } else {
                 throw new XMLStreamException("Bogus GoodsContainer tag: "

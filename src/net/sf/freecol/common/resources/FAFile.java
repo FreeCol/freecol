@@ -201,14 +201,14 @@ public class FAFile {
             for (int i=0; i<numberOfPoints; i++) {
                 newLetter.points[i] = new Point(xs[i], ys[i]);                
             }           
-            letters.put(new Character(letter), newLetter);
+            letters.put(letter, newLetter);
             line = in.readLine();
         }
     }
 
 
     private FALetter getLetter(char letter) {
-        return (FALetter) letters.get(new Character(letter));
+        return (FALetter) letters.get(letter);
     }
 
     private FAName getFAName(String name) {

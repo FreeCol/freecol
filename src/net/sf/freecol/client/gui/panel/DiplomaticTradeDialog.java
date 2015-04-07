@@ -273,7 +273,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             final String command = event.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
-                    int amount = ((Integer)spinner.getValue()).intValue();
+                    int amount = ((Integer)spinner.getValue());
                     DiplomaticTradeDialog.this.addGoldTradeItem(source, amount);
                     break;
                 case CLEAR:

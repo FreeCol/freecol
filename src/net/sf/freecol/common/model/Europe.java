@@ -212,7 +212,7 @@ public class Europe extends UnitLocation
      */
     public int getUnitPrice(UnitType unitType) {
         Integer price = unitPrices.get(unitType);
-        return (price != null) ? price.intValue() : unitType.getPrice();
+        return (price != null) ? price : unitType.getPrice();
     }
 
     /**
@@ -602,7 +602,7 @@ public class Europe extends UnitLocation
 
             int price = xr.getAttribute(PRICE_TAG, -1);
 
-            unitPrices.put(unitType, Integer.valueOf(price));
+            unitPrices.put(unitType, price);
             xr.closeTag(UNIT_PRICE_TAG);
 
         // @compat 0.10.0

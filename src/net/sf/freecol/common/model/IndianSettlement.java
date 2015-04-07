@@ -1074,7 +1074,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             for (AbstractGoods ag : t.getSortedPotential()) {
                 GoodsType type = ag.getType().getStoredAs();
                 Integer i = goodsMap.get(type);
-                int value = (i == null) ? 0 : i.intValue();
+                int value = (i == null) ? 0 : i;
                 goodsMap.put(type, value + ag.getAmount());
             }
         }

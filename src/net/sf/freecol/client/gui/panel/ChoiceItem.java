@@ -108,7 +108,7 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
      *            not an <code>Integer</code>.
      */
     public int getChoice() {
-        return ((Integer) object).intValue();
+        return ((Integer) object);
     }
     
     /**

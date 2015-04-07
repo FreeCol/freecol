@@ -172,7 +172,7 @@ public class ProductionCache {
 
     public int decrementUnitCount(BuildingType buildingType) {
         Integer result = unitCounts.incrementCount(buildingType, -1);
-        return (result == null) ? 0 : result.intValue();
+        return (result == null) ? 0 : result;
     }
 
     public List<Entry> getAssigned() {
