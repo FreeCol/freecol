@@ -151,7 +151,9 @@ public final class ReportColonyPanel extends ReportPanel
     }
 
 
-    // Standard pretty version
+    /**
+     * Standard version of the Colony Report Panel
+     */
     private void classicColonyPanel(List<Colony> colonies) {
         ImageLibrary lib = getImageLibrary();
         final int COLONISTS_PER_ROW = 20;
@@ -168,7 +170,7 @@ public final class ReportColonyPanel extends ReportPanel
             JButton button = GUI.getLinkButton(colony.getName(), null,
                 colony.getId());
             button.addActionListener(this);
-            reportPanel.add(button, "newline 20, split 2");
+            reportPanel.add(button, "newline, split 2");
             reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
             // Currently building
@@ -260,8 +262,9 @@ public final class ReportColonyPanel extends ReportPanel
     }
 
 
-    // Compact version
-
+    /**
+     * Compact version of the Colony Report Panel
+     */
     private void initializeCompactColonyPanel() {
         Specification spec = getSpecification();
         goodsTypes = new ArrayList<>(spec.getGoodsTypeList());
