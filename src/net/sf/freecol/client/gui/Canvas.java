@@ -1110,7 +1110,7 @@ public final class Canvas extends JDesktopPane {
 
         Dimension size = getSavedSize(comp);
         if (size == null) {
-            size = pref;
+            size = new Dimension(pref);
             save = true;
         }
 
