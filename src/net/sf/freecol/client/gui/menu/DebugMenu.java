@@ -47,6 +47,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -158,7 +159,7 @@ public class DebugMenu extends JMenu {
         cvpMenu.setOpaque(false);
         ButtonGroup bg = new ButtonGroup();
         final JRadioButtonMenuItem cv1
-            = new JRadioButtonMenuItem("Do not display",
+            = Utility.localizedRadioButtonMenuItem(StringTemplate.template("none"),
                 FreeColDebugger.debugDisplayColonyValuePlayer() == null);
         cv1.setOpaque(false);
         cv1.setMnemonic(KeyEvent.VK_C);
@@ -342,10 +343,10 @@ public class DebugMenu extends JMenu {
         europeStatus.setEnabled(hasServer);
 
         final JCheckBoxMenuItem dam
-            = new JCheckBoxMenuItem("Display AI-missions",
+            = Utility.localizedCheckBoxMenuItem("menuBar.debug.displayAIMissions",
                 FreeColDebugger.debugShowMission());
         final JCheckBoxMenuItem dami
-            = new JCheckBoxMenuItem("Additional AI-mission info",
+            = Utility.localizedCheckBoxMenuItem("menuBar.debug.displayAdditionalAIMissionInfo",
                 FreeColDebugger.debugShowMissionInfo());
         dam.setOpaque(false);
         dam.setMnemonic(KeyEvent.VK_A);
