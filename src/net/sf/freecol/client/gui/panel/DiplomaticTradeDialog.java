@@ -930,12 +930,13 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, 
                 FontLibrary.FontSize.TINY, Font.BOLD);
         labelDemandMessage.setFont(font);
-        panel.add(labelDemandMessage, "aligny bottom");
+        panel.add(labelDemandMessage);
         JTextArea blank = new JTextArea(" ");
-        panel.add(blank, "center");
+        blank.setVisible(false);
+        panel.add(blank, "");
         JTextArea labelOfferMessage = Utility.getDefaultTextArea(this.offerMessage);
         labelOfferMessage.setFont(font);
-        panel.add(labelOfferMessage, "aligny bottom");
+        panel.add(labelOfferMessage);
 
         // Panel contents
         // TODO: Expand center panel so that contents fill cell horizontally. 
@@ -945,7 +946,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             if (!tutorial.equals("")) {
                 // Display only if tutorial variable contents overriden
                 //      Can only occur if: First Contact with a forgeign Nation
-                JTextArea tutArea = Utility.getDefaultTextArea(tutorial);
+                JTextArea tutArea = Utility.getDefaultTextArea(tutorial, 30);
                 centerPanel.add(tutArea, "center");
             }
             centerPanel.add(this.summary, "top");
