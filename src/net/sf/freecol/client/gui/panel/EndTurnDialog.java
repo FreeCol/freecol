@@ -122,7 +122,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
 
             JPanel panel = (isSelected) ? selectedPanel : itemPanel;
             panel.removeAll();
-            panel.add(imageLabel, "center");
+            panel.add(imageLabel, "center, width 40!, height 40!");
             panel.add(nameLabel, "split 2, flowy");
             panel.add(locationLabel);
             return panel;
