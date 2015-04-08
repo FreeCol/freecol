@@ -2349,7 +2349,7 @@ public final class InGameController extends Controller {
 
         case HAPPY: case CONTENT: case DISPLEASED:
             if (settlement.hasMissionary()) {
-                settlement.csKillMissionary("indianSettlement.mission.denounced", cs);
+                settlement.csKillMissionary(false, cs);
             }
             // Always show the tile the unit was on
             cs.add(See.perhaps().always(serverPlayer), unit.getTile());

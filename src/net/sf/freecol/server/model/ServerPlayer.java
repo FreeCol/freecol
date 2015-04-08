@@ -3404,7 +3404,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (sis.hasMissionary()) {
                 missionaryOwner = (ServerPlayer)sis.getMissionary().getOwner();
                 radius = sis.getMissionaryLineOfSight();
-                sis.csKillMissionary("indianSettlement.mission.destroyed", cs);
+                sis.csKillMissionary(true, cs);
             }
         }
             

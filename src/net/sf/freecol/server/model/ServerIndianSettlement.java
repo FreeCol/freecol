@@ -525,31 +525,31 @@ public class ServerIndianSettlement extends IndianSettlement
     /**
      * Kills the missionary at this settlement.
      *
-     * @param messageId An optional messageId to send.
+     * @param destroy If true, the settlement is destroyed, if false the
+     *     missionary is denounced, if null do not generate a message.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csKillMissionary(String messageId, ChangeSet cs) {
+    public void csKillMissionary(Boolean destroy, ChangeSet cs) {
         Unit missionary = getMissionary();
         if (missionary == null) return;
         csChangeMissionary(null, cs);
         
         // Inform the enemy of loss of mission
         ServerPlayer missionaryOwner = (ServerPlayer)missionary.getOwner();
-        if (null != messageId) switch (messageId) {
-            case "indianSettlement.mission.denounced":
+        if (destroy != null) {
+            if (destroy) {
                 cs.addMessage(See.only(missionaryOwner),
-                        new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                messageId, this)
-                                .addStringTemplate("%settlement%",
-                                        getLocationLabelFor(missionaryOwner)));
-                break;
-            case "indianSettlement.mission.destroyed":
+                    new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                        "indianSettlement.mission.destroyed", this)
+                        .addStringTemplate("%settlement%",
+                            getLocationLabelFor(missionaryOwner)));
+            } else {
                 cs.addMessage(See.only(missionaryOwner),
-                        new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                messageId, this)
-                                .addStringTemplate("%settlement%",
-                                        getLocationLabelFor(missionaryOwner)));
-                break;
+                    new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                        "indianSettlement.mission.denounced", this)
+                        .addStringTemplate("%settlement%",
+                            getLocationLabelFor(missionaryOwner)));
+            }
         }
     }
 
