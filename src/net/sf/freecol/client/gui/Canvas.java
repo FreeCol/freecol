@@ -1101,15 +1101,42 @@ public final class Canvas extends JDesktopPane {
      * remember its size and position.
      *
      * @param comp The <code>Component</code> to use.
-     * @param d The <code>Dimension</code> to restore from.
+     * @param d The <code>Dimension</code> to use as default.
      */
     public void restoreSavedSize(Component comp, Dimension d) {
+        final Dimension pref = comp.getPreferredSize();
+        final Dimension sugg = (d == null) ? pref : d;
+        boolean save = false;
+
         Dimension size = getSavedSize(comp);
         if (size == null) {
-            size = d;
+            size = pref;
+            save = true;
+        }
+
+        // Fix up broken/outdated saved sizes
+        if(size.width < sugg.width) {
+            size.width = sugg.width;
+            save = true;
+        }
+        if(size.height < sugg.height) {
+            size.height = sugg.height;
+            save = true;
+        }
+        if(size.width < pref.width) {
+            size.width = pref.width;
+            save = true;
+        }
+        if(size.height < pref.height) {
+            size.height = pref.height;
+            save = true;
+        }
+
+        if(save) {
             saveSize(comp, size);
         }
-        if (!comp.getPreferredSize().equals(size)) {
+
+        if (!pref.equals(size)) {
             comp.setPreferredSize(size);
         }
     }
