@@ -522,7 +522,7 @@ public final class MapViewer {
     private int getCompoundHeight(TileType tileType, int height) {
         int compoundHeight = height;
         if (tileType != null) {
-            Image overlayImage = lib.getOverlayImage(
+            Image overlayImage = ImageLibrary.getOverlayImage(
                 tileType, tileType.getId(), lib.getScalingFactor());
             int tmpHeight;
             if (overlayImage != null) {
@@ -712,7 +712,7 @@ public final class MapViewer {
                         0, 0, null);
         }
 
-        if (price > 0 && !tile.hasSettlement()) {
+        if (price > 0 && tile != null && !tile.hasSettlement()) {
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
             centerImage(g, image, tileWidth, tileHeight);
         }
@@ -1090,7 +1090,7 @@ public final class MapViewer {
      */
     public int setOffsetFocus(Tile tile) {
         if (tile == null) return 0;
-        int where = 0;
+        int where;
         final Map map = freeColClient.getGame().getMap();
         final int tx = tile.getX(), ty = tile.getY(),
             width = rightColumn - leftColumn;
@@ -1341,13 +1341,13 @@ public final class MapViewer {
         double deg2rad = Math.PI/180.0;
         double angle = -90.0 * deg2rad;
         double offset = extent * 0.5;
-        double size = (extent - padding - padding) * 0.5;
+        double size1 = (extent - padding - padding) * 0.5;
 
         GeneralPath path = new GeneralPath();
-        path.moveTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+        path.moveTo(Math.cos(angle) * size1 + offset, Math.sin(angle) * size1 + offset);
         for (int i = 0; i < 4; i++) {
             angle += 144 * deg2rad;
-            path.lineTo(Math.cos(angle) * size + offset, Math.sin(angle) * size + offset);
+            path.lineTo(Math.cos(angle) * size1 + offset, Math.sin(angle) * size1 + offset);
         }
         path.closePath();
 
@@ -1461,8 +1461,8 @@ public final class MapViewer {
 
         // create path
         double offset = extent * 0.5;
-        double size = extent - padding - padding;
-        double bar = size / 3.0;
+        double size1 = extent - padding - padding;
+        double bar = size1 / 3.0;
         double inset = 0.0;
         double kludge = 0.0;
 
@@ -1470,9 +1470,9 @@ public final class MapViewer {
         GeneralPath cross = new GeneralPath();
         if (expertMissionary) {
             // this is meant to represent the eucharist (the -1, +1 thing is a nasty kludge)
-            circle.append(new Ellipse2D.Double(padding-1, padding-1, size+1, size+1), false);
+            circle.append(new Ellipse2D.Double(padding-1, padding-1, size1+1, size1+1), false);
             inset = 4.0;
-            bar = (size - inset - inset) / 3.0;
+            bar = (size1 - inset - inset) / 3.0;
             // more nasty -1, +1 kludges
             kludge = 1.0;
         }
@@ -1550,10 +1550,8 @@ public final class MapViewer {
 
                         if (tile.getType() == borderingTile.getType()) {
                             // Equal tiles, no need to draw border
-                            continue;
                         } else if (tile.isLand() && !borderingTile.isLand()) {
                             // The beach borders are drawn on the side of water tiles only
-                            continue;
                         } else if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
                             // If there is a Coast image (eg. beach) defined, use it, otherwise skip
                             // Draw the grass from the neighboring tile, spilling over on the side of this tile
@@ -1571,7 +1569,6 @@ public final class MapViewer {
                             if (library.getTerrainImage(tile.getType(), 0, 0)
                                 .equals(library.getTerrainImage(borderingTile.getType(), 0, 0))) {
                                 // Do not draw limit between tile that share same graphics (ocean & great river)
-                                continue;
                             } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
                                 // Draw land terrain with bordering land type, or ocean/high seas limit
                                 si = new SortableImage(library.getBorderImage(borderingTile.getType(), direction,
@@ -1925,9 +1922,8 @@ public final class MapViewer {
                         Image rightImage = null;
                         if (settlement instanceof Colony) {
                             Colony colony = (Colony)settlement;
-                            String size = Integer.toString(colony.getDisplayUnitCount());
-
-                            leftImage = createLabel(g, size,
+                            String string = Integer.toString(colony.getDisplayUnitCount());
+                            leftImage = createLabel(g, string,
                                 ((colony.getPreferredSizeChange() > 0) ? italicFont : font),
                                 backgroundColor);
                             if (player.owns(settlement)) {
@@ -2164,10 +2160,7 @@ public final class MapViewer {
                 // Draw image of indian settlement in center of the tile.
                 centerImage(g, settlementImage, tileWidth, tileHeight);
 
-                String text = null;
-                Image chip = null;
-                Color background = is.getOwner().getNationColor();
-                if (background == null) background = Color.WHITE;
+                Image chip;
                 float xOffset = STATE_OFFSET_X * lib.getScalingFactor();
                 float yOffset = STATE_OFFSET_Y * lib.getScalingFactor();
                 final int colonyLabels = freeColClient.getClientOptions()
@@ -2215,10 +2208,9 @@ public final class MapViewer {
             g.drawImage(lib.getTerrainImage(null, tile.getX(), tile.getY()), 0, 0, null);
         } else {
             // layer additions and improvements according to zIndex
-            List<TileItem> tileItems = new ArrayList<>();
-            if (tile.getTileItemContainer() != null) {
-                tileItems = tile.getTileItemContainer().getTileItems();
-            }
+            List<TileItem> tileItems = (tile.getTileItemContainer() != null)
+                ? tile.getTileItemContainer().getTileItems()
+                : new ArrayList<TileItem>();
             int startIndex = 0;
             for (int index = startIndex; index < tileItems.size(); index++) {
                 if (tileItems.get(index).getZIndex() < OVERLAY_INDEX) {
@@ -2370,7 +2362,7 @@ public final class MapViewer {
     private static void drawResourceItem(Graphics2D g, ImageLibrary lib,
                                          Resource item,
                                          int tileWidth, int tileHeight) {
-        Image bonusImage = lib.getBonusImage(((Resource) item).getType());
+        Image bonusImage = lib.getBonusImage(item.getType());
         if (bonusImage != null) {
             centerImage(g, bonusImage, tileWidth, tileHeight);
         }
