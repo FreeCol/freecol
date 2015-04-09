@@ -339,11 +339,6 @@ public final class ColonyPanel extends PortPanel
         SwingUtilities.replaceUIInputMap(this.nameBox,
             JComponent.WHEN_IN_FOCUSED_WINDOW, nameIM);
 
-        // See the message of Ulf Onnen for more information about the
-        // presence of this fake mouse listener.
-        // Disabled 2013/09, no longer appears necessary.
-        //addMouseListener(new MouseAdapter() {});
-
         initialize(colony);
         getGUI().restoreSavedSize(this, 950, 650);
     }

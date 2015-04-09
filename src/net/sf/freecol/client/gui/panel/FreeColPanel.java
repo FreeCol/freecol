@@ -91,10 +91,6 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
         setBorder(FreeColImageBorder.imageBorder);
 
-        // See the message of Ulf Onnen for more information about the presence
-        // of this fake mouse listener.
-        addMouseListener(new MouseAdapter() {});
-
         okButton.setActionCommand(OK);
         okButton.addActionListener(this);
         setCancelComponent(okButton);
