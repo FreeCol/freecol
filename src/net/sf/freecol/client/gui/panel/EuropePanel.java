@@ -563,7 +563,7 @@ public final class EuropePanel extends PortPanel {
      */
     public EuropePanel(FreeColClient freeColClient, Canvas canvas) {
         super(freeColClient, new MigLayout("wrap 3, fill",
-                                           "[380:][380:][150:200:]"));
+                                           "[30%:][30%:][15%:]"));
 
         exitButton = new EuropeButton(Messages.message("close"),
             KeyEvent.VK_ESCAPE, EuropeAction.EXIT.toString(), this);
@@ -673,13 +673,13 @@ public final class EuropePanel extends PortPanel {
             add(Utility.localizedHeader(europe.getNameKey(), false),
                 "span, top, center");
         }
-        add(toAmericaScroll, "sg, height 124:, grow");
-        add(toEuropeScroll, "sg, height 124:, grow");
+        add(toAmericaScroll, "sg, height 15%:, grow");
+        add(toEuropeScroll, "sg, height 15%:, grow");
         add(logScroll, "spany 3, grow");
-        add(inPortScroll, "sg, height 124:, grow");
+        add(inPortScroll, "sg, height 15%:, grow");
         add(docksScroll, "spany 2, grow");
-        add(cargoScroll, "height 100:, grow");
-        add(marketScroll, "span, height 100:, grow");
+        add(cargoScroll, "height 10%:, grow");
+        add(marketScroll, "span, height 10%:, grow");
 
         add(recruitButton, "span, split 6");
         add(purchaseButton);
