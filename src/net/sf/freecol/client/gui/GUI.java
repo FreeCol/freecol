@@ -1531,7 +1531,7 @@ public class GUI {
         if (name == null) {
             // Cancelled
         } else if (name.isEmpty()) {
-            showErrorMessage("enterSomeText"); // 0-length is invalid
+            showInformationMessage("enterSomeText"); // 0-length is invalid
         } else if (player.getSettlementByName(name) != null) {
             // Must be unique
             showInformationMessage(tile, StringTemplate

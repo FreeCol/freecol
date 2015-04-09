@@ -373,7 +373,7 @@ public final class InGameController implements NetworkConstants {
 
             // Check that the purchase is funded.
             if (!player.checkGold(market.getBidPrice(type, amount))) {
-                gui.showErrorMessage("notEnoughGold");
+                gui.showInformationMessage("notEnoughGold");
                 return false;
             }
         }
@@ -3895,12 +3895,12 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn() || colony == null) return false;
 
         if (!getSpecification().getBoolean(GameOptions.PAY_FOR_BUILDING)) {
-            gui.showErrorMessage("payForBuilding.disabled");
+            gui.showInformationMessage("payForBuilding.disabled");
             return false;
         }
 
         if (!colony.canPayToFinishBuilding()) {
-            gui.showErrorMessage("notEnoughGold");
+            gui.showInformationMessage("notEnoughGold");
             return false;
         }
 
@@ -3979,7 +3979,7 @@ public final class InGameController implements NetworkConstants {
         if (!player.isColonial()) return false;
 
         if (!player.checkGold(player.getRecruitPrice())) {
-            gui.showErrorMessage("notEnoughGold");
+            gui.showInformationMessage("notEnoughGold");
             return false;
         }
 
@@ -4017,7 +4017,7 @@ public final class InGameController implements NetworkConstants {
             if (name == null) { // User cancelled
                 return false;
             } else if (name.isEmpty()) { // Zero length invalid
-                gui.showErrorMessage("enterSomeText");
+                gui.showInformationMessage("enterSomeText");
                 return false;
             } else if (colony.getName().equals(name)) { // No change
                 return false;
@@ -4408,7 +4408,7 @@ public final class InGameController implements NetworkConstants {
         final Player player = freeColClient.getMyPlayer();
         Europe europe = player.getEurope();
         if (!player.checkGold(europe.getUnitPrice(unitType))) {
-            gui.showErrorMessage("notEnoughGold");
+            gui.showInformationMessage("notEnoughGold");
             return false;
         }
 

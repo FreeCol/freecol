@@ -152,17 +152,15 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles an "error"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element error(Element element)  {
-        if (element.hasAttribute("messageID")) {
-            getGUI().showErrorMessage(element.getAttribute("messageID"),
-                                  element.getAttribute("message"));
-        } else {
-            getGUI().showErrorMessage(null, element.getAttribute("message"));
-        }
+        getGUI().showErrorMessage((element.hasAttribute("messageID"))
+            ? element.getAttribute("messageID")
+            : null,
+            element.getAttribute("message"));
         return null;
     }
 
