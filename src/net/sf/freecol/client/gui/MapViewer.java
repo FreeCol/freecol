@@ -700,7 +700,12 @@ public final class MapViewer {
         }
 
         displayBaseTile(g, lib, tile, false);
-        displayTileOverlays(g, tile, false, false);
+        if (tile != null && tile.isExplored()) {
+            displayTileItems(g, tile);
+            displaySettlement(g, lib, tile, tileWidth, tileHeight, false);
+            displayFogOfWar(g, tile);
+            displayOptionalValues(g, tile);
+        }
 
         if (tileCannotBeWorked) {
             g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN),
@@ -1799,7 +1804,20 @@ public final class MapViewer {
                 // Display the Tile overlays:
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_OFF);
-                displayTileOverlays(g, tile, true, withNumbers);
+                if (tile != null && tile.isExplored()) {
+                    for (Direction direction : Direction.values()) {
+                        Tile borderingTile = tile.getNeighbourOrNull(direction);
+                        if (borderingTile != null && !borderingTile.isExplored()) {
+                            g.drawImage(lib.getBorderImage(
+                                    null, direction, tile.getX(), tile.getY()),
+                                0, 0, null);
+                        }
+                    }
+                    displayTileItems(g, tile);
+                    displaySettlement(g, lib, tile, tileWidth, tileHeight, withNumbers);
+                    displayFogOfWar(g, tile);
+                    displayOptionalValues(g, tile);
+                }
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_ON);
                 // paint transparent borders
@@ -2243,39 +2261,6 @@ public final class MapViewer {
             for (TileItem ti : tileItems.subList(startIndex, tileItems.size())) {
                 drawItem(g, lib, tile, ti, tileWidth, tileHeight);
             }
-        }
-    }
-
-    /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates.  Everything located on
-     * the Tile will also be drawn except for units because their
-     * image can be larger than a Tile.
-     *
-     * @param g The Graphics2D object on which to draw the Tile.
-     * @param tile The Tile to draw.
-     * @param drawUnexploredBorders If true; draws border between explored and
-     *     unexplored terrain.
-     * @param withNumber indicates if the number of inhabitants should
-     *     be drawn too.
-     */
-    private void displayTileOverlays(Graphics2D g, Tile tile,
-                                     boolean drawUnexploredBorders,
-                                     boolean withNumber) {
-        if (tile != null && tile.isExplored()) {
-            if (drawUnexploredBorders) {
-                for (Direction direction : Direction.values()) {
-                    Tile borderingTile = tile.getNeighbourOrNull(direction);
-                    if (borderingTile != null && !borderingTile.isExplored()) {
-                        g.drawImage(lib.getBorderImage(null, direction,
-                                tile.getX(), tile.getY()), 0, 0, null);
-                    }
-                }
-            }
-            displayTileItems(g, tile);
-            displaySettlement(g, lib, tile, tileWidth, tileHeight, withNumber);
-            displayFogOfWar(g, tile);
-            displayOptionalValues(g, tile);
         }
     }
 
