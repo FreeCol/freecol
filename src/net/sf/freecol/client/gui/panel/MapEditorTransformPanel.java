@@ -39,6 +39,7 @@ import javax.swing.JToggleButton;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.LostCityRumour;
@@ -115,7 +116,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         final Specification spec = getSpecification();
         List<TileType> tileList = spec.getTileTypeList();
         for (TileType type : tileList) {
-            listPanel.add(buildButton(getImageLibrary().getCompoundTerrainImage(type, 0.5f),
+            listPanel.add(buildButton(MapViewer.getCompoundTerrainImage(type, 0.5f),
                                       Messages.getName(type),
                                       new TileTypeTransform(type)));
         }

@@ -28,10 +28,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -71,7 +73,7 @@ public class TerrainDetailPanel
         DefaultMutableTreeNode node =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
         for (TileType t : getSpecification().getTileTypeList()) {
-            ImageIcon icon = new ImageIcon(getImageLibrary().getCompoundTerrainImage(t, getScale()));
+            ImageIcon icon = new ImageIcon(MapViewer.getCompoundTerrainImage(t, getScale()));
             node.add(buildItem(t, icon));
         }
         root.add(node);
@@ -105,7 +107,7 @@ public class TerrainDetailPanel
         panel.add(nameLabel, "span, align center");
 
         panel.add(Utility.localizedLabel("colopedia.terrain.terrainImage"), "spany 3");
-        Image terrainImage = getImageLibrary().getCompoundTerrainImage(tileType, 1);
+        Image terrainImage = MapViewer.getCompoundTerrainImage(tileType, 1);
         panel.add(new JLabel(new ImageIcon(terrainImage)), "spany 3");
 
         List<ResourceType> resourceList = tileType.getResourceTypes();

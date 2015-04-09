@@ -927,47 +927,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the scaled terrain-image for a terrain type (and position 0, 0).
-     *
-     * @param type The type of the terrain-image to return.
-     * @param scale The scale of the terrain image to return.
-     * @return The terrain-image
-     */
-    public static Image getCompoundTerrainImage(TileType type, float scale) {
-        Image terrainImage = getTerrainImage(type, 0, 0, scale);
-        Image overlayImage = getOverlayImage(type, type.getId(), scale);
-        Image forestImage = type.isForested() ? getForestImage(type, scale)
-            : null;
-        if (overlayImage == null && forestImage == null) {
-            return terrainImage;
-        } else {
-            int width = terrainImage.getWidth(null);
-            int height = terrainImage.getHeight(null);
-            if (overlayImage != null) {
-                height = Math.max(height, overlayImage.getHeight(null));
-            }
-            if (forestImage != null) {
-                height = Math.max(height, forestImage.getHeight(null));
-            }
-            BufferedImage compositeImage = new BufferedImage(
-                width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = compositeImage.createGraphics();
-            g.drawImage(terrainImage, 0,
-                        height - terrainImage.getHeight(null), null);
-            if (overlayImage != null) {
-                g.drawImage(overlayImage, 0,
-                            height - overlayImage.getHeight(null), null);
-            }
-            if (forestImage != null) {
-                g.drawImage(forestImage, 0,
-                            height - forestImage.getHeight(null), null);
-            }
-            g.dispose();
-            return compositeImage;
-        }
-    }
-
-    /**
      * Create a "chip" with the given text and colors.
      *
      * @param text The text to display.
