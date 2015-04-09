@@ -2661,11 +2661,11 @@
           <integerOption id="model.option.destroySettlementScore" value="-2"/>
           <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.always" />
           <rangeOption id="model.option.settlementNumber" defaultValue="10" localizedLabels="true">
-            <rangeValue label="verySmall" value="10"/>
-            <rangeValue label="small" value="8"/>
-            <rangeValue label="medium" value="7"/>
-            <rangeValue label="large" value="6"/>
-            <rangeValue label="veryLarge" value="5"/>
+            <rangeValue label="model.option.settlementNumber.verySmall" value="10"/>
+            <rangeValue label="model.option.settlementNumber.small" value="8"/>
+            <rangeValue label="model.option.settlementNumber.medium" value="7"/>
+            <rangeValue label="model.option.settlementNumber.large" value="6"/>
+            <rangeValue label="model.option.settlementNumber.veryLarge" value="5"/>
           </rangeOption>
         </optionGroup>
         <optionGroup id="model.difficulty.monarch" editable="false">
@@ -2801,11 +2801,11 @@
           <integerOption id="model.option.destroySettlementScore" value="-3"/>
           <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.first" />
           <rangeOption id="model.option.settlementNumber" defaultValue="8" localizedLabels="true">
-            <rangeValue label="verySmall" value="10"/>
-            <rangeValue label="small" value="8"/>
-            <rangeValue label="medium" value="7"/>
-            <rangeValue label="large" value="6"/>
-            <rangeValue label="veryLarge" value="5"/>
+            <rangeValue label="model.option.settlementNumber.verySmall" value="10"/>
+            <rangeValue label="model.option.settlementNumber.small" value="8"/>
+            <rangeValue label="model.option.settlementNumber.medium" value="7"/>
+            <rangeValue label="model.option.settlementNumber.large" value="6"/>
+            <rangeValue label="model.option.settlementNumber.veryLarge" value="5"/>
           </rangeOption>
         </optionGroup>
         <optionGroup id="model.difficulty.monarch" editable="false">
@@ -2936,11 +2936,11 @@
           <integerOption id="model.option.destroySettlementScore" value="-4"/>
           <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.firstAndUncontacted" />
           <rangeOption id="model.option.settlementNumber" defaultValue="7" localizedLabels="true">
-            <rangeValue label="verySmall" value="10"/>
-            <rangeValue label="small" value="8"/>
-            <rangeValue label="medium" value="7"/>
-            <rangeValue label="large" value="6"/>
-            <rangeValue label="veryLarge" value="5"/>
+            <rangeValue label="model.option.settlementNumber.verySmall" value="10"/>
+            <rangeValue label="model.option.settlementNumber.small" value="8"/>
+            <rangeValue label="model.option.settlementNumber.medium" value="7"/>
+            <rangeValue label="model.option.settlementNumber.large" value="6"/>
+            <rangeValue label="model.option.settlementNumber.veryLarge" value="5"/>
           </rangeOption>
         </optionGroup>
         <optionGroup id="model.difficulty.monarch" editable="false">
@@ -3064,11 +3064,11 @@
           <integerOption id="model.option.destroySettlementScore" value="-5"/>
           <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.never" />
           <rangeOption id="model.option.settlementNumber" defaultValue="6" localizedLabels="true">
-            <rangeValue label="verySmall" value="10"/>
-            <rangeValue label="small" value="8"/>
-            <rangeValue label="medium" value="7"/>
-            <rangeValue label="large" value="6"/>
-            <rangeValue label="veryLarge" value="5"/>
+            <rangeValue label="model.option.settlementNumber.verySmall" value="10"/>
+            <rangeValue label="model.option.settlementNumber.small" value="8"/>
+            <rangeValue label="model.option.settlementNumber.medium" value="7"/>
+            <rangeValue label="model.option.settlementNumber.large" value="6"/>
+            <rangeValue label="model.option.settlementNumber.veryLarge" value="5"/>
           </rangeOption>
         </optionGroup>
         <optionGroup id="model.difficulty.monarch" editable="false">
@@ -3192,11 +3192,11 @@
           <integerOption id="model.option.destroySettlementScore" value="-6"/>
           <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.never" />
           <rangeOption id="model.option.settlementNumber" defaultValue="5" localizedLabels="true">
-            <rangeValue label="verySmall" value="10"/>
-            <rangeValue label="small" value="8"/>
-            <rangeValue label="medium" value="7"/>
-            <rangeValue label="large" value="6"/>
-            <rangeValue label="veryLarge" value="5"/>
+            <rangeValue label="model.option.settlementNumber.verySmall" value="10"/>
+            <rangeValue label="model.option.settlementNumber.small" value="8"/>
+            <rangeValue label="model.option.settlementNumber.medium" value="7"/>
+            <rangeValue label="model.option.settlementNumber.large" value="6"/>
+            <rangeValue label="model.option.settlementNumber.veryLarge" value="5"/>
           </rangeOption>
         </optionGroup>
         <optionGroup id="model.difficulty.monarch" editable="false">
@@ -3339,11 +3339,11 @@
             <choice value="model.option.buildOnNativeLand.never" />
           </stringOption>
           <rangeOption id="model.option.settlementNumber" defaultValue="5" localizedLabels="true">
-            <rangeValue label="verySmall" value="10"/>
-            <rangeValue label="small" value="8"/>
-            <rangeValue label="medium" value="7"/>
-            <rangeValue label="large" value="6"/>
-            <rangeValue label="veryLarge" value="5"/>
+            <rangeValue label="model.option.settlementNumber.verySmall" value="10"/>
+            <rangeValue label="model.option.settlementNumber.small" value="8"/>
+            <rangeValue label="model.option.settlementNumber.medium" value="7"/>
+            <rangeValue label="model.option.settlementNumber.large" value="6"/>
+            <rangeValue label="model.option.settlementNumber.veryLarge" value="5"/>
           </rangeOption>
         </optionGroup>
         <optionGroup id="model.difficulty.monarch">
@@ -3675,67 +3675,67 @@
              The value indicates the number of land tile per river tile -->
         <rangeOption id="model.option.riverNumber"
                      defaultValue="10" localizedLabels="true">
-          <rangeValue label="verySmall" value="20"/>
-          <rangeValue label="small" value="10"/>
-          <rangeValue label="medium" value="9"/>
-          <rangeValue label="large" value="8"/>
-          <rangeValue label="veryLarge" value="7"/>
+          <rangeValue label="model.option.riverNumber.verySmall" value="20"/>
+          <rangeValue label="model.option.riverNumber.small" value="10"/>
+          <rangeValue label="model.option.riverNumber.medium" value="9"/>
+          <rangeValue label="model.option.riverNumber.large" value="8"/>
+          <rangeValue label="model.option.riverNumber.veryLarge" value="7"/>
         </rangeOption>
         <!-- Option for setting the number of mountains on the map
              The value indicates the number of land tile per mountain tile -->
         <rangeOption id="model.option.mountainNumber"
                      defaultValue="10" localizedLabels="true">
-          <rangeValue label="verySmall" value="20"/>
-          <rangeValue label="small" value="10"/>
-          <rangeValue label="medium" value="9"/>
-          <rangeValue label="large" value="8"/>
-          <rangeValue label="veryLarge" value="7"/>
+          <rangeValue label="model.option.mountainNumber.verySmall" value="20"/>
+          <rangeValue label="model.option.mountainNumber.small" value="10"/>
+          <rangeValue label="model.option.mountainNumber.medium" value="9"/>
+          <rangeValue label="model.option.mountainNumber.large" value="8"/>
+          <rangeValue label="model.option.mountainNumber.veryLarge" value="7"/>
         </rangeOption>
         <!-- Option for setting the number of rumours on the map The
              value indicates the number of land tile per rumour tile -->
         <rangeOption id="model.option.rumourNumber"
                      defaultValue="35" localizedLabels="true">
-          <rangeValue label="verySmall" value="50"/>
-          <rangeValue label="small" value="35"/>
-          <rangeValue label="medium" value="30"/>
-          <rangeValue label="large" value="25"/>
-          <rangeValue label="veryLarge" value="20"/>
+          <rangeValue label="model.option.rumourNumber.verySmall" value="50"/>
+          <rangeValue label="model.option.rumourNumber.small" value="35"/>
+          <rangeValue label="model.option.rumourNumber.medium" value="30"/>
+          <rangeValue label="model.option.rumourNumber.large" value="25"/>
+          <rangeValue label="model.option.rumourNumber.veryLarge" value="20"/>
         </rangeOption>
         <!-- Option for setting the percentage of forests on the map -->
         <rangeOption id="model.option.forestNumber"
                      defaultValue="50" localizedLabels="true">
-          <rangeValue label="verySmall" value="10"/>
-          <rangeValue label="small" value="30"/>
-          <rangeValue label="medium" value="50"/>
-          <rangeValue label="large" value="70"/>
-          <rangeValue label="veryLarge" value="90"/>
+          <rangeValue label="model.option.forestNumber.verySmall" value="10"/>
+          <rangeValue label="model.option.forestNumber.small" value="30"/>
+          <rangeValue label="model.option.forestNumber.medium" value="50"/>
+          <rangeValue label="model.option.forestNumber.large" value="70"/>
+          <rangeValue label="model.option.forestNumber.veryLarge" value="90"/>
         </rangeOption>
         <!-- Option for setting the percentage of bonus tiles on the map -->
         <rangeOption id="model.option.bonusNumber"
                      defaultValue="10" localizedLabels="true">
-          <rangeValue label="verySmall" value="5"/>
-          <rangeValue label="small" value="10"/>
-          <rangeValue label="medium" value="13"/>
-          <rangeValue label="large" value="17"/>
-          <rangeValue label="veryLarge" value="20"/>
+          <rangeValue label="model.option.bonusNumber.verySmall" value="5"/>
+          <rangeValue label="model.option.bonusNumber.small" value="10"/>
+          <rangeValue label="model.option.bonusNumber.medium" value="13"/>
+          <rangeValue label="model.option.bonusNumber.large" value="17"/>
+          <rangeValue label="model.option.bonusNumber.veryLarge" value="20"/>
         </rangeOption>
         <!-- Option for setting the humidity of the map -->
         <rangeOption id="model.option.humidity"
                      defaultValue="40" localizedLabels="true">
-          <rangeValue label="veryDry" value="25"/>
-          <rangeValue label="dry" value="35"/>
-          <rangeValue label="normal" value="40"/>
-          <rangeValue label="wet" value="55"/>
-          <rangeValue label="veryWet" value="60"/>
+          <rangeValue label="model.option.humidity.veryDry" value="25"/>
+          <rangeValue label="model.option.humidity.dry" value="35"/>
+          <rangeValue label="model.option.humidity.normal" value="40"/>
+          <rangeValue label="model.option.humidity.wet" value="55"/>
+          <rangeValue label="model.option.humidity.veryWet" value="60"/>
         </rangeOption>
         <!-- Option for setting the temperature of the map -->
         <rangeOption id="model.option.temperature"
                      defaultValue="2" localizedLabels="true">
-          <rangeValue label="cold" value="0"/>
-          <rangeValue label="chilly" value="1"/>
-          <rangeValue label="temperate" value="2"/>
-          <rangeValue label="warm" value="3"/>
-          <rangeValue label="hot" value="4"/>
+          <rangeValue label="model.option.temperature.cold" value="0"/>
+          <rangeValue label="model.option.temperature.chilly" value="1"/>
+          <rangeValue label="model.option.temperature.temperate" value="2"/>
+          <rangeValue label="model.option.temperature.warm" value="3"/>
+          <rangeValue label="model.option.temperature.hot" value="4"/>
         </rangeOption>
       </optionGroup>
     </optionGroup>
