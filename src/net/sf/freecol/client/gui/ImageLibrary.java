@@ -539,11 +539,11 @@ public final class ImageLibrary {
      * @param scale The scale of the image to return.
      * @return The terrain-image at the given index.
      */
-    public Image getOverlayImage(TileType type, String id, float scale) {
+    public static Image getOverlayImage(TileType type, String id, float scale) {
         return getRandomizedImage(type.getId() + ".overlay", id, scale);
     }
 
-    private Image getRandomizedImage(String prefix, String id, float scale) {
+    private static Image getRandomizedImage(String prefix, String id, float scale) {
         ArrayList<String> keys = ResourceManager.getKeys(prefix, ".image");
         int count = keys.size();
         switch(count) {
@@ -933,7 +933,7 @@ public final class ImageLibrary {
      * @param scale The scale of the terrain image to return.
      * @return The terrain-image
      */
-    public Image getCompoundTerrainImage(TileType type, float scale) {
+    public static Image getCompoundTerrainImage(TileType type, float scale) {
         Image terrainImage = getTerrainImage(type, 0, 0, scale);
         Image overlayImage = getOverlayImage(type, type.getId(), scale);
         Image forestImage = type.isForested() ? getForestImage(type, scale)
