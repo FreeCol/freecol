@@ -951,7 +951,7 @@ public final class InGameInputHandler extends InputHandler {
         if (unit == null || defaultName == null 
             || !unit.hasTile()) return null;
 
-        getGUI().showNameNewLandDialog("newLand.text", defaultName, unit);
+        igc().newLandName(defaultName, unit);
         return null;
     }
 
@@ -971,16 +971,7 @@ public final class InGameInputHandler extends InputHandler {
         final String defaultName = message.getNewRegionName();
         if (defaultName == null || region == null) return null;
 
-        if (region.isPacific()) {
-            getGUI().showEventPanel(Messages.message("event.discoverPacific"),
-                                    "EventImage.discoverPacific", null);
-            igc().nameNewRegion(tile, unit, region, defaultName);
-        } else {
-            StringTemplate template = StringTemplate.template("nameRegion.text")
-                .addStringTemplate("%type%", region.getLabel());
-            getGUI().showNameNewRegionDialog(template, defaultName, unit,
-                                             tile, region);
-        }
+        igc().newRegionName(region, defaultName, tile, unit);
         return null;
     }
 

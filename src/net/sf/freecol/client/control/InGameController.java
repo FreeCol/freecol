@@ -3760,6 +3760,36 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Ask the player to name the new land.
+     *
+     * @param defaultName The default name to use.
+     * @param unit The <code>Unit</code> that has landed.
+     */
+    public void newLandName(String defaultName, Unit unit) {
+        gui.showNameNewLandDialog("newLand.text", defaultName, unit);
+    }
+
+    /**
+     * Ask the player to name a new region.
+     *
+     * @param region The <code>Region</code> to name.
+     * @param defaultName The default name to use.
+     * @param tile The <code>Tile</code> the unit landed at.
+     * @param unit The <code>Unit</code> that has landed.
+     */
+    public void newRegionName(Region region, String defaultName, Tile tile,
+                              Unit unit) {
+        if (region.isPacific()) {
+            gui.showEventPanel(Messages.message("event.discoverPacific"),
+                               "EventImage.discoverPacific", null);
+            nameNewRegion(tile, unit, region, defaultName);
+        } else {
+            gui.showNameNewRegionDialog(StringTemplate.
+                template("nameRegion.text"), defaultName, unit, tile, region);
+        }
+    }
+
+    /**
      * Switch to a new turn.
      *
      * Called from IGIH.newTurn
