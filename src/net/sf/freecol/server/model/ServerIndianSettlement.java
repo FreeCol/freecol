@@ -163,7 +163,7 @@ public class ServerIndianSettlement extends IndianSettlement
         logger.finest("Conversion at " + getName() + " alarm=" + alarm
             + " " + convert
             + " = " + getConvertProgress() + " + " + cMiss + " + " + cAlarm);
-        Settlement colony = tile.getNearestSettlement(other,
+        ServerColony colony = (ServerColony)tile.getNearestSettlement(other,
             MAX_CONVERT_DISTANCE, true);
         if (convert < (float)getType().getConvertThreshold()
             || (getUnitCount() + tile.getUnitCount()) <= 2
@@ -179,24 +179,7 @@ public class ServerIndianSettlement extends IndianSettlement
             if (ul.isEmpty()) ul.addAll(getUnitList());
             ServerUnit brave = (ServerUnit)getRandomMember(logger, "Convert",
                                                            ul, random);
-            ServerPlayer owner = (ServerPlayer)getOwner();
-            if (owner.csChangeOwner(brave, other, ChangeType.CONVERSION, 
-                                    colony.getTile(), cs)) { //-vis(other)
-                brave.changeRole(spec.getDefaultRole(), 0);
-                brave.setMovesLeft(0);
-                brave.setState(Unit.UnitState.ACTIVE);
-                cs.addDisappear(other, tile, brave);
-                cs.add(See.only(other), colony.getTile());
-                StringTemplate nation = owner.getNationName();
-                cs.addMessage(See.only(other),
-                    new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                     "model.colony.newConvert", brave)
-                        .addStringTemplate("%nation%", nation)
-                        .addName("%colony%", colony.getName()));
-                other.invalidateCanSeeTiles();//+vis(other)
-                logger.fine("Convert at " + getName()
-                    + " for " + colony.getName());
-            }
+            colony.csAddConvert(brave, cs);
         }
     }
 
