@@ -210,6 +210,7 @@ public final class Specification {
     private final List<UnitType> unitTypesPurchasedInEurope = new ArrayList<>();
     private UnitType fastestLandUnitType = null;
     private UnitType fastestNavalUnitType = null;
+    private UnitType defaultUnitType = null;
 
     /* Other containers. */
 
@@ -585,8 +586,10 @@ public final class Specification {
         experts.clear();
         unitTypesTrainedInEurope.clear();
         unitTypesPurchasedInEurope.clear();
+        defaultUnitType = null;
         int bestLandValue = -1, bestNavalValue = -1;
         for (UnitType unitType : unitTypeList) {
+            if (unitType.isDefaultUnitType()) defaultUnitType = unitType;
             if (unitType.needsGoodsToBuild()
                 && !unitType.hasAbility(Ability.BORN_IN_COLONY)) {
                 buildableUnitTypes.add(unitType);
@@ -1238,7 +1241,9 @@ public final class Specification {
      * @return The free colonist unit type.
      */
     public UnitType getDefaultUnitType() {
-        return getUnitType("model.unit.freeColonist");
+        return (defaultUnitType != null) ? defaultUnitType
+            // Drop this is due course
+            : getUnitType("model.unit.freeColonist");
     }
 
     /**

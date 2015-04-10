@@ -54,6 +54,9 @@ public final class UnitType extends BuildableType implements Consumer {
     /** The capacity of this UnitType. */
     private int space = 0;
 
+    /** Is this the default unit type? */
+    private boolean defaultUnit = false;
+
     /**
      * The number of hit points this UnitType has. At the moment, this
      * is only used for ships. All other UnitTypes are downgraded or
@@ -212,6 +215,15 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     public boolean isDefensive() {
         return getBaseDefence() > UnitType.DEFAULT_DEFENCE;
+    }
+
+    /**
+     * Is this the default unit type?
+     *
+     * @return True if this is the default unit type.
+     */
+    public boolean isDefaultUnitType() {
+        return defaultUnit;
     }
 
     /**
@@ -689,7 +701,7 @@ public final class UnitType extends BuildableType implements Consumer {
     private static final String DEFAULT_EQUIPMENT_TAG = "default-equipment";
     // end @compat
     private static final String DEFAULT_ROLE_TAG = "default-role";
-
+    private static final String DEFAULT_UNIT_TAG = "defaultUnit";
     private static final String DEFENCE_TAG = "defence";
     private static final String EXPERT_PRODUCTION_TAG = "expert-production";
     private static final String HIT_POINTS_TAG = "hitPoints";
@@ -721,6 +733,8 @@ public final class UnitType extends BuildableType implements Consumer {
         xw.writeAttribute(OFFENCE_TAG, offence);
 
         xw.writeAttribute(DEFENCE_TAG, defence);
+
+        xw.writeAttribute(DEFAULT_UNIT_TAG, defaultUnit);
 
         xw.writeAttribute(MOVEMENT_TAG, movement);
 
@@ -803,6 +817,8 @@ public final class UnitType extends BuildableType implements Consumer {
         offence = xr.getAttribute(OFFENCE_TAG, parent.offence);
 
         defence = xr.getAttribute(DEFENCE_TAG, parent.defence);
+
+        defaultUnit = xr.getAttribute(DEFAULT_UNIT_TAG, false);
 
         movement = xr.getAttribute(MOVEMENT_TAG, parent.movement);
 

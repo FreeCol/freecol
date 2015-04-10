@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.86
+<!-- XSD for specification version 0.87
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -63,6 +63,7 @@
      0.84: Add is-military to goods type.
      0.85: Add role-change element to Role.
      0.86: expended-equipment becomes required-role in tileimprovement-type.
+     0.87: Add defaultUnit attribute to unit-type.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -410,8 +411,9 @@
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
-      <xs:attribute name="abstract" use="optional" type="xs:boolean" />
+      <xs:attribute name="abstract" use="optional" type="xs:boolean"/>
       <xs:attribute name="extends" use="optional" type="xs:string" />
+      <xs:attribute name="defaultUnit" use="optional" type="xs:boolean"/>
       <xs:attribute name="offence" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="defence" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="movement" use="optional" type="xs:nonNegativeInteger"/>

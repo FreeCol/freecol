@@ -319,6 +319,7 @@
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="abstract" use="optional" type="xs:boolean" />
       <xs:attribute name="extends" use="optional" type="xs:string" />
+      <xs:attribute name="defaultUnit" use="optional" type="xs:boolean"/>
       <xs:attribute name="offence" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="defence" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="movement" use="optional" type="xs:nonNegativeInteger"/>
