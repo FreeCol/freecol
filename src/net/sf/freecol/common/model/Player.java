@@ -658,8 +658,6 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /** A cache of ship names. */
     protected List<String> shipNames = null;
-    /** A fallback ship name prefix. */
-    protected String shipFallback = null;
 
 
     //
@@ -948,16 +946,10 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     private void initializeShipNames(Random random) {
         if (shipNames == null) {
-            shipNames = new ArrayList<>();
-            shipNames.addAll(Messages.getShipNames(this));
-            shipFallback = (shipNames.isEmpty()) ? null
-                : shipNames.remove(0);
-            String startingShip = (shipNames.isEmpty()) ? null
-                : shipNames.remove(0);
+            shipNames = Messages.getShipNames(this);
             if (random != null) {
                 randomShuffle(logger, "Ship names", shipNames, random);
             }
-            if (startingShip != null) shipNames.add(0, startingShip);
             logger.info("Installed " + shipNames.size()
                 + " ship names for player " + this);
         }
@@ -992,15 +984,7 @@ public class Player extends FreeColGameObject implements Nameable {
             if (!navalNames.contains(name)) return name;
         }
 
-        // Fallback method
-        if (shipFallback != null) {
-            final String base = shipFallback + "-";
-            int i = 0;
-            while (navalNames.contains(name = base + Integer.toString(i))) i++;
-            return name;
-        }
-
-        return null;
+        return Messages.getFallbackShipName(this);
     }
 
 
@@ -2179,6 +2163,19 @@ public class Player extends FreeColGameObject implements Nameable {
         synchronized (units) {
             return new ArrayList<>(units);
         }
+    }
+
+    /**
+     * Get a player unit by name.
+     *
+     * @param name The name of the unit.
+     * @return The unit with the given name, or null if none found.
+     */
+    public Unit getUnit(String name) {
+        for (Unit u : units) {
+            if (name.equals(u.getName())) return u;
+        }
+        return null;
     }
 
     /**

@@ -865,6 +865,24 @@ public class Messages {
     }
 
     /**
+     * Get a fallback ship name for a player.
+     *
+     * @param player The <code>Player</code> to get the name for.
+     * @return A suitable fallback ship name.
+     */
+    public static String getFallbackShipName(Player player) {
+        final String base = message("Ship") + "-";
+        int i = 0;
+        String name = null;
+        for (;;) {
+            name = base + Integer.toString(i);
+            if (player.getUnit(name) == null) break;
+            i++;
+        }
+        return name;
+    }
+
+    /**
      * Gets a list of ship names and a fallback prefix for a player.
      *
      * @param player The <code>Player</code> to get names for.
@@ -873,11 +891,6 @@ public class Messages {
     public static List<String> getShipNames(Player player) {
         final String prefix = player.getNationId() + ".ship.";
         List<String> names = new ArrayList<>();
-
-        // Fallback prefix first
-        names.add(message("Ship"));
-
-        // Collect the rest
         collectNames(prefix, names);
         return names;
     }
