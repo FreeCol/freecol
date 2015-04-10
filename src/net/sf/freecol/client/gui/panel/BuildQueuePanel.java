@@ -59,6 +59,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 import javax.swing.plaf.PanelUI;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -83,7 +84,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.resources.ResourceManager;
+
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -425,8 +426,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         private final JLabel imageLabel = new JLabel(new ImageIcon());
         private final JLabel nameLabel = new JLabel();
 
-        private final JLabel lockLabel
-            = new JLabel(new ImageIcon(ResourceManager.getImage("lock.image", 0.5f)));
+        private final JLabel lockLabel = new JLabel(new ImageIcon(
+            ImageLibrary.getMiscImage(ImageLibrary.LOCK, 0.5f)));
 
         private final Dimension buildingDimension = new Dimension(-1, 48);
 
@@ -452,8 +453,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             JPanel panel = (isSelected) ? selectedPanel : itemPanel;
             panel.removeAll();
 
-            ((ImageIcon)imageLabel.getIcon()).setImage(ResourceManager
-                .getImage(value.getId() + ".image", buildingDimension));
+            ((ImageIcon)imageLabel.getIcon()).setImage(ImageLibrary
+                .getImage(value, buildingDimension));
 
             nameLabel.setText(Messages.getName(value));
             panel.setToolTipText(lockReasons.get(value));

@@ -32,23 +32,21 @@ import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.util.ArrayList;
-
-import javax.swing.JComponent;
-
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.JComponent;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObjectType;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Nation;
@@ -81,7 +79,8 @@ public final class ImageLibrary {
                                TILE_OWNED_BY_INDIANS = "nativeLand.image",
                                LOST_CITY_RUMOUR = "lostCityRumour.image",
                                DARKNESS = "halo.dark.image",
-                               BELLS = "model.goods.bells.image";
+                               BELLS = "model.goods.bells.image",
+                               LOCK = "lock.image";
 
     public static enum PathType {
         NAVAL,
