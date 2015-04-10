@@ -107,7 +107,9 @@ public final class InfoPanel extends FreeColPanel {
     public class TileInfoPanel extends MigPanel {
 
         private Tile tile;
-        private final Font font = new JLabel().getFont().deriveFont(9f);
+
+        // TODO: Find a way of removing the need for an extremely tiny font.
+        private final Font font = new JLabel().getFont().deriveFont(8f);
 
 
         /**
@@ -116,7 +118,7 @@ public final class InfoPanel extends FreeColPanel {
         public TileInfoPanel() {
             super(new MigLayout("fill, wrap 5, gap 2 2"));
 
-            setSize(226, 128);
+            setSize(248, 128);
             setOpaque(false);
         }
 
@@ -142,7 +144,9 @@ public final class InfoPanel extends FreeColPanel {
                              : tile.getCompletedTileImprovements()) {
                         items.add(tileImprovement.getType().getDescriptionKey());
                     }
-                    add(Utility.localizedLabel(items), "span, align center");
+                    JLabel itemLabel = Utility.localizedLabel(items);
+                    itemLabel.setFont(font);
+                    add(itemLabel, "span, align center");
 
                     add(new JLabel(new ImageIcon(image)), "spany");
                     if (tile.getOwner() != null) {
