@@ -686,8 +686,7 @@ public final class ReportColonyPanel extends ReportPanel
                 - u.getTurnsOfTraining();
             if (left <= 0) {
                 b = colourButton(cac, Integer.toString(0),
-                    new ImageIcon(lib.getTinyUnitImage(u.getType(),
-                        Specification.DEFAULT_ROLE_ID, true)),
+                    new ImageIcon(lib.getTinyUnitImage(u.getType(), true)),
                     cAlarm,
                     stpl("report.colony.making.noteach.description")
                         .addName("%colony%", colony.getName())
@@ -695,8 +694,7 @@ public final class ReportColonyPanel extends ReportPanel
                             u.getLabel(Unit.UnitLabelType.NATIONAL)));
             } else {
                 b = colourButton(cac, Integer.toString(left),
-                    new ImageIcon(lib.getTinyUnitImage(u.getType(),
-                        Specification.DEFAULT_ROLE_ID, true)),
+                    new ImageIcon(lib.getTinyUnitImage(u.getType(), true)),
                     Color.BLACK,
                     stpl("report.colony.making.educating.description")
                         .addName("%colony%", colony.getName())
@@ -756,8 +754,7 @@ public final class ReportColonyPanel extends ReportPanel
         }
         final UnitType colonistType = getSpecification().getDefaultUnitType();
         ImageIcon colonistIcon
-            = new ImageIcon(lib.getTinyUnitImage(colonistType,
-                Specification.DEFAULT_ROLE_ID, true));
+            = new ImageIcon(lib.getTinyUnitImage(colonistType, true));
         reportPanel.add(newLabel(null, colonistIcon, null,
                                  stpl("report.colony.birth.description")));
         reportPanel.add(newLabel("report.colony.making.header", null, null,
@@ -879,8 +876,7 @@ public final class ReportColonyPanel extends ReportPanel
             }
             Suggestion suggestion = suggestions.get(type);
             String label = Integer.toString(suggestion.amount);
-            ImageIcon icon = new ImageIcon(lib.getTinyUnitImage(type,
-                Specification.DEFAULT_ROLE_ID, true));
+            ImageIcon icon = new ImageIcon(lib.getTinyUnitImage(type, true));
             StringTemplate tip = (suggestion.oldType == null)
                 ? stpl("report.colony.wanting.description")
                     .addName("%colony%", colony.getName())

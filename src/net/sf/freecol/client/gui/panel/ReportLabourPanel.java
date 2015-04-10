@@ -66,12 +66,12 @@ public final class ReportLabourPanel extends ReportPanel {
         public final UnitType unitType;
 
 
-        public LabourUnitPanel(UnitType unitType, String roleId, int count) {
+        public LabourUnitPanel(UnitType unitType, int count) {
             this.unitType = unitType;
             setOpaque(false);
             setLayout(new MigLayout("wrap 2", "[60, right][left]"));
             add(new JLabel(new ImageIcon(getImageLibrary().getSmallUnitImage(
-                    unitType, roleId, (count == 0)))),
+                    unitType, (count == 0)))),
                 "spany 2");
             add(new JLabel(Messages.getName(unitType)));
             add(new JLabel(Integer.toString(count)));
@@ -168,8 +168,7 @@ public final class ReportLabourPanel extends ReportPanel {
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isPerson() && unitType.isAvailableTo(getMyPlayer())) {
                 int count = this.unitCount.getCount(unitType);
-                model.addElement(new LabourUnitPanel(unitType,
-                        unitType.getDisplayRoleId(), count));
+                model.addElement(new LabourUnitPanel(unitType, count));
             }
         }
         Action selectAction = new AbstractAction() {

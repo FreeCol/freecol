@@ -192,14 +192,14 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
 
     protected JButton getUnitButton(final UnitType unitType, String roleId) {
         ImageIcon unitIcon = new ImageIcon(
-            getImageLibrary().getSmallUnitImage(unitType, roleId));
+            getImageLibrary().getSmallUnitImage(unitType, roleId, false));
         JButton unitButton = getButton(unitType, null, unitIcon);
         unitButton.setHorizontalAlignment(JButton.LEFT);
         return unitButton;
     }
 
     protected JButton getUnitButton(final UnitType unitType) {
-        return getUnitButton(unitType, Specification.DEFAULT_ROLE_ID);
+        return getUnitButton(unitType, unitType.getDisplayRoleId());
     }
 
     public JComponent getModifierComponent(Modifier modifier) {

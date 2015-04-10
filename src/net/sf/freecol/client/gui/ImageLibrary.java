@@ -705,9 +705,8 @@ public final class ImageLibrary {
             false, false, scalingFactor * (1f/3f));
     }
 
-    public Image getTinyUnitImage(UnitType unitType, String roleId,
-                                   boolean grayscale) {
-        return getUnitImage(unitType, roleId,
+    public Image getTinyUnitImage(UnitType unitType, boolean grayscale) {
+        return getUnitImage(unitType, unitType.getDisplayRoleId(),
             false, grayscale, scalingFactor * (1f/3f));
     }
 
@@ -721,9 +720,9 @@ public final class ImageLibrary {
             false, false, scalingFactor * (2f/3f));
     }
 
-    public Image getSmallUnitImage(UnitType unitType, String roleId) {
-        return getUnitImage(unitType, roleId,
-            false, false, scalingFactor * (2f/3f));
+    public Image getSmallUnitImage(UnitType unitType, boolean grayscale) {
+        return getUnitImage(unitType, unitType.getDisplayRoleId(),
+            false, grayscale, scalingFactor * (2f/3f));
     }
 
     public Image getSmallUnitImage(UnitType unitType, String roleId,
@@ -740,16 +739,6 @@ public final class ImageLibrary {
     public static Image getUnitImage(UnitType unitType, float scale) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
             false, false, scale);
-    }
-
-    public static Image getUnitImage(UnitType unitType, String roleId,
-                                     float scale) {
-        return getUnitImage(unitType, roleId, false, false, scale);
-    }
-
-    public static Image getUnitImage(UnitType unitType, String roleId,
-                                     boolean grayscale, float scale) {
-        return getUnitImage(unitType, roleId, false, grayscale, scale);
     }
 
     /**
