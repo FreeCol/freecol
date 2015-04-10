@@ -216,7 +216,7 @@ public final class ReportIndianPanel extends ReportPanel {
                     if (visited && wantedGoods[i] != null) {
                         goodsLabel = new JLabel("");
                         goodsLabel.setIcon(new ImageIcon(
-                            lib.getSmallGoodsImage(wantedGoods[i])));
+                            lib.getSmallImage(wantedGoods[i])));
                         Utility.localizeToolTip(goodsLabel, Messages
                             .message(settlement.getWantedGoodsLabel(i, player)));
                     } else {

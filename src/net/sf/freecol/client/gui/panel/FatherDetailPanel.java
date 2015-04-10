@@ -90,7 +90,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
 
             parent.add(node);
             for (FoundingFather father : fathersByType.get(fatherType)) {
-                ImageIcon icon = new ImageIcon(ImageLibrary.getBellsImage(getScale()));
+                ImageIcon icon = new ImageIcon(ImageLibrary.getMiscImage(ImageLibrary.BELLS, getScale()));
                 node.add(buildItem(father, icon));
             }
         }

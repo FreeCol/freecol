@@ -61,7 +61,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
             enemyPanel.setOpaque(false);
             JLabel coatLabel = new JLabel();
             final ImageIcon coatOfArms = new ImageIcon(freeColClient.getGUI()
-                .getImageLibrary().getCoatOfArmsImage(enemy.getNation()));
+                .getImageLibrary().getImage(enemy.getNation()));
             if (coatOfArms != null) {
                 coatLabel.setIcon(coatOfArms);
             }

@@ -2362,7 +2362,7 @@ public final class MapViewer {
     private static void drawResourceItem(Graphics2D g, ImageLibrary lib,
                                          Resource item,
                                          int tileWidth, int tileHeight) {
-        Image bonusImage = lib.getBonusImage(item.getType());
+        Image bonusImage = lib.getImage(item.getType());
         if (bonusImage != null) {
             centerImage(g, bonusImage, tileWidth, tileHeight);
         }

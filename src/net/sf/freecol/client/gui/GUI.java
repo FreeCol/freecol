@@ -741,7 +741,7 @@ public class GUI {
     }
 
     public ImageIcon createGoodsImageIcon(GoodsType goodsType) {
-        return GUI.createImageIcon(imageLibrary.getGoodsImage(goodsType));
+        return GUI.createImageIcon(imageLibrary.getImage(goodsType));
     }
 
     /**
@@ -1367,8 +1367,7 @@ public class GUI {
                 BoycottAction.DUMP_CARGO));
 
         return getChoice(true, null, Utility.getDefaultTextArea(template),
-                         GUI.createImageIcon(
-                             imageLibrary.getGoodsImage(goods.getType())),
+                         GUI.createImageIcon(imageLibrary.getImage(goods.getType())),
                          "cancel", choices);
     }
 
@@ -1396,8 +1395,7 @@ public class GUI {
                                      BuyAction.HAGGLE));
 
         return getChoice(true, unit.getTile(), Utility.getDefaultTextArea(template),
-                         GUI.createImageIcon(
-                             imageLibrary.getGoodsImage(goods.getType())),
+                         GUI.createImageIcon(imageLibrary.getImage(goods.getType())),
                          "cancel", choices);
     }
 
@@ -1430,8 +1428,7 @@ public class GUI {
                                      ClaimAction.STEAL));
 
         return getChoice(true, tile, Utility.getDefaultTextArea(template),
-                         GUI.createImageIcon(
-                             imageLibrary.getCoatOfArmsImage(owner.getNation())),
+                         GUI.createImageIcon(imageLibrary.getImage(owner.getNation())),
                          "indianLand.cancel", choices);
     }
 
@@ -1664,8 +1661,7 @@ public class GUI {
                 SellAction.GIFT));
 
         return getChoice(true, unit.getTile(), Utility.getDefaultTextArea(template),
-                         GUI.createImageIcon(
-                             imageLibrary.getGoodsImage(goods.getType())),
+                         GUI.createImageIcon(imageLibrary.getImage(goods.getType())),
                          "cancel", choices);
     }
 

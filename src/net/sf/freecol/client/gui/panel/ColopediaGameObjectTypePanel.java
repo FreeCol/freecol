@@ -164,7 +164,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     }
 
     protected JButton getResourceButton(final ResourceType resourceType) {
-        return getButton(resourceType, null, new ImageIcon(getImageLibrary().getBonusImage(resourceType)));
+        return getButton(resourceType, null, new ImageIcon(getImageLibrary().getImage(resourceType)));
     }
 
     protected JButton getGoodsButton(final GoodsType goodsType) {
@@ -181,7 +181,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
 
     protected JButton getGoodsButton(final GoodsType goodsType, String text) {
         JButton result = getButton(goodsType, text,
-            new ImageIcon(getImageLibrary().getGoodsImage(goodsType)));
+            new ImageIcon(getImageLibrary().getImage(goodsType)));
         result.setToolTipText(Messages.getName(goodsType));
         return result;
     }

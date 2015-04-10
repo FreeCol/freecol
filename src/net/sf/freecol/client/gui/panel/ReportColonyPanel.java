@@ -747,7 +747,7 @@ public final class ReportColonyPanel extends ReportPanel
                                  stpl("report.colony.road.description")));
         ImageLibrary lib = getImageLibrary();
         for (GoodsType g : goodsTypes) {
-            ImageIcon icon = new ImageIcon(lib.getSmallGoodsImage(g));
+            ImageIcon icon = new ImageIcon(lib.getSmallImage(g));
             JLabel l = newLabel(null, icon, null,
                 stpl("report.colony.production.header")
                     .addNamed("%goods%", g));

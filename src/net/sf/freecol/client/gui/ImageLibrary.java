@@ -53,7 +53,6 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.SettlementType;
@@ -81,7 +80,8 @@ public final class ImageLibrary {
                                TILE_TAKEN = "tileTaken.image",
                                TILE_OWNED_BY_INDIANS = "nativeLand.image",
                                LOST_CITY_RUMOUR = "lostCityRumour.image",
-                               DARKNESS = "halo.dark.image";
+                               DARKNESS = "halo.dark.image",
+                               BELLS = "model.goods.bells.image";
 
     public static enum PathType {
         NAVAL,
@@ -236,20 +236,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Gets the bonus image of the given type.
-     *
-     * @param type The <code>ResourceType</code> to look up.
-     * @return The bonus image.
-     */
-    public Image getBonusImage(ResourceType type) {
-        return getBonusImage(type, scalingFactor);
-    }
-
-    public static Image getBonusImage(ResourceType type, float scale) {
-        return ResourceManager.getImage(type.getId() + ".image", scale);
-    }
-
-    /**
      * Returns the border terrain-image for the given type.
      *
      * @param type The type of the terrain-image to return.
@@ -266,32 +252,6 @@ public final class ImageLibrary {
         return ResourceManager.getImage(key + ".border_" + direction
                                         + ((isEven(x, y)) ?  "_even" : "_odd")
                                         + ".image", scalingFactor);
-    }
-
-    public Image getSmallerCoatOfArmsImage(Nation nation) {
-        return getCoatOfArmsImage(nation, scalingFactor * 0.5f);
-    }
-
-    public Image getSmallCoatOfArmsImage(Nation nation) {
-        return getCoatOfArmsImage(nation, scalingFactor * (2f/3f));
-    }
-
-    /**
-     * Returns the coat-of-arms image for the given Nation.
-     *
-     * @param nation The nation.
-     * @return the coat-of-arms of this nation
-     */
-    public Image getCoatOfArmsImage(Nation nation) {
-        return getCoatOfArmsImage(nation, scalingFactor);
-    }
-
-    public static Image getCoatOfArmsImage(Nation nation, float scale) {
-        return ResourceManager.getImage(nation.getId() + ".image", scale);
-    }
-
-    public static Image getCoatOfArmsImage(Nation nation, Dimension size) {
-        return ResourceManager.getImage(nation.getId() + ".image", size);
     }
 
     /**
@@ -334,36 +294,6 @@ public final class ImageLibrary {
             : ResourceManager.getImage(resource);
     }
 
-    public static Image getBellsImage(float scale) {
-        return ResourceManager.getImage("model.goods.bells.image", scale);
-    }
-
-    public Image getSmallerGoodsImage(GoodsType goodsType) {
-        return getGoodsImage(goodsType, scalingFactor * 0.5f);
-    }
-
-    public Image getSmallGoodsImage(GoodsType goodsType) {
-        return getGoodsImage(goodsType, scalingFactor * (2f/3f));
-    }
-
-    /**
-     * Returns the goods-image at the given index.
-     *
-     * @param goodsType The type of the goods-image to return.
-     * @return The goods-image at the given index.
-     */
-    public Image getGoodsImage(GoodsType goodsType) {
-        return getGoodsImage(goodsType, scalingFactor);
-    }
-
-    public static Image getGoodsImage(GoodsType goodsType, float scale) {
-        return ResourceManager.getImage(goodsType.getId() + ".image", scale);
-    }
-
-    public static Image getGoodsImage(GoodsType goodsType, Dimension size) {
-        return ResourceManager.getImage(goodsType.getId() + ".image", size);
-    }
-
     public Image getSmallBuildableImage(BuildableType buildable, Player player) {
         // FIXME: distinguish national unit types
         float scale = scalingFactor * (2f/3f);
@@ -392,12 +322,48 @@ public final class ImageLibrary {
         return ResourceManager.getImage(key, scale);
     }
 
+    public Image getSmallerImage(FreeColGameObjectType type) {
+        return getImage(type, scalingFactor * 0.5f);
+    }
+
+    public Image getSmallImage(FreeColGameObjectType type) {
+        return getImage(type, scalingFactor * (2f/3f));
+    }
+
+    /**
+     * Gets the image of the given type.
+     *
+     * @param type The <code>FreeColGameObjectType</code> to look up.
+     * @return The corresponding image.
+     */
     public Image getImage(FreeColGameObjectType type) {
-        return ResourceManager.getImage(type.getId() + ".image", scalingFactor);
+        return getImage(type, scalingFactor);
     }
 
     public static Image getImage(FreeColGameObjectType type, float scale) {
         return ResourceManager.getImage(type.getId() + ".image", scale);
+    }
+
+    public static Image getImage(FreeColGameObjectType type, Dimension size) {
+        return ResourceManager.getImage(type.getId() + ".image", size);
+    }
+
+    /**
+     * Returns the image with the given identifier.
+     *
+     * @param id The object identifier.
+     * @return The image.
+     */
+    public Image getMiscImage(String id) {
+        return getMiscImage(id, scalingFactor);
+    }
+
+    public static Image getMiscImage(String id, float scale) {
+        return ResourceManager.getImage(id, scale);
+    }
+
+    public static Image getMiscImage(String id, Dimension size) {
+        return ResourceManager.getImage(id, size);
     }
 
     /**
@@ -410,7 +376,7 @@ public final class ImageLibrary {
     @Deprecated
     public Image getSmallObjectImage(FreeColObject display) {
         try {
-            Image image = null;
+            Image image;
             if (display instanceof Goods)
                 display = ((Goods)display).getType();
 
@@ -418,7 +384,7 @@ public final class ImageLibrary {
             final float combinedScale = scalingFactor * scale;
             if (display instanceof GoodsType) {
                 GoodsType goodsType = (GoodsType)display;
-                image = getGoodsImage(goodsType, combinedScale);
+                image = getImage(goodsType, combinedScale);
             } else if (display instanceof Unit) {
                 Unit unit = (Unit)display;
                 image = getUnitImage(unit, combinedScale);
@@ -432,7 +398,7 @@ public final class ImageLibrary {
                 image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR,
                     combinedScale);
             } else if (display instanceof Player) {
-                image = getCoatOfArmsImage(((Player)display).getNation(),
+                image = getImage(((Player)display).getNation(),
                     combinedScale);
             } else {
                 logger.warning("could not find image of unknown type for "
@@ -466,7 +432,7 @@ public final class ImageLibrary {
 
             if (display instanceof GoodsType) {
                 GoodsType goodsType = (GoodsType)display;
-                image = getGoodsImage(goodsType);
+                image = getImage(goodsType);
             } else if (display instanceof Unit) {
                 Unit unit = (Unit)display;
                 image = getUnitImage(unit);
@@ -479,7 +445,7 @@ public final class ImageLibrary {
             } else if (display instanceof LostCityRumour) {
                 image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
             } else if (display instanceof Player) {
-                image = getCoatOfArmsImage(((Player)display).getNation());
+                image = getImage(((Player)display).getNation());
             } else {
                 logger.warning("could not find image of unknown type for " + display);
                 return null;
@@ -494,20 +460,6 @@ public final class ImageLibrary {
             logger.log(Level.WARNING, "could not find image", e);
             return null;
         }
-    }
-
-    /**
-     * Returns the image with the given identifier.
-     *
-     * @param id The object identifier.
-     * @return The image.
-     */
-    public Image getMiscImage(String id) {
-        return getMiscImage(id, scalingFactor);
-    }
-
-    public static Image getMiscImage(String id, float scale) {
-        return ResourceManager.getImage(id, scale);
     }
 
     /**

@@ -126,7 +126,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", 0.5f),
                                   Messages.message("majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
-        listPanel.add(buildButton(ImageLibrary.getBonusImage(getSpecification()
+        listPanel.add(buildButton(ImageLibrary.getImage(getSpecification()
                                                              .getResourceTypeList().get(0), 0.8f),
                                   Messages.message("editor.resource"), new ResourceTransform()));
         listPanel.add(buildButton(ImageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 2f/3f),

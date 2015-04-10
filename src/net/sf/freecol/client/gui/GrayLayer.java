@@ -107,7 +107,7 @@ public class GrayLayer extends Component {
 
         } else {
             coatOfArmsIcon = new ImageIcon(freeColClient.getGUI()
-                .getImageLibrary().getCoatOfArmsImage(player.getNation()));
+                .getImageLibrary().getImage(player.getNation()));
             StringTemplate t = StringTemplate.template("waitingFor")
                 .addStringTemplate("%nation%", player.getNationName());
             message = Messages.message(t);

@@ -45,7 +45,7 @@ public class AbstractGoodsLabel extends JLabel {
      *     will visually represent.
      */
     public AbstractGoodsLabel(ImageLibrary lib, AbstractGoods abstractGoods) {
-        super(new ImageIcon(lib.getGoodsImage(abstractGoods.getType())));
+        super(new ImageIcon(lib.getImage(abstractGoods.getType())));
 
         this.abstractGoods = abstractGoods;
 

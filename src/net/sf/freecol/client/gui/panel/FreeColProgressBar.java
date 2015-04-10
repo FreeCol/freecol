@@ -106,7 +106,7 @@ public class FreeColProgressBar extends JPanel {
 
         setBorder(Utility.PROGRESS_BORDER);
         if (goodsType != null) {
-            image = ImageLibrary.getGoodsImage(goodsType,
+            image = ImageLibrary.getImage(goodsType,
                 new Dimension(-1, iconHeight));
             iconWidth = image.getWidth(this);
         }

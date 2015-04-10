@@ -83,7 +83,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
         nations.addAll(getSpecification().getREFNationTypes());
         nations.addAll(getSpecification().getIndianNationTypes());
         for (NationType type : nations) {
-            ImageIcon icon = new ImageIcon(ImageLibrary.getBellsImage(getScale()));
+            ImageIcon icon = new ImageIcon(ImageLibrary.getMiscImage(ImageLibrary.BELLS, getScale()));
             parent.add(buildItem(type, icon));
         }
         root.add(parent);

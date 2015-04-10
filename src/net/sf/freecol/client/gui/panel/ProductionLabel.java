@@ -159,7 +159,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         this.displayNumber = options
             .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
         this.goodsIcon = (ag.getType() == null) ? null
-            : new ImageIcon(lib.getGoodsImage(ag.getType()));
+            : new ImageIcon(lib.getImage(ag.getType()));
         this.compressedWidth = (this.goodsIcon == null) ? 0
             : this.goodsIcon.getIconWidth() * 2;
 
