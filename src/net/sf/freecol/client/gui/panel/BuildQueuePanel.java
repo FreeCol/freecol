@@ -1043,9 +1043,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             while (!buildables.isEmpty()
                 && lockReasons.get(buildables.get(0)) != null) {
                 getGUI().showInformationMessage(buildables.get(0),
-                    StringTemplate.template("colonyPanel.unbuildable")
-                    .addName("%colony%", this.colony.getName())
-                    .addNamed("%object%", buildables.get(0)));
+                    this.colony.getUnbuildableMessage(buildables.get(0)));
                 command = FAIL;
                 removeBuildable(buildables.remove(0));
             }

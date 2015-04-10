@@ -396,12 +396,12 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
             if (messageId != null) {
                 cs.addMessage(See.only(owner),
-                              new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
-                                               messageId, this, type)
-                              .addNamed("%goods%", type)
-                              .addAmount("%waste%", waste)
-                              .addAmount("%level%", high)
-                              .addName("%colony%", getName()));
+                    new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
+                                     messageId, this, type)
+                        .addNamed("%goods%", type)
+                        .addAmount("%waste%", waste)
+                        .addAmount("%level%", high)
+                        .addName("%colony%", getName()));
             }
 
             // No problem this turn, but what about the next?
@@ -639,19 +639,14 @@ public class ServerColony extends Colony implements ServerModelObject {
                     getTile().cacheUnseen(copied);//+til
                 }
             } else {
-                cs.addMessage(See.only((ServerPlayer) owner),
-                    new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
-                                     "colonyPanel.unbuildable",
-                                     this)
-                        .addName("%colony%", getName())
-                        .addNamed("%object%", type));
+                cs.addMessage(See.only((ServerPlayer)owner),
+                              getUnbuildableMessage(type));
             }
         }
         if (success) {
             cs.addMessage(See.only((ServerPlayer) owner),
                 new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
-                                 "model.colony.buildingReady",
-                                 this)
+                                 "model.colony.buildingReady", this)
                     .addName("%colony%", getName())
                     .addNamed("%building%", type));
             if (owner.isAI()) {
@@ -714,11 +709,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     + " for " + buildable
                     + ": " + getNoBuildReason(buildable, null));
                 cs.addMessage(See.only(owner),
-                    new ModelMessage(ModelMessage.MessageType.WARNING,
-                                     "colonyPanel.unbuildable",
-                                     this, buildable)
-                        .addName("%colony%", getName())
-                        .addNamed("%object%", buildable));
+                              getUnbuildableMessage(buildable));
                 break;
             }
             queue.remove(0);

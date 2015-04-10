@@ -1518,6 +1518,19 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
+     * Gets the message to display if a colony can not build something.
+     *
+     * @param buildable The <code>BuildableType</code> that can not be built.
+     * @return A <code>ModelMessage</code> describing the build failure.
+     */
+    public ModelMessage getUnbuildableMessage(BuildableType buildable) {
+        return new ModelMessage(ModelMessage.MessageType.WARNING,
+            "colonyPanel.unbuildable", this, buildable)
+            .addName("%colony%", getName())
+            .addNamed("%object%", buildable);
+    }
+
+    /**
      * Returns 1, 0, or -1 to indicate that government would improve,
      * remain the same, or deteriorate if the colony had the given
      * population.
