@@ -377,15 +377,15 @@ public final class ImageLibrary {
     public Image getSmallObjectImage(FreeColObject display) {
         try {
             Image image;
-            if (display instanceof Goods)
+            if (display instanceof Goods) {
                 display = ((Goods)display).getType();
+            } else if (display instanceof Player) {
+                display = ((Player)display).getNation();
+            }
 
             final float scale = 2f/3f;
             final float combinedScale = scalingFactor * scale;
-            if (display instanceof GoodsType) {
-                GoodsType goodsType = (GoodsType)display;
-                image = getImage(goodsType, combinedScale);
-            } else if (display instanceof Unit) {
+            if (display instanceof Unit) {
                 Unit unit = (Unit)display;
                 image = getUnitImage(unit, combinedScale);
             } else if (display instanceof UnitType) {
@@ -397,9 +397,9 @@ public final class ImageLibrary {
             } else if (display instanceof LostCityRumour) {
                 image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR,
                     combinedScale);
-            } else if (display instanceof Player) {
-                image = getImage(((Player)display).getNation(),
-                    combinedScale);
+            } else if (display instanceof FreeColGameObjectType) {
+                FreeColGameObjectType type = (FreeColGameObjectType)display;
+                image = getImage(type, combinedScale);
             } else {
                 logger.warning("could not find image of unknown type for "
                     + display);
@@ -427,13 +427,13 @@ public final class ImageLibrary {
     public Image getObjectImage(FreeColObject display) {
         try {
             Image image;
-            if (display instanceof Goods)
+            if (display instanceof Goods) {
                 display = ((Goods)display).getType();
+            } else if (display instanceof Player) {
+                display = ((Player)display).getNation();
+            }
 
-            if (display instanceof GoodsType) {
-                GoodsType goodsType = (GoodsType)display;
-                image = getImage(goodsType);
-            } else if (display instanceof Unit) {
+            if (display instanceof Unit) {
                 Unit unit = (Unit)display;
                 image = getUnitImage(unit);
             } else if (display instanceof UnitType) {
@@ -444,8 +444,9 @@ public final class ImageLibrary {
                 image = getSettlementImage(settlement);
             } else if (display instanceof LostCityRumour) {
                 image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
-            } else if (display instanceof Player) {
-                image = getImage(((Player)display).getNation());
+            } else if (display instanceof FreeColGameObjectType) {
+                FreeColGameObjectType type = (FreeColGameObjectType)display;
+                image = getImage(type);
             } else {
                 logger.warning("could not find image of unknown type for " + display);
                 return null;
