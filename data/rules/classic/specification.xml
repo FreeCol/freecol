@@ -3451,11 +3451,11 @@
           <integerOption id="model.option.arrearsFactor" value="700" minimumValue="100" maximumValue="1000"/>
           <integerOption id="model.option.unitsThatUseNoBells" value="2" minimumValue="0" maximumValue="20"/>
           <stringOption id="model.option.tileProduction" value="veryLow">
-            <choice value="veryLow" />
-            <choice value="low" />
-            <choice value="medium" />
-            <choice value="high" />
-            <choice value="veryHigh" />
+            <choice value="model.option.tileProduction.veryLow.name" />
+            <choice value="model.option.tileProduction.low.name" />
+            <choice value="model.option.tileProduction.medium.name" />
+            <choice value="model.option.tileProduction.high.name" />
+            <choice value="model.option.tileProduction.veryHigh.name" />
           </stringOption>
           <percentageOption id="model.option.badRumour" value="37"/>
           <percentageOption id="model.option.goodRumour" value="17"/>
