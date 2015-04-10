@@ -19,15 +19,18 @@
 
 package net.sf.freecol.server.model;
 
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -218,6 +221,33 @@ public class ServerBuilding extends Building implements ServerModelObject {
                 && getType().hasAbility(Ability.REPAIR_UNITS,
                                         unit.getType())) {
                 ((ServerUnit) unit).csRepairUnit(cs);
+            }
+        }
+    }
+
+    /**
+     * Check a building to see if it is missing input.
+     *
+     * The building must need input, have a person working there, and have
+     * no production occurring.
+     *
+     * @param pi The <code>ProductionInfo</code> for the building.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csCheckMissingInput(ProductionInfo pi, ChangeSet cs) {
+        List<AbstractGoods> inputs = getInputs();
+        if (!(inputs.isEmpty()
+              || isEmpty()
+              || canAutoProduce())
+            && pi.getProduction().isEmpty()) {
+            for (AbstractGoods goods : inputs) {
+                cs.addMessage(See.only((ServerPlayer)getOwner()),
+                    new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                     "model.building.notEnoughInput",
+                                     this, goods.getType())
+                        .addNamed("%inputGoods%", goods.getType())
+                        .addNamed("%building%", this)
+                        .addName("%colony%", getColony().getName()));
             }
         }
     }

@@ -170,9 +170,9 @@ public class ServerColony extends Colony implements ServerModelObject {
                     }
                 }
             }
-            if (workLocation instanceof Building) {
+            if (workLocation instanceof ServerBuilding) {
                 // FIXME: generalize to other WorkLocations?
-                csCheckMissingInput((Building)workLocation, productionInfo, cs);
+                ((ServerBuilding)workLocation).csCheckMissingInput(productionInfo, cs);
             }
         }
 
@@ -520,35 +520,6 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
         }
         return false;
-    }
-
-    /**
-     * Check a building to see if it is missing input.
-     *
-     * The building must need input, have a person working there, and have
-     * no production occurring.
-     *
-     * @param building The <code>Building</code> to check.
-     * @param pi The <code>ProductionInfo</code> for the building.
-     * @param cs A <code>ChangeSet</code> to update.
-     */
-    private void csCheckMissingInput(Building building, ProductionInfo pi,
-                                     ChangeSet cs) {
-        List<AbstractGoods> inputs = building.getInputs();
-        if (!(inputs.isEmpty()
-              || building.isEmpty()
-              || building.canAutoProduce())
-            && pi.getProduction().isEmpty()) {
-            for (AbstractGoods goods : inputs) {
-                cs.addMessage(See.only((ServerPlayer) owner),
-                              new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                               "model.building.notEnoughInput",
-                                               this, goods.getType())
-                              .addNamed("%inputGoods%", goods.getType())
-                              .addNamed("%building%", building)
-                              .addName("%colony%", getName()));
-            }
-        }
     }
 
     /**
