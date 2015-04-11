@@ -21,19 +21,19 @@ package net.sf.freecol.client.gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.DisplayMode;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.GraphicsDevice;
-import java.awt.DisplayMode;
-import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
-import java.awt.MouseInfo;
 import java.awt.Image;
+import java.awt.Insets;
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -48,8 +48,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.sound.sampled.Mixer;
 
+import javax.sound.sampled.Mixer;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -99,10 +99,10 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -119,8 +119,9 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
-import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -295,9 +296,10 @@ public class GUI {
      * @param fontName An optional font name to be used.
      */
     public static void installLookAndFeel(String fontName) throws FreeColException {
-        Font font = FontLibrary.createMainFont(fontName);
         FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
-        FreeColLookAndFeel.install(fclaf, font);
+        FreeColLookAndFeel.install(fclaf);
+        Font font = FontLibrary.createMainFont(fontName);
+        FreeColLookAndFeel.installFont(font);
     }
 
     /**

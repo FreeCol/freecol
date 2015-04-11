@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui;
 
 import java.awt.Font;
 import java.util.logging.Logger;
+
 import net.sf.freecol.common.resources.ResourceManager;
 
 /**
@@ -69,6 +70,11 @@ public class FontLibrary {
     }
 
     /**
+     * The optional custom main Font
+     */
+    private static Font mainFont = null;
+
+    /**
      * How much the font size is scaled.
      */
     private final float scaleFactor;
@@ -97,13 +103,18 @@ public class FontLibrary {
      *                 user-provided name.
     */
     static Font createMainFont(String fontName) {
+        final float defaultSize = 12f;
+        mainFont = null;
         if (fontName != null) {
             Font font = Font.decode(fontName);
-            if (font != null)
+            if (font != null) {
+                font = font.deriveFont(defaultSize);
+                mainFont = font;
                 return font;
+            }
             logger.warning("Font not found: " + fontName);
         }
-        return ResourceManager.getFont("NormalFont");
+        return ResourceManager.getFont("NormalFont").deriveFont(defaultSize);
     }
 
     public Font createScaledFont(FontType fontType, FontSize fontSize) {
@@ -162,7 +173,7 @@ public class FontLibrary {
             default:
                 logger.warning("Unknown FontType");
             case NORMAL:
-                fontName = "NormalFont";
+                fontName = (mainFont != null) ? null : "NormalFont";
                 break;
             case SIMPLE:
                 fontName = "SimpleFont";
@@ -190,7 +201,9 @@ public class FontLibrary {
                 pixelSize = 48f;
         }
         float scaledSize = pixelSize * scaleFactor;
-        Font font = ResourceManager.getFont(fontName);
+        Font font = (fontName == null)
+            ? mainFont
+            : ResourceManager.getFont(fontName);
         font = font.deriveFont(style, scaledSize);
         return font;
     }
