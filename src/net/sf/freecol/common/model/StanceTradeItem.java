@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Stance;
 
 
 /**
@@ -85,7 +85,7 @@ public class StanceTradeItem extends TradeItem {
      */
     @Override
     public StringTemplate getLabel() {
-        return stance.getLabel();
+        return StringTemplate.key(stance);
     }
 
     /**

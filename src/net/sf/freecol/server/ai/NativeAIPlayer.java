@@ -44,7 +44,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;

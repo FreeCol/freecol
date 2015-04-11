@@ -441,8 +441,8 @@ public class ColonyTest extends FreeColTestCase {
         assertFalse("Not at war with the Iroquois.", colony.isUnderSiege());
 
         // declare war
-        colony.getOwner().setStance(iroquois, Player.Stance.WAR);
-        iroquois.setStance(colony.getOwner(), Player.Stance.WAR);
+        colony.getOwner().setStance(iroquois, Stance.WAR);
+        iroquois.setStance(colony.getOwner(), Stance.WAR);
 
         assertTrue("At war with the Iroquois.", colony.isUnderSiege());
 

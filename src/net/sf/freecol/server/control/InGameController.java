@@ -82,7 +82,7 @@ import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.RandomRange;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;

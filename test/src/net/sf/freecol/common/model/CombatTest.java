@@ -359,8 +359,8 @@ public class CombatTest extends FreeColTestCase {
         tile1.setType(hills);
         assertEquals(hills, tile1.getType());
 
-        dutch.setStance(french, Player.Stance.WAR);
-        french.setStance(dutch, Player.Stance.WAR);
+        dutch.setStance(french, Stance.WAR);
+        french.setStance(dutch, Stance.WAR);
 
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
         colonist.setStateUnchecked(Unit.UnitState.FORTIFIED);
@@ -394,8 +394,8 @@ public class CombatTest extends FreeColTestCase {
         tile1.setType(hills);
         assertEquals(hills, tile1.getType());
 
-        spanish.setStance(tupi, Player.Stance.WAR);
-        tupi.setStance(spanish, Player.Stance.WAR);
+        spanish.setStance(tupi, Stance.WAR);
+        tupi.setStance(spanish, Stance.WAR);
 
         Unit soldier = new ServerUnit(game, tile1, spanish, colonistType,
                                       soldierRole);
@@ -449,8 +449,8 @@ public class CombatTest extends FreeColTestCase {
         tile2.setType(ocean);
         assertEquals(ocean, tile2.getType());
 
-        spanish.setStance(tupi, Player.Stance.WAR);
-        tupi.setStance(spanish, Player.Stance.WAR);
+        spanish.setStance(tupi, Stance.WAR);
+        tupi.setStance(spanish, Stance.WAR);
 
         Unit galleon = new ServerUnit(game, tile2, spanish, galleonType);
         Unit brave = new ServerUnit(game, tile1, tupi, braveType);
@@ -554,8 +554,8 @@ public class CombatTest extends FreeColTestCase {
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         ServerPlayer inca = (ServerPlayer)game.getPlayer("model.nation.inca");
-        dutch.setStance(inca, Player.Stance.WAR);
-        inca.setStance(dutch, Player.Stance.WAR);
+        dutch.setStance(inca, Stance.WAR);
+        inca.setStance(dutch, Stance.WAR);
 
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);

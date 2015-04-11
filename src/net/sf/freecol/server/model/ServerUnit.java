@@ -48,7 +48,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.ResourceType;

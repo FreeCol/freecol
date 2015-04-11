@@ -97,7 +97,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
 
             //TODO: Get stance only if not player's Nation.
             enemyPanel.add(new JLabel(stance), "newline");
-            enemyPanel.add(Utility.localizedLabel(ns.getStance().getLabel()));
+            enemyPanel.add(Utility.localizedLabel(ns.getStance()));
 
             n = ns.getNumberOfSettlements();
             enemyPanel.add(new JLabel(numberOfColonies), "newline");

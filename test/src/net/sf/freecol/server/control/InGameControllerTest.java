@@ -45,7 +45,7 @@ import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.SimpleCombatModel;

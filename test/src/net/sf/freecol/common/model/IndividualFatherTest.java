@@ -236,12 +236,12 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
         assertFalse(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
 
-        dutch.setStance(french, Player.Stance.WAR);
+        dutch.setStance(french, Stance.WAR);
 
         assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
         assertFalse(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));
 
-        dutch.setStance(french, Player.Stance.PEACE);
+        dutch.setStance(french, Stance.PEACE);
 
         assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
         assertTrue(dutch.canTrade(musketsType, Market.Access.CUSTOM_HOUSE));

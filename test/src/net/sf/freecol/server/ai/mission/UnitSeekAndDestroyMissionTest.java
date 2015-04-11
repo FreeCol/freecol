@@ -21,7 +21,7 @@ package net.sf.freecol.server.ai.mission;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;

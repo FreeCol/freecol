@@ -131,8 +131,7 @@ public final class ReportIndianPanel extends ReportPanel {
         reportPanel.add(Utility.localizedLabel(StringTemplate
                 .template("report.indian.tensionStance")
                 .add("%tension%", opponent.getTension(player).getKey())
-                .addStringTemplate("%stance%", opponent.getStance(player)
-                        .getLabel())),
+                .addNamed("%stance%", opponent.getStance(player))),
             "left, wrap 20");
 
         if (nativeSettlements.isEmpty()) {

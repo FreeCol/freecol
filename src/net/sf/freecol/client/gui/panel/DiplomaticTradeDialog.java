@@ -64,7 +64,7 @@ import net.sf.freecol.common.model.InciteTradeItem;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeItem;
@@ -551,8 +551,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             public Component getListCellRendererComponent(JList<? extends Stance> list,
                 Stance value, int index, boolean isSelected,
                 boolean cellHasFocus) {
-                setText((value == null) ? ""
-                    : Messages.message(value.getLabel()));
+                setText((value == null) ? "" : Messages.getName(value));
                 return this;
             }
         }
