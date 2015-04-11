@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Building;
@@ -117,7 +118,8 @@ public class WorkProductionPanel extends FreeColPanel {
             result = 0.0f;
         }
 
-        Font bigFont = getFont().deriveFont(Font.BOLD, 16);
+        Font bigFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.SMALLER, Font.BOLD);
         JLabel finalLabel = Utility.localizedLabel("model.source.finalResult.name");
         finalLabel.setFont(bigFont);
         add(finalLabel, "newline");

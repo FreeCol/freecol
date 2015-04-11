@@ -20,23 +20,25 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.swing.ImageIcon;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.common.model.CombatModel;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Turn;
@@ -128,7 +130,8 @@ public class PreCombatDialog extends FreeColConfirmDialog {
             }
         }
 
-        Font bigFont = getFont().deriveFont(Font.BOLD, 20f);
+        Font bigFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.SMALLER, Font.BOLD);
         float offenceResult
             = FeatureContainer.applyModifiers(0f, turn, attackModifiers);
         JLabel finalOffenceLabel = Utility.localizedLabel("model.source.finalResult.name");

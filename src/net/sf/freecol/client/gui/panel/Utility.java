@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Insets;
+
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -44,6 +45,7 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
+
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Named;
@@ -135,8 +137,10 @@ public final class Utility {
             .getStyle(StyleContext.DEFAULT_STYLE);
 
         Style regular = STYLE_CONTEXT.addStyle("regular", defaultStyle);
-        StyleConstants.setFontFamily(regular, "NormalFont");
-        StyleConstants.setFontSize(regular, 13);
+        Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                                           FontLibrary.FontSize.TINY);
+        StyleConstants.setFontFamily(regular, font.getFamily());
+        StyleConstants.setFontSize(regular, font.getSize());
 
         Style buttonStyle = STYLE_CONTEXT.addStyle("button", regular);
         StyleConstants.setForeground(buttonStyle, LINK_COLOR);
