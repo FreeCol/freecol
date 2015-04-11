@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -83,8 +84,12 @@ public final class ReportTradePanel extends ReportPanel {
         reportPanel.removeAll();
         goodsHeader.removeAll();
 
+        ImageLibrary lib = getImageLibrary();
+
         String layoutConstraints = "insets 0, gap 0 0";
-        String columnConstraints = "[170!, fill][42!, fill]";
+        String columnConstraints = "[17%!, fill]["
+            + (lib.getImage(storableGoods.get(0)).getWidth(null) * 5) / 4
+            + "!, fill]";
         String rowConstraints = "[fill]";
 
         reportPanel.setLayout(new MigLayout(layoutConstraints, columnConstraints, rowConstraints));
@@ -120,7 +125,6 @@ public final class ReportTradePanel extends ReportPanel {
         }
 
         int column = 0;
-        ImageLibrary lib = getImageLibrary();
         for (GoodsType goodsType : storableGoods) {
             column++;
             int sales = player.getSales(goodsType);
@@ -196,7 +200,7 @@ public final class ReportTradePanel extends ReportPanel {
     }
 
     private JLabel createLeftLabel(String key) {
-        JLabel result = Utility.localizedLabel(key, JLabel.TRAILING);
+        JLabel result = Utility.localizedLabel(key, JLabel.LEADING);
         result.setBorder(Utility.LEFTCELLBORDER);
         return result;
     }
