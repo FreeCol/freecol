@@ -3340,9 +3340,9 @@ public class Unit extends GoodsLocation
         }
         if (loc.getColony() != null) {
             // Cash in if at a colony which has connectivity to Europe
-            // if the player does not have a galleon.
+            // if the player does not have a suitable carrier.
             return loc.getColony().isConnectedPort()
-                && !getOwner().hasUnitType("model.unit.galleon");
+                && getOwner().getCarriersForUnit(this).isEmpty();
         }
         // Otherwise, cash in if in Europe.
         return loc instanceof Europe

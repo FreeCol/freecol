@@ -2273,6 +2273,8 @@ public class Player extends FreeColGameObject implements Nameable {
         return n;
     }
 
+ 
+
     /**
      * Checks if this player has at least one of a given unit type.
      *
