@@ -50,13 +50,13 @@ public final class ReportReligiousPanel extends ReportPanel {
         final Player player = getMyPlayer();
         final Specification spec = getSpecification();
 
-        reportPanel.setLayout(new MigLayout("wrap 5, gap 20 20", "", ""));
+        reportPanel.setLayout(new MigLayout("wrap 6, fill", "center"));
 
         for (GoodsType gt : spec.getImmigrationGoodsTypeList()) {
             JLabel crosses = Utility.localizedLabel(gt);
             crosses.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                     FontLibrary.FontSize.SMALLER, Font.BOLD));
-            reportPanel.add(crosses, "growx, align right");
+            reportPanel.add(crosses, "span, split 2");
             FreeColProgressBar progressBar = new FreeColProgressBar(gt, 0,
                 player.getImmigrationRequired(), player.getImmigration(),
                 player.getTotalImmigrationProduction());
@@ -66,7 +66,7 @@ public final class ReportReligiousPanel extends ReportPanel {
                 Building building = colony.getBuildingForProducing(gt);
                 if (building != null) {
                     reportPanel.add(createColonyButton(colony),
-                        "split 2, flowy, align center");
+                        "split 2, flowy");
                     BuildingPanel bp = new BuildingPanel(getFreeColClient(),
                                                          building);
                     bp.initialize();
