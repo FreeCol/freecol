@@ -20,7 +20,9 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
+
 import javax.swing.JLabel;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -30,7 +32,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.WorkLocation;
 
 
 /**
@@ -62,19 +63,16 @@ public final class ReportReligiousPanel extends ReportPanel {
             reportPanel.add(progressBar, "span");
 
             for (Colony colony : freeColClient.getMySortedColonies()) {
-                WorkLocation wl = colony.getWorkLocationForProducing(gt);
-                if (wl == null
-                    || !(wl instanceof Building)) // FIXME: non-OO
-                    continue;
-                Building building = (Building)wl;
-                reportPanel.add(createColonyButton(colony),
-                                "split 2, flowy, align center");
-                BuildingPanel bp = new BuildingPanel(getFreeColClient(),
-                                                     building);
-                bp.initialize();
-                reportPanel.add(bp);
+                Building building = colony.getBuildingForProducing(gt);
+                if (building != null) {
+                    reportPanel.add(createColonyButton(colony),
+                        "split 2, flowy, align center");
+                    BuildingPanel bp = new BuildingPanel(getFreeColClient(),
+                                                         building);
+                    bp.initialize();
+                    reportPanel.add(bp);
+                }
             }
         }
     }
 }
-
