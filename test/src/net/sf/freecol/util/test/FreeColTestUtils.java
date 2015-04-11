@@ -57,7 +57,7 @@ public class FreeColTestUtils {
 
         // Required parameter
         static final UnitType colonistType
-            = FreeColTestCase.spec().getDefaultUnitType();
+            = FreeColTestCase.spec().getDefaultUnitType(null);
         private Game game;
 
         private HashMap<UnitType,Integer> colonists = new HashMap<>();

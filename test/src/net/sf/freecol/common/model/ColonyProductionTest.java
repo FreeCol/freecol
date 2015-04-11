@@ -500,7 +500,8 @@ public class ColonyProductionTest extends FreeColTestCase {
         Building townHall = colony.getBuilding(townHallType);
         assertNotNull(townHall);
         assertTrue(townHall.isEmpty());
-        UnitType colonistType = spec().getDefaultUnitType();
+        UnitType colonistType = spec()
+            .getDefaultUnitType(colony.getOwner().getNationType());
         assertNotNull(colonistType);
 
         assertEquals("Zero potential production of cotton in town hall", 0,

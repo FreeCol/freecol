@@ -295,7 +295,7 @@ public abstract class WorkLocation extends UnitLocation
      */
     public int getGenericPotential(GoodsType goodsType) {
         return getPotentialProduction(goodsType,
-            getSpecification().getDefaultUnitType());
+            getSpecification().getDefaultUnitType(getOwner().getNationType()));
     }
 
     /**

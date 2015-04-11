@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -341,7 +342,9 @@ public final class ReportColonyPanel extends ReportPanel
     private void updateColony(Colony colony) {
         final Specification spec = getSpecification();
         final GoodsType foodType = spec.getPrimaryFoodType();
-        final UnitType colonistType = spec.getDefaultUnitType();
+        final Player owner = colony.getOwner();
+        final UnitType colonistType
+            = spec.getDefaultUnitType(owner.getNationType());
 
         // Assemble the fundamental facts about this colony
         final String cac = colony.getId();
@@ -752,7 +755,9 @@ public final class ReportColonyPanel extends ReportPanel
             l.setEnabled(market == null || market.getArrears(g) <= 0);
             reportPanel.add(l);
         }
-        final UnitType colonistType = getSpecification().getDefaultUnitType();
+        final Player owner = getMyPlayer();
+        final UnitType colonistType = getSpecification()
+            .getDefaultUnitType(owner.getNationType());
         ImageIcon colonistIcon
             = new ImageIcon(lib.getTinyUnitImage(colonistType, true));
         reportPanel.add(newLabel(null, colonistIcon, null,

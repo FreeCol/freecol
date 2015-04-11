@@ -210,7 +210,7 @@ public final class Specification {
     private final List<UnitType> unitTypesPurchasedInEurope = new ArrayList<>();
     private UnitType fastestLandUnitType = null;
     private UnitType fastestNavalUnitType = null;
-    private UnitType defaultUnitType = null;
+    private final List<UnitType> defaultUnitTypes = new ArrayList<>();
 
     /* Other containers. */
 
@@ -586,10 +586,10 @@ public final class Specification {
         experts.clear();
         unitTypesTrainedInEurope.clear();
         unitTypesPurchasedInEurope.clear();
-        defaultUnitType = null;
+        defaultUnitTypes.clear();
         int bestLandValue = -1, bestNavalValue = -1;
         for (UnitType unitType : unitTypeList) {
-            if (unitType.isDefaultUnitType()) defaultUnitType = unitType;
+            if (unitType.isDefaultUnitType()) defaultUnitTypes.add(unitType);
             if (unitType.needsGoodsToBuild()
                 && !unitType.hasAbility(Ability.BORN_IN_COLONY)) {
                 buildableUnitTypes.add(unitType);
@@ -1238,12 +1238,28 @@ public final class Specification {
      * Provides a type to use to make a neutral comparison of the
      * productivity of work locations.
      *
+     * @param nationType The <code>NationType</code> to find the default
+     *     unit type for, or null indicating a normal player nation
+     *     (i.e. non-REF European).
      * @return The free colonist unit type.
      */
-    public UnitType getDefaultUnitType() {
-        return (defaultUnitType != null) ? defaultUnitType
-            // Drop this is due course
-            : getUnitType("model.unit.freeColonist");
+    public UnitType getDefaultUnitType(NationType nationType) {
+        for (UnitType ut : defaultUnitTypes) {
+            if (nationType == null) { // European is default
+                if (!ut.hasAbility(Ability.NATIVE)
+                    && !ut.hasAbility(Ability.REF_UNIT)) return ut;
+            } else if (nationType.isIndian()) {
+                if (ut.hasAbility(Ability.NATIVE)
+                    && !ut.hasAbility(Ability.REF_UNIT)) return ut;
+            } else if (nationType.isREF()) {
+                if (!ut.hasAbility(Ability.NATIVE)
+                    && ut.hasAbility(Ability.REF_UNIT)) return ut;
+            } else { // European
+                if (!ut.hasAbility(Ability.NATIVE)
+                    && !ut.hasAbility(Ability.REF_UNIT)) return ut;
+            }
+        }
+        return getUnitType("model.unit.freeColonist"); // Drop this soon
     }
 
     /**

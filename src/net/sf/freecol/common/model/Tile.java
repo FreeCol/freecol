@@ -1404,6 +1404,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public String getBuildColonyWarnings(Unit unit) {
         final Specification spec = getSpecification();
+        final Player owner = unit.getOwner();
         boolean landLocked = true;
         boolean ownedByEuropeans = false;
         boolean ownedBySelf = false;
@@ -1434,18 +1435,17 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
                 entry.setValue(entry.getValue()
                     + t.getPotentialProduction(entry.getKey(),
-                        spec.getDefaultUnitType()));
+                        spec.getDefaultUnitType(owner.getNationType())));
             }
             Player tileOwner = t.getOwner();
-            if (unit.getOwner() == tileOwner) {
+            if (owner == tileOwner) {
                 if (t.getOwningSettlement() != null) {
                     // we are using newTile
                     ownedBySelf = true;
                 } else {
                     for (Tile ownTile : t.getSurroundingTiles(1)) {
                         Colony colony = ownTile.getColony();
-                        if (colony != null
-                            && colony.getOwner() == unit.getOwner()) {
+                        if (colony != null && colony.getOwner() == owner) {
                             // newTile can be used from an own colony
                             ownedBySelf = true;
                             break;

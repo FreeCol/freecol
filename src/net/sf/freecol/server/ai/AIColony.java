@@ -543,7 +543,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         }
         for (Role role : spec.getRoles()) {
-            if (role.isAvailableTo(player, spec.getDefaultUnitType())) {
+            if (role.isAvailableTo(player,
+                    spec.getDefaultUnitType(player.getNationType()))) {
                 for (AbstractGoods ag : role.getRequiredGoods()) {
                     if (fullExport.contains(ag.getType())) {
                         fullExport.remove(ag.getType());
@@ -637,7 +638,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // If a tile can be stolen, do so if already at war with the
         // owner or if it is the best one available.
-        UnitType unitType = spec.getDefaultUnitType();
+        UnitType unitType = spec.getDefaultUnitType(player.getNationType());
         Tile steal = null;
         float score = 1.0f;
         for (Tile t : tile.getSurroundingTiles(1)) {
@@ -1169,7 +1170,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 <= colony.getFoodConsumption()
                 + colony.getOwner().getMaximumFoodConsumption();
             // Choose expert for best work location plan
-            UnitType expert = spec.getDefaultUnitType();
+            final Player owner = colony.getOwner();
+            UnitType expert = spec.getDefaultUnitType(owner.getNationType());
             for (WorkLocationPlan plan : (needFood) ? colonyPlan.getFoodPlans()
                      : colonyPlan.getWorkPlans()) {
                 WorkLocation location = plan.getWorkLocation();

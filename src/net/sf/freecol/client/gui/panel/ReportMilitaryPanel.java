@@ -115,7 +115,8 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
     protected void addOwnUnits() {
         final Specification spec = getSpecification();
         final Player player = getMyPlayer();
-        final UnitType defaultType = spec.getDefaultUnitType();
+        final UnitType defaultType
+            = spec.getDefaultUnitType(player.getNationType());
 
         reportPanel.add(Utility.localizedLabel(StringTemplate
                 .template("report.military.forces")

@@ -397,7 +397,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
      */
     public int getImprovementValue(Tile tile, GoodsType goodsType) {
         final UnitType colonistType
-            = getSpecification().getDefaultUnitType();
+            = getSpecification().getDefaultUnitType(null);
         int value = 0;
         if (goodsType.isFarmed()) {
             final int oldProduction = tile.getType()
