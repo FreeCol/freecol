@@ -1676,7 +1676,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                 Location repairLocation = unit.getRepairLocation();
                                 if (repairLocation == null) {
                                     messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                            "model.disaster.effect.lossOfUnit", colony)
+                                            effect.getId(), colony)
                                             .addStringTemplate("%unit%", unit.getLabel()));
                                     csSinkShip(unit, null, cs);
                                 } else {
