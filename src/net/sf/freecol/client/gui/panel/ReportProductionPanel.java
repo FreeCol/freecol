@@ -27,6 +27,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -89,7 +90,7 @@ public final class ReportProductionPanel extends ReportPanel {
     private void update() {
         reportPanel.removeAll();
         JLabel selectLabel = Utility.localizedLabel("report.production.selectGoods");
-        reportPanel.add(selectLabel, "span, split " + (NUMBER_OF_GOODS + 2));
+        reportPanel.add(selectLabel);
 
         JButton selectButton = Utility.localizedButton("report.production.update");
         selectButton.addActionListener(new ActionListener() {
@@ -98,7 +99,7 @@ public final class ReportProductionPanel extends ReportPanel {
                     update();
                 }
             });
-        reportPanel.add(selectButton, "wrap 20");
+        reportPanel.add(selectButton, "wrap");
 
         List<GoodsType> selectedTypes = new ArrayList<>();
         for (int index = 0; index < NUMBER_OF_GOODS; index++) {
