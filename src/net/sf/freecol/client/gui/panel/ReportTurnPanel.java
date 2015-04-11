@@ -130,7 +130,7 @@ public final class ReportTurnPanel extends ReportPanel {
             case ClientOptions.MESSAGES_GROUP_BY_TYPE:
                 if (message.getMessageType() != type) {
                     type = message.getMessageType();
-                    JLabel headline = Utility.localizedLabel(message.getMessageTypeName());
+                    JLabel headline = Utility.localizedLabel(message.getMessageType().getKey());
                     headline.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
                         FontLibrary.FontSize.SMALL));
                     reportPanel.add(headline, "newline 20, skip, span");
@@ -223,7 +223,7 @@ public final class ReportTurnPanel extends ReportPanel {
                 JButton filterButton = new JButton("X");
                 Utility.localizeToolTip(filterButton, StringTemplate
                     .template("model.message.filter")
-                    .add("%type%", message.getMessageTypeName()));
+                    .add("%type%", message.getMessageType().getKey()));
                 final ModelMessage m = message;
                 filterButton.addActionListener(new ActionListener() {
                         

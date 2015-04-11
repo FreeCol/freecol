@@ -65,6 +65,15 @@ public class ModelMessage extends StringTemplate {
         public String getOptionName() {
             return optionName;
         }
+
+        /**
+         * Get a message key for this message type.
+         *
+         * @return A message key.
+         */
+        public String getKey() {
+            return "model.message." + this; // Uppercase
+        }
     }
 
     private String sourceId;
@@ -242,15 +251,6 @@ public class ModelMessage extends StringTemplate {
      */
     public void setMessageType(MessageType messageType) {
         this.messageType = messageType;
-    }
-
-    /**
-     * Gets a key for this type of message.
-     *
-     * @return A message key.
-     */
-    public String getMessageTypeName() {
-        return "model.message." + messageType;
     }
 
     /**
