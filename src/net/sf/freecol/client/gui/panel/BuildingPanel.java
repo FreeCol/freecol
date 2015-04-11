@@ -28,10 +28,11 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -223,8 +224,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     @Override
     public void paintComponent(Graphics g) {
         ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
-        g.drawImage(ImageLibrary.fadeImage(lib.getBuildingImage(building),
-                0.6f, 192.0f), 0, 0, this);
+        g.drawImage(lib.getBuildingImage(building), 0, 0, this);
     }
 
 
