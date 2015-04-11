@@ -71,8 +71,10 @@ public final class SpecificationTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.brave");
     private static final UnitType caravelType
         = spec().getUnitType("model.unit.caravel");
-    private static final UnitType colonistType
+    private static final UnitType freeColonistType
         = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType kingsRegularType
+        = spec().getUnitType("model.unit.kingsRegular");
     private static final UnitType privateerType
         = spec().getUnitType("model.unit.privateer");
     private static final UnitType wagonType
@@ -98,13 +100,13 @@ public final class SpecificationTest extends FreeColTestCase {
      * Test for some typical abilities.
      */
     public void testUnitAbilities() {
-        assertTrue(colonistType.hasAbility(Ability.FOUND_COLONY));
-        assertFalse(colonistType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT));
-        assertTrue(colonistType.isRecruitable());
-        assertFalse(colonistType.hasAbility(Ability.NAVAL_UNIT));
-        assertFalse(colonistType.hasAbility(Ability.CARRY_GOODS));
-        assertFalse(colonistType.hasAbility(Ability.CARRY_UNITS));
-        assertFalse(colonistType.hasAbility(Ability.CAPTURE_GOODS));
+        assertTrue(freeColonistType.hasAbility(Ability.FOUND_COLONY));
+        assertFalse(freeColonistType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT));
+        assertTrue(freeColonistType.isRecruitable());
+        assertFalse(freeColonistType.hasAbility(Ability.NAVAL_UNIT));
+        assertFalse(freeColonistType.hasAbility(Ability.CARRY_GOODS));
+        assertFalse(freeColonistType.hasAbility(Ability.CARRY_UNITS));
+        assertFalse(freeColonistType.hasAbility(Ability.CAPTURE_GOODS));
 
         assertFalse(wagonType.hasAbility(Ability.FOUND_COLONY));
         assertFalse(wagonType.isRecruitable());
@@ -408,6 +410,31 @@ public final class SpecificationTest extends FreeColTestCase {
         }
     }
 
+    public void testGetDefaultUnitType() {
+        NationType europeanNationType = null;
+        NationType nativeNationType = null;
+        NationType refNationType = null;
+        for (NationType nt : spec().getNationTypes()) {
+            if (nt.isIndian()) {
+                if (nativeNationType == null) nativeNationType = nt;
+            } else if (nt.isREF()) {
+                if (refNationType == null) refNationType = nt;
+            } else {
+                if (europeanNationType == null) europeanNationType = nt;
+            }
+        }
+        assertNotNull("No European nation type", europeanNationType);
+        assertNotNull("No native nation type", nativeNationType);
+        assertNotNull("No REF nation type", refNationType);
+                
+        assertEquals("Should find free colonist", freeColonistType,
+                     spec().getDefaultUnitType(europeanNationType));
+        assertEquals("Should find brave", braveType,
+                     spec().getDefaultUnitType(nativeNationType));
+        assertEquals("Should find kings regular", kingsRegularType,
+                     spec().getDefaultUnitType(refNationType));
+    }        
+        
     public void testLoadMods() {
         try {
             Specification specification = new Specification(new FreeColTcFile("freecol").getSpecificationInputStream());

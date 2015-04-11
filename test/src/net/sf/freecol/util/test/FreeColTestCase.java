@@ -544,8 +544,6 @@ public class FreeColTestCase extends TestCase {
                 skillToTeach = spec().getUnitType(skillTaught);
             }
 
-            UnitType indianBraveType = spec().getUnitType("model.unit.brave");
-
             // indianPlayer not set, get default
             if(indianPlayer == null){
                 indianPlayer = game.getPlayer(defaultIndianPlayer);
@@ -553,6 +551,8 @@ public class FreeColTestCase extends TestCase {
                     throw new IllegalArgumentException("Default Indian player " + defaultIndianPlayer + " not in game");
                 }
             }
+            UnitType indianBraveType
+                = spec().getDefaultUnitType(indianPlayer.getNationType());
 
             // settlement tile no set, get default
             if(settlementTile == null){

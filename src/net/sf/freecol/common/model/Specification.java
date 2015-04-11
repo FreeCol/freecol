@@ -1246,16 +1246,16 @@ public final class Specification {
     public UnitType getDefaultUnitType(NationType nationType) {
         for (UnitType ut : defaultUnitTypes) {
             if (nationType == null) { // European is default
-                if (!ut.hasAbility(Ability.NATIVE)
+                if (!ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
                     && !ut.hasAbility(Ability.REF_UNIT)) return ut;
             } else if (nationType.isIndian()) {
-                if (ut.hasAbility(Ability.NATIVE)
+                if (ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
                     && !ut.hasAbility(Ability.REF_UNIT)) return ut;
             } else if (nationType.isREF()) {
-                if (!ut.hasAbility(Ability.NATIVE)
+                if (!ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
                     && ut.hasAbility(Ability.REF_UNIT)) return ut;
             } else { // European
-                if (!ut.hasAbility(Ability.NATIVE)
+                if (!ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
                     && !ut.hasAbility(Ability.REF_UNIT)) return ut;
             }
         }
