@@ -300,7 +300,16 @@ public final class Monarch extends FreeColGameObject implements Named {
         SUPPORT_SEA,
         MONARCH_MERCENARIES, 
         HESSIAN_MERCENARIES,
-        DISPLEASURE,
+        DISPLEASURE;
+
+        /**
+         * Get a key for this action.
+         *
+         * @return A message key.
+         */
+        public String getKey() {
+            return "model.monarch.action." + this; // Uppercase
+        }
     }
 
     /**

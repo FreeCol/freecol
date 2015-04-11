@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Turn;
@@ -410,7 +411,7 @@ public class MessagesTest extends FreeColTestCase {
 
     public void testREFMessages() {
         StringTemplate template = StringTemplate
-            .template("model.monarch.action.ADD_TO_REF")
+            .template(Monarch.MonarchAction.ADD_TO_REF.getKey())
             .addAmount("%number%", 1)
             .addNamed("%unit%", kingsRegular);
         String expected = "The Crown has added 1 King's Regular"
@@ -419,7 +420,7 @@ public class MessagesTest extends FreeColTestCase {
         assertTrue(expected.equals(Messages.message(template)));
 
         template = StringTemplate
-            .template("model.monarch.action.ADD_TO_REF")
+            .template(Monarch.MonarchAction.ADD_TO_REF.getKey())
             .addAmount("%number%", 2)
             .addNamed("%unit%", artillery);
         expected = "The Crown has added 2 Pieces of Artillery"
@@ -428,7 +429,7 @@ public class MessagesTest extends FreeColTestCase {
         assertTrue(expected.equals(Messages.message(template)));
 
         template = StringTemplate
-            .template("model.monarch.action.ADD_TO_REF")
+            .template(Monarch.MonarchAction.ADD_TO_REF.getKey())
             .addAmount("%number%", 3)
             .addNamed("%unit%", manOWar);
         expected = "The Crown has added 3 Men of War"

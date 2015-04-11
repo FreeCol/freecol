@@ -98,15 +98,10 @@ public class MonarchSession extends TransactionSession {
     public void complete(ChangeSet cs) {
         switch (action) {
         case RAISE_TAX_ACT: case RAISE_TAX_WAR:
-            serverPlayer.csRaiseTax(tax, goods, true, cs);
-            cs.addMessage(See.only(serverPlayer),
-                new ModelMessage("model.monarch.ignoredTax", serverPlayer)
-                    .addAmount("%amount%", tax));
+            serverPlayer.ignoreTax(tax, goods, cs);
             break;
         case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
-            cs.addMessage(See.only(serverPlayer),
-                new ModelMessage("model.monarch.ignoredMercenaries",
-                                 serverPlayer));
+            serverPlayer.ignoreMercenaries(cs);
             break;
         default:
             break;

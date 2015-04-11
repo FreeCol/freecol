@@ -1013,7 +1013,7 @@ public final class InGameController extends Controller {
         final Specification spec = game.getSpecification();
         boolean valid = monarch.actionIsValid(action);
         if (!valid) return;
-        String messageId = "model.monarch.action." + action;
+        String messageId = action.getKey();
         StringTemplate template;
         MonarchActionMessage message;
         String monarchKey = serverPlayer.getMonarchKey();
@@ -1028,7 +1028,7 @@ public final class InGameController extends Controller {
                 logger.finest("Ignoring tax raise, no goods to boycott.");
                 break;
             }
-            template = StringTemplate.template("model.monarch.action." + action)
+            template = StringTemplate.template(messageId)
                 .addStringTemplate("%goods%", goods.getType().getLabel())
                 .addAmount("%amount%", taxRaise);
             if (action == MonarchAction.RAISE_TAX_WAR) {
@@ -1124,7 +1124,7 @@ public final class InGameController extends Controller {
             if (mercenaries.isEmpty()) break;
             final int mercPrice = serverPlayer.priceMercenaries(mercenaries);
             message = new MonarchActionMessage(action, StringTemplate
-                .template("model.monarch.action.MONARCH_MERCENARIES")
+                .template(messageId)
                 .addAmount("%gold%", mercPrice)
                 .addStringTemplate("%mercenaries%",
                     abstractUnitTemplate(", ", mercenaries)),
@@ -1141,7 +1141,7 @@ public final class InGameController extends Controller {
             n = randomInt(logger, "Mercenary leader", random, n);
             final int hessPrice = serverPlayer.priceMercenaries(hessians);
             message = new MonarchActionMessage(action, StringTemplate
-                .template("model.monarch.action.HESSIAN_MERCENARIES")
+                .template(messageId)
                 .addName("%leader%", Messages.getMercenaryLeaderName(n))
                 .addAmount("%gold%", hessPrice)
                 .addStringTemplate("%mercenaries%",

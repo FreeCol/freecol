@@ -60,7 +60,7 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
         super(freeColClient);
 
         final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
-        final String messageId = "model.monarch.action." + action;
+        final String messageId = action.getKey();
         if (!Messages.containsKey(messageId)) {
             throw new IllegalStateException("Unrecognized monarch action: "
                 + action);

@@ -4030,7 +4030,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             csSetTax(tax + extraTax, cs);
             cs.add(See.only(this), ChangePriority.CHANGE_NORMAL,
                 new MonarchActionMessage(Monarch.MonarchAction.FORCE_TAX,
-                    StringTemplate.template("model.monarch.action.FORCE_TAX")
+                    StringTemplate.template(Monarch.MonarchAction.FORCE_TAX.getKey())
                     .addAmount("%amount%", tax + extraTax),
                     monarchKey));
             logger.info("Forced tax raise to: " + (tax + extraTax));
@@ -4072,6 +4072,32 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Handle the end of a session where the player has ignored a tax
+     * increase demand.
+     *
+     * @param tax The new tax rate.
+     * @param goods The <code>Goods</code> to use in a goods party.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void ignoreTax(int tax, Goods goods, ChangeSet cs) {
+        csRaiseTax(tax, goods, true, cs);
+        cs.addMessage(See.only(this),
+            new ModelMessage("model.monarch.ignoredTax", this)
+                .addAmount("%amount%", tax));
+    }
+
+    /**
+     * Handle the end of a session where the player has ignored an
+     * offer of mercenaries.
+     *
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void ignoreMercenaries(ChangeSet cs) {
+        cs.addMessage(See.only(this),
+            new ModelMessage("model.monarch.ignoredMercenaries", this));
+    }
+
+    /**
      * Set the player tax rate.
      * If this requires a change to the bells bonuses, we have to update
      * the whole player (bah) because we can not yet independently update
@@ -4107,7 +4133,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             getMonarch().setDispleasure(true);
             cs.add(See.only(this), ChangePriority.CHANGE_NORMAL,
                 new MonarchActionMessage(Monarch.MonarchAction.DISPLEASURE,
-                    StringTemplate.template("model.monarch.action.DISPLEASURE"),
+                    StringTemplate.template(Monarch.MonarchAction.DISPLEASURE.getKey()),
                     getMonarchKey()));
         }
     }
