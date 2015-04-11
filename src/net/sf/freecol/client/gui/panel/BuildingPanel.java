@@ -37,6 +37,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -244,12 +245,13 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
         public UpkeepLabel(int number) {
             super(new ImageIcon(freeColClient.getGUI().getImageLibrary()
                 .getMiscImage("coin")));
-
+            GUI gui = freeColClient.getGUI();
             image = ImageLibrary.getStringImage(
-                freeColClient.getGUI().getCanvas().getGraphics(),
+                gui.getCanvas().getGraphics(),
                 Integer.toString(number), getForeground(),
                 FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                    FontLibrary.FontSize.TINY, Font.BOLD));
+                    FontLibrary.FontSize.TINY, Font.BOLD,
+                    gui.getImageLibrary().getScalingFactor()));
         }
 
         /**

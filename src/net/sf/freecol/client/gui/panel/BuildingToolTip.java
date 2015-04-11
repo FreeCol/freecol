@@ -28,6 +28,7 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -72,7 +73,7 @@ public class BuildingToolTip extends JToolTip {
         if (arrow == null) {
             arrow = new JLabel(ResourceManager.getString("arrow.E"));
             arrow.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                    FontLibrary.FontSize.SMALL, Font.BOLD));
+                FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScalingFactor()));
         }
 
         String columns = "[align center]";
@@ -86,7 +87,7 @@ public class BuildingToolTip extends JToolTip {
 
         JLabel buildingName = new JLabel(Messages.getName(building));
         buildingName.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.SMALLER, Font.BOLD));
+            FontLibrary.FontSize.SMALLER, Font.BOLD, lib.getScalingFactor()));
         add(buildingName, "span");
 
         ProductionInfo info = building.getProductionInfo();

@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JLabel;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -77,7 +78,7 @@ public final class ReportExplorationPanel extends ReportPanel {
          * Header Row
          */
         Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.TINY, Font.BOLD);
+            FontLibrary.FontSize.TINY, Font.BOLD, getImageLibrary().getScalingFactor());
         JLabel nameOfRegion = Utility.localizedLabel("report.exploration.nameOfRegion");
         nameOfRegion.setFont(font);
         reportPanel.add(nameOfRegion);

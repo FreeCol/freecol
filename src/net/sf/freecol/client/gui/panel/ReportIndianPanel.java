@@ -27,6 +27,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -108,11 +109,11 @@ public final class ReportIndianPanel extends ReportPanel {
         reportPanel.add(villageLabel, "span, split 2");
         JLabel headline = Utility.localizedLabel(opponent.getNationName());
         headline.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.SMALL, Font.BOLD));
+            FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScalingFactor()));
         reportPanel.add(headline, "wrap 20, aligny center");
         JLabel label = Utility.localizedLabel("report.indian.chieftain");
         Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.TINY, Font.BOLD);
+            FontLibrary.FontSize.TINY, Font.BOLD, lib.getScalingFactor());
         label.setFont(font);
         reportPanel.add(label);
         reportPanel.add(Utility.localizedLabel(opponent.getName()), "left, wrap");

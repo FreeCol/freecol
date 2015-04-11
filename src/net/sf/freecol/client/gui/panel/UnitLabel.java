@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
+
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -298,7 +299,8 @@ public final class UnitLabel extends JLabel
                 String underRepair = Messages.message(unit.getRepairLabel());
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
-                Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY);
+                Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                    FontLibrary.FontSize.TINY, lib.getScalingFactor());
                 Image repairImage1 = ImageLibrary.getStringImage(g, underRepair1, Color.RED, font);
                 Image repairImage2 = ImageLibrary.getStringImage(g, underRepair2, Color.RED, font);
                 int textHeight = repairImage1.getHeight(null) + repairImage2.getHeight(null);

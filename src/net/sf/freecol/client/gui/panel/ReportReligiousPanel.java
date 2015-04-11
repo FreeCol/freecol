@@ -47,6 +47,9 @@ public final class ReportReligiousPanel extends ReportPanel {
     public ReportReligiousPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportReligionAction");
 
+        final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.SMALLER, Font.BOLD,
+            freeColClient.getGUI().getImageLibrary().getScalingFactor());
         final Player player = getMyPlayer();
         final Specification spec = getSpecification();
 
@@ -54,8 +57,7 @@ public final class ReportReligiousPanel extends ReportPanel {
 
         for (GoodsType gt : spec.getImmigrationGoodsTypeList()) {
             JLabel crosses = Utility.localizedLabel(gt);
-            crosses.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                    FontLibrary.FontSize.SMALLER, Font.BOLD));
+            crosses.setFont(font);
             reportPanel.add(crosses, "span, split 2");
             FreeColProgressBar progressBar = new FreeColProgressBar(gt, 0,
                 player.getImmigrationRequired(), player.getImmigration(),

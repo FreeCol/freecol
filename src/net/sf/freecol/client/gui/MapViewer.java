@@ -1618,7 +1618,8 @@ public final class MapViewer {
      * @param path The <code>PathNode</code> to display.
      */
     private void displayPath(Graphics2D g, PathNode path) {
-        final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY, lib.getScalingFactor());
+        final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, lib.getScalingFactor());
         final boolean debug = FreeColDebugger
             .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
 

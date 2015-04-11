@@ -35,6 +35,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -62,6 +63,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
                            FreeColGameObject defender) {
         super(freeColClient);
         
+        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
         final Game game = attacker.getGame();
         final CombatModel combatModel = game.getCombatModel();
         final Turn turn = game.getTurn();
@@ -96,7 +98,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
             Settlement settlement = (Settlement) defender;
             defenderName = settlement.getName();
             defenderLabel = new JLabel(new ImageIcon(
-                getGUI().getImageLibrary().getSettlementImage(settlement)));
+                lib.getSettlementImage(settlement)));
 
         } else {
             throw new IllegalStateException("Bogus attack");
@@ -131,7 +133,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         }
 
         Font bigFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD);
+            FontLibrary.FontSize.SMALLER, Font.BOLD, lib.getScalingFactor());
         float offenceResult
             = FeatureContainer.applyModifiers(0f, turn, attackModifiers);
         JLabel finalOffenceLabel = Utility.localizedLabel("model.source.finalResult.name");
