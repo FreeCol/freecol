@@ -342,7 +342,7 @@ public final class ColonyPanel extends PortPanel
             JComponent.WHEN_IN_FOCUSED_WINDOW, nameIM);
 
         initialize(colony);
-        getGUI().restoreSavedSize(this, 950, 650);
+        getGUI().restoreSavedSize(this, 1050, 725);
     }
 
 
