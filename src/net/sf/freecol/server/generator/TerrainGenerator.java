@@ -23,9 +23,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -62,7 +60,6 @@ public class TerrainGenerator {
 
     public static final int LAND_REGIONS_SCORE_VALUE = 1000;
     public static final int LAND_REGION_MIN_SCORE = 5;
-    public static final int PACIFIC_SCORE_VALUE = 100;
     public static final int LAND_REGION_MAX_SIZE = 75;
 
     /** The Game to generate for. */
@@ -347,177 +344,6 @@ public class TerrainGenerator {
 
 
     // Create map entities
-
-    /**
-     * Creates ocean map regions in the given Map.
-     *
-     * Be careful to tolerate regions pre-existing from an imported game.
-     * At the moment, the ocean is divided into two by two regions.
-     *
-     * @param map The <code>Map</code> to work on.
-     * @param lb A <code>LogBuilder</code> to log to.
-     */
-    private void createOceanRegions(Map map, LogBuilder lb) {
-        ServerRegion pacific = (ServerRegion)map
-            .getRegion("model.region.pacific");
-        ServerRegion northPacific = (ServerRegion)map
-            .getRegion("model.region.northPacific");
-        ServerRegion southPacific = (ServerRegion)map
-            .getRegion("model.region.southPacific");
-        ServerRegion atlantic = (ServerRegion)map
-            .getRegion("model.region.atlantic");
-        ServerRegion northAtlantic = (ServerRegion)map
-            .getRegion("model.region.northAtlantic");
-        ServerRegion southAtlantic = (ServerRegion)map
-            .getRegion("model.region.southAtlantic");
-        int present = 0;
-        if (pacific == null) {
-            pacific = new ServerRegion(game,
-                "model.region.pacific", RegionType.OCEAN, null);
-            pacific.setDiscoverable(true);
-            map.putRegion(pacific);
-            pacific.setScoreValue(PACIFIC_SCORE_VALUE);
-        }
-        if (northPacific == null) {
-            northPacific = new ServerRegion(game,
-                "model.region.northPacific", RegionType.OCEAN, pacific);
-            northPacific.setDiscoverable(false);
-            map.putRegion(northPacific);
-        } else present++;
-        if (southPacific == null) {
-            southPacific = new ServerRegion(game,
-                "model.region.southPacific", RegionType.OCEAN, pacific);
-            southPacific.setDiscoverable(false);
-            map.putRegion(southPacific);
-        } else present++;
-        if (atlantic == null) {
-            atlantic = new ServerRegion(game,
-                "model.region.atlantic", RegionType.OCEAN, null);
-            atlantic.setPrediscovered(true);
-            atlantic.setDiscoverable(false);
-            map.putRegion(atlantic);
-        }
-        if (northAtlantic == null) {
-            northAtlantic = new ServerRegion(game,
-                "model.region.northAtlantic", RegionType.OCEAN, atlantic);
-            northAtlantic.setPrediscovered(true);
-            northAtlantic.setDiscoverable(false);
-            map.putRegion(northAtlantic);
-        } else present++;
-        if (southAtlantic == null) {
-            southAtlantic = new ServerRegion(game,
-                "model.region.southAtlantic", RegionType.OCEAN, atlantic);
-            southAtlantic.setPrediscovered(true);
-            southAtlantic.setDiscoverable(false);
-            map.putRegion(southAtlantic);
-        } else present++;
-
-        if (present == 4) {
-            // All the ocean regions were defined, no need to regenerate.
-            return;
-        }
-
-        // Fill the ocean regions by first filling the quadrants individually,
-        // then allow the quadrants to overflow into their horizontally
-        // opposite quadrant, then finally into the whole map.
-        // This correctly handles cases like:
-        //
-        //   NP NP NP NA NA NA      NP NP NP NA NA NA
-        //   NP L  L  L  L  NA      NP L  L  NA L  NA
-        //   NP L  NA NA NA NA  or  NP L  NA NA L  NA
-        //   SP L  SA SA SA SA      SP L  NA L  L  SA
-        //   SP L  L  L  L  SA      SP L  L  L  L  SA
-        //   SP SP SP SA SA SA      SP SP SP SA SA SA
-        //
-        // or multiple such incursions across the nominal quadrant divisions.
-        //
-        final int maxx = map.getWidth();
-        final int midx = maxx / 2;
-        final int maxy = map.getHeight();
-        final int midy = maxy / 2;
-
-        Tile tNP = null, tSP = null, tNA = null, tSA = null, t;
-        for (int y = midy-1; y >= 0; y--) {
-            if (tNP == null && !(t = map.getTile(0, y)).isLand()) tNP = t;
-            if (tNA == null && !(t = map.getTile(maxx-1, y)).isLand()) tNA = t;
-            if (tNP != null && tNA != null) break;
-        }
-        for (int y = midy; y < maxy; y++) {
-            if (tSP == null && !(t = map.getTile(0, y)).isLand()) tSP = t;
-            if (tSA == null && !(t = map.getTile(maxx-1, y)).isLand()) tSA = t;
-            if (tSP != null && tSA != null) break;
-        }
-        int nNP = 0, nSP = 0, nNA = 0, nSA = 0;
-
-        Rectangle rNP = new Rectangle(0,0,       midx,midy);
-        Rectangle rSP = new Rectangle(0,midy,    midx,maxy-midy);
-        Rectangle rNA = new Rectangle(midx,0,    maxx-midx,midy);
-        Rectangle rSA = new Rectangle(midx,midy, maxx-midx,maxy-midy);
-        if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rNP);
-        if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rSP);
-        if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rNA);
-        if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rSA);
-
-        Rectangle rN = new Rectangle(0,0,    maxx,midy);
-        Rectangle rS = new Rectangle(0,midy, maxx,maxy-midy);
-        if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rN);
-        if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rS);
-        if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rN);
-        if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rS);
-
-        Rectangle rAll = new Rectangle(0,0, maxx,maxy);
-        if (tNP != null) nNP += fillOcean(map, tNP, northPacific,  rAll);
-        if (tSP != null) nSP += fillOcean(map, tSP, southPacific,  rAll);
-        if (tNA != null) nNA += fillOcean(map, tNA, northAtlantic, rAll);
-        if (tSA != null) nSA += fillOcean(map, tSA, southAtlantic, rAll);
-
-        if (nNP <= 0) lb.add("No North Pacific tiles found.\n");
-        if (nSP <= 0) lb.add("No South Pacific tiles found");
-        if (nNA <= 0) lb.add("No North Atlantic tiles found");
-        if (nSA <= 0) lb.add("No South Atlantic tiles found");
-        lb.add("Ocean regions complete: ",
-            nNP, " North Pacific, ",
-            nSP, " South Pacific, ",
-            nNA, " North Atlantic, ",
-            nSP, " South Atlantic");
-    }
-
-    /**
-     * Flood fill ocean regions.
-     *
-     * @param map The <code>Map</code> to fill in.
-     * @param tile A valid starting <code>Tile</code>.
-     * @param region A <code>ServerRegion</code> to fill with.
-     * @param bounds A <code>Rectangle</code> that bounds the filling.
-     * @return The number of tiles filled.
-     */
-    private int fillOcean(Map map, Tile tile, ServerRegion region,
-                          Rectangle bounds) {
-        Queue<Tile> q = new LinkedList<>();
-        int n = 0;
-        boolean[][] visited = new boolean[map.getWidth()][map.getHeight()];
-        visited[tile.getX()][tile.getY()] = true;
-        q.add(tile);
-
-        while ((tile = q.poll()) != null) {
-            region.addTile(tile);
-            n++;
-
-            for (Direction direction : Direction.values()) {
-                Tile t = map.getAdjacentTile(tile, direction);
-                if (t != null
-                    && !visited[t.getX()][t.getY()]
-                    && bounds.contains(t.getX(), t.getY())) {
-                    visited[t.getX()][t.getY()] = true;
-                    if ((t.getRegion() == null || t.getRegion() == region)
-                        && !t.isLand()) {
-                        q.add(t);
-                    }
-                }
-            }
-        }
-        return n;
-    }
 
     /**
      * Makes sure we have the standard regions.
@@ -1325,12 +1151,12 @@ public class TerrainGenerator {
 
         if (importTerrain) {
             if (!fixRegions.isEmpty()) { // Fix the tiles missing regions.
-                createOceanRegions(map, lb);
+                ServerRegion.makeFixedOceans(map, lb);
                 createLakeRegions(map, lb);
                 createLandRegions(map, lb);
             }
         } else {
-            createOceanRegions(map, lb);
+            ServerRegion.makeFixedOceans(map, lb);
             map.resetHighSeas(
                 mapOptions.getInteger(MapGeneratorOptions.DISTANCE_TO_HIGH_SEA),
                 mapOptions.getInteger(MapGeneratorOptions.MAXIMUM_DISTANCE_TO_EDGE));
