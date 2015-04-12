@@ -1233,11 +1233,19 @@ public abstract class FreeColObject
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        final String tag = xr.getLocalName();
+        String tag = xr.getLocalName();
         if (tag == null) {
             throw new XMLStreamException("Parse error, null opening tag.");
         }
-        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+        int next = -1;
+        for (;;) {
+            try {
+                next = xr.nextTag();
+            } catch (XMLStreamException xse) {
+                logger.log(Level.SEVERE, "nextTag failed at " + tag
+                    + ", previous=" + next, xse);
+            }
+            if (next == XMLStreamConstants.END_ELEMENT) break;
             readChild(xr);
         }
         xr.expectTag(tag);
