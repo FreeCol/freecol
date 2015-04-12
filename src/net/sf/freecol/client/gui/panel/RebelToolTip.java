@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -31,8 +32,8 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
-import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -59,6 +60,8 @@ public class RebelToolTip extends JToolTip {
         StringTemplate t;
 
         setLayout(new MigLayout("fillx, wrap 3", "[][right][right]", ""));
+        // TODO: Calculate this from the size of the components
+        setPreferredSize(new Dimension(425,325));
 
         add(Utility.localizedLabel(StringTemplate
                 .template("colonyPanel.rebelLabel")
@@ -149,13 +152,6 @@ public class RebelToolTip extends JToolTip {
             add(new JLabel(Integer.toString(-grow)), "skip");
         }
     }
-
-
-    @Override
-    public final Dimension getPreferredSize() {
-        return new Dimension(350, 250);
-    }
-
 
     // Override Component
 
