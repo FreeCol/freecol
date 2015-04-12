@@ -29,6 +29,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -66,17 +67,19 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
 
         JPanel recruitingPanel = new MigPanel();
         recruitingPanel.setLayout(new MigLayout("center, wrap 1", "center"));
-        if (player.getCurrentFather() == null) {
+        FoundingFather currentFather = player.getCurrentFather();
+        if (currentFather == null) {
             recruitingPanel.add(new JLabel(none), "wrap 20");
         } else {
-            FoundingFather father = player.getCurrentFather();
-            String name = Messages.getName(father);
-            JButton button = Utility.getLinkButton(name, null, father.getId());
+            String name = Messages.getName(currentFather);
+            JButton button = Utility.getLinkButton(name, null,
+                currentFather.getId());
             button.addActionListener(this);
             recruitingPanel.add(button);
-            JLabel currentFatherLabel
-                = new JLabel(new ImageIcon(ImageLibrary.getFoundingFatherImage(father, false)));
-            currentFatherLabel.setToolTipText(Messages.getDescription(father));
+            JLabel currentFatherLabel = new JLabel(new ImageIcon(
+                ImageLibrary.getFoundingFatherImage(currentFather, false)));
+            currentFatherLabel.setToolTipText(
+                Messages.getDescription(currentFather));
             recruitingPanel.add(currentFatherLabel);
             for (GoodsType gt : getSpecification().getLibertyGoodsTypeList()) {
                 int total = 0;
@@ -98,11 +101,11 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             JPanel panel = new MigPanel();
             panel.setLayout(new MigLayout("flowy", "[center]"));
             panels.put(type, panel);
-            JScrollPane scrollPane = new JScrollPane(panel,
+            JScrollPane imageScrollPane = new JScrollPane(panel,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             tabs.addTab(Messages.message(FoundingFather.getTypeKey(type)), null,
-                        scrollPane, null);
+                        imageScrollPane, null);
         }
         Map<String, Turn> electionTurns = getMyPlayer().getElectionTurns();
         for (FoundingFather father : getSpecification().getFoundingFathers()) {
