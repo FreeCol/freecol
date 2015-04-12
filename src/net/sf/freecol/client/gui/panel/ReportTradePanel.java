@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -64,7 +63,6 @@ public final class ReportTradePanel extends ReportPanel {
     public ReportTradePanel(FreeColClient freeColClient) {
         super(freeColClient, "reportTradeAction");
 
-        setSize(getMinimumSize());
         Player player = getMyPlayer();
         colonies = freeColClient.getMySortedColonies();
 
@@ -239,11 +237,6 @@ public final class ReportTradePanel extends ReportPanel {
         button.setActionCommand(colony.getId());
         button.addActionListener(this);
         return button;
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(900, 750);
     }
 
     @Override
