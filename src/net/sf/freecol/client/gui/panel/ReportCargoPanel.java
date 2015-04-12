@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Dimension;
 import javax.swing.JSeparator;
 
 import net.sf.freecol.client.FreeColClient;
@@ -78,13 +77,4 @@ public final class ReportCargoPanel extends ReportUnitPanel {
         }
     }
 
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(750, 600);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return getMinimumSize();
-    }
 }
