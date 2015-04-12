@@ -24,6 +24,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -88,6 +89,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 
 import net.miginfocom.swing.MigLayout;
+
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 
@@ -1201,8 +1203,11 @@ public final class ColonyPanel extends PortPanel
          */
         public void update() {
             final Colony colony = getColony();
-            ImageLibrary lib = getImageLibrary();
             if (colony == null) return;
+            final ImageLibrary lib = getGUI().getColonyTileMapViewer()
+                .getImageLibrary();
+            final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.SMALLER, lib.getScalingFactor());
             final int uc = colony.getUnitCount();
             final int solPercent = colony.getSoL();
             final int rebels = Colony.calculateRebels(uc, solPercent);
@@ -1220,14 +1225,17 @@ public final class ColonyPanel extends PortPanel
             t = StringTemplate.template("colonyPanel.rebelLabel")
                               .addAmount("%number%", rebels);
             rebelLabel.setText(Messages.message(t));
+            rebelLabel.setFont(font);
             add(rebelLabel, "split 2, flowy");
 
             rebelMemberLabel.setText(solPercent + "%");
+            rebelMemberLabel.setFont(font);
             add(rebelMemberLabel);
 
             t = StringTemplate.template("colonyPanel.populationLabel")
                               .addAmount("%number%", uc);
             popLabel.setText(Messages.message(t));
+            popLabel.setFont(font);
             add(popLabel, "split 2, flowy");
 
             t = StringTemplate.template("colonyPanel.bonusLabel")
@@ -1235,14 +1243,17 @@ public final class ColonyPanel extends PortPanel
                               .add("%extra%", ((grow == 0) ? ""
                                       : "(" + grow + ")"));
             bonusLabel.setText(Messages.message(t));
+            bonusLabel.setFont(font);
             add(bonusLabel);
 
             t = StringTemplate.template("colonyPanel.royalistLabel")
                               .addAmount("%number%", uc - rebels);
             royalistLabel.setText(Messages.message(t));
+            royalistLabel.setFont(font);
             add(royalistLabel, "split 2, flowy");
 
             royalistMemberLabel.setText(colony.getTory() + "%");
+            royalistMemberLabel.setFont(font);
             add(royalistMemberLabel);
 
             Nation other = (colony.getOwner().isREF())

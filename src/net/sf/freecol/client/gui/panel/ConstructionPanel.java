@@ -19,18 +19,22 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -126,29 +130,43 @@ public class ConstructionPanel extends MigPanel
 
     public void update(BuildableType buildable) {
         removeAll();
+        final ImageLibrary lib = freeColClient.getGUI()
+            .getColonyTileMapViewer().getImageLibrary();
+        final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.SMALLER, lib.getScalingFactor());
 
         if (buildable == null) {
             String clickToBuild = Messages.message(getDefaultLabel());
             int breakingPoint = Messages.getBreakingPoint(clickToBuild);
             if (breakingPoint > 0) {
-                add(new JLabel(clickToBuild.substring(0, breakingPoint)),
-                    "span, align center");
-                add(new JLabel(clickToBuild.substring(breakingPoint + 1)),
-                    "span, align center");
+                JLabel label0 = new JLabel(
+                    clickToBuild.substring(0, breakingPoint));
+                label0.setFont(font);
+                add(label0, "span, align center");
+                JLabel label1 = new JLabel(
+                    clickToBuild.substring(breakingPoint + 1));
+                label1.setFont(font);
+                add(label1, "span, align center");
             } else {
-                add(new JLabel(clickToBuild), "span, align center");
+                JLabel label = new JLabel(clickToBuild);
+                label.setFont(font);
+                add(label, "span, align center");
             }
         } else {
             int turns = colony.getTurnsToComplete(buildable);
-            Image image = freeColClient.getGUI().getImageLibrary()
-                .getSmallBuildableImage(buildable, colony.getOwner());
+            Image image = lib.getSmallBuildableImage(
+                buildable, colony.getOwner());
             add(new JLabel(new ImageIcon(image)), "spany");
-            add(Utility.localizedLabel(StringTemplate
-                    .template("colonyPanel.currentlyBuilding")
-                    .addName("%buildable%", buildable)));
-            add(Utility.localizedLabel(StringTemplate
-                    .template("turnsToComplete.long")
-                    .addName("%number%", Messages.getTurnsText(turns))));
+            JLabel label0 = Utility.localizedLabel(StringTemplate
+                .template("colonyPanel.currentlyBuilding")
+                .addName("%buildable%", buildable));
+            label0.setFont(font);
+            add(label0);
+            JLabel label1 = Utility.localizedLabel(StringTemplate
+                .template("turnsToComplete.long")
+                .addName("%number%", Messages.getTurnsText(turns)));
+            label1.setFont(font);
+            add(label1);
 
             for (AbstractGoods ag : buildable.getRequiredGoods()) {
                 int amountNeeded = ag.getAmount();
