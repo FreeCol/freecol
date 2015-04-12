@@ -40,7 +40,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.AttributeSet;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -223,8 +222,6 @@ public final class Utility {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setFocusable(false);
-        textArea.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY));
         textArea.setSize(textArea.getPreferredSize());
         return textArea;
     }
