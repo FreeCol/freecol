@@ -246,24 +246,7 @@ public final class Utility {
      */
     public static JTextPane getDefaultTextPane(String text) {
         DefaultStyledDocument document
-            = new DefaultStyledDocument(STYLE_CONTEXT) {
-                    @Override
-                    public Font getFont(AttributeSet attr) {
-                        Font font = ResourceManager
-                            .getFont(StyleConstants.getFontFamily(attr));
-                        int fontStyle = Font.PLAIN;
-                        if (StyleConstants.isBold(attr)) {
-                            fontStyle |= Font.BOLD;
-                        }
-                        if (StyleConstants.isItalic(attr)) {
-                            fontStyle |= Font.ITALIC;
-                        }
-                        return (fontStyle == Font.PLAIN)
-                            ? font.deriveFont(StyleConstants.getFontSize(attr))
-                            : font.deriveFont(fontStyle,
-                                StyleConstants.getFontSize(attr));
-                    }
-                };
+            = new DefaultStyledDocument(STYLE_CONTEXT);
 
         JTextPane textPane = new JTextPane(document);
         textPane.setOpaque(false);
