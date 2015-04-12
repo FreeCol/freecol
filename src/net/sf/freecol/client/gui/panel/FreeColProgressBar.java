@@ -28,6 +28,7 @@ import java.awt.RenderingHints;
 
 import javax.swing.JPanel;
 
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
@@ -144,6 +145,8 @@ public class FreeColProgressBar extends JPanel {
     protected void paintComponent(Graphics g) {
 
         Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+            FontLibrary.FontSize.TINY));
         int width = getWidth() - getInsets().left - getInsets().right;
         int height = getHeight() - getInsets().top - getInsets().bottom;
 
