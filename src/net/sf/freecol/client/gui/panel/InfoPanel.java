@@ -35,9 +35,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.MapViewer;
@@ -80,22 +82,37 @@ public final class InfoPanel extends FreeColPanel {
         public EndTurnPanel() {
             super(new MigLayout("wrap 1, center", "[center]", ""));
 
+            final ImageLibrary lib = getGUI().getColonyTileMapViewer()
+                .getImageLibrary();
+            Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.TINY, lib.getScalingFactor());
+
             String labelString = Messages.message("infoPanel.endTurnPanel.text");
-            int width = getFontMetrics(getFont()).stringWidth(labelString);
+            int width = getFontMetrics(font).stringWidth(labelString);
             if (width > 150 ) {
                 int index = Messages.getBreakingPoint(labelString);
                 if (index > 0) {
-                    add(new JLabel(labelString.substring(0, index)));
-                    add(new JLabel(labelString.substring(index + 1)));
+                    JLabel label0 = new JLabel(labelString.substring(0, index));
+                    label0.setFont(font);
+                    add(label0);
+                    JLabel label1 = new JLabel(labelString.substring(index + 1));
+                    label1.setFont(font);
+                    add(label1);
                 } else {
-                    add(new JLabel(labelString));
+                    JLabel label = new JLabel(labelString);
+                    label.setFont(font);
+                    add(label);
                 }
             } else {
-                add(new JLabel(labelString));
+                JLabel label = new JLabel(labelString);
+                label.setFont(font);
+                add(label);
             }
 
-            add(new JButton(getFreeColClient().getActionManager()
-                    .getFreeColAction(EndTurnAction.id)));
+            JButton button = new JButton(getFreeColClient().getActionManager()
+                .getFreeColAction(EndTurnAction.id));
+            button.setFont(font);
+            add(button);
             setOpaque(false);
             setSize(getPreferredSize());
         }
@@ -135,7 +152,7 @@ public final class InfoPanel extends FreeColPanel {
 
             if (tile != null) {
                 final MapViewer mapViewer = getGUI().getColonyTileMapViewer();
-                final ImageLibrary lib = getImageLibrary();
+                final ImageLibrary lib = mapViewer.getImageLibrary();
                 BufferedImage image = mapViewer.createTerrainImage(tile);
                 if (tile.isExplored()) {
                     StringTemplate items = StringTemplate.label(", ");
@@ -252,7 +269,10 @@ public final class InfoPanel extends FreeColPanel {
         public void update() {
             removeAll();
 
-            final ImageLibrary lib = getImageLibrary();
+            final ImageLibrary lib = getGUI().getColonyTileMapViewer()
+                .getImageLibrary();
+            Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.TINY, lib.getScalingFactor());
             if (unit != null) {
                 add(new JLabel(new ImageIcon(lib.getUnitImage(unit))),
                     "spany, gapafter 5px");
@@ -261,16 +281,24 @@ public final class InfoPanel extends FreeColPanel {
                 // FIXME: this is too brittle!
                 int index = name.indexOf(" (");
                 if (index < 0) {
-                    add(new JLabel(name), "span");
+                    JLabel nameLabel = new JLabel(name);
+                    nameLabel.setFont(font);
+                    add(nameLabel, "span");
                 } else {
-                    add(new JLabel(name.substring(0, index)), "span");
-                    add(new JLabel(name.substring(index + 1)), "span");
+                    JLabel nameLabel0 = new JLabel(name.substring(0, index));
+                    nameLabel0.setFont(font);
+                    add(nameLabel0, "span");
+                    JLabel nameLabel1 = new JLabel(name.substring(index + 1));
+                    nameLabel1.setFont(font);
+                    add(nameLabel1, "span");
                 }
 
                 String text = (unit.isInEurope())
                     ? Messages.getName(unit.getOwner().getEurope())
                     : Messages.message("moves") +" "+ unit.getMovesAsString();
-                add(new JLabel(text), "span");
+                JLabel textLabel = new JLabel(text);
+                textLabel.setFont(font);
+                add(textLabel, "span");
 
                 if (unit.isCarrier()) {
                     ImageIcon icon;
@@ -279,6 +307,7 @@ public final class InfoPanel extends FreeColPanel {
                         icon = new ImageIcon(lib.getSmallImage(goods.getType()));
                         label = new JLabel(icon);
                         text = Messages.message(goods.getLabel(true));
+                        label.setFont(font);
                         label.setToolTipText(text);
                         add(label);
                     }
@@ -286,6 +315,7 @@ public final class InfoPanel extends FreeColPanel {
                         icon = new ImageIcon(lib.getSmallerUnitImage(carriedUnit));
                         label = new JLabel(icon);
                         text = carriedUnit.getDescription(Unit.UnitLabelType.NATIONAL);
+                        label.setFont(font);
                         label.setToolTipText(text);
                         add(label);
                     }
@@ -313,8 +343,6 @@ public final class InfoPanel extends FreeColPanel {
     private static final int PANEL_WIDTH = 256;
 
     public static final int PANEL_HEIGHT = 128;
-
-    private final Player player;
 
     private InfoPanelMode mode = InfoPanelMode.NONE;
 
@@ -347,7 +375,6 @@ public final class InfoPanel extends FreeColPanel {
     public InfoPanel(final FreeColClient freeColClient, boolean useSkin) {
         super(freeColClient);
 
-        this.player = freeColClient.getMyPlayer();
         this.endTurnPanel = new EndTurnPanel();
         this.mapEditorPanel = new JPanel(null);
         this.mapEditorPanel.setSize(130, 100);
@@ -467,28 +494,28 @@ public final class InfoPanel extends FreeColPanel {
         if (this.mode != newMode) {
             switch (this.mode = newMode) {
             case END:
-                this.endTurnPanel.setVisible(true);
                 this.mapEditorPanel.setVisible(false);
                 this.tileInfoPanel.setVisible(false);
                 this.unitInfoPanel.setVisible(false);
+                this.endTurnPanel.setVisible(true);
                 break;
             case MAP:
-                this.mapEditorPanel.setVisible(true);
                 this.endTurnPanel.setVisible(false);
                 this.tileInfoPanel.setVisible(false);
                 this.unitInfoPanel.setVisible(false);
+                this.mapEditorPanel.setVisible(true);
                 break;
             case TILE:
-                this.tileInfoPanel.setVisible(true);
                 this.endTurnPanel.setVisible(false);
                 this.mapEditorPanel.setVisible(false);
                 this.unitInfoPanel.setVisible(false);
+                this.tileInfoPanel.setVisible(true);
                 break;
             case UNIT:
-                this.unitInfoPanel.setVisible(true);
                 this.endTurnPanel.setVisible(false);
                 this.mapEditorPanel.setVisible(false);
                 this.tileInfoPanel.setVisible(false);
+                this.unitInfoPanel.setVisible(true);
                 break;
             case NONE: default:
                 this.endTurnPanel.setVisible(false);
