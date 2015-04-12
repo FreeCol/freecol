@@ -347,9 +347,7 @@ public class Unit extends GoodsLocation
                 if (Messages.containsKey(equipmentKey)) {
                     // Currently only used for missionary which does not
                     // have equipment that directly corresponds to goods.
-                    extra = StringTemplate.template("model.goods.goodsAmount")
-                        .add("%goods%", equipmentKey)
-                        .addAmount("%amount%", 1);
+                    extra = AbstractGoods.getLabel(equipmentKey, 1);
                 } else {
                     // Other roles can be characterized by their goods.
                     List<AbstractGoods> requiredGoods

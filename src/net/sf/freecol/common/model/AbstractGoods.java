@@ -141,6 +141,19 @@ public class AbstractGoods extends FreeColObject implements Named {
     }
 
     /**
+     * Get a label given a key and amount.
+     *
+     * @param key A key for the goods to display.
+     * @param amount The amount of goods.
+     * @return The goods label.
+     */
+    public static StringTemplate getLabel(String key, int amount) {
+        return StringTemplate.template("model.goods.goodsAmount")
+            .add("%goods%", key)
+            .addAmount("%amount%", amount);
+    }
+
+    /**
      * Convenience lookup of the member of a collection of abstract goods that
      * matches a given goods type.
      *
