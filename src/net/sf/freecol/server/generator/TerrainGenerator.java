@@ -461,10 +461,9 @@ public class TerrainGenerator {
             // c starting at 1, c=0 is all water tiles
             String id;
             do {
-                id = "model.region.land" + Integer.toString(landIndex++);
+                id = RegionType.LAND.getNameKey() + Integer.toString(landIndex++);
             } while (map.getRegion(id) != null);
-            landregions[c] = new ServerRegion(game, id,
-                Region.RegionType.LAND, null);
+            landregions[c] = new ServerRegion(game, id, RegionType.LAND, null);
             landregions[c].setDiscoverable(true);
             map.putRegion(landregions[c]);
         }
@@ -556,8 +555,8 @@ public class TerrainGenerator {
                 }
 
                 ServerRegion mountainRegion = new ServerRegion(game,
-                    "model.region.mountain" + tries,
-                    Region.RegionType.MOUNTAIN, startTile.getRegion());
+                    RegionType.MOUNTAIN.getNameKey() + tries,
+                    RegionType.MOUNTAIN, startTile.getRegion());
                 mountainRegion.setDiscoverable(true);
                 mountainRegion.setClaimable(true);
                 map.putRegion(mountainRegion);
@@ -662,7 +661,7 @@ public class TerrainGenerator {
                 if (riverMap.get(tile) == null) {
                     // no river here yet
                     ServerRegion riverRegion = new ServerRegion(game,
-                        "model.region.river" + i, Region.RegionType.RIVER,
+                        RegionType.RIVER.getNameKey() + i, RegionType.RIVER,
                         tile.getRegion());
                     riverRegion.setDiscoverable(true);
                     riverRegion.setClaimable(true);
@@ -750,7 +749,7 @@ public class TerrainGenerator {
             if (tile.getRegion() != null) continue;
 
             String id;
-            while (game.getFreeColGameObject(id = "model.region.inlandLake"
+            while (game.getFreeColGameObject(id = RegionType.LAKE.getNameKey()
                     + lakeCount) != null) lakeCount++;
             ServerRegion lakeRegion = new ServerRegion(game, id,
                                                        RegionType.LAKE, null);

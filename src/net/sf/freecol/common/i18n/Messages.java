@@ -752,7 +752,7 @@ public class Messages {
      * @return A suitable name.
      */
     public static String getDefaultRegionName(Player player, Region region) {
-        if (region.isPacific()) return message("model.region.pacific");
+        if (region.isPacific()) return message(Region.PACIFIC_NAME_KEY);
         // Try national names first.
         net.sf.freecol.common.model.Map map = player.getGame().getMap();
         int index = player.getNameIndex(region.getType().getNameIndexKey());
