@@ -76,7 +76,7 @@ public class Nation extends FreeColGameObjectType {
         defaultColors.put("model.nation.swedishREF",    new Color(0x367588));
         defaultColors.put("model.nation.danishREF",     new Color(0x91006d));
         defaultColors.put("model.nation.russianREF",    new Color(0xbebebe));
-        defaultColors.put("model.nation.unknownEnemy",  UNKNOWN_NATION_COLOR);
+        defaultColors.put(UNKNOWN_NATION_ID,            UNKNOWN_NATION_COLOR);
     }
     // end @compat 0.10.x
 
