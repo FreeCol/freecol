@@ -1370,16 +1370,16 @@ public final class MapViewer {
 
 
     /**
-     * Creates an Image that shows the given text centred on a
+     * Creates an BufferedImage that shows the given text centred on a
      * translucent rounded rectangle with the given color.
      *
      * @param g a <code>Graphics2D</code> value
      * @param text a <code>String</code> value
      * @param font a <code>Font</code> value
      * @param backgroundColor a <code>Color</code> value
-     * @return an <code>Image</code> value
+     * @return an <code>BufferedImage</code> value
      */
-    private Image createLabel(Graphics2D g, String text, Font font,
+    private BufferedImage createLabel(Graphics2D g, String text, Font font,
                               Color backgroundColor) {
         TextSpecification[] specs = new TextSpecification[1];
         specs[0] = new TextSpecification(text, font);
@@ -1387,15 +1387,15 @@ public final class MapViewer {
     }
 
     /**
-     * Creates an Image that shows the given text centred on a
+     * Creates an BufferedImage that shows the given text centred on a
      * translucent rounded rectangle with the given color.
      *
      * @param g a <code>Graphics2D</code> value
      * @param textSpecs a <code>TextSpecification</code> array
      * @param backgroundColor a <code>Color</code> value
-     * @return an <code>Image</code> value
+     * @return an <code>BufferedImage</code> value
      */
-    private Image createLabel(Graphics2D g, TextSpecification[] textSpecs,
+    private BufferedImage createLabel(Graphics2D g, TextSpecification[] textSpecs,
                               Color backgroundColor) {
         int hPadding = 15;
         int vPadding = 10;

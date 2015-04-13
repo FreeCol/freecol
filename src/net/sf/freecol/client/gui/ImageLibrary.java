@@ -935,7 +935,7 @@ public final class ImageLibrary {
      * @param foreground The foreground <code>Color</code>.
      * @return A chip.
      */
-    private Image createChip(String text, Color border,
+    private BufferedImage createChip(String text, Color border,
                              Color background, Color foreground) {
         // Draw it and put it in the cache
         Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
@@ -970,7 +970,7 @@ public final class ImageLibrary {
      * @param foreground The foreground <code>Color</code>.
      * @return A chip.
      */
-    private Image createFilledChip(String text, Color border, Color background,
+    private BufferedImage createFilledChip(String text, Color border, Color background,
                                    double amount, Color fill,
                                    Color foreground) {
         // Draw it and put it in the cache
