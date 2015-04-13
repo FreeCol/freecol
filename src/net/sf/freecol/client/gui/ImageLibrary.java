@@ -27,7 +27,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.TexturePaint;
 import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
@@ -827,6 +829,53 @@ public final class ImageLibrary {
             g.setColor(c.getBackground());
             g.fillRect(xmin, ymin, width, height);
         }
+    }
+
+    /**
+     * Fills a certain rectangle with the image texture.
+     * 
+     * @param g2 The <code>Graphics</code> used for painting the border.
+     * @param img The <code>BufferedImage</code> to fill the texture.
+     * @param x The x-component of the offset.
+     * @param y The y-component of the offset.
+     * @param width The width of the rectangle.
+     * @param height The height of the rectangle.
+     */
+    public static void fillTexture(Graphics2D g2, BufferedImage img,
+                                   int x, int y, int width, int height) {
+        Rectangle anchor = new Rectangle(
+            x, y, img.getWidth(null), img.getHeight(null));
+        TexturePaint paint = new TexturePaint(img, anchor);
+        g2.setPaint(paint);
+        g2.fillRect(x, y, width, height);
+    }
+
+    /**
+     * Creates a buffered image out of a given <code>Image</code> object.
+     * 
+     * @param id The object identifier.
+     * @return The created <code>BufferedImage</code> object.
+     */
+    public static BufferedImage createBufferedImage(String id) {
+        Image image = ResourceManager.getImage(id);
+        return createBufferedImage(image);
+    }
+
+    /**
+     * Creates a buffered image out of a given <code>Image</code> object.
+     * 
+     * @param image The <code>Image</code> object.
+     * @return The created <code>BufferedImage</code> object.
+     */
+    public static BufferedImage createBufferedImage(Image image) {
+        if(image == null)
+            return null;
+        BufferedImage result = new BufferedImage(image.getWidth(null),
+            image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = result.createGraphics();
+        g.drawImage(image, 0, 0, null);
+        g.dispose();
+        return result;
     }
 
     public static BufferedImage createResizedImage(Image image,
