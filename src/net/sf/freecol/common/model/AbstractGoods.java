@@ -124,7 +124,20 @@ public class AbstractGoods extends FreeColObject implements Named {
      * @return The label for these goods.
      */
     public StringTemplate getLabel() {
-        return getLabel(type, amount);
+        return getLabel(getType(), getAmount());
+    }
+
+    /**
+     * Get a label for these goods.
+     *
+     * @param sellable Whether these goods can be sold.
+     * @return A label for these goods.
+     */
+    public StringTemplate getLabel(boolean sellable) {
+        return (sellable) ? getLabel()
+            : StringTemplate.template("model.goods.goodsBoycotted")
+                .addNamed("%goods%", getType())
+                .addAmount("%amount%", getAmount());
     }
 
     /**
@@ -136,7 +149,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      */
     public static StringTemplate getLabel(GoodsType type, int amount) {
         return StringTemplate.template("model.goods.goodsAmount")
-            .addStringTemplate("%goods%", type.getLabel())
+            .addNamed("%goods%", type)
             .addAmount("%amount%", amount);
     }
 

@@ -124,19 +124,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     }
 
     /**
-     * Gets the name of this type of goods.
-     *
-     * @param sellable Whether these <code>Goods</code> can be sold.
-     * @return A template for these <code>Goods</code>.
-     */
-    public StringTemplate getLabel(boolean sellable) {
-        if (sellable) return super.getLabel();
-        return StringTemplate.template("model.goods.goodsBoycotted")
-            .addAmount("%amount%", getAmount())
-            .addNamed("%goods%", getType());
-    }
-
-    /**
      * If the amount of goods is greater than the container can hold,
      * then this method adjusts the amount to the maximum amount possible.
      */
