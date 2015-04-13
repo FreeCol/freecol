@@ -27,7 +27,6 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.List;
@@ -44,8 +43,6 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Named;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.StringTemplate.TemplateType;
@@ -165,12 +162,6 @@ public class Messages {
     static {
         tagMap.put("turn", new TurnSelector());
     }
-
-    /** Extra river names. */
-    private static List<String> otherRivers = null;
-
-    /** Mercenary leaders. */
-    private static List<String> mercenaryLeaders = null;
 
 
     // Message bundle initialization
@@ -669,248 +660,6 @@ public class Messages {
             ? message("notApplicable.short")
             : (turns >= 0) ? Integer.toString(turns)
             : ">" + Integer.toString(-turns);
-    }
-
-    /**
-     * Initialize the otherRivers collection.
-     */
-    public static synchronized void requireOtherRivers() {
-        if (otherRivers == null) {
-            otherRivers = new ArrayList<>();
-            collectNames("model.other.region.river.", otherRivers);
-            // Does not need to use player or system PRNG
-            Collections.shuffle(otherRivers);
-        }
-    }
-
-    /**
-     * Initialize the mercenary leaders collection.
-     */
-    private static synchronized void requireMercenaryLeaders() {
-        if (mercenaryLeaders == null) {
-            mercenaryLeaders = new ArrayList<>();
-            collectNames("model.mercenaries.", mercenaryLeaders);
-        }
-    }
-
-    /**
-     * Get the number of mercenary leaders.
-     *
-     * @return The number of mercenary leaders.
-     */
-    public static int getMercenaryLeaderCount() {
-        requireMercenaryLeaders();
-        return mercenaryLeaders.size();
-    }
-
-    /**
-     * Get the name of the nth mercenary leader.
-     *
-     * @param n The index of the leader required.
-     * @return The mercenary leader name.
-     */
-    public static String getMercenaryLeaderName(int n) {
-        requireMercenaryLeaders();
-        return mercenaryLeaders.get(n);
-    }
-
-    /**
-     * Collects all the names with a given prefix.
-     *
-     * @param prefix The prefix to check.
-     * @param names A list to fill with the names found.
-     */
-    private static void collectNames(String prefix, List<String> names) {
-        String name;
-        int i = 0;
-        while (Messages.containsKey(name = prefix + Integer.toString(i))) {
-            names.add(message(name));
-            i++;
-        }
-    }
-
-    // Player-specific naming
-
-    /**
-     * Get the new land name for a player.
-     *
-     * @param player The <code>Player</code> to query.
-     * @return The new land name of a player.
-     */
-    public static String getNewLandName(Player player) {
-        return (player.getNewLandName() == null)
-            ? message(player.getNationId() + ".newLandName")
-            : player.getNewLandName();
-    }
-
-    /**
-     * Creates a unique region name by fetching a new default name
-     * from the list of default names if possible.
-     *
-     * @param player The <code>Player</code> to find a region name for.
-     * @param region The <code>Region</code> to name.
-     * @return A suitable name.
-     */
-    public static String getDefaultRegionName(Player player, Region region) {
-        if (region.isPacific()) return message(Region.PACIFIC_NAME_KEY);
-        // Try national names first.
-        net.sf.freecol.common.model.Map map = player.getGame().getMap();
-        int index = player.getNameIndex(region.getType().getNameIndexKey());
-        if (index < 1) index = 1;
-        String prefix = player.getNationId() + ".region."
-            + region.getType().getKey() + ".";
-        String name;
-        do {
-            name = null;
-            if (containsKey(prefix + Integer.toString(index))) {
-                name = message(prefix + Integer.toString(index));
-                index++;
-            }
-        } while (name != null && map.getRegionByName(name) != null);
-        player.setNameIndex(region.getType().getNameIndexKey(), index);
-
-        // There are a bunch of extra rivers not attached to a specific
-        // nation at model.other.region.river.*.
-        if (name == null && region.getType() == Region.RegionType.RIVER) {
-            requireOtherRivers();
-            while (!otherRivers.isEmpty()) {
-                name = otherRivers.remove(0);
-                if (map.getRegionByName(name) == null) return name;
-            }
-            name = null;
-        }
-
-        // Fall back to generic names.
-        if (name == null) {
-            StringTemplate nn = player.getNationName();
-            do {
-                name = message(StringTemplate
-                    .label("").addStringTemplate(nn)
-                    .addName(" ").addNamed(region.getType())
-                    .addName(" " + String.valueOf(index)));
-                index++;
-            } while (map.getRegionByName(name) != null);
-        }
-        return name;
-    }
-
-    /**
-     * Get the stem of the fallback settlement name for a player.
-     *
-     * @param player The <code>Player</code> to get the base settlement name
-     *     for.
-     * @return The base settlement name for a player.
-     */
-    private static String getBaseSettlementName(Player player) {
-        return message((player.isEuropean()) ? "Colony" : "Settlement") + "-";
-    }
-
-    /**
-     * Is a name a fallback settlement name for a player?
-     *
-     * @param name The settlement name to check.
-     * @param player The <code>Player</code> to check.
-     * @return True if the name is a fallback settlement name for the player.
-     */
-    public static boolean isFallbackSettlementName(String name, Player player) {
-        return name.startsWith(getBaseSettlementName(player));
-    }
-
-    /**
-     * Get a fallback settlement name for a player.
-     *
-     * @param player The <code>Player</code> to get a fallback
-     *     settlement name for.
-     * @return A unique fallback settlement name for the player.
-     */
-    public static String getFallbackSettlementName(Player player) {
-        final String base = getBaseSettlementName(player);
-        int i = player.getSettlements().size() + 1;
-        String name = null;
-        for (;;) {
-            name = base + Integer.toString(i);
-            if (player.getGame().getSettlement(name) == null) break;
-            i++;
-        }
-        return name;
-    }
-
-    /**
-     * Gets a list of settlement names and a fallback prefix for a player.
-     *
-     * @param player The <code>Player</code> to get names for.
-     * @return A list of settlement names, with the first being the
-     *     fallback prefix.
-     */
-    public static List<String> getSettlementNames(Player player) {
-        List<String> names = new ArrayList<>();
-
-        collectNames(player.getNationId() + ".settlementName.", names);
-
-        // Try the spec-qualified version.
-        if (names.isEmpty()) {
-            collectNames(player.getNationId() + ".settlementName."
-                + player.getSpecification().getId() + ".", names);
-        }
-
-        // If still empty and not using the "freecol" ruleset, try
-        // those names.
-        if (names.isEmpty()) {
-            collectNames(player.getNationId() + ".settlementName."
-                + "freecol.", names);
-        }
-
-        return names;
-    }
-
-    /**
-     * Get a fallback ship name for a player.
-     *
-     * @param player The <code>Player</code> to get the name for.
-     * @return A suitable fallback ship name.
-     */
-    public static String getFallbackShipName(Player player) {
-        final String base = message("Ship") + "-";
-        int i = 0;
-        String name = null;
-        for (;;) {
-            name = base + Integer.toString(i);
-            if (player.getUnit(name) == null) break;
-            i++;
-        }
-        return name;
-    }
-
-    /**
-     * Gets a list of ship names and a fallback prefix for a player.
-     *
-     * @param player The <code>Player</code> to get names for.
-     * @return A list of ship names, with the first being the fallback prefix.
-     */
-    public static List<String> getShipNames(Player player) {
-        final String prefix = player.getNationId() + ".ship.";
-        List<String> names = new ArrayList<>();
-        collectNames(prefix, names);
-        return names;
-    }
-
-    /**
-     * Get a new default trade route name for a player.
-     *
-     * @param player The <code>Player</code> to get the name for.
-     * @return A new trade route name.
-     */
-    public static String getTradeRouteName(Player player) {
-        String base = message("tradeRoute.newRoute");
-        if (player.getTradeRoute(base) == null) return base;
-        int i = 1;
-        String name;
-        for (;;) {
-            name = base + Integer.toString(i);
-            if (player.getTradeRoute(name) == null) break;
-            i++;
-        }
-        return name;
     }
 
 

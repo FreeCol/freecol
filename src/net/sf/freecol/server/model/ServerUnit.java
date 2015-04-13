@@ -990,7 +990,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             String newLand = null;
             boolean firstLanding = !serverPlayer.isNewLandNamed();
             if (serverPlayer.isEuropean() && firstLanding) {
-                newLand = Messages.getNewLandName(serverPlayer);
+                newLand = serverPlayer.getNameForNewLand();
                 // Set the default value now to prevent multiple attempts.
                 // The user setNewLandName can override.
                 serverPlayer.setNewLandName(newLand);
@@ -1103,7 +1103,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             && region.getDiscoverer() == null) {
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new NewRegionNameMessage(region, newTile, this,
-                    Messages.getDefaultRegionName(serverPlayer, region)));
+                    serverPlayer.getNameForRegion(region)));
             region.setDiscoverer(getId());
         }
     }

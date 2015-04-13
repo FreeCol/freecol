@@ -43,6 +43,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -1137,12 +1138,11 @@ public final class InGameController extends Controller {
             final List<AbstractUnit> hessians
                 = monarch.getMercenaries(random);
             if (hessians.isEmpty()) break;
-            int n = Messages.getMercenaryLeaderCount();
-            n = randomInt(logger, "Mercenary leader", random, n);
+            int n = NameCache.getMercenaryLeaderIndex(random);
             final int hessPrice = serverPlayer.priceMercenaries(hessians);
             message = new MonarchActionMessage(action, StringTemplate
                 .template(messageId)
-                .addName("%leader%", Messages.getMercenaryLeaderName(n))
+                .addName("%leader%", NameCache.getMercenaryLeaderName(n))
                 .addAmount("%gold%", hessPrice)
                 .addStringTemplate("%mercenaries%",
                     abstractUnitTemplate(", ", hessians)),
@@ -4076,7 +4076,7 @@ public final class InGameController extends Controller {
     public Element getNewTradeRoute(ServerPlayer serverPlayer) {
         List<TradeRoute> routes = serverPlayer.getTradeRoutes();
         TradeRoute route = new TradeRoute(getGame(), 
-            serverPlayer.getNewTradeRouteName(), serverPlayer);
+            serverPlayer.getNameForTradeRoute());
         routes.add(route);
         return new ChangeSet().addTradeRoute(serverPlayer, route)
             .build(serverPlayer);

@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -521,9 +522,6 @@ public class Player extends FreeColGameObject implements Nameable {
     /** The name of the national capital.  (Only used by natives ATM). */
     protected String capitalName = null;
 
-    /** A cache of ship names. */
-    protected List<String> shipNames = null;
-
 
     //
     // Constructors
@@ -646,6 +644,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get a name for the new land.
+     *
+     * @return A suitable name.
+     */
+    public String getNameForNewLand() {
+        return NameCache.getNewLandName(this);
+    }
+
+    /**
      * Get a name key for the player Europe.
      *
      * @return A name key, or null if Europe is null.
@@ -744,7 +751,7 @@ public class Player extends FreeColGameObject implements Nameable {
     private void initializeSettlementNames(Random random) {
         if (settlementNames == null) {
             settlementNames = new ArrayList<>();
-            settlementNames.addAll(Messages.getSettlementNames(this));
+            settlementNames.addAll(NameCache.getSettlementNames(this));
             if (isIndian()) {
                 capitalName = settlementNames.remove(0);
                 if (random != null) {
@@ -787,7 +794,7 @@ public class Player extends FreeColGameObject implements Nameable {
             if (game.getSettlement(name) == null) return name;
         }
 
-        return Messages.getFallbackSettlementName(this);
+        return NameCache.getFallbackSettlementName(this);
     }
 
     /**
@@ -797,59 +804,30 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void putSettlementName(String name) {
         if (settlementNames == null) return; // Can not happen
-        if (!Messages.isFallbackSettlementName(name, this)) {
+        if (!NameCache.isFallbackSettlementName(name, this)) {
             settlementNames.add(name); // Only if it is not a fallback name
         }
     }
 
     /**
-     * Installs suitable ships names into the player name cache.
-     * Optionally shuffles all but the first name so so as to provide
-     * a stable starting ship name.
+     * Get a name for a region.
      *
-     * @param random A <code>Random</code> number source.
+     * @param region The <code>Region</code> to name.
+     * @return A suitable name.
      */
-    private void initializeShipNames(Random random) {
-        if (shipNames == null) {
-            shipNames = Messages.getShipNames(this);
-            if (random != null) {
-                randomShuffle(logger, "Ship names", shipNames, random);
-            }
-            logger.info("Installed " + shipNames.size()
-                + " ship names for player " + this);
-        }
+    public String getNameForRegion(Region region) {
+        return NameCache.getRegionName(this, region);
     }
 
     /**
      * Gets a new name for a unit.
-     *
-     * Currently only names naval units, not specific to type.
-     * FIXME: specific names for types.
      *
      * @param type The <code>UnitType</code> to choose a name for.
      * @param random A pseudo-random number source.
      * @return A name for the unit, or null if not available.
      */
     public String getNameForUnit(UnitType type, Random random) {
-        if (!type.isNaval()) return null;
-
-        // Collect all the names of existing naval units.
-        List<String> navalNames = new ArrayList<>();
-        for (Unit u : getUnits()) {
-            if (u.isNaval() && u.getName() != null) {
-                navalNames.add(u.getName());
-            }
-        }
-
-        // Find a new name in the installed ship names if possible.
-        if (shipNames == null) initializeShipNames(random);
-        String name;
-        while (!shipNames.isEmpty()) {
-            name = shipNames.remove(0);
-            if (!navalNames.contains(name)) return name;
-        }
-
-        return Messages.getFallbackShipName(this);
+        return NameCache.getUnitName(this, type, random);
     }
 
 
@@ -2270,8 +2248,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a unique name for a new trade route.
      */
-    public String getNewTradeRouteName() {
-        return Messages.getTradeRouteName(this);
+    public String getNameForTradeRoute() {
+        return NameCache.getTradeRouteName(this);
     }
 
     /**
