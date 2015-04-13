@@ -157,8 +157,10 @@ public final class PreGameController {
             gui.closeMainPanel();
             gui.closeMenus();
             gui.closeStatusPanel();
-            gui.playSound(null); // Stop the long introduction sound
-            gui.playSound("sound.intro." + player.getNationId());
+            // Stop the long introduction sound
+            freeColClient.getSoundController().playSound(null);
+            freeColClient.getSoundController().playSound(
+                "sound.intro." + player.getNationId());
         }
         freeColClient.askServer()
             .registerMessageHandler(freeColClient.getInGameInputHandler());

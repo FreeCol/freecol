@@ -237,8 +237,6 @@ public class GUI {
 
     private MapControls mapControls;
 
-    private SoundPlayer soundPlayer;
-
     private JWindow splash;
 
     private boolean windowed;
@@ -260,6 +258,11 @@ public class GUI {
 
 
     // Simple accessors
+
+    // TODO: Temporary accessor needs to be removed, as its backwards.
+    public FreeColClient getFreeColClient() {
+        return freeColClient;
+    }
 
     private InGameController igc() {
         return freeColClient.getInGameController();
@@ -398,30 +401,9 @@ public class GUI {
      * Starts the GUI by creating and displaying the GUI-objects.
      *
      * @param desiredWindowSize The desired size of the GUI window.
-     * @param sound Enable sound if true.
      */
-    public void startGUI(final Dimension desiredWindowSize,
-                         boolean sound) {
+    public void startGUI(final Dimension desiredWindowSize) {
         final ClientOptions opts = freeColClient.getClientOptions();
-
-        // Prepare the sound system.
-        if (sound) {
-            final AudioMixerOption amo
-                = (AudioMixerOption) opts.getOption(ClientOptions.AUDIO_MIXER);
-            final PercentageOption volume
-                = (PercentageOption) opts.getOption(ClientOptions.AUDIO_VOLUME);
-            try {
-                this.soundPlayer = new SoundPlayer(amo, volume);
-            } catch (Exception e) {
-                // #3168279 reports an undocumented NPE thrown by
-                // AudioSystem.getMixer(null).  Workaround this and other
-                // such failures by just disabling sound.
-                this.soundPlayer = null;
-                logger.log(Level.WARNING, "Sound disabled", e);
-            }
-        } else {
-            this.soundPlayer = null;
-        }
 
         if (graphicsDevice == null) {
             logger.info("It seems that the GraphicsEnvironment is headless!");
@@ -632,53 +614,6 @@ public class GUI {
             = new CanvasMapEditorMouseListener(freeColClient, canvas);
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
-    }
-
-    // Sound related methods
-
-    /**
-     * Can this client play sounds?
-     *
-     * @return True if there is a sound player present.
-     */
-    public boolean canPlaySound() {
-        return soundPlayer != null;
-    }
-
-    /**
-     * Play a sound.
-     *
-     * @param sound The sound resource to play, or if null stop playing.
-     */
-    public void playSound(String sound) {
-        if (!canPlaySound()) return;
-        if (sound == null) {
-            soundPlayer.stop();
-        } else {
-            File file = ResourceManager.getAudio(sound);
-            if (file != null) {
-                soundPlayer.playOnce(file);
-            }
-            logger.finest(((file == null) ? "Could not load" : "Playing")
-                + " sound: " + sound);
-        }
-    }
-
-    /**
-     * Get the label text for the sound player mixer.
-     *
-     * Needed by the audio mixer option UI.
-     *
-     * @return The text.
-     */
-    public String getSoundMixerLabelText() {
-        Mixer mixer;
-        String text = (soundPlayer == null)
-            ? Messages.message("nothing")
-            : ((mixer = soundPlayer.getMixer()) == null)
-            ? Messages.message("none")
-            : mixer.getMixerInfo().getName();
-        return Messages.message("Current") + ":  " + text;
     }
 
 

@@ -1153,7 +1153,7 @@ public final class Canvas extends JDesktopPane {
         removeInGameComponents();
 
         showMainPanel(null);
-        gui.playSound("sound.intro.general");
+        freeColClient.getSoundController().playSound("sound.intro.general");
         repaint();
     }
 
@@ -1848,7 +1848,7 @@ public final class Canvas extends JDesktopPane {
         // option for it is turned on
         if (freeColClient.getClientOptions()
             .getBoolean(ClientOptions.AUDIO_ALERTS)) {
-            gui.playSound("sound.event.alertSound");
+            freeColClient.getSoundController().playSound("sound.event.alertSound");
         }
 
         showFreeColPanel(new InformationPanel(freeColClient, text, 
@@ -2096,7 +2096,7 @@ public final class Canvas extends JDesktopPane {
     public void showOpeningVideoPanel(final String userMsg) {
         closeMenus();
         final Video video = ResourceManager.getVideo("Opening.video");
-        boolean muteAudio = !gui.canPlaySound();
+        boolean muteAudio = !freeColClient.getSoundController().canPlaySound();
         final VideoComponent vp = new VideoComponent(video, muteAudio);
         final class AbortListener implements ActionListener, KeyListener,
             MouseListener, VideoListener {
@@ -2150,7 +2150,8 @@ public final class Canvas extends JDesktopPane {
                 vp.stop();
                 Canvas.this.remove(vp);
                 if (t != null) t.stop();
-                gui.playSound("sound.intro.general");
+                freeColClient.getSoundController()
+                    .playSound("sound.intro.general");
                 showMainPanel(userMsg);
             }
         }

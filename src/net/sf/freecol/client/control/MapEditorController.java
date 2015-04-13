@@ -99,7 +99,7 @@ public final class MapEditorController {
             requireNativeNations(game);
             freeColClient.setGame(game);
             freeColClient.setMyPlayer(null);
-            gui.playSound(null);
+            freeColClient.getSoundController().playSound(null);
 
             gui.closeMainPanel();
             gui.closeMenus();
@@ -326,7 +326,8 @@ public final class MapEditorController {
                 public void run() {
                     gui.closeMainPanel();
                     gui.showMainPanel(null);
-                    gui.playSound("sound.intro.general");
+                    freeColClient.getSoundController()
+                        .playSound("sound.intro.general");
                 }
             });
     }

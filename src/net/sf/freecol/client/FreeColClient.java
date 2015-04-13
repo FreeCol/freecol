@@ -37,6 +37,7 @@ import net.sf.freecol.client.control.InGameInputHandler;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.control.PreGameInputHandler;
+import net.sf.freecol.client.control.SoundController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.networking.UserServerAPI;
@@ -79,6 +80,8 @@ public final class FreeColClient {
     private final InGameInputHandler inGameInputHandler;
 
     private final MapEditorController mapEditorController;
+
+    private final SoundController soundController;
 
     /** The server that has been started from the client-GUI. */
     private FreeColServer freeColServer = null;
@@ -238,9 +241,12 @@ public final class FreeColClient {
             }
         }
 
+        // Initialize Sound
+        soundController = new SoundController(this, sound);
+
         // Start the GUI (headless-safe)
         gui.hideSplashScreen();
-        gui.startGUI(size, sound);
+        gui.startGUI(size);
 
         // Now the GUI is going, either:
         //   - load the saved game if one was supplied
@@ -252,7 +258,7 @@ public final class FreeColClient {
         //     do (which will often be to progress through the
         //     NewPanel to a call to the connect controller to start a game)
         if (savedGame != null) {
-            gui.playSound("sound.intro.general");
+            soundController.playSound("sound.intro.general");
             SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -263,7 +269,7 @@ public final class FreeColClient {
                     }
                 });
         } else if (spec != null) { // Debug or fast start
-            gui.playSound("sound.intro.general");
+            soundController.playSound("sound.intro.general");
             SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -281,7 +287,7 @@ public final class FreeColClient {
                     }
                 });
         } else {
-            gui.playSound("sound.intro.general");
+            soundController.playSound("sound.intro.general");
             SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -419,6 +425,15 @@ public final class FreeColClient {
      */
     public MapEditorController getMapEditorController() {
         return mapEditorController;
+    }
+
+    /**
+     * Gets the controller for the sound.
+     *
+     * @return The sound controller, if any.
+     */
+    public SoundController getSoundController() {
+        return soundController;
     }
 
     /**

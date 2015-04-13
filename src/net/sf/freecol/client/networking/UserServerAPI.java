@@ -49,7 +49,7 @@ public class UserServerAPI extends ServerAPI {
     protected void doClientProcessingFor(Element reply) {
         String sound = reply.getAttribute("sound");
         if (sound != null && !sound.isEmpty()) {
-            gui.playSound(sound);
+            gui.getFreeColClient().getSoundController().playSound(sound);
         }
     }
 }
