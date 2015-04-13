@@ -1400,9 +1400,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * warnings if this has disadvantages.
      *
      * @param unit The <code>Unit</code> which is to build the colony.
-     * @return A string containing the warnings, or null if none.
+     * @return A <code>StringTemplate</code> containing the warnings,
+     *      or null if none.
      */
-    public String getBuildColonyWarnings(Unit unit) {
+    public StringTemplate getBuildColonyWarnings(Unit unit) {
         final Specification spec = getSpecification();
         final Player owner = unit.getOwner();
         boolean landLocked = true;
@@ -1466,35 +1467,33 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         }
 
-        LogBuilder lb = new LogBuilder(256);
-        lb.mark();
+        StringTemplate ret = StringTemplate.label("\n");
         if (landLocked) {
-            lb.add(Messages.message("buildColony.landLocked"), "\n");
+            ret.add("buildColony.landLocked");
         }
         if (food < 8) {
-            lb.add(Messages.message("buildColony.noFood"), "\n");
+            ret.add("buildColony.noFood");
         }
         for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
             if (!entry.getKey().isFoodType()
                 && entry.getValue() < LOW_PRODUCTION_WARNING_VALUE) {
-                lb.add(Messages.message(StringTemplate
-                        .template("buildColony.noBuildingMaterials")
-                        .addNamed("%goods%", entry.getKey())),
-                    "\n");
+                ret.addStringTemplate(StringTemplate
+                    .template("buildColony.noBuildingMaterials")
+                    .addNamed("%goods%", entry.getKey()));
             }
         }
 
         if (ownedBySelf) {
-            lb.add(Messages.message("buildColony.ownLand"), "\n");
+            ret.add("buildColony.ownLand");
         }
         if (ownedByEuropeans) {
-            lb.add(Messages.message("buildColony.EuropeanLand"), "\n");
+            ret.add("buildColony.EuropeanLand");
         }
         if (ownedByIndians) {
-            lb.add(Messages.message("buildColony.IndianLand"), "\n");
+            ret.add("buildColony.IndianLand");
         }
 
-        return (!lb.grew()) ? null : lb.toString();
+        return ret;
     }
 
     //

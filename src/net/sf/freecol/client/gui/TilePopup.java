@@ -498,7 +498,7 @@ public final class TilePopup extends JPopupMenu {
             if (unit.isDamaged()) {
                 occ = StringTemplate.label(": ")
                     .add("model.unit.occupation.underRepair")
-                    .add(Integer.toString(unit.getTurnsForRepair()));
+                    .addName(Integer.toString(unit.getTurnsForRepair()));
             } else if (tradeRoute != null) {
                 occ = StringTemplate.label(": ")
                     .add("model.unit.occupation.inTradeRoute")
@@ -510,11 +510,11 @@ public final class TilePopup extends JPopupMenu {
                    && unit.getWorkImprovement() != null) {
             occ = StringTemplate.label(": ")
                 .add(unit.getWorkImprovement().getType() + ".occupationString")
-                .add(Integer.toString(unit.getWorkTurnsLeft()));
+                .addName(Integer.toString(unit.getWorkTurnsLeft()));
         } else if (tradeRoute != null) {
             occ = StringTemplate.label(": ")
                 .add("model.unit.occupation.inTradeRoute")
-                .add(tradeRoute.getName());
+                .addName(tradeRoute.getName());
         } else if (unit.getDestination() != null) {
             occ = StringTemplate.key("model.unit.occupation.goingSomewhere");
         } else {

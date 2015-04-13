@@ -2605,9 +2605,9 @@ public final class InGameController implements NetworkConstants {
         // Show the warnings if applicable.
         if (freeColClient.getClientOptions()
             .getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)) {
-            String warnings = tile.getBuildColonyWarnings(unit);
-            if (warnings != null
-                && !gui.confirm(true, tile, StringTemplate.label(warnings),
+            StringTemplate warnings = tile.getBuildColonyWarnings(unit);
+            if (!warnings.getReplacements().isEmpty()
+                && !gui.confirm(true, tile, warnings,
                                 unit, "buildColony.yes", "buildColony.no")) {
                 return false;
             }
