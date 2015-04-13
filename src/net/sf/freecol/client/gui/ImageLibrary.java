@@ -274,11 +274,21 @@ public final class ImageLibrary {
     }
 
     public static Image getForestImage(TileType type, TileImprovementStyle riverStyle, float scale) {
-        if (riverStyle == null) {
-            return ResourceManager.getImage(type.getId() + ".forest", scale);
-        } else {
-            return ResourceManager.getImage(type.getId() + ".forest" + riverStyle.getMask(), scale);
+        if (riverStyle != null) {
+            Image image = ResourceManager.getImage(
+                type.getId() + ".forest" + riverStyle.getMask(), scale);
+            // @compat 0.10.6
+            // Workaround for BR#3599586.  America_large used to contain
+            // tiles with an isolated river (old river style="0"!).
+            // There will never be an image for these, so just drop the
+            // river style.  The map is now fixed, this is just for the
+            // the saved games.
+            // Consider keeping the fallback, as its safer to have one.
+            if(image != null)
+            // end @compat
+                return image;
         }
+        return ResourceManager.getImage(type.getId() + ".forest", scale);
     }
 
     /**
