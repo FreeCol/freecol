@@ -784,10 +784,10 @@ public class Messages {
         if (name == null) {
             StringTemplate nn = player.getNationName();
             do {
-                name = message(StringTemplate.template("model.region.default")
-                    .addStringTemplate("%nation%", nn)
-                    .addNamed("%type%", region.getType())
-                    .addAmount("%index%", index));
+                name = message(StringTemplate
+                    .label("").addStringTemplate(nn)
+                    .addName(" ").addNamed(region.getType())
+                    .addName(" " + String.valueOf(index)));
                 index++;
             } while (map.getRegionByName(name) != null);
         }
@@ -802,8 +802,7 @@ public class Messages {
      * @return The base settlement name for a player.
      */
     private static String getBaseSettlementName(Player player) {
-        return Messages.message((player.isEuropean()) ? "Colony"
-            : "Settlement") + "-";
+        return message((player.isEuropean()) ? "Colony" : "Settlement") + "-";
     }
 
     /**
