@@ -563,30 +563,32 @@ public class StringTemplate extends FreeColObject {
         sb.append(templateType).append(": ");
         switch (templateType) {
         case LABEL:
-            if (replacements == null) {
+            if (this.replacements == null) {
                 sb.append(getId());
             } else {
-                for (StringTemplate object : replacements) {
+                for (StringTemplate object : this.replacements) {
                     sb.append(object).append(getId());
                 }
             }
             break;
         case TEMPLATE:
             sb.append(getId());
-            if (defaultId != null) {
-                sb.append(" (").append(defaultId).append(")");
+            if (this.defaultId != null) {
+                sb.append(" (").append(this.defaultId).append(")");
             }
             sb.append(" [");
-            for (int index = 0; index < keys.size(); index++) {
-                sb.append("[").append(keys.get(index)).append(": ")
-                    .append(replacements.get(index)).append("]");
+            if (this.keys != null) {
+                for (int index = 0; index < this.keys.size(); index++) {
+                    sb.append("[").append(this.keys.get(index)).append(": ")
+                        .append(this.replacements.get(index)).append("]");
+                }
             }
             sb.append("]");
             break;
         case KEY:
             sb.append(getId());
-            if (defaultId != null) {
-                sb.append(" (").append(defaultId).append(")");
+            if (this.defaultId != null) {
+                sb.append(" (").append(this.defaultId).append(")");
             }
             break;
         case NAME:
