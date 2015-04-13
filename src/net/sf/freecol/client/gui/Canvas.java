@@ -2089,13 +2089,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Shows the <code>OpenGamePanel</code>.
-     */
-    public void showOpenGamePanel() {
-        showErrorMessage("openGame.unimplemented");
-    }
-
-    /**
      * Shows the <code>VideoPanel</code>.
      *
      * @param userMsg An optional user message.

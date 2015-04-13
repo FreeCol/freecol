@@ -30,7 +30,6 @@ import javax.swing.JTextField;
 
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.Utility;
-import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.FileOption;
 
 
@@ -67,14 +66,8 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
             browse.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
-                        if (file == null) {
-                            return;
-                        } else if (!file.isFile()) {
-                            gui.showErrorMessage("fileNotFound");
-                            return;
-                        }
-                        setValue(file);
+                        File file = gui.showLoadSaveFileDialog();
+                        if (file != null) setValue(file);
                     }
                 });
         }

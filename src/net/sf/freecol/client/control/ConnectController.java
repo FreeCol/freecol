@@ -138,7 +138,7 @@ public final class ConnectController {
             gui.showErrorMessage("server.noRouteToServer");
             logger.log(Level.WARNING, "No route to server.", e);
         } catch (IOException e) {
-            gui.showErrorMessage("server.couldNotStart");
+            gui.showErrorMessage("server.initialize");
             logger.log(Level.WARNING, "Could not start server.", e);
         }
         return null;
@@ -512,7 +512,7 @@ public final class ConnectController {
         try {
             fis = new FreeColSavegameFile(file);
         } catch (IOException ioe) {
-            SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
+            SwingUtilities.invokeLater(new ErrorJob("couldNotLoadGame"));
             logger.log(Level.WARNING, "Could not open save file: "
                 + file.getName());
             return false;
@@ -547,7 +547,7 @@ public final class ConnectController {
         } catch (XMLStreamException e) {
             logger.log(Level.WARNING, "Error reading game from: "
                 + file.getName(), e);
-            SwingUtilities.invokeLater(new ErrorJob("server.couldNotStart") );
+            SwingUtilities.invokeLater(new ErrorJob("couldNotLoadGame") );
             return false;
         } catch (Exception e) {
             SwingUtilities.invokeLater(new ErrorJob("couldNotLoadGame"));
@@ -609,7 +609,7 @@ public final class ConnectController {
                         });
                         return; // Success!
                     }
-                    err = "server.loginFail";
+                    err = "server.couldNotLogin";
                     logger.warning("Could not log in.");
                 } catch (FileNotFoundException e) {
                     err = "fileNotFound";
@@ -618,13 +618,13 @@ public final class ConnectController {
                     err = e.getMessage();
                     logger.log(Level.WARNING, "FreeCol error.", e);
                 } catch (IOException e) {
-                    err = "server.couldNotStart";
+                    err = "server.initialize";
                     logger.log(Level.WARNING, "Error starting game.", e);
                 } catch (NoRouteToServerException e) {
                     err = "server.noRouteToServer";
                     logger.log(Level.WARNING, "No route to server.", e);
                 } catch (XMLStreamException e) {
-                    err = "server.streamError";
+                    err = "couldNotLoadGame";
                     logger.log(Level.WARNING, "Stream error.", e);
                 }
                 if (err != null) {

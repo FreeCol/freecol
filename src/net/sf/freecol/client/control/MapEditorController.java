@@ -110,7 +110,7 @@ public final class MapEditorController {
             gui.showErrorMessage("server.noRouteToServer");
             return;
         } catch (IOException e) {
-            gui.showErrorMessage("server.couldNotStart");
+            gui.showErrorMessage("server.initialize");
             return;
         }
     }
@@ -235,14 +235,8 @@ public final class MapEditorController {
      * game.
      */
     public void loadGame() {
-        File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
-        if (file == null) return;
-        if (!file.isFile()) {
-            gui.showErrorMessage("fileNotFound");
-            return;
-        }
-
-        loadGame(file);
+        File file = gui.showLoadSaveFileDialog();
+        if (file != null) loadGame(file);
     }
 
     /**
@@ -316,10 +310,10 @@ public final class MapEditorController {
                         SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
                     } catch (IOException e) {
                         reloadMainPanel();
-                        SwingUtilities.invokeLater(new ErrorJob("server.couldNotStart"));
+                        SwingUtilities.invokeLater(new ErrorJob("server.initialize"));
                     } catch (XMLStreamException e) {
                         reloadMainPanel();
-                        SwingUtilities.invokeLater(new ErrorJob("server.streamError"));
+                        SwingUtilities.invokeLater(new ErrorJob("couldNotLoadGame"));
                     }
                 }
             };

@@ -3543,12 +3543,8 @@ public final class InGameController implements NetworkConstants {
      * Returns no status as this game is stopped.
      */
     public void loadGame() {
-        File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
+        File file = gui.showLoadSaveFileDialog();
         if (file == null) return;
-        if (!file.isFile()) {
-            gui.showErrorMessage("fileNotFound");
-            return;
-        }
         if (freeColClient.isInGame() && !gui.confirmStopGame()) return;
 
         freeColClient.getConnectController().quitGame(true);

@@ -80,6 +80,7 @@ import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -2098,6 +2099,15 @@ public class GUI {
         return canvas.showLoadDialog(directory, fileFilters);
     }
 
+    public File showLoadSaveFileDialog() {
+        File file = showLoadDialog(FreeColDirectories.getSaveDirectory());
+        if (file != null && !file.isFile()) {
+            showErrorMessage("noSuchFile");
+            file = null;
+        }
+        return file;
+    }
+            
     public boolean showLoadingSavegameDialog(boolean publicServer,
                                              boolean singlePlayer) {
         if (canvas == null) return false;
