@@ -29,7 +29,6 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Direction;
-import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
@@ -180,11 +179,7 @@ public final class PreGameController {
 
         if (freeColClient.getGame().getTurn().getNumber() == 1) {
             // force view of tutorial message
-            Direction sailDirection = (player.getNation().startsOnEastCoast())
-                ? Direction.W : Direction.E;
-            player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
-                                                    "tutorial.startGame", player)
-                .addNamed("%direction%", sailDirection));
+            player.addStartGameMessage();
             igc.nextModelMessage();
         }
         return true;

@@ -2614,6 +2614,18 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Add the tutorial message for the start of the game.
+     */
+    public void addStartGameMessage() {
+        Direction sailDirection = (getNation().startsOnEastCoast())
+            ? Direction.W
+            : Direction.E;
+        addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
+                                         "tutorial.startGame", this)
+            .addNamed("%direction%", sailDirection));
+    }
+
+    /**
      * Get the history events for this player.
      *
      * @return The list of <code>HistoryEvent</code>s for this player.
