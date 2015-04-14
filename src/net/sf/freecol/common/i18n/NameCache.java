@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.StringTemplate;
@@ -53,6 +54,11 @@ public class NameCache {
 
     /** Extra river names. */
     private static List<String> otherRivers = null;
+
+    /** Settlement names. */
+    private static Map<Player, String> capitalNames = null;
+    private static Map<Player, List<String>> settlementNames = null;
+    private static final Object settlementNameLock = new Object();
 
     /** Ship names. */
     private static final Map<Player, List<String>> shipNames = new HashMap<>();
@@ -109,12 +115,56 @@ public class NameCache {
     /**
      * Initialize the otherRivers collection.
      */
-    public static synchronized void requireOtherRivers() {
+    private static synchronized void requireOtherRivers() {
         if (otherRivers == null) {
             otherRivers = new ArrayList<>();
             collectNames("model.other.region.river.", otherRivers);
             // Does not need to use player or system PRNG
             Collections.shuffle(otherRivers);
+        }
+    }
+
+    /**
+     * Initialize the settlement names for a player.
+     *
+     * @param player The <code>Player</code> to install names for.
+     * @param random A pseudo-random number source.
+     */
+    private static synchronized void requireSettlementNames(Player player,
+                                                            Random random) {
+        if (settlementNames == null) {
+            capitalNames = new HashMap<>();
+            settlementNames = new HashMap<>();
+        }
+        if (settlementNames.get(player) == null) {
+            List<String> names = new ArrayList<>();
+            // @compat 0.10.x
+            // Try the base names
+            collectNames(player.getNationId() + ".settlementName.", names);
+            // end @compat 0.10.x
+
+            // Try the spec-qualified version.
+            if (names.isEmpty()) {
+                collectNames(player.getNationId() + ".settlementName."
+                             + player.getSpecification().getId() + ".", names);
+            }
+
+            // If still empty use the "freecol" names.
+            if (names.isEmpty()) {
+                collectNames(player.getNationId() + ".settlementName.freecol.",
+                             names);
+            }
+
+            // Indians have capitals and need randomization
+            if (player.isIndian()) {
+                capitalNames.put(player, names.remove(0));
+                if (random != null) {
+                    randomShuffle(logger, "Settlement names", names, random);
+                }
+            }
+            settlementNames.put(player, names);
+            logger.fine("Loaded " + names.size() + " settlement names for "
+                        + player.getId());
         }
     }
 
@@ -276,73 +326,75 @@ public class NameCache {
     }
 
     /**
-     * Get the stem of the fallback settlement name for a player.
-     *
-     * @param player The <code>Player</code> to get the base settlement name
-     *     for.
-     * @return The base settlement name for a player.
-     */
-    private static String getBaseSettlementName(Player player) {
-        return Messages.message((player.isEuropean()) ? "Colony"
-            : "Settlement") + "-";
-    }
-
-    /**
-     * Is a name a fallback settlement name for a player?
-     *
-     * @param name The settlement name to check.
-     * @param player The <code>Player</code> to check.
-     * @return True if the name is a fallback settlement name for the player.
-     */
-    public static boolean isFallbackSettlementName(String name, Player player) {
-        return name.startsWith(getBaseSettlementName(player));
-    }
-
-    /**
      * Get a fallback settlement name for a player.
      *
      * @param player The <code>Player</code> to get a fallback
      *     settlement name for.
      * @return A unique fallback settlement name for the player.
      */
-    public static String getFallbackSettlementName(Player player) {
-        final String base = getBaseSettlementName(player);
+    private static String getFallbackSettlementName(Player player) {
+        return Messages.message((player.isEuropean()) ? "Colony"
+            : "Settlement") + "-";
+    }
+
+    /**
+     * Get the name of this players capital.  Only meaningful to natives.
+     *
+     * @param player The <code>Player</code> to get a capital name for.
+     * @param random An optional pseudo-random number source.
+     * @return The name of this players capital.
+     */
+    public static String getCapitalName(Player player, Random random) {
+        requireSettlementNames(player, random);
+        synchronized (settlementNameLock) {
+            return capitalNames.get(player);
+        }
+    }
+
+    /**
+     * Get a settlement name suitable for a player.
+     *
+     * @param player The <code>Player</code> to get a settlement name for.
+     * @param random An optional pseudo-random number source.
+     * @return A new settlement name.
+     */
+    public static String getSettlementName(Player player, Random random) {
+        requireSettlementNames(player, random);
+        final Game game = player.getGame();
+        synchronized (settlementNameLock) {
+            List<String> names = settlementNames.get(player);
+            while (!names.isEmpty()) {
+                String name = names.remove(0);
+                if (game.getSettlement(name) == null) return name;
+            }
+        }
+
+        // Use the fallback name
+        final String base = getFallbackSettlementName(player);
         int i = player.getSettlements().size() + 1;
         String name = null;
         for (;;) {
             name = base + Integer.toString(i);
-            if (player.getGame().getSettlement(name) == null) break;
+            if (game.getSettlement(name) == null) break;
             i++;
         }
         return name;
-    }
+    }           
 
     /**
-     * Gets a list of settlement names and a fallback prefix for a player.
+     * Puts a suggested settlement name back into the pool.
      *
-     * @param player The <code>Player</code> to get names for.
-     * @return A list of settlement names, with the first being the
-     *     fallback prefix.
+     * @param player The <code>Player</code> returning the settlement name.
+     * @param name A formerly suggested settlement name.
      */
-    public static List<String> getSettlementNames(Player player) {
-        List<String> names = new ArrayList<>();
-
-        collectNames(player.getNationId() + ".settlementName.", names);
-
-        // Try the spec-qualified version.
-        if (names.isEmpty()) {
-            collectNames(player.getNationId() + ".settlementName."
-                + player.getSpecification().getId() + ".", names);
+    public static void putSettlementName(Player player, String name) {
+        if (!name.startsWith(getFallbackSettlementName(player))) {
+            requireSettlementNames(player, null);
+            synchronized (settlementNameLock) {
+                List<String> names = settlementNames.get(player);
+                names.add(name);
+            }
         }
-
-        // If still empty and not using the "freecol" ruleset, try
-        // those names.
-        if (names.isEmpty()) {
-            collectNames(player.getNationId() + ".settlementName."
-                + "freecol.", names);
-        }
-
-        return names;
     }
 
     /**

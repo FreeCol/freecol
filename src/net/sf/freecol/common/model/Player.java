@@ -517,11 +517,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     protected HighSeas highSeas = null;
 
-    /** A cache of settlement names. */
-    protected List<String> settlementNames = null;
-    /** The name of the national capital.  (Only used by natives ATM). */
-    protected String capitalName = null;
-
 
     //
     // Constructors
@@ -743,39 +738,13 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Installs suitable settlement names (and the capital if native)
-     * into the player name cache.
-     *
-     * @param random An optional pseudo-random number source.
-     */
-    private void initializeSettlementNames(Random random) {
-        if (settlementNames == null) {
-            settlementNames = new ArrayList<>();
-            settlementNames.addAll(NameCache.getSettlementNames(this));
-            if (isIndian()) {
-                capitalName = settlementNames.remove(0);
-                if (random != null) {
-                    randomShuffle(logger, "Settlement names",
-                                  settlementNames, random);
-                }
-            } else {
-                capitalName = null;
-            }
-            logger.info("Installed " + settlementNames.size()
-                + " settlement names for player " + this);
-        }
-    }
-
-    /**
      * Gets the name of this players capital.  Only meaningful to natives.
      *
      * @param random An optional pseudo-random number source.
      * @return The name of this players capital.
      */
     public String getCapitalName(Random random) {
-        if (isEuropean()) return null;
-        if (capitalName == null) initializeSettlementNames(random);
-        return capitalName;
+        return NameCache.getCapitalName(this, random);
     }
 
     /**
@@ -785,16 +754,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A new settlement name.
      */
     public String getSettlementName(Random random) {
-        final Game game = getGame();
-        if (settlementNames == null) initializeSettlementNames(random);
-
-        // Try the names in the players national name list.
-        while (!settlementNames.isEmpty()) {
-            String name = settlementNames.remove(0);
-            if (game.getSettlement(name) == null) return name;
-        }
-
-        return NameCache.getFallbackSettlementName(this);
+        return NameCache.getSettlementName(this, random);
     }
 
     /**
@@ -803,10 +763,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param name A formerly suggested settlement name.
      */
     public void putSettlementName(String name) {
-        if (settlementNames == null) return; // Can not happen
-        if (!NameCache.isFallbackSettlementName(name, this)) {
-            settlementNames.add(name); // Only if it is not a fallback name
-        }
+        NameCache.putSettlementName(this, name);
     }
 
     /**
