@@ -206,16 +206,10 @@ public abstract class ReportUnitPanel extends ReportPanel {
         ImageIcon icon = new ImageIcon(getImageLibrary().getUnitImage(unit));
         JButton button = Utility.getLinkButton("", icon, unit.getLocation().getId());
         button.addActionListener(this);
-        StringTemplate tip;
-        if (unit.getDestination() == null) {
-            tip = unit.getLabel();
-        } else {
-            String type = (unit.isPerson()) ? "person"
-                : (unit.isNaval()) ? "ship"
-                : "other";
-            tip = StringTemplate.template("report.unit.goingTo")
-                .addStringTemplate("%unit%", unit.getLabel())
-                .addStringTemplate("%going%", unit.getDestinationLabel());
+        StringTemplate tip = StringTemplate.label("\n")
+            .addStringTemplate(unit.getLabel());
+        if (unit.getDestination() != null) {
+            tip.addStringTemplate(unit.getDestinationLabel());
         }
         Utility.localizeToolTip(button, tip);
         return button;
