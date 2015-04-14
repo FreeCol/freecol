@@ -153,7 +153,6 @@ public class ResourceManager {
      */
     public static void preload() {
         logger.finest("preload");
-        dirty = true;
         updateIfDirty();
     }
 
