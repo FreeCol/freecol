@@ -42,6 +42,12 @@ public class NameCache {
 
     private static final Logger logger = Logger.getLogger(NameCache.class.getName());
 
+    private final static String CIBOLA_PREFIX = "lostCityRumour.cityName.";
+    
+    /** Cities of Cibola. */
+    private static List<String> cibolaKeys = null;
+    private static Object cibolaLock = new Object();
+
     /** Mercenary leaders. */
     private static List<String> mercenaryLeaders = null;
 
@@ -64,6 +70,29 @@ public class NameCache {
         while (Messages.containsKey(name = prefix + Integer.toString(i))) {
             names.add(Messages.message(name));
             i++;
+        }
+    }
+
+    /**
+     * Initialize the cities of Cibola collection.
+     *
+     * Public for FreeColServer.
+     *
+     * @param random A pseudo-random number source.
+     */
+    public static void requireCitiesOfCibola(Random random) {
+        synchronized (cibolaLock) {
+            if (cibolaKeys == null) {
+                cibolaKeys = new ArrayList<>();
+                collectNames("lostCityRumour.cityName.", cibolaKeys);
+                int count = cibolaKeys.size();
+                // Actually, store the keys.
+                cibolaKeys.clear();
+                for (int i = 0; i < count; i++) {
+                    cibolaKeys.add(CIBOLA_PREFIX + i);
+                }
+                randomShuffle(logger, "Cibola", cibolaKeys, random);
+            }
         }
     }
 
@@ -111,6 +140,52 @@ public class NameCache {
         return names;
     }
     
+
+    /**
+     * Get the next name for a city of Cibola, removing it from the
+     * list of available names.
+     *
+     * @return A name for a city of Cibola, or null if exhausted.
+     */
+    public static String getNextCityOfCibola() {
+        synchronized (cibolaLock) {
+            return (cibolaKeys == null || cibolaKeys.isEmpty()) ? null
+                : Messages.message(cibolaKeys.remove(0));
+        }
+    }
+
+    /**
+     * Get the current list of available cities of Cibola keys.
+     *
+     * @return A list of city names.
+     */
+    public static List<String> getCitiesOfCibola() {
+        synchronized (cibolaLock) {
+            return (cibolaKeys == null) ? Collections.<String>emptyList()
+                : cibolaKeys;
+        }
+    }
+
+    /**
+     * Clear the city of Cibola cache.
+     */
+    public static synchronized void clearCitiesOfCibola() {
+        synchronized (cibolaLock) {
+            if (cibolaKeys != null) cibolaKeys.clear();
+        }
+    }
+
+    /**
+     * Add a key for a city of Cibola.
+     *
+     * @param key The key to add.
+     */
+    public static void addCityOfCibola(String key) {
+        synchronized (cibolaLock) {
+            if (cibolaKeys == null) cibolaKeys = new ArrayList<>();
+            cibolaKeys.add(key);
+        }
+    }
 
     /**
      * Get a random mercenary leader index.

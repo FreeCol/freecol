@@ -28,6 +28,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
@@ -782,7 +783,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     "lostCityRumour.colonist", serverPlayer, newUnit));
             break;
         case CIBOLA:
-            String cityName = game.nextCityOfCibola();
+            String cityName = NameCache.getNextCityOfCibola();
             if (cityName != null) {
                 int treasureAmount = randomInt(logger,
                     "Base treasure amount", random, dx * 600) + dx * 300;

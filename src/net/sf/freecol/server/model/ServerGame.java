@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -66,9 +67,6 @@ public class ServerGame extends Game implements ServerModelObject {
 
     private static final Logger logger = Logger.getLogger(ServerGame.class.getName());
 
-    /** How many cities of Cibola? */
-    private static final int CIBOLA_COUNT = 7;
-
     /** Timestamp of last move, if any.  Do not serialize. */
     private long lastTime = -1L;
 
@@ -77,6 +75,7 @@ public class ServerGame extends Game implements ServerModelObject {
      * Creates a new game model.
      *
      * @param specification The <code>Specification</code> to use in this game.
+     * @param random A pseudo-random number source.
      * @see net.sf.freecol.server.FreeColServer
      */
     public ServerGame(Specification specification) {
@@ -126,6 +125,20 @@ public class ServerGame extends Game implements ServerModelObject {
             .newInstance(this, id);
     }
 
+    /**
+     * Collects a list of all the ServerModelObjects in this game.
+     *
+     * @return A list of all the ServerModelObjects in this game.
+     */
+    public List<ServerModelObject> getServerModelObjects() {
+        List<ServerModelObject> objs = new ArrayList<>();
+        for (FreeColGameObject fcgo : getFreeColGameObjects()) {
+            if (fcgo instanceof ServerModelObject) {
+                objs.add((ServerModelObject)fcgo);
+            }
+        }
+        return objs;
+    }
 
     /**
      * Get a unique identifier to identify a <code>FreeColGameObject</code>.
@@ -139,6 +152,14 @@ public class ServerGame extends Game implements ServerModelObject {
         return id;
     }
 
+    /**
+     * Randomize a new game.
+     *
+     * @param random A pseudo-random number source.
+     */
+    public void randomize(Random random) {
+        if (random != null) NameCache.requireCitiesOfCibola(random);
+    }
 
     /**
      * Checks if anybody has won this game.
@@ -378,34 +399,6 @@ public class ServerGame extends Game implements ServerModelObject {
         }
 
         return weakest;
-    }
-
-    /**
-     * Collects a list of all the ServerModelObjects in this game.
-     *
-     * @return A list of all the ServerModelObjects in this game.
-     */
-    public List<ServerModelObject> getServerModelObjects() {
-        List<ServerModelObject> objs = new ArrayList<>();
-        for (FreeColGameObject fcgo : getFreeColGameObjects()) {
-            if (fcgo instanceof ServerModelObject) {
-                objs.add((ServerModelObject)fcgo);
-            }
-        }
-        return objs;
-    }
-
-    /**
-     * Initialize the list of cities of Cibola.
-     *
-     * @param random A pseudo-random number source.
-     */
-    public void initializeCitiesOfCibola(Random random) {
-        citiesOfCibola.clear();
-        for (int index = 0; index < CIBOLA_COUNT; index++) {
-            citiesOfCibola.add("lostCityRumour.cityName." + index);
-        }
-        randomShuffle(logger, "Cibola", citiesOfCibola, random);
     }
 
 

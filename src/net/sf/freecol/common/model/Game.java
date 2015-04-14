@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -148,9 +149,6 @@ public class Game extends FreeColGameObject {
 
     /** Whether the War of Spanish Succession has already taken place. */
     private boolean spanishSuccession = false;
-
-    /** The cities of Cibola remaining in this game. */
-    protected final List<String> citiesOfCibola = new ArrayList<>();
 
     // Serialization not required below.
 
@@ -863,18 +861,6 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get the next name for a city of Cibola, removing it from the
-     * list of available names.
-     *
-     * @return The next name key for a city of Cibola, or null if none
-     *     available.
-     */
-    public String nextCityOfCibola() {
-        return (citiesOfCibola.isEmpty()) ? null : citiesOfCibola.remove(0);
-    }
-
-
-    /**
      * Sets the <code>FreeColGameObjectListener</code> attached to this game.
      *
      * @param fcgol The new <code>FreeColGameObjectListener</code>.
@@ -1224,7 +1210,8 @@ public class Game extends FreeColGameObject {
 
         specification.toXML(xw);
 
-        for (String cityName : citiesOfCibola) { // Preserve existing order
+        for (String cityName : NameCache.getCitiesOfCibola()) {
+            // Preserve existing order
             xw.writeStartElement(CIBOLA_TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, cityName);
@@ -1275,7 +1262,7 @@ public class Game extends FreeColGameObject {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        citiesOfCibola.clear();
+        NameCache.clearCitiesOfCibola();
         players.clear();
         unknownEnemy = null;
 
@@ -1310,7 +1297,7 @@ public class Game extends FreeColGameObject {
         //logger.finest("Found game tag " + tag + " id=" + xr.readId());
 
         if (CIBOLA_TAG.equals(tag)) {
-            citiesOfCibola.add(xr.readId());
+            NameCache.addCityOfCibola(xr.readId());
             xr.closeTag(CIBOLA_TAG);
 
         } else if (Map.getXMLElementTagName().equals(tag)) {

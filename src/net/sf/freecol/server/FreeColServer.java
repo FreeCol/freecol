@@ -222,8 +222,8 @@ public final class FreeColServer {
 
         this.random = new Random(FreeColSeed.getFreeColSeed(true));
         this.game = new ServerGame(specification);
-        game.setNationOptions(new NationOptions(specification));
-        game.initializeCitiesOfCibola(random);
+        this.game.setNationOptions(new NationOptions(specification));
+        this.game.randomize(random);
         
         this.inGameController = new InGameController(this, random);
         this.mapGenerator = new SimpleMapGenerator(game, random);
