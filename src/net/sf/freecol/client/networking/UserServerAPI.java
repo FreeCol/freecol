@@ -19,11 +19,11 @@
 
 package net.sf.freecol.client.networking;
 
+import org.w3c.dom.Element;
+
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.networking.ServerAPI;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -49,7 +49,7 @@ public class UserServerAPI extends ServerAPI {
     protected void doClientProcessingFor(Element reply) {
         String sound = reply.getAttribute("sound");
         if (sound != null && !sound.isEmpty()) {
-            gui.getFreeColClient().getSoundController().playSound(sound);
+            gui.playSound(sound);
         }
     }
 }

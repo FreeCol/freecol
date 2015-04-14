@@ -283,7 +283,7 @@ public final class FreeColClient {
             SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        gui.showOpeningVideoPanel(userMsg);
+                        gui.showOpeningVideo(userMsg);
                     }
                 });
         } else {

@@ -25,14 +25,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +43,6 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
@@ -64,8 +59,8 @@ import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
+import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.CompactLabourReport;
 import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
 import net.sf.freecol.client.gui.panel.DeclarationPanel;
@@ -95,8 +90,8 @@ import net.sf.freecol.client.gui.panel.LoadDialog;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
-import net.sf.freecol.client.gui.panel.MapSizeDialog;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
+import net.sf.freecol.client.gui.panel.MapSizeDialog;
 import net.sf.freecol.client.gui.panel.MonarchDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.Parameters;
@@ -126,22 +121,20 @@ import net.sf.freecol.client.gui.panel.RiverStyleDialog;
 import net.sf.freecol.client.gui.panel.SaveDialog;
 import net.sf.freecol.client.gui.panel.ScaleMapSizeDialog;
 import net.sf.freecol.client.gui.panel.SelectAmountDialog;
-import net.sf.freecol.client.gui.panel.SelectTributeAmountDialog;
 import net.sf.freecol.client.gui.panel.SelectDestinationDialog;
+import net.sf.freecol.client.gui.panel.SelectTributeAmountDialog;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
-import net.sf.freecol.client.gui.panel.TradeRoutePanel;
 import net.sf.freecol.client.gui.panel.TradeRouteInputPanel;
+import net.sf.freecol.client.gui.panel.TradeRoutePanel;
 import net.sf.freecol.client.gui.panel.TrainPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.panel.VictoryDialog;
 import net.sf.freecol.client.gui.panel.WarehouseDialog;
 import net.sf.freecol.client.gui.panel.WorkProductionPanel;
-import net.sf.freecol.client.gui.video.VideoComponent;
-import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -171,8 +164,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.common.resources.Video;
 
 
 /**
@@ -1151,9 +1142,7 @@ public final class Canvas extends JDesktopPane {
         // point the GUI should have been informed.
         closeMenus();
         removeInGameComponents();
-
         showMainPanel(null);
-        freeColClient.getSoundController().playSound("sound.intro.general");
         repaint();
     }
 
@@ -1843,14 +1832,6 @@ public final class Canvas extends JDesktopPane {
                                        Tile tile, ImageIcon icon,
                                        StringTemplate template) {
         String text = Messages.message(template);
-
-        // Plays an alert sound on each information message if the
-        // option for it is turned on
-        if (freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.AUDIO_ALERTS)) {
-            freeColClient.getSoundController().playSound("sound.event.alertSound");
-        }
-
         showFreeColPanel(new InformationPanel(freeColClient, text, 
                                               displayObject, icon),
                          tile, true);
@@ -1928,7 +1909,7 @@ public final class Canvas extends JDesktopPane {
         gui.getFrame().setJMenuBar(null);
         mainPanel = new MainPanel(freeColClient);
         addCentered(mainPanel, JLayeredPane.DEFAULT_LAYER);
-        if (userMsg != null) showInformationMessage(userMsg);
+        if (userMsg != null) gui.showInformationMessage(userMsg);
         mainPanel.requestFocus();
     }
 
@@ -2089,87 +2070,18 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Shows the <code>VideoPanel</code>.
+     * Shows the given video Component.
      *
-     * @param userMsg An optional user message.
+     * @param vp The video Component.
+     * @param ml A MouseListener for stopping the video.
+     * @param kl A KeyListener for stopping the video.
      */
-    public void showOpeningVideoPanel(final String userMsg) {
-        closeMenus();
-        final Video video = ResourceManager.getVideo("Opening.video");
-        boolean muteAudio = !freeColClient.getSoundController().canPlaySound();
-        final VideoComponent vp = new VideoComponent(video, muteAudio);
-        final class AbortListener implements ActionListener, KeyListener,
-            MouseListener, VideoListener {
-
-            private Timer t = null;
-
-            @Override
-            public void keyPressed(KeyEvent e) {}
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                execute();
-            }
-
-            @Override
-            public void keyTyped(KeyEvent e) {}
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                execute();
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {}
-            @Override
-            public void mouseExited(MouseEvent e) {}
-            @Override
-            public void mousePressed(MouseEvent e) {}
-            @Override
-            public void mouseReleased(MouseEvent e) {}
-
-            @Override
-            public void stopped() {
-                execute();
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                execute();
-            }
-
-            private void setTimer(Timer t) {
-                this.t = t;
-            }
-
-            private void execute() {
-                removeKeyListener(this);
-                removeMouseListener(this);
-                vp.removeMouseListener(this);
-                //vp.removeVideoListener(this);
-                vp.stop();
-                Canvas.this.remove(vp);
-                if (t != null) t.stop();
-                freeColClient.getSoundController()
-                    .playSound("sound.intro.general");
-                showMainPanel(userMsg);
-            }
-        }
-
-        AbortListener l = new AbortListener();
-        addMouseListener(l);
-        addKeyListener(l);
-        vp.addMouseListener(l);
-        //vp.addVideoListener(l);
+    public void showVideoComponent(final Component vp,
+                                   final MouseListener ml,
+                                   final KeyListener kl) {
+        addMouseListener(ml);
+        addKeyListener(kl);
         addCentered(vp, JLayeredPane.PALETTE_LAYER);
-        vp.play();
-        // Cortado applet is failing to quit when finished, make sure it
-        // eventually gets kicked.  Change the magic number if we
-        // change the opening video length.
-        Timer t = new Timer(80000, l);
-        l.setTimer(t);
-        t.setRepeats(false);
-        t.start();
     }
 
     /**

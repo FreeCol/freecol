@@ -53,11 +53,9 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == button1) {
-                    gui.getFreeColClient().getSoundController()
-                        .playSound("sound.event.buildingComplete");
+                    gui.playSound("sound.event.buildingComplete");
                 } else if (e.getSource() == button2) {
-                    gui.getFreeColClient().getSoundController()
-                        .playSound("sound.intro.general");
+                    gui.playSound("sound.intro.general");
                 } else if (e.getSource() == cbox) {
                     MixerWrapper value = (MixerWrapper) cbox.getSelectedItem();
                     if (getOption().getValue() != value) {
@@ -73,6 +71,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
      * Creates a new <code>AudioMixerOptionUI</code> for the given
      * <code>AudioMixerOption</code>.
      *
+     * @param gui The GUI.
      * @param option The <code>AudioMixerOption</code> to make a user
      *      interface for.
      * @param editable boolean whether user can modify the setting
@@ -114,8 +113,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
     }
 
     private void updateMixerLabel() {
-        currentMixerLabel.setText(gui.getFreeColClient()
-            .getSoundController().getSoundMixerLabelText());
+        currentMixerLabel.setText(gui.getSoundMixerLabelText());
     }
 
 

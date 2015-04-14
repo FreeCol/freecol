@@ -34,9 +34,14 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -49,11 +54,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.sound.sampled.Mixer;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JWindow;
+import javax.swing.Timer;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.client.ClientOptions;
@@ -76,7 +81,8 @@ import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.client.gui.panel.TradeRoutePanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
-import net.sf.freecol.client.gui.sound.SoundPlayer;
+import net.sf.freecol.client.gui.video.VideoComponent;
+import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.i18n.Messages;
@@ -112,14 +118,13 @@ import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.resources.Video;
 import net.sf.freecol.common.util.LogBuilder;
 
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -259,11 +264,6 @@ public class GUI {
 
     // Simple accessors
 
-    // TODO: Temporary accessor needs to be removed, as its backwards.
-    public FreeColClient getFreeColClient() {
-        return freeColClient;
-    }
-
     private InGameController igc() {
         return freeColClient.getInGameController();
     }
@@ -375,6 +375,98 @@ public class GUI {
             splash.dispose();
             splash = null;
         }
+    }
+
+    /**
+     * Shows the <code>VideoPanel</code>.
+     *
+     * @param userMsg An optional user message.
+     */
+    public void showOpeningVideo(final String userMsg) {
+        if (canvas == null) return;
+        canvas.closeMenus();
+        final Video video = ResourceManager.getVideo("Opening.video");
+        boolean muteAudio = !freeColClient.getSoundController().canPlaySound();
+        final VideoComponent vp = new VideoComponent(video, muteAudio);
+
+        final class AbortListener implements ActionListener, KeyListener, MouseListener, VideoListener {
+
+            private Timer t = null;
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e1) {
+                execute();
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e2) {
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e3) {
+                execute();
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e4) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e5) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e6) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e7) {
+            }
+
+            @Override
+            public void stopped() {
+                execute();
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e8) {
+                execute();
+            }
+
+            private void setTimer(Timer t1) {
+                this.t = t1;
+            }
+
+            private void execute() {
+                canvas.removeKeyListener(this);
+                canvas.removeMouseListener(this);
+                vp.removeMouseListener(this);
+                //vp.removeVideoListener(this);
+                vp.stop();
+                canvas.remove(vp);
+                if (t != null) {
+                    t.stop();
+                }
+                freeColClient.getSoundController().playSound("sound.intro.general");
+                showMainPanel(userMsg);
+            }
+        }
+        AbortListener l = new AbortListener();
+        vp.addMouseListener(l);
+        //vp.addVideoListener(l);
+        canvas.showVideoComponent(vp, l, l);
+        vp.play();
+        // Cortado applet is failing to quit when finished, make sure it
+        // eventually gets kicked.  Change the magic number if we
+        // change the opening video length.
+        Timer t2 = new Timer(80000, l);
+        l.setTimer(t2);
+        t2.setRepeats(false);
+        t2.start();
     }
 
     /**
@@ -1768,6 +1860,7 @@ public class GUI {
     public void returnToTitle() {
         if (canvas == null) return;
         canvas.returnToTitle();
+        freeColClient.getSoundController().playSound("sound.intro.general");
     }
 
     public void showAboutPanel() {
@@ -1953,16 +2046,19 @@ public class GUI {
     }
 
     public void showInformationMessage(String messageId) {
+        alertSound();
         if (canvas == null) return;
         canvas.showInformationMessage(messageId);
     }
 
     public void showInformationMessage(StringTemplate template) {
+        alertSound();
         if (canvas == null) return;
         canvas.showInformationMessage(template);
     }
 
     public void showInformationMessage(ModelMessage message) {
+        alertSound();
         if (canvas == null) return;
         canvas.showInformationMessage(message);
     }
@@ -1974,6 +2070,7 @@ public class GUI {
 
     public void showInformationMessage(Settlement displayObject,
                                        StringTemplate template) {
+        alertSound();
         if (canvas == null) return;
         ImageIcon icon = null;
         Tile tile = null;
@@ -1991,6 +2088,7 @@ public class GUI {
 
     public void showInformationMessage(Unit displayObject,
                                        StringTemplate template) {
+        alertSound();
         if (canvas == null) return;
         ImageIcon icon = null;
         Tile tile = null;
@@ -2008,18 +2106,21 @@ public class GUI {
 
     public void showInformationMessage(Tile displayObject,
                                        StringTemplate template) {
+        alertSound();
         if (canvas == null) return;
         canvas.showInformationMessage(displayObject, displayObject, null, template);
     }
 
     public void showInformationMessage(FreeColObject displayObject,
                                        String messageId) {
+        alertSound();
         if (canvas == null) return;
         canvas.showInformationMessage(displayObject, messageId);
     }
 
     public void showInformationMessage(FreeColObject displayObject,
                                        StringTemplate template) {
+        alertSound();
         if (canvas == null) return;
         canvas.showInformationMessage(displayObject, template);
     }
@@ -2143,11 +2244,6 @@ public class GUI {
     public void showNewPanel(Specification specification) {
         if (canvas == null) return;
         canvas.showNewPanel(specification);
-    }
-
-    public void showOpeningVideoPanel(String userMsg) {
-        if (canvas == null) return;
-        canvas.showOpeningVideoPanel(userMsg);
     }
 
     public void showSpyColonyPanel(final Tile tile, Runnable callback) {
@@ -2463,4 +2559,40 @@ public class GUI {
         if (mapViewer == null) return;
         mapViewer.toggleViewMode();
     }
+
+
+    // Forwarding to SoundController, only for gui classes in need of sound
+
+    /**
+     * Play a sound.
+     *
+     * @param sound The sound resource to play, or if null stop playing.
+     */
+    public void playSound(String sound) {
+        freeColClient.getSoundController().playSound(sound);
+    }
+
+    /**
+     * Plays an alert sound for an information message if the
+     * option for it is turned on.
+     */
+    private void alertSound() {
+        if (freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.AUDIO_ALERTS)) {
+            freeColClient.getSoundController()
+                .playSound("sound.event.alertSound");
+        }
+    }
+
+    /**
+     * Get the label text for the sound player mixer.
+     *
+     * Needed by the audio mixer option UI.
+     *
+     * @return The text.
+     */
+    public String getSoundMixerLabelText() {
+        return freeColClient.getSoundController().getSoundMixerLabelText();
+    }
+
 }
