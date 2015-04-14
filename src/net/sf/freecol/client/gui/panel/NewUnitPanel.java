@@ -84,7 +84,7 @@ public class NewUnitPanel extends FreeColPanel {
             }
         };
 
-        okButton.setText(Messages.message("newUnitPanel.ok"));
+        okButton.setText(Messages.message("close"));
 
         update();
     }

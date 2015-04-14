@@ -110,7 +110,7 @@ public final class RecruitPanel extends FreeColPanel {
             i++;
         }
 
-        okButton.setText(Messages.message("recruitPanel.ok"));
+        okButton.setText(Messages.message("close"));
         add(okButton, "newline 20, tag ok");
 
         setSize(getPreferredSize());
