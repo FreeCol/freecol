@@ -3802,8 +3802,10 @@ public final class InGameController implements NetworkConstants {
                                "EventImage.discoverPacific", null);
             nameNewRegion(tile, unit, region, defaultName);
         } else {
-            gui.showNameNewRegionDialog(StringTemplate.
-                template("nameRegion.text"), defaultName, unit, tile, region);
+            gui.showNameNewRegionDialog(StringTemplate
+                .template("nameRegion.text")
+                .addStringTemplate("%type%", region.getLabel()),
+                defaultName, unit, tile, region);
         }
     }
 
