@@ -1473,7 +1473,7 @@ public final class Canvas extends JDesktopPane {
      * @param nodeId The node identifier to display.
      */
     public void showColopediaPanel(String nodeId) {
-        showSubPanel(new ColopediaPanel(freeColClient, nodeId), false);
+        showSubPanel(new ColopediaPanel(freeColClient, nodeId), true);
     }
 
     /**
@@ -1667,7 +1667,7 @@ public final class Canvas extends JDesktopPane {
                         removeEuropeanSubpanels();
                     }
                 });
-            showSubPanel(panel, false);
+            showSubPanel(panel, true);
         }
     }
 
@@ -1748,7 +1748,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showHighScoresPanel(String messageId, List<HighScore> scores) {
         showSubPanel(new ReportHighScoresPanel(freeColClient, messageId, scores),
-                     PopupPosition.ORIGIN, false);
+                     PopupPosition.CENTERED, true);
     }
 
     /**
