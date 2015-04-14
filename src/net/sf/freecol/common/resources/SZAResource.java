@@ -79,7 +79,10 @@ public class SZAResource extends Resource implements Resource.Preloadable {
      * @return The <code>SimpleZippedAnimation</code> in it's original size.
      */
     public SimpleZippedAnimation getSimpleZippedAnimation() {
-        if (szAnimation == null) preload();
+        if (szAnimation == null) {
+            logger.finest("Preload not ready for " + getResourceLocator());
+            preload();
+        }
         return szAnimation;
     }
 

@@ -113,7 +113,10 @@ public class ImageResource extends Resource implements Resource.Preloadable {
      * @return The image in it's original size.
      */
     public Image getImage() {
-        if (image == null) preload();
+        if (image == null) {
+            logger.finest("Preload not ready for " + getResourceLocator());
+            preload();
+        }
         return image;
     }
 

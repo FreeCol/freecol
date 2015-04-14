@@ -74,6 +74,7 @@ public class ResourceManager {
      * @param mapping The mapping between IDs and files.
      */
     public static void setBaseMapping(final ResourceMapping mapping) {
+        logger.info("setBaseMapping " + mapping);
         baseMapping = mapping;
         dirty = true;
     }
@@ -84,6 +85,7 @@ public class ResourceManager {
      * @param mapping The mapping between IDs and files.
      */
     public static void setTcMapping(final ResourceMapping mapping) {
+        logger.info("setTcMapping " + mapping);
         tcMapping = mapping;
         dirty = true;
     }
@@ -94,6 +96,7 @@ public class ResourceManager {
      * @param mappings A list of the mappings between IDs and files.
      */
     public static void setModMappings(final List<ResourceMapping> mappings) {
+        logger.info("setModMappings size " + mappings.size() + " " + mappings.hashCode());
         modMappings = mappings;
         dirty = true;
     }
@@ -104,6 +107,7 @@ public class ResourceManager {
      * @param mapping The mapping between IDs and files.
      */
     public static void setScenarioMapping(final ResourceMapping mapping) {
+        logger.info("setScenarioMapping " + mapping);
         scenarioMapping = mapping;
         dirty = true;
     }
@@ -114,6 +118,7 @@ public class ResourceManager {
      * @param mapping The mapping between IDs and resources.
      */
     public static void setGameMapping(final ResourceMapping mapping) {
+        logger.info("setGameMapping " + mapping);
         gameMapping = mapping;
         dirty = true;
     }
@@ -124,6 +129,7 @@ public class ResourceManager {
      * @param mapping The <code>ResourceMapping</code> to add.
      */
     public static synchronized void addGameMapping(final ResourceMapping mapping) {
+        logger.info("addGameMapping(ResourceMapping) " + mapping);
         if (gameMapping == null) gameMapping = new ResourceMapping();
         gameMapping.addAll(mapping);
         dirty = true;
@@ -136,6 +142,7 @@ public class ResourceManager {
      * @param resource The resource to add.
      */
     public static synchronized void addGameMapping(String key, Resource resource) {
+        //logger.finest("addGameMapping(" + key + ", " + resource + ")");
         if (gameMapping == null) gameMapping = new ResourceMapping();
         gameMapping.add(key, resource);
         mergedContainer.add(key, resource);
@@ -145,6 +152,7 @@ public class ResourceManager {
      * Preload resources.
      */
     public static void preload() {
+        logger.finest("preload");
         dirty = true;
         updateIfDirty();
     }
@@ -168,6 +176,7 @@ public class ResourceManager {
                     // in thread safety issues in Java. 
                     // Could lead to a race condition in case a Resource class
                     // is not completely thread safe, as references are shared.
+                    logger.info("Background thread started");
                     List<Resource> resources
                         = new LinkedList<>(getResources().values());
                     int n = 0;
@@ -197,6 +206,7 @@ public class ResourceManager {
      */
     private static void updateIfDirty() {
         if (dirty) {
+            //logger.finest("updateIfDirty dirty==true");
             dirty = false;
             preloadThread = null;
             createMergedContainer();
@@ -206,6 +216,7 @@ public class ResourceManager {
     }
 
     public static synchronized boolean hasResource(final String resourceId) {
+        //logger.finest("hasResource(" + resourceId + ")");
         return mergedContainer.containsKey(resourceId);
     }
 
@@ -214,6 +225,7 @@ public class ResourceManager {
     }
 
     public static synchronized Map<String, Resource> getResources() {
+        logger.finest("getResources");
         return mergedContainer.getResources();
     }
 
@@ -224,6 +236,7 @@ public class ResourceManager {
      * @return a list of all keys starting with the given prefix
      */
     public static synchronized ArrayList<String> getKeys(String prefix) {
+        logger.finest("getKeys(" + prefix + ")");
         return mergedContainer.getKeys(prefix);
     }
 
@@ -236,6 +249,7 @@ public class ResourceManager {
      */
     public static synchronized ArrayList<String> getKeys(String prefix,
                                                          String suffix) {
+        //logger.finest("getKeys(" + prefix + ", " + suffix + ")");
         return mergedContainer.getKeys(prefix, suffix);
     }
 
@@ -263,11 +277,15 @@ public class ResourceManager {
      */
     public static <T> T getResource(final String resourceId,
                                     final Class<T> type) {
+        if(dirty) {
+           logger.finest("dirty==true on getResource(" + resourceId
+                + ", " + type.getName() + ")");
+        }
         updateIfDirty();
         final Resource r = getResource(resourceId);
         if (r == null) { // Log only unexpected failures
             if (!resourceId.startsWith("dynamic.")) {
-                logger.finest("getResource(" + resourceId
+                logger.warning("getResource(" + resourceId
                               + ", " + type.getName() + ") failed");
             }
             return null;
