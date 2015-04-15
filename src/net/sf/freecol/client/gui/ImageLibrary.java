@@ -504,11 +504,12 @@ public final class ImageLibrary {
      * @return The terrain-image at the given index.
      */
     public static Image getOverlayImage(TileType type, String id, float scale) {
-        return getRandomizedImage(type.getId() + ".overlay", id, scale);
+        String prefix = type.getId() + ".overlay";
+        ArrayList<String> keys = ResourceManager.getKeys(prefix, ".image");
+        return getRandomizedImage(keys, id, scale);
     }
 
-    private static Image getRandomizedImage(String prefix, String id, float scale) {
-        ArrayList<String> keys = ResourceManager.getKeys(prefix, ".image");
+    private static Image getRandomizedImage(ArrayList<String> keys, String id, float scale) {
         int count = keys.size();
         switch(count) {
             case 0:
