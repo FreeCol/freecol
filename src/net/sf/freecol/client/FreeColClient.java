@@ -229,10 +229,6 @@ public final class FreeColClient {
         loadClientOptions(savedGame);
 
         if (!headless) {
-            // Once resources are in place, get preloading started ASAP!
-            logger.info("Preload of resources starting.");
-            ResourceManager.preload();
-
             // Swing system and look-and-feel initialization.
             try {
                 GUI.installLookAndFeel(fontName);

@@ -25,7 +25,6 @@ import java.awt.Font;
 import java.awt.Image;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +55,7 @@ public class ResourceManager {
     // TODO: Check if game and mod resources are always added in a predetermined fixed order.
     private static ResourceMapping gameMapping;
     private static List<ResourceMapping> modMappings
-        = new LinkedList<>();
+        = new ArrayList<>();
 
     /**
      * All the mappings above merged into this single ResourceMapping
@@ -65,8 +64,6 @@ public class ResourceManager {
     private static ResourceMapping mergedContainer;
 
     private static volatile Thread preloadThread = null;
-
-    private static volatile boolean dirty = false;
 
 
     /**
@@ -77,7 +74,7 @@ public class ResourceManager {
     public static void setBaseMapping(final ResourceMapping mapping) {
         logger.info("setBaseMapping " + mapping);
         baseMapping = mapping;
-        dirty = true;
+        update(mapping != null);
     }
 
     /**
@@ -88,7 +85,7 @@ public class ResourceManager {
     public static void setTcMapping(final ResourceMapping mapping) {
         logger.info("setTcMapping " + mapping);
         tcMapping = mapping;
-        dirty = true;
+        update(mapping != null);
     }
 
     /**
@@ -99,7 +96,7 @@ public class ResourceManager {
     public static void setModMappings(final List<ResourceMapping> mappings) {
         logger.info("setModMappings size " + mappings.size() + " " + mappings.hashCode());
         modMappings = mappings;
-        dirty = true;
+        update(!mappings.isEmpty());
     }
 
     /**
@@ -110,7 +107,7 @@ public class ResourceManager {
     public static void setScenarioMapping(final ResourceMapping mapping) {
         logger.info("setScenarioMapping " + mapping);
         scenarioMapping = mapping;
-        dirty = true;
+        update(mapping != null);
     }
 
     /**
@@ -118,10 +115,10 @@ public class ResourceManager {
      *
      * @param mapping The mapping between IDs and resources.
      */
-    public static void setGameMapping(final ResourceMapping mapping) {
+    public static synchronized void setGameMapping(final ResourceMapping mapping) {
         logger.info("setGameMapping " + mapping);
         gameMapping = mapping;
-        dirty = true;
+        update(mapping != null);
     }
 
     /**
@@ -133,7 +130,7 @@ public class ResourceManager {
         logger.info("addGameMapping(ResourceMapping) " + mapping);
         if (gameMapping == null) gameMapping = new ResourceMapping();
         gameMapping.addAll(mapping);
-        dirty = true;
+        update(mapping != null);
     }
 
     /**
@@ -150,11 +147,33 @@ public class ResourceManager {
     }
 
     /**
-     * Preload resources.
+     * Updates the resource mappings after making changes.
+     * 
+     * @param newItems If new items have been added.
      */
-    public static void preload() {
-        logger.finest("preload");
-        updateIfDirty();
+    private static void update(boolean newItems) {
+        logger.finest("update(" + newItems + ")");
+        if(newItems) {
+            preloadThread = null;
+        }
+        createMergedContainer();
+        if(newItems) {
+            // TODO: This should wait for the thread to exit, if one was running.
+            startBackgroundPreloading();
+        }
+    }
+
+    /**
+     * Creates a merged container containing all the resources.
+     */
+    private static synchronized void createMergedContainer() {
+        ResourceMapping mc = new ResourceMapping();
+        mc.addAll(baseMapping);
+        mc.addAll(tcMapping);
+        mc.addAll(scenarioMapping);
+        for (ResourceMapping rm : modMappings) mc.addAll(rm);
+        mc.addAll(gameMapping);
+        mergedContainer = mc;
     }
 
     /**
@@ -177,8 +196,8 @@ public class ResourceManager {
                     // Could lead to a race condition in case a Resource class
                     // is not completely thread safe, as references are shared.
                     logger.info("Background thread started");
-                    List<Resource> resources
-                        = new LinkedList<>(getResources().values());
+                    ArrayList<Resource> resources
+                        = new ArrayList<>(getResources().values());
                     int n = 0;
                     for (Resource r : resources) {
                         if (preloadThread != this) {
@@ -199,20 +218,6 @@ public class ResourceManager {
             };
         preloadThread.setPriority(2);
         preloadThread.start();
-    }
-
-    /**
-     * Updates the resource mappings after making changes.
-     */
-    private static void updateIfDirty() {
-        if (dirty) {
-            //logger.finest("updateIfDirty dirty==true");
-            dirty = false;
-            preloadThread = null;
-            createMergedContainer();
-            // TODO: This should wait for the thread to exit, if one was running.
-            startBackgroundPreloading();
-        }
     }
 
     public static synchronized boolean hasResource(final String resourceId) {
@@ -269,19 +274,6 @@ public class ResourceManager {
     }
 
     /**
-     * Creates a merged container containing all the resources.
-     */
-    private static synchronized void createMergedContainer() {
-        ResourceMapping mc = new ResourceMapping();
-        mc.addAll(baseMapping);
-        mc.addAll(tcMapping);
-        mc.addAll(scenarioMapping);
-        for (ResourceMapping rm : modMappings) mc.addAll(rm);
-        mc.addAll(gameMapping);
-        mergedContainer = mc;
-    }
-
-    /**
      * Gets the resource of the given type.
      *
      * @param <T> The type of the resource to get.
@@ -292,11 +284,7 @@ public class ResourceManager {
      */
     public static <T> T getResource(final String resourceId,
                                     final Class<T> type) {
-        if(dirty) {
-           logger.finest("dirty==true on getResource(" + resourceId
-                + ", " + type.getName() + ")");
-        }
-        updateIfDirty();
+        //logger.finest("getResource(" + resourceId + ", " + type.getName() + ")");
         final Resource r = getResource(resourceId);
         if (r == null) { // Log only unexpected failures
             if (!resourceId.startsWith("dynamic.")) {
@@ -312,44 +300,6 @@ public class ResourceManager {
             return null;
         }
         return type.cast(r);
-    }
-
-    /**
-     * Returns the animation specified by the given name.
-     *
-     * @param resource The name of the resource to return.
-     * @return The animation identified by <code>resource</code>
-     *      or <code>null</code> if there is no animation
-     *      identified by that name.
-     */
-    public static SimpleZippedAnimation getSimpleZippedAnimation(final String resource) {
-        final SZAResource r = getResource(resource, SZAResource.class);
-        return (r != null) ? r.getSimpleZippedAnimation() : null;
-    }
-
-    /**
-     * Gets the <code>Video</code> represented by the given resource.
-     * @return The <code>Video</code> in it's original size.
-     */
-    public static Video getVideo(final String resource) {
-        final VideoResource r = getResource(resource, VideoResource.class);
-        return (r != null) ? r.getVideo() : null;
-    }
-
-    /**
-     * Returns the animation specified by the given name.
-     *
-     * @param resource The name of the resource to return.
-     * @param scale The size of the requested animation (with 1
-     *      being normal size, 2 twice the size, 0.5 half the
-     *      size etc). Rescaling will be performed unless using 1.
-     * @return The animation identified by <code>resource</code>
-     *      or <code>null</code> if there is no animation
-     *      identified by that name.
-     */
-    public static SimpleZippedAnimation getSimpleZippedAnimation(final String resource, final float scale) {
-        final SZAResource r = getResource(resource, SZAResource.class);
-        return (r != null) ? r.getSimpleZippedAnimation(scale) : null;
     }
 
     /**
@@ -429,6 +379,35 @@ public class ResourceManager {
     }
 
     /**
+     * Returns the animation specified by the given name.
+     *
+     * @param resource The name of the resource to return.
+     * @return The animation identified by <code>resource</code>
+     *      or <code>null</code> if there is no animation
+     *      identified by that name.
+     */
+    public static SimpleZippedAnimation getSimpleZippedAnimation(final String resource) {
+        final SZAResource r = getResource(resource, SZAResource.class);
+        return (r != null) ? r.getSimpleZippedAnimation() : null;
+    }
+
+    /**
+     * Returns the animation specified by the given name.
+     *
+     * @param resource The name of the resource to return.
+     * @param scale The size of the requested animation (with 1
+     *      being normal size, 2 twice the size, 0.5 half the
+     *      size etc). Rescaling will be performed unless using 1.
+     * @return The animation identified by <code>resource</code>
+     *      or <code>null</code> if there is no animation
+     *      identified by that name.
+     */
+    public static SimpleZippedAnimation getSimpleZippedAnimation(final String resource, final float scale) {
+        final SZAResource r = getResource(resource, SZAResource.class);
+        return (r != null) ? r.getSimpleZippedAnimation(scale) : null;
+    }
+
+    /**
      * Returns the <code>Color</code> with the given name.
      *
      * @param resource The name of the resource to return.
@@ -458,17 +437,6 @@ public class ResourceManager {
     }
 
     /**
-     * Gets a FAFile resource with the given name.
-     *
-     * @param resource The name of the resource to query.
-     * @return The <code>FAFile</code> found in a FAFileResource.
-     */
-    public static FAFile getFAFile(final String resource) {
-        final FAFileResource r = getResource(resource, FAFileResource.class);
-        return (r == null) ? null : r.getFAFile();
-    }
-
-    /**
      * Gets an audio resource with the given name.
      *
      * @param resource The name of the resource to query.
@@ -477,6 +445,27 @@ public class ResourceManager {
     public static File getAudio(final String resource) {
         final AudioResource r = getResource(resource, AudioResource.class);
         return (r == null) ? null : r.getAudio();
+    }
+
+    /**
+     * Gets the <code>Video</code> represented by the given resource.
+     * @param resource The name of the resource to return.
+     * @return The <code>Video</code> in it's original size.
+     */
+    public static Video getVideo(final String resource) {
+        final VideoResource r = getResource(resource, VideoResource.class);
+        return (r != null) ? r.getVideo() : null;
+    }
+
+    /**
+     * Gets a FAFile resource with the given name.
+     *
+     * @param resource The name of the resource to query.
+     * @return The <code>FAFile</code> found in a FAFileResource.
+     */
+    public static FAFile getFAFile(final String resource) {
+        final FAFileResource r = getResource(resource, FAFileResource.class);
+        return (r == null) ? null : r.getFAFile();
     }
 
     /**
