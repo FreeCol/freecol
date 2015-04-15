@@ -457,246 +457,246 @@ public class MessagesTest extends FreeColTestCase {
 
         // King's regulars
         unit = new ServerUnit(game, null, dutchREF, kingsRegular, defaultRole);
-        assertTrue("King's Regular"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Royal Expeditionary Force King's Regular"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Royal Expeditionary Force King's Regular"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("King's Regular",
+            unit.getDescription());
+        assertEquals("Dutch Royal Expeditionary Force King's Regular",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Royal Expeditionary Force King's Regular",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.changeRole(infantryRole, 1);
-        assertTrue("Infantry"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Royal Expeditionary Force Infantry"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Royal Expeditionary Force Infantry (50 Muskets)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Infantry",
+            unit.getDescription());
+        assertEquals("Dutch Royal Expeditionary Force Infantry",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Royal Expeditionary Force Infantry (50 Muskets)",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.changeRole(cavalryRole, 1);
-        assertTrue("Cavalry"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Royal Expeditionary Force Cavalry"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Royal Expeditionary Force Cavalry (50 Muskets 50 Horses)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Cavalry",
+            unit.getDescription());
+        assertEquals("Dutch Royal Expeditionary Force Cavalry",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Royal Expeditionary Force Cavalry (50 Muskets 50 Horses)",
+            unit.getDescription(UnitLabelType.FULL));
 
         // Colonial regulars
         unit = new ServerUnit(game, null, dutch, colonialRegular, defaultRole);
-        assertTrue("Colonial Regular"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Colonial Regular"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Colonial Regular"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Colonial Regular",
+            unit.getDescription());
+        assertEquals("Dutch Colonial Regular",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Colonial Regular",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.changeRole(soldierRole, 1);
-        assertTrue("Continental Army"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Continental Army"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Continental Army (50 Muskets)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Continental Army",
+            unit.getDescription());
+        assertEquals("Dutch Continental Army",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Continental Army (50 Muskets)",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.changeRole(dragoonRole, 1);
-        assertTrue("Continental Cavalry"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Continental Cavalry"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Continental Cavalry (50 Muskets 50 Horses)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Continental Cavalry",
+            unit.getDescription());
+        assertEquals("Dutch Continental Cavalry",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Continental Cavalry (50 Muskets 50 Horses)",
+            unit.getDescription(UnitLabelType.FULL));
 
         // Veteran Soldiers
         unit = new ServerUnit(game, null, dutch, veteranSoldier, soldierRole);
-        assertTrue("Veteran Soldier"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Veteran Soldier"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Veteran Soldier (50 Muskets)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Veteran Soldier",
+            unit.getDescription());
+        assertEquals("Dutch Veteran Soldier",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Veteran Soldier (50 Muskets)",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.changeRole(defaultRole, 0);
-        assertTrue("Veteran Soldier"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Veteran Soldier"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Veteran Soldier (no muskets)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Veteran Soldier",
+            unit.getDescription());
+        assertEquals("Dutch Veteran Soldier",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Veteran Soldier (no muskets)",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.changeRole(dragoonRole, 1);
-        assertTrue("Veteran Dragoon"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Veteran Dragoon"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Veteran Dragoon (50 Muskets 50 Horses)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Veteran Dragoon",
+            unit.getDescription());
+        assertEquals("Dutch Veteran Dragoon",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Veteran Dragoon (50 Muskets 50 Horses)",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.setName("Davy Crockett");
-        assertTrue("Davy Crockett (Veteran Dragoon)"
-            .equals(unit.getDescription()));
-        assertTrue("Davy Crockett (Dutch Veteran Dragoon)"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Davy Crockett (Dutch Veteran Dragoon/50 Muskets 50 Horses)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Davy Crockett (Veteran Dragoon)",
+            unit.getDescription());
+        assertEquals("Davy Crockett (Dutch Veteran Dragoon)",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Davy Crockett (Dutch Veteran Dragoon/50 Muskets 50 Horses)",
+            unit.getDescription(UnitLabelType.FULL));
 
         // Indian Braves
         unit = new ServerUnit(game, null, sioux, brave, defaultRole);
-        assertTrue("Brave"
-            .equals(unit.getDescription()));
-        assertTrue("Sioux Brave"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Sioux Brave"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Brave",
+            unit.getDescription());
+        assertEquals("Sioux Brave",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Sioux Brave",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.changeRole(armedBraveRole, 1);
-        assertTrue("Armed Brave"
-            .equals(unit.getDescription()));
-        assertTrue("Sioux Armed Brave"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Sioux Armed Brave (25 Muskets)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Armed Brave",
+            unit.getDescription());
+        assertEquals("Sioux Armed Brave",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Sioux Armed Brave (25 Muskets)",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.changeRole(mountedBraveRole, 1);
-        assertTrue("Mounted Brave"
-            .equals(unit.getDescription()));
-        assertTrue("Sioux Mounted Brave"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Sioux Mounted Brave (25 Horses)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Mounted Brave",
+            unit.getDescription());
+        assertEquals("Sioux Mounted Brave",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Sioux Mounted Brave (25 Horses)",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.changeRole(nativeDragoonRole, 1);
-        assertTrue("Native Dragoon"
-            .equals(unit.getDescription()));
-        assertTrue("Sioux Native Dragoon"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Sioux Native Dragoon (25 Muskets 25 Horses)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Native Dragoon",
+            unit.getDescription());
+        assertEquals("Sioux Native Dragoon",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Sioux Native Dragoon (25 Muskets 25 Horses)",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.setName("Chingachgook");
-        assertTrue("Chingachgook (Native Dragoon)"
-            .equals(unit.getDescription()));
-        assertTrue("Chingachgook (Sioux Native Dragoon)"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Chingachgook (Sioux Native Dragoon/25 Muskets 25 Horses)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Chingachgook (Native Dragoon)",
+            unit.getDescription());
+        assertEquals("Chingachgook (Sioux Native Dragoon)",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Chingachgook (Sioux Native Dragoon/25 Muskets 25 Horses)",
+            unit.getDescription(UnitLabelType.FULL));
 
         // Hardy Pioneers
         unit = new ServerUnit(game, null, dutch, hardyPioneer, pioneerRole);
-        assertTrue("Hardy Pioneer"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Hardy Pioneer (100 Tools)"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Hardy Pioneer (100 Tools)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Hardy Pioneer",
+            unit.getDescription());
+        assertEquals("Dutch Hardy Pioneer (100 Tools)",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Hardy Pioneer (100 Tools)",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.changeRole(defaultRole, 0);
-        assertTrue("Hardy Pioneer"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Hardy Pioneer"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Hardy Pioneer (no tools)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Hardy Pioneer",
+            unit.getDescription());
+        assertEquals("Dutch Hardy Pioneer",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Hardy Pioneer (no tools)",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.setName("Daniel Boone");
-        assertTrue("Daniel Boone (Hardy Pioneer)"
-            .equals(unit.getDescription()));
-        assertTrue("Daniel Boone (Dutch Hardy Pioneer)"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Daniel Boone (Dutch Hardy Pioneer/no tools)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Daniel Boone (Hardy Pioneer)",
+            unit.getDescription());
+        assertEquals("Daniel Boone (Dutch Hardy Pioneer)",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Daniel Boone (Dutch Hardy Pioneer/no tools)",
+            unit.getDescription(UnitLabelType.FULL));
 
         // Jesuit Missionaries
         unit = new ServerUnit(game, null, dutch, jesuitMissionary, 
                               missionaryRole);
-        assertTrue("Jesuit Missionary"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Jesuit Missionary"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Jesuit Missionary (1 Bible)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Jesuit Missionary",
+            unit.getDescription());
+        assertEquals("Dutch Jesuit Missionary",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Jesuit Missionary (1 Bible)",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.changeRole(defaultRole, 0);
-        assertTrue("Jesuit Missionary"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Jesuit Missionary"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Jesuit Missionary (not commissioned)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Jesuit Missionary",
+            unit.getDescription());
+        assertEquals("Dutch Jesuit Missionary",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Jesuit Missionary (not commissioned)",
+            unit.getDescription(UnitLabelType.FULL));
 
         // Free Colonists
         unit = new ServerUnit(game, null, dutch, freeColonist, defaultRole);
-        assertTrue("Free Colonist"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Free Colonist"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Free Colonist"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Free Colonist",
+            unit.getDescription());
+        assertEquals("Dutch Free Colonist",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Free Colonist",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.setRole(soldierRole);
-        assertTrue("Soldier (Free Colonist)"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Soldier (Free Colonist)"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Soldier (Free Colonist/50 Muskets)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Soldier (Free Colonist)",
+            unit.getDescription());
+        assertEquals("Dutch Soldier (Free Colonist)",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Soldier (Free Colonist/50 Muskets)",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.setName("John Doe");
-        assertTrue("John Doe (Soldier/Free Colonist)"
-            .equals(unit.getDescription()));
-        assertTrue("John Doe (Dutch Soldier/Free Colonist)"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("John Doe (Dutch Soldier/Free Colonist/50 Muskets)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("John Doe (Soldier/Free Colonist)",
+            unit.getDescription());
+        assertEquals("John Doe (Dutch Soldier/Free Colonist)",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("John Doe (Dutch Soldier/Free Colonist/50 Muskets)",
+            unit.getDescription(UnitLabelType.FULL));
 
         // Expert
         unit = new ServerUnit(game, null, dutch, masterCarpenter, defaultRole);
-        assertTrue("Master Carpenter"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Master Carpenter"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Master Carpenter"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Master Carpenter",
+            unit.getDescription());
+        assertEquals("Dutch Master Carpenter",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Master Carpenter",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.setRole(missionaryRole);
-        assertTrue("Missionary (Master Carpenter)"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Missionary (Master Carpenter)"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Missionary (Master Carpenter/1 Bible)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Missionary (Master Carpenter)",
+            unit.getDescription());
+        assertEquals("Dutch Missionary (Master Carpenter)",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Missionary (Master Carpenter/1 Bible)",
+            unit.getDescription(UnitLabelType.FULL));
 
         // Treasure Train
         unit = new ServerUnit(game, null, dutch, treasureTrain, defaultRole);
         unit.setTreasureAmount(4567);
-        assertTrue("Treasure Train"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Treasure Train"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Treasure Train (4567 gold)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Treasure Train",
+            unit.getDescription());
+        assertEquals("Dutch Treasure Train",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Treasure Train (4567 gold)",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.setName("The Gold of El Dorado");
-        assertTrue("The Gold of El Dorado (Treasure Train)"
-            .equals(unit.getDescription()));
-        assertTrue("The Gold of El Dorado (Dutch Treasure Train)"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("The Gold of El Dorado (Dutch Treasure Train/4567 gold)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("The Gold of El Dorado (Treasure Train)",
+            unit.getDescription());
+        assertEquals("The Gold of El Dorado (Dutch Treasure Train)",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("The Gold of El Dorado (Dutch Treasure Train/4567 gold)",
+            unit.getDescription(UnitLabelType.FULL));
 
         // Caravel
         unit = new ServerUnit(game, null, dutch, caravel, defaultRole);
-        assertTrue("Caravel"
-            .equals(unit.getDescription()));
-        assertTrue("Dutch Caravel"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Dutch Caravel"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Caravel",
+            unit.getDescription());
+        assertEquals("Dutch Caravel",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Dutch Caravel",
+            unit.getDescription(UnitLabelType.FULL));
 
         unit.setName("Santa Maria");
-        assertTrue("Santa Maria (Caravel)"
-            .equals(unit.getDescription()));
-        assertTrue("Santa Maria (Dutch Caravel)"
-            .equals(unit.getDescription(UnitLabelType.NATIONAL)));
-        assertTrue("Santa Maria (Dutch Caravel)"
-            .equals(unit.getDescription(UnitLabelType.FULL)));
+        assertEquals("Santa Maria (Caravel)",
+            unit.getDescription());
+        assertEquals("Santa Maria (Dutch Caravel)",
+            unit.getDescription(UnitLabelType.NATIONAL));
+        assertEquals("Santa Maria (Dutch Caravel)",
+            unit.getDescription(UnitLabelType.FULL));
     }
 }

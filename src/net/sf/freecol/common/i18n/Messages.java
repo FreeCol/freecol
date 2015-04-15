@@ -495,7 +495,7 @@ public class Messages {
                                               String roleId,
                                               StringTemplate extra) {
         // Check for special role-specific key, which will not have a
-        // %role% argument.  These exist so we can avoid mentioning
+        // role argument.  These exist so we can avoid mentioning
         // the role twice, e.g. "Seasoned Scout Scout".
         StringTemplate type;
         String roleKey;
@@ -510,55 +510,79 @@ public class Messages {
             roleKey = (Role.isDefaultRoleId(roleId)) ? null : roleId;
         }
 
-        // This is extra brutal, but crash proof.
         StringTemplate ret;
         if (name == null) {
             if (nationId == null) {
                 if (roleKey == null) {
                     if (extra == null) {
-                        ret = StringTemplate.template("unitFormat.null.null.null.null")
-                            .addStringTemplate("%type%", type);
+                        // %type% | "Free Colonist"
+                        ret = type;
                     } else {
-                        ret = StringTemplate.template("unitFormat.null.null.null.equip")
-                            .addStringTemplate("%type%", type)
-                            .addStringTemplate("%equipment%", extra);
+                        // %type% (%extra%) | "Treasure Train (5000 gold)"
+                        ret = StringTemplate.label("")
+                            .addStringTemplate(type)
+                            .addName(" (")
+                            .addStringTemplate(extra)
+                            .addName(")");
                     }
                 } else {
                     if (extra == null) {
-                        ret = StringTemplate.template("unitFormat.null.null.role.null")
-                            .addStringTemplate("%type%", type)
-                            .add("%role%", nameKey(roleKey));
+                        // %role% (%type%) | "Soldier (Free Colonist)"
+                        ret = StringTemplate.label("")
+                            .add(nameKey(roleKey))
+                            .addName(" (")
+                            .addStringTemplate(type)
+                            .addName(")");
                     } else {
-                        ret = StringTemplate.template("unitFormat.null.null.role.equip")
-                            .addStringTemplate("%type%", type)
-                            .add("%role%", nameKey(roleKey))
-                            .addStringTemplate("%equipment%", extra);
+                        // %role% (%type%/%extra%) | "Soldier (Free Colonist/50 muskets)"
+                        ret = StringTemplate.label("")
+                            .add(nameKey(roleKey))
+                            .addName(" (")
+                            .addStringTemplate(type)
+                            .addName("/")
+                            .addStringTemplate(extra)
+                            .addName(")");
                     }
                 }
             } else {
                 if (roleKey == null) {
                     if (extra == null) {
-                        ret = StringTemplate.template("unitFormat.null.nation.null.null")
-                            .addStringTemplate("%type%", type)
-                            .add("%nation%", nameKey(nationId));
+                        // %nation% %type% | "Dutch Free Colonist"
+                        ret = StringTemplate.label("")
+                            .add(nameKey(nationId))
+                            .addName(" ")
+                            .addStringTemplate(type);
                     } else {
-                        ret = StringTemplate.template("unitFormat.null.nation.null.equip")
-                            .addStringTemplate("%type%", type)
-                            .add("%nation%", nameKey(nationId))
-                            .addStringTemplate("%equipment%", extra);
+                        // %nation% %type% (%extra%) | "Dutch Treasure Train (5000 gold)"
+                        ret = StringTemplate.label("")
+                            .add(nameKey(nationId))
+                            .addName(" ")
+                            .addStringTemplate(type)
+                            .addName(" (")
+                            .addStringTemplate(extra)
+                            .addName(")");
                     }
                 } else {
                     if (extra == null) {
-                        ret = StringTemplate.template("unitFormat.null.nation.role.null")
-                            .addStringTemplate("%type%", type)
-                            .add("%nation%", nameKey(nationId))
-                            .add("%role%", nameKey(roleKey));
+                        // %nation% %role% (%type%) | "Dutch Soldier (Free Colonist)"
+                        ret = StringTemplate.label("")
+                            .add(nameKey(nationId))
+                            .addName(" ")
+                            .add(nameKey(roleKey))
+                            .addName(" (")
+                            .addStringTemplate(type)
+                            .addName(")");
                     } else {
-                        ret = StringTemplate.template("unitFormat.null.nation.role.equip")
-                            .addStringTemplate("%type%", type)
-                            .add("%nation%", nameKey(nationId))
-                            .add("%role%", nameKey(roleKey))
-                            .addStringTemplate("%equipment%", extra);
+                        // %nation% %role% (%type%/%extra%) | "Dutch Soldier (Free Colonist/50 muskets)"
+                        ret = StringTemplate.label("")
+                            .add(nameKey(nationId))
+                            .addName(" ")
+                            .add(nameKey(roleKey))
+                            .addName(" (")
+                            .addStringTemplate(type)
+                            .addName("/")
+                            .addStringTemplate(extra)
+                            .addName(")");
                     }
                 }
             }
@@ -566,57 +590,93 @@ public class Messages {
             if (nationId == null) {
                 if (roleKey == null) {
                     if (extra == null) {
-                        ret = StringTemplate.template("unitFormat.name.null.null.null")
-                            .addName("%name%", name)
-                            .addStringTemplate("%type%", type);
+                        // %name% (%type%) | "Bob (Free Colonist)"
+                        ret = StringTemplate.label("")
+                            .addName(name)
+                            .addName(" (")
+                            .addStringTemplate(type)
+                            .addName(")");
                     } else {
-                        ret = StringTemplate.template("unitFormat.name.null.null.equip")
-                            .addName("%name%", name)
-                            .addStringTemplate("%type%", type)
-                            .addStringTemplate("%equipment%", extra);
+                        // %name% (%type%/%extra%) | "Moolah (Treasure Train/5000 gold)"
+                        ret = StringTemplate.label("")
+                            .addName(name)
+                            .addName(" (")
+                            .addStringTemplate(type)
+                            .addName("/")
+                            .addStringTemplate(extra)
+                            .addName(")");
                     }
                 } else {
                     if (extra == null) {
-                        ret = StringTemplate.template("unitFormat.name.null.role.null")
-                            .addName("%name%", name)
-                            .addStringTemplate("%type%", type)
-                            .add("%role%", nameKey(roleKey));
+                        // %name% (%role%/%type%) | "Bob (Soldier/Free Colonist)"
+                        ret = StringTemplate.label("")
+                            .addName(name)
+                            .addName(" (")
+                            .add(nameKey(roleKey))
+                            .addName("/")
+                            .addStringTemplate(type)
+                            .addName(")");
                     } else {
-                        ret = StringTemplate.template("unitFormat.name.null.role.equip")
-                            .addName("%name%", name)
-                            .addStringTemplate("%type%", type)
-                            .add("%role%", nameKey(roleKey))
-                            .addStringTemplate("%equipment%", extra);
+                        // %name% (%role%/%type%/%extra%) | "Bob (Soldier/Free Colonist/50 muskets)"
+                        ret = StringTemplate.label("")
+                            .addName(name)
+                            .addName(" (")
+                            .add(nameKey(roleKey))
+                            .addName("/")
+                            .addStringTemplate(type)
+                            .addName("/")
+                            .addStringTemplate(extra)
+                            .addName(")");
                     }
                 }
             } else {
                 if (roleKey == null) {
                     if (extra == null) {
-                        ret = StringTemplate.template("unitFormat.name.nation.null.null")
-                            .addName("%name%", name)
-                            .addStringTemplate("%type%", type)
-                            .add("%nation%", nameKey(nationId));
+                        // %name% (%nation% %type%) | "Bob (Dutch Free Colonist)"
+                        ret = StringTemplate.label("")
+                            .addName(name)
+                            .addName(" (")
+                            .add(nameKey(nationId))
+                            .addName(" ")
+                            .addStringTemplate(type)
+                            .addName(")");
                     } else {
-                        ret = StringTemplate.template("unitFormat.name.nation.null.equip")
-                            .addName("%name%", name)
-                            .addStringTemplate("%type%", type)
-                            .add("%nation%", nameKey(nationId))
-                            .addStringTemplate("%equipment%", extra);
+                        // %name% (%nation% %type%/%extra%) | "Moolah (Dutch Treasure Train/5000 gold)"
+                        ret = StringTemplate.label("")
+                            .addName(name)
+                            .addName(" (")
+                            .add(nameKey(nationId))
+                            .addName(" ")
+                            .addStringTemplate(type)
+                            .addName("/")
+                            .addStringTemplate(extra)
+                            .addName(")");
                     }
                 } else {
                     if (extra == null) {
-                        ret = StringTemplate.template("unitFormat.name.nation.role.null")
-                            .addName("%name%", name)
-                            .addStringTemplate("%type%", type)
-                            .add("%nation%", nameKey(nationId))
-                            .add("%role%", nameKey(roleKey));
+                        // %name% (%nation% %role%/%type%) | "Bob (Dutch Soldier/Free Colonist)"
+                        ret = StringTemplate.label("")
+                            .addName(name)
+                            .addName(" (")
+                            .add(nameKey(nationId))
+                            .addName(" ")
+                            .add(nameKey(roleKey))
+                            .addName("/")
+                            .addStringTemplate(type)
+                            .addName(")");
                     } else {
-                        ret = StringTemplate.template("unitFormat.name.nation.role.equip")
-                            .addName("%name%", name)
-                            .addStringTemplate("%type%", type)
-                            .add("%nation%", nameKey(nationId))
-                            .add("%role%", nameKey(roleKey))
-                            .addStringTemplate("%equipment%", extra);
+                        // %name% (%nation% %role%/%type%/%extra%) | "Bob (Dutch Soldier/Free Colonist/50 muskets)"
+                        ret = StringTemplate.label("")
+                            .addName(name)
+                            .addName(" (")
+                            .add(nameKey(nationId))
+                            .addName(" ")
+                            .add(nameKey(roleKey))
+                            .addName("/")
+                            .addStringTemplate(type)
+                            .addName("/")
+                            .addStringTemplate(extra)
+                            .addName(")");
                     }
                 }
             }
