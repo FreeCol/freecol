@@ -28,7 +28,6 @@ public class AllTests {
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for net.sf.freecol.client.gui");
         //$JUnit-BEGIN$
-        suite.addTestSuite(net.sf.freecol.client.gui.sound.SoundTest.class);
         suite.addTestSuite(FontTest.class);
         //$JUnit-END$
         return suite;

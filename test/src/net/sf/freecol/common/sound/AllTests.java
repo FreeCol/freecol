@@ -17,24 +17,20 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.common;
+package net.sf.freecol.common.sound;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+
 public class AllTests {
 
     public static Test suite() {
-        TestSuite suite = new TestSuite("Test for net.sf.freecol.common");
+	TestSuite suite = new TestSuite("Test for net.sf.freecol.common.sound");
         //$JUnit-BEGIN$
-        suite.addTest(net.sf.freecol.common.i18n.AllTests.suite());
-        suite.addTest(net.sf.freecol.common.io.AllTests.suite());
-        suite.addTest(net.sf.freecol.common.option.AllTests.suite());
-        suite.addTest(net.sf.freecol.common.model.AllTests.suite());
-        suite.addTest(net.sf.freecol.common.utils.AllTests.suite());
-        suite.addTest(net.sf.freecol.common.sound.AllTests.suite());
+        suite.addTestSuite(SoundTest.class);
         //$JUnit-END$
         return suite;
     }
-    
+
 }
