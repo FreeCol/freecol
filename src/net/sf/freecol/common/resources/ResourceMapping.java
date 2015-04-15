@@ -22,7 +22,9 @@ package net.sf.freecol.common.resources;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -119,6 +121,23 @@ public class ResourceMapping {
         ArrayList<String> result = new ArrayList<>();
         for (String key : resources.keySet()) {
             if (key.startsWith(prefix) && key.endsWith(suffix)) {
+                result.add(key);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Get the keys in this mapping with a given infix and suffix.
+     *
+     * @param infix The infix to check for.
+     * @param suffix The suffix to check for.
+     * @return The set of keys.
+     */
+    public Set<String> getFilteredKeys(String infix, String suffix) {
+        HashSet<String> result = new HashSet<>();
+        for (String key : resources.keySet()) {
+            if (key.endsWith(suffix) && key.contains(infix)) {
                 result.add(key);
             }
         }

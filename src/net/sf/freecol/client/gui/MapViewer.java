@@ -47,6 +47,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -82,8 +83,9 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
-import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
+
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -519,11 +521,10 @@ public final class MapViewer {
         }
     }
 
-    private int getCompoundHeight(TileType tileType, int height) {
+    private int getCompoundHeight(TileType tileType, int height,
+                                  Image overlayImage) {
         int compoundHeight = height;
         if (tileType != null) {
-            Image overlayImage = ImageLibrary.getOverlayImage(
-                tileType, tileType.getId(), lib.getScalingFactor());
             int tmpHeight;
             if (overlayImage != null) {
                 tmpHeight = overlayImage.getHeight(null);
@@ -554,15 +555,17 @@ public final class MapViewer {
         final TileType tileType = tile.getType();
         final Image terrain = lib.getTerrainImage(
             tileType, tile.getX(), tile.getY());
+        Image overlayImage = lib.getOverlayImage(tile);
         final int width = terrain.getWidth(null);
         final int height = terrain.getHeight(null);
-        final int compoundHeight = getCompoundHeight(tileType, height);
+        final int compoundHeight = getCompoundHeight(tileType, height,
+                                                     overlayImage);
         BufferedImage image = new BufferedImage(
             width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
         g.translate(0, compoundHeight - height);
         displayBaseTile(g, lib, tile, true);
-        displayTileItems(g, tile);
+        displayTileItems(g, tile, overlayImage);
         g.dispose();
         return image;
     }
@@ -621,12 +624,14 @@ public final class MapViewer {
             tileType, tile.getX(), tile.getY());
         final int width = terrain.getWidth(null);
         final int height = terrain.getHeight(null);
-        final int compoundHeight = getCompoundHeight(tileType, height);
+        Image overlayImage = lib.getOverlayImage(tile);
+        final int compoundHeight = getCompoundHeight(tileType, height,
+                                                     overlayImage);
         BufferedImage image = new BufferedImage(
             width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
         g.translate(0, compoundHeight - height);
-        displayColonyTile(g, tile, colony);
+        displayColonyTile(g, tile, colony, overlayImage);
         g.dispose();
         return image;
     }
@@ -654,6 +659,7 @@ public final class MapViewer {
      *      of the <code>Tile</code> objects for.
      */
     public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
+        Set<String> overlayCache = ImageLibrary.createOverlayCache();
         final Tile tile = colony.getTile();
         Dimension tileSize = getTileSize(tile);
         for (int x = 0; x < 3; x++) {
@@ -662,7 +668,8 @@ public final class MapViewer {
                     int xx = (((2 - x) + y) * tileSize.width) / 2;
                     int yy = ((x + y) * tileSize.height) / 2;
                     g.translate(xx, yy);
-                    displayColonyTile(g, tiles[x][y], colony);
+                    Image overlayImage = lib.getOverlayImage(tile, overlayCache);
+                    displayColonyTile(g, tiles[x][y], colony, overlayImage);
                     g.translate(-xx, -yy);
                 }
             }
@@ -682,8 +689,10 @@ public final class MapViewer {
      * @param colony The <code>Colony</code> to create the visualization
      *      of the <code>Tile</code> for. This object is also used to
      *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
+     * @param overlayImage The Image for the tile overlay.
      */
-    public void displayColonyTile(Graphics2D g, Tile tile, Colony colony) {
+    public void displayColonyTile(Graphics2D g, Tile tile, Colony colony,
+                                  Image overlayImage) {
         boolean tileCannotBeWorked = false;
         Unit unit = null;
         int price = 0;
@@ -701,7 +710,7 @@ public final class MapViewer {
 
         displayBaseTile(g, lib, tile, false);
         if (tile != null && tile.isExplored()) {
-            displayTileItems(g, tile);
+            displayTileItems(g, tile, overlayImage);
             displaySettlement(g, lib, tile, tileWidth, tileHeight, false);
             displayFogOfWar(g, tile);
             displayOptionalValues(g, tile);
@@ -1774,6 +1783,7 @@ public final class MapViewer {
         List<AffineTransform> unitTransforms = new ArrayList<>();
         List<Settlement> settlements = new ArrayList<>();
         List<AffineTransform> settlementTransforms = new ArrayList<>();
+        Set<String> overlayCache = ImageLibrary.createOverlayCache();
 
         int colonyLabels = options.getInteger(ClientOptions.COLONY_LABELS);
         boolean withNumbers = colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC;
@@ -1811,7 +1821,8 @@ public final class MapViewer {
                                 0, 0, null);
                         }
                     }
-                    displayTileItems(g, tile);
+                    Image overlayImage = lib.getOverlayImage(tile, overlayCache);
+                    displayTileItems(g, tile, overlayImage);
                     displaySettlement(g, lib, tile, tileWidth, tileHeight, withNumbers);
                     displayFogOfWar(g, tile);
                     displayOptionalValues(g, tile);
@@ -2201,8 +2212,9 @@ public final class MapViewer {
      *
      * @param g The Graphics2D object on which to draw the Tile.
      * @param tile The Tile to draw.
+     * @param overlayImage The Image for the tile overlay.
      */
-    private void displayTileItems(Graphics2D g, Tile tile) {
+    private void displayTileItems(Graphics2D g, Tile tile, Image overlayImage) {
         // ATTENTION: we assume that only overlays and forests
         // might be taller than a tile.
         if (!tile.isExplored()) {
@@ -2223,7 +2235,6 @@ public final class MapViewer {
                 }
             }
             // Tile Overlays (eg. hills and mountains)
-            Image overlayImage = lib.getOverlayImage(tile);
             if (overlayImage != null) {
                 g.drawImage(overlayImage, 0, (tileHeight - overlayImage.getHeight(null)), null);
             }

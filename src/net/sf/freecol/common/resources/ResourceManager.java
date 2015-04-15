@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
@@ -240,16 +241,31 @@ public class ResourceManager {
     }
 
     /**
-     * Returns a list of all keys starting with the given prefix.
+     * Returns a list of all keys starting with the given prefix and
+     * ending with the given suffix.
      *
      * @param prefix the prefix
      * @param suffix the suffix
-     * @return a list of all keys starting with the given prefix
+     * @return a list of all resulting keys
      */
     public static synchronized ArrayList<String> getKeys(String prefix,
                                                          String suffix) {
         //logger.finest("getKeys(" + prefix + ", " + suffix + ")");
         return mergedContainer.getKeys(prefix, suffix);
+    }
+
+    /**
+     * Returns a set of all keys containing the infix and
+     * ending with the given suffix.
+     *
+     * @param infix the infix string contained somewhere
+     * @param suffix the suffix
+     * @return a set of all keys with these characteristics
+     */
+    public static synchronized Set<String> getFilteredKeys(String infix,
+                                                           String suffix) {
+        //logger.finest("getFilteredKeys(" + infix + ", " + suffix + ")");
+        return mergedContainer.getFilteredKeys(infix, suffix);
     }
 
     /**

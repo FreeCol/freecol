@@ -34,7 +34,9 @@ import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -506,6 +508,27 @@ public final class ImageLibrary {
     public static Image getOverlayImage(TileType type, String id, float scale) {
         String prefix = type.getId() + ".overlay";
         ArrayList<String> keys = ResourceManager.getKeys(prefix, ".image");
+        return getRandomizedImage(keys, id, scale);
+    }
+
+    public static Set<String> createOverlayCache() {
+        return ResourceManager.getFilteredKeys(".overlay", ".image");
+    }
+
+    public Image getOverlayImage(Tile tile, Set<String> overlayCache) {
+        return getOverlayImage(tile.getType(), tile.getId(), scalingFactor,
+                               overlayCache);
+    }
+
+    public static Image getOverlayImage(TileType type, String id, float scale,
+                                        Set<String> overlayCache) {
+        String prefix = type.getId() + ".overlay";
+        ArrayList<String> keys = new ArrayList<>();
+        for (String key : overlayCache) {
+            if (key.startsWith(prefix)) {
+                keys.add(key);
+            }
+        }
         return getRandomizedImage(keys, id, scale);
     }
 
