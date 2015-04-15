@@ -626,7 +626,7 @@
              export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
         -->
         <junit printsummary="on" errorProperty="error.junit"
-               failureProperty="error.junit" fork="yes" maxmemory="48m">
+               failureProperty="error.junit" fork="yes" maxmemory="256m">
             <classpath refid="test.run.classpath"/>
             <formatter type="xml" />
 
@@ -852,7 +852,7 @@
         <mkdir dir="${freecol.build.dir}/report/xml"/>
 
         <junit printsummary="on" errorproperty="error.junit"
-               fork="yes" maxmemory="48m">
+               fork="yes" maxmemory="256m">
             <classpath location="build/instrumented-classes"/>
             <classpath location="build/net"/>
             <classpath refid="cobertura.classpath"/>
