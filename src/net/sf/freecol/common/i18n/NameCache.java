@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
+import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -38,6 +39,12 @@ import static net.sf.freecol.common.util.RandomUtils.*;
 
 /**
  * A cache of proper names of various types.
+ *
+ * Most of these collections auto-initialize when the public accessor
+ * is called, but the cities of Cibola are different because they are
+ * saved in the Game, and hence requireCitiesOfCibola has to public
+ * for generating a new game, and there are clear/add/get routines to
+ * allow the the collection to be serialized.
  */
 public class NameCache {
 
@@ -47,21 +54,32 @@ public class NameCache {
     
     /** Cities of Cibola. */
     private static List<String> cibolaKeys = null;
-    private static Object cibolaLock = new Object();
+    private static final Object cibolaLock = new Object();
 
     /** Mercenary leaders. */
     private static List<String> mercenaryLeaders = null;
+    private static final Object mercenaryLock = new Object();
+
+    /** Region names and index. */
+    private static final Map<String, List<String>> regionNames
+        = new HashMap<>();
+    private static final Object regionNameLock = new Object();
+    private static final Map<String, Integer> regionIndex = new HashMap<>();
 
     /** Extra river names. */
-    private static List<String> otherRivers = null;
+    private static List<String> riverNames = null;
+    private static final Object riverNameLock = new Object();
 
     /** Settlement names. */
-    private static Map<Player, String> capitalNames = null;
-    private static Map<Player, List<String>> settlementNames = null;
+    private static final Map<Player, String> capitalNames
+        = new HashMap<>();
+    private static final Map<Player, List<String>> settlementNames
+        = new HashMap<>();
     private static final Object settlementNameLock = new Object();
 
     /** Ship names. */
     private static final Map<Player, List<String>> shipNames = new HashMap<>();
+    private static final Object shipNameLock = new Object();
 
 
     /**
@@ -82,7 +100,7 @@ public class NameCache {
     /**
      * Initialize the cities of Cibola collection.
      *
-     * Public for FreeColServer.
+     * Public for FreeColServer to initialize with a new game.
      *
      * @param random A pseudo-random number source.
      */
@@ -105,22 +123,54 @@ public class NameCache {
     /**
      * Initialize the mercenary leaders collection.
      */
-    private static synchronized void requireMercenaryLeaders() {
-        if (mercenaryLeaders == null) {
-            mercenaryLeaders = new ArrayList<>();
-            collectNames("model.mercenaries.", mercenaryLeaders);
+    private static void requireMercenaryLeaders() {
+        synchronized (mercenaryLock) {
+            if (mercenaryLeaders == null) {
+                mercenaryLeaders = new ArrayList<>();
+                collectNames("model.mercenaries.", mercenaryLeaders);
+            }
         }
     }
 
     /**
-     * Initialize the otherRivers collection.
+     * Make a key for a player and region type.
+     *
+     * @param player The <code>Player</code> to install region names for.
+     * @param type The <code>RegionType</code> to get names of.
+     * @return A key for the player and region type.
      */
-    private static synchronized void requireOtherRivers() {
-        if (otherRivers == null) {
-            otherRivers = new ArrayList<>();
-            collectNames("model.other.region.river.", otherRivers);
-            // Does not need to use player or system PRNG
-            Collections.shuffle(otherRivers);
+    private static String makeRegionKey(Player player, RegionType type) {
+        return player.getNationId() + ".region." + type.getKey() + ".";
+    }
+
+    /**
+     * Initialize the region names for a player.
+     *
+     * @param player The <code>Player</code> to install region names for.
+     * @param regionType The <code>RegionType</code> to get names of.
+     */
+    private static void requireRegionNames(Player player, RegionType type) {
+        synchronized (regionNameLock) {
+            final String prefix = makeRegionKey(player, type);
+            List<String> names = regionNames.get(prefix);
+            if (names == null) {
+                names = new ArrayList<String>();
+                collectNames(prefix, names);
+            }
+        }
+    }
+
+    /**
+     * Initialize the riverNames collection.
+     */
+    private static void requireRiverNames() {
+        synchronized (riverNameLock) {
+            if (riverNames == null) {
+                riverNames = new ArrayList<>();
+                collectNames("model.other.region.river.", riverNames);
+                // Does not need to use player or system PRNG
+                Collections.shuffle(riverNames);
+            }
         }
     }
 
@@ -130,41 +180,38 @@ public class NameCache {
      * @param player The <code>Player</code> to install names for.
      * @param random A pseudo-random number source.
      */
-    private static synchronized void requireSettlementNames(Player player,
-                                                            Random random) {
-        if (settlementNames == null) {
-            capitalNames = new HashMap<>();
-            settlementNames = new HashMap<>();
-        }
-        if (settlementNames.get(player) == null) {
-            List<String> names = new ArrayList<>();
-            // @compat 0.10.x
-            // Try the base names
-            collectNames(player.getNationId() + ".settlementName.", names);
-            // end @compat 0.10.x
+    private static void requireSettlementNames(Player player, Random random) {
+        synchronized (settlementNameLock) {
+            if (settlementNames.get(player) == null) {
+                List<String> names = new ArrayList<>();
+                // @compat 0.10.x
+                // Try the base names
+                collectNames(player.getNationId() + ".settlementName.", names);
+                // end @compat 0.10.x
 
-            // Try the spec-qualified version.
-            if (names.isEmpty()) {
-                collectNames(player.getNationId() + ".settlementName."
-                             + player.getSpecification().getId() + ".", names);
-            }
-
-            // If still empty use the "freecol" names.
-            if (names.isEmpty()) {
-                collectNames(player.getNationId() + ".settlementName.freecol.",
-                             names);
-            }
-
-            // Indians have capitals and need randomization
-            if (player.isIndian()) {
-                capitalNames.put(player, names.remove(0));
-                if (random != null) {
-                    randomShuffle(logger, "Settlement names", names, random);
+                // Try the spec-qualified version.
+                if (names.isEmpty()) {
+                    collectNames(player.getNationId() + ".settlementName."
+                        + player.getSpecification().getId() + ".", names);
                 }
+
+                // If still empty use the "freecol" names.
+                if (names.isEmpty()) {
+                    collectNames(player.getNationId() + ".settlementName.freecol.",
+                                 names);
+                }
+
+                // Indians have capitals and need randomization
+                if (player.isIndian()) {
+                    capitalNames.put(player, names.remove(0));
+                    if (random != null) {
+                        randomShuffle(logger, "Settlement names", names, random);
+                    }
+                }
+                settlementNames.put(player, names);
+                logger.fine("Loaded " + names.size() + " settlement names for "
+                    + player.getId());
             }
-            settlementNames.put(player, names);
-            logger.fine("Loaded " + names.size() + " settlement names for "
-                        + player.getId());
         }
     }
 
@@ -173,21 +220,20 @@ public class NameCache {
      *
      * @param player The <code>Player</code> to install names for.
      * @param random A pseudo-random number source.
-     * @return A list of ship names for the player.
      */
-    public static synchronized List<String> requireShipNames(Player player,
-                                                             Random random) {
-        List<String> names = shipNames.get(player);
-        if (names == null) {
-            final String prefix = player.getNationId() + ".ship.";
-            names = new ArrayList<String>();
-            collectNames(prefix, names);
-            if (random != null) {
-                randomShuffle(logger, "Ship names", names, random);
+    private static void requireShipNames(Player player, Random random) {
+        synchronized (shipNameLock) {
+            List<String> names = shipNames.get(player);
+            if (names == null) {
+                final String prefix = player.getNationId() + ".ship.";
+                names = new ArrayList<String>();
+                collectNames(prefix, names);
+                if (random != null) {
+                    randomShuffle(logger, "Ship names", names, random);
+                }
+                shipNames.put(player, names);
             }
-            shipNames.put(player, names);
         }
-        return names;
     }
     
 
@@ -219,7 +265,7 @@ public class NameCache {
     /**
      * Clear the city of Cibola cache.
      */
-    public static synchronized void clearCitiesOfCibola() {
+    public static void clearCitiesOfCibola() {
         synchronized (cibolaLock) {
             if (cibolaKeys != null) cibolaKeys.clear();
         }
@@ -245,8 +291,11 @@ public class NameCache {
      */
     public static int getMercenaryLeaderIndex(Random random) {
         requireMercenaryLeaders();
-        return randomInt(logger, "Mercenary leader", random,
-                         mercenaryLeaders.size());
+        int n;
+        synchronized (mercenaryLock) {
+            n = mercenaryLeaders.size();
+        }
+        return randomInt(logger, "Mercenary leader", random, n);
     }
 
     /**
@@ -257,7 +306,9 @@ public class NameCache {
      */
     public static String getMercenaryLeaderName(int index) {
         requireMercenaryLeaders();
-        return mercenaryLeaders.get(index);
+        synchronized (mercenaryLock) {
+            return mercenaryLeaders.get(index);
+        }
     }
 
     /**
@@ -284,43 +335,47 @@ public class NameCache {
         if (region.isPacific()) {
             return Messages.message(Region.PACIFIC_NAME_KEY);
         }
-        // Try national names first.
-        net.sf.freecol.common.model.Map map = player.getGame().getMap();
-        int index = player.getNameIndex(region.getType().getNameIndexKey());
-        if (index < 1) index = 1;
-        String prefix = player.getNationId() + ".region."
-            + region.getType().getKey() + ".";
+        final net.sf.freecol.common.model.Map map = player.getGame().getMap();
         String name;
-        do {
-            name = null;
-            if (Messages.containsKey(prefix + Integer.toString(index))) {
-                name = Messages.message(prefix + Integer.toString(index));
-                index++;
-            }
-        } while (name != null && map.getRegionByName(name) != null);
-        player.setNameIndex(region.getType().getNameIndexKey(), index);
+        int index;
 
-        // There are a bunch of extra rivers not attached to a specific
-        // nation at model.other.region.river.*.
-        if (name == null && region.getType() == Region.RegionType.RIVER) {
-            requireOtherRivers();
-            while (!otherRivers.isEmpty()) {
-                name = otherRivers.remove(0);
+        // Try national names first.
+        final String prefix = makeRegionKey(player, region.getType());
+        requireRegionNames(player, region.getType());
+        synchronized (regionNameLock) {
+            List<String> names = regionNames.get(prefix);
+            while (!names.isEmpty()) {
+                name = names.remove(0);
                 if (map.getRegionByName(name) == null) return name;
             }
-            name = null;
+        }
+            
+        // There are a bunch of extra rivers not attached to a specific
+        // nation at model.other.region.river.*.
+        if (region.getType() == Region.RegionType.RIVER) {
+            requireRiverNames();
+            synchronized (riverNameLock) {
+                while (!riverNames.isEmpty()) {
+                    name = riverNames.remove(0);
+                    if (map.getRegionByName(name) == null) return name;
+                }
+            }
         }
 
         // Fall back to generic names.
-        if (name == null) {
-            StringTemplate nn = player.getNationName();
-            do {
-                name = Messages.message(StringTemplate
-                    .label("").addStringTemplate(nn)
-                    .addName(" ").addNamed(region.getType())
-                    .addName(" " + String.valueOf(index)));
-                index++;
-            } while (map.getRegionByName(name) != null);
+        synchronized (regionNameLock) {
+            index = regionIndex.get(prefix);
+        }
+        StringTemplate nn = player.getNationName();
+        do {
+            name = Messages.message(StringTemplate.label("")
+                .addStringTemplate(nn)
+                .addNamed(region.getType())
+                .addName(String.valueOf(index)));
+            index++;
+        } while (map.getRegionByName(name) != null);
+        synchronized (regionNameLock) {
+            regionIndex.put(prefix, index);
         }
         return name;
     }
@@ -373,11 +428,7 @@ public class NameCache {
         final String base = getFallbackSettlementName(player);
         int i = player.getSettlements().size() + 1;
         String name = null;
-        for (;;) {
-            name = base + Integer.toString(i);
-            if (game.getSettlement(name) == null) break;
-            i++;
-        }
+        while (game.getSettlement(name = base + i++) != null);
         return name;
     }           
 
@@ -406,13 +457,9 @@ public class NameCache {
     public static String getTradeRouteName(Player player) {
         String base = Messages.message("tradeRoute.newRoute");
         if (player.getTradeRoute(base) == null) return base;
-        int i = 1;
         String name;
-        for (;;) {
-            name = base + Integer.toString(i);
-            if (player.getTradeRoute(name) == null) break;
-            i++;
-        }
+        int i = 1;
+        while (player.getTradeRoute(name = base + i++) != null);
         return name;
     }
 
@@ -430,31 +477,22 @@ public class NameCache {
     public static String getUnitName(Player player, UnitType type,
                                      Random random) {
         if (!type.isNaval()) return null;
-        List<String> names = requireShipNames(player, random);
-
-        // Collect all the names of existing naval units.
-        List<String> navalNames = new ArrayList<>();
-        for (Unit u : player.getUnits()) {
-            if (u.isNaval() && u.getName() != null) {
-                navalNames.add(u.getName());
-            }
-        }
+        String name;
 
         // Find a new name in the installed ship names if possible.
-        String name;
-        while (!names.isEmpty()) {
-            name = names.remove(0);
-            if (!navalNames.contains(name)) return name;
+        requireShipNames(player, random);
+        synchronized (shipNameLock) {
+            List<String> names = shipNames.get(player);
+            while (!names.isEmpty()) {
+                name = names.remove(0);
+                if (player.getUnit(name) == null) return name;
+            }
         }
 
         // Get a fallback ship name
         final String base = Messages.message("Ship") + "-";
-        int i = 0;
-        for (;;) {
-            name = base + Integer.toString(i);
-            if (player.getUnit(name) == null) break;
-            i++;
-        }
+        int i = 1;
+        while (player.getUnit(name = base + i++) != null);
         return name;
     }
 }

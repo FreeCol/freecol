@@ -475,9 +475,6 @@ public class Player extends FreeColGameObject implements Nameable {
     /** The last-sale data. */
     protected HashMap<String, LastSale> lastSales = null;
 
-    /** A map of indices of the largest used region name by type. */
-    protected final HashMap<String, Integer> nameIndex = new HashMap<>();
-
     // Temporary/transient variables, do not serialize.
 
     /** The units this player owns. */
@@ -702,26 +699,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public String getMonarchKey() {
         return nationId + ".monarch.image";
-    }
-
-    /**
-     * Gets the name index for a given key.
-     *
-     * @param key The key to use.
-     */
-    public int getNameIndex(String key) {
-        Integer val = nameIndex.get(key);
-        return (val == null) ? 0 : val;
-    }
-
-    /**
-     * Sets the name index for a given key.
-     *
-     * @param key The key to use.
-     * @param value The new value.
-     */
-    public void setNameIndex(String key, int value) {
-        nameIndex.put(key, value);
     }
 
     /**
@@ -3875,12 +3852,6 @@ public class Player extends FreeColGameObject implements Nameable {
         if (entryLocation != null) {
             xw.writeLocationAttribute(ENTRY_LOCATION_TAG, entryLocation);
         }
-
-        for (RegionType regionType : RegionType.values()) {
-            String key = regionType.getNameIndexKey();
-            int index = getNameIndex(key);
-            if (index > 0) xw.writeAttribute(key, index);
-        }
     }
 
     /**
@@ -4067,12 +4038,6 @@ public class Player extends FreeColGameObject implements Nameable {
 
         entryLocation = xr.getLocationAttribute(game, ENTRY_LOCATION_TAG,
                                                 true);
-
-        for (RegionType regionType : RegionType.values()) {
-            String key = regionType.getNameIndexKey();
-            int index = xr.getAttribute(key, -1);
-            if (index > 0) setNameIndex(key, index);
-        }
     }
 
     /**
