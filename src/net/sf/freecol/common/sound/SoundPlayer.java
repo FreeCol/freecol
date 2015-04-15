@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.sound;
+package net.sf.freecol.common.sound;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

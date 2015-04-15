@@ -22,7 +22,7 @@ package net.sf.freecol.common.resources;
 import java.io.File;
 import java.net.URI;
 
-import net.sf.freecol.client.gui.sound.SoundPlayer;
+import net.sf.freecol.common.sound.SoundPlayer;
 
 
 /**
