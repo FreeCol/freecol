@@ -292,7 +292,7 @@ public final class UnitLabel extends JLabel
                    getParent() instanceof InPortPanel ||
                    getParent() instanceof EuropePanel.DocksPanel ||
                    getParent().getParent() instanceof ReportPanel) {
-            String text = Messages.message(unit.getOccupationKey(player.owns(unit)));
+            String text = Messages.message(unit.getOccupationLabel(player, false));
             g.drawImage(lib.getOccupationIndicatorChip(unit, text), 0, 0, null);
 
             if (unit.isDamaged()) {

@@ -3263,28 +3263,58 @@ public class Unit extends GoodsLocation
     // Miscellaneous more complex functionality
 
     /**
-     * Get a message key for the unit occupation.
+     * Get a label for the current unit occupation.
      *
-     * @param owner True if the key should be for the owner of the unit.
-     * @return A message key.
+     * @param player The <code>Player</code> viewing the unit, as the
+     *     owner has access to more information.
+     * @param full If true, return a more detailed result.
+     * @return A <code>StringTemplate</code> for the unit occupation.
      */
-    public String getOccupationKey(boolean owner) {
-        return (owner)
-            ? ((isDamaged())
-                ? "model.unit.occupation.underRepair"
-                : (getTradeRoute() != null)
-                ? "model.unit.occupation.inTradeRoute"
-                : (getDestination() != null)
-                ? "model.unit.occupation.goingSomewhere"
-                : (getState() == Unit.UnitState.IMPROVING
-                    && getWorkImprovement() != null)
-                ? (getWorkImprovement().getType().getId() + ".occupationString")
-                : (getState() == Unit.UnitState.ACTIVE && getMovesLeft() <= 0)
-                ? "model.unit.occupation.activeNoMovesLeft"
-                : ("model.unit.occupation." + getState().getKey()))
-            : (isNaval())
-            ? Integer.toString(getVisibleGoodsCount())
-            : "model.unit.occupation.activeNoMovesLeft";
+    public StringTemplate getOccupationLabel(Player player, boolean full) {
+        final TradeRoute tradeRoute = getTradeRoute();
+        StringTemplate ret;
+        if (player != null && player.owns(this)) {
+            if (isDamaged()) {
+                if (full) {
+                    ret = StringTemplate.label(": ")
+                        .add("model.unit.occupation.underRepair")
+                        .addName(String.valueOf(getTurnsForRepair()));
+                } else {
+                    ret = StringTemplate.key("model.unit.occupation.underRepair");
+                }
+            } else if (tradeRoute != null) {
+                if (full) {
+                    ret = StringTemplate.label(": ")
+                        .add("model.unit.occupation.inTradeRoute")
+                        .addName(tradeRoute.getName());
+                } else {
+                    ret = StringTemplate.key("model.unit.occupation.inTradeRoute");
+                }
+            } else if (getState() == UnitState.ACTIVE && getMovesLeft() == 0) {
+                ret = StringTemplate.key("model.unit.occupation.activeNoMovesLeft");
+            } else if (getState() == UnitState.IMPROVING
+                && getWorkImprovement() != null) {
+                if (full) {
+                    ret = StringTemplate.label(": ")
+                        .add(getWorkImprovement().getType() + ".occupationString")
+                        .addName(String.valueOf(getWorkTurnsLeft()));
+                } else {
+                    ret = StringTemplate.key(getWorkImprovement().getType() + ".occupationString");
+                }
+            } else if (getDestination() != null) {
+                ret = StringTemplate.key("model.unit.occupation.goingSomewhere");
+            } else {
+                ret = StringTemplate.key("model.unit.occupation."
+                    + getState().getKey());
+            }
+        } else {
+            if (isNaval()) {
+                ret = StringTemplate.name(String.valueOf(getVisibleGoodsCount()));
+            } else {
+                ret = StringTemplate.key("model.unit.occupation.activeNoMovesLeft");
+            }
+        }
+        return ret;
     }
 
     /**

@@ -733,8 +733,8 @@ public final class MapViewer {
                         tileWidth/4 - image.getWidth(null) / 2,
                         halfHeight - image.getHeight(null) / 2, null);
             // Draw an occupation and nation indicator.
-            boolean owner = freeColClient.getMyPlayer().owns(unit);
-            String text = Messages.message(unit.getOccupationKey(owner));
+            Player owner = freeColClient.getMyPlayer();
+            String text = Messages.message(unit.getOccupationLabel(owner, false));
             g.drawImage(lib.getOccupationIndicatorChip(unit, text),
                         (int)(STATE_OFFSET_X * lib.getScalingFactor()),
                         0, null);
@@ -2286,8 +2286,7 @@ public final class MapViewer {
         g.drawImage(image, p.x, p.y, null);
 
         // Draw an occupation and nation indicator.
-        boolean owned = player != null && player.owns(unit);
-        String text = Messages.message(unit.getOccupationKey(owned));
+        String text = Messages.message(unit.getOccupationLabel(player, false));
         g.drawImage(lib.getOccupationIndicatorChip(unit, text),
                     (int)(STATE_OFFSET_X * lib.getScalingFactor()), 0,
                     null);
@@ -2669,7 +2668,8 @@ public final class MapViewer {
         final int unitX = (width - unitImg.getWidth(null)) / 2;
         g.drawImage(unitImg, unitX, 0, null);
 
-        String text = Messages.message(unit.getOccupationKey(true));
+        Player player = freeColClient.getMyPlayer();
+        String text = Messages.message(unit.getOccupationLabel(player, false));
         g.drawImage(lib.getOccupationIndicatorChip(unit, text), 0, 0, null);
 
         final JLabel label = new JLabel(new ImageIcon(img));

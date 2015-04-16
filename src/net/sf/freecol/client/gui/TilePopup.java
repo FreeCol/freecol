@@ -474,38 +474,8 @@ public final class TilePopup extends JPopupMenu {
      */
     private int addUnit(Container menu, final Unit unit, boolean enabled,
                         boolean indent) {
-        StringTemplate occ;
-        TradeRoute tradeRoute = unit.getTradeRoute();
-
-        if (unit.getState() == Unit.UnitState.ACTIVE
-            && unit.getMovesLeft() == 0) {
-            if (unit.isDamaged()) {
-                occ = StringTemplate.label(": ")
-                    .add("model.unit.occupation.underRepair")
-                    .addName(Integer.toString(unit.getTurnsForRepair()));
-            } else if (tradeRoute != null) {
-                occ = StringTemplate.label(": ")
-                    .add("model.unit.occupation.inTradeRoute")
-                    .addName(tradeRoute.getName());
-            } else {
-                occ = StringTemplate.key("model.unit.occupation.activeNoMovesLeft");
-            }
-        } else if (unit.getState() == Unit.UnitState.IMPROVING
-                   && unit.getWorkImprovement() != null) {
-            occ = StringTemplate.label(": ")
-                .add(unit.getWorkImprovement().getType() + ".occupationString")
-                .addName(Integer.toString(unit.getWorkTurnsLeft()));
-        } else if (tradeRoute != null) {
-            occ = StringTemplate.label(": ")
-                .add("model.unit.occupation.inTradeRoute")
-                .addName(tradeRoute.getName());
-        } else if (unit.getDestination() != null) {
-            occ = StringTemplate.key("model.unit.occupation.goingSomewhere");
-        } else {
-            occ = StringTemplate.key("model.unit.occupation."
-                + unit.getState().getKey());
-        }
-
+        StringTemplate occ
+            = unit.getOccupationLabel(freeColClient.getMyPlayer(), true);
         String text = (indent ? "    " : "")
             + unit.getDescription(Unit.UnitLabelType.NATIONAL)
             + " (" + Messages.message(occ) + ")";
