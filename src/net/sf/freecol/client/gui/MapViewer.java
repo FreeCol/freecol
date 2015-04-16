@@ -1334,14 +1334,13 @@ public final class MapViewer {
     /**
      * Draws the pentagram indicating a native capital.
      */
-    private Image createCapitalLabel(int extent, int padding,
+    private static Image createCapitalLabel(int extent, int padding,
                                      Color backgroundColor) {
-        // TODO: Improve image quality by separately drawing the imgage
-        //       for all scaling factors, using different key values and
-        //       not using scaling on the getImage calls
         String key = "dynamic.label.nativeCapital"
-            + "." + Integer.toHexString(backgroundColor.getRGB());
-        Image image = ResourceManager.getImage(key, lib.getScalingFactor());
+            + "." + Integer.toHexString(backgroundColor.getRGB())
+            + "." + Integer.toHexString(extent)
+            + "." + Integer.toHexString(padding);
+        Image image = ResourceManager.getImage(key);
         if (image != null) {
             return image;
         }
@@ -1374,7 +1373,7 @@ public final class MapViewer {
         g.fill(path);
         g.dispose();
         ResourceManager.addGameMapping(key, new ImageResource(bi));
-        return ResourceManager.getImage(key, lib.getScalingFactor());
+        return bi;
     }
 
 
@@ -1455,15 +1454,14 @@ public final class MapViewer {
      * Draws a cross indicating a religious mission is present in the
      * native village.
      */
-    private Image createReligiousMissionLabel(int extent, int padding,
-        // TODO: Improve image quality by separately drawing the imgage
-        //       for all scaling factors, using different key values and
-        //       not using scaling on the getImage calls
+    private static Image createReligiousMissionLabel(int extent, int padding,
         Color backgroundColor, boolean expertMissionary) {
         String key = "dynamic.label.religiousMission"
             + (expertMissionary ? ".expert" : "")
-            + "." + Integer.toHexString(backgroundColor.getRGB());
-        Image image = ResourceManager.getImage(key, lib.getScalingFactor());
+            + "." + Integer.toHexString(backgroundColor.getRGB())
+            + "." + Integer.toHexString(extent)
+            + "." + Integer.toHexString(padding);
+        Image image = ResourceManager.getImage(key);
         if (image != null) {
             return image;
         }
@@ -1509,7 +1507,7 @@ public final class MapViewer {
         g.draw(cross);
         g.dispose();
         ResourceManager.addGameMapping(key, new ImageResource(bi));
-        return ResourceManager.getImage(key, lib.getScalingFactor());
+        return bi;
     }
 
     /**
