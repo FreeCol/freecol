@@ -620,7 +620,7 @@ public final class MapViewer {
                     int xx = (((2 - x) + y) * tileSize.width) / 2;
                     int yy = ((x + y) * tileSize.height) / 2;
                     g.translate(xx, yy);
-                    Image overlayImage = lib.getOverlayImage(tile, overlayCache);
+                    Image overlayImage = lib.getOverlayImage(tiles[x][y], overlayCache);
                     displayColonyTile(g, tiles[x][y], colony, overlayImage);
                     g.translate(-xx, -yy);
                 }
