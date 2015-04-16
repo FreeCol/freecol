@@ -368,9 +368,9 @@ public class TradeRoute extends FreeColGameObject
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[").append(getXMLTagName())
-            .append(" \"").append(getName()).append("\"")
-            .append(" owner=").append(owner.getId())
-            .append(" silent=").append(Boolean.toString(silent));
+            .append(" \"").append(name).append("\"");
+        if (owner != null) sb.append(" owner=").append(owner.getId());
+        sb.append(" silent=").append(Boolean.toString(silent));
         for (TradeRouteStop stop : getStops()) sb.append(" ").append(stop);
         sb.append("]");
         return sb.toString();
