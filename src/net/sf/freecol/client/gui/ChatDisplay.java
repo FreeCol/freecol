@@ -19,11 +19,14 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.util.Date;
 import java.util.ArrayList;
+import java.util.Date;
+
+import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * ChatDisplay manages use of <code>GUIMessage</code>.
@@ -84,9 +87,9 @@ public class ChatDisplay {
      * 
      * @param g The Graphics2D the messages should be displayed on.
      * @param fontLibrary The FontLibrary to use.
-     * @param height The height of the space for displaying in.
+     * @param size The size of the space for displaying in.
      */
-    public synchronized void display(Graphics2D g, FontLibrary fontLibrary, int height) {
+    public synchronized void display(Graphics2D g, FontLibrary fontLibrary, Dimension size) {
         if (getMessageCount() > 0) {
             // Don't edit the list of messages while I'm drawing them.
             Font font = fontLibrary.createScaledFont(
@@ -94,7 +97,7 @@ public class ChatDisplay {
             GUIMessage message = getMessage(0);
             Image si = ImageLibrary.getStringImage(
                 g, message.getMessage(), message.getColor(), font);
-            int yy = height - 300 - getMessageCount() * si.getHeight(null);
+            int yy = size.height - 300 - getMessageCount() * si.getHeight(null);
             int xx = 40;
 
             for (int i = 0; i < getMessageCount(); i++) {
@@ -104,6 +107,15 @@ public class ChatDisplay {
                     xx, yy, null);
                 yy += si.getHeight(null);
             }
+            Image decoration = ResourceManager.getImage("menuborder.shadow.s.image");
+            int width = decoration.getWidth(null);
+            for (int index = 0; index < size.width; index += width) {
+                g.drawImage(decoration, index, 0, null);
+            }
+            decoration = ResourceManager.getImage("menuborder.shadow.sw.image");
+            g.drawImage(decoration, 0, 0, null);
+            decoration = ResourceManager.getImage("menuborder.shadow.se.image");
+            g.drawImage(decoration, size.width - decoration.getWidth(null), 0, null);
         }
     }
 

@@ -19,16 +19,21 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.font.TextLayout;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -164,6 +169,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -258,6 +264,8 @@ public final class Canvas extends JDesktopPane {
     private final ChatDisplay chatDisplay;
 
     private final MapViewer mapViewer;
+
+    private GrayLayer greyLayer;
 
     private final ServerListPanel serverListPanel;
 
@@ -1176,7 +1184,70 @@ public final class Canvas extends JDesktopPane {
         updateSizes();
         Graphics2D g2d = (Graphics2D) g;
         chatDisplay.removeOldMessages();
-        mapViewer.display(g2d, chatDisplay);
+
+        Dimension size = getSize();
+        if ((freeColClient.getGame() != null)
+                && (freeColClient.getGame().getMap() != null)
+                && (mapViewer.getFocus() != null)
+                && freeColClient.isInGame()) {
+            /* ingame view */
+
+            // paint map
+            mapViewer.displayMap(g2d);
+
+            // Grey out the map if it is not my turn (and a multiplayer game).
+            if (!freeColClient.isMapEditor() && freeColClient.getGame() != null
+                    && !freeColClient.currentPlayerIsMyPlayer()) {
+                if (greyLayer == null) {
+                    greyLayer = new GrayLayer(freeColClient);
+                }
+                if (greyLayer.getParent() == null) {
+                    add(greyLayer, JLayeredPane.DRAG_LAYER);
+                }
+                greyLayer.setBounds(0, 0, size.width, size.height);
+                greyLayer.setPlayer(freeColClient.getGame().getCurrentPlayer());
+            } else {
+                if (greyLayer != null && greyLayer.getParent() != null) {
+                    removeFromCanvas(greyLayer);
+                }
+            }
+
+            // paint chat display
+            chatDisplay.display(g2d,
+                new FontLibrary(mapViewer.getImageLibrary().getScalingFactor()),
+                size);
+
+        } else {
+            if (!freeColClient.isMapEditor()) {
+                /* main menu */
+                // TODO: Check if its right to sometimes have an unfocused map
+                //       ingame and end up here after clicking outside map.
+                Image bgImage = ResourceManager.getImage("CanvasBackgroundImage", size);
+                if (bgImage != null) {
+                    g2d.drawImage(bgImage, 0, 0, gui.getCanvas());
+                    String versionStr = "v. " + FreeCol.getVersion();
+                    Font oldFont = g2d.getFont();
+                    Color oldColor = g2d.getColor();
+                    Font newFont = oldFont.deriveFont(Font.BOLD);
+                    TextLayout layout = new TextLayout(versionStr, newFont, g2d.getFontRenderContext());
+                    Rectangle2D bounds = layout.getBounds();
+                    float x = size.width - (float) bounds.getWidth() - 5;
+                    float y = size.height - (float) bounds.getHeight();
+                    g2d.setColor(Color.white);
+                    layout.draw(g2d, x, y);
+                    g2d.setFont(oldFont);
+                    g2d.setColor(oldColor);
+                } else {
+                    g2d.setColor(Color.BLACK);
+                    g2d.fillRect(0, 0, size.width, size.height);
+                }
+
+            } else {
+                /* map editor??? */
+                g2d.setColor(Color.BLACK);
+                g2d.fillRect(0, 0, size.width, size.height);
+            }
+        }
     }
 
 

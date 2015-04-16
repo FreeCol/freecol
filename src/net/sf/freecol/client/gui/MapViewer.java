@@ -38,7 +38,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -55,7 +54,6 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.UIManager;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.debug.DebugUtils;
@@ -237,7 +235,6 @@ public final class MapViewer {
     private volatile boolean blinkingMarqueeEnabled;
 
     private Image cursorImage;
-    private GrayLayer greyLayer;
 
     private final java.util.Map<Unit, Integer> unitsOutForAnimation;
     private final java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
@@ -475,51 +472,6 @@ public final class MapViewer {
 
     }
 
-    /**
-     * Displays this GUI onto the given Graphics2D.
-     *
-     * @param g The Graphics2D on which to display this GUI.
-     * @param chatDisplay The ChatDisplay for displaying chat messages.
-     */
-    public void display(Graphics2D g, ChatDisplay chatDisplay) {
-        if ((freeColClient.getGame() != null)
-                && (freeColClient.getGame().getMap() != null)
-                && (focus != null)
-                && freeColClient.isInGame()) {
-            displayMap(g, chatDisplay);
-        } else {
-            if (freeColClient.isMapEditor()) {
-                g.setColor(Color.BLACK);
-                g.fillRect(0, 0, size.width, size.height);
-            } else {
-                Image bgImage = ResourceManager.getImage("CanvasBackgroundImage", size);
-                if (bgImage != null) {
-                    g.drawImage(bgImage, 0, 0, gui.getCanvas());
-
-                    // Show version on initial screen
-                    String versionStr = "v. " + FreeCol.getVersion();
-                    Font oldFont = g.getFont();
-                    Color oldColor = g.getColor();
-                    Font newFont = oldFont.deriveFont(Font.BOLD);
-                    TextLayout layout = new TextLayout(versionStr, newFont, g.getFontRenderContext());
-
-                    Rectangle2D bounds = layout.getBounds();
-                    float x = size.width - (float) bounds.getWidth() - 5;
-                    float y = size.height - (float) bounds.getHeight();
-                    g.setColor(Color.white);
-                    layout.draw(g, x, y);
-
-                    // restore old values
-                    g.setFont(oldFont);
-                    g.setColor(oldColor);
-
-                } else {
-                    g.setColor(Color.BLACK);
-                    g.fillRect(0, 0, size.width, size.height);
-                }
-            }
-        }
-    }
 
     private int getCompoundHeight(TileType tileType, int height,
                                   Image overlayImage) {
@@ -1674,9 +1626,8 @@ public final class MapViewer {
      * location (x, y) is displayed in the center.
      *
      * @param g The Graphics2D object on which to draw the Map.
-     * @param chatDisplay The ChatDisplay for displaying chat messages.
      */
-    private void displayMap(Graphics2D g, ChatDisplay chatDisplay) {
+    void displayMap(Graphics2D g) {
         final ClientOptions options = freeColClient.getClientOptions();
         final Player player = freeColClient.getMyPlayer();
         AffineTransform originTransform = g.getTransform();
@@ -2003,51 +1954,6 @@ public final class MapViewer {
         if (gotoPath != null) {
             displayPath(g, gotoPath);
         }
-
-        /*
-        PART 5
-        ======
-        Grey out the map if it is not my turn (and a multiplayer game).
-        */
-        Canvas canvas = gui.getCanvas();
-
-        if (!freeColClient.isMapEditor()
-            && freeColClient.getGame() != null
-            && !freeColClient.currentPlayerIsMyPlayer()) {
-
-            if (greyLayer == null) {
-                greyLayer = new GrayLayer(freeColClient);
-            }
-            if (greyLayer.getParent() == null) { // Not added to the canvas yet.
-                canvas.add(greyLayer, JLayeredPane.DRAG_LAYER);
-            }
-
-            greyLayer.setBounds(0, 0, canvas.getSize().width,
-                                canvas.getSize().height);
-            greyLayer.setPlayer(freeColClient.getGame().getCurrentPlayer());
-        } else {
-            if (greyLayer != null && greyLayer.getParent() != null) {
-                canvas.removeFromCanvas(greyLayer);
-            }
-        }
-
-        /*
-        PART 6
-        ======
-        Display the messages, if there are any.
-        */
-
-        chatDisplay.display(g, fontLibrary, size.height);
-
-        Image decoration = ResourceManager.getImage("menuborder.shadow.s.image");
-        int width = decoration.getWidth(null);
-        for (int index = 0; index < size.width; index += width) {
-            g.drawImage(decoration, index, 0, null);
-        }
-        decoration = ResourceManager.getImage("menuborder.shadow.sw.image");
-        g.drawImage(decoration, 0, 0, null);
-        decoration = ResourceManager.getImage("menuborder.shadow.se.image");
-        g.drawImage(decoration, size.width - decoration.getWidth(null), 0, null);
 
     }
 
