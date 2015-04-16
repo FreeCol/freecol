@@ -83,9 +83,7 @@ public final class TilePopup extends JPopupMenu {
      *       The popup menu also appears near this <code>Tile</code>.
      */
     public TilePopup(final FreeColClient freeColClient, final Tile tile) {
-        super(Messages.message(StringTemplate.template("tile")
-                                             .addAmount("%x%", tile.getX())
-                                             .addAmount("%y%", tile.getY())));
+        super(Messages.message(tile.getSimpleLabel()));
 
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
