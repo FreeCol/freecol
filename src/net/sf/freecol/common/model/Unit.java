@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
@@ -388,6 +389,24 @@ public class Unit extends GoodsLocation
         return Messages.message(getLabel(ult));
     }
 
+    /**
+     * Get a label for the chance of success in a potential combat.
+     *
+     * @param tile The <code>Tile</code> to attack into.
+     * @return A suitable label.
+     */
+    public StringTemplate getCombatLabel(Tile tile) {
+        final CombatModel.CombatOdds combatOdds = getGame().getCombatModel()
+            .calculateCombatOdds(this, tile.getDefendingUnit(this));
+        // If attacking a settlement, the true odds are never
+        // known because units may be hidden within
+        boolean unknown = combatOdds.win == CombatModel.CombatOdds.UNKNOWN_ODDS
+            || tile.hasSettlement();
+        return StringTemplate.template("attackTileOdds")
+            .addName("%chance%", (unknown) ? "??"
+                : String.valueOf((int)(combatOdds.win * 100)));
+    }
+    
     /**
      * Get a destination label for this unit.
      *

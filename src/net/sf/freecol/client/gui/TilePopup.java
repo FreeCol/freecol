@@ -42,7 +42,6 @@ import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.CombatModel.CombatOdds;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
@@ -99,21 +98,8 @@ public final class TilePopup extends JPopupMenu {
             if (activeUnit.isOffensiveUnit()
                 && unitTile.isAdjacent(tile)
                 && activeUnit.getMoveType(tile).isAttack()) {
-                CombatOdds combatOdds = activeUnit.getGame().getCombatModel()
-                    .calculateCombatOdds(activeUnit, tile.getDefendingUnit(activeUnit));
-
-                String victoryPercent;
-                // If attacking a settlement, the true odds are never
-                // known because units may be hidden within
-                if (tile.hasSettlement() 
-                    || combatOdds.win == CombatOdds.UNKNOWN_ODDS) {
-                    victoryPercent = "??";
-                } else {
-                    victoryPercent = Integer.toString((int)(combatOdds.win * 100));
-                }
-                gotoMenuItem = Utility.localizedMenuItem(StringTemplate
-                    .template("attackTileOdds")
-                    .addName("%chance%", victoryPercent));
+                gotoMenuItem = Utility.localizedMenuItem(activeUnit
+                    .getCombatLabel(tile));
             } else if (activeUnit.getSimpleMoveType(unitTile, tile).isLegal()) {
                 gotoMenuItem = Utility.localizedMenuItem("gotoThisTile");
             }
