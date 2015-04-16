@@ -466,9 +466,9 @@ public final class QuickActionMenu extends JPopupMenu {
                         .template("menu.unit.experience")
                         .addName("%job%", jobName)));
                 experiencePanel.add(Utility.localizedLabel(StringTemplate
-                        .template("fraction")
-                        .addAmount("%numerator%", experience)
-                        .addAmount("%denominator%", maxExperience)),
+                        .label("/")
+                        .addName(String.valueOf(experience))
+                        .addName(String.valueOf(maxExperience))),
                     "align right");
                 experiencePanel.add(Utility.localizedLabel("menu.unit.upgrade"));
                 experiencePanel.add(new JLabel(ModifierFormat.format(probability) + "%"),
