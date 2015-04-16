@@ -675,6 +675,16 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get a label indicating that we are waiting for this player.
+     *
+     * @return A suitable <code>StringTemplate</code>.
+     */
+    public StringTemplate getWaitingLabel() {
+        return StringTemplate.template("waitingFor")
+            .addStringTemplate("%nation%", getNationName());
+    }
+
+    /**
      * Get a short debug-suitable name for this player.
      *
      * @return A short name for this player.
