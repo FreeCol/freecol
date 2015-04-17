@@ -1813,13 +1813,17 @@ public final class MapViewer {
         */
         if (!units.isEmpty()) {
             g.setColor(Color.BLACK);
-            final Image im = lib.getMiscImage(ImageLibrary.DARKNESS);
+            Image darkness = null;
             for (int index = 0; index < units.size(); index++) {
                 final Unit unit = units.get(index);
                 g.setTransform(unitTransforms.get(index));
                 if (unit.isUndead()) {
+                    if(darkness == null) {
+                        // Rescale dark halo only in rare case its needed!
+                        darkness = lib.getMiscImage(ImageLibrary.DARKNESS);
+                    }
                     // display darkness
-                    centerImage(g, im, tileWidth, tileHeight);
+                    centerImage(g, darkness, tileWidth, tileHeight);
                 }
                 displayUnit(g, unit);
             }
