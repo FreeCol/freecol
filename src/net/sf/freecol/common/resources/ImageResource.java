@@ -23,20 +23,19 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.MediaTracker;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
 
 
 /**
@@ -84,22 +83,10 @@ public class ImageResource extends Resource implements Resource.Preloadable {
     public void preload() {
         synchronized (loadingLock) {
             if (image == null) {
-                MediaTracker mt = new MediaTracker(_c);
-                Image im;
                 try {
-                    // Explicitly check that the URI is valid before
-                    // letting createImage go off and look for it, as the
-                    // error it throws is cryptic.
                     URL url = getResourceLocator().toURL();
-                    InputStream is = url.openStream();
-                    is.close();
-                    im = Toolkit.getDefaultToolkit().createImage(url);
-                    mt.addImage(im, 0);
-                    mt.waitForID(0);
-                    if (mt.statusID(0, false) == MediaTracker.COMPLETE) {
-                        image = im;
-                    }
-                } catch (IOException | InterruptedException e) {
+                    image = ImageIO.read(url);
+                } catch (IOException e) {
                     logger.log(Level.WARNING, "Failed to load image from: "
                         + getResourceLocator(), e);
                 }
