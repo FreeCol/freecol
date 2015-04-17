@@ -185,13 +185,13 @@ public class ImageResource extends Resource implements Resource.Preloadable {
      * @return The <code>Image</code>.
      */
     public Image getGrayscaleImage(Dimension d) {
-        final Image im = getImage(d);
-        if (im == null) return null;
         final Image cachedGrayscaleImage = grayscaleImages.get(d);
         if (cachedGrayscaleImage != null) return cachedGrayscaleImage;
         synchronized (loadingLock) {
             final Image cached = grayscaleImages.get(d);
             if (cached != null) return cached;
+            final Image im = getImage(d);
+            if (im == null) return null;
             int width = im.getWidth(null);
             int height = im.getHeight(null);
             ColorConvertOp filter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
