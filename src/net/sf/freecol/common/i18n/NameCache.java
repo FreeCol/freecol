@@ -85,12 +85,17 @@ public class NameCache {
     /**
      * Collects all the names with a given prefix.
      *
+     * Note: some collections start at 0, some at 1.
+     *
      * @param prefix The prefix to check.
      * @param names A list to fill with the names found.
      */
     private static void collectNames(String prefix, List<String> names) {
         String name;
-        int i = 0;
+        if (Messages.containsKey(name = prefix + "0")) {
+            names.add(Messages.message(name));
+        }
+        int i = 1;
         while (Messages.containsKey(name = prefix + Integer.toString(i))) {
             names.add(Messages.message(name));
             i++;
@@ -156,7 +161,10 @@ public class NameCache {
             if (names == null) {
                 names = new ArrayList<String>();
                 collectNames(prefix, names);
+                regionNames.put(prefix, names);
             }
+            Integer index = regionIndex.get(prefix);
+            if (index == null) regionIndex.put(prefix, names.size()+1);
         }
     }
 
@@ -368,7 +376,7 @@ public class NameCache {
         }
         StringTemplate nn = player.getNationName();
         do {
-            name = Messages.message(StringTemplate.label("")
+            name = Messages.message(StringTemplate.label(" ")
                 .addStringTemplate(nn)
                 .addNamed(region.getType())
                 .addName(String.valueOf(index)));
