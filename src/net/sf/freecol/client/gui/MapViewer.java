@@ -1574,7 +1574,7 @@ public final class MapViewer {
                 : null;
 
             Image turns = (p.getTurns() <= 0) ? null
-                : ImageLibrary.getStringImage(g, Integer.toString(p.getTurns()),
+                : lib.getStringImage(g, Integer.toString(p.getTurns()),
                                       Color.WHITE, font);
             g.setColor((turns == null) ? Color.GREEN : Color.RED);
 
@@ -1582,7 +1582,7 @@ public final class MapViewer {
                 if (activeUnit != null) {
                     image = ImageLibrary.getPathNextTurnImage(activeUnit);
                 }
-                turns = ImageLibrary.getStringImage(g, Integer.toString(p.getTurns())
+                turns = lib.getStringImage(g, Integer.toString(p.getTurns())
                     + "/" + Integer.toString(p.getMovesLeft()),
                     Color.WHITE, font);
             }
@@ -1836,7 +1836,7 @@ public final class MapViewer {
                 g.setTransform(settlementTransforms.get(index));
                 switch (colonyLabels) {
                 case ClientOptions.COLONY_LABELS_CLASSIC:
-                    Image img = ImageLibrary.getStringImage(g, name, backgroundColor, font);
+                    Image img = lib.getStringImage(g, name, backgroundColor, font);
                     g.drawImage(img, (tileWidth - img.getWidth(null))/2 + 1,
                                 yOffset, null);
                     break;
@@ -2047,7 +2047,7 @@ public final class MapViewer {
                         : FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
                             FontLibrary.FontSize.TINY, Font.BOLD,
                             lib.getScalingFactor());
-                    Image stringImage = ImageLibrary.getStringImage(g,
+                    Image stringImage = lib.getStringImage(g,
                         populationString, theColor, font);
                     centerImage(g, stringImage, tileWidth, tileHeight);
                 }

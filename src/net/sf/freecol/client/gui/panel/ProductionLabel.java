@@ -183,7 +183,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             number += String.valueOf(amount);
             if (showMax) number += "/" + String.valueOf(maximumProduction);
             
-            this.stringImage = ImageLibrary.getStringImage(g, number,
+            this.stringImage = lib.getStringImage(g, number,
                 getForeground(), getFont());
         } else {
             this.stringImage = null;

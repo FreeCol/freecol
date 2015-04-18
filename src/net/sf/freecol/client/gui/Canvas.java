@@ -1213,9 +1213,7 @@ public final class Canvas extends JDesktopPane {
             }
 
             // paint chat display
-            chatDisplay.display(g2d,
-                new FontLibrary(mapViewer.getImageLibrary().getScalingFactor()),
-                size);
+            chatDisplay.display(g2d, mapViewer.getImageLibrary(), size);
 
         } else {
             if (!freeColClient.isMapEditor()) {

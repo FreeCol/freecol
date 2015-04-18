@@ -34,6 +34,7 @@ import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -132,6 +133,7 @@ public final class ImageLibrary {
      */
     private final float scalingFactor;
 
+    private final HashMap<String,BufferedImage> stringImageCache;
 
     /**
      * The constructor to use when needing an unscaled <code>ImageLibrary</code>.
@@ -147,6 +149,7 @@ public final class ImageLibrary {
      */
     public ImageLibrary(float scalingFactor) {
         this.scalingFactor = scalingFactor;
+        stringImageCache = new HashMap<>();
     }
 
 
@@ -1120,7 +1123,7 @@ public final class ImageLibrary {
      * @param font The <code>Font</code> to display the text with.
      * @return The image that was created.
      */
-    public static Image getStringImage(Graphics g, String text, Color color,
+    public BufferedImage getStringImage(Graphics g, String text, Color color,
                                 Font font) {
         if (color == null) {
             logger.warning("createStringImage called with color null");
@@ -1128,11 +1131,11 @@ public final class ImageLibrary {
         }
 
         // Lookup in the cache if the image has been generated already
-        String key = "dynamic.stringImage." + text
+        String key = text
             + "." + font.getFontName().replace(' ', '-')
             + "." + Integer.toString(font.getSize())
             + "." + Integer.toHexString(color.getRGB());
-        Image img = ResourceManager.getImage(key);
+        BufferedImage img = stringImageCache.get(key);
         if (img != null) {
             return img;
         }
@@ -1210,7 +1213,7 @@ public final class ImageLibrary {
         g2.drawString(text, 2, fm.getMaxAscent());
         g2.dispose();
 
-        ResourceManager.addGameMapping(key, new ImageResource(bi));
+        stringImageCache.put(key, bi);
         return bi;
     }
 

@@ -86,23 +86,23 @@ public class ChatDisplay {
      * Displays the list of messages.
      * 
      * @param g The Graphics2D the messages should be displayed on.
-     * @param fontLibrary The FontLibrary to use.
+     * @param lib The imageLibrary to use.
      * @param size The size of the space for displaying in.
      */
-    public synchronized void display(Graphics2D g, FontLibrary fontLibrary, Dimension size) {
+    public synchronized void display(Graphics2D g, ImageLibrary lib, Dimension size) {
         if (getMessageCount() > 0) {
             // Don't edit the list of messages while I'm drawing them.
-            Font font = fontLibrary.createScaledFont(
-                FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY);
+            Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.TINY, lib.getScalingFactor());
             GUIMessage message = getMessage(0);
-            Image si = ImageLibrary.getStringImage(
+            Image si = lib.getStringImage(
                 g, message.getMessage(), message.getColor(), font);
             int yy = size.height - 300 - getMessageCount() * si.getHeight(null);
             int xx = 40;
 
             for (int i = 0; i < getMessageCount(); i++) {
                 message = getMessage(i);
-                g.drawImage(ImageLibrary.getStringImage(g,
+                g.drawImage(lib.getStringImage(g,
                         message.getMessage(), message.getColor(), font),
                     xx, yy, null);
                 yy += si.getHeight(null);
