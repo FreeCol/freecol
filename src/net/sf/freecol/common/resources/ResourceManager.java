@@ -52,8 +52,7 @@ public class ResourceManager {
     private static ResourceMapping baseMapping;
     private static ResourceMapping tcMapping;
     private static ResourceMapping scenarioMapping;
-    // TODO: Check if game and mod resources are always added in a predetermined fixed order.
-    private static ResourceMapping gameMapping;
+    // TODO: Check if mod resources are always added in a predetermined fixed order.
     private static List<ResourceMapping> modMappings
         = new ArrayList<>();
 
@@ -111,42 +110,6 @@ public class ResourceManager {
     }
 
     /**
-     * Sets the mappings specified in a game, such as the player colors.
-     *
-     * @param mapping The mapping between IDs and resources.
-     */
-    public static synchronized void setGameMapping(final ResourceMapping mapping) {
-        logger.info("setGameMapping " + mapping);
-        gameMapping = mapping;
-        update(mapping != null);
-    }
-
-    /**
-     * Add more mappings to the game mapping.
-     *
-     * @param mapping The <code>ResourceMapping</code> to add.
-     */
-    public static synchronized void addGameMapping(final ResourceMapping mapping) {
-        logger.info("addGameMapping(ResourceMapping) " + mapping);
-        if (gameMapping == null) gameMapping = new ResourceMapping();
-        gameMapping.addAll(mapping);
-        update(mapping != null);
-    }
-
-    /**
-     * Add a single mappings to the game mapping.
-     *
-     * @param key The key.
-     * @param resource The resource to add.
-     */
-    public static synchronized void addGameMapping(String key, Resource resource) {
-        //logger.finest("addGameMapping(" + key + ", " + resource + ")");
-        if (gameMapping == null) gameMapping = new ResourceMapping();
-        gameMapping.add(key, resource);
-        mergedContainer.add(key, resource);
-    }
-
-    /**
      * Updates the resource mappings after making changes.
      * 
      * @param newItems If new items have been added.
@@ -172,7 +135,6 @@ public class ResourceManager {
         mc.addAll(tcMapping);
         mc.addAll(scenarioMapping);
         for (ResourceMapping rm : modMappings) mc.addAll(rm);
-        mc.addAll(gameMapping);
         mergedContainer = mc;
     }
 
