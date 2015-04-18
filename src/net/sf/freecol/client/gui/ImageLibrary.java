@@ -962,7 +962,8 @@ public final class ImageLibrary {
     private BufferedImage createChip(String text, Color border,
                              Color background, Color foreground) {
         // Draw it and put it in the cache
-        Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
+        Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+            FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
         // hopefully, this is big enough
         BufferedImage bi = new BufferedImage(100, 100,
                                              BufferedImage.TYPE_INT_ARGB);
@@ -998,7 +999,8 @@ public final class ImageLibrary {
                                    double amount, Color fill,
                                    Color foreground) {
         // Draw it and put it in the cache
-        Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE, FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
+        Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+            FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
         // hopefully, this is big enough
         BufferedImage bi = new BufferedImage(100, 100,
                                              BufferedImage.TYPE_INT_ARGB);
@@ -1035,7 +1037,7 @@ public final class ImageLibrary {
      * @param player The observing <code>Player</code>.
      * @return An alarm chip, or null if none suitable.
      */
-    public Image getAlarmChip(IndianSettlement is, Player player) {
+    public BufferedImage getAlarmChip(IndianSettlement is, Player player) {
         if (player == null || !is.hasContacted(player)) return null;
         Color ownerColor = is.getOwner().getNationColor();
         Player enemy = is.getMostHated();
@@ -1055,18 +1057,10 @@ public final class ImageLibrary {
         }
         Color foreground = getForegroundColor(enemyColor);
         String text = ResourceManager.getString((is.worthScouting(player))
-                                       ? "indianAlarmChip.contacted"
-                                       : "indianAlarmChip.scouted");
-        String key = "dynamic.alarm." + text + "." + ownerColor.getRGB()
-            + "." + amount + "." + enemyColor.getRGB()
-            + "." + Float.toHexString(scalingFactor);
-        Image img = ResourceManager.getImage(key);
-        if (img == null) {
-            img = createFilledChip(text, Color.BLACK, ownerColor, amount/4.0,
+                                                ? "indianAlarmChip.contacted"
+                                                : "indianAlarmChip.scouted");
+        return createFilledChip(text, Color.BLACK, ownerColor, amount/4.0,
                                    enemyColor, foreground);
-            ResourceManager.addGameMapping(key, new ImageResource(img));
-        }
-        return img;
     }
 
     /**
@@ -1075,20 +1069,12 @@ public final class ImageLibrary {
      * @param is The <code>IndianSettlement</code> to check.
      * @return A chip.
      */
-    public Image getIndianSettlementChip(IndianSettlement is) {
+    public BufferedImage getIndianSettlementChip(IndianSettlement is) {
         String text = ResourceManager.getString("indianSettlementChip."
             + ((is.getType().isCapital()) ? "capital" : "normal"));
         Color background = is.getOwner().getNationColor();
-        String key = "dynamic.indianSettlement." + text
-            + "." + Integer.toHexString(background.getRGB())
-            + "." + Float.toHexString(scalingFactor);
-        Image img = ResourceManager.getImage(key);
-        if (img == null) {
-            img = createChip(text, Color.BLACK, background,
-                             getForegroundColor(background));
-            ResourceManager.addGameMapping(key, new ImageResource(img));
-        }
-        return img;
+        return createChip(text, Color.BLACK, background,
+                          getForegroundColor(background));
     }
 
     /**
@@ -1098,23 +1084,15 @@ public final class ImageLibrary {
      * @param expert True if the unit is an expert.
      * @return A suitable chip, or null if no mission is present.
      */
-    public Image getMissionChip(Player owner, boolean expert) {
+    public BufferedImage getMissionChip(Player owner, boolean expert) {
         Color background = owner.getNationColor();
-        String key = "dynamic.mission." + ((expert) ? "expert" : "normal")
-            + "." + Integer.toHexString(background.getRGB())
-            + "." + Float.toHexString(scalingFactor);
-        Image img = ResourceManager.getImage(key);
-        if (img == null) {
-            Color foreground = ResourceManager.getColor("mission."
-                + ((expert) ? "expert" : "normal") + ".foreground.color");
-            if (foreground == null) {
-                foreground = (expert) ? Color.BLACK : Color.GRAY;
-            }
-            img = createChip(ResourceManager.getString("cross"),
-                             Color.BLACK, background, foreground);
-            ResourceManager.addGameMapping(key, new ImageResource(img));
+        Color foreground = ResourceManager.getColor("mission."
+            + ((expert) ? "expert" : "normal") + ".foreground.color");
+        if (foreground == null) {
+            foreground = (expert) ? Color.BLACK : Color.GRAY;
         }
-        return img;
+        return createChip(ResourceManager.getString("cross"),
+                          Color.BLACK, background, foreground);
     }
 
     /**
@@ -1125,20 +1103,11 @@ public final class ImageLibrary {
      * @param text The text for the chip.
      * @return A suitable chip.
      */
-    public Image getOccupationIndicatorChip(Unit unit, String text) {
+    public BufferedImage getOccupationIndicatorChip(Unit unit, String text) {
         Color backgroundColor = unit.getOwner().getNationColor();
         Color foregroundColor = (unit.getState() == Unit.UnitState.FORTIFIED)
             ? Color.GRAY : getForegroundColor(backgroundColor);
-        String key = "dynamic.occupationIndicator." + text
-            + "." + Integer.toHexString(backgroundColor.getRGB())
-            + "." + Float.toHexString(scalingFactor);
-        Image img = ResourceManager.getImage(key);
-        if (img == null) {
-            img = createChip(text, Color.BLACK,
-                             backgroundColor, foregroundColor);
-            ResourceManager.addGameMapping(key, new ImageResource(img));
-        }
-        return img;
+        return createChip(text, Color.BLACK, backgroundColor, foregroundColor);
     }
 
     /**

@@ -1286,17 +1286,8 @@ public final class MapViewer {
     /**
      * Draws the pentagram indicating a native capital.
      */
-    private static Image createCapitalLabel(int extent, int padding,
+    private static BufferedImage createCapitalLabel(int extent, int padding,
                                      Color backgroundColor) {
-        String key = "dynamic.label.nativeCapital"
-            + "." + Integer.toHexString(backgroundColor.getRGB())
-            + "." + Integer.toHexString(extent)
-            + "." + Integer.toHexString(padding);
-        Image image = ResourceManager.getImage(key);
-        if (image != null) {
-            return image;
-        }
-
         // create path
         double deg2rad = Math.PI/180.0;
         double angle = -90.0 * deg2rad;
@@ -1324,7 +1315,6 @@ public final class MapViewer {
         g.setColor(Color.WHITE);
         g.fill(path);
         g.dispose();
-        ResourceManager.addGameMapping(key, new ImageResource(bi));
         return bi;
     }
 
@@ -1406,18 +1396,8 @@ public final class MapViewer {
      * Draws a cross indicating a religious mission is present in the
      * native village.
      */
-    private static Image createReligiousMissionLabel(int extent, int padding,
+    private static BufferedImage createReligiousMissionLabel(int extent, int padding,
         Color backgroundColor, boolean expertMissionary) {
-        String key = "dynamic.label.religiousMission"
-            + (expertMissionary ? ".expert" : "")
-            + "." + Integer.toHexString(backgroundColor.getRGB())
-            + "." + Integer.toHexString(extent)
-            + "." + Integer.toHexString(padding);
-        Image image = ResourceManager.getImage(key);
-        if (image != null) {
-            return image;
-        }
-
         // create path
         double offset = extent * 0.5;
         double size1 = extent - padding - padding;
@@ -1458,7 +1438,6 @@ public final class MapViewer {
         }
         g.draw(cross);
         g.dispose();
-        ResourceManager.addGameMapping(key, new ImageResource(bi));
         return bi;
     }
 
