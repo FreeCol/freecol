@@ -1220,14 +1220,21 @@ public final class Canvas extends JDesktopPane {
                 /* main menu */
                 // TODO: Check if its right to sometimes have an unfocused map
                 //       ingame and end up here after clicking outside map.
-                Image bgImage = ResourceManager.getImage("CanvasBackgroundImage", size);
+
+                // Get the background without scaling, to avoid wasting memory
+                // needlessly keeping an unbounded number of rescaled versions
+                // of the largest image in FreeCol, forever.
+                Image bgImage = ResourceManager.getImage("CanvasBackgroundImage");
                 if (bgImage != null) {
-                    g2d.drawImage(bgImage, 0, 0, gui.getCanvas());
+                    // Draw background image with scaling.
+                    g2d.drawImage(bgImage, 0, 0, size.width, size.height,
+                                  gui.getCanvas());
                     String versionStr = "v. " + FreeCol.getVersion();
                     Font oldFont = g2d.getFont();
                     Color oldColor = g2d.getColor();
                     Font newFont = oldFont.deriveFont(Font.BOLD);
-                    TextLayout layout = new TextLayout(versionStr, newFont, g2d.getFontRenderContext());
+                    TextLayout layout = new TextLayout(versionStr, newFont,
+                        g2d.getFontRenderContext());
                     Rectangle2D bounds = layout.getBounds();
                     float x = size.width - (float) bounds.getWidth() - 5;
                     float y = size.height - (float) bounds.getHeight();
