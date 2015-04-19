@@ -1267,23 +1267,6 @@ public final class MapViewer {
     }
 
     /**
-     * Center the given String on the current Tile.
-     *
-     * @param g a <code>Graphics2D</code> value
-     * @param text a <code>String</code> value
-     */
-    private static void centerString(Graphics2D g, ImageLibrary lib,
-                                     String text,
-                                     int tileWidth, int tileHeight) {
-        g.setColor(Color.BLACK);
-        g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, lib.getScalingFactor()));
-        g.drawString(text,
-            (tileWidth - g.getFontMetrics().stringWidth(text))/2,
-            (tileHeight - g.getFontMetrics().getAscent()     )/2);
-    }
-
-    /**
      * Draws the pentagram indicating a native capital.
      */
     private static BufferedImage createCapitalLabel(int extent, int padding,
@@ -1979,22 +1962,22 @@ public final class MapViewer {
             break;
         }
 
+        g.setColor(Color.BLACK);
+        g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, lib.getScalingFactor()));
         if (text != null) {
             int b = Messages.getBreakingPoint(text);
             if (b == -1) {
-                centerString(g, lib, text, tileWidth, tileHeight);
+                g.drawString(text,
+                    (tileWidth - g.getFontMetrics().stringWidth(text)) / 2,
+                    (tileHeight - g.getFontMetrics().getAscent()) / 2);
             } else {
-                g.setColor(Color.BLACK);
-                g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                    FontLibrary.FontSize.TINY, lib.getScalingFactor()));
                 g.drawString(text.substring(0, b),
-                             (tileWidth -
-                              g.getFontMetrics().stringWidth(text.substring(0, b)))/2,
-                             halfHeight - (g.getFontMetrics().getAscent()*2)/3);
+                    (tileWidth - g.getFontMetrics().stringWidth(text.substring(0, b)))/2,
+                    halfHeight - (g.getFontMetrics().getAscent()*2)/3);
                 g.drawString(text.substring(b+1),
-                             (tileWidth -
-                              g.getFontMetrics().stringWidth(text.substring(b+1)))/2,
-                             halfHeight + (g.getFontMetrics().getAscent()*2)/3);
+                    (tileWidth - g.getFontMetrics().stringWidth(text.substring(b+1)))/2,
+                    halfHeight + (g.getFontMetrics().getAscent()*2)/3);
             }
         }
 
@@ -2003,10 +1986,16 @@ public final class MapViewer {
             if (tile.getHighSeasCount() >= 0) {
                 posString += "/" + Integer.toString(tile.getHighSeasCount());
             }
-            centerString(g, lib, posString, tileWidth, tileHeight);
+            g.drawString(posString,
+                (tileWidth - g.getFontMetrics().stringWidth(posString)) / 2,
+                (tileHeight - g.getFontMetrics().getAscent()) / 2);
         }
         String value = DebugUtils.getColonyValue(tile);
-        if (value != null) centerString(g, lib, value, tileWidth, tileHeight);
+        if (value != null) {
+            g.drawString(value,
+                (tileWidth - g.getFontMetrics().stringWidth(value)) / 2,
+                (tileHeight - g.getFontMetrics().getAscent()) / 2);
+        }
     }
 
     /**
