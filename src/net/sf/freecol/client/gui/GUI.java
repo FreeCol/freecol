@@ -863,26 +863,27 @@ public class GUI {
     }
 
     private void resetMapZoom() {
+        ResourceManager.clean();
         mapViewer.resetMapScale();
         refresh();
     }
 
     public boolean canZoomInMap() {
-        return !mapViewer.isAtMaxMapScale();
+        return mapViewer != null && !mapViewer.isAtMaxMapScale();
     }
 
     public boolean canZoomOutMap() {
-        return !mapViewer.isAtMinMapScale();
+        return mapViewer != null && !mapViewer.isAtMinMapScale();
     }
 
     public void zoomInMap() {
-        if (mapViewer == null) return;
+        ResourceManager.clean();
         mapViewer.increaseMapScale();
         refresh();
     }
 
     public void zoomOutMap() {
-        if (mapViewer == null) return;
+        ResourceManager.clean();
         mapViewer.decreaseMapScale();
         refresh();
     }
