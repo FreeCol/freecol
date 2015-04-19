@@ -127,9 +127,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                   Messages.message("majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
         listPanel.add(buildButton(ImageLibrary.getImage(getSpecification()
-                                                             .getResourceTypeList().get(0), 0.8f),
+                                                             .getResourceTypeList().get(0), 0.75f),
                                   Messages.message("editor.resource"), new ResourceTransform()));
-        listPanel.add(buildButton(ImageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 2f/3f),
+        listPanel.add(buildButton(ImageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.5f),
                                   Messages.message("model.message.LOST_CITY_RUMOUR"),
                                   new LostCityRumourTransform()));
         SettlementType settlementType = nativeNation.getType().getCapitalType();

@@ -309,7 +309,7 @@ public final class ImageLibrary {
 
     public Image getSmallBuildableImage(BuildableType buildable, Player player) {
         // FIXME: distinguish national unit types
-        float scale = scalingFactor * (2f/3f);
+        float scale = scalingFactor * 0.75f;
         Image image = (buildable instanceof BuildingType)
             ? ImageLibrary.getBuildingImage(
                 (BuildingType) buildable, player, scale)
@@ -319,7 +319,7 @@ public final class ImageLibrary {
 
     public Image getSmallBuildingImage(Building building) {
         return getBuildingImage(building.getType(), building.getOwner(),
-            scalingFactor * (2f/3f));
+            scalingFactor * 0.75f);
     }
 
     public Image getBuildingImage(Building building) {
@@ -340,7 +340,7 @@ public final class ImageLibrary {
     }
 
     public Image getSmallImage(FreeColGameObjectType type) {
-        return getImage(type, scalingFactor * (2f/3f));
+        return getImage(type, scalingFactor * 0.75f);
     }
 
     /**
@@ -396,7 +396,7 @@ public final class ImageLibrary {
                 display = ((Player)display).getNation();
             }
 
-            final float scale = 2f/3f;
+            final float scale = 0.75f;
             final float combinedScale = scalingFactor * scale;
             if (display instanceof Unit) {
                 Unit unit = (Unit)display;
@@ -641,7 +641,7 @@ public final class ImageLibrary {
     }
 
     public Image getSmallSettlementImage(Settlement settlement) {
-        return getSettlementImage(settlement, scalingFactor * (2f/3f));
+        return getSettlementImage(settlement, scalingFactor * 0.75f);
     }
 
     /**
@@ -713,12 +713,12 @@ public final class ImageLibrary {
 
     public Image getSmallUnitImage(Unit unit) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
-            unit.hasNativeEthnicity(), false, scalingFactor * (2f/3f));
+            unit.hasNativeEthnicity(), false, scalingFactor * 0.75f);
     }
 
     public Image getSmallUnitImage(Unit unit, boolean grayscale) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
-            unit.hasNativeEthnicity(), grayscale, scalingFactor * (2f/3f));
+            unit.hasNativeEthnicity(), grayscale, scalingFactor * 0.75f);
     }
 
     public Image getUnitImage(Unit unit) {
@@ -738,12 +738,12 @@ public final class ImageLibrary {
 
     public Image getTinyUnitImage(UnitType unitType) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
-            false, false, scalingFactor * (1f/3f));
+            false, false, scalingFactor * 0.25f);
     }
 
     public Image getTinyUnitImage(UnitType unitType, boolean grayscale) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
-            false, grayscale, scalingFactor * (1f/3f));
+            false, grayscale, scalingFactor * 0.25f);
     }
 
     public Image getSmallerUnitImage(UnitType unitType) {
@@ -753,18 +753,18 @@ public final class ImageLibrary {
 
     public Image getSmallUnitImage(UnitType unitType) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
-            false, false, scalingFactor * (2f/3f));
+            false, false, scalingFactor * 0.75f);
     }
 
     public Image getSmallUnitImage(UnitType unitType, boolean grayscale) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
-            false, grayscale, scalingFactor * (2f/3f));
+            false, grayscale, scalingFactor * 0.75f);
     }
 
     public Image getSmallUnitImage(UnitType unitType, String roleId,
                                    boolean grayscale) {
         return getUnitImage(unitType, roleId,
-            false, grayscale, scalingFactor * (2f/3f));
+            false, grayscale, scalingFactor * 0.75f);
     }
 
     public Image getUnitImage(UnitType unitType) {
