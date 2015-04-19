@@ -99,8 +99,10 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
      */
     @Override
     public void clean() {
-        scaledImages = new HashMap<>();
-        grayscaleImages = new HashMap<>();
+        synchronized (loadingLock) {
+            scaledImages = new HashMap<>();
+            grayscaleImages = new HashMap<>();
+        }
     }
 
     /**
