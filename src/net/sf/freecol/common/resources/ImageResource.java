@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,9 +44,9 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
 
     private static final Logger logger = Logger.getLogger(ImageResource.class.getName());
 
-    private Map<Dimension, Image> scaledImages = new HashMap<>();
-    private Map<Dimension, Image> grayscaleImages = new HashMap<>();
-    private Image image = null;
+    private HashMap<Dimension, Image> scaledImages = new HashMap<>();
+    private HashMap<Dimension, Image> grayscaleImages = new HashMap<>();
+    private volatile Image image = null;
     private final Object loadingLock = new Object();
 
 
@@ -97,10 +96,8 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
      */
     @Override
     public void clean() {
-        synchronized (loadingLock) {
-            scaledImages = new HashMap<>();
-            grayscaleImages = new HashMap<>();
-        }
+        scaledImages = new HashMap<>();
+        grayscaleImages = new HashMap<>();
     }
 
     /**
@@ -154,22 +151,20 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
         if(wNew == w && hNew == h)
             return im;
 
-        synchronized (loadingLock) {
-            final Image cached = scaledImages.get(d);
-            if (cached != null) return cached;
+        final Image cached = scaledImages.get(d);
+        if (cached != null) return cached;
 
-            try {
-                BufferedImage scaled = new BufferedImage(wNew, hNew, BufferedImage.TYPE_INT_ARGB);
-                Graphics2D g = scaled.createGraphics();
-                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-                g.drawImage(im, 0, 0, wNew, hNew, null);
-                g.dispose();
-                scaledImages.put(d, scaled);
-                return scaled;
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to scale image: "
-                    + getResourceLocator(), e);
-            }
+        try {
+            BufferedImage scaled = new BufferedImage(wNew, hNew, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = scaled.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            g.drawImage(im, 0, 0, wNew, hNew, null);
+            g.dispose();
+            scaledImages.put(d, scaled);
+            return scaled;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to scale image: "
+                + getResourceLocator(), e);
         }
         return null;
     }
@@ -183,22 +178,22 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
     public Image getGrayscaleImage(Dimension d) {
         final Image cachedGrayscaleImage = grayscaleImages.get(d);
         if (cachedGrayscaleImage != null) return cachedGrayscaleImage;
-        synchronized (loadingLock) {
-            final Image cached = grayscaleImages.get(d);
-            if (cached != null) return cached;
-            final Image im = getImage(d);
-            if (im == null) return null;
-            int width = im.getWidth(null);
-            int height = im.getHeight(null);
-            ColorConvertOp filter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-            BufferedImage srcImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = srcImage.createGraphics();
-            g.drawImage(im, 0, 0, null);
-            g.dispose();
-            final Image grayscaleImage = filter.filter(srcImage, null);
-            grayscaleImages.put(d, grayscaleImage);
-            return grayscaleImage;
-        }
+        final Image cached = grayscaleImages.get(d);
+        if (cached != null) return cached;
+        final Image im = getImage(d);
+        if (im == null) return null;
+        int width = im.getWidth(null);
+        int height = im.getHeight(null);
+        ColorConvertOp filter = new ColorConvertOp(
+            ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+        BufferedImage srcImage = new BufferedImage(width, height,
+            BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = srcImage.createGraphics();
+        g.drawImage(im, 0, 0, null);
+        g.dispose();
+        final Image grayscaleImage = filter.filter(srcImage, null);
+        grayscaleImages.put(d, grayscaleImage);
+        return grayscaleImage;
     }
 
     /**

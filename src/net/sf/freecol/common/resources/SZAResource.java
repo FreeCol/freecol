@@ -22,7 +22,6 @@ package net.sf.freecol.common.resources;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,9 +37,9 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 public class SZAResource extends Resource implements Resource.Preloadable {
     private static final Logger logger = Logger.getLogger(SZAResource.class.getName());
 
-    private final Map<Float, SimpleZippedAnimation> scaledSzAnimations
+    private final HashMap<Float, SimpleZippedAnimation> scaledSzAnimations
         = new HashMap<>();
-    private SimpleZippedAnimation szAnimation = null;
+    private volatile SimpleZippedAnimation szAnimation = null;
     private final Object loadingLock = new Object();
 
 
@@ -62,12 +61,15 @@ public class SZAResource extends Resource implements Resource.Preloadable {
     @Override
     public void preload() {
         synchronized (loadingLock) {
-            if (szAnimation != null) return;
-            try {
-                szAnimation = new SimpleZippedAnimation(getResourceLocator().toURL());
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Could not load SimpleZippedAnimation: "
-                    + getResourceLocator(), e);
+            if (szAnimation == null) {
+                try {
+                    szAnimation = new SimpleZippedAnimation(
+                        getResourceLocator().toURL());
+                } catch (IOException e) {
+                    logger.log(Level.WARNING,
+                        "Could not load SimpleZippedAnimation: "
+                        + getResourceLocator(), e);
+                }
             }
         }
     }
@@ -100,17 +102,14 @@ public class SZAResource extends Resource implements Resource.Preloadable {
         if (scale == 1.0f) {
             return sza;
         }
-        final SimpleZippedAnimation cachedScaledVersion = scaledSzAnimations.get(scale);
+        final SimpleZippedAnimation cachedScaledVersion
+            = scaledSzAnimations.get(scale);
         if (cachedScaledVersion != null) {
             return cachedScaledVersion;
         }
-        synchronized (loadingLock) {
-            if (scaledSzAnimations.get(scale) != null) {
-                return scaledSzAnimations.get(scale);
-            }
-            final SimpleZippedAnimation scaledVersion = sza.createScaledVersion(scale);
-            scaledSzAnimations.put(scale, scaledVersion);
-            return scaledVersion;
-        }
+        final SimpleZippedAnimation scaledVersion
+            = sza.createScaledVersion(scale);
+        scaledSzAnimations.put(scale, scaledVersion);
+        return scaledVersion;
     }
 }

@@ -35,7 +35,7 @@ import java.util.Set;
 public class ResourceMapping {
 
     /** Mappings between an object identifier and a resource. */
-    protected final Map<String, Resource> resources;
+    protected final HashMap<String, Resource> resources;
 
 
     /**
@@ -81,7 +81,7 @@ public class ResourceMapping {
      * @return An unmodifiable <code>Map</code>.
      */
     public Map<String, Resource> getResources() {
-        return Collections.unmodifiableMap(resources);
+        return new HashMap<>(resources);
     }
 
     /**

@@ -41,6 +41,13 @@ public class ResourceManager {
 
     private static final Logger logger = Logger.getLogger(ResourceManager.class.getName());
 
+    // TODO: There are no obvious flaws currently, but this could still
+    // profit from deeper verification, including checking ResourceMapping and
+    // all Resource classes another time, by someone knowledgeable
+    // in thread safety issues in Java. 
+    // It is currently assumed changing of mappings can happen on any thread,
+    // but Resources are only retrieved or cleaned from the AWT thread.
+
     /**
      * The following fields are mappings from resource IDs to
      * resources.  A mapping is defined within a specific context.
@@ -53,8 +60,7 @@ public class ResourceManager {
     private static ResourceMapping tcMapping;
     private static ResourceMapping scenarioMapping;
     // TODO: Check if mod resources are always added in a predetermined fixed order.
-    private static List<ResourceMapping> modMappings
-        = new ArrayList<>();
+    private static List<ResourceMapping> modMappings = new ArrayList<>();
 
     /**
      * All the mappings above merged into this single ResourceMapping
@@ -67,10 +73,11 @@ public class ResourceManager {
 
     /**
      * Sets the mappings specified in the date/base-directory.
+     * Do not access the mapping after the call.
      *
      * @param mapping The mapping between IDs and files.
      */
-    public static void setBaseMapping(final ResourceMapping mapping) {
+    public static synchronized void setBaseMapping(final ResourceMapping mapping) {
         logger.info("setBaseMapping " + mapping);
         baseMapping = mapping;
         update(mapping != null);
@@ -78,10 +85,11 @@ public class ResourceManager {
 
     /**
      * Sets the mappings specified for a Total Conversion (TC).
+     * Do not access the mapping after the call.
      *
      * @param mapping The mapping between IDs and files.
      */
-    public static void setTcMapping(final ResourceMapping mapping) {
+    public static synchronized void setTcMapping(final ResourceMapping mapping) {
         logger.info("setTcMapping " + mapping);
         tcMapping = mapping;
         update(mapping != null);
@@ -89,10 +97,11 @@ public class ResourceManager {
 
     /**
      * Sets the mappings specified by mods.
+     * Do not access the mappings after the call.
      *
      * @param mappings A list of the mappings between IDs and files.
      */
-    public static void setModMappings(final List<ResourceMapping> mappings) {
+    public static synchronized void setModMappings(final List<ResourceMapping> mappings) {
         logger.info("setModMappings size " + mappings.size() + " " + mappings.hashCode());
         modMappings = mappings;
         update(!mappings.isEmpty());
@@ -100,10 +109,11 @@ public class ResourceManager {
 
     /**
      * Sets the mappings specified in a scenario.
+     * Do not access the mapping after the call.
      *
      * @param mapping The mapping between IDs and files.
      */
-    public static void setScenarioMapping(final ResourceMapping mapping) {
+    public static synchronized void setScenarioMapping(final ResourceMapping mapping) {
         logger.info("setScenarioMapping " + mapping);
         scenarioMapping = mapping;
         // As this is called when loading a new savegame,
@@ -115,7 +125,7 @@ public class ResourceManager {
     /**
      * Clean up easily replaced modified copies in caches.
      */
-    public static void clean() {
+    public static synchronized void clean() {
         if(baseMapping != null) {
             for (Map.Entry<String,Resource> entry
                 : baseMapping.getResources().entrySet()) {
@@ -172,7 +182,7 @@ public class ResourceManager {
     /**
      * Creates a merged container containing all the resources.
      */
-    private static synchronized void createMergedContainer() {
+    private static void createMergedContainer() {
         ResourceMapping mc = new ResourceMapping();
         mc.addAll(baseMapping);
         mc.addAll(tcMapping);
@@ -194,12 +204,6 @@ public class ResourceManager {
                 @Override
                 public void run() {
                     // Make a local list of the resources to load.
-                    // TODO: There are no obvious flaws currently, but this
-                    // needs deeper verification, including checking all
-                    // Resource classes another time, by someone knowledgeable
-                    // in thread safety issues in Java. 
-                    // Could lead to a race condition in case a Resource class
-                    // is not completely thread safe, as references are shared.
                     logger.info("Background thread started");
                     ArrayList<Resource> resources
                         = new ArrayList<>(getResources().values());
