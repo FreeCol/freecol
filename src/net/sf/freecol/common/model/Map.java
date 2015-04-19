@@ -121,8 +121,9 @@ public class Map extends FreeColGameObject implements Location {
         public Position(Position start, Direction direction) {
             int xx = start.x, yy = start.y;
             if (direction != null) {
-                xx = direction.stepX(xx, yy);
-                yy = direction.stepY(xx, yy);
+                Position step = direction.step(xx, yy);
+                xx = step.x;
+                yy = step.y;
             }
             this.x = xx;
             this.y = yy;
@@ -205,9 +206,8 @@ public class Map extends FreeColGameObject implements Location {
          */
         public Direction getDirection(Position other) {
             for (Direction d : Direction.values()) {
-                int x = d.stepX(this.x, this.y);
-                int y = d.stepY(this.x, this.y);
-                if (x == other.x && y == other.y) return d;
+                Position step = d.step(x, y);
+                if (step.x == other.x && step.y == other.y) return d;
             }
             return null;
         }
@@ -599,8 +599,9 @@ public class Map extends FreeColGameObject implements Location {
      */
     public Direction getDirection(Tile t1, Tile t2) {
         for (Direction d : Direction.values()) {
-            if (d.stepX(t1.getX(), t1.getY()) == t2.getX()
-                && d.stepY(t1.getX(), t1.getY()) == t2.getY()) return d;
+            Position step = d.step(t1.getX(), t1.getY());
+            if (step.x == t2.getX()
+                && step.y == t2.getY()) return d;
         }
         return null;
     }
@@ -630,7 +631,8 @@ public class Map extends FreeColGameObject implements Location {
      *     direction, or null if invalid.
      */
     public Tile getAdjacentTile(int x, int y, Direction direction) {
-        return getTile(direction.stepX(x, y), direction.stepY(x, y));
+        Position step = direction.step(x, y);
+        return getTile(step.x, step.y);
     }
 
     /**
@@ -1725,20 +1727,24 @@ public class Map extends FreeColGameObject implements Location {
             this.radius = radius;
             n = 0;
 
+            Position step;
             if (isFilled || radius == 1) {
-                x = Direction.NE.stepX(center.getX(), center.getY());
-                y = Direction.NE.stepY(center.getX(), center.getY());
+                step = Direction.NE.step(center.getX(), center.getY());
+                x = step.x;
+                y = step.y;
                 currentRadius = 1;
             } else {
                 this.currentRadius = radius;
                 x = center.getX();
                 y = center.getY();
                 for (int i = 1; i < radius; i++) {
-                    x = Direction.N.stepX(x, y);
-                    y = Direction.N.stepY(x, y);
+                    step = Direction.N.step(x, y);
+                    x = step.x;
+                    y = step.y;
                 }
-                x = Direction.NE.stepX(x, y);
-                y = Direction.NE.stepY(x, y);
+                step = Direction.NE.step(x, y);
+                x = step.x;
+                y = step.y;
             }
             if (!isValid(x, y)) nextTile();
         }
@@ -1772,8 +1778,9 @@ public class Map extends FreeColGameObject implements Location {
                     } else {
                         n = 0;
                         started = false;
-                        x = Direction.NE.stepX(x, y);
-                        y = Direction.NE.stepY(x, y);
+                        Position step = Direction.NE.step(x, y);
+                        x = step.x;
+                        y = step.y;
                     }
                 } else {
                     int i = n / width;
@@ -1795,8 +1802,9 @@ public class Map extends FreeColGameObject implements Location {
                         throw new IllegalStateException("i=" + i + ", n=" + n
                                                         + ", width=" + width);
                     }
-                    x = direction.stepX(x, y);
-                    y = direction.stepY(x, y);
+                    Position step = direction.step(x, y);
+                    x = step.x;
+                    y = step.y;
                 }
             } while (!isValid(x, y));
         }

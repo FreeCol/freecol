@@ -83,25 +83,18 @@ public enum Direction implements Named {
 
 
     /**
-     * Step an x coordinate in this direction.
+     * Step the x and y coordinates in this direction.
      *
      * @param x The x coordinate.
      * @param y The y coordinate.
-     * @return The x coordinate after the step.
+     * @return The map position after the step.
      */
-    public int stepX(int x, int y) {
-        return x + (((y & 1) != 0) ? oddDX : evenDX);
-    }
-
-    /**
-     * Step a y coordinate in this direction.
-     *
-     * @param x The x coordinate.
-     * @param y The y coordinate.
-     * @return The y coordinate after the step.
-     */
-    public int stepY(int x, int y) {
-        return y + (((y & 1) != 0) ? oddDY : evenDY);
+    public Map.Position step(int x, int y) {
+        if((y & 1) != 0) {
+            return new Map.Position(x + oddDX, y + oddDY);
+        } else {
+            return new Map.Position(x + evenDX, y + evenDY);
+        }
     }
 
     /**

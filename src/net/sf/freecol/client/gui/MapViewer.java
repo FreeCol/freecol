@@ -79,7 +79,6 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
 
@@ -463,8 +462,9 @@ public final class MapViewer {
         int col = newCol;
         int row = newRow;
         if (direction != null) {
-            col = direction.stepX(newCol, newRow);
-            row = direction.stepY(newCol, newRow);
+            Map.Position step = direction.step(newCol, newRow);
+            col = step.x;
+            row = step.y;
         }
         logger.finest("Direction is " + direction
                       + ", new focus is " + col + ", " + row);
