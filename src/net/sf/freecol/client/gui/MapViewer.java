@@ -687,7 +687,7 @@ public final class MapViewer {
             // Draw an occupation and nation indicator.
             Player owner = freeColClient.getMyPlayer();
             String text = Messages.message(unit.getOccupationLabel(owner, false));
-            g.drawImage(lib.getOccupationIndicatorChip(unit, text),
+            g.drawImage(lib.getOccupationIndicatorChip(g, unit, text),
                         (int)(STATE_OFFSET_X * lib.getScalingFactor()),
                         0, null);
         }
@@ -2055,7 +2055,7 @@ public final class MapViewer {
                     .getInteger(ClientOptions.COLONY_LABELS);
                 if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
                     // Draw the settlement chip
-                    chip = lib.getIndianSettlementChip(is);
+                    chip = lib.getIndianSettlementChip(g, is);
                     g.drawImage(chip, (int)xOffset, (int)yOffset, null);
                     xOffset += chip.getWidth(null) + 2;
 
@@ -2064,7 +2064,7 @@ public final class MapViewer {
                     if (missionary != null) {
                         boolean expert
                             = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
-                        g.drawImage(lib.getMissionChip(missionary.getOwner(),
+                        g.drawImage(lib.getMissionChip(g, missionary.getOwner(),
                                                        expert),
                                     (int)xOffset, (int)yOffset, null);
                         xOffset += chip.getWidth(null) + 2;
@@ -2072,7 +2072,7 @@ public final class MapViewer {
                 }
 
                 // Draw the alarm chip if needed.
-                if ((chip = lib.getAlarmChip(is, player)) != null) {
+                if ((chip = lib.getAlarmChip(g, is, player)) != null) {
                     g.drawImage(chip, (int)xOffset, (int)yOffset, null);
                 }
             } else {
@@ -2163,7 +2163,7 @@ public final class MapViewer {
 
         // Draw an occupation and nation indicator.
         String text = Messages.message(unit.getOccupationLabel(player, false));
-        g.drawImage(lib.getOccupationIndicatorChip(unit, text),
+        g.drawImage(lib.getOccupationIndicatorChip(g, unit, text),
                     (int)(STATE_OFFSET_X * lib.getScalingFactor()), 0,
                     null);
 
@@ -2546,7 +2546,7 @@ public final class MapViewer {
 
         Player player = freeColClient.getMyPlayer();
         String text = Messages.message(unit.getOccupationLabel(player, false));
-        g.drawImage(lib.getOccupationIndicatorChip(unit, text), 0, 0, null);
+        g.drawImage(lib.getOccupationIndicatorChip(g, unit, text), 0, 0, null);
 
         final JLabel label = new JLabel(new ImageIcon(img));
         label.setSize(width, height);

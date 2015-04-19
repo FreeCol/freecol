@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -293,7 +294,7 @@ public final class UnitLabel extends JLabel
                    getParent() instanceof EuropePanel.DocksPanel ||
                    getParent().getParent() instanceof ReportPanel) {
             String text = Messages.message(unit.getOccupationLabel(player, false));
-            g.drawImage(lib.getOccupationIndicatorChip(unit, text), 0, 0, null);
+            g.drawImage(lib.getOccupationIndicatorChip((Graphics2D)g, unit, text), 0, 0, null);
 
             if (unit.isDamaged()) {
                 String underRepair = Messages.message(unit.getRepairLabel());

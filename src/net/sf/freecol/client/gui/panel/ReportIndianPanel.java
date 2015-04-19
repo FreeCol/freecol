@@ -20,6 +20,8 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -177,10 +179,14 @@ public final class ReportIndianPanel extends ReportPanel {
                 final Unit missionary = settlement.getMissionary();
                 JLabel missionLabel = new JLabel("");
                 if (missionary != null) {
+                    BufferedImage dummy = new BufferedImage(1, 1,
+                        BufferedImage.TYPE_INT_ARGB);
+                    Graphics2D g = dummy.createGraphics();
                     missionLabel.setIcon(new ImageIcon(lib
-                            .getMissionChip(missionary.getOwner(),
+                            .getMissionChip(g, missionary.getOwner(),
                                 missionary.hasAbility(Ability
                                         .EXPERT_MISSIONARY))));
+                    g.dispose();
                     Utility.localizeToolTip(missionLabel, Messages
                         .message(missionary.getLabel(Unit.UnitLabelType
                                 .NATIONAL)));

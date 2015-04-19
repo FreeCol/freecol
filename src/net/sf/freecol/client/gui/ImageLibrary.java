@@ -30,12 +30,10 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.TexturePaint;
-import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
@@ -65,7 +63,6 @@ import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -956,40 +953,40 @@ public final class ImageLibrary {
     /**
      * Create a "chip" with the given text and colors.
      *
+     * @param g Graphics2D for getting the FontMetrics.
      * @param text The text to display.
      * @param border The border <code>Color</code>.
      * @param background The background <code>Color</code>.
      * @param foreground The foreground <code>Color</code>.
      * @return A chip.
      */
-    private BufferedImage createChip(String text, Color border,
-                             Color background, Color foreground) {
-        // Draw it and put it in the cache
+    private BufferedImage createChip(Graphics2D g, String text, Color border,
+                                     Color background, Color foreground) {
         Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
             FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
-        // hopefully, this is big enough
-        BufferedImage bi = new BufferedImage(100, 100,
-                                             BufferedImage.TYPE_INT_ARGB);
+        FontMetrics fm = g.getFontMetrics(font);
+        int padding = (int)(6 * scalingFactor);
+        BufferedImage bi = new BufferedImage(fm.stringWidth(text) + padding,
+            fm.getMaxAscent() + fm.getMaxDescent() + padding,
+            BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();
-        TextLayout label = new TextLayout(text, font,
-                                          g2.getFontRenderContext());
-        float padding = 6 * scalingFactor;
-        int width = (int)(label.getBounds().getWidth() + padding);
-        int height = (int)(label.getAscent() + label.getDescent() + padding);
+        g2.setFont(font);
+        int width = bi.getWidth();
+        int height = bi.getHeight();
         g2.setColor(border);
         g2.fillRect(0, 0, width, height);
         g2.setColor(background);
         g2.fillRect(1, 1, width - 2, height - 2);
         g2.setColor(foreground);
-        label.draw(g2, (float)(padding/2 - label.getBounds().getX()),
-                   label.getAscent() + padding/2);
+        g2.drawString(text, padding/2, fm.getMaxAscent() + padding/2);
         g2.dispose();
-        return bi.getSubimage(0, 0, width, height);
+        return bi;
     }
 
     /**
      * Create a filled "chip" with the given text and colors.
      *
+     * @param g Graphics2D for getting the FontMetrics.
      * @param text The text to display.
      * @param border The border <code>Color</code>.
      * @param background The background <code>Color</code>.
@@ -998,21 +995,21 @@ public final class ImageLibrary {
      * @param foreground The foreground <code>Color</code>.
      * @return A chip.
      */
-    private BufferedImage createFilledChip(String text, Color border, Color background,
-                                   double amount, Color fill,
-                                   Color foreground) {
-        // Draw it and put it in the cache
+    private BufferedImage createFilledChip(Graphics2D g, String text,
+                                           Color border, Color background,
+                                           double amount, Color fill,
+                                           Color foreground) {
         Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
             FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
-        // hopefully, this is big enough
-        BufferedImage bi = new BufferedImage(100, 100,
-                                             BufferedImage.TYPE_INT_ARGB);
+        FontMetrics fm = g.getFontMetrics(font);
+        int padding = (int)(6 * scalingFactor);
+        BufferedImage bi = new BufferedImage(fm.stringWidth(text) + padding,
+            fm.getMaxAscent() + fm.getMaxDescent() + padding,
+            BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();
-        TextLayout label = new TextLayout(text, font,
-                                          g2.getFontRenderContext());
-        float padding = 6 * scalingFactor;
-        int width = (int)(label.getBounds().getWidth() + padding);
-        int height = (int)(label.getAscent() + label.getDescent() + padding);
+        g2.setFont(font);
+        int width = bi.getWidth();
+        int height = bi.getHeight();
         g2.setColor(border);
         g2.fillRect(0, 0, width, height);
         g2.setColor(background);
@@ -1022,10 +1019,9 @@ public final class ImageLibrary {
             g2.fillRect(1, 1, width - 2, (int)((height - 2) * amount));
         }
         g2.setColor(foreground);
-        label.draw(g2, (float)(padding/2 - label.getBounds().getX()),
-                   label.getAscent() + padding/2);
+        g2.drawString(text, padding/2, fm.getMaxAscent() + padding/2);
         g2.dispose();
-        return bi.getSubimage(0, 0, width, height);
+        return bi;
     }
 
 
@@ -1036,11 +1032,13 @@ public final class ImageLibrary {
      * The background is either the native owner's, or that of the
      * most hated nation if any.
      *
+     * @param g Graphics2D for getting the FontMetrics.
      * @param is The <code>IndianSettlement</code> to check.
      * @param player The observing <code>Player</code>.
      * @return An alarm chip, or null if none suitable.
      */
-    public BufferedImage getAlarmChip(IndianSettlement is, Player player) {
+    public BufferedImage getAlarmChip(Graphics2D g,
+                                      IndianSettlement is, Player player) {
         if (player == null || !is.hasContacted(player)) return null;
         Color ownerColor = is.getOwner().getNationColor();
         Player enemy = is.getMostHated();
@@ -1062,39 +1060,43 @@ public final class ImageLibrary {
         String text = ResourceManager.getString((is.worthScouting(player))
                                                 ? "indianAlarmChip.contacted"
                                                 : "indianAlarmChip.scouted");
-        return createFilledChip(text, Color.BLACK, ownerColor, amount/4.0,
+        return createFilledChip(g, text, Color.BLACK, ownerColor, amount/4.0,
                                    enemyColor, foreground);
     }
 
     /**
      * Gets the owner chip for the settlement.
      *
+     * @param g Graphics2D for getting the FontMetrics.
      * @param is The <code>IndianSettlement</code> to check.
      * @return A chip.
      */
-    public BufferedImage getIndianSettlementChip(IndianSettlement is) {
+    public BufferedImage getIndianSettlementChip(Graphics2D g,
+                                                 IndianSettlement is) {
         String text = ResourceManager.getString("indianSettlementChip."
             + ((is.getType().isCapital()) ? "capital" : "normal"));
         Color background = is.getOwner().getNationColor();
-        return createChip(text, Color.BLACK, background,
+        return createChip(g, text, Color.BLACK, background,
                           getForegroundColor(background));
     }
 
     /**
      * Gets the mission chip for a native settlement.
      *
+     * @param g Graphics2D for getting the FontMetrics.
      * @param owner The player that owns the mission.
      * @param expert True if the unit is an expert.
      * @return A suitable chip, or null if no mission is present.
      */
-    public BufferedImage getMissionChip(Player owner, boolean expert) {
+    public BufferedImage getMissionChip(Graphics2D g,
+                                        Player owner, boolean expert) {
         Color background = owner.getNationColor();
         Color foreground = ResourceManager.getColor("mission."
             + ((expert) ? "expert" : "normal") + ".foreground.color");
         if (foreground == null) {
             foreground = (expert) ? Color.BLACK : Color.GRAY;
         }
-        return createChip(ResourceManager.getString("cross"),
+        return createChip(g, ResourceManager.getString("cross"),
                           Color.BLACK, background, foreground);
     }
 
@@ -1102,15 +1104,17 @@ public final class ImageLibrary {
      * Gets a chip for an occupation indicator, i.e. a small image with a
      * single letter or symbol that indicates the Unit's state.
      *
+     * @param g Graphics2D for getting the FontMetrics.
      * @param unit The <code>Unit</code> with the occupation.
      * @param text The text for the chip.
      * @return A suitable chip.
      */
-    public BufferedImage getOccupationIndicatorChip(Unit unit, String text) {
+    public BufferedImage getOccupationIndicatorChip(Graphics2D g,
+                                                    Unit unit, String text) {
         Color backgroundColor = unit.getOwner().getNationColor();
         Color foregroundColor = (unit.getState() == Unit.UnitState.FORTIFIED)
             ? Color.GRAY : getForegroundColor(backgroundColor);
-        return createChip(text, Color.BLACK, backgroundColor, foregroundColor);
+        return createChip(g, text, Color.BLACK, backgroundColor, foregroundColor);
     }
 
     /**
