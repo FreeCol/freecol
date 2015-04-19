@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.resources;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -50,7 +49,6 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
     private Map<Dimension, Image> grayscaleImages = new HashMap<>();
     private Image image = null;
     private final Object loadingLock = new Object();
-    private static final Component _c = new Component() {};
 
 
     /**
