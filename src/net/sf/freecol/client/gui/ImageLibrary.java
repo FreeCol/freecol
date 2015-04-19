@@ -1145,8 +1145,9 @@ public final class ImageLibrary {
         }
         // create an image of the appropriate size
         FontMetrics fm = g.getFontMetrics(font);
-        BufferedImage bi = new BufferedImage(fm.stringWidth(text) + 4,
-            fm.getMaxAscent() + fm.getMaxDescent(),
+        int width = fm.stringWidth(text) + 4;
+        int height = fm.getMaxAscent() + fm.getMaxDescent();
+        BufferedImage bi = new BufferedImage(width, height,
             BufferedImage.TYPE_INT_ARGB);
         // draw the string with selected color
         Graphics2D g2 = bi.createGraphics();
@@ -1158,9 +1159,9 @@ public final class ImageLibrary {
         int borderWidth = 1;
         int borderColor = getStringBorderColor(color).getRGB();
         int srcRGB, dstRGB, srcA;
-        for (int biY = 0; biY < bi.getHeight(); biY++) {
-            for (int biX = borderWidth; biX < bi.getWidth() - borderWidth; biX++) {
-                int biXI = bi.getWidth() - biX - 1;
+        for (int biY = 0; biY < height; biY++) {
+            for (int biX = borderWidth; biX < width - borderWidth; biX++) {
+                int biXI = width - biX - 1;
                 for (int d = 1; d <= borderWidth; d++) {
                     // left to right
                     srcRGB = bi.getRGB(biX, biY);
@@ -1185,9 +1186,9 @@ public final class ImageLibrary {
                 }
             }
         }
-        for (int biX = 0; biX < bi.getWidth(); biX++) {
-            for (int biY = borderWidth; biY < bi.getHeight() - borderWidth; biY++) {
-                int biYI = bi.getHeight() - biY - 1;
+        for (int biX = 0; biX < width; biX++) {
+            for (int biY = borderWidth; biY < height - borderWidth; biY++) {
+                int biYI = height - biY - 1;
                 for (int d = 1; d <= borderWidth; d++) {
                     // top to bottom
                     srcRGB = bi.getRGB(biX, biY);
