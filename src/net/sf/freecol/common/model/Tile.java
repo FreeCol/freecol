@@ -1055,7 +1055,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     <code>Direction</code>, or null if none present.
      */
     public Tile getNeighbourOrNull(Direction direction) {
-        return getMap().getAdjacentTile(this, direction);
+        return getMap().getAdjacentTile(x, y, direction);
     }
 
     /**
