@@ -42,12 +42,12 @@ import javax.imageio.ImageIO;
  * A <code>Resource</code> wrapping an <code>Image</code>.
  * @see Resource
  */
-public class ImageResource extends Resource implements Resource.Preloadable {
+public class ImageResource extends Resource implements Resource.Preloadable, Resource.Cleanable {
 
     private static final Logger logger = Logger.getLogger(ImageResource.class.getName());
 
-    private final Map<Dimension, Image> grayscaleImages = new HashMap<>();
-    private final Map<Dimension, Image> scaledImages = new HashMap<>();
+    private Map<Dimension, Image> scaledImages = new HashMap<>();
+    private Map<Dimension, Image> grayscaleImages = new HashMap<>();
     private Image image = null;
     private final Object loadingLock = new Object();
     private static final Component _c = new Component() {};
@@ -92,6 +92,15 @@ public class ImageResource extends Resource implements Resource.Preloadable {
                 }
             }
         }
+    }
+
+    /**
+     * Clean up old cached copies.
+     */
+    @Override
+    public void clean() {
+        scaledImages = new HashMap<>();
+        grayscaleImages = new HashMap<>();
     }
 
     /**

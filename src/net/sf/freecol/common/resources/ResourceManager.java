@@ -106,7 +106,50 @@ public class ResourceManager {
     public static void setScenarioMapping(final ResourceMapping mapping) {
         logger.info("setScenarioMapping " + mapping);
         scenarioMapping = mapping;
+        // As this is called when loading a new savegame,
+        // use it as a hint for cleaning up
+        clean();
         update(mapping != null);
+    }
+
+    /**
+     * Clean up easily replaced modified copies in caches.
+     */
+    public static void clean() {
+        if(baseMapping != null) {
+            for (Map.Entry<String,Resource> entry
+                : baseMapping.getResources().entrySet()) {
+                Resource resource = entry.getValue();
+                if(resource instanceof Resource.Cleanable)
+                    ((Resource.Cleanable)resource).clean();
+            }
+        }
+        if(tcMapping != null) {
+            for (Map.Entry<String,Resource> entry
+                : tcMapping.getResources().entrySet()) {
+                Resource resource = entry.getValue();
+                if(resource instanceof Resource.Cleanable)
+                    ((Resource.Cleanable)resource).clean();
+            }
+        }
+        if(scenarioMapping != null) {
+            for (Map.Entry<String,Resource> entry
+                : scenarioMapping.getResources().entrySet()) {
+                Resource resource = entry.getValue();
+                if(resource instanceof Resource.Cleanable)
+                    ((Resource.Cleanable)resource).clean();
+            }
+        }
+        if(modMappings != null) {
+            for (ResourceMapping mapping : modMappings) {
+                for (Map.Entry<String,Resource> entry
+                    : mapping.getResources().entrySet()) {
+                    Resource resource = entry.getValue();
+                    if(resource instanceof Resource.Cleanable)
+                        ((Resource.Cleanable)resource).clean();
+                }
+            }
+        }
     }
 
     /**
