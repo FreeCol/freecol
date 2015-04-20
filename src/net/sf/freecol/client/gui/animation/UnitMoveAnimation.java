@@ -85,9 +85,9 @@ final class UnitMoveAnimation {
                 @Override
                 public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
                     final Point srcPoint
-                        = gui.getMapViewer().getUnitLabelPositionInTile(unitLabel, srcP);
+                        = gui.getMapViewer().calculateUnitLabelPositionInTile(unitLabel, srcP);
                     final Point dstPoint
-                        = gui.getMapViewer().getUnitLabelPositionInTile(unitLabel, dstP);
+                        = gui.getMapViewer().calculateUnitLabelPositionInTile(unitLabel, dstP);
                     final double xratio = gui.getMapViewer().getTileWidthHeightRatio();
                     final int stepX = (srcPoint.getX() == dstPoint.getX()) ? 0
                         : (srcPoint.getX() > dstPoint.getX()) ? -1 : 1;

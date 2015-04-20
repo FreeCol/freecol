@@ -153,7 +153,7 @@ public final class InfoPanel extends FreeColPanel {
             if (tile != null) {
                 final MapViewer mapViewer = getGUI().getColonyTileMapViewer();
                 final ImageLibrary lib = mapViewer.getImageLibrary();
-                BufferedImage image = mapViewer.createTerrainImage(tile);
+                BufferedImage image = mapViewer.createTileImageWithBeachBorderAndItems(tile);
                 if (tile.isExplored()) {
                     StringTemplate items = StringTemplate.label(", ");
                     items.addNamed(tile);

@@ -473,8 +473,8 @@ public final class MapViewer {
     }
 
 
-    private int getCompoundHeight(TileType tileType, int height,
-                                  Image overlayImage) {
+    private int calculateHeightForTileWithOverlayAndForest(
+            TileType tileType, int height, Image overlayImage) {
         int compoundHeight = height;
         if (tileType != null) {
             int tmpHeight;
@@ -503,20 +503,20 @@ public final class MapViewer {
      * @param tile The Tile to draw.
      * @return The image.
      */
-    public BufferedImage createTerrainImage(Tile tile) {
+    public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
         final TileType tileType = tile.getType();
         final Image terrain = lib.getTerrainImage(
             tileType, tile.getX(), tile.getY());
         Image overlayImage = lib.getOverlayImage(tile);
         final int width = terrain.getWidth(null);
         final int height = terrain.getHeight(null);
-        final int compoundHeight = getCompoundHeight(tileType, height,
-                                                     overlayImage);
+        final int compoundHeight = calculateHeightForTileWithOverlayAndForest(
+            tileType, height, overlayImage);
         BufferedImage image = new BufferedImage(
             width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
         g.translate(0, compoundHeight - height);
-        displayBaseTile(g, lib, tile, true);
+        displayTileWithBeachAndBorder(g, lib, tile, true);
         displayTileItems(g, tile, overlayImage);
         g.dispose();
         return image;
@@ -529,7 +529,7 @@ public final class MapViewer {
      * @param scale The scale of the terrain image to return.
      * @return The terrain-image
      */
-    public static Image getCompoundTerrainImage(TileType type, float scale) {
+    public static Image createTileImageWithOverlayAndForest(TileType type, float scale) {
         Image terrainImage = ImageLibrary.getTerrainImage(type, 0, 0, scale);
         Image overlayImage = ImageLibrary.getOverlayImage(type, type.getId(), scale);
         Image forestImage = type.isForested() ? ImageLibrary.getForestImage(type, scale) : null;
@@ -544,7 +544,8 @@ public final class MapViewer {
             if (forestImage != null) {
                 height = Math.max(height, forestImage.getHeight(null));
             }
-            BufferedImage compositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage compositeImage = new BufferedImage(width, height,
+                BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = compositeImage.createGraphics();
             g.drawImage(terrainImage, 0, height - terrainImage.getHeight(null), null);
             if (overlayImage != null) {
@@ -577,8 +578,8 @@ public final class MapViewer {
         final int width = terrain.getWidth(null);
         final int height = terrain.getHeight(null);
         Image overlayImage = lib.getOverlayImage(tile);
-        final int compoundHeight = getCompoundHeight(tileType, height,
-                                                     overlayImage);
+        final int compoundHeight = calculateHeightForTileWithOverlayAndForest(
+            tileType, height, overlayImage);
         BufferedImage image = new BufferedImage(
             width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
@@ -594,7 +595,7 @@ public final class MapViewer {
      * @param tile The <code>Tile</code> to get the size for.
      * @return The tile size.
      */
-    public Dimension getTileSize(Tile tile) {
+    public Dimension calculateTileSize(Tile tile) {
         final TileType tileType = tile.getType();
         final Image image = lib.getTerrainImage(tileType,
             tile.getX(), tile.getY());
@@ -613,7 +614,7 @@ public final class MapViewer {
     public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
         final Tile tile = colony.getTile();
-        Dimension tileSize = getTileSize(tile);
+        Dimension tileSize = calculateTileSize(tile);
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 if (tiles[x][y] != null) {
@@ -660,12 +661,13 @@ public final class MapViewer {
             }
         }
 
-        displayBaseTile(g, lib, tile, false);
+        displayTileWithBeachAndBorder(g, lib, tile, false);
         if (tile != null && tile.isExplored()) {
             displayTileItems(g, tile, overlayImage);
-            displaySettlement(g, lib, tile, tileWidth, tileHeight, false);
+            displaySettlementWithChipsOrPopulationNumber(
+                g, lib, tile, tileWidth, tileHeight, false);
             displayFogOfWar(g, tile);
-            displayOptionalValues(g, tile);
+            displayOptionalTileTextAndRegionBorder(g, tile);
         }
 
         if (tileCannotBeWorked) {
@@ -675,7 +677,7 @@ public final class MapViewer {
 
         if (price > 0 && tile != null && !tile.hasSettlement()) {
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
-            centerImage(g, image, tileWidth, tileHeight);
+            displayCenteredImage(g, image, tileWidth, tileHeight);
         }
 
         Image image;
@@ -817,7 +819,7 @@ public final class MapViewer {
      * @param tile The <code>Tile</code> on the screen.
      * @return The bounds <code>Rectangle</code>.
      */
-    public Rectangle getTileBounds(Tile tile) {
+    public Rectangle calculateTileBounds(Tile tile) {
         Rectangle result = new Rectangle(0, 0, size.width, size.height);
         if (isTileVisible(tile)) {
             result.x = ((tile.getX() - leftColumn) * tileWidth) + leftColumnX;
@@ -840,7 +842,7 @@ public final class MapViewer {
      *     <code>null</code> if the <code>Tile</code> is not drawn on
      *     the mapboard.
      */
-    public Point getTilePosition(Tile t) {
+    public Point calculateTilePosition(Tile t) {
         repositionMapIfNeeded();
         if (!isTileVisible(t)) return null;
 
@@ -867,7 +869,7 @@ public final class MapViewer {
      * @param tileP The position of the Tile on the screen.
      * @return The position where to put the label, null if tileP is null.
      */
-    public Point getUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
+    public Point calculateUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
         if (tileP != null) {
             int labelX = tileP.x + tileWidth
                 / 2 - unitLabel.getWidth() / 2;
@@ -1119,14 +1121,14 @@ public final class MapViewer {
         selectedTile = newTile;
 
         if (getViewMode() == GUI.MOVE_UNITS_MODE) {
-            if (noActiveUnitIsAt(newTile)) {
+            if (isNoActiveUnitAt(newTile)) {
                 if (newTile != null && newTile.hasSettlement()) {
                     gui.getCanvas().showSettlement(newTile.getSettlement());
                     return false;
                 }
 
                 // else, just select a unit on the selected tile
-                Unit unitInFront = getUnitInFront(newTile);
+                Unit unitInFront = findUnitInFront(newTile);
                 if (unitInFront != null) {
                     ret = setActiveUnit(unitInFront);
                     updateCurrentPathForActiveUnit();
@@ -1227,7 +1229,7 @@ public final class MapViewer {
      * Reset the scale of the map to the default.
      */
     void resetMapScale() {
-        setImageLibrary(new ImageLibrary());
+        setImageLibraryAndUpdateData(new ImageLibrary());
     }
 
     boolean isAtMaxMapScale() {
@@ -1242,23 +1244,23 @@ public final class MapViewer {
         float newScale = lib.getScalingFactor() + MAP_SCALE_STEP;
         if (newScale >= MAP_SCALE_MAX)
             newScale = MAP_SCALE_MAX;
-        setImageLibrary(new ImageLibrary(newScale));
+        setImageLibraryAndUpdateData(new ImageLibrary(newScale));
     }
 
     void decreaseMapScale() {
         float newScale = lib.getScalingFactor() - MAP_SCALE_STEP;
         if (newScale <= MAP_SCALE_MIN)
             newScale = MAP_SCALE_MIN;
-        setImageLibrary(new ImageLibrary(newScale));
+        setImageLibraryAndUpdateData(new ImageLibrary(newScale));
     }
 
     /**
      * Centers the given Image on the tile.
      *
-     * @param g a <code>Graphics2D</code> value
-     * @param image an <code>Image</code> value
+     * @param g a <code>Graphics2D</code>
+     * @param image an <code>Image</code>
      */
-    private static void centerImage(Graphics2D g, Image image,
+    private static void displayCenteredImage(Graphics2D g, Image image,
                                     int tileWidth, int tileHeight) {
         g.drawImage(image,
                     (tileWidth - image.getWidth(null))/2,
@@ -1306,11 +1308,11 @@ public final class MapViewer {
      * Creates an BufferedImage that shows the given text centred on a
      * translucent rounded rectangle with the given color.
      *
-     * @param g a <code>Graphics2D</code> value
-     * @param text a <code>String</code> value
-     * @param font a <code>Font</code> value
-     * @param backgroundColor a <code>Color</code> value
-     * @return an <code>BufferedImage</code> value
+     * @param g a <code>Graphics2D</code>
+     * @param text a <code>String</code>
+     * @param font a <code>Font</code>
+     * @param backgroundColor a <code>Color</code>
+     * @return an <code>BufferedImage</code>
      */
     private BufferedImage createLabel(Graphics2D g, String text, Font font,
                               Color backgroundColor) {
@@ -1323,10 +1325,10 @@ public final class MapViewer {
      * Creates an BufferedImage that shows the given text centred on a
      * translucent rounded rectangle with the given color.
      *
-     * @param g a <code>Graphics2D</code> value
+     * @param g a <code>Graphics2D</code>
      * @param textSpecs a <code>TextSpecification</code> array
-     * @param backgroundColor a <code>Color</code> value
-     * @return an <code>BufferedImage</code> value
+     * @param backgroundColor a <code>Color</code>
+     * @return a <code>BufferedImage</code>
      */
     private BufferedImage createLabel(Graphics2D g, TextSpecification[] textSpecs,
                               Color backgroundColor) {
@@ -1379,8 +1381,8 @@ public final class MapViewer {
      * Draws a cross indicating a religious mission is present in the
      * native village.
      */
-    private static BufferedImage createReligiousMissionLabel(int extent, int padding,
-        Color backgroundColor, boolean expertMissionary) {
+    private static BufferedImage createReligiousMissionLabel(int extent,
+            int padding, Color backgroundColor, boolean expertMissionary) {
         // create path
         double offset = extent * 0.5;
         double size1 = extent - padding - padding;
@@ -1434,9 +1436,10 @@ public final class MapViewer {
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
      */
-    private static void displayBaseTile(Graphics2D g, ImageLibrary library,
-                                        Tile tile,
-                                        boolean drawUnexploredBorders) {
+    private static void displayTileWithBeachAndBorder(Graphics2D g,
+                                                      ImageLibrary library,
+                                                      Tile tile,
+                                                      boolean drawUnexploredBorders) {
         if (tile != null) {
             int x = tile.getX();
             int y = tile.getY();
@@ -1547,7 +1550,7 @@ public final class MapViewer {
         for (PathNode p = path; p != null; p = p.next) {
             Tile tile = p.getTile();
             if (tile == null) continue;
-            Point point = getTilePosition(tile);
+            Point point = calculateTilePosition(tile);
             if (point == null) continue;
 
             Image image = (p.isOnCarrier())
@@ -1576,8 +1579,9 @@ public final class MapViewer {
                 g.setColor(Color.BLACK);
                 g.drawOval(halfWidth, halfHeight, 10, 10);
             } else {
-                centerImage(g, image, tileWidth, tileHeight);
-                if (turns != null) centerImage(g, turns, tileWidth, tileHeight);
+                displayCenteredImage(g, image, tileWidth, tileHeight);
+                if (turns != null)
+                    displayCenteredImage(g, turns, tileWidth, tileHeight);
             }
             g.translate(-point.x, -point.y);
         }
@@ -1676,7 +1680,7 @@ public final class MapViewer {
             // Column per column; start at the left side to display the tiles.
             for (int column = firstColumn; column <= lastColumn; column++) {
                 Tile tile = map.getTile(column, row);
-                displayBaseTile(g, lib, tile, true);
+                displayTileWithBeachAndBorder(g, lib, tile, true);
                 g.translate(tileWidth, 0);
             }
             g.setTransform(rowTransform);
@@ -1719,7 +1723,7 @@ public final class MapViewer {
                 Tile tile = map.getTile(column, row);
 
                 // paint full borders
-                paintBorders(g, tile, BorderType.COUNTRY, true);
+                displayTerritorialBorders(g, tile, BorderType.COUNTRY, true);
                 // Display the Tile overlays:
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -1734,21 +1738,22 @@ public final class MapViewer {
                     }
                     Image overlayImage = lib.getOverlayImage(tile, overlayCache);
                     displayTileItems(g, tile, overlayImage);
-                    displaySettlement(g, lib, tile, tileWidth, tileHeight, withNumbers);
+                    displaySettlementWithChipsOrPopulationNumber(
+                        g, lib, tile, tileWidth, tileHeight, withNumbers);
                     displayFogOfWar(g, tile);
-                    displayOptionalValues(g, tile);
+                    displayOptionalTileTextAndRegionBorder(g, tile);
                 }
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                    RenderingHints.VALUE_ANTIALIAS_ON);
                 // paint transparent borders
-                paintBorders(g, tile, BorderType.COUNTRY, false);
+                displayTerritorialBorders(g, tile, BorderType.COUNTRY, false);
 
                 if (displayTileCursor(tile)) {
-                    drawCursor(g);
+                    displayCursor(g);
                 }
                 // check for units
                 if (tile != null) {
-                    Unit unitInFront = getUnitInFront(tile);
+                    Unit unitInFront = findUnitInFront(tile);
                     if (unitInFront != null && !isOutForAnimation(unitInFront)) {
                         units.add(unitInFront);
                         unitTransforms.add(g.getTransform());
@@ -1785,7 +1790,7 @@ public final class MapViewer {
                         darkness = lib.getMiscImage(ImageLibrary.DARKNESS);
                     }
                     // display darkness
-                    centerImage(g, darkness, tileWidth, tileHeight);
+                    displayCenteredImage(g, darkness, tileWidth, tileHeight);
                 }
                 displayUnit(g, unit);
             }
@@ -1931,7 +1936,7 @@ public final class MapViewer {
      * @param g The Graphics2D object on which to draw the Tile.
      * @param tile The Tile to draw.
      */
-    private void displayOptionalValues(Graphics2D g, Tile tile) {
+    private void displayOptionalTileTextAndRegionBorder(Graphics2D g, Tile tile) {
         String text = null;
         int op = freeColClient.getClientOptions()
             .getInteger(ClientOptions.DISPLAY_TILE_TEXT);
@@ -1953,7 +1958,7 @@ public final class MapViewer {
                     text = Messages.message(tile.getRegion().getLabel());
                 }
             }
-            paintBorders(g, tile, BorderType.REGION, true);
+            displayTerritorialBorders(g, tile, BorderType.REGION, true);
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_EMPTY:
             break;
@@ -2007,7 +2012,8 @@ public final class MapViewer {
      * @param tile The Tile to draw.
      * @param withNumber Whether to display the number of units present.
      */
-    private void displaySettlement(Graphics2D g, ImageLibrary lib,
+    private void displaySettlementWithChipsOrPopulationNumber(
+                                   Graphics2D g, ImageLibrary lib,
                                    Tile tile, int tileWidth, int tileHeight,
                                    boolean withNumber) {
         final Player player = freeColClient.getMyPlayer();
@@ -2019,7 +2025,7 @@ public final class MapViewer {
 
                 // Draw image of colony in center of the tile.
                 Image colonyImage = lib.getSettlementImage(settlement);
-                centerImage(g, colonyImage, tileWidth, tileHeight);
+                displayCenteredImage(g, colonyImage, tileWidth, tileHeight);
 
                 if (withNumber) {
                     String populationString = Integer.toString(
@@ -2038,7 +2044,7 @@ public final class MapViewer {
                             lib.getScalingFactor());
                     Image stringImage = lib.getStringImage(g,
                         populationString, theColor, font);
-                    centerImage(g, stringImage, tileWidth, tileHeight);
+                    displayCenteredImage(g, stringImage, tileWidth, tileHeight);
                 }
 
             } else if (settlement instanceof IndianSettlement) {
@@ -2046,7 +2052,7 @@ public final class MapViewer {
                 Image settlementImage = lib.getSettlementImage(settlement);
 
                 // Draw image of indian settlement in center of the tile.
-                centerImage(g, settlementImage, tileWidth, tileHeight);
+                displayCenteredImage(g, settlementImage, tileWidth, tileHeight);
 
                 Image chip;
                 float xOffset = STATE_OFFSET_X * lib.getScalingFactor();
@@ -2103,7 +2109,7 @@ public final class MapViewer {
             int startIndex = 0;
             for (int index = startIndex; index < tileItems.size(); index++) {
                 if (tileItems.get(index).getZIndex() < OVERLAY_INDEX) {
-                    drawItem(g, lib, tile, tileItems.get(index), tileWidth, tileHeight);
+                    displayTileItem(g, lib, tile, tileItems.get(index), tileWidth, tileHeight);
                     startIndex = index + 1;
                 } else {
                     startIndex = index;
@@ -2116,7 +2122,7 @@ public final class MapViewer {
             }
             for (int index = startIndex; index < tileItems.size(); index++) {
                 if (tileItems.get(index).getZIndex() < FOREST_INDEX) {
-                    drawItem(g, lib, tile, tileItems.get(index), tileWidth, tileHeight);
+                    displayTileItem(g, lib, tile, tileItems.get(index), tileWidth, tileHeight);
                     startIndex = index + 1;
                 } else {
                     startIndex = index;
@@ -2131,7 +2137,7 @@ public final class MapViewer {
 
             // draw all remaining items
             for (TileItem ti : tileItems.subList(startIndex, tileItems.size())) {
-                drawItem(g, lib, tile, ti, tileWidth, tileHeight);
+                displayTileItem(g, lib, tile, ti, tileWidth, tileHeight);
             }
         }
     }
@@ -2148,7 +2154,7 @@ public final class MapViewer {
 
         // Draw the 'selected unit' image if needed.
         //if ((unit == getActiveUnit()) && cursor) {
-        if (displayUnitCursor(unit)) drawCursor(g);
+        if (displayUnitCursor(unit)) displayCursor(g);
 
         // Draw the unit.
         // If unit is sentry, draw in grayscale
@@ -2158,7 +2164,7 @@ public final class MapViewer {
         Image image = lib.getUnitImage(unit, fade);
         if (image == null) return; // Defend against resource failure
 
-        Point p = getUnitImagePositionInTile(image);
+        Point p = calculateUnitImagePositionInTile(image);
         g.drawImage(image, p.x, p.y, null);
 
         // Draw an occupation and nation indicator.
@@ -2212,48 +2218,44 @@ public final class MapViewer {
     }
 
     /**
-     * Describe <code>drawCursor</code> method here.
+     * Describe <code>displayCursor</code> method here.
      *
-     * @param g a <code>Graphics2D</code> value
+     * @param g a <code>Graphics2D</code>
      */
-    private void drawCursor(Graphics2D g) {
+    private void displayCursor(Graphics2D g) {
         g.drawImage(cursorImage, 0, 0, null);
     }
 
     /**
      * Draws the given TileItem on the given Tile.
-     *
-     * @param g a <code>Graphics2D</code> value
-     * @param tile a <code>Tile</code> value
-     * @param item a <code>TileItem</code> value
      */
-    private void drawItem(Graphics2D g, ImageLibrary lib, Tile tile,
+    private void displayTileItem(Graphics2D g, ImageLibrary lib, Tile tile,
                           TileItem item, int tileWidth, int tileHeight) {
         if (item instanceof Resource) {
-            drawResourceItem(g, lib, (Resource) item, tileWidth, tileHeight);
+            displayResourceTileItem(g, lib, (Resource) item, tileWidth, tileHeight);
         } else if (item instanceof LostCityRumour) {
-            drawLostCityRumour(g, lib, tileWidth, tileHeight);
+            displayLostCityRumour(g, lib, tileWidth, tileHeight);
         } else {
-            drawTileImprovement(g, lib, tile, (TileImprovement)item);
+            displayTileImprovement(g, lib, tile, (TileImprovement)item);
         }
     }
 
-    private static void drawResourceItem(Graphics2D g, ImageLibrary lib,
+    private static void displayResourceTileItem(Graphics2D g, ImageLibrary lib,
                                          Resource item,
                                          int tileWidth, int tileHeight) {
         Image bonusImage = lib.getImage(item.getType());
         if (bonusImage != null) {
-            centerImage(g, bonusImage, tileWidth, tileHeight);
+            displayCenteredImage(g, bonusImage, tileWidth, tileHeight);
         }
     }
 
-    private static void drawLostCityRumour(Graphics2D g, ImageLibrary lib,
+    private static void displayLostCityRumour(Graphics2D g, ImageLibrary lib,
                                            int tileWidth, int tileHeight) {
-        centerImage(g, lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
+        displayCenteredImage(g, lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
             tileWidth, tileHeight);
     }
 
-    private void drawTileImprovement(Graphics2D g, ImageLibrary lib,
+    private void displayTileImprovement(Graphics2D g, ImageLibrary lib,
                                          Tile tile, TileImprovement  ti) {
         if (ti.isComplete()) {
             String key = ti.getType().getId() + ".image";
@@ -2270,7 +2272,7 @@ public final class MapViewer {
                 // end @compat 0.10.5
                     g.drawImage(lib.getRiverImage(ti.getStyle()), 0, 0, null);
             } else if (ti.isRoad()) {
-                drawRoad(g, tile);
+                displayRoad(g, tile);
             }
         }
     }
@@ -2279,9 +2281,9 @@ public final class MapViewer {
      * Draws all roads on the given Tile.
      *
      * @param g The <code>Graphics</code> to draw the road upon.
-     * @param tile a <code>Tile</code> value
+     * @param tile a <code>Tile</code>
      */
-    private void drawRoad(Graphics2D g, Tile tile) {
+    private void displayRoad(Graphics2D g, Tile tile) {
         Color oldColor = g.getColor();
         g.setColor(ResourceManager.getColor("road.color"));
         g.setStroke(roadStroke);
@@ -2342,23 +2344,15 @@ public final class MapViewer {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     }
 
-
-    /**
-     * Describe <code>enterUnitOutForAnimation</code> method here.
-     *
-     * @param unit an <code>Unit</code> value
-     * @param sourceTile a <code>Tile</code> value
-     * @return a <code>JLabel</code> value
-     */
     private JLabel enterUnitOutForAnimation(final Unit unit,
                                             final Tile sourceTile) {
         Integer i = unitsOutForAnimation.get(unit);
         if (i == null) {
-            final JLabel unitLabel = getUnitLabel(unit);
+            final JLabel unitLabel = createUnitLabel(unit);
 
             i = 1;
-            unitLabel.setLocation(getUnitLabelPositionInTile(unitLabel,
-                    getTilePosition(sourceTile)));
+            unitLabel.setLocation(calculateUnitLabelPositionInTile(unitLabel,
+                    calculateTilePosition(sourceTile)));
             unitsOutForAnimationLabels.put(unit, unitLabel);
             gui.getCanvas().add(unitLabel, JLayeredPane.DEFAULT_LAYER);
         } else {
@@ -2444,7 +2438,7 @@ public final class MapViewer {
      * @param unitImage The unit's image
      * @return The coordinates where the unit should be drawn onscreen
      */
-    private Point getUnitImagePositionInTile(Image unitImage) {
+    private Point calculateUnitImagePositionInTile(Image unitImage) {
         int unitX = (tileWidth - unitImage.getWidth(null)) / 2;
         int unitY = (tileHeight - unitImage.getHeight(null)) / 2 -
                     (int) (UNIT_OFFSET * lib.getScalingFactor());
@@ -2455,10 +2449,10 @@ public final class MapViewer {
     /**
      * Gets the unit that should be displayed on the given tile.
      *
-     * @param unitTile The <code>Tile</code>.
+     * @param unitTile The <code>Tile</code> to check.
      * @return The <code>Unit</code> to display or null if none found.
      */
-    private Unit getUnitInFront(Tile unitTile) {
+    private Unit findUnitInFront(Tile unitTile) {
         Unit result;
 
         if (unitTile == null || unitTile.isEmpty()) {
@@ -2530,7 +2524,7 @@ public final class MapViewer {
      * @param unit The unit to be drawn
      * @return A JLabel object with the unit's image.
      */
-    private JLabel getUnitLabel(Unit unit) {
+    private JLabel createUnitLabel(Unit unit) {
         final Image unitImg = lib.getUnitImage(unit);
         if (unitImg == null) return null;
 
@@ -2601,8 +2595,8 @@ public final class MapViewer {
     /**
      * Returns true if the given Unit is being animated.
      *
-     * @param unit an <code>Unit</code> value
-     * @return a <code>boolean</code> value
+     * @param unit an <code>Unit</code>
+     * @return a <code>boolean</code>
      */
     private boolean isOutForAnimation(final Unit unit) {
         return unitsOutForAnimation.containsKey(unit);
@@ -2614,7 +2608,7 @@ public final class MapViewer {
             && tile.getX() >= leftColumn && tile.getX() <= rightColumn;
     }
 
-    private boolean noActiveUnitIsAt(Tile tile) {
+    private boolean isNoActiveUnitAt(Tile tile) {
         return activeUnit == null || activeUnit.getTile() != tile;
     }
 
@@ -2622,12 +2616,12 @@ public final class MapViewer {
      * Draws the borders of a territory on the given Tile. The
      * territory is either a country or a region.
      *
-     * @param g a <code>Graphics2D</code> value
-     * @param tile a <code>Tile</code> value
-     * @param type a <code>BorderType</code> value
-     * @param opaque a <code>boolean</code> value
+     * @param g a <code>Graphics2D</code>
+     * @param tile a <code>Tile</code>
+     * @param type a <code>BorderType</code>
+     * @param opaque a <code>boolean</code>
      */
-    private void paintBorders(Graphics2D g, Tile tile, BorderType type, boolean opaque) {
+    private void displayTerritorialBorders(Graphics2D g, Tile tile, BorderType type, boolean opaque) {
         if (tile == null ||
             (type == BorderType.COUNTRY
              && !freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_BORDERS))) {
@@ -2816,11 +2810,6 @@ public final class MapViewer {
         }
     }
 
-    /**
-     * Describe <code>releaseUnitOutForAnimation</code> method here.
-     *
-     * @param unit an <code>Unit</code> value
-     */
     private void releaseUnitOutForAnimation(final Unit unit) {
         Integer i = unitsOutForAnimation.get(unit);
         if (i == null) {
@@ -2845,7 +2834,7 @@ public final class MapViewer {
      *
      * @param lib an <code>ImageLibrary</code> value
      */
-    private void setImageLibrary(ImageLibrary lib) {
+    private void setImageLibraryAndUpdateData(ImageLibrary lib) {
         this.lib = lib;
         cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
         // ATTENTION: we assume that all base tiles have the same size
@@ -2917,9 +2906,6 @@ public final class MapViewer {
         updateMapDisplayVariables();
     }
 
-    /**
-     * Describe <code>updateMapDisplayVariables</code> method here.
-     */
     private void updateMapDisplayVariables() {
         // Calculate the amount of rows that will be drawn above the
         // central Tile

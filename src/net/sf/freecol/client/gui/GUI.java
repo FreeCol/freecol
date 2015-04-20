@@ -847,7 +847,7 @@ public class GUI {
     public void refreshTile(Tile tile) {
         if (mapViewer == null || canvas == null) return;
         if (tile.getX() >= 0 && tile.getY() >= 0) {
-            canvas.repaint(mapViewer.getTileBounds(tile));
+            canvas.repaint(mapViewer.calculateTileBounds(tile));
         }
     }
 
@@ -2522,12 +2522,12 @@ public class GUI {
 
     public Rectangle getTileBounds(Tile tile) {
         if (mapViewer == null) return null;
-        return mapViewer.getTileBounds(tile);
+        return mapViewer.calculateTileBounds(tile);
     }
 
     public Point getTilePosition(Tile tile) {
         if (mapViewer == null) return null;
-        return mapViewer.getTilePosition(tile);
+        return mapViewer.calculateTilePosition(tile);
     }
 
     public int getViewMode() {
