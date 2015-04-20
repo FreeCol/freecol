@@ -1748,7 +1748,7 @@ public final class MapViewer {
                 // paint transparent borders
                 displayTerritorialBorders(g, tile, BorderType.COUNTRY, false);
 
-                if (displayTileCursor(tile)) {
+                if (shouldDisplayTileCursor(tile)) {
                     displayCursor(g);
                 }
                 // check for units
@@ -2154,7 +2154,7 @@ public final class MapViewer {
 
         // Draw the 'selected unit' image if needed.
         //if ((unit == getActiveUnit()) && cursor) {
-        if (displayUnitCursor(unit)) displayCursor(g);
+        if (shouldDisplayUnitCursor(unit)) displayCursor(g);
 
         // Draw the unit.
         // If unit is sentry, draw in grayscale
@@ -2920,12 +2920,12 @@ public final class MapViewer {
         rightSpace = leftSpace;
     }
 
-    public boolean displayTileCursor(Tile tile) {
+    public boolean shouldDisplayTileCursor(Tile tile) {
         return viewMode == GUI.VIEW_TERRAIN_MODE
             && tile != null && tile.equals(selectedTile);
     }
 
-    public boolean displayUnitCursor(Unit unit) {
+    public boolean shouldDisplayUnitCursor(Unit unit) {
         return viewMode == GUI.MOVE_UNITS_MODE
             && unit == activeUnit
             && (cursor.isActive() || unit.getMovesLeft() <= 0);
