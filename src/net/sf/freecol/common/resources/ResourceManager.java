@@ -326,6 +326,9 @@ public class ResourceManager {
 
     /**
      * Returns the image specified by the given name.
+     * Please, avoid using too many different scaling factors!
+     * For each is a scaled image cached here for a long time,
+     * which wastes memory if you are not careful.
      *
      * @param resource The name of the resource to return.
      * @param scale The size of the requested image (with 1 being normal size,
@@ -342,6 +345,8 @@ public class ResourceManager {
 
     /**
      * Returns the image specified by the given name.
+     * Please, avoid using this, as for each size another scaled version
+     * of the image is cached!
      *
      * @param resource The name of the resource to return.
      * @param size The size of the requested image. Rescaling
