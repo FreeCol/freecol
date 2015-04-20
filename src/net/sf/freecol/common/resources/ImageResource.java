@@ -21,7 +21,6 @@ package net.sf.freecol.common.resources;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
@@ -40,13 +39,14 @@ import javax.imageio.ImageIO;
  * A <code>Resource</code> wrapping an <code>Image</code>.
  * @see Resource
  */
-public class ImageResource extends Resource implements Resource.Preloadable, Resource.Cleanable {
+public class ImageResource extends Resource
+                           implements Resource.Preloadable, Resource.Cleanable {
 
     private static final Logger logger = Logger.getLogger(ImageResource.class.getName());
 
-    private HashMap<Dimension, Image> scaledImages = new HashMap<>();
-    private HashMap<Dimension, Image> grayscaleImages = new HashMap<>();
-    private volatile Image image = null;
+    private HashMap<Dimension, BufferedImage> scaledImages = new HashMap<>();
+    private HashMap<Dimension, BufferedImage> grayscaleImages = new HashMap<>();
+    private volatile BufferedImage image = null;
     private final Object loadingLock = new Object();
 
 
@@ -64,9 +64,9 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
     /**
      * Create a new image resource to contain an image.
      *
-     * @param image The <code>Image</code> to contain.
+     * @param image The <code>BufferedImage</code> to contain.
      */
-    public ImageResource(Image image) {
+    public ImageResource(BufferedImage image) {
         super(null);
 
         this.image = image;
@@ -105,7 +105,7 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
      *
      * @return The image in it's original size.
      */
-    public Image getImage() {
+    public BufferedImage getImage() {
         if (image == null) {
             logger.finest("Preload not ready for " + getResourceLocator());
             preload();
@@ -118,13 +118,13 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
      * 
      * @param scale The size of the requested image (with 1 being
      *     normal size, 2 twice the size, 0.5 half the size etc).
-     * @return The scaled <code>Image</code>.
+     * @return The scaled <code>BufferedImage</code>.
      */
-    public Image getImage(float scale) {
-        final Image im = getImage();
+    public BufferedImage getImage(float scale) {
+        final BufferedImage im = getImage();
         return (im == null) ? null
-            : getImage(new Dimension((int)(im.getWidth(null) * scale),
-                                     (int)(im.getHeight(null) * scale)));    
+            : getImage(new Dimension((int)(im.getWidth() * scale),
+                                     (int)(im.getHeight() * scale)));
     }
 
     /**
@@ -132,18 +132,18 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
      * 
      * @param d The <code>Dimension</code> of the requested
      *      image.  Rescaling will be performed if necessary.
-     * @return The <code>Image</code> with the required dimension.
+     * @return The <code>BufferedImage</code> with the required dimension.
      */
-    public Image getImage(Dimension d) {
-        final Image im = getImage();
+    public BufferedImage getImage(Dimension d) {
+        final BufferedImage im = getImage();
         if (im == null)
             return null;
         int wNew = d.width;
         int hNew = d.height;
         if(wNew < 0 && hNew < 0)
             return im;
-        int w = im.getWidth(null);
-        int h = im.getHeight(null);
+        int w = im.getWidth();
+        int h = im.getHeight();
         if(wNew < 0)
             wNew = (w * hNew)/h;
         if(hNew < 0)
@@ -151,7 +151,7 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
         if(wNew == w && hNew == h)
             return im;
 
-        final Image cached = scaledImages.get(d);
+        final BufferedImage cached = scaledImages.get(d);
         if (cached != null) return cached;
 
         try {
@@ -173,17 +173,17 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
      * Gets a grayscale version of the image of the given size.
      * 
      * @param d The requested size.
-     * @return The <code>Image</code>.
+     * @return The <code>BufferedImage</code>.
      */
-    public Image getGrayscaleImage(Dimension d) {
-        final Image cachedGrayscaleImage = grayscaleImages.get(d);
+    public BufferedImage getGrayscaleImage(Dimension d) {
+        final BufferedImage cachedGrayscaleImage = grayscaleImages.get(d);
         if (cachedGrayscaleImage != null) return cachedGrayscaleImage;
-        final Image cached = grayscaleImages.get(d);
+        final BufferedImage cached = grayscaleImages.get(d);
         if (cached != null) return cached;
-        final Image im = getImage(d);
+        final BufferedImage im = getImage(d);
         if (im == null) return null;
-        int width = im.getWidth(null);
-        int height = im.getHeight(null);
+        int width = im.getWidth();
+        int height = im.getHeight();
         ColorConvertOp filter = new ColorConvertOp(
             ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         BufferedImage srcImage = new BufferedImage(width, height,
@@ -191,7 +191,7 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
         Graphics2D g = srcImage.createGraphics();
         g.drawImage(im, 0, 0, null);
         g.dispose();
-        final Image grayscaleImage = filter.filter(srcImage, null);
+        final BufferedImage grayscaleImage = filter.filter(srcImage, null);
         grayscaleImages.put(d, grayscaleImage);
         return grayscaleImage;
     }
@@ -202,12 +202,13 @@ public class ImageResource extends Resource implements Resource.Preloadable, Res
      * @param scale The size of the requested image (with 1 being normal size,
      *      2 twice the size, 0.5 half the size etc). Rescaling
      *      will be performed unless using 1.
-     * @return The <code>Image</code>.
+     * @return The <code>BufferedImage</code>.
      */
-    public Image getGrayscaleImage(float scale) {
-        final Image im = getImage();
+    public BufferedImage getGrayscaleImage(float scale) {
+        final BufferedImage im = getImage();
         if (im == null) return im;
-        return getGrayscaleImage(new Dimension((int) (im.getWidth(null) * scale), (int) (im.getHeight(null) * scale)));    
+        return getGrayscaleImage(new Dimension((int) (im.getWidth() * scale),
+                                               (int) (im.getHeight() * scale)));
     }
 
     public int getCount() {

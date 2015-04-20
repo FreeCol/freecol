@@ -22,7 +22,7 @@ package net.sf.freecol.common.resources;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -319,7 +319,7 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getImage(final String resource) {
+    public static BufferedImage getImage(final String resource) {
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getImage() : null;
     }
@@ -335,7 +335,7 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getImage(final String resource, final float scale) {
+    public static BufferedImage getImage(final String resource, final float scale) {
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getImage(scale) : null;
     }
@@ -350,7 +350,7 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getImage(final String resource, final Dimension size) {
+    public static BufferedImage getImage(final String resource, final Dimension size) {
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getImage(size) : null;
     }
@@ -366,7 +366,7 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getGrayscaleImage(final String resource, final Dimension size) {
+    public static BufferedImage getGrayscaleImage(final String resource, final Dimension size) {
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getGrayscaleImage(size) : null;
     }
@@ -382,7 +382,7 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getGrayscaleImage(final String resource, final float scale) {
+    public static BufferedImage getGrayscaleImage(final String resource, final float scale) {
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getGrayscaleImage(scale) : null;
     }
