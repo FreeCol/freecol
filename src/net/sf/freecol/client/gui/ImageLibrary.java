@@ -218,7 +218,7 @@ public final class ImageLibrary {
      * @param y an <code>int</code> value
      * @return The image at the given index.
      */
-    public Image getBeachCornerImage(int index, int x, int y) {
+    public BufferedImage getBeachCornerImage(int index, int x, int y) {
         return ResourceManager.getImage("model.tile.beach.corner" + index
                                         + ((isEven(x, y)) ? "_even" : "_odd"),
                                         scalingFactor);
@@ -232,7 +232,7 @@ public final class ImageLibrary {
      * @param y an <code>int</code> value
      * @return The image at the given index.
      */
-    public Image getBeachEdgeImage(int index, int x, int y) {
+    public BufferedImage getBeachEdgeImage(int index, int x, int y) {
         return ResourceManager.getImage("model.tile.beach.edge" + index
                                         + ((isEven(x, y)) ? "_even" : "_odd"),
                                         scalingFactor);
@@ -249,7 +249,7 @@ public final class ImageLibrary {
      *     drawn.
      * @return The terrain-image at the given index.
      */
-    public Image getBorderImage(TileType type, Direction direction,
+    public BufferedImage getBorderImage(TileType type, Direction direction,
                                 int x, int y) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
         return ResourceManager.getImage(key + ".border_" + direction
@@ -263,21 +263,21 @@ public final class ImageLibrary {
      * @param type The type of the terrain-image to return.
      * @return The image at the given index.
      */
-    public Image getForestImage(TileType type) {
+    public BufferedImage getForestImage(TileType type) {
         return getForestImage(type, scalingFactor);
     }
 
-    public Image getForestImage(TileType type, TileImprovementStyle riverStyle) {
+    public BufferedImage getForestImage(TileType type, TileImprovementStyle riverStyle) {
         return getForestImage(type, riverStyle, scalingFactor);
     }
 
-    public static Image getForestImage(TileType type, float scale) {
+    public static BufferedImage getForestImage(TileType type, float scale) {
         return ResourceManager.getImage(type.getId() + ".forest", scale);
     }
 
-    public static Image getForestImage(TileType type, TileImprovementStyle riverStyle, float scale) {
+    public static BufferedImage getForestImage(TileType type, TileImprovementStyle riverStyle, float scale) {
         if (riverStyle != null) {
-            Image image = ResourceManager.getImage(
+            BufferedImage image = ResourceManager.getImage(
                 type.getId() + ".forest" + riverStyle.getMask(), scale);
             // @compat 0.10.6
             // Workaround for BR#3599586.  America_large used to contain
@@ -298,36 +298,36 @@ public final class ImageLibrary {
      *
      * @param father a <code>FoundingFather</code> value
      * @param grey if the image should be in greyscale
-     * @return an <code>Image</code> value
+     * @return an <code>BufferedImage</code> value
      */
-    public static Image getFoundingFatherImage(FoundingFather father, boolean grey) {
+    public static BufferedImage getFoundingFatherImage(FoundingFather father, boolean grey) {
         String resource = father.getId() + ".image";
         return grey
             ? ResourceManager.getGrayscaleImage(resource, 1f)
             : ResourceManager.getImage(resource);
     }
 
-    public Image getSmallBuildableImage(BuildableType buildable, Player player) {
+    public BufferedImage getSmallBuildableImage(BuildableType buildable, Player player) {
         // FIXME: distinguish national unit types
         float scale = scalingFactor * 0.75f;
-        Image image = (buildable instanceof BuildingType)
+        BufferedImage image = (buildable instanceof BuildingType)
             ? ImageLibrary.getBuildingImage(
                 (BuildingType) buildable, player, scale)
             : ImageLibrary.getImage(buildable, scale);
         return image;
     }
 
-    public Image getSmallBuildingImage(Building building) {
+    public BufferedImage getSmallBuildingImage(Building building) {
         return getBuildingImage(building.getType(), building.getOwner(),
             scalingFactor * 0.75f);
     }
 
-    public Image getBuildingImage(Building building) {
+    public BufferedImage getBuildingImage(Building building) {
         return getBuildingImage(building.getType(), building.getOwner(),
             scalingFactor);
     }
 
-    public static Image getBuildingImage(BuildingType buildingType, Player player, float scale) {
+    public static BufferedImage getBuildingImage(BuildingType buildingType, Player player, float scale) {
         String key = buildingType.getId() + "." + player.getNationNameKey() + ".image";
         if (!ResourceManager.hasResource(key)) {
             key = buildingType.getId() + ".image";
@@ -335,11 +335,11 @@ public final class ImageLibrary {
         return ResourceManager.getImage(key, scale);
     }
 
-    public Image getSmallerImage(FreeColGameObjectType type) {
+    public BufferedImage getSmallerImage(FreeColGameObjectType type) {
         return getImage(type, scalingFactor * 0.5f);
     }
 
-    public Image getSmallImage(FreeColGameObjectType type) {
+    public BufferedImage getSmallImage(FreeColGameObjectType type) {
         return getImage(type, scalingFactor * 0.75f);
     }
 
@@ -349,15 +349,15 @@ public final class ImageLibrary {
      * @param type The <code>FreeColGameObjectType</code> to look up.
      * @return The corresponding image.
      */
-    public Image getImage(FreeColGameObjectType type) {
+    public BufferedImage getImage(FreeColGameObjectType type) {
         return getImage(type, scalingFactor);
     }
 
-    public static Image getImage(FreeColGameObjectType type, float scale) {
+    public static BufferedImage getImage(FreeColGameObjectType type, float scale) {
         return ResourceManager.getImage(type.getId() + ".image", scale);
     }
 
-    public static Image getImage(FreeColGameObjectType type, Dimension size) {
+    public static BufferedImage getImage(FreeColGameObjectType type, Dimension size) {
         return ResourceManager.getImage(type.getId() + ".image", size);
     }
 
@@ -367,29 +367,29 @@ public final class ImageLibrary {
      * @param id The object identifier.
      * @return The image.
      */
-    public Image getMiscImage(String id) {
+    public BufferedImage getMiscImage(String id) {
         return getMiscImage(id, scalingFactor);
     }
 
-    public static Image getMiscImage(String id, float scale) {
+    public static BufferedImage getMiscImage(String id, float scale) {
         return ResourceManager.getImage(id, scale);
     }
 
-    public static Image getMiscImage(String id, Dimension size) {
+    public static BufferedImage getMiscImage(String id, Dimension size) {
         return ResourceManager.getImage(id, size);
     }
 
     /**
-     * Returns the appropriate small Image for a FreeColObject.
+     * Returns the appropriate small BufferedImage for a FreeColObject.
      *
      * @param display The FreeColObject to display.
-     * @return The appropriate Image.
+     * @return The appropriate BufferedImage.
      * @deprecated Please use a more specific method.
      */
     @Deprecated
-    public Image getSmallObjectImage(FreeColObject display) {
+    public BufferedImage getSmallObjectImage(FreeColObject display) {
         try {
-            Image image;
+            BufferedImage image;
             if (display instanceof Goods) {
                 display = ((Goods)display).getType();
             } else if (display instanceof Player) {
@@ -431,15 +431,15 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the appropriate Image for a FreeColObject.
+     * Returns the appropriate BufferedImage for a FreeColObject.
      * Please use a more specific method.
      *
      * @param display The FreeColObject to display.
-     * @return The appropriate Image.
+     * @return The appropriate BufferedImage.
      */
-    public Image getObjectImage(FreeColObject display) {
+    public BufferedImage getObjectImage(FreeColObject display) {
         try {
-            Image image;
+            BufferedImage image;
             if (display instanceof Goods) {
                 display = ((Goods)display).getType();
             } else if (display instanceof Player) {
@@ -482,7 +482,7 @@ public final class ImageLibrary {
      * @param nation The nation this monarch rules.
      * @return the monarch-image for the given nation.
      */
-    public static Image getMonarchImage(Nation nation) {
+    public static BufferedImage getMonarchImage(Nation nation) {
         return ResourceManager.getImage(nation.getId() + ".monarch.image");
     }
 
@@ -492,7 +492,7 @@ public final class ImageLibrary {
      * @param tile The tile for which to return an image.
      * @return A pseudo-random terrain image.
      */
-    public Image getOverlayImage(Tile tile) {
+    public BufferedImage getOverlayImage(Tile tile) {
         return getOverlayImage(tile.getType(), tile.getId(), scalingFactor);
     }
 
@@ -505,7 +505,7 @@ public final class ImageLibrary {
      * @param scale The scale of the image to return.
      * @return The terrain-image at the given index.
      */
-    public static Image getOverlayImage(TileType type, String id, float scale) {
+    public static BufferedImage getOverlayImage(TileType type, String id, float scale) {
         String prefix = type.getId() + ".overlay";
         ArrayList<String> keys = ResourceManager.getKeys(prefix, ".image");
         return getRandomizedImage(keys, id, scale);
@@ -515,12 +515,12 @@ public final class ImageLibrary {
         return ResourceManager.getFilteredKeys(".overlay", ".image");
     }
 
-    public Image getOverlayImage(Tile tile, Set<String> overlayCache) {
+    public BufferedImage getOverlayImage(Tile tile, Set<String> overlayCache) {
         return getOverlayImage(tile.getType(), tile.getId(), scalingFactor,
                                overlayCache);
     }
 
-    public static Image getOverlayImage(TileType type, String id, float scale,
+    public static BufferedImage getOverlayImage(TileType type, String id, float scale,
                                         Set<String> overlayCache) {
         String prefix = type.getId() + ".overlay";
         ArrayList<String> keys = new ArrayList<>();
@@ -532,7 +532,7 @@ public final class ImageLibrary {
         return getRandomizedImage(keys, id, scale);
     }
 
-    private static Image getRandomizedImage(ArrayList<String> keys, String id, float scale) {
+    private static BufferedImage getRandomizedImage(ArrayList<String> keys, String id, float scale) {
         int count = keys.size();
         switch(count) {
             case 0:
@@ -550,9 +550,9 @@ public final class ImageLibrary {
      * Gets an image to represent the path of given path type.
      *
      * @param pt The <code>PathType</code>
-     * @return The <code>Image</code>.
+     * @return The <code>BufferedImage</code>.
      */
-    public static Image getPathImage(PathType pt) {
+    public static BufferedImage getPathImage(PathType pt) {
         return (pt == null) ? null
             : ResourceManager.getImage(pt.getImageKey());
     }
@@ -561,9 +561,9 @@ public final class ImageLibrary {
      * Gets an image to represent the path of the given <code>Unit</code>.
      *
      * @param u The <code>Unit</code>
-     * @return The <code>Image</code>.
+     * @return The <code>BufferedImage</code>.
      */
-    public static Image getPathImage(Unit u) {
+    public static BufferedImage getPathImage(Unit u) {
         return (u == null) ? null
             : getPathImage(PathType.getPathType(u));
     }
@@ -572,9 +572,9 @@ public final class ImageLibrary {
      * Gets an image to represent the path of the given <code>Unit</code>.
      *
      * @param pt The <code>PathType</code>
-     * @return The <code>Image</code>.
+     * @return The <code>BufferedImage</code>.
      */
-    public static Image getPathNextTurnImage(PathType pt) {
+    public static BufferedImage getPathNextTurnImage(PathType pt) {
         return (pt == null) ? null
             : ResourceManager.getImage(pt.getNextTurnImageKey());
     }
@@ -583,9 +583,9 @@ public final class ImageLibrary {
      * Gets an image to represent the path of the given <code>Unit</code>.
      *
      * @param u The <code>Unit</code>
-     * @return The <code>Image</code>.
+     * @return The <code>BufferedImage</code>.
      */
-    public static Image getPathNextTurnImage(Unit u) {
+    public static BufferedImage getPathNextTurnImage(Unit u) {
         return (u == null) ? null
             : getPathNextTurnImage(PathType.getPathType(u));
     }
@@ -596,7 +596,7 @@ public final class ImageLibrary {
      * @param style a <code>TileImprovementStyle</code> value
      * @return The image with the given style.
      */
-    public Image getRiverImage(TileImprovementStyle style) {
+    public BufferedImage getRiverImage(TileImprovementStyle style) {
         return getRiverImage(style, scalingFactor);
     }
 
@@ -607,7 +607,7 @@ public final class ImageLibrary {
      * @param scale a <code>double</code> value
      * @return The image with the given style.
      */
-    public static Image getRiverImage(TileImprovementStyle style, float scale) {
+    public static BufferedImage getRiverImage(TileImprovementStyle style, float scale) {
         return getRiverImage(style.getString(), scale);
     }
 
@@ -618,7 +618,7 @@ public final class ImageLibrary {
      * @param scale a <code>double</code> value
      * @return The image with the given style.
      */
-    public static Image getRiverImage(String style, float scale) {
+    public static BufferedImage getRiverImage(String style, float scale) {
         return ResourceManager.getImage("model.tile.river" + style, scale);
     }
 
@@ -633,14 +633,14 @@ public final class ImageLibrary {
      *            drawn (ignored).
      * @return The terrain-image at the given index.
      */
-    public Image getRiverMouthImage(Direction direction, int magnitude,
+    public BufferedImage getRiverMouthImage(Direction direction, int magnitude,
                                     int x, int y) {
         String key = "model.tile.delta_" + direction
             + (magnitude == 1 ? "_small" : "_large");
         return ResourceManager.getImage(key, scalingFactor);
     }
 
-    public Image getSmallSettlementImage(Settlement settlement) {
+    public BufferedImage getSmallSettlementImage(Settlement settlement) {
         return getSettlementImage(settlement, scalingFactor * 0.75f);
     }
 
@@ -650,7 +650,7 @@ public final class ImageLibrary {
      * @param settlement The settlement whose graphics type is needed.
      * @return The graphics that will represent the given settlement.
      */
-    public Image getSettlementImage(Settlement settlement) {
+    public BufferedImage getSettlementImage(Settlement settlement) {
         return getSettlementImage(settlement, scalingFactor);
     }
 
@@ -661,11 +661,11 @@ public final class ImageLibrary {
      * @param scale a <code>double</code> value
      * @return The graphics that will represent the given settlement.
      */
-    public static Image getSettlementImage(Settlement settlement, float scale) {
+    public static BufferedImage getSettlementImage(Settlement settlement, float scale) {
         return ResourceManager.getImage(settlement.getImageKey(), scale);
     }
 
-    public static Image getSettlementImage(Settlement settlement, Dimension size) {
+    public static BufferedImage getSettlementImage(Settlement settlement, Dimension size) {
         return ResourceManager.getImage(settlement.getImageKey(), size);
     }
 
@@ -676,11 +676,11 @@ public final class ImageLibrary {
      *     type is needed.
      * @return The graphics that will represent the given settlement.
      */
-    public Image getSettlementImage(SettlementType settlementType) {
+    public BufferedImage getSettlementImage(SettlementType settlementType) {
         return getSettlementImage(settlementType, scalingFactor);
     }
 
-    public static Image getSettlementImage(SettlementType settlementType,
+    public static BufferedImage getSettlementImage(SettlementType settlementType,
                                     float scale) {
         return ResourceManager.getImage(settlementType.getId() + ".image",
                                         scale);
@@ -696,83 +696,83 @@ public final class ImageLibrary {
      *            drawn.
      * @return The terrain-image at the given index.
      */
-    public Image getTerrainImage(TileType type, int x, int y) {
+    public BufferedImage getTerrainImage(TileType type, int x, int y) {
         return getTerrainImage(type, x, y, scalingFactor);
     }
 
-    public static Image getTerrainImage(TileType type, int x, int y, float scale) {
+    public static BufferedImage getTerrainImage(TileType type, int x, int y, float scale) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
         return ResourceManager.getImage(key + ".center"
             + (isEven(x, y) ? "0" : "1") + ".image", scale);
     }
 
-    public Image getSmallerUnitImage(Unit unit) {
+    public BufferedImage getSmallerUnitImage(Unit unit) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), false, scalingFactor * 0.5f);
     }
 
-    public Image getSmallUnitImage(Unit unit) {
+    public BufferedImage getSmallUnitImage(Unit unit) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), false, scalingFactor * 0.75f);
     }
 
-    public Image getSmallUnitImage(Unit unit, boolean grayscale) {
+    public BufferedImage getSmallUnitImage(Unit unit, boolean grayscale) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), grayscale, scalingFactor * 0.75f);
     }
 
-    public Image getUnitImage(Unit unit) {
+    public BufferedImage getUnitImage(Unit unit) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), false, scalingFactor);
     }
 
-    public Image getUnitImage(Unit unit, boolean grayscale) {
+    public BufferedImage getUnitImage(Unit unit, boolean grayscale) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), grayscale, scalingFactor);
     }
 
-    public static Image getUnitImage(Unit unit, float scale) {
+    public static BufferedImage getUnitImage(Unit unit, float scale) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
             unit.hasNativeEthnicity(), false, scale);
     }
 
-    public Image getTinyUnitImage(UnitType unitType) {
+    public BufferedImage getTinyUnitImage(UnitType unitType) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
             false, false, scalingFactor * 0.25f);
     }
 
-    public Image getTinyUnitImage(UnitType unitType, boolean grayscale) {
+    public BufferedImage getTinyUnitImage(UnitType unitType, boolean grayscale) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
             false, grayscale, scalingFactor * 0.25f);
     }
 
-    public Image getSmallerUnitImage(UnitType unitType) {
+    public BufferedImage getSmallerUnitImage(UnitType unitType) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
             false, false, scalingFactor * 0.5f);
     }
 
-    public Image getSmallUnitImage(UnitType unitType) {
+    public BufferedImage getSmallUnitImage(UnitType unitType) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
             false, false, scalingFactor * 0.75f);
     }
 
-    public Image getSmallUnitImage(UnitType unitType, boolean grayscale) {
+    public BufferedImage getSmallUnitImage(UnitType unitType, boolean grayscale) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
             false, grayscale, scalingFactor * 0.75f);
     }
 
-    public Image getSmallUnitImage(UnitType unitType, String roleId,
+    public BufferedImage getSmallUnitImage(UnitType unitType, String roleId,
                                    boolean grayscale) {
         return getUnitImage(unitType, roleId,
             false, grayscale, scalingFactor * 0.75f);
     }
 
-    public Image getUnitImage(UnitType unitType) {
+    public BufferedImage getUnitImage(UnitType unitType) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
             false, false, scalingFactor);
     }
 
-    public static Image getUnitImage(UnitType unitType, float scale) {
+    public static BufferedImage getUnitImage(UnitType unitType, float scale) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
             false, false, scale);
     }
@@ -785,11 +785,11 @@ public final class ImageLibrary {
      * @param nativeEthnicity If true the unit is a former native.
      * @param grayscale If true draw in inactive/disabled-looking state.
      * @param scale How much the image is scaled.
-     * @return A suitable <code>Image</code>.
+     * @return A suitable <code>BufferedImage</code>.
      */
-    public static Image getUnitImage(UnitType unitType, String roleId,
-                                      boolean nativeEthnicity,
-                                      boolean grayscale, float scale) {
+    public static BufferedImage getUnitImage(UnitType unitType, String roleId,
+                                             boolean nativeEthnicity,
+                                             boolean grayscale, float scale) {
         // units that can only be native don't need the .native key part
         if (unitType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)) {
             nativeEthnicity = false;
@@ -804,7 +804,7 @@ public final class ImageLibrary {
         if (!ResourceManager.hasResource(key) && nativeEthnicity) {
             key = unitType.getId() + roleQual + ".image";
         }
-        Image image = (grayscale)
+        BufferedImage image = (grayscale)
             ? ResourceManager.getGrayscaleImage(key, scale)
             : ResourceManager.getImage(key, scale);
         if (image == null) {
@@ -837,7 +837,7 @@ public final class ImageLibrary {
                                       JComponent c, Insets insets) {
         int width = c.getWidth();
         int height = c.getHeight();
-        Image image = ResourceManager.getImage(resource);
+        BufferedImage image = ResourceManager.getImage(resource);
         int dx, dy, xmin, ymin;
 
         if (insets == null) {
@@ -849,8 +849,8 @@ public final class ImageLibrary {
             width -= insets.left + insets.right;
             height -= insets.top + insets.bottom;
         }
-        if (image != null && (dx = image.getWidth(null)) > 0
-            && (dy = image.getHeight(null)) > 0) {
+        if (image != null && (dx = image.getWidth()) > 0
+            && (dy = image.getHeight()) > 0) {
             int xmax, ymax;
             xmax = xmin + width;
             ymax = ymin + height;
@@ -878,22 +878,12 @@ public final class ImageLibrary {
     public static void fillTexture(Graphics2D g2, BufferedImage img,
                                    int x, int y, int width, int height) {
         Rectangle anchor = new Rectangle(
-            x, y, img.getWidth(null), img.getHeight(null));
+            x, y, img.getWidth(), img.getHeight());
         TexturePaint paint = new TexturePaint(img, anchor);
         g2.setPaint(paint);
         g2.fillRect(x, y, width, height);
     }
 
-    /**
-     * Creates a buffered image out of a given <code>Image</code> object.
-     * 
-     * @param id The object identifier.
-     * @return The created <code>BufferedImage</code> object.
-     */
-    public static BufferedImage createBufferedImage(String id) {
-        Image image = ResourceManager.getImage(id);
-        return createBufferedImage(image);
-    }
 
     /**
      * Creates a buffered image out of a given <code>Image</code> object.

@@ -29,6 +29,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.border.AbstractBorder;
 
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -54,14 +55,14 @@ public class FreeColImageBorder extends AbstractBorder {
      * Creates the default border.
      */
     public FreeColImageBorder() {
-        this(ImageLibrary.createBufferedImage("menuborder.nw.image"),
-             ImageLibrary.createBufferedImage("menuborder.n.image"),
-             ImageLibrary.createBufferedImage("menuborder.ne.image"),
-             ImageLibrary.createBufferedImage("menuborder.e.image"),
-             ImageLibrary.createBufferedImage("menuborder.se.image"),
-             ImageLibrary.createBufferedImage("menuborder.s.image"),
-             ImageLibrary.createBufferedImage("menuborder.sw.image"),
-             ImageLibrary.createBufferedImage("menuborder.w.image"));
+        this(ResourceManager.getImage("menuborder.nw.image"),
+             ResourceManager.getImage("menuborder.n.image"),
+             ResourceManager.getImage("menuborder.ne.image"),
+             ResourceManager.getImage("menuborder.e.image"),
+             ResourceManager.getImage("menuborder.se.image"),
+             ResourceManager.getImage("menuborder.s.image"),
+             ResourceManager.getImage("menuborder.sw.image"),
+             ResourceManager.getImage("menuborder.w.image"));
     }
 
 
