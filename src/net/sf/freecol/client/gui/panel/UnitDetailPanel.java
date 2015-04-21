@@ -31,6 +31,7 @@ import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -67,7 +68,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
      */
     public UnitDetailPanel(FreeColClient freeColClient,
                            ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.UNITS.toString(), 0.5f);
+        super(freeColClient, colopediaPanel, PanelType.UNITS.toString());
     }
 
 
@@ -196,7 +197,6 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         Map<String, Boolean> abilities = type.getRequiredAbilities();
         if (!abilities.isEmpty()) {
             panel.add(Utility.localizedLabel("colopedia.unit.requirements"), "newline, top");
-            String key = abilities.keySet().iterator().next();
             try {
                 JTextPane textPane = Utility.getDefaultTextPane();
                 StyledDocument doc = textPane.getStyledDocument();

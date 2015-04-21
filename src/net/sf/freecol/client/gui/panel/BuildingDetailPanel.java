@@ -37,6 +37,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -66,8 +67,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
      */
     public BuildingDetailPanel(FreeColClient freeColClient,
                                ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel,
-              PanelType.BUILDINGS.toString(), 0.75f);
+        super(freeColClient, colopediaPanel, PanelType.BUILDINGS.toString());
     }
 
 

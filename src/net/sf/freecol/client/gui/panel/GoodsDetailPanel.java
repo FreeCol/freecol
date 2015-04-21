@@ -26,6 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -38,9 +39,9 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 
 
@@ -58,7 +59,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
      */
     public GoodsDetailPanel(FreeColClient freeColClient,
                             ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.GOODS.toString(), 0.75f);
+        super(freeColClient, colopediaPanel, PanelType.GOODS.toString());
     }
 
 

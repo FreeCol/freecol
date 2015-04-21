@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -47,7 +48,6 @@ import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ResourceType;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
 
 
@@ -57,18 +57,19 @@ import net.sf.freecol.common.model.UnitType;
 public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectType>
     extends FreeColPanel implements ColopediaDetailPanel<T> {
 
+    public static final Dimension ICON_SIZE = new Dimension(-1,24);
+
     private final String id;
-    private float scale = 1;
     private ColopediaPanel colopediaPanel;
 
 
     public ColopediaGameObjectTypePanel(FreeColClient freeColClient,
-        ColopediaPanel colopediaPanel, String id, float scale) {
+                                        ColopediaPanel colopediaPanel,
+                                        String id) {
         super(freeColClient);
 
         this.colopediaPanel = colopediaPanel;
         this.id = "colopediaAction." + id;
-        this.scale = scale;
     }
 
     /**
@@ -84,15 +85,6 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
 
     protected String getId() {
         return id;
-    }
-
-    /**
-     * Returns the scale to use for icons.
-     *
-     * @return a float value
-     */
-    protected float getScale() {
-        return scale;
     }
 
     /**
@@ -119,17 +111,17 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
         int width = 0;
         int height = 0;
         for (FreeColGameObjectType type : types) {
-            Image image = ImageLibrary.getImage(type, scale);
+            Image image = ImageLibrary.getImage(type, ICON_SIZE);
             if (image == null) continue;
             width = Math.max(image.getWidth(null), width);
             height = Math.max(image.getHeight(null), height);
         }
         for (FreeColGameObjectType type : types) {
-            BufferedImage centeredImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Image image = ImageLibrary.getImage(type, scale);
+            Image image = ImageLibrary.getImage(type, ICON_SIZE);
             if (image == null) continue;
             int x = (width - image.getWidth(null)) / 2;
             int y = (height - image.getHeight(null)) / 2;
+            BufferedImage centeredImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = centeredImage.createGraphics();
             g.drawImage(image, x, y, null);
             g.dispose();

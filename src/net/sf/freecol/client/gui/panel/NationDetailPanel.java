@@ -26,6 +26,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -51,8 +52,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
      */
     public NationDetailPanel(FreeColClient freeColClient,
                              ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel,
-              PanelType.NATIONS.toString(), 0.5f);
+        super(freeColClient, colopediaPanel, PanelType.NATIONS.toString());
     }
 
 

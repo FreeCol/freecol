@@ -20,12 +20,12 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Scope;
+
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -54,8 +55,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
      */
     public ResourcesDetailPanel(FreeColClient freeColClient,
                                 ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel,
-              PanelType.RESOURCES.toString(), 0.75f);
+        super(freeColClient, colopediaPanel, PanelType.RESOURCES.toString());
     }
 
 
@@ -98,7 +98,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
         for (Modifier modifier : type.getModifiers()) {
             String text = ModifierFormat.getModifierAsString(modifier);
             if (modifier.hasScope()) {
-                List<String> scopeStrings = new ArrayList<>();
+                ArrayList<String> scopeStrings = new ArrayList<>();
                 for (Scope scope : modifier.getScopes()) {
                     if (scope.getType() != null) {
                         FreeColGameObjectType fcgot = getSpecification()

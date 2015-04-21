@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -45,6 +46,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.util.RandomChoice;
+
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -61,8 +63,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
      */
     public NationTypeDetailPanel(FreeColClient freeColClient,
                                  ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel,
-              PanelType.NATION_TYPES.toString(), 0.75f);
+        super(freeColClient, colopediaPanel, PanelType.NATION_TYPES.toString());
     }
 
 
@@ -82,8 +83,8 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
         nations.addAll(getSpecification().getEuropeanNationTypes());
         nations.addAll(getSpecification().getREFNationTypes());
         nations.addAll(getSpecification().getIndianNationTypes());
+        ImageIcon icon = new ImageIcon(ImageLibrary.getMiscImage(ImageLibrary.BELLS, ICON_SIZE));
         for (NationType type : nations) {
-            ImageIcon icon = new ImageIcon(ImageLibrary.getMiscImage(ImageLibrary.BELLS, getScale()));
             parent.add(buildItem(type, icon));
         }
         root.add(parent);

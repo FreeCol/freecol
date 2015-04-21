@@ -56,8 +56,7 @@ public class TerrainDetailPanel
      */
     public TerrainDetailPanel(FreeColClient freeColClient,
                               ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel,
-              PanelType.TERRAIN.toString(), 0.25f);
+        super(freeColClient, colopediaPanel, PanelType.TERRAIN.toString());
     }
 
 
@@ -73,7 +72,8 @@ public class TerrainDetailPanel
         DefaultMutableTreeNode node =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
         for (TileType t : getSpecification().getTileTypeList()) {
-            ImageIcon icon = new ImageIcon(MapViewer.createTileImageWithOverlayAndForest(t, getScale()));
+            // FIXME: Use ICON_SIZE, not magic scale factor
+            ImageIcon icon = new ImageIcon(MapViewer.createTileImageWithOverlayAndForest(t, 0.25f));
             node.add(buildItem(t, icon));
         }
         root.add(node);

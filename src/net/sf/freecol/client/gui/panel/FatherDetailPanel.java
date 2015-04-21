@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -57,8 +58,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
      */
     public FatherDetailPanel(FreeColClient freeColClient,
                              ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel,
-              PanelType.FATHERS.toString(), 0.75f);
+        super(freeColClient, colopediaPanel, PanelType.FATHERS.toString());
     }
 
 
@@ -82,6 +82,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
         for (FoundingFather foundingFather : getSpecification().getFoundingFathers()) {
             fathersByType.get(foundingFather.getType()).add(foundingFather);
         }
+        ImageIcon icon = new ImageIcon(ImageLibrary.getMiscImage(ImageLibrary.BELLS, ICON_SIZE));
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
             String id = FoundingFather.getTypeKey(fatherType);
             String typeName = Messages.message(id);
@@ -90,7 +91,6 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
 
             parent.add(node);
             for (FoundingFather father : fathersByType.get(fatherType)) {
-                ImageIcon icon = new ImageIcon(ImageLibrary.getMiscImage(ImageLibrary.BELLS, getScale()));
                 node.add(buildItem(father, icon));
             }
         }
