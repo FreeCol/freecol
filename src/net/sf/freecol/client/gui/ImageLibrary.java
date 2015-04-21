@@ -76,6 +76,21 @@ public final class ImageLibrary {
 
     private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());
 
+    /**
+     * Canonical sizes of images GUI elements and map are expecting
+     * in some cases already and current image files have.
+     * ATM this is just for documentation.
+     * Currently, most images result in a size of image size times scaling
+     * factor times requested size. If these canonical sizes would get used
+     * in the equation, the game could tolerate changing sizes in the files,
+     * without GUI elements sized wrongly, parts cut off or moved unexpectedly.
+     */
+    public static final Dimension ICON_SIZE = new Dimension(32, 32),
+                                  BUILDING_SIZE = new Dimension(128, 96),
+                                  TILE_SIZE = new Dimension(128, 64),
+                                  TILE_OVERLAY_SIZE = new Dimension(128, 96),
+                                  TILE_FOREST_SIZE = new Dimension(128, 84);
+
     public static final String DELETE = "image.miscicon.delete",
                                PLOWED = "image.tile.model.improvement.plow",
                                UNIT_SELECT = "image.tile.unitSelect",
