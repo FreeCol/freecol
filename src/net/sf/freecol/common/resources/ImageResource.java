@@ -122,9 +122,10 @@ public class ImageResource extends Resource
      */
     public BufferedImage getImage(float scale) {
         final BufferedImage im = getImage();
-        return (im == null) ? null
-            : getImage(new Dimension((int)(im.getWidth() * scale),
-                                     (int)(im.getHeight() * scale)));
+        if(scale == 1.0f || im == null)
+            return im;
+        return getImage(new Dimension((int)(im.getWidth() * scale),
+                                      (int)(im.getHeight() * scale)));
     }
 
     /**
