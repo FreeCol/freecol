@@ -274,11 +274,9 @@ public class FreeColDataFile {
                 final String key = todo.remove(0);
                 final String value = properties.getProperty(key)
                     .substring(resourceScheme.length());
-                Resource r = rc.get(value);
-                if (r == null) {
+                if (!rc.duplicateResource(value, key)) {
                     miss.add(key);
                 } else {
-                    rc.add(key, r);
                     progress = true;
                 }
             }

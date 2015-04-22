@@ -20,7 +20,6 @@
 package net.sf.freecol.common.resources;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -32,17 +31,31 @@ import java.util.Set;
  *
  * @see Resource
  */
-public class ResourceMapping {
+public final class ResourceMapping {
 
     /** Mappings between an object identifier and a resource. */
-    protected final HashMap<String, Resource> resources;
+    private final HashMap<String, ColorResource> colorResources;
+    private final HashMap<String, FontResource> fontResources;
+    private final HashMap<String, StringResource> stringResources;
+    private final HashMap<String, FAFileResource> fafResources;
+    private final HashMap<String, SZAResource> szaResources;
+    private final HashMap<String, AudioResource> audioResources;
+    private final HashMap<String, VideoResource> videoResources;
+    private final HashMap<String, ImageResource> imageResources;
 
 
     /**
      * Creates a new empty <code>ResourceMapping</code>.
      */
     public ResourceMapping() {
-        resources = new HashMap<>();
+        colorResources = new HashMap<>();
+        fontResources = new HashMap<>();
+        stringResources = new HashMap<>();
+        fafResources = new HashMap<>();
+        szaResources = new HashMap<>();
+        audioResources = new HashMap<>();
+        videoResources = new HashMap<>();
+        imageResources = new HashMap<>();
     }
 
 
@@ -54,8 +67,80 @@ public class ResourceMapping {
      * @param value The <code>Resource</code> identified by the
      *     identifier in the mapping,.
      */
-    public void add(String id, Resource value) {
-        resources.put(id, value);
+    public void add(String id, ColorResource value) {
+        colorResources.put(id, value);
+    }
+
+    public void add(String id, FontResource value) {
+        fontResources.put(id, value);
+    }
+
+    public void add(String id, StringResource value) {
+        stringResources.put(id, value);
+    }
+
+    public void add(String id, FAFileResource value) {
+        fafResources.put(id, value);
+    }
+
+    public void add(String id, SZAResource value) {
+        szaResources.put(id, value);
+    }
+
+    public void add(String id, AudioResource value) {
+        audioResources.put(id, value);
+    }
+
+    public void add(String id, VideoResource value) {
+        videoResources.put(id, value);
+    }
+
+    public void add(String id, ImageResource value) {
+        imageResources.put(id, value);
+    }
+
+    public boolean duplicateResource(String id, String idNew) {
+        ColorResource cr = colorResources.get(id);
+        if(cr != null) {
+            colorResources.put(idNew, cr);
+            return true;
+        }
+        FontResource fr = fontResources.get(id);
+        if(fr != null) {
+            fontResources.put(idNew, fr);
+            return true;
+        }
+        StringResource sr = stringResources.get(id);
+        if(sr != null) {
+            stringResources.put(idNew, sr);
+            return true;
+        }
+        FAFileResource far = fafResources.get(id);
+        if(far != null) {
+            fafResources.put(idNew, far);
+            return true;
+        }
+        SZAResource szr = szaResources.get(id);
+        if(szr != null) {
+            szaResources.put(idNew, szr);
+            return true;
+        }
+        AudioResource ar = audioResources.get(id);
+        if(ar != null) {
+            audioResources.put(idNew, ar);
+            return true;
+        }
+        VideoResource vr = videoResources.get(id);
+        if(vr != null) {
+            videoResources.put(idNew, vr);
+            return true;
+        }
+        ImageResource ir = imageResources.get(id);
+        if(ir != null) {
+            imageResources.put(idNew, ir);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -66,12 +151,15 @@ public class ResourceMapping {
      */
     public void addAll(ResourceMapping rc) {
         if (rc != null) {
-            resources.putAll(rc.getResources());
+            colorResources.putAll(rc.colorResources);
+            fontResources.putAll(rc.fontResources);
+            stringResources.putAll(rc.stringResources);
+            fafResources.putAll(rc.fafResources);
+            szaResources.putAll(rc.szaResources);
+            audioResources.putAll(rc.audioResources);
+            videoResources.putAll(rc.videoResources);
+            imageResources.putAll(rc.imageResources);
         }
-    }
-
-    public boolean containsKey(String key) {
-        return resources.containsKey(key);
     }
 
     /**
@@ -81,7 +169,35 @@ public class ResourceMapping {
      * @return An unmodifiable <code>Map</code>.
      */
     public Map<String, Resource> getResources() {
-        return new HashMap<>(resources);
+        HashMap<String, Resource> result = new HashMap<>();
+            result.putAll(colorResources);
+            result.putAll(fontResources);
+            result.putAll(stringResources);
+            result.putAll(fafResources);
+            result.putAll(szaResources);
+            result.putAll(audioResources);
+            result.putAll(videoResources);
+            result.putAll(imageResources);
+        return result;
+    }
+
+    public Map<String, ImageResource> getImageResources() {
+        return new HashMap<>(imageResources);
+    }
+
+    public boolean containsKey(String key) {
+        return colorResources.containsKey(key)
+            || fontResources.containsKey(key)
+            || stringResources.containsKey(key)
+            || fafResources.containsKey(key)
+            || szaResources.containsKey(key)
+            || audioResources.containsKey(key)
+            || videoResources.containsKey(key)
+            || imageResources.containsKey(key);
+    }
+
+    public boolean containsImageKey(String key) {
+        return imageResources.containsKey(key);
     }
 
     /**
@@ -90,19 +206,47 @@ public class ResourceMapping {
      * @param id The resource identifier.
      * @return The <code>Resource</code>.
      */
-    public Resource get(String id) {
-        return resources.get(id);
+    public ColorResource getColorResource(String id) {
+        return colorResources.get(id);
+    }
+
+    public FontResource getFontResource(String id) {
+        return fontResources.get(id);
+    }
+
+    public StringResource getStringResource(String id) {
+        return stringResources.get(id);
+    }
+
+    public FAFileResource getFAFileResource(String id) {
+        return fafResources.get(id);
+    }
+
+    public SZAResource getSZAResource(String id) {
+        return szaResources.get(id);
+    }
+
+    public AudioResource getAudioResource(String id) {
+        return audioResources.get(id);
+    }
+
+    public VideoResource getVideoResource(String id) {
+        return videoResources.get(id);
+    }
+
+    public ImageResource getImageResource(String id) {
+        return imageResources.get(id);
     }
 
     /**
-     * Get the keys in this mapping with a given prefix.
+     * Get the image keys in this mapping with a given prefix.
      *
      * @param prefix The prefix to check for.
      * @return A list of keys.
      */
-    public ArrayList<String> getKeys(String prefix) {
+    public ArrayList<String> getImageKeys(String prefix) {
         ArrayList<String> result = new ArrayList<>();
-        for (String key : resources.keySet()) {
+        for (String key : imageResources.keySet()) {
             if (key.startsWith(prefix)) {
                 result.add(key);
             }
@@ -111,15 +255,15 @@ public class ResourceMapping {
     }
 
     /**
-     * Get the keys in this mapping with a given prefix and suffix.
+     * Get the image keys in this mapping with a given prefix and suffix.
      *
      * @param prefix The prefix to check for.
      * @param suffix The suffix to check for.
      * @return A list of keys.
      */
-    public ArrayList<String> getKeys(String prefix, String suffix) {
+    public ArrayList<String> getImageKeys(String prefix, String suffix) {
         ArrayList<String> result = new ArrayList<>();
-        for (String key : resources.keySet()) {
+        for (String key : imageResources.keySet()) {
             if (key.startsWith(prefix) && key.endsWith(suffix)) {
                 result.add(key);
             }
@@ -128,15 +272,15 @@ public class ResourceMapping {
     }
 
     /**
-     * Get the keys in this mapping with a given infix and suffix.
+     * Get the image keys in this mapping with a given infix and suffix.
      *
      * @param infix The infix to check for.
      * @param suffix The suffix to check for.
      * @return The set of keys.
      */
-    public Set<String> getFilteredKeys(String infix, String suffix) {
+    public Set<String> getImageKeySet(String infix, String suffix) {
         HashSet<String> result = new HashSet<>();
-        for (String key : resources.keySet()) {
+        for (String key : imageResources.keySet()) {
             if (key.endsWith(suffix) && key.contains(infix)) {
                 result.add(key);
             }

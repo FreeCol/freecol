@@ -337,7 +337,7 @@ public final class ImageLibrary {
 
     public static BufferedImage getBuildingImage(BuildingType buildingType, Player player, float scale) {
         String key = buildingType.getId() + "." + player.getNationNameKey() + ".image";
-        if (!ResourceManager.hasResource(key)) {
+        if (!ResourceManager.hasImageResource(key)) {
             key = buildingType.getId() + ".image";
         }
         return ResourceManager.getImage(key, scale);
@@ -515,12 +515,12 @@ public final class ImageLibrary {
      */
     public static BufferedImage getOverlayImage(TileType type, String id, float scale) {
         String prefix = type.getId() + ".overlay";
-        ArrayList<String> keys = ResourceManager.getKeys(prefix, ".image");
+        ArrayList<String> keys = ResourceManager.getImageKeys(prefix, ".image");
         return getRandomizedImage(keys, id, scale);
     }
 
     public static Set<String> createOverlayCache() {
-        return ResourceManager.getFilteredKeys(".overlay", ".image");
+        return ResourceManager.getImageKeySet(".overlay", ".image");
     }
 
     public BufferedImage getOverlayImage(Tile tile, Set<String> overlayCache) {
@@ -809,7 +809,7 @@ public final class ImageLibrary {
         String key = unitType.getId() + roleQual
             + ((nativeEthnicity) ? ".native" : "")
             + ".image";
-        if (!ResourceManager.hasResource(key) && nativeEthnicity) {
+        if (!ResourceManager.hasImageResource(key) && nativeEthnicity) {
             key = unitType.getId() + roleQual + ".image";
         }
         BufferedImage image = (grayscale)

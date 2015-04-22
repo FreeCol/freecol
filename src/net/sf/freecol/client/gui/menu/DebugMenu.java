@@ -415,20 +415,17 @@ public class DebugMenu extends JMenu {
         showResourceKeys.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    Map<String, Resource> resources
-                        = ResourceManager.getResources();
+                    Map<String, ImageResource> resources
+                        = ResourceManager.getImageResources();
                     List<String> keys = new ArrayList<>(resources.keySet());
                     Collections.sort(keys);
                     StringBuilder builder = new StringBuilder();
                     for (String key : keys) {
                         builder.append(key);
-                        Resource resource = resources.get(key);
-                        if (resource instanceof ImageResource) {
-                            ImageResource ir = (ImageResource) resource;
-                            builder.append(" (");
-                            builder.append(ir.getCount());
-                            builder.append(")");
-                        }
+                        ImageResource resource = resources.get(key);
+                        builder.append(" (");
+                        builder.append(resource.getCount());
+                        builder.append(")");
                         builder.append("\n");
                     }
                     gui.showInformationMessage(builder.toString());

@@ -22,7 +22,7 @@ package net.sf.freecol.common.resources;
 /**
  * Puts the Resource into the ResourceMapping.
  */
-public class ResourceMapper implements ResourceFactory.ResourceSink {
+public final class ResourceMapper implements ResourceFactory.ResourceSink {
 
     private final ResourceMapping resourceMapping;
     private String key;

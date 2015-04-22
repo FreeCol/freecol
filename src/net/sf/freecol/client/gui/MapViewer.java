@@ -2258,7 +2258,7 @@ public final class MapViewer {
                                          Tile tile, TileImprovement  ti) {
         if (ti.isComplete()) {
             String key = ti.getType().getId() + ".image";
-            if (ResourceManager.hasResource(key)) {
+            if (ResourceManager.hasImageResource(key)) {
                 // Has its own Overlay Image in Misc, use it
                 Image overlay = ResourceManager.getImage(key,
                     lib.getScalingFactor());
