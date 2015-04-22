@@ -1334,7 +1334,7 @@ public final class MapViewer {
                               Color backgroundColor) {
         int hPadding = 15;
         int vPadding = 10;
-        int linePadding = 2;
+        int linePadding = 5;
         int width = 0;
         int height = vPadding;
         int i;
@@ -1347,16 +1347,16 @@ public final class MapViewer {
             spec = textSpecs[i];
             label = new TextLayout(spec.text, spec.font, g.getFontRenderContext());
             labels[i] = label;
-            width = Math.max(width, (int) label.getBounds().getWidth() + hPadding);
-            height += (int) (label.getAscent() + label.getDescent());
+            Rectangle textRectangle = label.getPixelBounds(null, 0, 0);
+            width = Math.max(width, textRectangle.width + hPadding);
             if (i > 0) height += linePadding;
+            height += (int) (label.getAscent() + label.getDescent());
         }
 
         int radius = Math.min(hPadding, vPadding);
 
         BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();
-        g2.scale(lib.getScalingFactor(), lib.getScalingFactor());
         g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
@@ -1364,14 +1364,13 @@ public final class MapViewer {
         g2.setColor(backgroundColor);
         g2.fill(new RoundRectangle2D.Float(0, 0, width, height, radius, radius));
         g2.setColor(ImageLibrary.getForegroundColor(backgroundColor));
-        int offset = 0;
+        float y = vPadding / 2;
         for (i = 0; i < labels.length; i++) {
-            if (i > 0) {
-                offset += labels[i - 1].getAscent() + linePadding + vPadding/2;
-            }
-            float x = (width - (float)labels[i].getBounds().getWidth()) / 2.0f;
-            float y = labels[i].getAscent() + offset + vPadding/2;
+            Rectangle textRectangle = labels[i].getPixelBounds(null, 0, 0);
+            float x = (width - textRectangle.width) / 2;
+            y += labels[i].getAscent();
             labels[i].draw(g2, x, y);
+            y += labels[i].getDescent() + linePadding;
         }
         g2.dispose();
         return bi;
@@ -1816,9 +1815,9 @@ public final class MapViewer {
                 if (name == null) continue;
                 Color backgroundColor = settlement.getOwner().getNationColor();
                 if (backgroundColor == null) backgroundColor = Color.WHITE;
-                Font font = fontLibrary.createScaledFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER);
-                Font italicFont = fontLibrary.createScaledFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER, Font.ITALIC);
-                Font productionFont = fontLibrary.createScaledFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY);
+                Font font = fontLibrary.createScaledFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER, Font.BOLD);
+                Font italicFont = fontLibrary.createScaledFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER, Font.BOLD | Font.ITALIC);
+                Font productionFont = fontLibrary.createScaledFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY, Font.BOLD);
                 // int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
                 int yOffset = tileHeight;
                 g.setTransform(settlementTransforms.get(index));
