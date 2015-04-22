@@ -63,81 +63,81 @@ public final class ResourceMapping {
      * Adds a mapping between the given object identifier and a
      * <code>Resource</code>.
      *
-     * @param id The identifier for the given resource in the mapping.
+     * @param key The identifier for the given resource in the mapping.
      * @param value The <code>Resource</code> identified by the
      *     identifier in the mapping,.
      */
-    public void add(String id, ColorResource value) {
-        colorResources.put(id, value);
+    public void add(String key, ColorResource value) {
+        colorResources.put(key, value);
     }
 
-    public void add(String id, FontResource value) {
-        fontResources.put(id, value);
+    public void add(String key, FontResource value) {
+        fontResources.put(key, value);
     }
 
-    public void add(String id, StringResource value) {
-        stringResources.put(id, value);
+    public void add(String key, StringResource value) {
+        stringResources.put(key, value);
     }
 
-    public void add(String id, FAFileResource value) {
-        fafResources.put(id, value);
+    public void add(String key, FAFileResource value) {
+        fafResources.put(key, value);
     }
 
-    public void add(String id, SZAResource value) {
-        szaResources.put(id, value);
+    public void add(String key, SZAResource value) {
+        szaResources.put(key, value);
     }
 
-    public void add(String id, AudioResource value) {
-        audioResources.put(id, value);
+    public void add(String key, AudioResource value) {
+        audioResources.put(key, value);
     }
 
-    public void add(String id, VideoResource value) {
-        videoResources.put(id, value);
+    public void add(String key, VideoResource value) {
+        videoResources.put(key, value);
     }
 
-    public void add(String id, ImageResource value) {
-        imageResources.put(id, value);
+    public void add(String key, ImageResource value) {
+        imageResources.put(key, value);
     }
 
-    public boolean duplicateResource(String id, String idNew) {
-        ColorResource cr = colorResources.get(id);
+    public boolean duplicateResource(String key, String keyNew) {
+        ColorResource cr = colorResources.get(key);
         if(cr != null) {
-            colorResources.put(idNew, cr);
+            colorResources.put(keyNew, cr);
             return true;
         }
-        FontResource fr = fontResources.get(id);
+        FontResource fr = fontResources.get(key);
         if(fr != null) {
-            fontResources.put(idNew, fr);
+            fontResources.put(keyNew, fr);
             return true;
         }
-        StringResource sr = stringResources.get(id);
+        StringResource sr = stringResources.get(key);
         if(sr != null) {
-            stringResources.put(idNew, sr);
+            stringResources.put(keyNew, sr);
             return true;
         }
-        FAFileResource far = fafResources.get(id);
+        FAFileResource far = fafResources.get(key);
         if(far != null) {
-            fafResources.put(idNew, far);
+            fafResources.put(keyNew, far);
             return true;
         }
-        SZAResource szr = szaResources.get(id);
+        SZAResource szr = szaResources.get(key);
         if(szr != null) {
-            szaResources.put(idNew, szr);
+            szaResources.put(keyNew, szr);
             return true;
         }
-        AudioResource ar = audioResources.get(id);
+        AudioResource ar = audioResources.get(key);
         if(ar != null) {
-            audioResources.put(idNew, ar);
+            audioResources.put(keyNew, ar);
             return true;
         }
-        VideoResource vr = videoResources.get(id);
+        VideoResource vr = videoResources.get(key);
         if(vr != null) {
-            videoResources.put(idNew, vr);
+            videoResources.put(keyNew, vr);
             return true;
         }
-        ImageResource ir = imageResources.get(id);
+        ImageResource ir = imageResources.get(key);
         if(ir != null) {
-            imageResources.put(idNew, ir);
+            imageResources.put(keyNew, ir);
             return true;
         }
         return false;
@@ -203,39 +203,39 @@ public final class ResourceMapping {
     /**
      * Gets the <code>Resource</code> by identifier.
      *
-     * @param id The resource identifier.
+     * @param key The resource identifier.
      * @return The <code>Resource</code>.
      */
-    public ColorResource getColorResource(String id) {
-        return colorResources.get(id);
+    public ColorResource getColorResource(String key) {
+        return colorResources.get(key);
     }
 
-    public FontResource getFontResource(String id) {
-        return fontResources.get(id);
+    public FontResource getFontResource(String key) {
+        return fontResources.get(key);
     }
 
-    public StringResource getStringResource(String id) {
-        return stringResources.get(id);
+    public StringResource getStringResource(String key) {
+        return stringResources.get(key);
     }
 
-    public FAFileResource getFAFileResource(String id) {
-        return fafResources.get(id);
+    public FAFileResource getFAFileResource(String key) {
+        return fafResources.get(key);
     }
 
-    public SZAResource getSZAResource(String id) {
-        return szaResources.get(id);
+    public SZAResource getSZAResource(String key) {
+        return szaResources.get(key);
     }
 
-    public AudioResource getAudioResource(String id) {
-        return audioResources.get(id);
+    public AudioResource getAudioResource(String key) {
+        return audioResources.get(key);
     }
 
-    public VideoResource getVideoResource(String id) {
-        return videoResources.get(id);
+    public VideoResource getVideoResource(String key) {
+        return videoResources.get(key);
     }
 
-    public ImageResource getImageResource(String id) {
-        return imageResources.get(id);
+    public ImageResource getImageResource(String key) {
+        return imageResources.get(key);
     }
 
     /**

@@ -222,14 +222,14 @@ public class ResourceManager {
         preloadThread.start();
     }
 
-    public static synchronized boolean hasResource(final String resourceId) {
-        logger.finest("hasResource(" + resourceId + ")");
-        return mergedContainer.containsKey(resourceId);
+    public static synchronized boolean hasResource(final String key) {
+        logger.finest("hasResource(" + key + ")");
+        return mergedContainer.containsKey(key);
     }
 
-    public static synchronized boolean hasImageResource(final String resourceId) {
-        //logger.finest("hasImageResource(" + resourceId + ")");
-        return mergedContainer.containsImageKey(resourceId);
+    public static synchronized boolean hasImageResource(final String key) {
+        //logger.finest("hasImageResource(" + key + ")");
+        return mergedContainer.containsImageKey(key);
     }
 
     public static synchronized Map<String, Resource> getResources() {
@@ -355,13 +355,13 @@ public class ResourceManager {
     /**
      * Returns the image specified by the given name.
      *
-     * @param resource The name of the resource to return.
+     * @param key The name of the resource to return.
      * @return The image identified by <code>resource</code>
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static BufferedImage getImage(final String resource) {
-        final ImageResource r = getImageResource(resource);
+    public static BufferedImage getImage(final String key) {
+        final ImageResource r = getImageResource(key);
         return (r != null) ? r.getImage() : null;
     }
 
@@ -371,7 +371,7 @@ public class ResourceManager {
      * For each is a scaled image cached here for a long time,
      * which wastes memory if you are not careful.
      *
-     * @param resource The name of the resource to return.
+     * @param key The name of the resource to return.
      * @param scale The size of the requested image (with 1 being normal size,
      *      2 twice the size, 0.5 half the size etc). Rescaling
      *      will be performed unless using 1.
@@ -379,8 +379,8 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static BufferedImage getImage(final String resource, final float scale) {
-        final ImageResource r = getImageResource(resource);
+    public static BufferedImage getImage(final String key, final float scale) {
+        final ImageResource r = getImageResource(key);
         return (r != null) ? r.getImage(scale) : null;
     }
 
@@ -389,15 +389,15 @@ public class ResourceManager {
      * Please, avoid using this, as for each size another scaled version
      * of the image is cached!
      *
-     * @param resource The name of the resource to return.
+     * @param key The name of the resource to return.
      * @param size The size of the requested image. Rescaling
      *      will be performed if necessary.
      * @return The image identified by <code>resource</code>
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static BufferedImage getImage(final String resource, final Dimension size) {
-        final ImageResource r = getImageResource(resource);
+    public static BufferedImage getImage(final String key, final Dimension size) {
+        final ImageResource r = getImageResource(key);
         return (r != null) ? r.getImage(size) : null;
     }
 
@@ -405,22 +405,22 @@ public class ResourceManager {
      * Returns the a grayscale version of the image specified by
      * the given name.
      *
-     * @param resource The name of the resource to return.
+     * @param key The name of the resource to return.
      * @param size The size of the requested image. Rescaling
      *      will be performed if necessary.
      * @return The image identified by <code>resource</code>
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static BufferedImage getGrayscaleImage(final String resource, final Dimension size) {
-        final ImageResource r = getImageResource(resource);
+    public static BufferedImage getGrayscaleImage(final String key, final Dimension size) {
+        final ImageResource r = getImageResource(key);
         return (r != null) ? r.getGrayscaleImage(size) : null;
     }
 
     /**
      * Returns the grayscale version of the image specified by the given name.
      *
-     * @param resource The name of the resource to return.
+     * @param key The name of the resource to return.
      * @param scale The size of the requested image (with 1 being normal size,
      *      2 twice the size, 0.5 half the size etc). Rescaling
      *      will be performed unless using 1.
@@ -428,28 +428,28 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static BufferedImage getGrayscaleImage(final String resource, final float scale) {
-        final ImageResource r = getImageResource(resource);
+    public static BufferedImage getGrayscaleImage(final String key, final float scale) {
+        final ImageResource r = getImageResource(key);
         return (r != null) ? r.getGrayscaleImage(scale) : null;
     }
 
     /**
      * Returns the animation specified by the given name.
      *
-     * @param resource The name of the resource to return.
+     * @param key The name of the resource to return.
      * @return The animation identified by <code>resource</code>
      *      or <code>null</code> if there is no animation
      *      identified by that name.
      */
-    public static SimpleZippedAnimation getSimpleZippedAnimation(final String resource) {
-        final SZAResource r = getSZAResource(resource);
+    public static SimpleZippedAnimation getSimpleZippedAnimation(final String key) {
+        final SZAResource r = getSZAResource(key);
         return (r != null) ? r.getSimpleZippedAnimation() : null;
     }
 
     /**
      * Returns the animation specified by the given name.
      *
-     * @param resource The name of the resource to return.
+     * @param key The name of the resource to return.
      * @param scale The size of the requested animation (with 1
      *      being normal size, 2 twice the size, 0.5 half the
      *      size etc). Rescaling will be performed unless using 1.
@@ -457,36 +457,36 @@ public class ResourceManager {
      *      or <code>null</code> if there is no animation
      *      identified by that name.
      */
-    public static SimpleZippedAnimation getSimpleZippedAnimation(final String resource, final float scale) {
-        final SZAResource r = getSZAResource(resource);
+    public static SimpleZippedAnimation getSimpleZippedAnimation(final String key, final float scale) {
+        final SZAResource r = getSZAResource(key);
         return (r != null) ? r.getSimpleZippedAnimation(scale) : null;
     }
 
     /**
      * Returns the <code>Color</code> with the given name.
      *
-     * @param resource The name of the resource to return.
+     * @param key The name of the resource to return.
      * @return An <code>Color</code> created with the image
      *      identified by <code>resource</code> or
      *      <code>null</code> if there is no color identified
      *      by that name.
      * @see #getImage(String)
      */
-    public static Color getColor(final String resource) {
-        final ColorResource r = getColorResource(resource);
+    public static Color getColor(final String key) {
+        final ColorResource r = getColorResource(key);
         return (r != null) ? r.getColor() : null;
     }
 
     /**
      * Gets the font with the given name.
      *
-     * @param resource The name of the resource to query.
+     * @param key The name of the resource to query.
      * @return The <code>Font</code> found in a FontResource, which
      *     may default to the Java default font if the resource failed
      *     to load.
      */
-    public static Font getFont(final String resource) {
-        final FontResource r = getFontResource(resource);
+    public static Font getFont(final String key) {
+        final FontResource r = getFontResource(key);
         if (r == null) return FontResource.getEmergencyFont();
         return r.getFont();
     }
@@ -494,43 +494,43 @@ public class ResourceManager {
     /**
      * Gets an audio resource with the given name.
      *
-     * @param resource The name of the resource to query.
+     * @param key The name of the resource to query.
      * @return A <code>File</code> containing the audio data.
      */
-    public static File getAudio(final String resource) {
-        final AudioResource r = getAudioResource(resource);
+    public static File getAudio(final String key) {
+        final AudioResource r = getAudioResource(key);
         return (r == null) ? null : r.getAudio();
     }
 
     /**
      * Gets the <code>Video</code> represented by the given resource.
-     * @param resource The name of the resource to return.
+     * @param key The name of the resource to return.
      * @return The <code>Video</code> in it's original size.
      */
-    public static Video getVideo(final String resource) {
-        final VideoResource r = getVideoResource(resource);
+    public static Video getVideo(final String key) {
+        final VideoResource r = getVideoResource(key);
         return (r != null) ? r.getVideo() : null;
     }
 
     /**
      * Gets a FAFile resource with the given name.
      *
-     * @param resource The name of the resource to query.
+     * @param key The name of the resource to query.
      * @return The <code>FAFile</code> found in a FAFileResource.
      */
-    public static FAFile getFAFile(final String resource) {
-        final FAFileResource r = getFAFileResource(resource);
+    public static FAFile getFAFile(final String key) {
+        final FAFileResource r = getFAFileResource(key);
         return (r == null) ? null : r.getFAFile();
     }
 
     /**
      * Gets a string resource with the given name.
      *
-     * @param resource The name of the resource to query.
+     * @param key The name of the resource to query.
      * @return The string value.
      */
-    public static String getString(final String resource) {
-        final StringResource r = getStringResource(resource);
+    public static String getString(final String key) {
+        final StringResource r = getStringResource(key);
         return (r == null) ? null : r.getString();
     }
 
