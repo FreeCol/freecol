@@ -42,9 +42,13 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceFactory;
+import net.sf.freecol.common.resources.ResourceMapper;
 import net.sf.freecol.common.resources.ResourceMapping;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
+
 import net.sf.freecol.common.util.LogBuilder;
+
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -247,6 +251,7 @@ public class FreeColDataFile {
         ResourceMapping rc = new ResourceMapping();
         List<String> todo = new ArrayList<>();
         Enumeration<?> pn = properties.propertyNames();
+        ResourceMapper rm = new ResourceMapper(rc);
         while (pn.hasMoreElements()) {
             final String key = (String) pn.nextElement();
             final String value = properties.getProperty(key);
@@ -255,7 +260,8 @@ public class FreeColDataFile {
             } else {
                 URI uri = getURI(value);
                 if (uri != null) {
-                    rc.add(key, ResourceFactory.createResource(uri));
+                    rm.setKey(key);
+                    ResourceFactory.createResource(uri, rm);
                 }
             }
         }

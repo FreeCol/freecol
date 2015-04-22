@@ -36,32 +36,118 @@ public class ResourceFactory {
     private static final Logger logger = Logger.getLogger(ResourceFactory.class.getName());
 
     /**
-     * A <code>WeakHashMap</code> to ensure that only one
+     * Takes a newly produced Resource.
+     */
+    public interface ResourceSink {
+
+        void add(ColorResource r);
+        void add(FontResource r);
+        void add(StringResource r);
+        void add(FAFileResource r);
+        void add(SZAResource r);
+        void add(AudioResource r);
+        void add(VideoResource r);
+        void add(ImageResource r);
+
+    }
+
+    /**
+     * <code>WeakHashMap</code>s to ensure that only one
      * <code>Resource</code> is created given the same
      * <code>URI</code>.
      */
-    private static final Map<URI, WeakReference<Resource>> resources = new WeakHashMap<>();
-
+    private static final Map<URI, WeakReference<ColorResource>> colorResources
+        = new WeakHashMap<>();
+    private static final Map<URI, WeakReference<FontResource>> fontResources
+        = new WeakHashMap<>();
+    private static final Map<URI, WeakReference<StringResource>> stringResources
+        = new WeakHashMap<>();
+    private static final Map<URI, WeakReference<FAFileResource>> fafResources
+        = new WeakHashMap<>();
+    private static final Map<URI, WeakReference<SZAResource>> szaResources
+        = new WeakHashMap<>();
+    private static final Map<URI, WeakReference<AudioResource>> audioResources
+        = new WeakHashMap<>();
+    private static final Map<URI, WeakReference<VideoResource>> videoResources
+        = new WeakHashMap<>();
+    private static final Map<URI, WeakReference<ImageResource>> imageResources
+        = new WeakHashMap<>();
 
     /**
-     * Gets the resource with the given <code>URI</code> from
-     * {@link #resources}.
+     * Check for previously created resources.
      *
-     * @param uri The <code>URI</code> to identify a previously created
-     *      <code>Resource</code>.
-     * @return The <code>Resource</code> identified by the given
-     *      <code>URI</code>, or <code>null</code> if no such
-     *      <code>Resource</code> exists.
+     * @param uri The <code>URI</code> used when creating the instance.
+     * @param output Where a previously created instance of <code>Resource</code>
+     *      with the given <code>URI</code> is put if such an object has
+     *      already been created.
+     * @return If a Resource is found.
      */
-    private static Resource getResource(URI uri) {
-        final WeakReference<Resource> wr = resources.get(uri);
-        if (wr != null) {
-            final Resource r = wr.get();
-            if (r != null) {
-                return r;
+    private static boolean findResource(URI uri, ResourceSink output) {
+        final WeakReference<ColorResource> crwr = colorResources.get(uri);
+        if(crwr != null) {
+            final ColorResource cr = crwr.get();
+            if (cr != null) {
+                output.add(cr);
+                return true;
             }
         }
-        return null;
+        final WeakReference<FontResource> frwr = fontResources.get(uri);
+        if(frwr != null) {
+            final FontResource fr = frwr.get();
+            if (fr != null) {
+                output.add(fr);
+                return true;
+            }
+        }
+        final WeakReference<StringResource> srwr = stringResources.get(uri);
+        if(srwr != null) {
+            final StringResource sr = srwr.get();
+            if (sr != null) {
+                output.add(sr);
+                return true;
+            }
+        }
+        final WeakReference<FAFileResource> farwr = fafResources.get(uri);
+        if(farwr != null) {
+            final FAFileResource far = farwr.get();
+            if (far != null) {
+                output.add(far);
+                return true;
+            }
+        }
+        final WeakReference<SZAResource> szrwr = szaResources.get(uri);
+        if(szrwr != null) {
+            final SZAResource szr = szrwr.get();
+            if (szr != null) {
+                output.add(szr);
+                return true;
+            }
+        }
+        final WeakReference<AudioResource> arwr = audioResources.get(uri);
+        if(arwr != null) {
+            final AudioResource ar = arwr.get();
+            if (ar != null) {
+                output.add(ar);
+                return true;
+            }
+        }
+        final WeakReference<VideoResource> vrwr = videoResources.get(uri);
+        if(vrwr != null) {
+            final VideoResource vr = vrwr.get();
+            if (vr != null) {
+                output.add(vr);
+                return true;
+            }
+        }
+        final WeakReference<ImageResource> irwr = imageResources.get(uri);
+        if(irwr != null) {
+            final ImageResource ir = irwr.get();
+            if (ir != null) {
+                output.add(ir);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -70,46 +156,65 @@ public class ResourceFactory {
      *
      * @param uri The <code>URI</code> used when creating the
      *      instance.
-     * @return A previously created instance of <code>Resource</code>
-     *      with the given <code>URI</code> if such an object has
+     * @param output Where a previously created instance of <code>Resource</code>
+     *      with the given <code>URI</code> is put if such an object has
      *      already been created, or a new instance if not.
      */
-    public static Resource createResource(URI uri) {
-        Resource r = getResource(uri);
-        if (r == null) {
-            try {
-                if ("urn".equals(uri.getScheme())) {
-                    if (uri.getSchemeSpecificPart().startsWith(ColorResource.SCHEME)) {
-                        r = new ColorResource(uri);
-                    } else if (uri.getSchemeSpecificPart().startsWith(FontResource.SCHEME)) {
-                        r = new FontResource(uri);
-                    }
-                } else if (uri.getPath().endsWith("\"")
-                    && uri.getPath().lastIndexOf('"',
-                        uri.getPath().length()-1) >= 0) {
-                    r = new StringResource(uri);
-                } else if (uri.getPath().endsWith(".faf")) {
-                    r = new FAFileResource(uri);
-                } else if (uri.getPath().endsWith(".sza")) {
-                    r = new SZAResource(uri);
-                } else if (uri.getPath().endsWith(".ttf")) {
-                    r = new FontResource(uri);
-                } else if (uri.getPath().endsWith(".wav")) {
-                    r = new AudioResource(uri);
-                } else if (uri.getPath().endsWith(".ogg")) {
-                    if (uri.getPath().endsWith(".video.ogg")) {
-                        r = new VideoResource(uri);
-                    } else {
-                        r = new AudioResource(uri);
-                    }
-                } else {
-                    r = new ImageResource(uri);
+    public static void createResource(URI uri, ResourceSink output) {
+        if(findResource(uri, output))
+            return;
+
+        try {
+            if ("urn".equals(uri.getScheme())) {
+                if (uri.getSchemeSpecificPart().startsWith(ColorResource.SCHEME)) {
+                    ColorResource cr = new ColorResource(uri);
+                    output.add(cr);
+                    colorResources.put(uri, new WeakReference<>(cr));
+                } else if (uri.getSchemeSpecificPart().startsWith(FontResource.SCHEME)) {
+                    FontResource fr = new FontResource(uri);
+                    output.add(fr);
+                    fontResources.put(uri, new WeakReference<>(fr));
                 }
-                resources.put(uri, new WeakReference<>(r));
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to create resource with URI: " + uri, e);
+            } else if (uri.getPath().endsWith("\"")
+                    && uri.getPath().lastIndexOf('"',
+                            uri.getPath().length()-1) >= 0) {
+                StringResource sr = new StringResource(uri);
+                output.add(sr);
+                stringResources.put(uri, new WeakReference<>(sr));
+            } else if (uri.getPath().endsWith(".faf")) {
+                FAFileResource far = new FAFileResource(uri);
+                output.add(far);
+                fafResources.put(uri, new WeakReference<>(far));
+            } else if (uri.getPath().endsWith(".sza")) {
+                SZAResource szr = new SZAResource(uri);
+                output.add(szr);
+                szaResources.put(uri, new WeakReference<>(szr));
+            } else if (uri.getPath().endsWith(".ttf")) {
+                FontResource fr = new FontResource(uri);
+                output.add(fr);
+                fontResources.put(uri, new WeakReference<>(fr));
+            } else if (uri.getPath().endsWith(".wav")) {
+                AudioResource ar = new AudioResource(uri);
+                output.add(ar);
+                audioResources.put(uri, new WeakReference<>(ar));
+            } else if (uri.getPath().endsWith(".ogg")) {
+                if (uri.getPath().endsWith(".video.ogg")) {
+                    VideoResource vr = new VideoResource(uri);
+                    output.add(vr);
+                    videoResources.put(uri, new WeakReference<>(vr));
+                } else {
+                    AudioResource ar = new AudioResource(uri);
+                    output.add(ar);
+                    audioResources.put(uri, new WeakReference<>(ar));
+                }
+            } else {
+                ImageResource ir = new ImageResource(uri);
+                output.add(ir);
+                imageResources.put(uri, new WeakReference<>(ir));
             }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to create resource with URI: " + uri, e);
         }
-        return r;
     }
+
 }
