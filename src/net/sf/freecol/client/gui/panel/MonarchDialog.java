@@ -60,19 +60,20 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
         super(freeColClient);
 
         final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
-        final String messageId = action.getKey();
+        final String messageId = action.getTextKey();
         if (!Messages.containsKey(messageId)) {
             throw new IllegalStateException("Unrecognized monarch action: "
                 + action);
         }
-        String yesId = messageId + ".yes";
+        String yesId = action.getYesKey();
         if (!Messages.containsKey(yesId)) yesId = null;        
-        String noId = messageId + ".no";
+        String noId = action.getNoKey();
         if (!Messages.containsKey(noId)) noId = "close";
 
-        String hdrKey = (action == MonarchAction.HESSIAN_MERCENARIES)
-            ? "monarchDialog.header.fromHessians"
-            : "monarchDialog.header.fromCrown";
+        String hdrKey = action.getHeaderKey();
+        if (!Messages.containsKey(hdrKey)) {
+            hdrKey = "monarchDialog.default";
+        }
         String hdr = Messages.message(hdrKey);
         JTextArea header = Utility.getDefaultTextArea(hdr);
         header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,

@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import javax.swing.JScrollPane;
 import net.miginfocom.swing.MigLayout;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.i18n.Messages;
@@ -190,10 +191,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
     protected boolean save(File file) {
         OptionGroup og = Specification.saveOptionsFile(this.group, file);
         if (og != null) return true;
-
-        StringTemplate t = StringTemplate.template("failedToSave")
-            .addName("%name%", file.getPath());
-        getGUI().showInformationMessage(t);
+        getGUI().showErrorMessage(FreeCol.badSave(file));
         return false;
     }
 

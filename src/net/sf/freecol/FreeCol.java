@@ -992,12 +992,12 @@ public final class FreeCol {
      * Gets the user name.
      *
      * @return The user name, defaults to the user.name property, then to
-     *     the "defaultPlayerName" message value.
+     *     the "main.defaultPlayerName" message value.
      */
     public static String getName() {
         return (name != null) ? name
             : System.getProperty("user.name",
-                                 Messages.message("defaultPlayerName"));
+                                 Messages.message("main.defaultPlayerName"));
     }
 
     /**
@@ -1149,6 +1149,29 @@ public final class FreeCol {
     }
 
 
+    /**
+     * Utility to make a load failure message.
+     *
+     * @param file The <code>File</code> that failed to load.
+     * @return A <code>StringTemplate</code> with the error message.
+     */
+    public static StringTemplate badLoad(File file) {
+        return StringTemplate.template("error.couldNotLoad")
+            .addName("%name%", file.getPath());
+    }
+
+    /**
+     * Utility to make a save failure message.
+     *
+     * @param file The <code>File</code> that failed to save.
+     * @return A <code>StringTemplate</code> with the error message.
+     */
+    public static StringTemplate badSave(File file) {
+        return StringTemplate.template("error.couldNotSave")
+            .addName("%name%", file.getPath());
+    }
+
+
     // The major final actions.
 
     /**
@@ -1199,7 +1222,7 @@ public final class FreeCol {
                 }
             } catch (Exception e) {
                 if (checkIntegrity) gripe("cli.check-savegame.failure");
-                fatal(Messages.message("server.load")
+                fatal(Messages.message(badLoad(saveGame))
                     + ": " + e.getMessage());
                 return;
             }

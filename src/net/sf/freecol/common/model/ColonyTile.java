@@ -379,7 +379,7 @@ public class ColonyTile extends WorkLocation {
     @Override
     public StringTemplate getClaimTemplate() {
         return (isColonyCenterTile()) ? super.getClaimTemplate()
-            : (StringTemplate.template("workClaimColonyTile")
+            : (StringTemplate.template("model.colonyTile.claim")
                 .addNamed("%direction%", getTile().getDirection(workTile)));
     }
 

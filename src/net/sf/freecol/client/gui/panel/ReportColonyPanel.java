@@ -179,9 +179,8 @@ public final class ReportColonyPanel extends ReportPanel
             if (currentType != null) {
                 buildableLabel = new JLabel(new ImageIcon(lib
                     .getSmallBuildableImage(currentType, colony.getOwner())));
-                Utility.localizeToolTip(buildableLabel, StringTemplate
-                    .template("colonyPanel.currentlyBuilding")
-                    .addNamed("%buildable%", currentType));
+                Utility.localizeToolTip(buildableLabel,
+                    currentType.getCurrentlyBuildingLabel());
                 buildableLabel.setIcon(buildableLabel.getDisabledIcon());
             }
 

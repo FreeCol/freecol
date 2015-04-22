@@ -65,6 +65,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -137,7 +138,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                     new Dimension(64, -1)));
             }
             StringTemplate template = StringTemplate
-                .template("selectDestination.destinationTurns")
+                .template("selectDestinationDialog.destinationTurns")
                 .addName("%location%", name)
                 .addAmount("%turns%", this.turns)
                 .addName("%extras%", this.extras);
@@ -182,7 +183,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
             } else if (loc instanceof Settlement
                 && ((Settlement)loc).getOwner().atWarWith(owner)) {
-                lb.add("[", Messages.message("model.stance.war"), "]");
+                lb.add("[", Messages.getName(Stance.WAR), "]");
 
             } else if (loc instanceof Settlement) {
                 if (loc instanceof IndianSettlement) {
@@ -380,7 +381,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         JScrollPane listScroller = new JScrollPane(destinationList);
         listScroller.setPreferredSize(new Dimension(300, 300));
 
-        String omcb = Messages.message("selectDestination.onlyMyColonies");
+        String omcb = Messages.message("selectDestinationDialog.onlyMyColonies");
         this.onlyMyColoniesBox = new JCheckBox(omcb, showOnlyMyColonies);
         this.onlyMyColoniesBox.addChangeListener(new ChangeListener() {
                 @Override
@@ -391,9 +392,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             });
 
         this.comparatorBox = new JComboBox<>(new String[] {
-                Messages.message("selectDestination.sortByOwner"),
-                Messages.message("selectDestination.sortByName"),
-                Messages.message("selectDestination.sortByDistance")
+                Messages.message("selectDestinationDialog.sortByOwner"),
+                Messages.message("selectDestinationDialog.sortByName"),
+                Messages.message("selectDestinationDialog.sortByDistance")
             });
         this.comparatorBox.addItemListener(new ItemListener() {
                 @Override
@@ -411,7 +412,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1, fill",
                                                     "[align center]", ""));
-        panel.add(Utility.localizedHeader("selectDestination.text", true));
+        panel.add(Utility.localizedHeader("selectDestinationDialog.text", true));
 
         panel.add(listScroller, "newline 30, growx, growy");
         panel.add(this.onlyMyColoniesBox, "left");
@@ -421,7 +422,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         List<ChoiceItem<Location>> c = choices();
         c.add(new ChoiceItem<>(Messages.message("ok"),
                 (Location)null).okOption());
-        c.add(new ChoiceItem<>(Messages.message("selectDestination.cancel"),
+        c.add(new ChoiceItem<>(Messages.message("selectDestinationDialog.cancel"),
                 (Location)null).cancelOption().defaultOption());
         initializeDialog(DialogType.QUESTION, true, panel, GUI.createImageIcon(
             getImageLibrary().getSmallUnitImage(unit)), c);

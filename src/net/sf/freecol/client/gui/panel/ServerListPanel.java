@@ -212,8 +212,8 @@ class ServerListTableModel extends AbstractTableModel {
         Messages.message("name"),
         Messages.message("host"),
         Messages.message("port"),
-        Messages.message("players"),
-        Messages.message("gameState"),
+        Messages.message("serverListPanel.players"),
+        Messages.message("serverListPanel.gameState"),
     };
 
     private List<ServerInfo> items;
@@ -294,7 +294,7 @@ class ServerListTableModel extends AbstractTableModel {
                 return Integer.toString(si.getCurrentlyPlaying()) + "/"
                         + Integer.toString(si.getCurrentlyPlaying() + si.getSlotsAvailable());
             case 4:
-                return Messages.message("gameState." + Integer.toString(si.getGameState()));
+                return Messages.message("serverListPanel.gameState." + Integer.toString(si.getGameState()));
             default:
                 return null;
             }

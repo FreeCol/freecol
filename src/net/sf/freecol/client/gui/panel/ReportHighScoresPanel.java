@@ -81,7 +81,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
                             "skip");
             int retirementTurn = highScore.getRetirementTurn();
             reportPanel.add((retirementTurn <= 0)
-                ? Utility.localizedLabel("notApplicable.short")
+                ? Utility.localizedLabel("notApplicable")
                 : Utility.localizedLabel(Turn.getLabel(retirementTurn)));
 
             reportPanel.add(Utility.localizedLabel("report.highScores.score"),

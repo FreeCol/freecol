@@ -1528,7 +1528,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 // stockade, BR#3522055.
                 source = getBuilding((BuildingType)source).getType();
             }
-            return StringTemplate.template("colonyPanel.minimumColonySize")
+            return StringTemplate.template("model.colony.minimumColonySize")
                 .addName("%object%", source);
         }
         return null;
@@ -1542,7 +1542,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public ModelMessage getUnbuildableMessage(BuildableType buildable) {
         return new ModelMessage(ModelMessage.MessageType.WARNING,
-            "colonyPanel.unbuildable", this, buildable)
+            "model.colony.unbuildable", this, buildable)
             .addName("%colony%", getName())
             .addNamed("%object%", buildable);
     }
@@ -2824,7 +2824,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     @Override
     public StringTemplate getAlarmLevelMessage(Player player) {
         Stance stance = getOwner().getStance(player);
-        return StringTemplate.template("colony.tension." + stance.getKey())
+        return StringTemplate.template("model.colony." + stance.getKey())
             .addStringTemplate("%nation%", getOwner().getNationName());
     }
 

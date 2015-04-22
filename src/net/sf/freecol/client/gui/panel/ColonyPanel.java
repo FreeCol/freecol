@@ -629,7 +629,7 @@ public final class ColonyPanel extends PortPanel
             StringBuilder sb = new StringBuilder(64);
             if (student != null) {
                 sb.append(unit.getDescription())
-                    .append(" ").append(Messages.message("producing.name"))
+                    .append(" ").append(Messages.message("colonyPanel.producing"))
                     .append(" ").append(Messages.getName(unit.getType()
                             .getSkillTaught()))
                     .append(" ").append(unit.getTurnsOfTraining())
@@ -650,12 +650,12 @@ public final class ColonyPanel extends PortPanel
                     .template(goodsType)
                     .addAmount("%amount%", producing));
                 sb.append(unit.getDescription())
-                    .append(" ").append(Messages.message("producing.name"))
+                    .append(" ").append(Messages.message("colonyPanel.producing"))
                     .append(" ").append(producing)
                     .append(" ").append(nominative);
             } else {
                 sb.append(unit.getDescription())
-                    .append(" ").append(Messages.message("producing.name"))
+                    .append(" ").append(Messages.message("colonyPanel.producing"))
                     .append(" ").append(Messages.message("nothing"));
             }
             String menuTitle = sb.toString();
@@ -675,7 +675,7 @@ public final class ColonyPanel extends PortPanel
             if (unit.isCarrier()) {
                 unitIcon = new ImageIcon(lib.getSmallerUnitImage(unit));
                 String menuTitle = unit.getDescription()
-                    + " " + Messages.message("inPort.name");
+                    + " " + Messages.message("colonyPanel.inPort");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
                     @Override
@@ -707,7 +707,7 @@ public final class ColonyPanel extends PortPanel
             } else if (!unit.isOnCarrier()) {
                 unitIcon = new ImageIcon(lib.getSmallerUnitImage(unit));
                 String menuTitle = unit.getDescription()
-                    + " " + Messages.message("outsideOfColony.name");
+                    + " " + Messages.message("colonyPanel.outsideOfColony");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
                     @Override
@@ -1056,7 +1056,7 @@ public final class ColonyPanel extends PortPanel
             UnitType oldType = (UnitType) event.getOldValue();
             UnitType newType = (UnitType) event.getNewValue();
             getGUI().showInformationMessage(object, StringTemplate
-                .template("model.colony.unitChange")
+                .template("colonyPanel.unitChange")
                 .addName("%colony%", colony.getName())
                 .addNamed("%oldType%", oldType)
                 .addNamed("%newType%", newType));
@@ -1316,7 +1316,7 @@ public final class ColonyPanel extends PortPanel
             super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
 
             setLayout(new MigLayout("wrap 3, fill, insets 0"));
-            setBorder(Utility.localizedBorder("outsideColony"));
+            setBorder(Utility.localizedBorder("colonyPanel.outsideColony"));
         }
 
 
@@ -1448,7 +1448,7 @@ public final class ColonyPanel extends PortPanel
         public ColonyInPortPanel() {
             super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
 
-            setBorder(Utility.localizedBorder("inPort"));
+            setBorder(Utility.localizedBorder("colonyPanel.inPort"));
             setLayout(new MigLayout("wrap 3, fill, insets 0"));
         }
 
@@ -1838,7 +1838,7 @@ public final class ColonyPanel extends PortPanel
                 Building building = getBuilding();
                 NoAddReason reason = building.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    getGUI().showInformationMessage(building, reason.getKey());
+                    getGUI().showInformationMessage(building, reason.getDescriptionKey());
                     return false;
                 }
 
@@ -2155,7 +2155,7 @@ public final class ColonyPanel extends PortPanel
                         }
                         break;
                     default: // Otherwise, can not use land
-                        getGUI().showInformationMessage(tile, claim.getKey());
+                        getGUI().showInformationMessage(tile, claim.getNameKey());
                         return false;
                     }
                     // Check reason again, claim should be satisfied.
@@ -2167,7 +2167,7 @@ public final class ColonyPanel extends PortPanel
                 // Claim sorted, but complain about other failure.
                 NoAddReason reason = colonyTile.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    getGUI().showInformationMessage(colonyTile, reason.getKey());
+                    getGUI().showInformationMessage(colonyTile, reason.getDescriptionKey());
                     return false;
                 }
 

@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -221,6 +222,16 @@ public abstract class BuildableType extends FreeColGameObjectType {
     private void addLimit(Limit limit) {
         if (limits == null) limits = new ArrayList<>();
         limits.add(limit);
+    }
+
+    /**
+     * Get a label describing this buildable type as being currently built.
+     *
+     * @return A suitable label.
+     */
+    public StringTemplate getCurrentlyBuildingLabel() {
+        return StringTemplate.template("model.buildableType.currentlyBuilding")
+            .addNamed("%buildable%", this);
     }
 
 

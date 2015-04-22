@@ -113,7 +113,7 @@ public class WorkProductionPanel extends FreeColPanel {
 
         result = wl.getPotentialProduction(workType, unitType);
         if (result < 0.0f) {
-            add(Utility.localizedLabel("model.source.zeroThreshold.name"), "newline");
+            add(Utility.localizedLabel("workProductionPanel.zeroThreshold"), "newline");
             add(new JLabel(ModifierFormat.format(-result)), "wrap 30");
             result = 0.0f;
         }

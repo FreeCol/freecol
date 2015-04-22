@@ -226,21 +226,21 @@ public class TradeRoute extends FreeColGameObject
      */
     public StringTemplate verify() {
         if (owner == null) {
-            return StringTemplate.template("tradeRoute.nullOwner");
+            return StringTemplate.template("model.tradeRoute.nullOwner");
         }
 
         // Check that the name is unique
         for (TradeRoute route : owner.getTradeRoutes()) {
             if (route == this) continue;
             if (route.getName().equals(name)) {
-                return StringTemplate.template("tradeRoute.duplicateName")
+                return StringTemplate.template("model.tradeRoute.duplicateName")
                     .addName("%name%", name);
             }
         }
 
         // Verify that it has at least two stops
         if (stops.size() < 2) {
-            return StringTemplate.template("tradeRoute.notEnoughStops");
+            return StringTemplate.template("model.tradeRoute.notEnoughStops");
         }
 
         // Check:
@@ -256,9 +256,9 @@ public class TradeRoute extends FreeColGameObject
             if (!stop.getCargo().isEmpty()) empty = false;
             always.retainAll(stop.getCargo());
         }
-        if (empty) return StringTemplate.template("tradeRoute.allEmpty");
+        if (empty) return StringTemplate.template("model.tradeRoute.allEmpty");
         if (!always.isEmpty()) {
-            return StringTemplate.template("tradeRoute.alwaysPresent")
+            return StringTemplate.template("model.tradeRoute.alwaysPresent")
                 .addNamed("%goodsType%", always.iterator().next());
         }
         

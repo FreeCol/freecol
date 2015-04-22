@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -35,7 +36,11 @@ public class ColopediaAction extends FreeColAction {
     public static enum PanelType {
         TERRAIN, RESOURCES, UNITS, GOODS,
         SKILLS, BUILDINGS, FATHERS, NATIONS,
-        NATION_TYPES, CONCEPTS
+        NATION_TYPES, CONCEPTS;
+
+        public String getKey() {
+            return getEnumKey(this);
+        }
     }
 
     private static final int[] mnemonics = {
@@ -59,7 +64,7 @@ public class ColopediaAction extends FreeColAction {
      * @param panelType The <code>PanelType</code> to use.
      */
     public ColopediaAction(FreeColClient freeColClient, PanelType panelType) {
-        super(freeColClient, id + panelType);
+        super(freeColClient, id + panelType.getKey());
 
         setMnemonic(mnemonics[panelType.ordinal()]);
     }

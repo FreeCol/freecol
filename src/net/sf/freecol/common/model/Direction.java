@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.i18n.Messages;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
@@ -215,6 +216,16 @@ public enum Direction implements Named {
         return Direction.values()[(int)Math.floor(angle / (Math.PI/4))];
     }
 
+    /**
+     * Get a message key for this direction.
+     *
+     * @return A suitable message key.
+     */
+    public String getKey() {
+        return "direction." + this; // Deliberately retain upper case
+    }
+
+
     // Implement Named
 
     /**
@@ -222,6 +233,6 @@ public enum Direction implements Named {
      */
     @Override
     public String getNameKey() {
-        return "direction." + this; // Upper case
+        return Messages.nameKey("model." + getKey());
     }
 }

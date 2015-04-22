@@ -20,6 +20,7 @@
 package net.sf.freecol.common.util;
 
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -86,5 +87,36 @@ public class StringUtils {
         int last = (s == null) ? -1 : s.lastIndexOf(delim);
         return (last > 0) ? s.substring(last+delim.length(), s.length())
             : s;
+    }
+
+    /**
+     * Get the standard form an enum is used as a key.
+     *
+     * Convert to lower case, and remove underscores uppercasing the
+     * next letter.
+     *
+     * @param value The enum value.
+     * @return A suitable key.
+     */
+    public static String getEnumKey(Enum<?> value) {
+        final String base = value.toString().toLowerCase(Locale.US);
+        final int len = base.length();
+        StringBuilder sb = new StringBuilder(len);
+        int idx, from = 0;
+        for (;;) {
+            if ((idx = base.indexOf('_', from)) < 0) {
+                sb.append(base.substring(from));
+                break;
+            }
+            sb.append(base.substring(from, idx));
+            from = idx+1;
+            if (from >= len) break;
+            char ch = base.charAt(from);
+            if (Character.isLetter(ch)) {
+                sb.append(Character.toUpperCase(ch));
+                from++;
+            }
+        }
+        return sb.toString();
     }
 }

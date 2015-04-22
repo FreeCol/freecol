@@ -216,12 +216,12 @@ public class MapGeneratorTest extends FreeColTestCase {
         gen.createMap(new LogBuilder(-1));
 
         Map map = game.getMap();
-        Region pacific = map.getRegion("model.region.pacific");
+        Region pacific = map.getRegion("model.region.pacific.name");
         assertNotNull(pacific);
         assertTrue(pacific.isPacific());
         assertEquals(pacific, pacific.getDiscoverableRegion());
 
-        Region southPacific = map.getRegion("model.region.southPacific");
+        Region southPacific = map.getRegion("model.region.southPacific.name");
         assertNotNull(southPacific);
         assertFalse(southPacific.isDiscoverable());
         assertTrue(southPacific.isPacific());
@@ -239,13 +239,13 @@ public class MapGeneratorTest extends FreeColTestCase {
         assertEquals(pacific, southPacific.getParent());
         assertNull(southPacific.getDiscoverableRegion());
 
-        Region atlantic = map.getRegion("model.region.atlantic");
+        Region atlantic = map.getRegion("model.region.atlantic.name");
         assertNotNull(atlantic);
         assertFalse(atlantic.isPacific());
         assertFalse(atlantic.isDiscoverable());
         assertNull(atlantic.getDiscoverableRegion());
 
-        Region northAtlantic = map.getRegion("model.region.northAtlantic");
+        Region northAtlantic = map.getRegion("model.region.northAtlantic.name");
         assertNotNull(northAtlantic);
         assertFalse(northAtlantic.isPacific());
         assertFalse(northAtlantic.isDiscoverable());

@@ -130,7 +130,7 @@ public final class ReportTurnPanel extends ReportPanel {
             case ClientOptions.MESSAGES_GROUP_BY_TYPE:
                 if (message.getMessageType() != type) {
                     type = message.getMessageType();
-                    JLabel headline = Utility.localizedLabel(message.getMessageType().getKey());
+                    JLabel headline = Utility.localizedLabel(message.getMessageType());
                     headline.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
                         FontLibrary.FontSize.SMALL));
                     reportPanel.add(headline, "newline 20, skip, span");
@@ -186,7 +186,7 @@ public final class ReportTurnPanel extends ReportPanel {
             case WAREHOUSE_CAPACITY:
                 JButton ignoreButton = new JButton("x");
                 Utility.localizeToolTip(ignoreButton, 
-                    new StringTemplate("model.message.ignore", message));
+                    new StringTemplate("report.turn.ignore", message));
                 final ModelMessage m = message;
                 ignoreButton.addActionListener(new ActionListener() {
                         @Override
@@ -222,8 +222,8 @@ public final class ReportTurnPanel extends ReportPanel {
             if (filterOption != null) {
                 JButton filterButton = new JButton("X");
                 Utility.localizeToolTip(filterButton, StringTemplate
-                    .template("model.message.filter")
-                    .add("%type%", message.getMessageType().getKey()));
+                    .template("report.turn.filter")
+                    .addNamed("%type%", message.getMessageType()));
                 final ModelMessage m = message;
                 filterButton.addActionListener(new ActionListener() {
                         
@@ -268,7 +268,7 @@ public final class ReportTurnPanel extends ReportPanel {
         } else if (source instanceof Player) {
             Player player = (Player) source;
             headline = Utility.localizedLabel(StringTemplate
-                .template("playerNation")
+                .template("report.turn.playerNation")
                 .addName("%player%", player.getName())
                 .addStringTemplate("%nation%", player.getNationName()));
         } else if (source instanceof Europe) {

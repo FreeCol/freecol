@@ -56,7 +56,7 @@ public final class StatisticsPanel extends FreeColPanel {
     private static class StatisticsModel extends AbstractTableModel {
 
         private static final int NAME_COLUMN = 0, VALUE_COLUMN = 1;
-        private final String[] columnNames = { "Name", "Value" };
+        private final String[] columnNames = { "name", "value" };
 
         private Object data[][] = null;
 
@@ -99,7 +99,7 @@ public final class StatisticsPanel extends FreeColPanel {
          */
         @Override
         public String getColumnName(int column) {
-            return columnNames[column];
+            return Messages.message(columnNames[column]);
         }
 
         ///**
@@ -175,8 +175,8 @@ public final class StatisticsPanel extends FreeColPanel {
         scrollPane.setBorder(null);
 
         this.add(scrollPane,BorderLayout.CENTER);
-        statsPanel.add(displayStatsMessage("Client", clientStatistics));
-        statsPanel.add(displayStatsMessage("Server", serverStatistics));
+        statsPanel.add(displayStatsMessage("client", clientStatistics));
+        statsPanel.add(displayStatsMessage("server", serverStatistics));
 
         add(okButton, BorderLayout.SOUTH);
 
@@ -193,7 +193,7 @@ public final class StatisticsPanel extends FreeColPanel {
         Map<String, String> memory = new HashMap<>();
         Map<String, String> ai = new HashMap<>();
         for (String k : memoryKeys) {
-            memory.put(Messages.message("menuBar.debug.memoryManager." + k),
+            memory.put(Messages.message("memoryManager." + k),
                        stats.remove(k));
         }
         for (String k : new ArrayList<>(stats.keySet())) {

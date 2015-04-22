@@ -336,7 +336,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 if (marketAmount > 0) {
                     owner.addExtraTrade(new AbstractGoods(type, marketAmount));
                 }
-                StringTemplate st = StringTemplate.template("customs.saleData")
+                StringTemplate st = StringTemplate.template("model.colony.customs.saleData")
                     .addAmount("%amount%", amount)
                     .addNamed("%goods%", type)
                     .addAmount("%gold%", (owner.getGold() - oldGold));
@@ -346,7 +346,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 lb2.shrink(", ");
                 cs.addMessage(See.only(owner),
                     new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                                     "customs.sale", this)
+                                     "model.colony.customs.sale", this)
                         .addName("%colony%", getName())
                         .addName("%data%", lb2.toString()));
                 cs.addPartial(See.only(owner), owner, "gold");
@@ -371,7 +371,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 && !(type == spec.getPrimaryFoodType() && newUnitBorn)) {
                 cs.addMessage(See.only(owner),
                     new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
-                                     "model.building.warehouseEmpty",
+                                     "model.colony.warehouseEmpty",
                                      this, type)
                               .addNamed("%goods%", type)
                               .addAmount("%level%", low)
@@ -386,13 +386,13 @@ public class ServerColony extends Colony implements ServerModelObject {
                 // limit has been exceeded
                 waste = amount - limit;
                 container.removeGoods(type, waste);
-                messageId = "model.building.warehouseWaste";
+                messageId = "model.colony.warehouseWaste";
             } else if (amount == limit && oldAmount < limit) {
                 // limit has been reached during this turn
-                messageId = "model.building.warehouseOverfull";
+                messageId = "model.colony.warehouseOverfull";
             } else if (amount > high && oldAmount <= high) {
                 // high-water-mark has been reached this turn
-                messageId = "model.building.warehouseFull";
+                messageId = "model.colony.warehouseFull";
             }
             if (messageId != null) {
                 cs.addMessage(See.only(owner),
@@ -413,7 +413,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 if (loss > 0) {
                     cs.addMessage(See.only(owner),
                         new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
-                                         "model.building.warehouseSoonFull",
+                                         "model.colony.warehouseSoonFull",
                                          this, type)
                             .addNamed("%goods%", goods)
                             .addName("%colony%", getName())
@@ -465,8 +465,8 @@ public class ServerColony extends Colony implements ServerModelObject {
             cs.addMessage(See.only(owner),
                 new ModelMessage(ModelMessage.MessageType.SONS_OF_LIBERTY,
                                  (sonsOfLiberty > oldSonsOfLiberty)
-                                 ? "model.colony.SoLIncrease"
-                                 : "model.colony.SoLDecrease",
+                                 ? "model.colony.soLIncrease"
+                                 : "model.colony.soLDecrease",
                                  this, spec.getGoodsType("model.goods.bells"))
                     .addAmount("%oldSoL%", oldSonsOfLiberty)
                     .addAmount("%newSoL%", sonsOfLiberty)

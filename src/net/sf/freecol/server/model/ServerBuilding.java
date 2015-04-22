@@ -166,7 +166,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
             StringTemplate newName = student.getLabel();
             cs.addMessage(See.only(owner),
                 new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                                 "model.unit.unitEducated",
+                                 "model.building.unitEducated",
                                  getColony(), this)
                     .addStringTemplate("%oldName%", oldName)
                     .addStringTemplate("%unit%", newName)

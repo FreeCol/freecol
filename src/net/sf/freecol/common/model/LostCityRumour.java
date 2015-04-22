@@ -30,7 +30,10 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.util.RandomChoice;
+import static net.sf.freecol.common.util.StringUtils.*;
+import static net.sf.freecol.common.util.RandomUtils.*;
 
 
 /**
@@ -39,6 +42,12 @@ import net.sf.freecol.common.util.RandomChoice;
 public class LostCityRumour extends TileItem {
 
     private static final Logger logger = Logger.getLogger(LostCityRumour.class.getName());
+
+    // The bogus end of the world year.
+    private static final int MAYAN_PROPHESY_YEAR = 2012;
+
+    // How many `nothing' rumours are there.
+    private static int rumourNothing = -1;
 
     /**
      * The type of the rumour.  A RumourType, or null if the type has
@@ -65,7 +74,24 @@ public class LostCityRumour extends TileItem {
         MOUNDS,
         RUINS,
         CIBOLA,
-        FOUNTAIN_OF_YOUTH
+        FOUNTAIN_OF_YOUTH;
+
+        /**
+         * Get the stem key for this LCR type.
+         *
+         * @return The stem key.
+         */
+        private String getKey() {
+            return "lostCityRumour." + getEnumKey(this);
+        }
+
+        public String getDescriptionKey() {
+            return Messages.descriptionKey("model." + getKey());
+        }
+
+        public String getAlternateDescriptionKey(String variant) {
+            return Messages.descriptionKey("model." + getKey() + "." + variant);
+        }
     }
 
 
@@ -231,7 +257,40 @@ public class LostCityRumour extends TileItem {
                                               random);
     }
 
-
+    /**
+     * Get the message for a "nothing" rumour.
+     *
+     * @param player The <code>Player</code> to generate the message for.
+     * @param mounds Is this rumour a result of exploring "strange mounds"?
+     * @param random A pseudo-random number source.
+     * @return A suitable message.
+     */
+    public ModelMessage getNothingMessage(Player player, boolean mounds,
+                                          Random random) {
+        final Game game = getGame();
+        if (game.getTurn().getYear() % 100 == 12
+            && randomInt(logger, "Mayans?", random, 4) == 0) {
+            int years = MAYAN_PROPHESY_YEAR - game.getTurn().getYear();
+            return new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                    "model.lostCityRumour.nothing.mayans",
+                                    player)
+                .addAmount("%years%", years);
+        } else if (mounds) {
+            return new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                    "model.lostCityRumour.nothing.mounds",
+                                    player);
+        }
+        int i;
+        if (rumourNothing < 0) {
+            for (i = 0; Messages.containsKey("model.lostCityRumour.nothing." + i); i++);
+            rumourNothing = i;
+        }
+        i = randomInt(logger, "Nothing rumour", random, rumourNothing);
+        return new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                "model.lostCityRumour.nothing." + i,
+                                player);
+    }
+    
     // Interface Named
 
     /**
@@ -239,7 +298,7 @@ public class LostCityRumour extends TileItem {
      */
     @Override
     public String getNameKey() {
-        return Messages.nameKey("lostCityRumour");
+        return Messages.nameKey("model.lostCityRumour");
     }
 
 

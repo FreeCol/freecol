@@ -68,7 +68,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
      */
     public UnitDetailPanel(FreeColClient freeColClient,
                            ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.UNITS.toString());
+        super(freeColClient, colopediaPanel, PanelType.UNITS.getKey());
     }
 
 
@@ -90,8 +90,10 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
                 skills.add(u);
             }
         }
-        super.addSubTrees(root, "colopediaAction." + PanelType.UNITS, units);
-        super.addSubTrees(root, "colopediaAction." + PanelType.SKILLS, skills);
+        super.addSubTrees(root, "colopediaAction." + PanelType.UNITS.getKey(),
+                          units);
+        super.addSubTrees(root, "colopediaAction." + PanelType.SKILLS.getKey(),
+                          skills);
     }
 
     /**
@@ -102,7 +104,8 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        if (getId().equals(id) || ("colopediaAction." + PanelType.SKILLS).equals(id)) {
+        if (getId().equals(id)
+            || ("colopediaAction." + PanelType.SKILLS.getKey()).equals(id)) {
             return;
         }
 

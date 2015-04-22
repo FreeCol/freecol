@@ -67,11 +67,11 @@ public final class IndianSettlementPanel extends FreeColPanel {
         String text = Messages.message(settlement.getLocationLabelFor(player))
             + ", "
             + Messages.message(StringTemplate
-                .template(settlement.isCapital() ? "indianCapital"
-                    : "indianSettlement")
+                .template(settlement.isCapital()
+                    ? "indianSettlementPanel.indianCapital"
+                    : "indianSettlementPanel.indianSettlement")
                 .addStringTemplate("%nation%", indian.getNationName()));
-        String messageId = settlement.getShortAlarmLevelMessageId(player);
-        text += " (" + Messages.message(messageId);
+        text += " (" + settlement.getAlarmLevelMessage(player);
         if (settlement.worthScouting(player)) {
             text += "," + ResourceManager.getString("unscoutedIndianSettlement");
         }
@@ -86,7 +86,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 JLabel.CENTER));
         }
 
-        add(Utility.localizedLabel("indianSettlement.learnableSkill"), "newline");
+        add(Utility.localizedLabel("indianSettlementPanel.learnableSkill"), "newline");
         final UnitType skillType = settlement.getLearnableSkill();
         add(Utility.localizedLabel(settlement.getLearnableSkillLabel(visited),
                 ((visited && skillType != null)
@@ -94,7 +94,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                     : null),
                 JLabel.CENTER));
 
-        add(Utility.localizedLabel("indianSettlement.mostHated"), "newline");
+        add(Utility.localizedLabel("indianSettlementPanel.mostHated"), "newline");
         final Player mostHated = settlement.getMostHated();
         add(Utility.localizedLabel(settlement.getMostHatedLabel(contacted),
                 ((contacted && mostHated != null)
@@ -104,13 +104,13 @@ public final class IndianSettlementPanel extends FreeColPanel {
 
         GoodsType[] wantedGoods = settlement.getWantedGoods();
         final int n = (visited) ? settlement.getWantedGoodsAmount() : 2;
-        add(Utility.localizedLabel("indianSettlement.highlyWanted"), "newline");
+        add(Utility.localizedLabel("indianSettlementPanel.highlyWanted"), "newline");
         add(Utility.localizedLabel(settlement.getWantedGoodsLabel(0, player),
                 ((visited && wantedGoods[0] != null)
                     ? new ImageIcon(lib.getImage(wantedGoods[0]))
                     : null),
                 JLabel.CENTER));
-        add(Utility.localizedLabel("indianSettlement.otherWanted"), "newline");
+        add(Utility.localizedLabel("indianSettlementPanel.otherWanted"), "newline");
         String x = "split " + Integer.toString(n-1);
         for (int i = 1; i < n; i++) {
             add(Utility.localizedLabel(settlement.getWantedGoodsLabel(i, player),

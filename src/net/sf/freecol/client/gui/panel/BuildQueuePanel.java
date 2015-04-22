@@ -590,7 +590,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         this.constructionPanel
             = new ConstructionPanel(freeColClient, this.colony, false);
         this.constructionPanel.setDefaultLabel(StringTemplate
-            .template("colonyPanel.currentlyBuilding")
+            .template("buildQueuePanel.currentlyBuilding")
             .add("%buildable%", "nothing"));
 
         this.buildQueueList = new JList<>(current);
@@ -623,17 +623,17 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             .put(KeyStroke.getKeyStroke("ENTER"), "add");
         this.buildingList.getActionMap().put("add", addAction);
 
-        this.buyBuildable = Utility.localizedButton("colonyPanel.buyBuilding");
+        this.buyBuildable = Utility.localizedButton("buildQueuePanel.buyBuilding");
         this.buyBuildable.setActionCommand(BUY);
         this.buyBuildable.addActionListener(this);
 
         this.compactBox
-            = new JCheckBox(Messages.message("colonyPanel.compactView"));
+            = new JCheckBox(Messages.message("buildQueuePanel.compactView"));
         this.compactBox.addItemListener(this);
         this.compactBox.setSelected(defaultCompact);
 
         this.showAllBox
-            = new JCheckBox(Messages.message("colonyPanel.showAll"));
+            = new JCheckBox(Messages.message("buildQueuePanel.showAll"));
         this.showAllBox.addItemListener(this);
         this.showAllBox.setSelected(defaultShowAll);
 
@@ -642,9 +642,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
         // Add all the components
         add(header, "span 3, align center, wrap 40");
-        add(Utility.localizedLabel("colonyPanel.units"), "align center");
-        add(Utility.localizedLabel("colonyPanel.buildQueue"), "align center");
-        add(Utility.localizedLabel("colonyPanel.buildings"), "align center");
+        add(Utility.localizedLabel("buildQueuePanel.units"), "align center");
+        add(Utility.localizedLabel("buildQueuePanel.buildQueue"), "align center");
+        add(Utility.localizedLabel("buildQueuePanel.buildings"), "align center");
         add(new JScrollPane(this.unitList), "grow");
         add(this.constructionPanel, "split 2, flowy");
         add(new JScrollPane(this.buildQueueList), "grow");
@@ -703,7 +703,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             }
 
             if (unitType.getRequiredPopulation() > this.colony.getUnitCount()) {
-                tmpl = StringTemplate.template("colonyPanel.populationTooSmall")
+                tmpl = StringTemplate.template("buildQueuePanel.populationTooSmall")
                     .addAmount("%number%", unitType.getRequiredPopulation());
                 lockReason.add(Messages.message(tmpl));
             }
@@ -759,7 +759,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             if (lockReason.isEmpty()) {
                 lockReasons.put(unitType, null);
             } else {
-                tmpl = StringTemplate.template("colonyPanel.requires")
+                tmpl = StringTemplate.template("buildQueuePanel.requires")
                     .addName("%string%", join("/", lockReason));
                 lockReasons.put(unitType, Messages.message(tmpl));
             }
@@ -798,12 +798,12 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
             if (buildingType.hasAbility(Ability.COASTAL_ONLY)
                 && !this.colony.getTile().isCoastland()) {
-                tmpl = StringTemplate.template("colonyPanel.coastalOnly");
+                tmpl = StringTemplate.template("buildQueuePanel.coastalOnly");
                 lockReason.add(Messages.message(tmpl));
             }
                                                 
             if (buildingType.getRequiredPopulation() > this.colony.getUnitCount()) {
-                tmpl = StringTemplate.template("colonyPanel.populationTooSmall")
+                tmpl = StringTemplate.template("buildQueuePanel.populationTooSmall")
                     .addAmount("%number%", buildingType.getRequiredPopulation());
                 lockReason.add(Messages.message(tmpl));
             }
@@ -843,7 +843,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             if (lockReason.isEmpty()) {
                 lockReasons.put(buildingType, null);
             } else {
-                tmpl = StringTemplate.template("colonyPanel.requires")
+                tmpl = StringTemplate.template("buildQueuePanel.requires")
                     .addName("%string%", join("/", lockReason));
                 lockReasons.put(buildingType, Messages.message(tmpl));
             }

@@ -736,9 +736,9 @@ public class DebugUtils {
             toEurope.clear();
             toAmerica.clear();
             units.clear();
-            units.put(Messages.message("goingToEurope"), toEurope);
+            units.put(Messages.message("sailingToEurope"), toEurope);
             units.put(Messages.getName(p.getEurope()), inEurope);
-            units.put(Messages.message("goingToAmerica"), toAmerica);
+            units.put(Messages.message("sailingToAmerica"), toAmerica);
             lb.add("\n==", Messages.message(p.getNationName()), "==\n");
 
             for (Unit u : p.getEurope().getUnitList()) {
@@ -1108,7 +1108,7 @@ public class DebugUtils {
                    " ", ((tension == null) ? "(none)"
                        : Integer.toString(tension.getValue())),
                    ((mostHated == p) ? " (most hated)" : ""),
-                   " ", Messages.message(sis.getShortAlarmLevelMessageId(p)),
+                   " ", sis.getAlarmLevelMessage(p),
                    " ", sis.getContactLevel(p), "\n");
         }
 

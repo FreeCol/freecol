@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.MapGeneratorOptions;
@@ -221,7 +222,7 @@ public final class MapEditorController {
                         SwingUtilities.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    gui.showErrorMessage("couldNotSaveGame");
+                                    gui.showErrorMessage(FreeCol.badSave(file));
                                 }
                             });
                     }
@@ -266,16 +267,16 @@ public final class MapEditorController {
         freeColClient.setMapEditor(true);
 
         class ErrorJob implements Runnable {
-            private final String message;
+            private final StringTemplate template;
 
-            ErrorJob(String message) {
-                this.message = message;
+            ErrorJob(StringTemplate template) {
+                this.template = template;
             }
 
             @Override
             public void run() {
                 gui.closeMenus();
-                gui.showErrorMessage(message);
+                gui.showErrorMessage(template);
             }
         }
 
@@ -304,16 +305,16 @@ public final class MapEditorController {
                             });
                     } catch (FreeColException e) {
                         reloadMainPanel();
-                        SwingUtilities.invokeLater(new ErrorJob(e.getMessage()));
+                        SwingUtilities.invokeLater(new ErrorJob(StringTemplate.name(e.getMessage())));
                     } catch (FileNotFoundException e) {
                         reloadMainPanel();
-                        SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
+                        SwingUtilities.invokeLater(new ErrorJob(StringTemplate.key("server.fileNotFound")));
                     } catch (IOException e) {
                         reloadMainPanel();
-                        SwingUtilities.invokeLater(new ErrorJob("server.initialize"));
+                        SwingUtilities.invokeLater(new ErrorJob(StringTemplate.key("server.initialize")));
                     } catch (XMLStreamException e) {
                         reloadMainPanel();
-                        SwingUtilities.invokeLater(new ErrorJob("couldNotLoadGame"));
+                        SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(theFile)));
                     }
                 }
             };

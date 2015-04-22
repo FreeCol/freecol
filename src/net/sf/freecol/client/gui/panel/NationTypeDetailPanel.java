@@ -53,7 +53,8 @@ import static net.sf.freecol.common.util.StringUtils.*;
 /**
  * This panel displays details of nations in the Colopedia.
  */
-public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationType> {
+public class NationTypeDetailPanel
+    extends ColopediaGameObjectTypePanel<NationType> {
 
     /**
      * Creates a new instance of this ColopediaDetailPanel.
@@ -63,7 +64,7 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
      */
     public NationTypeDetailPanel(FreeColClient freeColClient,
                                  ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.NATION_TYPES.toString());
+        super(freeColClient, colopediaPanel, PanelType.NATION_TYPES.getKey());
     }
 
 
@@ -188,12 +189,12 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
             FontLibrary.FontSize.SMALL));
         panel.add(name, "span, align center, wrap 40");
 
-        panel.add(Utility.localizedLabel("colopedia.nationType.aggression"));
-        panel.add(Utility.localizedLabel("colopedia.nationType.aggression."
+        panel.add(Utility.localizedLabel("colopedia.nationType.aggressionLevel"));
+        panel.add(Utility.localizedLabel("colopedia.nationType."
                 + nationType.getAggression().getKey()));
 
-        panel.add(Utility.localizedLabel("colopedia.nationType.numberOfSettlements"));
-        panel.add(Utility.localizedLabel("colopedia.nationType.numberOfSettlements."
+        panel.add(Utility.localizedLabel("colopedia.nationType.settlementNumber"));
+        panel.add(Utility.localizedLabel("colopedia.nationType."
                 + nationType.getNumberOfSettlements().getKey()));
 
         panel.add(Utility.localizedLabel("colopedia.nationType.typeOfSettlements"));

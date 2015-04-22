@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Player;
@@ -45,7 +46,8 @@ public class InciteTradeItem extends TradeItem {
      */
     public InciteTradeItem(Game game, Player source, Player destination,
                            Player victim) {
-        super(game, "tradeItem.incite", source, destination);
+        super(game, Messages.nameKey("model.tradeItem.incite"),
+              source, destination);
 
         this.victim = victim;
     }
@@ -86,7 +88,7 @@ public class InciteTradeItem extends TradeItem {
      */
     @Override
     public StringTemplate getLabel() {
-        return StringTemplate.template("inciteTradeItem.description")
+        return StringTemplate.template(Messages.descriptionKey("model.tradeItem.incite"))
             .addStringTemplate("%nation%", victim.getNationName());
     }
 

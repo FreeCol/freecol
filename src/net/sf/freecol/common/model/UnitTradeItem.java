@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
@@ -44,7 +45,8 @@ public class UnitTradeItem extends TradeItem {
      */
     public UnitTradeItem(Game game, Player source, Player destination,
                          Unit unit) {
-        super(game, "tradeItem.unit", source, destination);
+        super(game, Messages.nameKey("model.tradeItem.unit"),
+              source, destination);
 
         this.unit = unit;
     }

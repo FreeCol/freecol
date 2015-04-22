@@ -145,7 +145,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.addSeparator();
         ButtonGroup tileTextGroup = new ButtonGroup();
         for (DisplayText type : DisplayText.values()) {
-            menu.add(getRadioButtonMenuItem(DisplayTileTextAction.id + type,
+            menu.add(getRadioButtonMenuItem(DisplayTileTextAction.id + type.getKey(),
                                             tileTextGroup));
         }
 

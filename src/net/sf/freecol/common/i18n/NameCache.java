@@ -50,7 +50,8 @@ public class NameCache {
 
     private static final Logger logger = Logger.getLogger(NameCache.class.getName());
 
-    private final static String CIBOLA_PREFIX = "lostCityRumour.cityName.";
+    private final static String CIBOLA_PREFIX
+        = "nameCache.lostCityRumour.cityName.";
     
     /** Cities of Cibola. */
     private static List<String> cibolaKeys = null;
@@ -113,7 +114,7 @@ public class NameCache {
         synchronized (cibolaLock) {
             if (cibolaKeys == null) {
                 cibolaKeys = new ArrayList<>();
-                collectNames("lostCityRumour.cityName.", cibolaKeys);
+                collectNames(CIBOLA_PREFIX, cibolaKeys);
                 int count = cibolaKeys.size();
                 // Actually, store the keys.
                 cibolaKeys.clear();
@@ -132,7 +133,7 @@ public class NameCache {
         synchronized (mercenaryLock) {
             if (mercenaryLeaders == null) {
                 mercenaryLeaders = new ArrayList<>();
-                collectNames("model.mercenaries.", mercenaryLeaders);
+                collectNames("nameCache.mercenaries.", mercenaryLeaders);
             }
         }
     }
@@ -396,8 +397,9 @@ public class NameCache {
      * @return A unique fallback settlement name for the player.
      */
     private static String getFallbackSettlementName(Player player) {
-        return Messages.message((player.isEuropean()) ? "Colony"
-            : "Settlement") + "-";
+        return Messages.message((player.isEuropean())
+            ? "nameCache.base.colony"
+            : "nameCache.base.settlement") + "-";
     }
 
     /**
@@ -463,7 +465,7 @@ public class NameCache {
      * @return A new trade route name.
      */
     public static String getTradeRouteName(Player player) {
-        String base = Messages.message("tradeRoute.newRoute");
+        String base = Messages.message("nameCache.base.tradeRoute");
         if (player.getTradeRoute(base) == null) return base;
         String name;
         int i = 1;
@@ -498,7 +500,7 @@ public class NameCache {
         }
 
         // Get a fallback ship name
-        final String base = Messages.message("Ship") + "-";
+        final String base = Messages.message("nameCache.base.ship") + "-";
         int i = 1;
         while (player.getUnit(name = base + i++) != null);
         return name;

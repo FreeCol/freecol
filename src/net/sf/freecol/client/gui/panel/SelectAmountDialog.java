@@ -70,8 +70,7 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
             available = Math.min(available, gold/price);
         }
 
-        JTextArea question
-            = Utility.getDefaultTextArea(Messages.message("goodsTransfer.text"));
+        JTextArea question = Utility.getDefaultTextArea(Messages.message("selectAmountDialog.text"));
 
         int defaultIndex = -1;
         List<Integer> values = new ArrayList<>();

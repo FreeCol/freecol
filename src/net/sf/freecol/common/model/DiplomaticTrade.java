@@ -22,13 +22,13 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Stance;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 import org.w3c.dom.Element;
 
@@ -52,7 +52,7 @@ public class DiplomaticTrade extends FreeColObject {
          * @return A message key.
          */
         public String getKey() {
-            return this.toString().toLowerCase(Locale.US);
+            return getEnumKey(this);
         }
     }
 
@@ -204,12 +204,25 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A <code>StringTemplate</code> for the message.
      */
     public StringTemplate getSendMessage(Player player, Settlement settlement) {
-        return StringTemplate.template("negotiationDialog.send."
+        return StringTemplate.template("model.diplomaticTrade.send."
             + getContext().getKey())
             .addStringTemplate("%nation%",
                 settlement.getOwner().getNationName())
             .addStringTemplate("%settlement%",
                 settlement.getLocationLabelFor(player));
+    }
+
+    /**
+     * Handy utility to get the message associated with sending this
+     * agreement from a player to a settlement owner.
+     *
+     * @param player The <code>Player</code> the offer came from.
+     * @return A <code>StringTemplate</code> for the message.
+     */
+    public StringTemplate getReceiveMessage(Player player) {
+        return StringTemplate.template("model.diplomaticTrade.receive."
+            + getContext().getKey())
+            .addStringTemplate("%nation%", player.getNationName());
     }
 
     /**

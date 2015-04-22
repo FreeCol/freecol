@@ -22,13 +22,14 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 import org.w3c.dom.Element;
 
@@ -111,8 +112,17 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
          *
          * @return A message key.
          */
-        public String getKey() {
-            return "noAddReason." + toString().toLowerCase(Locale.US);
+        private String getKey() {
+            return "noAddReason." + getEnumKey(this);
+        }
+
+        /**
+         * Get the description key.
+         *
+         * @return The description key.
+         */
+        public String getDescriptionKey() {
+            return Messages.descriptionKey("model." + getKey());
         }
     }
 

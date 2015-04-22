@@ -907,7 +907,7 @@ public final class InGameController extends Controller {
         independent.setTax(0);
         independent.reinitialiseMarket();
         HistoryEvent h = new HistoryEvent(turn,
-            HistoryEvent.EventType.INDEPENDENCE, independent);
+            HistoryEvent.HistoryEventType.INDEPENDENCE, independent);
 
         // The score for actual independence is actually a percentage
         // bonus depending on how many other nations are independent.
@@ -925,7 +925,7 @@ public final class InGameController extends Controller {
         cs.addGlobalHistory(game, h);
         cs.addMessage(See.only(independent),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                "model.player.independence", independent)
+                "giveIndependence.announce", independent)
             .addStringTemplate("%ref%", serverPlayer.getNationName()));
 
         // Who surrenders?
@@ -943,7 +943,7 @@ public final class InGameController extends Controller {
         if (!surrenderUnits.isEmpty()) {
             cs.addMessage(See.only(independent),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                    "model.player.independence.unitsAcquired", independent)
+                    "giveIndependence.unitsAcquired", independent)
                 .addStringTemplate("%units%",
                     unitTemplate(", ", surrenderUnits)));
             independent.invalidateCanSeeTiles();//+vis(independent)
@@ -955,7 +955,7 @@ public final class InGameController extends Controller {
         cs.addPartial(See.all().except(independent), independent, "playerType");
         cs.addMessage(See.all().except(independent),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                "model.player.independence.announce", independent)
+                "giveIndependence.otherAnnounce", independent)
                 .addStringTemplate("%nation%", independent.getNationName())
                 .addStringTemplate("%ref%", serverPlayer.getNationName()));
         cs.add(See.only(independent), independent);
@@ -1014,7 +1014,7 @@ public final class InGameController extends Controller {
         final Specification spec = game.getSpecification();
         boolean valid = monarch.actionIsValid(action);
         if (!valid) return;
-        String messageId = action.getKey();
+        String messageId = action.getTextKey();
         StringTemplate template;
         MonarchActionMessage message;
         String monarchKey = serverPlayer.getMonarchKey();
@@ -1237,11 +1237,11 @@ public final class InGameController extends Controller {
             // Charge transport fee and apply tax
             cashInAmount = (fullAmount - unit.getTransportFee())
                 * (100 - serverPlayer.getTax()) / 100;
-            messageId = "model.unit.cashInTreasureTrain.colonial";
+            messageId = "cashInTreasureTrain.colonial";
         } else {
             // No fee possible, no tax applies.
             cashInAmount = fullAmount;
-            messageId = "model.unit.cashInTreasureTrain.independent";
+            messageId = "cashInTreasureTrain.independent";
         }
 
         serverPlayer.modifyGold(cashInAmount);
@@ -1252,8 +1252,8 @@ public final class InGameController extends Controller {
                 .addAmount("%cashInAmount%", cashInAmount));
         messageId = (serverPlayer.isRebel()
                      || serverPlayer.getPlayerType() == PlayerType.INDEPENDENT)
-            ? "model.unit.cashInTreasureTrain.other.independent"
-            : "model.unit.cashInTreasureTrain.other.colonial";
+            ? "cashInTreasureTrain.otherIndependent"
+            : "cashInTreasureTrain.otherColonial";
         cs.addMessage(See.all().except(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              messageId, serverPlayer)
@@ -1293,7 +1293,7 @@ public final class InGameController extends Controller {
         // entire player.  Likewise clear model messages.
         Turn turn = getGame().getTurn();
         HistoryEvent h = new HistoryEvent(turn,
-            HistoryEvent.EventType.DECLARE_INDEPENDENCE, serverPlayer);
+            HistoryEvent.HistoryEventType.DECLARE_INDEPENDENCE, serverPlayer);
         h.setScore(Math.max(0, Turn.yearToTurn(SCORE_INDEPENDENCE_YEAR,
                                                SCORE_INDEPENDENCE_SEASON)
                 - turn.getNumber()));
@@ -1301,7 +1301,7 @@ public final class InGameController extends Controller {
         serverPlayer.clearModelMessages();
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                "warOfIndependence.independenceDeclared", serverPlayer));
+                "declareIndependence.resolution", serverPlayer));
 
         // Dispose of units in or heading to Europe.
         Europe europe = serverPlayer.getEurope();
@@ -1324,7 +1324,7 @@ public final class InGameController extends Controller {
         if (lost) {
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                 "model.player.independence.unitsSeized",
+                                 "declareIndependence.unitsSeized",
                                  serverPlayer)
                     .addStringTemplate("%units%", seized));
         }
@@ -1371,7 +1371,7 @@ public final class InGameController extends Controller {
                 }
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                        "model.player.continentalArmyMuster",
+                        "declareIndpendence.continentalArmyMuster",
                         serverPlayer, colony)
                     .addName("%colony%", colony.getName())
                     .addAmount("%number%", n)
@@ -1755,7 +1755,7 @@ public final class InGameController extends Controller {
         cs.addPartial(See.only(serverPlayer), serverPlayer, "newLandName");
         Turn turn = serverPlayer.getGame().getTurn();
         HistoryEvent h = new HistoryEvent(turn,
-            HistoryEvent.EventType.DISCOVER_NEW_WORLD, serverPlayer)
+            HistoryEvent.HistoryEventType.DISCOVER_NEW_WORLD, serverPlayer)
                 .addName("%name%", name);
         cs.addHistory(serverPlayer, h);
 
@@ -2360,10 +2360,10 @@ public final class InGameController extends Controller {
 
         // Add the descriptive message.
         final StringTemplate nation = settlement.getOwner().getNationName();
-        final String messageId = "indianSettlement.mission." + tension.getKey();
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                             messageId, serverPlayer, unit)
+                             "indianSettlement.mission." + tension.getKey(),
+                             serverPlayer, unit)
                 .addStringTemplate("%nation%", nation));
 
         // Others can see missionary disappear and settlement acquire
@@ -2642,7 +2642,7 @@ public final class InGameController extends Controller {
 
         // Inform the receiver of the gift.
         ModelMessage m = new ModelMessage(ModelMessage.MessageType.GIFT_GOODS,
-                                          "model.unit.gift",
+                                          "deliverGift.goods",
                                           settlement, goods.getType())
             .addStringTemplate("%player%", serverPlayer.getNationName())
             .addNamed("%type%", goods)
@@ -2851,7 +2851,7 @@ public final class InGameController extends Controller {
                    serverPlayer.exploreForSettlement(settlement));
 
             cs.addHistory(serverPlayer, new HistoryEvent(game.getTurn(),
-                    HistoryEvent.EventType.FOUND_COLONY, serverPlayer)
+                    HistoryEvent.HistoryEventType.FOUND_COLONY, serverPlayer)
                 .addName("%colony%", settlement.getName()));
 
             // Remove equipment from founder in case role confuses
@@ -2962,7 +2962,7 @@ public final class InGameController extends Controller {
             serverPlayer.csLoseLocation(settlement, cs);
             cs.addHistory(serverPlayer,
                 new HistoryEvent(getGame().getTurn(),
-                    HistoryEvent.EventType.ABANDON_COLONY, serverPlayer)
+                    HistoryEvent.HistoryEventType.ABANDON_COLONY, serverPlayer)
                     .addName("%colony%", settlement.getName()));
         }
 

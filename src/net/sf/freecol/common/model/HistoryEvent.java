@@ -21,10 +21,12 @@ package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 import org.w3c.dom.Element;
 
@@ -34,7 +36,7 @@ import org.w3c.dom.Element;
  */
 public class HistoryEvent extends StringTemplate {
 
-    public static enum EventType {
+    public static enum HistoryEventType implements Named {
         DISCOVER_NEW_WORLD,
         DISCOVER_REGION,
         MEET_NATION,
@@ -55,7 +57,29 @@ public class HistoryEvent extends StringTemplate {
         DECLARE_WAR,
         CEASE_FIRE,
         MAKE_PEACE,
-        FORM_ALLIANCE
+        FORM_ALLIANCE;
+
+        /**
+         * Get the stem key.
+         *
+         * @return The stem key for this history event type.
+         */
+        private String getKey() {
+            return "historyEventType." + getEnumKey(this);
+        }
+
+        public String getDescriptionKey() {
+            return Messages.descriptionKey("model." + getKey());
+        }
+        
+        // Implement Named
+
+        /**
+         * {@inheritDoc}
+         */
+        public String getNameKey() {
+            return Messages.nameKey("model." + getKey());
+        }
     }
 
 
@@ -63,7 +87,7 @@ public class HistoryEvent extends StringTemplate {
     private Turn turn;
 
     /** The type of event. */
-    private EventType eventType;
+    private HistoryEventType eventType;
 
     /** Which player gets credit for the event, if any. */
     private String playerId;
@@ -80,8 +104,8 @@ public class HistoryEvent extends StringTemplate {
      * @param player An optional <code>Player</code> responsible for
      *     this event.
      */
-    public HistoryEvent(Turn turn, EventType eventType, Player player) {
-        super("model.history." + eventType, null, TemplateType.TEMPLATE);
+    public HistoryEvent(Turn turn, HistoryEventType eventType, Player player) {
+        super(eventType.getDescriptionKey(), null, TemplateType.TEMPLATE);
         this.turn = turn;
         this.eventType = eventType;
         this.playerId = (player == null) ? null : player.getId();
@@ -122,7 +146,7 @@ public class HistoryEvent extends StringTemplate {
      *
      * @return The event type.
      */
-    public final EventType getEventType() {
+    public final HistoryEventType getEventType() {
         return eventType;
     }
 
@@ -132,16 +156,16 @@ public class HistoryEvent extends StringTemplate {
      * @param stance The new <code>Stance</code>.
      * @return The corresponding event type.
      */
-    public static final EventType getEventTypeFromStance(Stance stance) {
+    public static final HistoryEventType getEventTypeFromStance(Stance stance) {
         switch (stance) {
         case WAR:
-            return EventType.DECLARE_WAR;
+            return HistoryEventType.DECLARE_WAR;
         case CEASE_FIRE:
-            return EventType.CEASE_FIRE;
+            return HistoryEventType.CEASE_FIRE;
         case PEACE:
-            return EventType.MAKE_PEACE;
+            return HistoryEventType.MAKE_PEACE;
         case ALLIANCE:
-            return EventType.FORM_ALLIANCE;
+            return HistoryEventType.FORM_ALLIANCE;
         default:
             break;
         }
@@ -280,7 +304,7 @@ public class HistoryEvent extends StringTemplate {
         turn = new Turn(xr.getAttribute(TURN_TAG, 0));
 
         eventType = xr.getAttribute(EVENT_TYPE_TAG,
-                                    EventType.class, (EventType)null);
+                                    HistoryEventType.class, (HistoryEventType)null);
 
         playerId = xr.getAttribute(PLAYER_ID_TAG, (String)null);
 

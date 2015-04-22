@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Role;
@@ -103,7 +104,7 @@ public class MessagesTest extends FreeColTestCase {
 
     public void testMessageString() {
         assertTrue("Press enter in order to end the turn."
-            .equals(Messages.message("infoPanel.endTurnPanel.text")));
+            .equals(Messages.message("infoPanel.endTurn")));
         assertTrue("Trade Advisor"
             .equals(Messages.message("reportTradeAction.name")));
 
@@ -133,26 +134,27 @@ public class MessagesTest extends FreeColTestCase {
     }
 
     // Tests if messages with special chars (like $) are well processed
-    public void testMessageWithSpecialChars(){
-        String errMsg = "Error setting up test.";
-        String expected = "You establish the colony of %colony%.";
-        String message = Messages.message("model.history.FOUND_COLONY");
-        assertTrue(errMsg, expected.equals(message));
-
-        String colNameWithSpecialChars="$specialColName\\";
-        errMsg = "Wrong message";
-        expected = "You establish the colony of $specialColName\\.";
+    public void testMessageWithSpecialChars() {
+        final String key = HistoryEvent.HistoryEventType.FOUND_COLONY.getDescriptionKey();
         try {
-            message = Messages.message(StringTemplate
-                .template("model.history.FOUND_COLONY")
-                .addName("%colony%", colNameWithSpecialChars));
+            assertEquals("You establish the colony of %colony%.",
+                         Messages.message(key));
+        } catch (Exception e) {
+            fail("Message fail");
+            throw e;
+        }
+        final String colNameWithSpecialChars="$specialColName\\";
+        try {
+            assertEquals("You establish the colony of $specialColName\\.",
+                         Messages.message(StringTemplate
+                             .template(key)
+                             .addName("%colony%", colNameWithSpecialChars)));
         } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("Illegal group reference")){
+            if (e.getMessage().contains("Illegal group reference")) {
                 fail("Does not process messages with special chars");
             }
             throw e;
         }
-        assertTrue(errMsg, expected.equals(message));
     }
 
     public void testStringTemplates() {
@@ -176,7 +178,7 @@ public class MessagesTest extends FreeColTestCase {
                      t1.getReplacements().get(0).getTemplateType());
         assertEquals(StringTemplate.TemplateType.NAME,
                      t1.getReplacements().get(1).getTemplateType());
-        assertTrue("model.goods.goodsAmount"
+        assertTrue("model.abstractGoods.label"
             .equals(t1.getId()));
         assertTrue("100 Food"
             .equals(Messages.message(t1)));
@@ -192,7 +194,7 @@ public class MessagesTest extends FreeColTestCase {
         assertTrue("New Amsterdam"
             .equals(colony.getName()));
 
-        StringTemplate t3 = StringTemplate.template("inLocation")
+        StringTemplate t3 = StringTemplate.template("model.building.locationLabel")
             .addName("%location%", colony.getName());
         assertTrue("In New Amsterdam"
             .equals(Messages.message(t3)));
@@ -252,29 +254,27 @@ public class MessagesTest extends FreeColTestCase {
     }
 
     public void testReplaceArbitraryTag() {
-        StringTemplate template = StringTemplate.template("tutorial.startGame")
+        final String testKey = "model.player.startGame";
+        StringTemplate template = StringTemplate.template(testKey)
             .add("%direction%", "east");
         String expected = "After months at sea, you have finally arrived off the "
             + "coast of an unknown continent. Sail eastward in order to discover "
             + "the New World and to claim it for the Crown.";
-        assertTrue(expected
-            .equals(Messages.message(template)));
+        assertTrue(expected.equals(Messages.message(template)));
 
-        template = StringTemplate.template("tutorial.startGame")
+        template = StringTemplate.template(testKey)
             .add("%direction%", "west");
         expected = "After months at sea, you have finally arrived off the "
             + "coast of an unknown continent. Sail westward in order to discover "
             + "the New World and to claim it for the Crown.";
-        assertTrue(expected
-            .equals(Messages.message(template)));
+        assertTrue(expected.equals(Messages.message(template)));
 
-        template = StringTemplate.template("tutorial.startGame")
+        template = StringTemplate.template(testKey)
             .add("%direction%", "whatever");
         expected = "After months at sea, you have finally arrived off the "
             + "coast of an unknown continent. Sail into the wind in order to discover "
             + "the New World and to claim it for the Crown.";
-        assertTrue(expected
-            .equals(Messages.message(template)));
+        assertTrue(expected.equals(Messages.message(template)));
     }
 
     public void testReplaceChoicesPlural() {
@@ -411,7 +411,7 @@ public class MessagesTest extends FreeColTestCase {
 
     public void testREFMessages() {
         StringTemplate template = StringTemplate
-            .template(Monarch.MonarchAction.ADD_TO_REF.getKey())
+            .template(Monarch.MonarchAction.ADD_TO_REF.getTextKey())
             .addAmount("%number%", 1)
             .addNamed("%unit%", kingsRegular);
         String expected = "The Crown has added 1 King's Regular"
@@ -420,7 +420,7 @@ public class MessagesTest extends FreeColTestCase {
         assertTrue(expected.equals(Messages.message(template)));
 
         template = StringTemplate
-            .template(Monarch.MonarchAction.ADD_TO_REF.getKey())
+            .template(Monarch.MonarchAction.ADD_TO_REF.getTextKey())
             .addAmount("%number%", 2)
             .addNamed("%unit%", artillery);
         expected = "The Crown has added 2 Pieces of Artillery"
@@ -429,7 +429,7 @@ public class MessagesTest extends FreeColTestCase {
         assertTrue(expected.equals(Messages.message(template)));
 
         template = StringTemplate
-            .template(Monarch.MonarchAction.ADD_TO_REF.getKey())
+            .template(Monarch.MonarchAction.ADD_TO_REF.getTextKey())
             .addAmount("%number%", 3)
             .addNamed("%unit%", manOWar);
         expected = "The Crown has added 3 Men of War"

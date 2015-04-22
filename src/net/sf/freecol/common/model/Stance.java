@@ -19,11 +19,11 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Locale;
-
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Tension;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -143,12 +143,12 @@ public enum Stance implements Named {
     }
 
     /**
-     * Gets a key for this stance.
+     * Get the stem key.
      *
-     * @return The stance key.
+     * @return The stance stem key.
      */
     public String getKey() {
-        return toString().toLowerCase(Locale.US);
+        return "stance." + getEnumKey(this);
     }
 
     // Implement Named
@@ -157,6 +157,6 @@ public enum Stance implements Named {
      * {@inheritDoc}
      */
     public String getNameKey() {
-        return "model.stance." + getKey();
+        return Messages.nameKey("model." + getKey());
     }
 }

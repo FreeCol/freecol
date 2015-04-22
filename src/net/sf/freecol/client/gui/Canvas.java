@@ -1945,7 +1945,7 @@ public final class Canvas extends JDesktopPane {
                                                         directory, fileFilters),
                                          null);
             if (response == null || response.isFile()) break;
-            showErrorMessage("noSuchFile");
+            showErrorMessage("error.noSuchFile");
         }
         return response;
     }

@@ -56,7 +56,7 @@ public class TerrainDetailPanel
      */
     public TerrainDetailPanel(FreeColClient freeColClient,
                               ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.TERRAIN.toString());
+        super(freeColClient, colopediaPanel, PanelType.TERRAIN.getKey());
     }
 
 

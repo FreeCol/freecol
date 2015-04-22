@@ -93,11 +93,11 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
         panel.add(currentMixerLabel, BorderLayout.EAST);
         updateMixerLabel();
 
-        button1 = Utility.localizedButton("Test");
+        button1 = Utility.localizedButton("test");
         panel.add(button1);
         button1.addActionListener(aHandler);
 
-        button2 = Utility.localizedButton("Music");
+        button2 = Utility.localizedButton("music");
         panel.add(button2);
         button2.addActionListener(aHandler);
 

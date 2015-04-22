@@ -21,9 +21,11 @@ package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 import org.w3c.dom.Element;
 
@@ -34,7 +36,7 @@ import org.w3c.dom.Element;
 public class ModelMessage extends StringTemplate {
 
     /** Constants describing the type of message. */
-    public static enum MessageType {
+    public static enum MessageType implements Named {
 
         DEFAULT(""),
         WARNING("model.option.guiShowWarning"),
@@ -71,8 +73,17 @@ public class ModelMessage extends StringTemplate {
          *
          * @return A message key.
          */
-        public String getKey() {
-            return "model.message." + this; // Uppercase
+        private String getKey() {
+            return "messageType." + getEnumKey(this);
+        }
+
+        // Implement Named
+
+        /**
+         * {@inheritDoc}
+         */
+        public String getNameKey() {
+            return Messages.nameKey("model." + getKey());
         }
     }
 

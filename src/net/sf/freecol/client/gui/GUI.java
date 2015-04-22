@@ -575,13 +575,13 @@ public class GUI {
                     Language language = (Language)e.getNewValue();
                     logger.info("Set language to: " + language);
                     if (Messages.AUTOMATIC.equalsIgnoreCase(language.getKey())) {
-                        showInformationMessage("autodetectLanguageSelected");
+                        showInformationMessage("info.autodetectLanguageSelected");
                     } else {
                         Locale l = language.getLocale();
                         Messages.setMessageBundle(l);
                         Messages.setModMessageBundle(l);
                         showInformationMessage(StringTemplate
-                            .template("newLanguageSelected")
+                            .template("info.newLanguageSelected")
                             .addName("%language%", l.getDisplayName()));
                     }
                 }
@@ -1167,7 +1167,7 @@ public class GUI {
         TradeRoute tr = unit.getTradeRoute();
         if (tr == null) return true;
         StringTemplate template = StringTemplate
-            .template("traderoute.reassignRoute")
+            .template("clearTradeRoute.text")
             .addStringTemplate("%unit%",
                 unit.getLabel(Unit.UnitLabelType.NATIONAL))
             .addName("%route%", tr.getName());
@@ -1262,19 +1262,19 @@ public class GUI {
             logger.finest("Player at war, no confirmation needed");
             return true;
         case CEASE_FIRE:
-            messageId = "model.diplomacy.attack.ceaseFire";
+            messageId = "confirmHostile.ceaseFire";
             break;
         case ALLIANCE:
-            messageId = "model.diplomacy.attack.alliance";
+            messageId = "confirmHostile.alliance";
             break;
         case UNCONTACTED: case PEACE: default:
-            messageId = "model.diplomacy.attack.peace";
+            messageId = "confirmHostile.peace";
             break;
         }
         return confirm(true, attacker.getTile(), StringTemplate
             .template(messageId)
             .addStringTemplate("%nation%", enemy.getNationName()),
-            attacker, "model.diplomacy.attack.confirm", "cancel");
+            attacker, "confirmHostile.yes", "cancel");
     }
 
     /**
@@ -1392,7 +1392,7 @@ public class GUI {
             .addAmount("%amount%", arrears);
 
         List<ChoiceItem<BoycottAction>> choices = new ArrayList<>();
-        choices.add(new ChoiceItem<>(Messages.message("boycottedGoods.payArrears"),
+        choices.add(new ChoiceItem<>(Messages.message("payArrears"),
                 BoycottAction.PAY_ARREARS));
         choices.add(new ChoiceItem<>(Messages.message("boycottedGoods.dumpGoods"),
                 BoycottAction.DUMP_CARGO));
@@ -2139,7 +2139,7 @@ public class GUI {
     public File showLoadSaveFileDialog() {
         File file = showLoadDialog(FreeColDirectories.getSaveDirectory());
         if (file != null && !file.isFile()) {
-            showErrorMessage("noSuchFile");
+            showErrorMessage("error.noSuchFile");
             file = null;
         }
         return file;

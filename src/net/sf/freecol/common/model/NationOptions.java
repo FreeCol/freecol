@@ -30,6 +30,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -45,6 +46,19 @@ public class NationOptions extends FreeColObject {
         FIXED,
         SELECTABLE;
 
+        /**
+         * Get a message key for this Advantages.
+         *
+         * @return A message key.
+         */
+        private String getKey() {
+            return "advantages." + getEnumKey(this);
+        }
+
+        public final String getShortDescriptionKey() {
+            return Messages.shortDescriptionKey("model." + getKey());
+        }
+
         // Implement Named
 
         /**
@@ -52,7 +66,7 @@ public class NationOptions extends FreeColObject {
          */
         @Override
         public final String getNameKey() {
-            return Messages.nameKey("playerOptions." + this);
+            return Messages.nameKey("model." + getKey());
         }
     };
 
@@ -60,7 +74,7 @@ public class NationOptions extends FreeColObject {
      * Nations may be available to all players, to AI players only, or
      * to no players.
      */
-    public static enum NationState {
+    public static enum NationState implements Named {
         AVAILABLE,
         AI_ONLY,
         NOT_AVAILABLE;
@@ -70,8 +84,22 @@ public class NationOptions extends FreeColObject {
          *
          * @return A message key.
          */
-        public String getKey() {
-            return "nationState." + this.toString();
+        private String getKey() {
+            return "nationState." + getEnumKey(this);
+        }
+
+        public final String getShortDescriptionKey() {
+            return Messages.shortDescriptionKey("model." + getKey());
+        }
+
+        // Implement Named
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public final String getNameKey() {
+            return Messages.nameKey("model." + getKey());
         }
     }
 

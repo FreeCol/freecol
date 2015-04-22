@@ -34,7 +34,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,6 +63,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -91,12 +91,12 @@ public final class ImageLibrary {
         FOOT;
 
         /**
-         * Get a message key for this path type.
+         * Get a key for this path type.
          *
-         * @return A message key.
+         * @return A key.
          */
-        public String getKey() {
-            return toString().toLowerCase(Locale.US);
+        private String getKey() {
+            return getEnumKey(this);
         }
 
         public String getImageKey() {

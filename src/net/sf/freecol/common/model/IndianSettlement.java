@@ -287,9 +287,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     public StringTemplate getLearnableSkillLabel(boolean visited) {
         return StringTemplate.key((visited)
             ? ((learnableSkill == null)
-                ? "indianSettlement.skillNone"
+                ? "model.indianSettlement.skillNone"
                 : learnableSkill.getNameKey())
-            : "indianSettlement.skillUnknown");
+            : "model.indianSettlement.skillUnknown");
     }
             
     /**
@@ -415,7 +415,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         StringTemplate ret;
         if (hasVisited(player) && 0 <= index && index < wantedGoods.length) {
             if (wantedGoods[index] == null) {
-                ret = StringTemplate.key("indianSettlement.wantedGoodsNone");
+                ret = StringTemplate.key("model.indianSettlement.wantedGoodsNone");
             } else {
                 ret = StringTemplate.label("")
                     .add(Messages.nameKey(wantedGoods[index]));
@@ -423,7 +423,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                 if (sale != null) ret.addName(" " + sale);
             }
         } else {
-            ret = StringTemplate.key("indianSettlement.wantedGoodsUnknown");
+            ret = StringTemplate.key("model.indianSettlement.wantedGoodsUnknown");
         }
         return ret;
     }                
@@ -459,9 +459,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     public StringTemplate getMostHatedLabel(boolean contacted) {
         return (contacted)
             ? ((mostHated == null)
-                ? StringTemplate.key("indianSettlement.mostHatedNone")
+                ? StringTemplate.key("model.indianSettlement.mostHatedNone")
                 : mostHated.getNationName())
-            : StringTemplate.key("indianSettlement.mostHatedUnknown");
+            : StringTemplate.key("model.indianSettlement.mostHatedUnknown");
     }
             
     /**
@@ -633,16 +633,19 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
-     * Gets a messageId for a short alarm message associated with the
+     * Gets a message key for a short alarm message associated with the
      * alarm level of this player.
      *
      * @param player The other <code>Player</code>.
-     * @return The alarm messageId.
+     * @return The alarm message key.
      */
-    public String getShortAlarmLevelMessageId(Player player) {
-        return (!player.hasContacted(owner)) ? "tension.wary"
-            : (hasContacted(player)) ? getAlarm(player).getKey()
-            : "tension.unknown";
+    public String getAlarmLevelKey(Player player) {
+        return "model.indianSettlement."
+            + ((!player.hasContacted(owner))
+                ? "tension.wary"
+                : (!hasContacted(player))
+                ? "tension.unknown"
+                : getAlarm(player).getKey());
     }
 
     /**
@@ -1132,7 +1135,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     @Override
     public StringTemplate getLocationLabelFor(Player player) {
         return (hasContacted(player)) ? StringTemplate.name(getName())
-            : StringTemplate.key("indianSettlement.nameUnknown");
+            : StringTemplate.key("model.indianSettlement.nameUnknown");
     }
 
     /**
@@ -1305,9 +1308,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     @Override
     public StringTemplate getAlarmLevelMessage(Player player) {
-        Tension alarm = (hasContacted(player)) ? getAlarm(player)
-            : new Tension(Tension.TENSION_MIN);
-        return StringTemplate.template("indianSettlement." + alarm.getKey())
+        return StringTemplate.template(getAlarmLevelKey(player))
             .addStringTemplate("%nation%", getOwner().getNationName());
     }
 

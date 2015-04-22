@@ -373,13 +373,13 @@ public class ServerGame extends Game implements ServerModelObject {
         StringTemplate winner = strongestAIPlayer.getNationName();
         cs.addMessage(See.all(),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                "model.diplomacy.spanishSuccession",
+                "model.game.spanishSuccession",
                 strongestAIPlayer)
                 .addStringTemplate("%loserNation%", loser)
                 .addStringTemplate("%nation%", winner));
         cs.addGlobalHistory(this,
             new HistoryEvent(getTurn(),
-                HistoryEvent.EventType.SPANISH_SUCCESSION, null)
+                HistoryEvent.HistoryEventType.SPANISH_SUCCESSION, null)
                 .addStringTemplate("%loserNation%", loser)
                 .addStringTemplate("%nation%", winner));
         setSpanishSuccession(true);

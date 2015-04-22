@@ -377,7 +377,7 @@ public class Building extends WorkLocation
      */
     @Override
     public StringTemplate getLocationLabel() {
-        return StringTemplate.template("inLocation")
+        return StringTemplate.template("model.building.locationLabel")
             .addNamed("%location%", this);
     }
 

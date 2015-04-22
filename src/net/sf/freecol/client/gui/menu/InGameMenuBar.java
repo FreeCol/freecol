@@ -155,7 +155,8 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.addSeparator();
         ButtonGroup group = new ButtonGroup();
         for (DisplayText type : DisplayText.values()) {
-            menu.add(getRadioButtonMenuItem(DisplayTileTextAction.id + type, group));
+            menu.add(getRadioButtonMenuItem(DisplayTileTextAction.id
+                    + type.getKey(), group));
         }
 
         menu.addSeparator();

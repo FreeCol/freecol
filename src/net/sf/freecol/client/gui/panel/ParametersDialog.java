@@ -74,10 +74,10 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
         str = Integer.toString(DEFAULT_maxDistanceToEdge);
         inputM = new JTextField(str, COLUMNS);
 
-        str = Messages.message("menuBar.tools.determineHighSeas.distToLandFromHighSeas");
+        str = Messages.message("parametersDialog.determineHighSeas.distToLandFromHighSeas");
         JLabel widthLabel = new JLabel(str);
         widthLabel.setLabelFor(inputD);
-        str = Messages.message("menuBar.tools.determineHighSeas.maxDistanceToEdge");
+        str = Messages.message("parametersDialog.determineHighSeas.maxDistanceToEdge");
         JLabel heightLabel = new JLabel(str);
         heightLabel.setLabelFor(inputM);
 

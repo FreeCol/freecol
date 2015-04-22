@@ -890,7 +890,7 @@ public final class FreeColServer {
         throws IOException, FreeColException, XMLStreamException {
         final int savegameVersion = fis.getSavegameVersion();
         if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
-            throw new FreeColException("incompatibleVersions");
+            throw new FreeColException("server.incompatibleVersions");
         }
         logger.info("Found savegame version " + savegameVersion);
 

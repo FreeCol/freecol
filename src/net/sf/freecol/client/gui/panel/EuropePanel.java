@@ -185,7 +185,7 @@ public final class EuropePanel extends PortPanel {
                     StringTemplate locName = destination
                         .getLocationLabelFor(unit.getOwner());
                     if (!getGUI().confirm(true, null, StringTemplate
-                            .template("europe.leaveColonists")
+                            .template("europePanel.leaveColonists")
                             .addStringTemplate("%newWorld%", locName),
                             unit, "ok", "cancel")) return null;
                 }
@@ -495,11 +495,11 @@ public final class EuropePanel extends PortPanel {
         @Override
         public void logPurchase(GoodsType goodsType, int amount, int price) {
             int total = amount * price;
-            StringTemplate t1 = StringTemplate.template("transaction.purchase")
+            StringTemplate t1 = StringTemplate.template("europePanel.transaction.purchase")
                 .addNamed("%goods%", goodsType)
                 .addAmount("%amount%", amount)
                 .addAmount("%gold%", price);
-            StringTemplate t2 = StringTemplate.template("transaction.price")
+            StringTemplate t2 = StringTemplate.template("europePanel.transaction.price")
                 .addAmount("%gold%", total);
             add(Messages.message(t1) + "\n" + Messages.message(t2));
         }
@@ -514,16 +514,16 @@ public final class EuropePanel extends PortPanel {
             int totalTax = totalBeforeTax * tax / 100;
             int totalAfterTax = totalBeforeTax - totalTax;
 
-            StringTemplate t1 = StringTemplate.template("transaction.sale")
+            StringTemplate t1 = StringTemplate.template("europePanel.transaction.sale")
                 .addNamed("%goods%", goodsType)
                 .addAmount("%amount%", amount)
                 .addAmount("%gold%", price);
-            StringTemplate t2 = StringTemplate.template("transaction.price")
+            StringTemplate t2 = StringTemplate.template("europePanel.transaction.price")
                 .addAmount("%gold%", totalBeforeTax);
-            StringTemplate t3 = StringTemplate.template("transaction.tax")
+            StringTemplate t3 = StringTemplate.template("europePanel.transaction.tax")
                 .addAmount("%tax%", tax)
                 .addAmount("%gold%", totalTax);
-            StringTemplate t4 = StringTemplate.template("transaction.net")
+            StringTemplate t4 = StringTemplate.template("europePanel.transaction.net")
                 .addAmount("%gold%", totalAfterTax);
             add(Messages.message(t1) + "\n" + Messages.message(t2)
                 + "\n" + Messages.message(t3) + "\n" + Messages.message(t4));
@@ -576,7 +576,7 @@ public final class EuropePanel extends PortPanel {
             KeyEvent.VK_R, EuropeAction.RECRUIT.toString(), this);
         unloadButton = new EuropeButton(Messages.message("unload"),
             KeyEvent.VK_U, EuropeAction.UNLOAD.toString(), this);
-        sailButton = new EuropeButton(Messages.message("sail"),
+        sailButton = new EuropeButton(Messages.message("setSail"),
             KeyEvent.VK_S, EuropeAction.SAIL.toString(), this);
 
         toAmericaPanel = new DestinationPanel();
@@ -646,8 +646,8 @@ public final class EuropePanel extends PortPanel {
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         logScroll.getVerticalScrollBar().setUnitIncrement(16);
 
-        toAmericaPanel.setBorder(Utility.localizedBorder("goingToAmerica"));
-        toEuropePanel.setBorder(Utility.localizedBorder("goingToEurope"));
+        toAmericaPanel.setBorder(Utility.localizedBorder("sailingToAmerica"));
+        toEuropePanel.setBorder(Utility.localizedBorder("sailingToEurope"));
         docksPanel.setBorder(Utility.localizedBorder("docks"));
         inPortPanel.setBorder(Utility.localizedBorder("inPort"));
         marketPanel.setBorder(Utility.blankBorder(10, 10, 10, 10));

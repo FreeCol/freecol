@@ -405,12 +405,12 @@ public final class ConnectController {
             // Disable this check if you need to debug a multiplayer client.
             // FIXME: allow if the server is in debug mode.
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-                gui.showErrorMessage("connectController.debugConnect");
+                gui.showErrorMessage("client.debugConnect");
                 return false;
             }
             List<String> names = getVacantPlayers(host, port);
             if (names == null || names.isEmpty()) {
-                gui.showErrorMessage("connectController.noPlayers");
+                gui.showErrorMessage("client.noPlayers");
                 return false;
             }
 
@@ -419,7 +419,7 @@ public final class ConnectController {
                 choices.add(new ChoiceItem<>(Messages.getName(n), n));
             }
             String choice = gui.getChoice(true, null,
-                Messages.message("connectController.choicePlayer"), null,
+                Messages.message("client.choicePlayer"), null,
                 "cancel", choices);
             if (choice == null) return false; // User cancelled
 
@@ -431,7 +431,7 @@ public final class ConnectController {
             break;
 
         case ENDING_GAME: default:
-            gui.showErrorMessage("connectController.ending");
+            gui.showErrorMessage("client.ending");
             return false;
         }
         return true;
@@ -494,15 +494,26 @@ public final class ConnectController {
 
         class ErrorJob implements Runnable {
             private final String message;
-
-            ErrorJob( String message ) {
+            private final StringTemplate template;
+            
+            ErrorJob(String message) {
                 this.message = message;
+                this.template = null;
             }
 
+            ErrorJob(StringTemplate template) {
+                this.message = null;
+                this.template = template;
+            }
+            
             @Override
             public void run() {
                 gui.closeMenus();
-                gui.showErrorMessage(message);
+                if (this.template != null) {
+                    gui.showErrorMessage(template);
+                } else {
+                    gui.showErrorMessage(message);
+                }
             }
         }
 
@@ -512,7 +523,7 @@ public final class ConnectController {
         try {
             fis = new FreeColSavegameFile(file);
         } catch (IOException ioe) {
-            SwingUtilities.invokeLater(new ErrorJob("couldNotLoadGame"));
+            SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(file)));
             logger.log(Level.WARNING, "Could not open save file: "
                 + file.getName());
             return false;
@@ -540,17 +551,17 @@ public final class ConnectController {
             options.fixClientOptions();
 
         } catch (FileNotFoundException e) {
-            SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
+            SwingUtilities.invokeLater(new ErrorJob("server.fileNotFound"));
             logger.log(Level.WARNING, "Can not find file: " + file.getName(),
                 e);
             return false;
         } catch (XMLStreamException e) {
             logger.log(Level.WARNING, "Error reading game from: "
                 + file.getName(), e);
-            SwingUtilities.invokeLater(new ErrorJob("couldNotLoadGame") );
+            SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(file)));
             return false;
         } catch (Exception e) {
-            SwingUtilities.invokeLater(new ErrorJob("couldNotLoadGame"));
+            SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(file)));
             logger.log(Level.WARNING, "Could not load game from: "
                 + file.getName(), e);
             return false;
@@ -587,7 +598,7 @@ public final class ConnectController {
             @Override
             public void run() {
                 FreeColServer freeColServer = null;
-                String err = null;
+                StringTemplate err = null;
                 try {
                     final FreeColSavegameFile saveGame
                         = new FreeColSavegameFile(theFile);
@@ -609,22 +620,22 @@ public final class ConnectController {
                         });
                         return; // Success!
                     }
-                    err = "server.couldNotLogin";
+                    err = StringTemplate.key("server.couldNotLogin");
                     logger.warning("Could not log in.");
                 } catch (FileNotFoundException e) {
-                    err = "fileNotFound";
+                    err = StringTemplate.key("server.fileNotFound");
                     logger.log(Level.WARNING, "Can not find file.", e);
                 } catch (FreeColException e) {
-                    err = e.getMessage();
+                    err = StringTemplate.name(e.getMessage());
                     logger.log(Level.WARNING, "FreeCol error.", e);
                 } catch (IOException e) {
-                    err = "server.initialize";
+                    err = StringTemplate.key("server.initialize");
                     logger.log(Level.WARNING, "Error starting game.", e);
                 } catch (NoRouteToServerException e) {
-                    err = "server.noRouteToServer";
+                    err = StringTemplate.key("server.noRouteToServer");
                     logger.log(Level.WARNING, "No route to server.", e);
                 } catch (XMLStreamException e) {
-                    err = "couldNotLoadGame";
+                    err = FreeCol.badLoad(theFile);
                     logger.log(Level.WARNING, "Stream error.", e);
                 }
                 if (err != null) {

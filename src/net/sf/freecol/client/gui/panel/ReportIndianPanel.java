@@ -54,10 +54,10 @@ import net.sf.freecol.common.resources.ResourceManager;
 public final class ReportIndianPanel extends ReportPanel {
 
     private static final String[] headlines = {
-        "Settlement",
+        "settlement",
         "mission",
         "report.indian.tension",
-        "report.indian.skillTaught",
+        "skillTaught",
         "report.indian.mostHated",
         "report.indian.tradeInterests"
     };
@@ -133,7 +133,7 @@ public final class ReportIndianPanel extends ReportPanel {
         label.setFont(font);
         reportPanel.add(Utility.localizedLabel(StringTemplate
                 .template("report.indian.tensionStance")
-                .add("%tension%", opponent.getTension(player).getKey())
+                .addNamed("%tension%", opponent.getTension(player))
                 .addNamed("%stance%", opponent.getStance(player))),
             "left, wrap 20");
 
@@ -193,8 +193,8 @@ public final class ReportIndianPanel extends ReportPanel {
                 }
                 reportPanel.add(missionLabel);
 
-                reportPanel.add(Utility.localizedLabel(settlement
-                        .getShortAlarmLevelMessageId(player)));
+                reportPanel.add(Utility
+                    .localizedLabel(settlement.getAlarmLevelMessage(player)));
 
                 final UnitType skillType = settlement.getLearnableSkill();
                 JLabel skillLabel;

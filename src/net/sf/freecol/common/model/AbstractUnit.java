@@ -122,7 +122,7 @@ public class AbstractUnit extends FreeColObject {
     public StringTemplate getLabel() {
         StringTemplate tmpl = Messages.getUnitLabel(null, getId(), getNumber(),
                                                     null, getRoleId(), null);
-        return StringTemplate.template("abstractUnit")
+        return StringTemplate.template("model.abstractUnit.label")
                              .addAmount("%number%", getNumber())
                              .addStringTemplate("%unit%", tmpl);
     }

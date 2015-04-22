@@ -194,7 +194,7 @@ public final class InGameController implements NetworkConstants {
     private boolean requireOurTurn() {
         if (!freeColClient.currentPlayerIsMyPlayer()) {
             if (freeColClient.isInGame()) {
-                gui.showInformationMessage("notYourTurn");
+                gui.showInformationMessage("info.notYourTurn");
             }
             return false;
         }
@@ -373,7 +373,7 @@ public final class InGameController implements NetworkConstants {
 
             // Check that the purchase is funded.
             if (!player.checkGold(market.getBidPrice(type, amount))) {
-                gui.showInformationMessage("notEnoughGold");
+                gui.showInformationMessage("info.notEnoughGold");
                 return false;
             }
         }
@@ -493,7 +493,7 @@ public final class InGameController implements NetworkConstants {
             server.saveGame(file, freeColClient.getClientOptions());
             result = true;
         } catch (IOException e) {
-            gui.showErrorMessage("couldNotSaveGame");
+            gui.showErrorMessage(FreeCol.badSave(file));
         } finally {
             gui.closeStatusPanel();
         }
@@ -832,7 +832,7 @@ public final class InGameController implements NetworkConstants {
                 .getLocationLabelFor(player);
             StringTemplate dst = destination.getLocationLabelFor(player);
             StringTemplate template = StringTemplate
-                .template("selectDestination.failed")
+                .template("info.moveToDestinationFailed")
                 .addStringTemplate("%unit%",
                     unit.getLabel(Unit.UnitLabelType.NATIONAL))
                 .addStringTemplate("%location%", src)
@@ -1236,14 +1236,14 @@ public final class InGameController implements NetworkConstants {
                 break;
             case ACCEPT_TRADE:
                 m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                     "negotiationDialog.offerAccepted",
+                                     "diplomacy.offerAccepted",
                                      colony)
                     .addStringTemplate("%nation%", nation);
                 dt = null;
                 break;
             case REJECT_TRADE:
                 m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                     "negotiationDialog.offerRejected",
+                                     "diplomacy.offerRejected",
                                      colony)
                     .addStringTemplate("%nation%", nation);
                 dt = null;
@@ -1470,11 +1470,10 @@ public final class InGameController implements NetworkConstants {
             = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
         UnitType skill = settlement.getLearnableSkill();
         if (skill == null) {
-            gui.showInformationMessage(settlement,
-                                       "indianSettlement.noMoreSkill");
+            gui.showInformationMessage(settlement, "info.noMoreSkill");
         } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
             gui.showInformationMessage(settlement, StringTemplate
-                .template("indianSettlement.cantLearnSkill")
+                .template("info.cantLearnSkill")
                 .addStringTemplate("%unit%",
                     unit.getLabel(Unit.UnitLabelType.NATIONAL))
                 .addNamed("%skill%", skill));
@@ -2613,7 +2612,7 @@ public final class InGameController implements NetworkConstants {
         case NATIVES: // Tile can still be claimed
             break;
         default:
-            gui.showInformationMessage(reason.getKey());
+            gui.showInformationMessage(reason.getDescriptionKey());
             return false;
         }
 
@@ -2814,8 +2813,7 @@ public final class InGameController implements NetworkConstants {
                     .addAmount("%fee%", percent);
             }
             if (!gui.confirm(true, unit.getTile(), template, unit,
-                    "cashInTreasureTrain.yes", "cashInTreasureTrain.no"))
-                return false;
+                             "accept", "reject")) return false;
         }
 
         UnitWas unitWas = new UnitWas(unit);
@@ -2910,7 +2908,7 @@ public final class InGameController implements NetworkConstants {
 
         if (unit.getState() == UnitState.IMPROVING
             && !gui.confirm(true, unit.getTile(), StringTemplate
-                .template("model.unit.confirmCancelWork")
+                .template("clearOrders.text")
                 .addAmount("%turns%", unit.getWorkTurnsLeft()),
                 unit, "ok", "cancel")) {
             return false;
@@ -3040,20 +3038,17 @@ public final class InGameController implements NetworkConstants {
                 visibilityChange = true;
             }
             if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
-            t = StringTemplate.template("negotiationDialog.offerAccepted")
+            t = StringTemplate.template("diplomacy.offerAccepted")
                 .addStringTemplate("%nation%", nation);
             gui.showInformationMessage(t);
             break;
         case REJECT_TRADE:
-            t = StringTemplate.template("negotiationDialog.offerRejected")
+            t = StringTemplate.template("diplomacy.offerRejected")
                 .addStringTemplate("%nation%", nation);
             gui.showInformationMessage(t);
             break;
         case PROPOSE_TRADE:
-            String messageId = "negotiationDialog.receive."
-                + agreement.getContext().getKey();
-            t = StringTemplate.template(messageId)
-                .addStringTemplate("%nation%", nation);
+            t = agreement.getReceiveMessage(otherPlayer);
             DiplomaticTrade ourAgreement
                 = gui.showDiplomaticTradeDialog(our, other, agreement, t);
             if (ourAgreement == null) {
@@ -3751,7 +3746,7 @@ public final class InGameController implements NetworkConstants {
             .getActionManager().getFreeColAction("buildColonyAction")
             .getAccelerator());
         player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
-                "tutorial.buildColony", player)
+                "buildColony.tutorial", player)
             .addName("%colonyKey%", key)
             .add("%colonyMenuItem%", "buildColonyAction.name")
             .add("%ordersMenuItem%", "menuBar.orders"));
@@ -3888,13 +3883,13 @@ public final class InGameController implements NetworkConstants {
         if (arrears <= 0) return false;
         if (!player.checkGold(arrears)) {
             gui.showInformationMessage(StringTemplate
-                .template("model.europe.cantPayArrears")
+                .template("payArrears.noGold")
                     .addAmount("%amount%", arrears));
             return false;
         }
 
         boolean ret = gui.confirm(true, null, StringTemplate
-            .template("model.europe.payArrears")
+            .template("payArrears.text")
             .addAmount("%amount%", arrears),
             gui.createGoodsImageIcon(type),
             "ok", "cancel")
@@ -3923,7 +3918,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (!colony.canPayToFinishBuilding()) {
-            gui.showInformationMessage("notEnoughGold");
+            gui.showInformationMessage("info.notEnoughGold");
             return false;
         }
 
@@ -3977,7 +3972,7 @@ public final class InGameController implements NetworkConstants {
      * Returns no status, this game is going away.
      */
     public void reconnect() {
-        if (gui.confirm("reconnect.text", "reconnect.quit", "reconnect.yes")) {
+        if (gui.confirm("reconnect.text", "reconnect.no", "reconnect.yes")) {
             logger.finest("Reconnect quit.");
             freeColClient.quit();
         } else {
@@ -4002,7 +3997,7 @@ public final class InGameController implements NetworkConstants {
         if (!player.isColonial()) return false;
 
         if (!player.checkGold(player.getRecruitPrice())) {
-            gui.showInformationMessage("notEnoughGold");
+            gui.showInformationMessage("info.notEnoughGold");
             return false;
         }
 
@@ -4040,7 +4035,7 @@ public final class InGameController implements NetworkConstants {
             if (name == null) { // User cancelled
                 return false;
             } else if (name.isEmpty()) { // Zero length invalid
-                gui.showInformationMessage("enterSomeText");
+                gui.showInformationMessage("info.enterSomeText");
                 return false;
             } else if (colony.getName().equals(name)) { // No change
                 return false;
@@ -4300,15 +4295,14 @@ public final class InGameController implements NetworkConstants {
 
                 } else if (player.getPlayerType() != Player.PlayerType.UNDEAD
                     && gui.confirm("defeatedSinglePlayer.text",
-                                   "defeatedSinglePlayer.yes",
-                                   "defeatedSinglePlayer.no")) {
+                                   "defeatedSinglePlayer.yes", "quit")) {
                     freeColClient.askServer().enterRevengeMode();
                 } else {
                     freeColClient.quit();
                 }
             } else {
                 if (!gui.confirm("defeated.text", "defeated.yes",
-                                 "defeated.no")) freeColClient.quit();
+                                 "quit")) freeColClient.quit();
             }
         } else {
             player.setStance(dead, null);
@@ -4434,7 +4428,7 @@ public final class InGameController implements NetworkConstants {
         final Player player = freeColClient.getMyPlayer();
         Europe europe = player.getEurope();
         if (!player.checkGold(europe.getUnitPrice(unitType))) {
-            gui.showInformationMessage("notEnoughGold");
+            gui.showInformationMessage("info.notEnoughGold");
             return false;
         }
 

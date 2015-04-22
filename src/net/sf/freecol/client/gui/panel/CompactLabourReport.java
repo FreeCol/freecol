@@ -191,12 +191,12 @@ public final class CompactLabourReport extends ReportPanel {
         headerRow.add(empty, "cell " + COLONY_COLUMN + " 1");
 
         if (isOverview() || !unitData.isSummary()) {
-            JLabel unitType = Utility.localizedLabel("model.unit.type");
+            JLabel unitType = Utility.localizedLabel("unitType");
             unitType.setBorder(Utility.TOPCELLBORDER);
             headerRow.add(unitType, "cell " + UNIT_TYPE_COLUMN + " 1");
         }
 
-        JLabel workingAs = Utility.localizedLabel("model.unit.workingAs");
+        JLabel workingAs = Utility.localizedLabel("report.labour.workingAs");
         workingAs.setBorder(Utility.TOPCELLBORDER);
         headerRow.add(workingAs, "cell " + WORKING_COLUMN + " 1");
 
@@ -211,7 +211,7 @@ public final class CompactLabourReport extends ReportPanel {
         headerRow.add(colonists, "cell " + COLONIST_COLUMN + " 1 2 1");
 
         if (isOverview()) {
-            JLabel production = Utility.localizedLabel("report.production");
+            JLabel production = Utility.localizedLabel("report.labour.production");
             production.setBorder(Utility.TOPCELLBORDER);
             headerRow.add(production, "cell " + PRODUCTION_SYMBOL_COLUMN + " 1 " + (COLUMNS - PRODUCTION_SYMBOL_COLUMN) + " 1");
         } else if (showProduction) {
@@ -420,8 +420,8 @@ public final class CompactLabourReport extends ReportPanel {
             reportPanel.add(button, "cell " + COLONY_COLUMN + " " + row + " 1 " + europe.getRowCount());
             row = addLocationData(europe, null, row);
         }
-        row = addNonLinkedLocation(unitData.getUnitsOnLand(), "report.onLand", row);
-        row = addNonLinkedLocation(unitData.getUnitsAtSea(), "report.atSea", row);
+        row = addNonLinkedLocation(unitData.getUnitsOnLand(), "report.labour.onLand", row);
+        row = addNonLinkedLocation(unitData.getUnitsAtSea(), "report.labour.atSea", row);
 
         reportPanel.add(Utility.localizedLabel("report.labour.canTrain"),
                         "cell 1 " + row + " " + COLUMNS + " 1");

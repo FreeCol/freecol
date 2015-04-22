@@ -54,23 +54,23 @@ public final class ReportForeignAffairPanel extends ReportPanel {
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScalingFactor());
         final String stance = Messages.message(
-            StringTemplate.key("report.stance"));
+            StringTemplate.key("report.foreignAffair.stance"));
         final String numberOfColonies = Messages.message(
-            StringTemplate.key("report.numberOfColonies"));
+            StringTemplate.key("report.foreignAffair.numberOfColonies"));
         final String numberOfUnits = Messages.message(
-            StringTemplate.key("report.numberOfUnits"));
+            StringTemplate.key("report.foreignAffair.numberOfUnits"));
         final String militaryStrength = Messages.message(
-            StringTemplate.key("report.militaryStrength"));
+            StringTemplate.key("report.foreignAffair.militaryStrength"));
         final String navalStrength = Messages.message(
-            StringTemplate.key("report.navalStrength"));
+            StringTemplate.key("report.foreignAffair.navalStrength"));
         final String goldTitle = Messages.message(
-            StringTemplate.key("goldTitle"));
+            StringTemplate.key("gold"));
         final String continentalCongress_title = Messages.message(
-            StringTemplate.key("report.continentalCongress.title"));
+            StringTemplate.key("report.foreignAffair.congress"));
         final String tax = Messages.message(
             StringTemplate.key("tax"));
         final String sonsOfLiberty = Messages.message(
-            StringTemplate.key("report.sonsOfLiberty"));
+            StringTemplate.key("report.foreignAffair.sonsOfLiberty"));
 
         // Display Panel
         reportPanel.removeAll();
@@ -143,7 +143,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
             reportPanel.add(enemyPanel);
         }
 
-        reportPanel.add(Utility.getDefaultTextArea(Messages.message("report.foreignAffairs.notice"), 40),
+        reportPanel.add(Utility.getDefaultTextArea(Messages.message("report.foreignAffair.notice"), 40),
                         "newline 20, span 8");
 
         reportPanel.doLayout();

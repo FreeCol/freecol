@@ -19,13 +19,14 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Locale;
+import net.sf.freecol.common.i18n.Messages;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
  * A measure of the tension between nations.
  */
-public class Tension {
+public class Tension implements Named {
 
     // Minimum possible tension value.
     public static final int TENSION_MIN = 0;
@@ -81,6 +82,15 @@ public class Tension {
 
         public int getLimit() {
             return limit;
+        }
+
+        /**
+         * Get a message key for the level.
+         *
+         * @return A message key.
+         */
+        public String getKey() {
+            return getEnumKey(this);
         }
     }
     
@@ -150,13 +160,24 @@ public class Tension {
     }
 
     /**
-     * Get a message key for this tension.
+     * Get the stem key.
      *
-     * @return A message key.
+     * @return The tension stem key.
      */
     public String getKey() {
-        return "tension." + toString().toLowerCase(Locale.US);
+        return "tension." + getLevel().getKey();
     }
+
+    // Implement Named
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getNameKey() {
+        return Messages.nameKey("model." + getKey());
+    }
+    
+    // Override Object
 
     /**
      * {@inheritDoc}

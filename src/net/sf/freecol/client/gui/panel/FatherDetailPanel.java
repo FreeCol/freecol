@@ -47,7 +47,8 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * This panel displays details of founding fathers in the Colopedia.
  */
-public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFather> {
+public class FatherDetailPanel
+    extends ColopediaGameObjectTypePanel<FoundingFather> {
 
 
     /**
@@ -58,7 +59,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
      */
     public FatherDetailPanel(FreeColClient freeColClient,
                              ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.FATHERS.toString());
+        super(freeColClient, colopediaPanel, PanelType.FATHERS.getKey());
     }
 
 

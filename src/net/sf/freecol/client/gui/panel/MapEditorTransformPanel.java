@@ -44,6 +44,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Resource;
@@ -121,20 +122,20 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                       new TileTypeTransform(type)));
         }
         listPanel.add(buildButton(ImageLibrary.getRiverImage("0101", 0.5f),
-                                  Messages.message("minorRiver"),
+                                  Messages.message("mapEditorTransformPanel.minorRiver"),
                                   new RiverTransform(TileImprovement.SMALL_RIVER)));
         listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", 0.5f),
-                                  Messages.message("majorRiver"),
+                                  Messages.message("mapEditorTransformPanel.majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
         listPanel.add(buildButton(ImageLibrary.getImage(getSpecification()
                                                              .getResourceTypeList().get(0), 0.75f),
-                                  Messages.message("editor.resource"), new ResourceTransform()));
+                                  Messages.message("mapEditorTransformPanel.resource"), new ResourceTransform()));
         listPanel.add(buildButton(ImageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.5f),
-                                  Messages.message("model.message.LOST_CITY_RUMOUR"),
+                                  Messages.getName(ModelMessage.MessageType.LOST_CITY_RUMOUR),
                                   new LostCityRumourTransform()));
         SettlementType settlementType = nativeNation.getType().getCapitalType();
         settlementButton = buildButton(ImageLibrary.getSettlementImage(settlementType, 0.5f),
-                                       Messages.message("Settlement"),
+                                       Messages.message("settlement"),
                                        new SettlementTransform());
         listPanel.add(settlementButton);
     }
@@ -310,8 +311,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                         choices.add(new ChoiceItem<>(name, rt));
                     }
                     ResourceType choice = getGUI().getChoice(true, null, 
-                        Messages.message("editor.chooseResource"), null,
-                        "cancel", choices);
+                        Messages.message("mapEditorTransformPanel.chooseResource"),
+                        null, "cancel", choices);
                     if (choice != null) {
                         t.addResource(new Resource(t.getGame(), t, choice,
                                       choice.getMaxValue()));

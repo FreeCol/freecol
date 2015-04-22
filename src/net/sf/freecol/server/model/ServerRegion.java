@@ -24,6 +24,7 @@ import java.util.Queue;
 
 import java.awt.Rectangle;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
@@ -78,15 +79,15 @@ public class ServerRegion extends Region {
      * Creates a new server region.
      *
      * @param game The <code>Game</code> to create in.
-     * @param nameKey The i18n-name of the region.
+     * @param key The stem key of the region
      * @param type The <code>RegionType</code> to use.
      * @param parent The <code>Region</code> to be the parent of this one.
      */
-    public ServerRegion(Game game, String nameKey, RegionType type,
+    public ServerRegion(Game game, String key, RegionType type,
                         Region parent) {
         super(game);
 
-        this.nameKey = nameKey;
+        this.nameKey = Messages.nameKey(key);
         this.type = type;
         this.parent = parent;
     }

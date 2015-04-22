@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -30,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -39,7 +39,9 @@ public class Region extends FreeColGameObject implements Nameable, Named {
 
     private static final Logger logger = Logger.getLogger(Region.class.getName());
 
-    public static final String PACIFIC_NAME_KEY = "model.region.pacific";
+    /** Hardwired name key for the Pacific for the benefit of isPacific(). */
+    public static final String PACIFIC_NAME_KEY
+        = Messages.nameKey("model.region.pacific");
 
     public static enum RegionType implements Named {
         OCEAN,
@@ -56,16 +58,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
          * @return A stem key.
          */
         public String getKey() {
-            return toString().toLowerCase(Locale.US);
-        }
-
-        /**
-         * Gets a name index key for this region type.
-         *
-         * @return A name index key.
-         */
-        public String getNameIndexKey() {
-            return "index." + getKey();
+            return "regionType." + getEnumKey(this);
         }
 
         /**
@@ -74,7 +67,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
          * @return A message key.
          */
         public String getUnknownKey() {
-            return "model.region." + getKey() + ".unknown";
+            return "model." + getKey() + ".unknown";
         }
 
         // Interface Named
@@ -84,7 +77,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
          */
         @Override
         public String getNameKey() {
-            return Messages.nameKey("model.region." + getKey());
+            return Messages.nameKey("model." + getKey());
         }
     }
 
@@ -392,7 +385,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
             ? getScoreValue()
             : 0;
         HistoryEvent h = new HistoryEvent(turn,
-            HistoryEvent.EventType.DISCOVER_REGION, player)
+            HistoryEvent.HistoryEventType.DISCOVER_REGION, player)
                 .addStringTemplate("%nation%", player.getNationName())
                 .addName("%region%", newName);
         h.setScore(getScoreValue());

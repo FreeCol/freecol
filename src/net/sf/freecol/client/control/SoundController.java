@@ -117,7 +117,7 @@ public class SoundController {
             : ((mixer = soundPlayer.getMixer()) == null)
                 ? Messages.message("none")
                 : mixer.getMixerInfo().getName();
-        return Messages.message("Current") + ":  " + text;
+        return Messages.message("current") + ":  " + text;
     }
 
 }

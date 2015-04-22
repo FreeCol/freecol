@@ -675,12 +675,22 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get a label indicating for the national forces.
+     *
+     * @return A suitable <code>StringTemplate</code>.
+     */
+    public StringTemplate getForcesLabel() {
+        return StringTemplate.template("model.player.forces")
+            .addStringTemplate("%nation%", getNationName());
+    }
+
+    /**
      * Get a label indicating that we are waiting for this player.
      *
      * @return A suitable <code>StringTemplate</code>.
      */
     public StringTemplate getWaitingLabel() {
-        return StringTemplate.template("waitingFor")
+        return StringTemplate.template("model.player.waitingFor")
             .addStringTemplate("%nation%", getNationName());
     }
 
@@ -720,7 +730,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public StringTemplate getMarketName() {
         return (getEurope() == null)
-            ? StringTemplate.key("model.market.independent")
+            ? StringTemplate.key("model.player.independentMarket")
             : StringTemplate.key(getEuropeNameKey());
     }
 
@@ -1556,7 +1566,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public java.util.Map<String, Turn> getElectionTurns() {
         java.util.Map<String, Turn> result = new HashMap<>();
         for (HistoryEvent e : getHistory()) {
-            if (e.getEventType() == HistoryEvent.EventType.FOUNDING_FATHER) {
+            if (e.getEventType() == HistoryEvent.HistoryEventType.FOUNDING_FATHER) {
                 result.put(e.getReplacement("%father%").getId(),
                            e.getTurn());
             }
@@ -1572,7 +1582,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public StringTemplate checkDeclareIndependence() {
         if (getPlayerType() != PlayerType.COLONIAL)
-            return StringTemplate.template("model.independence.colonial");
+            return StringTemplate.template("model.player.colonialIndependence");
         Event event = getSpecification()
             .getEvent("model.event.declareIndependence");
         for (Limit limit : event.getLimits()) {
@@ -2543,7 +2553,7 @@ public class Player extends FreeColGameObject implements Nameable {
             ? Direction.W
             : Direction.E;
         addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
-                                         "tutorial.startGame", this)
+                                         "model.player.startGame", this)
             .addNamed("%direction%", sailDirection));
     }
 
@@ -3030,7 +3040,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * to found a settlement or just to be used by one, including the
      * double negative NONE == "no reason" case.
      */
-    public static enum NoClaimReason {
+    public static enum NoClaimReason implements Named {
         NONE,            // Actually, tile can be claimed
         TERRAIN,         // Not on settleable terrain
         RUMOUR,          // Europeans can not claim tiles with LCR
@@ -3046,9 +3056,22 @@ public class Player extends FreeColGameObject implements Nameable {
          *
          * @return A message key.
          */
-        public String getKey() {
-            return "noClaimReason." + toString().toLowerCase(Locale.US);
+        private String getKey() {
+            return "noClaimReason." + getEnumKey(this);
         }
+
+        public String getDescriptionKey() {
+            return Messages.descriptionKey("model." + getKey());
+        }
+        
+        // Implement Named
+
+        /**
+         * {@inheritDoc}
+         */
+        public String getNameKey() {
+            return Messages.nameKey("model." + getKey());
+        }        
     };
 
     /**

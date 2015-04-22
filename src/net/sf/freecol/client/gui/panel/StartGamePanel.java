@@ -122,7 +122,7 @@ public final class StartGamePanel extends FreeColPanel {
 
         mapGeneratorOptions = Utility.localizedButton(MapGeneratorOptions.getXMLElementTagName());
 
-        readyBox = new JCheckBox(Messages.message("iAmReady"));
+        readyBox = new JCheckBox(Messages.message("startGamePanel.iAmReady"));
 
         if (singlePlayerGame) {
             // If we set the ready flag to false then the player will
@@ -248,7 +248,7 @@ public final class StartGamePanel extends FreeColPanel {
                     && e.getValue() != NationState.NOT_AVAILABLE) n++;
             }
             if (n == 0) {
-                getGUI().showErrorMessage("victory.noEuropeans");
+                getGUI().showInformationMessage("info.noEuropeans");
                 return false;
             }
         }

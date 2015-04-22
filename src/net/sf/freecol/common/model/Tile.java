@@ -1015,7 +1015,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A simple <code>StringTemplate</code> label.
      */
     public StringTemplate getSimpleLabel() {
-        return StringTemplate.template("tile")
+        return StringTemplate.template("model.tile.simpleLabel")
             .addAmount("%x%", getX())
             .addAmount("%y%", getY());
     }
@@ -1479,10 +1479,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         StringTemplate ret = StringTemplate.label("\n");
         if (landLocked) {
-            ret.add("buildColony.landLocked");
+            ret.add("warning.landLocked");
         }
         if (food < 8) {
-            ret.add("buildColony.noFood");
+            ret.add("warning.noFood");
         }
         for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
             if (!entry.getKey().isFoodType()
@@ -1497,10 +1497,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             ret.add("buildColony.ownLand");
         }
         if (ownedByEuropeans) {
-            ret.add("buildColony.EuropeanLand");
+            ret.add("buildColony.europeanLand");
         }
         if (ownedByIndians) {
-            ret.add("buildColony.IndianLand");
+            ret.add("buildColony.nativeLand");
         }
 
         return ret;
@@ -2049,7 +2049,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public StringTemplate getNearLocationLabel(Direction direction,
                                                StringTemplate location) {
-        return StringTemplate.template("nearLocation")
+        return StringTemplate.template("model.tile.nearLocation")
             .addNamed("%direction%", direction)
             .addStringTemplate("%location%", location);
     }
@@ -2067,7 +2067,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             if (nearSettlement != null
                 && nearSettlement.getName() != null) {
                 StringTemplate t = StringTemplate
-                    .template("nameLocation")
+                    .template("model.tile.nameLocation")
                     .addStringTemplate("%location%",
                         getNearLocationLabel(Map.getRoughDirection(tile, this),
                             nearSettlement.getLocationLabel()));
@@ -2080,7 +2080,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         }
         return (region != null && region.getName() != null)
-            ? StringTemplate.template("nameLocation")
+            ? StringTemplate.template("model.tile.nameLocation")
                 .addNamed("%name%", type)
                 .addNamed("%location%", region)
             : StringTemplate.key(type);

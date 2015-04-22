@@ -118,9 +118,7 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
         final UnitType defaultType
             = spec.getDefaultUnitType(player.getNationType());
 
-        reportPanel.add(Utility.localizedLabel(StringTemplate
-                .template("report.military.forces")
-                .addStringTemplate("%nation%", player.getNationName())),
+        reportPanel.add(Utility.localizedLabel(player.getForcesLabel()),
             "newline, span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 

@@ -59,7 +59,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
      */
     public GoodsDetailPanel(FreeColClient freeColClient,
                             ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.GOODS.toString());
+        super(freeColClient, colopediaPanel, PanelType.GOODS.getKey());
     }
 
 

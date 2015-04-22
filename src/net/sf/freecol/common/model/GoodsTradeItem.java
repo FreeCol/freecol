@@ -45,7 +45,8 @@ public class GoodsTradeItem extends TradeItem {
      */
     public GoodsTradeItem(Game game, Player source, Player destination,
                           Goods goods) {
-        super(game, "tradeItem.goods", source, destination);
+        super(game, Messages.nameKey("model.tradeItem.goods"),
+              source, destination);
 
         this.goods = goods;
     }

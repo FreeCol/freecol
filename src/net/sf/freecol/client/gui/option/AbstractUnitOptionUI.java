@@ -104,7 +104,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
             && typeOption.getChoices().size() > 1;
         typeUI = new UnitTypeOptionUI(typeOption, typeEditable);
 
-        Utility.localizeToolTip(typeUI.getComponent(), "model.unit.type");
+        Utility.localizeToolTip(typeUI.getComponent(), "unitType");
         typeUI.getComponent().addItemListener(this);
         panel.add(typeUI.getComponent(), "width 35%");
 

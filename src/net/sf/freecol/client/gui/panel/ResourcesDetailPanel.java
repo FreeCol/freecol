@@ -44,7 +44,8 @@ import static net.sf.freecol.common.util.StringUtils.*;
 /**
  * This panel displays details of resources in the Colopedia.
  */
-public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceType> {
+public class ResourcesDetailPanel
+    extends ColopediaGameObjectTypePanel<ResourceType> {
 
 
     /**
@@ -55,7 +56,7 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
      */
     public ResourcesDetailPanel(FreeColClient freeColClient,
                                 ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.RESOURCES.toString());
+        super(freeColClient, colopediaPanel, PanelType.RESOURCES.getKey());
     }
 
 

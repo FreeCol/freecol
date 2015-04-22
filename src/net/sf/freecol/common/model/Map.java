@@ -2278,7 +2278,7 @@ public class Map extends FreeColGameObject implements Location {
      */
     @Override
     public StringTemplate getLocationLabel() {
-        return StringTemplate.key("NewWorld");
+        return StringTemplate.key("newWorld");
     }
 
     /**

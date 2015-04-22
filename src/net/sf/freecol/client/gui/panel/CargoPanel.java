@@ -171,7 +171,7 @@ public class CargoPanel extends FreeColPanel
     private void updateTitle() {
         Utility.localizeBorder(this, (carrier == null)
             ? StringTemplate.key("cargoOnCarrier")
-            : StringTemplate.template("cargoOnCarrierLong")
+            : StringTemplate.template("cargoPanel.cargoAndSpace")
                 .addStringTemplate("%name%",
                     carrier.getLabel(Unit.UnitLabelType.NATIONAL))
                 .addAmount("%space%", carrier.getSpaceLeft()));

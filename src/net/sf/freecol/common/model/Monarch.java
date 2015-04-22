@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -307,8 +308,24 @@ public final class Monarch extends FreeColGameObject implements Named {
          *
          * @return A message key.
          */
-        public String getKey() {
-            return "model.monarch.action." + this; // Uppercase
+        private String getKey() {
+            return "monarch.action." + getEnumKey(this);
+        }
+
+        public String getTextKey() {
+            return "model." + getKey() + ".text";
+        }
+        
+        public String getYesKey() {
+            return "model." + getKey() + ".yes";
+        }
+
+        public String getNoKey() {
+            return "model." + getKey() + ".no";
+        }
+
+        public String getHeaderKey() {
+            return "model." + getKey() + ".header";
         }
     }
 

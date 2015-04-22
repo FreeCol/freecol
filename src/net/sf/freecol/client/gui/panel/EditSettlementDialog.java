@@ -122,15 +122,15 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         panel.add(this.owner);
         panel.add(Utility.localizedLabel("capital"));
         panel.add(this.capital);
-        panel.add(Utility.localizedLabel("report.indian.skillTaught"));
+        panel.add(Utility.localizedLabel("skillTaught"));
         panel.add(this.skill);
-        panel.add(Utility.localizedLabel("report.units"));
+        panel.add(Utility.localizedLabel("units"));
         panel.add(this.units);
 
         final IndianSettlement fake = null;
         List<ChoiceItem<IndianSettlement>> c = choices();
         c.add(new ChoiceItem<>(Messages.message("ok"), settlement).okOption());
-        c.add(new ChoiceItem<>(Messages.message("editor.removeSettlement"), fake));
+        c.add(new ChoiceItem<>(Messages.message("editSettlementDialog.removeSettlement"), fake));
         c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
             .cancelOption().defaultOption());
         initializeDialog(DialogType.QUESTION, true, panel, GUI.createImageIcon(
@@ -259,7 +259,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             ret = settlement;
 
         } else if (options.get(1).equals(value)) {
-            if (!getGUI().confirm("editor.removeSettlement.text", 
+            if (!getGUI().confirm("editSettlementDialog.removeSettlement.text", 
                                   "ok", "cancel")) {
                 return settlement;
             }

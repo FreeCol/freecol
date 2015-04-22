@@ -87,7 +87,7 @@ public final class InfoPanel extends FreeColPanel {
             Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                 FontLibrary.FontSize.TINY, lib.getScalingFactor());
 
-            String labelString = Messages.message("infoPanel.endTurnPanel.text");
+            String labelString = Messages.message("infoPanel.endTurn");
             int width = getFontMetrics(font).stringWidth(labelString);
             if (width > 150 ) {
                 int index = Messages.getBreakingPoint(labelString);
@@ -295,7 +295,7 @@ public final class InfoPanel extends FreeColPanel {
 
                 String text = (unit.isInEurope())
                     ? Messages.getName(unit.getOwner().getEurope())
-                    : Messages.message("moves") +" "+ unit.getMovesAsString();
+                    : Messages.message("infoPanel.moves") +" "+ unit.getMovesAsString();
                 JLabel textLabel = new JLabel(text);
                 textLabel.setFont(font);
                 add(textLabel, "span");

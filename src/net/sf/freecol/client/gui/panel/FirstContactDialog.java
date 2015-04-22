@@ -39,7 +39,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class FirstContactDialog extends FreeColConfirmDialog {
 
-    private static final String BASE_KEY = "event.meeting.";
+    private static final String BASE_KEY = "firstContactDialog.meeting.";
     private static final String IMAGE_BASE_KEY = "EventImage.meeting.";
     private static final String NATIVES_KEY = "natives";
     private static final String TUTORIAL_KEY = BASE_KEY + NATIVES_KEY + ".tutorial";
@@ -79,8 +79,9 @@ public class FirstContactDialog extends FreeColConfirmDialog {
             tutorial = Utility.getDefaultTextArea(Messages.message(TUTORIAL_KEY));
         }
 
-        String messageId = (tile != null) ? "welcomeOffer.text"
-            : "welcomeSimple.text";
+        String messageId = (tile != null)
+            ? "firstContactDialog.welcomeOffer.text"
+            : "firstContactDialog.welcomeSimple.text";
         String type = ((IndianNationType)other.getNationType())
             .getSettlementTypeKey(true);
         StringTemplate template = StringTemplate.template(messageId)

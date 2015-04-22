@@ -717,7 +717,7 @@ public class Messages {
      */
     public static String getTurnsText(int turns) {
         return (turns == FreeColObject.UNDEFINED)
-            ? message("notApplicable.short")
+            ? message("notApplicable")
             : (turns >= 0) ? Integer.toString(turns)
             : ">" + Integer.toString(-turns);
     }

@@ -30,6 +30,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.UnitType;
 
 
@@ -54,10 +55,10 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
         final List<UnitType> recruitables
             = new ArrayList<>(europe.getRecruitables());
 
-        String hdr = Messages.message("chooseImmigrant");
+        String hdr = Messages.message("emigrationDialog.chooseImmigrant");
         JTextArea header = Utility.getDefaultTextArea(hdr);
         if (foy) {
-            header.insert(Messages.message("lostCityRumour.fountainOfYouth")
+            header.insert(Messages.message(LostCityRumour.RumourType.FOUNTAIN_OF_YOUTH.getDescriptionKey())
                           + "\n\n", 0);
         }
 

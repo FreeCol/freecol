@@ -63,7 +63,7 @@ public class ConstructionPanel extends MigPanel
 
     /** The text to display if buildable == null. */
     private StringTemplate defaultLabel
-        = StringTemplate.key("colonyPanel.clickToBuild");
+        = StringTemplate.key("constructionPanel.clickToBuild");
 
 
     /**
@@ -157,13 +157,11 @@ public class ConstructionPanel extends MigPanel
             Image image = lib.getSmallBuildableImage(
                 buildable, colony.getOwner());
             add(new JLabel(new ImageIcon(image)), "spany");
-            JLabel label0 = Utility.localizedLabel(StringTemplate
-                .template("colonyPanel.currentlyBuilding")
-                .addName("%buildable%", buildable));
+            JLabel label0 = Utility.localizedLabel(buildable.getCurrentlyBuildingLabel());
             label0.setFont(font);
             add(label0);
             JLabel label1 = Utility.localizedLabel(StringTemplate
-                .template("turnsToComplete.long")
+                .template("constructionPanel.turnsToComplete")
                 .addName("%number%", Messages.getTurnsText(turns)));
             label1.setFont(font);
             add(label1);

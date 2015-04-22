@@ -44,7 +44,10 @@ public class FreeColFileFilter extends FileFilter {
         = new FreeColFileFilter(FreeCol.FREECOL_SAVE_EXTENSION, true,
                                 "filter.savedGames");
 
+    public static final FileFilter freeColXMLFilter
+        = new FreeColFileFilter(".xml", true, "filter.xml");
 
+    
     /**
      * Create a new FreeColFileFilter.
      *

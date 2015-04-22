@@ -68,29 +68,29 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
 
-        JLabel header = Utility.localizedLabel("LoadingSavegame.title", JLabel.CENTER);
+        JLabel header = Utility.localizedLabel(Messages.nameKey("loadingSavegameDialog"), JLabel.CENTER);
         header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.MEDIUM));
         header.setBorder(Utility.blankBorder(20, 0, 0, 0));
 
         JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        p1.add(Utility.localizedLabel("LoadingSavegame.serverName"));
+        p1.add(Utility.localizedLabel("loadingSavegameDialog.serverName"));
 
         serverNameField = new JTextField();
 
         JPanel p2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        p2.add(Utility.localizedLabel("LoadingSavegame.port"));
+        p2.add(Utility.localizedLabel("loadingSavegameDialog.port"));
 
         portField = new JSpinner(new SpinnerNumberModel(FreeCol.getServerPort(),
                                                         1, 65536, 1));
         ButtonGroup bg = new ButtonGroup();
-        String str = Messages.message("LoadingSavegame.singlePlayer");
+        String str = Messages.message("loadingSavegameDialog.singlePlayer");
         singlePlayer = new JRadioButton(str);
         bg.add(singlePlayer);
-        str = Messages.message("LoadingSavegame.privateMultiplayer");
+        str = Messages.message("loadingSavegameDialog.privateMultiplayer");
         privateMultiplayer = new JRadioButton(str);
         bg.add(privateMultiplayer);
-        str = Messages.message("LoadingSavegame.publicMultiplayer");
+        str = Messages.message("loadingSavegameDialog.publicMultiplayer");
         publicMultiplayer = new JRadioButton(str);
         bg.add(publicMultiplayer);
 

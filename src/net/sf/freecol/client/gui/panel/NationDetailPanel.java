@@ -52,7 +52,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
      */
     public NationDetailPanel(FreeColClient freeColClient,
                              ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.NATIONS.toString());
+        super(freeColClient, colopediaPanel, PanelType.NATIONS.getKey());
     }
 
 

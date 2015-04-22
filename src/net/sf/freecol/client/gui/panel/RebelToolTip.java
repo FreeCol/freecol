@@ -64,7 +64,7 @@ public class RebelToolTip extends JToolTip {
         setPreferredSize(new Dimension(425,325));
 
         add(Utility.localizedLabel(StringTemplate
-                .template("colonyPanel.rebelLabel")
+                .template("rebelToolTip.rebelLabel")
                 .addName("%number%", "")));
 
         add(new JLabel(Integer.toString(rebels)));
@@ -72,7 +72,7 @@ public class RebelToolTip extends JToolTip {
         add(new JLabel(solPercent + "%"));
 
         add(Utility.localizedLabel(StringTemplate
-                .template("colonyPanel.royalistLabel")
+                .template("rebelToolTip.royalistLabel")
                 .addName("%number%", "")));
 
         add(new JLabel(Integer.toString(population - rebels)));
@@ -130,25 +130,25 @@ public class RebelToolTip extends JToolTip {
             }
         }
 
-        final String na = Messages.message("notApplicable.short");
-        add(Utility.localizedLabel("report.nextMember"));
+        final String na = Messages.message("notApplicable");
+        add(Utility.localizedLabel("rebelToolTip.nextMember"));
         add(new JLabel((turnsNext < 0) ? na
                 : Integer.toString((int)Math.ceil(turnsNext))), "skip");
 
-        add(Utility.localizedLabel("report.50percent"));
+        add(Utility.localizedLabel("rebelToolTip.50percent"));
         add(new JLabel((turns50 < 0) ? na
                 : Integer.toString((int)Math.ceil(turns50))), "skip");
 
-        add(Utility.localizedLabel("report.100percent"));
+        add(Utility.localizedLabel("rebelToolTip.100percent"));
         add(new JLabel((turns100 < 0) ? na
                 : Integer.toString((int)Math.ceil(turns100))), "skip");
 
         final int grow = colony.getPreferredSizeChange();
         if (grow > 0) {
-            add(Utility.localizedLabel("report.changeMore"));
+            add(Utility.localizedLabel("rebelToolTip.changeMore"));
             add(new JLabel(Integer.toString(grow)), "skip");
         } else if (grow < 0) {
-            add(Utility.localizedLabel("report.changeLess"));
+            add(Utility.localizedLabel("rebelToolTip.changeLess"));
             add(new JLabel(Integer.toString(-grow)), "skip");
         }
     }

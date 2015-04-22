@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Stance;
@@ -45,7 +46,8 @@ public class StanceTradeItem extends TradeItem {
      */
     public StanceTradeItem(Game game, Player source, Player destination,
                            Stance stance) {
-        super(game, "tradeItem.stance", source, destination);
+        super(game, Messages.nameKey("model.tradeItem.stance"),
+              source, destination);
 
         this.stance = stance;
     }

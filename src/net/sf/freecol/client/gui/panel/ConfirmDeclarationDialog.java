@@ -258,24 +258,24 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         if (this.flag == null) this.flag = ENGLISH_FLAG; // default to USA-style
 
         StringTemplate sure = StringTemplate
-            .template("declareIndependence.areYouSure.text")
+            .template("confirmDeclarationDialog.areYouSure.text")
             .addNamed("%monarch%", player.getMonarch());
 
         StringTemplate country = StringTemplate
-            .template("declareIndependence.defaultCountry")
+            .template("confirmDeclarationDialog.defaultCountry")
             .addName("%nation%", player.getNewLandName());
         this.countryField = new JTextField(Messages.message(country), 20);
 
-        String cPrompt = Messages.message("declareIndependence.enterCountry");
+        String cPrompt = Messages.message("confirmDeclarationDialog.enterCountry");
 
         StringTemplate nation = StringTemplate
-            .template("declareIndependence.defaultNation")
+            .template("confirmDeclarationDialog.defaultNation")
             .addStringTemplate("%nation%", player.getNationName());
         this.nationField = new JTextField(Messages.message(nation), 20);
 
-        String nPrompt = Messages.message("declareIndependence.enterNation");
+        String nPrompt = Messages.message("confirmDeclarationDialog.enterNation");
 
-        String flagPrompt = Messages.message("declareIndependence.createFlag");
+        String flagPrompt = Messages.message("confirmDeclarationDialog.createFlag");
 
         this.label = new JLabel();
         this.label.setIcon(new ImageIcon(this.flag.getImage()));
@@ -349,9 +349,9 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
         final List<String> fake = null;
         List<ChoiceItem<List<String>>> c = choices();
-        c.add(new ChoiceItem<>(Messages.message("declareIndependence.areYouSure.yes"),
+        c.add(new ChoiceItem<>(Messages.message("confirmDeclarationDialog.areYouSure.yes"),
                 fake).okOption());
-        c.add(new ChoiceItem<>(Messages.message("declareIndependence.areYouSure.no"),
+        c.add(new ChoiceItem<>(Messages.message("confirmDeclarationDialog.areYouSure.no"),
                 fake).cancelOption().defaultOption());
         initializeDialog(DialogType.QUESTION, true, panel, icon, c);
     }

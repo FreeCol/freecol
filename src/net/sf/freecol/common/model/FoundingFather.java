@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -52,7 +52,7 @@ public class FoundingFather extends FreeColGameObjectType {
          * @return A message key.
          */
         public String getKey() {
-            return "model.foundingFather." + toString().toLowerCase(Locale.US);
+            return getEnumKey(this);
         }
     }
 
@@ -128,7 +128,7 @@ public class FoundingFather extends FreeColGameObjectType {
      * @return The message key.
      */
     public static String getTypeKey(FoundingFatherType type) {
-        return type.getKey();
+        return "model.foundingFather." + type.getKey();
     }
 
     /**

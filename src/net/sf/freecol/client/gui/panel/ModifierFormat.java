@@ -43,7 +43,7 @@ public class ModifierFormat {
 
 
     public static final String getUnknownValue() {
-        return Messages.message("model.modifier.unknown");
+        return Messages.message("modifierFormat.unknown");
     }
 
     public static final String format(double value) {

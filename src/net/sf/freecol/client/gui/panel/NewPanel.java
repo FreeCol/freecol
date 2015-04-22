@@ -177,13 +177,13 @@ public final class NewPanel extends FreeColPanel
         // Create the components
         this.buttonGroup = new ButtonGroup();
         JRadioButton
-            single = new JRadioButton(Messages.message("singlePlayerGame"),
+            single = new JRadioButton(Messages.message("newPanel.singlePlayerGame"),
                                       true),
-            join = new JRadioButton(Messages.message("joinMultiPlayerGame"),
+            join = new JRadioButton(Messages.message("newPanel.joinMultiPlayerGame"),
                                     false),
-            start = new JRadioButton(Messages.message("startMultiplayerGame"),
+            start = new JRadioButton(Messages.message("newPanel.startMultiplayerGame"),
                                      false),
-            meta = new JRadioButton(Messages.message("getServerList")
+            meta = new JRadioButton(Messages.message("newPanel.getServerList")
                 + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
         this.buttonGroup.add(single);
         single.setActionCommand(String.valueOf(NewPanelAction.SINGLE));
@@ -204,7 +204,7 @@ public final class NewPanel extends FreeColPanel
         this.nameBox = new JTextField(name, 20);
 
         this.advantagesLabel
-            = Utility.localizedLabel("playerOptions.nationalAdvantages");
+            = Utility.localizedLabel("newPanel.nationalAdvantages");
         this.advantagesBox = new JComboBox<>(new Advantages[] {
                 Advantages.SELECTABLE,
                 Advantages.FIXED,
@@ -213,7 +213,7 @@ public final class NewPanel extends FreeColPanel
         this.advantagesBox
             .setRenderer(new FreeColComboBoxRenderer<Advantages>());
 
-        this.serverPortLabel = Utility.localizedLabel("startServerOnPort");
+        this.serverPortLabel = Utility.localizedLabel("newPanel.startServerOnPort");
         this.serverPortField
             = new JTextField(Integer.toString(FreeCol.getServerPort()));
         this.serverPortField.addActionListener(new ActionListener() {
@@ -246,14 +246,14 @@ public final class NewPanel extends FreeColPanel
             .setRenderer(new FreeColComboBoxRenderer<FreeColTcFile>("mod."));
         this.rulesBox.addItemListener(this);
 
-        this.publicServer = new JCheckBox(Messages.message("publicServer"));
+        this.publicServer = new JCheckBox(Messages.message("newPanel.publicServer"));
 
         this.difficultyLabel = Utility.localizedLabel("difficulty");
         this.difficultyBox = new JComboBox<>();
         this.difficultyBox
             .setRenderer(new FreeColComboBoxRenderer<OptionGroup>());
         this.difficultyBox.addItemListener(this);
-        this.difficultyButton = Utility.localizedButton("showDifficulty");
+        this.difficultyButton = Utility.localizedButton("newPanel.showDifficulty");
         this.difficultyButton
             .setActionCommand(String.valueOf(NewPanelAction.SHOW_DIFFICULTY));
         this.difficultyButton.addActionListener(this);
@@ -278,7 +278,7 @@ public final class NewPanel extends FreeColPanel
         setCancelComponent(cancel);
 
         // Add all the components
-        add(Utility.localizedHeader("newGamePanel", false), "span 6, center");
+        add(Utility.localizedHeader("newPanel.newGamePanel", false), "span 6, center");
         add(single, "newline, span 3");
         add(new JSeparator(JSeparator.VERTICAL), "spany 7, grow");
         add(Utility.localizedLabel("name"), "span, split 2");
@@ -372,8 +372,9 @@ public final class NewPanel extends FreeColPanel
             this.difficultyButton.setEnabled(false);
         } else {
             this.difficultyButton.setEnabled(true);
-            String text = (this.difficulty.isEditable()) ? "editDifficulty"
-                : "showDifficulty";
+            String text = (this.difficulty.isEditable())
+                ? "newPanel.editDifficulty"
+                : "newPanel.showDifficulty";
             this.difficultyButton.setText(Messages.message(text));
         }
     }

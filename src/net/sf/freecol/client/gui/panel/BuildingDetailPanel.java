@@ -57,7 +57,8 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * This panel displays details of buildings in the Colopedia.
  */
-public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingType> {
+public class BuildingDetailPanel
+    extends ColopediaGameObjectTypePanel<BuildingType> {
 
     /**
      * Creates a new instance of this ColopediaDetailPanel.
@@ -67,7 +68,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
      */
     public BuildingDetailPanel(FreeColClient freeColClient,
                                ColopediaPanel colopediaPanel) {
-        super(freeColClient, colopediaPanel, PanelType.BUILDINGS.toString());
+        super(freeColClient, colopediaPanel, PanelType.BUILDINGS.getKey());
     }
 
 
@@ -152,7 +153,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
                 doc.insertString(doc.getLength(), "\n", doc.getStyle("regular"));
             }
             if (buildingType.getRequiredPopulation() > 0) {
-                StringTemplate template = StringTemplate.template("colonist")
+                StringTemplate template = StringTemplate.template("colopedia.buildings.requiredPopulation")
                     .addAmount("%number%", buildingType.getRequiredPopulation());
                 doc.insertString(doc.getLength(),
                                  Messages.message(template) + "\n",

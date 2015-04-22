@@ -22,12 +22,12 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -44,7 +44,7 @@ public abstract class NationType extends FreeColGameObjectType {
          * @return A message key.
          */
         public String getKey() {
-            return toString().toLowerCase(Locale.US);
+            return "settlementNumber." + getEnumKey(this);
         }
     }
 
@@ -57,7 +57,7 @@ public abstract class NationType extends FreeColGameObjectType {
          * @return A message key.
          */
         public String getKey() {
-            return toString().toLowerCase(Locale.US);
+            return "aggressionLevel." + getEnumKey(this);
         }
     }
 

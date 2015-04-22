@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
@@ -50,7 +51,8 @@ public class ColonyTradeItem extends TradeItem {
      */
     public ColonyTradeItem(Game game, Player source, Player destination,
                            Colony colony) {
-        super(game, "tradeItem.colony", source, destination);
+        super(game, Messages.nameKey("model.tradeItem.colony"),
+              source, destination);
         colonyId = colony.getId();
         colonyName = colony.getName();
         if (colony.getOwner() != source) {
@@ -97,7 +99,7 @@ public class ColonyTradeItem extends TradeItem {
      */
     @Override
     public StringTemplate getLabel() {
-        return StringTemplate.template("tradeItem.colony.long")
+        return StringTemplate.template(Messages.descriptionKey("model.tradeItem.colony"))
             .addName("%colony%", colonyName);
     }
 

@@ -54,7 +54,7 @@ public final class ErrorPanel extends FreeColPanel {
     public ErrorPanel(FreeColClient freeColClient, String message) {
         super(freeColClient, new MigLayout());
 
-        JButton showButton = Utility.localizedButton("errorMessage.showLogFile");
+        JButton showButton = Utility.localizedButton("errorPanel.showLogFile");
         showButton.setActionCommand(SHOW);
         showButton.addActionListener(this);
 

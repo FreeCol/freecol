@@ -183,7 +183,7 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
      * @return A <code>StringTemplate</code> for this stop.
      */
     public StringTemplate invalidStopLabel(Player player) {
-        return getLabelFor("tradeRoute.invalidStop", player);
+        return getLabelFor("model.tradeRoute.invalidStop", player);
     }
 
     /**

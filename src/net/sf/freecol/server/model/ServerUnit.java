@@ -84,12 +84,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
     private static final Logger logger = Logger.getLogger(ServerUnit.class.getName());
 
-    // The bogus end of the world year.
-    private static final int MAYAN_PROPHESY_YEAR = 2012;
-
-    // How many `nothing' rumours are there.
-    private static int rumourNothing = -1;
-
 
     /**
      * Trivial constructor required for all ServerModelObjects.
@@ -268,8 +262,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 changeType(learn);//-vis: safe within colony
                 cs.addMessage(See.only(owner),
                     new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                        "model.unit.experience",
-                        getColony(), this)
+                        "model.unit.experience", getColony(), this)
                     .addStringTemplate("%oldName%", oldName)
                     .addStringTemplate("%unit%", getLabel())
                     .addName("%colony%", getColony().getName()));
@@ -621,7 +614,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         serverPlayer.csChangeStance(Stance.WAR, indianPlayer, true, cs);
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                "lostCityRumour.burialGround", serverPlayer, this)
+                RumourType.BURIAL_GROUND.getDescriptionKey(), serverPlayer, this)
             .addStringTemplate("%nation%", indianPlayer.getNationName()));
     }
 
@@ -709,6 +702,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         logger.info("Unit " + getId() + " is exploring rumour " + rumour);
         boolean result = true;
+        String key = rumour.getDescriptionKey();
         switch (rumour) {
         case BURIAL_GROUND:
             csNativeBurialGround(cs);
@@ -716,35 +710,12 @@ public class ServerUnit extends Unit implements ServerModelObject {
         case EXPEDITION_VANISHES:
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                    "lostCityRumour.expeditionVanishes", serverPlayer));
+                                 key, serverPlayer));
             result = false;
             break;
         case NOTHING:
-            if (game.getTurn().getYear() % 100 == 12
-                && randomInt(logger, "Mayans?", random, 4) == 0) {
-                int years = MAYAN_PROPHESY_YEAR - game.getTurn().getYear();
-                cs.addMessage(See.only(serverPlayer),
-                    new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                        "lostCityRumour.mayans", serverPlayer, this)
-                    .addAmount("%years%", years));
-                break;
-            } else if (mounds) {
-                cs.addMessage(See.only(serverPlayer),
-                    new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                        "lostCityRumour.moundsNothing", serverPlayer, this));
-                break;
-            }
-            if (rumourNothing < 0) {
-                int i;
-                for (i = 0; Messages.containsKey("lostCityRumour.nothing."
-                                                 + Integer.toString(i)); i++);
-                rumourNothing = i;
-            }
             cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                    "lostCityRumour.nothing." + randomInt(logger,
-                        "Nothing rumour", random, rumourNothing),
-                    serverPlayer, this));
+                lostCity.getNothingMessage(serverPlayer, mounds, random));
             break;
         case LEARN:
             StringTemplate oldName = getLabel();
@@ -755,9 +726,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                    "lostCityRumour.learn", serverPlayer, this)
-                .addStringTemplate("%unit%", oldName)
-                .addNamed("%type%", getType()));
+                                 key, serverPlayer, this)
+                    .addStringTemplate("%unit%", oldName)
+                    .addNamed("%type%", getType()));
             break;
         case TRIBAL_CHIEF:
             int chiefAmount = randomInt(logger, "Chief base amount",
@@ -766,21 +737,22 @@ public class ServerUnit extends Unit implements ServerModelObject {
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold", "score");
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                    ((mounds) ? "lostCityRumour.moundsTrinkets"
-                        : "lostCityRumour.tribalChief"),
+                    ((mounds) ? rumour.getAlternateDescriptionKey("mounds")
+                        : key),
                     serverPlayer, this)
                 .addAmount("%money%", chiefAmount));
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
         case COLONIST:
-            List<UnitType> foundTypes = spec.getUnitTypesWithAbility(Ability.FOUND_IN_LOST_CITY);
+            List<UnitType> foundTypes
+                = spec.getUnitTypesWithAbility(Ability.FOUND_IN_LOST_CITY);
             unitType = getRandomMember(logger, "Choose found",
                                        foundTypes, random);
             newUnit = new ServerUnit(game, tile, serverPlayer,
                                      unitType);//-vis: safe, scout on tile
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                    "lostCityRumour.colonist", serverPlayer, newUnit));
+                                 key, serverPlayer, newUnit));
             break;
         case CIBOLA:
             String cityName = NameCache.getNextCityOfCibola();
@@ -794,12 +766,12 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 newUnit.setTreasureAmount(treasureAmount);
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                        "lostCityRumour.cibola", serverPlayer, newUnit)
+                                     key, serverPlayer, newUnit)
                     .addName("%city%", cityName)
                     .addAmount("%money%", treasureAmount));
                 cs.addGlobalHistory(game,
                     new HistoryEvent(game.getTurn(),
-                        HistoryEvent.EventType.CITY_OF_GOLD, serverPlayer)
+                        HistoryEvent.HistoryEventType.CITY_OF_GOLD, serverPlayer)
                     .addStringTemplate("%nation%", serverPlayer.getNationName())
                     .addName("%city%", cityName)
                     .addAmount("%treasure%", treasureAmount));
@@ -821,12 +793,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 newUnit.setTreasureAmount(ruinsAmount);
             }
             cs.addMessage(See.only(serverPlayer),
-                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                  ((mounds) ? "lostCityRumour.moundsTreasure"
-                                   : "lostCityRumour.ruins"),
-                                  serverPlayer, ((newUnit != null) ? newUnit
-                                                 : this))
-                     .addAmount("%money%", ruinsAmount));
+                new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                    ((mounds) ? rumour.getAlternateDescriptionKey("mounds")
+                        : key),
+                    serverPlayer, ((newUnit != null) ? newUnit : this))
+                    .addAmount("%money%", ruinsAmount));
             break;
         case FOUNTAIN_OF_YOUTH:
             ServerEurope europe = (ServerEurope)serverPlayer.getEurope();
@@ -834,9 +805,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 // FoY should now be disabled for non-colonial
                 // players, but leave this in for now as it is harmless.
                 cs.addMessage(See.only(serverPlayer),
-                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                         "lostCityRumour.fountainOfYouthWithoutEurope",
-                         serverPlayer, this));
+                    new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                        rumour.getAlternateDescriptionKey("noEurope"),
+                        serverPlayer, this));
             } else {
                 if (serverPlayer.isAI()) { // FIXME: let the AI select
                     europe.generateFountainRecruits(dx, random);
@@ -850,8 +821,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 }
                 cs.addMessage(See.only(serverPlayer),
                      new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                         "lostCityRumour.fountainOfYouth",
-                         serverPlayer, this));
+                                      key, serverPlayer, this));
                 cs.addAttribute(See.only(serverPlayer),
                                 "sound", "sound.event.fountainOfYouth");
             }

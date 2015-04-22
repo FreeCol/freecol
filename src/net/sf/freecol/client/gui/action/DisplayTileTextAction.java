@@ -27,6 +27,7 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -38,7 +39,11 @@ public class DisplayTileTextAction extends SelectableAction {
 
     // FIXME: make ClientOptions use enum
     public static enum DisplayText {
-        EMPTY, NAMES, OWNERS, REGIONS
+        EMPTY, NAMES, OWNERS, REGIONS;
+
+        public String getKey() {
+            return getEnumKey(this);
+        }
     };
 
     private static final int[] accelerators = {
@@ -59,7 +64,8 @@ public class DisplayTileTextAction extends SelectableAction {
      */
     public DisplayTileTextAction(FreeColClient freeColClient,
                                  DisplayText type) {
-        super(freeColClient, id + type, ClientOptions.DISPLAY_TILE_TEXT);
+        super(freeColClient, id + type.getKey(),
+              ClientOptions.DISPLAY_TILE_TEXT);
         display = type;
         setAccelerator(KeyStroke.getKeyStroke(accelerators[type.ordinal()],
                 KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));

@@ -61,6 +61,7 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -110,7 +111,8 @@ public final class PlayersTable extends JTable {
         }
     }
 
-    private class AdvantageCellRenderer implements TableCellRenderer {
+    private class AdvantageCellRenderer extends JLabel
+        implements TableCellRenderer {
 
         /** The national advantages type. */
         private final Advantages advantages;
@@ -157,11 +159,15 @@ public final class PlayersTable extends JTable {
                 ? Color.GRAY
                 : table.getForeground());
             label.setBackground(table.getBackground());
+            final Advantages advantages = (Advantages)value;
+            Utility.localizeToolTip(this, StringTemplate
+                .key(advantages.getShortDescriptionKey()));
             return label;
         }
     }
 
-    private static class AvailableCellRenderer implements TableCellRenderer {
+    private static class AvailableCellRenderer extends JLabel
+        implements TableCellRenderer {
 
         private final JComboBox<NationState> box
             = new JComboBox<>(NationState.values());
@@ -185,6 +191,9 @@ public final class PlayersTable extends JTable {
             Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
             box.setSelectedItem(value);
+            final NationState nationState = (NationState)value;
+            Utility.localizeToolTip(this, StringTemplate
+                .key(nationState.getShortDescriptionKey()));
             return box;
         }
     }
@@ -332,7 +341,7 @@ public final class PlayersTable extends JTable {
                                                       int index,
                                                       boolean isSelected,
                                                       boolean cellHasFocus) {
-            setText(Messages.message(value.getKey()));
+            setText(Messages.getName(value));
             return this;
         }
     }
@@ -629,8 +638,8 @@ public final class PlayersTable extends JTable {
 
     private static final String[] columnNames = {
         Messages.message("nation"),
-        Messages.message("availability"),
-        Messages.message("advantage"),
+        Messages.message("playersTable.availability"),
+        Messages.message("playersTable.advantage"),
         Messages.message("color"),
         Messages.message("player")
     };
@@ -661,16 +670,16 @@ public final class PlayersTable extends JTable {
         nationButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {
-                    gui.showColopediaPanel(PanelType.NATIONS.toString());
+                    gui.showColopediaPanel(PanelType.NATIONS.getKey());
                 }
             });
 
-        JLabel availabilityLabel = Utility.localizedLabel("availability");
-        JButton advantageButton = Utility.localizedButton("advantage");
+        JLabel availabilityLabel = Utility.localizedLabel("playersTable.availability");
+        JButton advantageButton = Utility.localizedButton("playersTable.advantage");
         advantageButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {
-                    gui.showColopediaPanel(PanelType.NATION_TYPES.toString());
+                    gui.showColopediaPanel(PanelType.NATION_TYPES.getKey());
                 }
             });
 

@@ -575,7 +575,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             = Utility.localizedLabel("tradeRouteInputPanel.destinationLabel");
         this.destinationSelector = new JComboBox<>();
         this.destinationSelector.setRenderer(new DestinationCellRenderer());
-        StringTemplate template = StringTemplate.template("report.allColonies");
+        StringTemplate template = StringTemplate.template("tradeRouteInputPanel.allColonies");
         this.destinationSelector.addItem(Messages.message(template));
         if (player.getEurope() != null) {
             this.destinationSelector.addItem(player.getEurope().getId());

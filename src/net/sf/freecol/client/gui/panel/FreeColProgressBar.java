@@ -186,7 +186,7 @@ public class FreeColProgressBar extends JPanel {
 
         String stepSignal = (step < 0) ? "-" : "+";
         String progressString = String.valueOf(value) + stepSignal + Math.abs(step) + "/" + max;
-        String turnsString = Messages.message("notApplicable.short");
+        String turnsString = Messages.message("notApplicable");
         if (max <= value) {
             turnsString = "0";
         } else if (step > 0) {
@@ -198,7 +198,7 @@ public class FreeColProgressBar extends JPanel {
             turnsString = Integer.toString(turns);
         }
         progressString += " " + Messages.message(StringTemplate
-            .template("turnsToComplete.short")
+            .template("freeColProgressBar.turnsToComplete")
             .addName("%number%", turnsString));
 
         int stringWidth = g2d.getFontMetrics().stringWidth(progressString);

@@ -140,9 +140,9 @@ public class ReportPanel extends FreeColPanel {
 
     protected String getLocationLabelFor(Unit unit) {
         if (unit.getDestination() instanceof Map) {
-            return Messages.message("goingToAmerica");
+            return Messages.message("sailingToAmerica");
         } else if (unit.getDestination() instanceof Europe) {
-            return Messages.message("goingToEurope");
+            return Messages.message("sailingToEurope");
         } else {
             return Messages.message(unit.getLocation()
                 .getLocationLabelFor(unit.getOwner()));

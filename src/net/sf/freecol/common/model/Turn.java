@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.i18n.Messages;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -53,7 +54,16 @@ public class Turn {
             }
             return "";
         }
-        
+
+        /**
+         * Get the stem key for this season.
+         *
+         * @return The stem key.
+         */
+        private String getKey() {
+            return "season." + getEnumKey(this);
+        }
+
         // Interface Named
 
         /**
@@ -61,7 +71,7 @@ public class Turn {
          */
         @Override
         public String getNameKey() {
-            return "season." + toString();
+            return Messages.nameKey("model." + getKey());
         }
     }
 

@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -96,12 +95,12 @@ public class Unit extends GoodsLocation
         SKIPPED;
 
         /**
-         * Get a message key for this unit state.
+         * Get the stem key for this unit state.
          *
-         * @return A message key.
+         * @return The stem key.
          */
         public String getKey() {
-            return toString().toLowerCase(Locale.US);
+            return "unitState." + getEnumKey(this);
         }
     }
 
@@ -402,7 +401,7 @@ public class Unit extends GoodsLocation
         // known because units may be hidden within
         boolean unknown = combatOdds.win == CombatModel.CombatOdds.UNKNOWN_ODDS
             || tile.hasSettlement();
-        return StringTemplate.template("attackTileOdds")
+        return StringTemplate.template("model.unit.attackTileOdds")
             .addName("%chance%", (unknown) ? "??"
                 : String.valueOf((int)(combatOdds.win * 100)));
     }
@@ -431,7 +430,7 @@ public class Unit extends GoodsLocation
      */
     public static StringTemplate getDestinationLabel(String tag,
         Location destination, Player player) {
-        return StringTemplate.template("goingTo")
+        return StringTemplate.template("model.unit.goingTo")
             .add("%type%", tag)
             .addStringTemplate("%location%",
                 destination.getLocationLabelFor(player));
@@ -3276,7 +3275,7 @@ public class Unit extends GoodsLocation
         if (player != null && player.owns(this)) {
             if (isDamaged()) {
                 if (full) {
-                    ret = StringTemplate.label(": ")
+                    ret = StringTemplate.label(":")
                         .add("model.unit.occupation.underRepair")
                         .addName(String.valueOf(getTurnsForRepair()));
                 } else {
@@ -3284,7 +3283,7 @@ public class Unit extends GoodsLocation
                 }
             } else if (tradeRoute != null) {
                 if (full) {
-                    ret = StringTemplate.label(": ")
+                    ret = StringTemplate.label(":")
                         .add("model.unit.occupation.inTradeRoute")
                         .addName(tradeRoute.getName());
                 } else {
@@ -3295,7 +3294,7 @@ public class Unit extends GoodsLocation
             } else if (getState() == UnitState.IMPROVING
                 && getWorkImprovement() != null) {
                 if (full) {
-                    ret = StringTemplate.label(": ")
+                    ret = StringTemplate.label(":")
                         .add(getWorkImprovement().getType() + ".occupationString")
                         .addName(String.valueOf(getWorkTurnsLeft()));
                 } else {
@@ -3304,8 +3303,7 @@ public class Unit extends GoodsLocation
             } else if (getDestination() != null) {
                 ret = StringTemplate.key("model.unit.occupation.goingSomewhere");
             } else {
-                ret = StringTemplate.key("model.unit.occupation."
-                    + getState().getKey());
+                ret = StringTemplate.key("model.unit." + getState().getKey());
             }
         } else {
             if (isNaval()) {
@@ -3826,7 +3824,7 @@ public class Unit extends GoodsLocation
      */
     @Override
     public StringTemplate getLocationLabel() {
-        return StringTemplate.template("onBoard")
+        return StringTemplate.template("model.unit.onBoard")
             .addStringTemplate("%unit%", this.getLabel());
     }
 
