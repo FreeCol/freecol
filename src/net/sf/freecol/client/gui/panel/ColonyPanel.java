@@ -128,7 +128,7 @@ public final class ColonyPanel extends PortPanel
         = Utility.localizedButton("unload");
 
     private JButton fillButton
-        = Utility.localizedButton("fill");
+        = Utility.localizedButton("load");
 
     private JButton warehouseButton
         = Utility.localizedButton("colonyPanel.warehouse");
