@@ -194,7 +194,7 @@ generated, and you can start the game simply by writing:
 
 Most FreeCol developers don't seem to use an IDE, so there is no
 ``official'' setup available. However, in the config folder, you can
-find contributed configuration files for both Netbeans and Eclipse.
+find contributed configuration files for both NetBeans and Eclipse.
 The following information has also been contributed by players that do
 use an IDE.
 
@@ -278,7 +278,36 @@ folder. Since this is an executable jar file, you can double click it
 and launch the game right away. Enjoy.
 
 
-\hypertarget{Using Netbeans}{\subsection{Using Netbeans (thanks to ``xsainnz'')}}
+\hypertarget{Using NetBeans}{\subsection{Using NetBeans (thanks to ``wintertime'')}}
+
+We have a NetBeans project with updated settings, but it is not at the
+standard location the IDE expects it at, as the IDE gets slower while a
+large project, like FreeCol, is open.
+NetBeans (currently on version 8.02) also, for a long time, contains a bug
+in that it wont read or write the editor setting for the Java version, if it
+was correctly set to 1.7.
+It is therefore set to 1.5 in the project file and causes the Editor to show a
+huge amount of wrong compatibility warnings, though compilation is not affected.
+
+You have the option of just clicking on ``build.xml'' in ``Files'' pane and
+starting the build commands easily through the ``Navigator'' pane inside
+the IDE that way.
+
+If you opt for using the provided project, copy the ``FreeCol/config/nbproject''
+folder to ``FreeCol/nbproject'' once. Without this step it will not work!
+Open the project inside NetBeans once, it will remember this, as long as
+you do not close the project manually.
+Each time you open the IDE right click on the ``FreeCol'' project name inside
+the ``Projects'' panel, choose ``Properties'', then from the opened dialog choose
+``Java Sources'' on the tree part, then change the ``Source Level'' setting to
+``JDK 1.7'' and click the ``OK'' button. This is necessary every time, until
+the NetBeans bug got fixed!
+
+\hypertarget{Creating a new NetBeans project}{\subsection{Creating a new NetBeans project (thanks to ``xsainnz'')}}
+
+\emph{This section is out of date and incomplete.
+Please, use the existing NetBeans project!
+Leaving as-is for now in the hope its still educational and updated someday.}
 
 \begin{itemize}
 \item In Netbeans, Select File > New Project
