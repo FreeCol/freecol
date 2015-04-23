@@ -19,7 +19,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -72,8 +74,17 @@ public class TerrainDetailPanel
         DefaultMutableTreeNode node =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
         for (TileType t : getSpecification().getTileTypeList()) {
-            // FIXME: Use ICON_SIZE, not magic scale factor
-            ImageIcon icon = new ImageIcon(MapViewer.createTileImageWithOverlayAndForest(t, 0.25f));
+            // FIXME: Use different method supporting request of an image of
+            //        fixed height taken from ICON_SIZE.
+            final float maxTileImageHeight = 96f;
+            Image tile = MapViewer.createTileImageWithOverlayAndForest(t,
+                ICON_SIZE.height / maxTileImageHeight);
+            BufferedImage image = new BufferedImage(tile.getWidth(null), ICON_SIZE.height,
+                BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = image.createGraphics();
+            g.drawImage(tile, 0, (ICON_SIZE.height - tile.getHeight(null)) / 2, null);
+            g.dispose();
+            ImageIcon icon = new ImageIcon(image);
             node.add(buildItem(t, icon));
         }
         root.add(node);
