@@ -27,7 +27,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
- * Draw the "background.FreeColBrightPanel" resource as a tiled
+ * Draw the "image.background.FreeColBrightPanel" resource as a tiled
  * background image.  BrightPanel is intended to provide a lighter
  * background than the default panel, and is used for panels that
  * might contain icons and text annotations, for example, many of the
@@ -44,7 +44,7 @@ public class FreeColBrightPanelUI extends BasicPanelUI {
     @Override
     public void paint(java.awt.Graphics g, javax.swing.JComponent c) {
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("background.FreeColBrightPanel", g, c, null);
+            ImageLibrary.drawTiledImage("image.background.FreeColBrightPanel", g, c, null);
         }
     }
 

@@ -3738,7 +3738,7 @@ public final class InGameController implements NetworkConstants {
         final Player player = unit.getOwner();
         StringTemplate t = StringTemplate.template("event.firstLanding")
             .addName("%name%", name);
-        gui.showEventPanel(Messages.message(t), "EventImage.firstLanding",
+        gui.showEventPanel(Messages.message(t), "image.flavor.event.firstLanding",
                            null);
 
         // Add tutorial message.
@@ -3794,7 +3794,7 @@ public final class InGameController implements NetworkConstants {
                               Unit unit) {
         if (region.isPacific()) {
             gui.showEventPanel(Messages.message("event.discoverPacific"),
-                               "EventImage.discoverPacific", null);
+                               "image.flavor.event.discoverPacific", null);
             nameNewRegion(tile, unit, region, defaultName);
         } else {
             gui.showNameNewRegionDialog(StringTemplate

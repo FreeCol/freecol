@@ -55,14 +55,14 @@ public class FreeColImageBorder extends AbstractBorder {
      * Creates the default border.
      */
     public FreeColImageBorder() {
-        this(ResourceManager.getImage("menuborder.nw.image"),
-             ResourceManager.getImage("menuborder.n.image"),
-             ResourceManager.getImage("menuborder.ne.image"),
-             ResourceManager.getImage("menuborder.e.image"),
-             ResourceManager.getImage("menuborder.se.image"),
-             ResourceManager.getImage("menuborder.s.image"),
-             ResourceManager.getImage("menuborder.sw.image"),
-             ResourceManager.getImage("menuborder.w.image"));
+        this(ResourceManager.getImage("image.menuborder.nw"),
+             ResourceManager.getImage("image.menuborder.n"),
+             ResourceManager.getImage("image.menuborder.ne"),
+             ResourceManager.getImage("image.menuborder.e"),
+             ResourceManager.getImage("image.menuborder.se"),
+             ResourceManager.getImage("image.menuborder.s"),
+             ResourceManager.getImage("image.menuborder.sw"),
+             ResourceManager.getImage("image.menuborder.w"));
     }
 
 

@@ -155,7 +155,7 @@ public class FreeColProgressBar extends JPanel {
         }
 
         if (isOpaque()) {
-            ImageLibrary.drawTiledImage("background.FreeColProgressBar", g, this, getInsets());
+            ImageLibrary.drawTiledImage("image.background.FreeColProgressBar", g, this, getInsets());
         }
 
         int dvalue = 0;

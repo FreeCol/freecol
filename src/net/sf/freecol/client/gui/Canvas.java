@@ -1224,7 +1224,7 @@ public final class Canvas extends JDesktopPane {
                 // Get the background without scaling, to avoid wasting memory
                 // needlessly keeping an unbounded number of rescaled versions
                 // of the largest image in FreeCol, forever.
-                Image bgImage = ResourceManager.getImage("CanvasBackgroundImage");
+                Image bgImage = ResourceManager.getImage("image.flavor.Canvas.map");
                 if (bgImage != null) {
                     // Draw background image with scaling.
                     g2d.drawImage(bgImage, 0, 0, size.width, size.height,

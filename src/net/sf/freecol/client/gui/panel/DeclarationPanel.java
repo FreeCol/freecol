@@ -69,7 +69,7 @@ public final class DeclarationPanel extends FreeColPanel {
     public DeclarationPanel(FreeColClient freeColClient) {
         super(freeColClient, null);
 
-        Image image = ResourceManager.getImage("Declaration.image");
+        Image image = ResourceManager.getImage("image.flavor.Declaration");
         setSize(image.getWidth(null), image.getHeight(null));
         setOpaque(false);
         setBorder(null);
@@ -135,7 +135,7 @@ public final class DeclarationPanel extends FreeColPanel {
      */
     @Override
     public void paintComponent(Graphics g) {
-        Image image = ResourceManager.getImage("Declaration.image");
+        Image image = ResourceManager.getImage("image.flavor.Declaration");
         g.drawImage(image, 0, 0, null);
     }
 

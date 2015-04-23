@@ -244,7 +244,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
          */
         public UpkeepLabel(int number) {
             super(new ImageIcon(freeColClient.getGUI().getImageLibrary()
-                .getMiscImage("coin")));
+                .getMiscImage(ImageLibrary.ICON_COIN)));
             GUI gui = freeColClient.getGUI();
             ImageLibrary lib = gui.getImageLibrary();
             image = lib.getStringImage(

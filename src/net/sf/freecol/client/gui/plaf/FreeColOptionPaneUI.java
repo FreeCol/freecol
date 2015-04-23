@@ -45,7 +45,7 @@ import net.sf.freecol.common.i18n.Messages;
 
 
 /**
- * Draw the "background.FreeColOptionPane" resource as a tiled
+ * Draw the "image.background.FreeColOptionPane" resource as a tiled
  * background image.
  */
 public class FreeColOptionPaneUI extends BasicOptionPaneUI {
@@ -239,7 +239,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
     @Override
     public void paint(Graphics g, JComponent c) {
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("background.FreeColOptionPane",
+            ImageLibrary.drawTiledImage("image.background.FreeColOptionPane",
                                         g, c, null);
         }
     }

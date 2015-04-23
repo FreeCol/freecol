@@ -154,7 +154,7 @@ public class BuildingToolTip extends JToolTip {
         int diff = building.getUnitCapacity() - building.getUnitCount();
         for (int index = 0; index < diff; index++) {
             add(new JLabel(new ImageIcon(ResourceManager
-                    .getImage("placeholder.image"))), "span 2");
+                    .getImage("image.unit.placeholder"))), "span 2");
         }
 
         int breedingNumber = (output == null) ? GoodsType.INFINITY

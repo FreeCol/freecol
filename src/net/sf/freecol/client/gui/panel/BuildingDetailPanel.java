@@ -84,7 +84,7 @@ public class BuildingDetailPanel
         DefaultMutableTreeNode parent =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
 
-        Image buildingImage = ResourceManager.getImage("Colopedia.buildingSection.image");
+        Image buildingImage = ResourceManager.getImage("image.icon.Colopedia.buildingSection");
         ImageIcon buildingIcon = (buildingImage == null) ? null
             : new ImageIcon(buildingImage);
 

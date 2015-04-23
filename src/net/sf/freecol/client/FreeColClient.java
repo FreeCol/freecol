@@ -208,7 +208,7 @@ public final class FreeColClient {
         //   - resources in the default actions
         //
         // FIXME: probably should not need to load "classic", but there
-        // are a bunch of things in there (e.g. orderButton) that first
+        // are a bunch of things in there (e.g. order buttons) that first
         // need to move to base because the action manager requires them.
         //
         // Not so easy, since the ActionManager also creates tile

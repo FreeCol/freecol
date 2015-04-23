@@ -237,10 +237,10 @@ public abstract class FreeColAction extends AbstractAction
      * @param key The identifier of the action.
      */
     protected void addImageIcons(String key) {
-        Image normal = ResourceManager.getImage("orderButton.normal." + key);
-        Image highlighted = ResourceManager.getImage("orderButton.highlighted." + key);
-        Image pressed = ResourceManager.getImage("orderButton.pressed." + key);
-        Image disabled = ResourceManager.getImage("orderButton.disabled." + key);
+        Image normal = ResourceManager.getImage("image.miscicon.button.normal." + key);
+        Image highlighted = ResourceManager.getImage("image.miscicon.button.highlighted." + key);
+        Image pressed = ResourceManager.getImage("image.miscicon.button.pressed." + key);
+        Image disabled = ResourceManager.getImage("image.miscicon.button.disabled." + key);
         orderButtonImageCount = ((normal == null) ? 0 : 1)
             + ((highlighted == null) ? 0 : 1)
             + ((pressed == null) ? 0 : 1)
@@ -252,7 +252,7 @@ public abstract class FreeColAction extends AbstractAction
             putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(disabled));
         } else {
             logger.warning("Missing " + (4-orderButtonImageCount)
-                + " orderButton images for " + getId());
+                + " order button images for " + getId());
         }
     }
 

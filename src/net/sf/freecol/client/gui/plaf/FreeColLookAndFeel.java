@@ -167,7 +167,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("ColorButtonUI", "javax.swing.plaf.metal.MetalButtonUI");
 
             // Add cursors:
-            Image im = ResourceManager.getImage("cursor.go.image");
+            Image im = ResourceManager.getImage("image.icon.cursor.go");
             if (im != null) {
                 u.put("cursor.go", Toolkit.getDefaultToolkit()
                       .createCustomCursor(im, new Point(im.getWidth(null)/2,

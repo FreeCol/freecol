@@ -40,7 +40,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class FirstContactDialog extends FreeColConfirmDialog {
 
     private static final String BASE_KEY = "firstContactDialog.meeting.";
-    private static final String IMAGE_BASE_KEY = "EventImage.meeting.";
+    private static final String IMAGE_BASE_KEY = "image.flavor.event.meeting.";
     private static final String NATIVES_KEY = "natives";
     private static final String TUTORIAL_KEY = BASE_KEY + NATIVES_KEY + ".tutorial";
 

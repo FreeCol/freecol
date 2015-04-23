@@ -427,7 +427,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         private final JLabel nameLabel = new JLabel();
 
         private final JLabel lockLabel = new JLabel(new ImageIcon(
-            ImageLibrary.getMiscImage(ImageLibrary.LOCK, 0.5f)));
+            ImageLibrary.getMiscImage(ImageLibrary.ICON_LOCK, 0.5f)));
 
         private final Dimension buildingDimension = new Dimension(-1, 48);
 

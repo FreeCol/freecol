@@ -60,7 +60,7 @@ public final class AboutPanel extends FreeColPanel {
         super(freeColClient, new MigLayout("wrap"));
 
         // Header with image
-        Image tempImage = ResourceManager.getImage("TitleImage");
+        Image tempImage = ResourceManager.getImage("image.flavor.Title");
         if (tempImage != null) {
             JLabel logoLabel = new JLabel(new ImageIcon(tempImage));
             logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,2,2),

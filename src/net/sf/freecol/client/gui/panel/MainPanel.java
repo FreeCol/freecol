@@ -75,7 +75,7 @@ public final class MainPanel extends FreeColPanel {
                 ? ContinueAction.id
                 : NewAction.id));
 
-        Image tempImage = ResourceManager.getImage("TitleImage");
+        Image tempImage = ResourceManager.getImage("image.flavor.Title");
 
         if (tempImage != null) {
             JLabel logoLabel = new JLabel(new ImageIcon(tempImage));

@@ -59,9 +59,9 @@ public class ColopediaTreeCellRenderer extends DefaultTreeCellRenderer {
         if (nodeItem.getIcon() != null) {
             setIcon(nodeItem.getIcon());
         } else if (expanded) {
-            setIcon(new ImageIcon(ResourceManager.getImage("Colopedia.openSection.image")));
+            setIcon(new ImageIcon(ResourceManager.getImage("image.icon.Colopedia.openSection")));
         } else {
-            setIcon(new ImageIcon(ResourceManager.getImage("Colopedia.closedSection.image")));
+            setIcon(new ImageIcon(ResourceManager.getImage("image.icon.Colopedia.closedSection")));
         }
         return this;
     }

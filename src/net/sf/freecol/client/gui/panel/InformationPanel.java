@@ -136,7 +136,7 @@ public class InformationPanel extends FreeColPanel {
 
     @Override
     public void paintComponent(Graphics g) {
-        g.drawImage(ResourceManager.getImage("InformationPanel.backgroundImage"),
+        g.drawImage(ResourceManager.getImage("image.skin.InformationPanel"),
             0, 0, this);
     }
 }

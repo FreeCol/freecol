@@ -385,7 +385,7 @@ public class GUI {
     public void showOpeningVideo(final String userMsg) {
         if (canvas == null) return;
         canvas.closeMenus();
-        final Video video = ResourceManager.getVideo("Opening.video");
+        final Video video = ResourceManager.getVideo("video.opening");
         boolean muteAudio = !freeColClient.getSoundController().canPlaySound();
         final VideoComponent vp = new VideoComponent(video, muteAudio);
 
@@ -564,7 +564,7 @@ public class GUI {
         this.colonyTileMapViewer = new MapViewer(freeColClient, windowSize);
 
         changeWindowedMode(windowed);
-        frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
+        frame.setIconImage(ResourceManager.getImage("image.miscicon.FrameIcon"));
 
         // Now that there is a canvas, prepare for language changes.
         LanguageOption o = (LanguageOption)freeColClient.getClientOptions()

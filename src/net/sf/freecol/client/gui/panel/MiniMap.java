@@ -63,7 +63,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     private final GUI gui;
 
     private Color backgroundColor = ResourceManager.getColor("miniMapBackground.color");
-    private final Image backgroundImage = ResourceManager.getImage("MiniMap.back");
+    private final Image backgroundImage = ResourceManager.getImage("image.background.MiniMap");
 
     private int tileSize; //tileSize is the size (in pixels) that each tile will take up on the mini map
 

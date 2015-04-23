@@ -81,7 +81,7 @@ public final class Utility {
     public static final Border COLOR_CELL_BORDER = BorderFactory
         .createCompoundBorder(
             BorderFactory.createMatteBorder(5, 10, 5, 10,
-                new ImageIcon(ResourceManager.getImage("background.ColorCellRenderer"))),
+                new ImageIcon(ResourceManager.getImage("image.background.ColorCellRenderer"))),
             BorderFactory.createLineBorder(BORDER_COLOR));
 
     public static final Border DIALOG_BORDER = BorderFactory

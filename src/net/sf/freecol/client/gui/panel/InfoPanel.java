@@ -381,7 +381,7 @@ public final class InfoPanel extends FreeColPanel {
         this.mapEditorPanel.setOpaque(false);
         this.tileInfoPanel = new TileInfoPanel();
         this.unitInfoPanel = new UnitInfoPanel();
-        this.skin = (useSkin) ? ResourceManager.getImage("InfoPanel.skin")
+        this.skin = (useSkin) ? ResourceManager.getImage("image.skin.InfoPanel")
             : null;
 
         setLayout(null);

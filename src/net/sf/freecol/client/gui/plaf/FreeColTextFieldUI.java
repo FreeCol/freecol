@@ -29,7 +29,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 
 
 /**
- * Provides a tiled background image "background.FreeColTextField" to
+ * Provides a tiled background image "image.background.FreeColTextField" to
  * text fields.
  */
 public class FreeColTextFieldUI extends BasicTextFieldUI {
@@ -56,7 +56,7 @@ public class FreeColTextFieldUI extends BasicTextFieldUI {
         JComponent c = getComponent();
 
         if (c.isOpaque()) {
-            ImageLibrary.drawTiledImage("background.FreeColTextField", g, c, null);
+            ImageLibrary.drawTiledImage("image.background.FreeColTextField", g, c, null);
         }
     }
 

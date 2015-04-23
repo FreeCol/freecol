@@ -107,14 +107,14 @@ public class ChatDisplay {
                     xx, yy, null);
                 yy += si.getHeight(null);
             }
-            Image decoration = ResourceManager.getImage("menuborder.shadow.s.image");
+            Image decoration = ResourceManager.getImage("image.menuborder.shadow.s");
             int width = decoration.getWidth(null);
             for (int index = 0; index < size.width; index += width) {
                 g.drawImage(decoration, index, 0, null);
             }
-            decoration = ResourceManager.getImage("menuborder.shadow.sw.image");
+            decoration = ResourceManager.getImage("image.menuborder.shadow.sw");
             g.drawImage(decoration, 0, 0, null);
-            decoration = ResourceManager.getImage("menuborder.shadow.se.image");
+            decoration = ResourceManager.getImage("image.menuborder.shadow.se");
             g.drawImage(decoration, size.width - decoration.getWidth(null), 0, null);
         }
     }

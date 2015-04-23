@@ -74,15 +74,16 @@ public final class ImageLibrary {
 
     private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());
 
-    public static final String UNIT_SELECT = "unitSelect.image",
-                               DELETE = "delete.image",
-                               PLOWED = "model.improvement.plow.image",
-                               TILE_TAKEN = "tileTaken.image",
-                               TILE_OWNED_BY_INDIANS = "nativeLand.image",
-                               LOST_CITY_RUMOUR = "lostCityRumour.image",
-                               DARKNESS = "halo.dark.image",
-                               BELLS = "model.goods.bells.image",
-                               LOCK = "lock.image";
+    public static final String DELETE = "image.miscicon.delete",
+                               PLOWED = "image.tile.model.improvement.plow",
+                               UNIT_SELECT = "image.tile.unitSelect",
+                               TILE_TAKEN = "image.tile.tileTaken",
+                               TILE_OWNED_BY_INDIANS = "image.tileitem.nativeLand",
+                               LOST_CITY_RUMOUR = "image.tileitem.lostCityRumour",
+                               DARKNESS = "image.halo.dark",
+                               ICON_LOCK = "image.icon.lock",
+                               ICON_COIN = "image.icon.coin",
+                               BELLS = "model.goods.bells.image";
 
     public static enum PathType {
         NAVAL,
@@ -100,11 +101,11 @@ public final class ImageLibrary {
         }
 
         public String getImageKey() {
-            return "path." + getKey() + ".image";
+            return "image.tileitem.path." + getKey();
         }
 
         public String getNextTurnImageKey() {
-            return "path." + getKey() + ".nextTurn.image";
+            return "image.tileitem.path." + getKey() + ".nextTurn";
         }
 
         /**

@@ -83,7 +83,7 @@ public final class CornerMapControls extends MapControls {
     public CornerMapControls(final FreeColClient freeColClient) {
         super(freeColClient, true);
 
-        compassRose = new JLabel(new ImageIcon(ResourceManager.getImage("compass.image")));
+        compassRose = new JLabel(new ImageIcon(ResourceManager.getImage("image.skin.compass")));
         compassRose.setFocusable(false);
         compassRose.setSize(compassRose.getPreferredSize());
         compassRose.addMouseListener(new MouseAdapter() {
@@ -106,7 +106,7 @@ public final class CornerMapControls extends MapControls {
                 }
             });
 
-        miniMapSkin = ResourceManager.getImage("MiniMap.skin");
+        miniMapSkin = ResourceManager.getImage("image.skin.MiniMap");
         miniMapPanel = new MiniMapPanel();
         miniMapPanel.setFocusable(false);
         
