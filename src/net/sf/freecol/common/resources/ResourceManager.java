@@ -249,7 +249,7 @@ public class ResourceManager {
      * @return a list of all keys starting with the given prefix
      */
     public static synchronized ArrayList<String> getImageKeys(String prefix) {
-        logger.finest("getImageKeys(" + prefix + ")");
+        //logger.finest("getImageKeys(" + prefix + ")");
         return mergedContainer.getImageKeys(prefix);
     }
 
@@ -263,22 +263,19 @@ public class ResourceManager {
      */
     public static synchronized ArrayList<String> getImageKeys(String prefix,
                                                               String suffix) {
-        //logger.finest("getImageKeys(" + prefix + ", " + suffix + ")");
+        logger.finest("getImageKeys(" + prefix + ", " + suffix + ")");
         return mergedContainer.getImageKeys(prefix, suffix);
     }
 
     /**
-     * Returns a set of all image keys containing the infix and
-     * ending with the given suffix.
+     * Returns a set of all keys starting with the given prefix.
      *
-     * @param infix the infix string contained somewhere
-     * @param suffix the suffix
-     * @return a set of all keys with these characteristics
+     * @param prefix the prefix
+     * @return a set of all keysstarting with the given prefix
      */
-    public static synchronized Set<String> getImageKeySet(String infix,
-                                                          String suffix) {
-        //logger.finest("getImageKeySet(" + infix + ", " + suffix + ")");
-        return mergedContainer.getImageKeySet(infix, suffix);
+    public static synchronized Set<String> getImageKeySet(String prefix) {
+        //logger.finest("getImageKeySet(" + prefix + ")");
+        return mergedContainer.getImageKeySet(prefix);
     }
 
     /**

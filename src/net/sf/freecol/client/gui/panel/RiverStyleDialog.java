@@ -43,7 +43,7 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
 
     public static final String DELETE = "DELETE";
 
-    private static final String PREFIX = "model.tile.river";
+    private static final String PREFIX = "image.tile.model.improvement.river";
 
 
     /**

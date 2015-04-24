@@ -228,8 +228,8 @@ public final class ImageLibrary {
      * @return The image at the given index.
      */
     public BufferedImage getBeachCornerImage(int index, int x, int y) {
-        return ResourceManager.getImage("model.tile.beach.corner" + index
-                                        + ((isEven(x, y)) ? "_even" : "_odd"),
+        return ResourceManager.getImage("image.tile.model.tile.beach.corner" + index
+                                        + ".r" + ((isEven(x, y)) ? "0" : "1"),
                                         scalingFactor);
     }
 
@@ -242,8 +242,8 @@ public final class ImageLibrary {
      * @return The image at the given index.
      */
     public BufferedImage getBeachEdgeImage(int index, int x, int y) {
-        return ResourceManager.getImage("model.tile.beach.edge" + index
-                                        + ((isEven(x, y)) ? "_even" : "_odd"),
+        return ResourceManager.getImage("image.tile.model.tile.beach.edge" + index
+                                        + ".r"+ ((isEven(x, y)) ? "0" : "1"),
                                         scalingFactor);
     }
 
@@ -261,9 +261,9 @@ public final class ImageLibrary {
     public BufferedImage getBorderImage(TileType type, Direction direction,
                                 int x, int y) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
-        return ResourceManager.getImage(key + ".border_" + direction
-                                        + ((isEven(x, y)) ?  "_even" : "_odd")
-                                        + ".image", scalingFactor);
+        return ResourceManager.getImage("image.tile." + key + ".border." + direction
+                                        + ".r" + ((isEven(x, y)) ?  "0" : "1")
+                                        , scalingFactor);
     }
 
     /**
@@ -281,13 +281,13 @@ public final class ImageLibrary {
     }
 
     public static BufferedImage getForestImage(TileType type, float scale) {
-        return ResourceManager.getImage(type.getId() + ".forest", scale);
+        return ResourceManager.getImage("image.tileforest." + type.getId(), scale);
     }
 
     public static BufferedImage getForestImage(TileType type, TileImprovementStyle riverStyle, float scale) {
         if (riverStyle != null) {
             BufferedImage image = ResourceManager.getImage(
-                type.getId() + ".forest" + riverStyle.getMask(), scale);
+                "image.tileforest." + type.getId() + ".s" + riverStyle.getMask(), scale);
             // @compat 0.10.6
             // Workaround for BR#3599586.  America_large used to contain
             // tiles with an isolated river (old river style="0"!).
@@ -299,7 +299,7 @@ public final class ImageLibrary {
             // end @compat
                 return image;
         }
-        return ResourceManager.getImage(type.getId() + ".forest", scale);
+        return ResourceManager.getImage("image.tileforest." + type.getId(), scale);
     }
 
     /**
@@ -515,13 +515,13 @@ public final class ImageLibrary {
      * @return The terrain-image at the given index.
      */
     public static BufferedImage getOverlayImage(TileType type, String id, float scale) {
-        String prefix = type.getId() + ".overlay";
-        ArrayList<String> keys = ResourceManager.getImageKeys(prefix, ".image");
+        String prefix = "image.tileoverlay." + type.getId();
+        ArrayList<String> keys = ResourceManager.getImageKeys(prefix);
         return getRandomizedImage(keys, id, scale);
     }
 
     public static Set<String> createOverlayCache() {
-        return ResourceManager.getImageKeySet(".overlay", ".image");
+        return ResourceManager.getImageKeySet("image.tileoverlay.");
     }
 
     public BufferedImage getOverlayImage(Tile tile, Set<String> overlayCache) {
@@ -531,7 +531,7 @@ public final class ImageLibrary {
 
     public static BufferedImage getOverlayImage(TileType type, String id, float scale,
                                         Set<String> overlayCache) {
-        String prefix = type.getId() + ".overlay";
+        String prefix = "image.tileoverlay." + type.getId() + ".r";
         ArrayList<String> keys = new ArrayList<>();
         for (String key : overlayCache) {
             if (key.startsWith(prefix)) {
@@ -628,7 +628,7 @@ public final class ImageLibrary {
      * @return The image with the given style.
      */
     public static BufferedImage getRiverImage(String style, float scale) {
-        return ResourceManager.getImage("model.tile.river" + style, scale);
+        return ResourceManager.getImage("image.tile.model.improvement.river.s" + style, scale);
     }
 
     /**
@@ -644,8 +644,8 @@ public final class ImageLibrary {
      */
     public BufferedImage getRiverMouthImage(Direction direction, int magnitude,
                                     int x, int y) {
-        String key = "model.tile.delta_" + direction
-            + (magnitude == 1 ? "_small" : "_large");
+        String key = "image.tile.model.tile.delta." + direction
+            + (magnitude == 1 ? ".small" : ".large");
         return ResourceManager.getImage(key, scalingFactor);
     }
 
@@ -711,8 +711,8 @@ public final class ImageLibrary {
 
     public static BufferedImage getTerrainImage(TileType type, int x, int y, float scale) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
-        return ResourceManager.getImage(key + ".center"
-            + (isEven(x, y) ? "0" : "1") + ".image", scale);
+        return ResourceManager.getImage("image.tile." + key + ".center.r"
+            + (isEven(x, y) ? "0" : "1"), scale);
     }
 
     public BufferedImage getSmallerUnitImage(Unit unit) {

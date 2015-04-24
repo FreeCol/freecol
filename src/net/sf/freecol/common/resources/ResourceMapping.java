@@ -272,16 +272,15 @@ public final class ResourceMapping {
     }
 
     /**
-     * Get the image keys in this mapping with a given infix and suffix.
+     * Get the image keys in this mapping with a given prefix.
      *
-     * @param infix The infix to check for.
-     * @param suffix The suffix to check for.
+     * @param prefix The prefix to check for.
      * @return The set of keys.
      */
-    public Set<String> getImageKeySet(String infix, String suffix) {
+    public Set<String> getImageKeySet(String prefix) {
         HashSet<String> result = new HashSet<>();
         for (String key : imageResources.keySet()) {
-            if (key.endsWith(suffix) && key.contains(infix)) {
+            if (key.startsWith(prefix)) {
                 result.add(key);
             }
         }
