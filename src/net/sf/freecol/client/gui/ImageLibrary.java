@@ -693,7 +693,7 @@ public final class ImageLibrary {
 
     public static BufferedImage getSettlementImage(SettlementType settlementType,
                                     float scale) {
-        return ResourceManager.getImage(settlementType.getId() + ".image",
+        return ResourceManager.getImage("image.tileitem." + settlementType.getId(),
                                         scale);
     }
 
