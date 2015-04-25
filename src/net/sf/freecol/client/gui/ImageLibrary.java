@@ -33,6 +33,7 @@ import java.awt.TexturePaint;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
@@ -63,6 +64,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
+
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -549,7 +551,7 @@ public final class ImageLibrary {
             case 1:
                 return ResourceManager.getImage(keys.get(0), scale);
             default:
-                keys.sort(null);
+                Collections.sort(keys);
                 return ResourceManager.getImage(
                     keys.get(Math.abs(id.hashCode() % count)), scale);
         }
