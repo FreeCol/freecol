@@ -118,9 +118,11 @@ public final class StartGamePanel extends FreeColPanel {
 
         start = Utility.localizedButton("startGame");
 
-        gameOptions = Utility.localizedButton(GameOptions.getXMLElementTagName());
+        gameOptions = Utility.localizedButton(Messages
+            .nameKey(GameOptions.getXMLElementTagName()));
 
-        mapGeneratorOptions = Utility.localizedButton(MapGeneratorOptions.getXMLElementTagName());
+        mapGeneratorOptions = Utility.localizedButton(Messages
+            .nameKey(MapGeneratorOptions.getXMLElementTagName()));
 
         readyBox = new JCheckBox(Messages.message("startGamePanel.iAmReady"));
 
