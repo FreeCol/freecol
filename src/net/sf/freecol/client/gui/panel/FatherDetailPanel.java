@@ -121,7 +121,7 @@ public class FatherDetailPanel
                 panel.add(Utility.getDefaultTextArea(
                     Messages.message("colopedia.foundingFather.description"), 40));
             } else {
-                Image image = ResourceManager.getImage(id + ".image");
+                Image image = ResourceManager.getImage("image.flavor." + id);
                 if (image != null) {
                     header.setText(Messages.message(id));
                     panel.add(new JLabel(new ImageIcon(image)));
