@@ -90,15 +90,15 @@ public final class GoodsLabel extends AbstractGoodsLabel
         String key = (!goods.getType().limitIgnored()
             && location instanceof Colony
             && ((Colony)location).getWarehouseCapacity() < goods.getAmount())
-            ? "goodsLabel.capacityExceeded.color"
+            ? "color.foreground.GoodsLabel.capacityExceeded"
             : (location instanceof Colony && type.isStorable()
                 && ((Colony)location).getExportData(type).getExported())
-            ? "goodsLabel.exported.color"
+            ? "color.foreground.GoodsLabel.exported"
             : (goods.getAmount() == 0)
-            ? "goodsLabel.zeroAmount.color"
+            ? "color.foreground.GoodsLabel.zeroAmount"
             : (goods.getAmount() < 0)
-            ? "goodsLabel.negativeAmount.color"
-            : "goodsLabel.positiveAmount.color";
+            ? "color.foreground.GoodsLabel.negativeAmount"
+            : "color.foreground.GoodsLabel.positiveAmount";
         setForeground(ResourceManager.getColor(key));
         super.setText(String.valueOf(goods.getAmount()));
     }

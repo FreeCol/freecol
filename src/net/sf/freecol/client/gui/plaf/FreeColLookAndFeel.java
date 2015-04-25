@@ -79,37 +79,37 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
         setCurrentTheme(new DefaultMetalTheme() {
                 @Override
                 protected ColorUIResource getPrimary1() {
-                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.primary1.color"));
+                    return new ColorUIResource(ResourceManager.getColor("color.primary1.LookAndFeel"));
                 }
 
                 @Override
                 protected ColorUIResource getPrimary2() {
-                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.backgroundSelect.color"));
+                    return new ColorUIResource(ResourceManager.getColor("color.backgroundSelect.LookAndFeel"));
                 }
 
                 @Override
                 protected ColorUIResource getPrimary3() {
-                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.primary3.color"));
+                    return new ColorUIResource(ResourceManager.getColor("color.primary3.LookAndFeel"));
                 }
 
                 @Override
                 protected ColorUIResource getSecondary1() {
-                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.secondary1.color"));
+                    return new ColorUIResource(ResourceManager.getColor("color.secondary1.LookAndFeel"));
                 }
 
                 @Override
                 protected ColorUIResource getSecondary2() {
-                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.disabled.color"));
+                    return new ColorUIResource(ResourceManager.getColor("color.disabled.LookAndFeel"));
                 }
 
                 @Override
                 protected ColorUIResource getSecondary3() {
-                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.background.color"));
+                    return new ColorUIResource(ResourceManager.getColor("color.background.LookAndFeel"));
                 }
 
                 @Override
                 public ColorUIResource getMenuDisabledForeground() {
-                    return new ColorUIResource(ResourceManager.getColor("lookAndFeel.disabledMenu.color"));
+                    return new ColorUIResource(ResourceManager.getColor("color.disabledMenu.LookAndFeel"));
                 }
             });
     }

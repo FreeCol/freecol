@@ -60,15 +60,15 @@ public final class Utility {
 
     /** The color to use for borders. */
     public static final Color BORDER_COLOR
-        = ResourceManager.getColor("lookAndFeel.border.color");
+        = ResourceManager.getColor("color.border.LookAndFeel");
 
     /** The color to use for links. */
     public static final Color LINK_COLOR
-        = ResourceManager.getColor("lookAndFeel.link.color");
+        = ResourceManager.getColor("color.link.LookAndFeel");
 
     /** The color to use for things the player probably should not do. */
     public static final Color WARNING_COLOR
-        = ResourceManager.getColor("lookAndFeel.warning.color");
+        = ResourceManager.getColor("color.warning.LookAndFeel");
 
 
     /** Useful static borders. */

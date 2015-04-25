@@ -2032,7 +2032,7 @@ public final class MapViewer {
                         colony.getDisplayUnitCount());
                     int bonus = colony.getProductionBonus();
                     Color theColor = ResourceManager.getColor(
-                        "productionBonus." + bonus + ".color");
+                        "color.map.productionBonus." + bonus);
                     // if government admits even more units, use
                     // italic and bigger number icon
                     Font font = (colony.getPreferredSizeChange() > 0)
@@ -2286,7 +2286,7 @@ public final class MapViewer {
      */
     private void displayRoad(Graphics2D g, Tile tile) {
         Color oldColor = g.getColor();
-        g.setColor(ResourceManager.getColor("road.color"));
+        g.setColor(ResourceManager.getColor("color.map.road"));
         g.setStroke(roadStroke);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         GeneralPath path = new GeneralPath();

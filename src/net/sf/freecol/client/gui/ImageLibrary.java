@@ -1092,8 +1092,8 @@ public final class ImageLibrary {
     public BufferedImage getMissionChip(Graphics2D g,
                                         Player owner, boolean expert) {
         Color background = owner.getNationColor();
-        Color foreground = ResourceManager.getColor("mission."
-            + ((expert) ? "expert" : "normal") + ".foreground.color");
+        Color foreground = ResourceManager.getColor("color.foreground.mission."
+            + ((expert) ? "expert" : "normal"));
         if (foreground == null) {
             foreground = (expert) ? Color.BLACK : Color.GRAY;
         }
