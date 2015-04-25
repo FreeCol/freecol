@@ -1195,7 +1195,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     public String getImageKey() {
         return getOwner().getNationId()
             + (isCapital() ? ".capital" : ".settlement")
-            + ((hasMissionary()) ? "" : ".mission")
+            + (hasMissionary() ? ".mission" : "")
             + ".image";
     }
 
