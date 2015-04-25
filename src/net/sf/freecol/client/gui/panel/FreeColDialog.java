@@ -47,9 +47,11 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.plaf.FreeColOptionPaneUI;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 
 
 /**
@@ -167,6 +169,9 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         }
         int def = selectDefault(options);
         ChoiceItem<T> ci = (def >= 0) ? options.get(def) : null;
+        if (obj instanceof StringTemplate) {
+            obj = Messages.message((StringTemplate)obj);
+        }
         this.pane = new JOptionPane(obj, paneType, JOptionPane.DEFAULT_OPTION,
                                     icon, selectOptions(), ci);
         this.pane.setBorder(Utility.DIALOG_BORDER);
