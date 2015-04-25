@@ -2257,21 +2257,23 @@ public final class MapViewer {
     private void displayTileImprovement(Graphics2D g, ImageLibrary lib,
                                          Tile tile, TileImprovement  ti) {
         if (ti.isComplete()) {
-            String key = ti.getType().getId() + ".image";
-            if (ResourceManager.hasImageResource(key)) {
-                // Has its own Overlay Image in Misc, use it
-                Image overlay = ResourceManager.getImage(key,
-                    lib.getScalingFactor());
-                g.drawImage(overlay, 0, 0, null);
+            if (ti.isRoad()) {
+                displayRoad(g, tile);
             } else if (ti.isRiver()
-                && ti.getMagnitude() < TileImprovement.FJORD_RIVER) {
+                    && ti.getMagnitude() < TileImprovement.FJORD_RIVER) {
                 // @compat 0.10.5
                 // America_large had some bogus rivers in 0.10.5
                 if (ti.getStyle() != null)
                 // end @compat 0.10.5
                     g.drawImage(lib.getRiverImage(ti.getStyle()), 0, 0, null);
-            } else if (ti.isRoad()) {
-                displayRoad(g, tile);
+            } else {
+                String key = "image.tile." + ti.getType().getId();
+                if (ResourceManager.hasImageResource(key)) {
+                    // Has its own Overlay Image in Misc, use it
+                    Image overlay = ResourceManager.getImage(key,
+                        lib.getScalingFactor());
+                    g.drawImage(overlay, 0, 0, null);
+                }
             }
         }
     }
