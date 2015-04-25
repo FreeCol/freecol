@@ -494,7 +494,7 @@ public final class ImageLibrary {
      * @return the monarch-image for the given nation.
      */
     public static BufferedImage getMonarchImage(Nation nation) {
-        return ResourceManager.getImage(nation.getId() + ".monarch.image");
+        return ResourceManager.getImage("image.flavor.monarch." + nation.getId());
     }
 
     /**

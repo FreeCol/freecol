@@ -718,7 +718,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The monarch image key.
      */
     public String getMonarchKey() {
-        return nationId + ".monarch.image";
+        return "image.flavor.monarch." + nationId;
     }
 
     /**
