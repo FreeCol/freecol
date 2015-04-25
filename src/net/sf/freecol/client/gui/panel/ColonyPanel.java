@@ -92,6 +92,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.MapViewer;
 
 
 /**
@@ -2018,8 +2019,9 @@ public final class ColonyPanel extends PortPanel
                 setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 setOpaque(false);
                 // Size and position:
-                Dimension size = getGUI().getColonyTileMapViewer()
-                    .calculateTileSize(colonyTile.getTile());
+                Dimension size = MapViewer.calculateTileSize(
+                    getGUI().getColonyTileMapViewer().getImageLibrary(),
+                    colonyTile.getTile());
                 setSize(size);
                 setLocation(((2 - x) + y) * size.width / 2,
                     (x + y) * size.height / 2);

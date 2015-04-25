@@ -592,10 +592,11 @@ public final class MapViewer {
     /**
      * Get a tile size for displaying the colony tiles.
      * 
+     * @param lib The ImageLibrary.
      * @param tile The <code>Tile</code> to get the size for.
      * @return The tile size.
      */
-    public Dimension calculateTileSize(Tile tile) {
+    public static Dimension calculateTileSize(ImageLibrary lib, Tile tile) {
         final TileType tileType = tile.getType();
         final Image image = lib.getTerrainImage(tileType,
             tile.getX(), tile.getY());
@@ -614,7 +615,7 @@ public final class MapViewer {
     public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
         final Tile tile = colony.getTile();
-        Dimension tileSize = calculateTileSize(tile);
+        Dimension tileSize = calculateTileSize(lib, tile);
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 if (tiles[x][y] != null) {
@@ -664,9 +665,9 @@ public final class MapViewer {
         displayTileWithBeachAndBorder(g, lib, tile, false);
         if (tile != null && tile.isExplored()) {
             displayTileItems(g, tile, overlayImage);
-            displaySettlementWithChipsOrPopulationNumber(
-                g, lib, tile, tileWidth, tileHeight, false);
-            displayFogOfWar(g, tile);
+            displaySettlementWithChipsOrPopulationNumber(freeColClient, lib,
+                g, tile, tileWidth, tileHeight, false);
+            displayFogOfWar(freeColClient, fog, g, tile);
             displayOptionalTileTextAndRegionBorder(g, tile);
         }
 
@@ -1518,7 +1519,8 @@ public final class MapViewer {
      *     the <code>Tile</code>.
      * @param tile The <code>Tile</code> to draw.
      */
-    private void displayFogOfWar(Graphics2D g, Tile tile) {
+    private static void displayFogOfWar(FreeColClient freeColClient,
+            GeneralPath fog, Graphics2D g, Tile tile) {
         if (freeColClient.getGame() != null
             && freeColClient.getGame().getSpecification()
                 .getBoolean(GameOptions.FOG_OF_WAR)
@@ -1737,9 +1739,9 @@ public final class MapViewer {
                     }
                     Image overlayImage = lib.getOverlayImage(tile, overlayCache);
                     displayTileItems(g, tile, overlayImage);
-                    displaySettlementWithChipsOrPopulationNumber(
-                        g, lib, tile, tileWidth, tileHeight, withNumbers);
-                    displayFogOfWar(g, tile);
+                    displaySettlementWithChipsOrPopulationNumber(freeColClient,
+                        lib, g, tile, tileWidth, tileHeight, withNumbers);
+                    displayFogOfWar(freeColClient, fog, g, tile);
                     displayOptionalTileTextAndRegionBorder(g, tile);
                 }
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -2011,10 +2013,9 @@ public final class MapViewer {
      * @param tile The Tile to draw.
      * @param withNumber Whether to display the number of units present.
      */
-    private void displaySettlementWithChipsOrPopulationNumber(
-                                   Graphics2D g, ImageLibrary lib,
-                                   Tile tile, int tileWidth, int tileHeight,
-                                   boolean withNumber) {
+    private static void displaySettlementWithChipsOrPopulationNumber(
+            FreeColClient freeColClient, ImageLibrary lib, Graphics2D g,
+            Tile tile, int tileWidth, int tileHeight, boolean withNumber) {
         final Player player = freeColClient.getMyPlayer();
         final Settlement settlement = tile.getSettlement();
 
@@ -2108,7 +2109,7 @@ public final class MapViewer {
             int startIndex = 0;
             for (int index = startIndex; index < tileItems.size(); index++) {
                 if (tileItems.get(index).getZIndex() < OVERLAY_INDEX) {
-                    displayTileItem(g, lib, tile, tileItems.get(index), tileWidth, tileHeight);
+                    displayTileItem(g, tile, tileItems.get(index));
                     startIndex = index + 1;
                 } else {
                     startIndex = index;
@@ -2121,7 +2122,7 @@ public final class MapViewer {
             }
             for (int index = startIndex; index < tileItems.size(); index++) {
                 if (tileItems.get(index).getZIndex() < FOREST_INDEX) {
-                    displayTileItem(g, lib, tile, tileItems.get(index), tileWidth, tileHeight);
+                    displayTileItem(g, tile, tileItems.get(index));
                     startIndex = index + 1;
                 } else {
                     startIndex = index;
@@ -2136,7 +2137,7 @@ public final class MapViewer {
 
             // draw all remaining items
             for (TileItem ti : tileItems.subList(startIndex, tileItems.size())) {
-                displayTileItem(g, lib, tile, ti, tileWidth, tileHeight);
+                displayTileItem(g, tile, ti);
             }
         }
     }
@@ -2228,8 +2229,7 @@ public final class MapViewer {
     /**
      * Draws the given TileItem on the given Tile.
      */
-    private void displayTileItem(Graphics2D g, ImageLibrary lib, Tile tile,
-                          TileItem item, int tileWidth, int tileHeight) {
+    private void displayTileItem(Graphics2D g, Tile tile, TileItem item) {
         if (item instanceof Resource) {
             displayResourceTileItem(g, lib, (Resource) item, tileWidth, tileHeight);
         } else if (item instanceof LostCityRumour) {
