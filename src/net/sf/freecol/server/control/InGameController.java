@@ -1146,7 +1146,7 @@ public final class InGameController extends Controller {
                 .addAmount("%gold%", hessPrice)
                 .addStringTemplate("%mercenaries%",
                     abstractUnitTemplate(", ", hessians)),
-                "model.mercenaries." + n + ".image");
+                "image.flavor.model.mercenaries." + n);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
                    message);
             new MonarchSession(serverPlayer, action, hessians, hessPrice);
