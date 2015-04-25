@@ -2683,16 +2683,16 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public String getImageKey() {
         String key;
         if (isUndead()) {
-            key = "undead";
+            key = ".undead";
         } else {
             int count = getDisplayUnitCount();
-            key = (count <= 3) ? "small"
-                : (count <= 7) ? "medium"
-                : "large";
+            key = (count <= 3) ? ".small"
+                : (count <= 7) ? ".medium"
+                : ".large";
             String stockade = getStockadeKey();
             if (stockade != null) key += "." + stockade;
         }
-        return "model.settlement." + key + ".image";
+        return "image.tileitem." + getType().getId() + key;
     }
 
     /**
