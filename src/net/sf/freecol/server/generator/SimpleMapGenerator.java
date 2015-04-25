@@ -248,7 +248,7 @@ public class SimpleMapGenerator implements MapGenerator {
 
     private boolean importIndianSettlements(Map map, LogBuilder lb) {
         int nSettlements = 0;
-
+        
         for (Player player : importGame.getLiveNativePlayers(null)) {
             Player indian = game.getPlayer(player.getNationId());
             if (indian == null) {
@@ -266,46 +266,45 @@ public class SimpleMapGenerator implements MapGenerator {
                 lb.add("Found native nation ", player.getNationId(),
                     " for import: ", indian.getId(), "\n");
             }
-            for (IndianSettlement is : player.getIndianSettlements()) {
-                int x = is.getTile().getX();
-                int y = is.getTile().getY();
-                Tile tile = map.getTile(x, y);
-                if (tile == null) continue;
-                UnitType skill = is.getLearnableSkill();
-                ServerIndianSettlement settlement
-                    = new ServerIndianSettlement(game, indian,
-                        is.getName(), tile, is.isCapital(), skill, null);
-                settlement.placeSettlement(false);
+        }
+        for (Tile tile : importGame.getMap().getAllTiles()) {
+            IndianSettlement is = tile.getIndianSettlement();
+            if (is == null) continue;
+            Player indian = game.getPlayer(is.getOwner().getNationId());
+            ServerIndianSettlement settlement
+                = new ServerIndianSettlement(game, indian, is.getName(),
+                    map.getTile(tile.getX(), tile.getY()), is.isCapital(),
+                    is.getLearnableSkill(), null);
+            settlement.placeSettlement(false);
 
-                List<Unit> units = is.getUnitList();
-                if (units.isEmpty()) {
-                    settlement.addUnits(random);
-                } else {
-                    for (Unit u : units) {
-                        UnitType t = spec.getUnitType(u.getType().getId());
-                        if (t != null) {
-                            Unit unit = new ServerUnit(game, settlement,
-                                                       indian, t);
-                            settlement.add(unit);
-                            settlement.addOwnedUnit(unit);
-                        }
+            List<Unit> units = is.getUnitList();
+            if (units.isEmpty()) {
+                settlement.addUnits(random);
+            } else {
+                for (Unit unit : units) {
+                    UnitType t = spec.getUnitType(unit.getType().getId());
+                    if (t != null) {
+                        Unit u = new ServerUnit(game, settlement, indian, t);
+                        settlement.add(u);
+                        settlement.addOwnedUnit(u);
                     }
                 }
-
-                List<Goods> goods = is.getCompactGoods();
-                if (goods.isEmpty()) {
-                    settlement.addRandomGoods(random);
-                } else {
-                    for (Goods g : goods) {
-                        GoodsType t = spec.getGoodsType(g.getType().getId());
-                        if (t != null) {
-                            settlement.addGoods(t, g.getAmount());
-                        }
-                    }
-                }
-                settlement.setWantedGoods(is.getWantedGoods());
-                nSettlements++;
             }
+            
+            List<Goods> goods = is.getCompactGoods();
+            if (goods.isEmpty()) {
+                settlement.addRandomGoods(random);
+            } else {
+                for (Goods g : goods) {
+                    GoodsType t = spec.getGoodsType(g.getType().getId());
+                    if (t != null) {
+                        settlement.addGoods(t, g.getAmount());
+                    }
+                }
+            }
+            settlement.setWantedGoods(is.getWantedGoods());
+            indian.addSettlement(settlement);
+            nSettlements++;
         }
 
         if (nSettlements > 0) {
