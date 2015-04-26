@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 
 /**
@@ -32,6 +33,8 @@ import java.util.Set;
  * @see Resource
  */
 public final class ResourceMapping {
+
+    private static final Logger logger = Logger.getLogger(ResourceMapping.class.getName());
 
     /** Mappings between an object identifier and a resource. */
     private final HashMap<String, ColorResource> colorResources;
@@ -59,6 +62,9 @@ public final class ResourceMapping {
     }
 
 
+    // TODO: Consider cutting off the type prefixes after validation,
+    //       to reduce processing time and memory use for strings.
+
     /**
      * Adds a mapping between the given object identifier and a
      * <code>Resource</code>.
@@ -66,79 +72,118 @@ public final class ResourceMapping {
      * @param key The identifier for the given resource in the mapping.
      * @param value The <code>Resource</code> identified by the
      *     identifier in the mapping,.
+     * @return true on success
      */
-    public void add(String key, ColorResource value) {
+    public boolean add(String key, ColorResource value) {
+        if(!key.startsWith("color.")) {
+            logger.warning("Rejecting malformed resource key: " + key);
+            return false;
+        }
         colorResources.put(key, value);
+        return true;
     }
 
-    public void add(String key, FontResource value) {
+    public boolean add(String key, FontResource value) {
+        if(!key.startsWith("font.")) {
+            logger.warning("Rejecting malformed resource key: " + key);
+            return false;
+        }
         fontResources.put(key, value);
+        return true;
     }
 
-    public void add(String key, StringResource value) {
+    public boolean add(String key, StringResource value) {
         stringResources.put(key, value);
+        return true;
     }
 
-    public void add(String key, FAFileResource value) {
+    public boolean add(String key, FAFileResource value) {
+        if(!key.startsWith("animatedfont.")) {
+            logger.warning("Rejecting malformed resource key: " + key);
+            return false;
+        }
         fafResources.put(key, value);
+        return true;
     }
 
-    public void add(String key, SZAResource value) {
+    public boolean add(String key, SZAResource value) {
+        // TODO: change to startsWith("animation.") after key renaming
+        if(!key.endsWith(".animation")) {
+            logger.warning("Rejecting malformed resource key: " + key);
+            return false;
+        }
         szaResources.put(key, value);
+        return true;
     }
 
-    public void add(String key, AudioResource value) {
+    public boolean add(String key, AudioResource value) {
+        if(!key.startsWith("sound.")) {
+            logger.warning("Rejecting malformed resource key: " + key);
+            return false;
+        }
         audioResources.put(key, value);
+        return true;
     }
 
-    public void add(String key, VideoResource value) {
+    public boolean add(String key, VideoResource value) {
+        if(!key.startsWith("video.")) {
+            logger.warning("Rejecting malformed resource key: " + key);
+            return false;
+        }
         videoResources.put(key, value);
+        return true;
     }
 
-    public void add(String key, ImageResource value) {
+    public boolean add(String key, ImageResource value) {
+        if(!key.startsWith("image.")
+                // TODO: remove compatibility with old style after key renaming
+                && !(key.startsWith("model.") && key.endsWith(".image"))) {
+            logger.warning("Rejecting malformed resource key: " + key);
+            return false;
+        }
         imageResources.put(key, value);
+        return true;
     }
 
+    /**
+     * Create another mapping for a Resource under a different key.
+     *
+     * @param key The key to find the existing Resource.
+     * @param keyNew The new key for the duplicate.
+     * @return true on success
+     */
     public boolean duplicateResource(String key, String keyNew) {
         ColorResource cr = colorResources.get(key);
         if(cr != null) {
-            colorResources.put(keyNew, cr);
-            return true;
+            return add(keyNew, cr);
         }
         FontResource fr = fontResources.get(key);
         if(fr != null) {
-            fontResources.put(keyNew, fr);
-            return true;
+            return add(keyNew, fr);
         }
         StringResource sr = stringResources.get(key);
         if(sr != null) {
-            stringResources.put(keyNew, sr);
-            return true;
+            return add(keyNew, sr);
         }
         FAFileResource far = fafResources.get(key);
         if(far != null) {
-            fafResources.put(keyNew, far);
-            return true;
+            return add(keyNew, far);
         }
         SZAResource szr = szaResources.get(key);
         if(szr != null) {
-            szaResources.put(keyNew, szr);
-            return true;
+            return add(keyNew, szr);
         }
         AudioResource ar = audioResources.get(key);
         if(ar != null) {
-            audioResources.put(keyNew, ar);
-            return true;
+            return add(keyNew, ar);
         }
         VideoResource vr = videoResources.get(key);
         if(vr != null) {
-            videoResources.put(keyNew, vr);
-            return true;
+            return add(keyNew, vr);
         }
         ImageResource ir = imageResources.get(key);
         if(ir != null) {
-            imageResources.put(keyNew, ir);
-            return true;
+            return add(keyNew, ir);
         }
         return false;
     }
