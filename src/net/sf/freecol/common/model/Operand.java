@@ -239,21 +239,21 @@ public class Operand extends Scope {
         if (value == null) {
             if (scopeLevel == ScopeLevel.PLAYER) {
                 List<FreeColObject> list = new LinkedList<>();
-                switch(operandType) {
+                switch (operandType) {
                 case UNITS:
-                    list.addAll(player.getUnits());
-                    break;
+                    return count(player.getUnits());
                 case BUILDINGS:
                     for (Colony colony : player.getColonies()) {
                         list.addAll(colony.getBuildings());
                     }
-                    break;
+                    return count(list);
                 case SETTLEMENTS:
-                    list.addAll(player.getSettlements());
-                    break;
+                    return count(player.getSettlements())
+                        + player.getSpecification()
+                            .getInteger(GameOptions.SETTLEMENT_LIMIT_MODIFIER);
                 case FOUNDING_FATHERS:
                     list.addAll(player.getFathers());
-                    break;
+                    return count(list);
                 default:
                     if (getMethodName() != null) {
                         try {
@@ -266,12 +266,10 @@ public class Operand extends Scope {
                         } catch (Exception e) {
                             logger.log(Level.WARNING, "Unable to invoke: "
                                 + getMethodName(), e);
-                            return null;
                         }
                     }
-                    return null;
                 }
-                return count(list);
+                return null;
             } else if (scopeLevel == ScopeLevel.GAME) {
                 return getValue(player.getGame());
             } else {
@@ -335,7 +333,7 @@ public class Operand extends Scope {
      * @param objects The list of objects to check.
      * @return The number of applicable objects.
      */
-    private int count(List<FreeColObject> objects) {
+    private int count(List<? extends FreeColObject> objects) {
         int result = 0;
         for (FreeColObject object : objects) {
             if (appliesTo(object)) {

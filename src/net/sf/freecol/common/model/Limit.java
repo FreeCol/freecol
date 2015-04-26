@@ -169,7 +169,6 @@ public final class Limit extends FreeColGameObjectType {
             lhs = leftHandSide.getValue();
             break;
         }
-
         Integer rhs = null;
         switch (rightHandSide.getScopeLevel()) {
         case GAME:
@@ -231,7 +230,6 @@ public final class Limit extends FreeColGameObjectType {
         switch (leftHandSide.getScopeLevel()) {
         case SETTLEMENT:
             lhs = leftHandSide.getValue(settlement);
-            lhs += spec.getInteger(GameOptions.SETTLEMENT_LIMIT_MODIFIER);
             break;
         case PLAYER:
             lhs = leftHandSide.getValue(settlement.getOwner());
