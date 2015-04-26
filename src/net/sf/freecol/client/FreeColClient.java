@@ -22,7 +22,6 @@ package net.sf.freecol.client;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -344,11 +343,11 @@ public final class FreeColClient {
         }
 
         // Reset the mod resources as a result of the client option update.
-        List<ResourceMapping> modMappings = new ArrayList<>();
+        ResourceMapping modMappings = new ResourceMapping();
         for (FreeColModFile f : clientOptions.getActiveMods()) {
-            modMappings.add(f.getResourceMapping());
+            modMappings.addAll(f.getResourceMapping());
         }
-        ResourceManager.setModMappings(modMappings);
+        ResourceManager.setModMapping(modMappings);
 
         // Update the actions, resources may have changed.
         if (actionManager != null) actionManager.update();

@@ -25,7 +25,6 @@ import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -56,8 +55,7 @@ public class ResourceManager {
     private static ResourceMapping baseMapping;
     private static ResourceMapping tcMapping;
     private static ResourceMapping scenarioMapping;
-    // TODO: Check if mod resources are always added in a predetermined fixed order.
-    private static List<ResourceMapping> modMappings = new ArrayList<>();
+    private static ResourceMapping modMapping;
 
     /**
      * All the mappings above merged into this single ResourceMapping
@@ -94,14 +92,14 @@ public class ResourceManager {
 
     /**
      * Sets the mappings specified by mods.
-     * Do not access the mappings after the call.
+     * Do not access the mapping after the call.
      *
-     * @param mappings A list of the mappings between IDs and files.
+     * @param mapping A list of the mappings between IDs and files.
      */
-    public static synchronized void setModMappings(final List<ResourceMapping> mappings) {
-        logger.info("setModMappings size " + mappings.size() + " " + mappings.hashCode());
-        modMappings = mappings;
-        update(!mappings.isEmpty());
+    public static synchronized void setModMapping(final ResourceMapping mapping) {
+        logger.info("setModMapping " + mapping);
+        modMapping = mapping;
+        update(mapping != null);
     }
 
     /**
@@ -144,13 +142,11 @@ public class ResourceManager {
                 resource.clean();
             }
         }
-        if(modMappings != null) {
-            for (ResourceMapping mapping : modMappings) {
-                for (Map.Entry<String,ImageResource> entry
-                    : mapping.getImageResources().entrySet()) {
-                    ImageResource resource = entry.getValue();
-                    resource.clean();
-                }
+        if(modMapping != null) {
+            for (Map.Entry<String,ImageResource> entry
+                : modMapping.getImageResources().entrySet()) {
+                ImageResource resource = entry.getValue();
+                resource.clean();
             }
         }
     }
@@ -180,7 +176,7 @@ public class ResourceManager {
         mc.addAll(baseMapping);
         mc.addAll(tcMapping);
         mc.addAll(scenarioMapping);
-        for (ResourceMapping rm : modMappings) mc.addAll(rm);
+        mc.addAll(modMapping);
         mergedContainer = mc;
     }
 
