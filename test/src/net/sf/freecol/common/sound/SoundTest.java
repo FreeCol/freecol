@@ -80,7 +80,6 @@ public class SoundTest extends FreeColTestCase {
     public void testSound() {
         // these sounds are base resources, and should be enough for a test
         playSound("sound.intro.general");
-        playSound("sound.event.illegalMove");
         // other sounds require loading a rule set
     }
 
@@ -104,6 +103,7 @@ public class SoundTest extends FreeColTestCase {
         playSound("sound.attack.mounted");
         playSound("sound.attack.naval");
         playSound("sound.event.meet.model.nation.aztec");
+        playSound("sound.event.illegalMove");
         playSound("sound.event.buildingComplete");
         playSound("sound.event.captureColony");
         playSound("sound.event.fountainOfYouth");
