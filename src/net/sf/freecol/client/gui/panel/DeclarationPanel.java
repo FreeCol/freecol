@@ -158,7 +158,7 @@ public final class DeclarationPanel extends FreeColPanel {
 
 
         SignaturePanel() {
-            faFile = ResourceManager.getFAFile("AnimatedFont");
+            faFile = ResourceManager.getFAFile("animatedfont.signature");
             setOpaque(false);
         }
 

@@ -114,7 +114,7 @@ public class FontLibrary {
             }
             logger.warning("Font not found: " + fontName);
         }
-        return ResourceManager.getFont("NormalFont").deriveFont(defaultSize);
+        return ResourceManager.getFont("font.normal").deriveFont(defaultSize);
     }
 
     public Font createScaledFont(FontType fontType, FontSize fontSize) {
@@ -173,13 +173,13 @@ public class FontLibrary {
             default:
                 logger.warning("Unknown FontType");
             case NORMAL:
-                fontName = (mainFont != null) ? null : "NormalFont";
+                fontName = (mainFont != null) ? null : "normal";
                 break;
             case SIMPLE:
-                fontName = "SimpleFont";
+                fontName = "simple";
                 break;
             case HEADER:
-                fontName = "HeaderFont";
+                fontName = "header";
         }
         float pixelSize;
         switch(fontSize) {
@@ -203,7 +203,7 @@ public class FontLibrary {
         float scaledSize = pixelSize * scaleFactor;
         Font font = (fontName == null)
             ? mainFont
-            : ResourceManager.getFont(fontName);
+            : ResourceManager.getFont("font." + fontName);
         font = font.deriveFont(style, scaledSize);
         return font;
     }
