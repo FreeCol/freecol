@@ -233,8 +233,6 @@ public final class MapViewer {
 
     private volatile boolean blinkingMarqueeEnabled;
 
-    private Image cursorImage;
-
     private final java.util.Map<Unit, Integer> unitsOutForAnimation;
     private final java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
 
@@ -2223,6 +2221,7 @@ public final class MapViewer {
      * @param g a <code>Graphics2D</code>
      */
     private void displayCursor(Graphics2D g) {
+        Image cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
         g.drawImage(cursorImage, 0, 0, null);
     }
 
@@ -2837,7 +2836,6 @@ public final class MapViewer {
      */
     private void setImageLibraryAndUpdateData(ImageLibrary lib) {
         this.lib = lib;
-        cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
         // ATTENTION: we assume that all base tiles have the same size
         Image unexplored = lib.getTerrainImage(null, 0, 0);
         tileHeight = unexplored.getHeight(null);
