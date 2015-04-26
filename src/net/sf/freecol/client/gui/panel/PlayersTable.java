@@ -159,7 +159,6 @@ public final class PlayersTable extends JTable {
                 ? Color.GRAY
                 : table.getForeground());
             label.setBackground(table.getBackground());
-            final Advantages advantages = (Advantages)value;
             Utility.localizeToolTip(this, StringTemplate
                 .key(advantages.getShortDescriptionKey()));
             return label;
