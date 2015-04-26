@@ -129,7 +129,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.addButton = Utility.localizedButton("negotiationDialog.add");
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
-            this.label = Utility.localizedLabel("tradeItem.colony");
+            this.label = Utility.localizedLabel(Messages.getName("model.tradeItem.colony"));
             this.allColonies = source.getColonies();
 
             setLayout(new MigLayout("wrap 1", "", ""));
@@ -238,7 +238,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             setBorder(Utility.SIMPLE_LINE_BORDER);
             setLayout(new MigLayout("wrap 1", "", ""));
 
-            add(Utility.localizedLabel("tradeItem.gold"));
+            add(Utility.localizedLabel(Messages.getName("model.tradeItem.gold")));
             add(this.spinner);
             add(clearButton, "split 2");
             add(addButton);
@@ -330,7 +330,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.addButton = Utility.localizedButton("negotiationDialog.add");
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
-            this.label = Utility.localizedLabel("tradeItem.goods");
+            this.label = Utility.localizedLabel(Messages.nameKey("model.tradeItem.goods"));
             this.allGoods = allGoods;
 
             setLayout(new MigLayout("wrap 1", "", ""));
@@ -458,7 +458,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.addButton = Utility.localizedButton("negotiationDialog.add");
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
-            this.label = Utility.localizedLabel("tradeItem.incite");
+            this.label = Utility.localizedLabel(Messages.nameKey("model.tradeItem.incite"));
 
             setBorder(Utility.SIMPLE_LINE_BORDER);
             setLayout(new MigLayout("wrap 1", "", ""));
@@ -584,7 +584,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             setBorder(Utility.SIMPLE_LINE_BORDER);
             setLayout(new MigLayout("wrap 1", "", ""));
 
-            add(Utility.localizedLabel("tradeItem.stance"));
+            add(Utility.localizedLabel(Messages.nameKey("model.tradeItem.stance")));
             add(this.stanceBox);
             add(this.clearButton, "split 2");
             add(this.addButton);
@@ -697,7 +697,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             this.addButton = Utility.localizedButton("negotiationDialog.add");
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
-            this.label = Utility.localizedLabel("tradeItem.unit");
+            this.label = Utility.localizedLabel(Messages.nameKey("model.tradeItem.unit"));
             this.allUnits = allUnits;
 
             setLayout(new MigLayout("wrap 1", "", ""));

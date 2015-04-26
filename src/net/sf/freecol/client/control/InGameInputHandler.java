@@ -924,9 +924,12 @@ public final class InGameInputHandler extends InputHandler {
         NodeList nodes = element.getChildNodes();
         List<Element> results = new ArrayList<>();
 
+logger.warning("MULTIPLE " + nodes.getLength());
         for (int i = 0; i < nodes.getLength(); i++) {
             try {
-                Element reply = handle(connection, (Element) nodes.item(i));
+logger.warning("MULTIPLE " + i + " " + (Element)nodes.item(i));
+                Element reply = handle(connection, (Element)nodes.item(i));
+logger.warning("MULTIPLE " + i + "=" + (Element)reply);
                 if (reply != null) results.add(reply);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Caught crash in multiple item " + i
