@@ -1369,7 +1369,7 @@ public class GUI {
                 ArmedUnitSettlementAction.SETTLEMENT_ATTACK));
 
         return getChoice(true, settlement.getTile(),
-            Utility.getDefaultTextArea(settlement.getAlarmLevelMessage(player)),
+            Utility.getDefaultTextArea(settlement.getAlarmLevelLabel(player)),
             GUI.createImageIcon(imageLibrary.getSettlementImage(settlement)),
             "cancel", choices);
     }
@@ -1518,7 +1518,7 @@ public class GUI {
                                                 boolean canEstablish,
                                                 boolean canDenounce) {
         StringBuilder sb = new StringBuilder(256);
-        StringTemplate t = settlement.getAlarmLevelMessage(unit.getOwner());
+        StringTemplate t = settlement.getAlarmLevelLabel(unit.getOwner());
         sb.append(Messages.message(t)).append("\n\n");
         t = StringTemplate.template("missionarySettlement.question")
             .addName("%settlement%", settlement.getName());
@@ -1616,7 +1616,7 @@ public class GUI {
         final Player owner = settlement.getOwner();
 
         StringBuilder sb = new StringBuilder(400);
-        sb.append(Messages.message(settlement.getAlarmLevelMessage(player)))
+        sb.append(Messages.message(settlement.getAlarmLevelLabel(player)))
             .append("\n\n");
         String key = ((IndianNationType)owner.getNationType())
             .getSettlementTypeKey(true);

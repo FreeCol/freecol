@@ -71,7 +71,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                     ? "indianSettlementPanel.indianCapital"
                     : "indianSettlementPanel.indianSettlement")
                 .addStringTemplate("%nation%", indian.getNationName()));
-        text += " (" + settlement.getAlarmLevelMessage(player);
+        text += " (" + Messages.getName(settlement.getAlarm(player));
         if (settlement.worthScouting(player)) {
             text += "," + ResourceManager.getString("unscoutedIndianSettlement");
         }

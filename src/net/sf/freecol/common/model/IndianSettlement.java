@@ -1306,7 +1306,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public StringTemplate getAlarmLevelMessage(Player player) {
+    public StringTemplate getAlarmLevelLabel(Player player) {
         return StringTemplate.template(getAlarmLevelKey(player))
             .addStringTemplate("%nation%", getOwner().getNationName());
     }

@@ -2825,7 +2825,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public StringTemplate getAlarmLevelMessage(Player player) {
+    public StringTemplate getAlarmLevelLabel(Player player) {
         Stance stance = getOwner().getStance(player);
         return StringTemplate.template("model.colony." + stance.getKey())
             .addStringTemplate("%nation%", getOwner().getNationName());
