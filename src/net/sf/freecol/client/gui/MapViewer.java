@@ -160,7 +160,8 @@ public final class MapViewer {
     /** Scaled ImageLibrary only used for map painting. */
     private ImageLibrary lib;
 
-    private final TerrainCursor cursor;
+    private TerrainCursor cursor;
+    private volatile boolean blinkingMarqueeEnabled;
 
     private Tile selectedTile;
     private Tile focus = null;
@@ -231,8 +232,6 @@ public final class MapViewer {
     private GeneralPath gridPath = null;
     private final GeneralPath fog = new GeneralPath();
 
-    private volatile boolean blinkingMarqueeEnabled;
-
     private final java.util.Map<Unit, Integer> unitsOutForAnimation;
     private final java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
 
@@ -268,14 +267,11 @@ public final class MapViewer {
 
         resetMapScale();
 
+        cursor = null;
+        blinkingMarqueeEnabled = false;
+
         unitsOutForAnimation = new HashMap<>();
         unitsOutForAnimationLabels = new HashMap<>();
-
-        logger.info("GUI created.");
-        logger.info("Starting in Move Units View Mode");
-        blinkingMarqueeEnabled = true;
-
-        cursor = new net.sf.freecol.client.gui.TerrainCursor();
     }
 
 
@@ -1180,6 +1176,8 @@ public final class MapViewer {
      * Starts the unit-selection-cursor blinking animation.
      */
     public void startCursorBlinking() {
+        blinkingMarqueeEnabled = true;
+
         ActionListener taskPerformer = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
@@ -1194,6 +1192,7 @@ public final class MapViewer {
             }
         };
 
+        cursor = new net.sf.freecol.client.gui.TerrainCursor();
         cursor.addActionListener(taskPerformer);
         cursor.startBlinking();
     }

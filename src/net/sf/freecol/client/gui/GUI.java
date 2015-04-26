@@ -588,6 +588,8 @@ public class GUI {
             });
 
         mapViewer.startCursorBlinking();
+        logger.info("GUI created.");
+        logger.info("Starting in Move Units View Mode");
     }
 
     /**
