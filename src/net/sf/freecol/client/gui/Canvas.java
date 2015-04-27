@@ -22,14 +22,17 @@ package net.sf.freecol.client.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.DisplayMode;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -178,6 +181,7 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -252,6 +256,12 @@ public final class Canvas extends JDesktopPane {
     /** Number of tries to find a clear spot on the canvas. */
     private static final int MAXTRY = 3;
 
+    /** The space not being used in windowed mode. */
+    private static final int DEFAULT_SCREEN_INSET_WIDTH  = 0;
+    private static final int DEFAULT_SCREEN_INSET_HEIGHT = 40;
+    private static final int DEFAULT_WINDOW_INSET_WIDTH  = 16;
+    private static final int DEFAULT_WINDOW_INSET_HEIGHT = 39;
+
     /** A class for frames being used as tool boxes. */
     private static class ToolBoxFrame extends JInternalFrame {}
 
@@ -307,14 +317,13 @@ public final class Canvas extends JDesktopPane {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param graphicsDevice The used graphics device.
-     * @param size The bounds of this <code>Canvas</code>.
-     * @param windowed If the frame should be windowed.
+     * @param desiredSize The desired size of the frame.
      * @param mapViewer The object responsible of drawing the map onto
      *     this component.
      */
     public Canvas(final FreeColClient freeColClient,
                   final GraphicsDevice graphicsDevice,
-                  final Dimension size, boolean windowed,
+                  final Dimension desiredSize,
                   MapViewer mapViewer) {
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
@@ -322,10 +331,29 @@ public final class Canvas extends JDesktopPane {
         chatDisplay = new ChatDisplay();
         this.mapViewer = mapViewer;
 
-        this.initialSize = size;
-
+        // Determine the window size.
+        if (desiredSize == null) {
+            if(graphicsDevice.isFullScreenSupported()) {
+                windowed = false;
+                initialSize = determineFullScreenSize(graphicsDevice);
+                logger.info("Full screen window size is " + initialSize);
+            } else {
+                windowed = true;
+                initialSize = new Dimension(-1, -1);
+                logger.warning("Full screen not supported.");
+                System.err.println(Messages.message("client.fullScreen"));
+            }
+        } else {
+            windowed = true;
+            initialSize = desiredSize;
+            logger.info("Desired window size is " + initialSize);
+        }
+        if(windowed && (initialSize.width <= 0 || initialSize.height <= 0)) {
+            initialSize = determineWindowSize(graphicsDevice);
+            logger.info("Inner window size is " + initialSize);
+        }
         setLocation(0, 0);
-        setSize(size);
+        setSize(initialSize);
 
         setDoubleBuffered(true);
         setOpaque(false);
@@ -348,6 +376,65 @@ public final class Canvas extends JDesktopPane {
 
     public boolean isWindowed() {
         return windowed;
+    }
+
+    /**
+     * Estimate size of client area when using the full screen.
+     *
+     * @return A suitable window size.
+     */
+    private static Dimension determineFullScreenSize(GraphicsDevice gd) {
+        Rectangle bounds = gd.getDefaultConfiguration().getBounds();
+        return new Dimension(bounds.width - bounds.x,
+            bounds.height - bounds.y);
+    }
+
+    /**
+     * Estimate size of client area for a window of maximum size.
+     *
+     * @return A suitable window size.
+     */
+    private static Dimension determineWindowSize(GraphicsDevice gd) {
+        // This is supposed to maximize a window
+        //   setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        // but there have been problems.
+
+        // Get max size of window including border.
+        DisplayMode dm = gd.getDisplayMode();
+        int width = dm.getWidth();
+        int height = dm.getHeight();
+        LogBuilder lb = new LogBuilder(256);
+        lb.add("determineWindowSize\n",
+            "  Display mode size: ", width, "x", height, "\n");
+
+        // Reduce by any screen insets (windowing system menu bar etc)
+        try {
+            Insets in = Toolkit.getDefaultToolkit()
+                .getScreenInsets(gd.getDefaultConfiguration());
+            width -= in.left + in.right;
+            height -= in.bottom + in.top;
+            lb.add("  less screen insets: ", (in.left + in.right),
+                "x", (in.bottom + in.top), "\n");
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Unable to get screen insets", e);
+            width -= DEFAULT_SCREEN_INSET_WIDTH;
+            height -= DEFAULT_SCREEN_INSET_HEIGHT;
+            lb.add("  less faked screen insets: ", DEFAULT_SCREEN_INSET_WIDTH,
+                "x", DEFAULT_SCREEN_INSET_HEIGHT, "\n");
+        }
+
+        // FIXME: find better way to get size of window title and
+        // border.  The information is only available from getInsets
+        // when a window is already displayable.
+        height -= DEFAULT_WINDOW_INSET_HEIGHT;
+        width -= DEFAULT_WINDOW_INSET_WIDTH;
+        lb.add("  less faked window decoration adjust: ",
+            DEFAULT_WINDOW_INSET_WIDTH, "x", DEFAULT_WINDOW_INSET_HEIGHT, "\n");
+
+        Dimension size = new Dimension(width, height);
+        lb.add("  = ", size);
+        lb.log(logger, Level.INFO);
+        return size;
     }
 
     /**
@@ -1292,8 +1379,9 @@ public final class Canvas extends JDesktopPane {
      * Updates the sizes of the components on this Canvas.
      */
     public void updateSizes() {
-        if (oldSize == null) oldSize = getSize();
-        if (oldSize.width != getWidth() || oldSize.height != getHeight()) {
+        if (oldSize == null
+                || oldSize.width != getWidth()
+                || oldSize.height != getHeight()) {
             gui.updateMapControlsInCanvas();
             mapViewer.setSize(getSize());
             mapViewer.forceReposition();

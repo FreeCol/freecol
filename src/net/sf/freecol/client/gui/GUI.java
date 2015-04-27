@@ -28,7 +28,6 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -118,7 +117,6 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.Video;
-import net.sf.freecol.common.util.LogBuilder;
 
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -193,12 +191,6 @@ public class GUI {
     private static final String levels[] = {
         "low", "normal", "high"
     };
-
-    /** The space not being used in windowed mode. */
-    private static final int DEFAULT_SCREEN_INSET_WIDTH  = 0;
-    private static final int DEFAULT_SCREEN_INSET_HEIGHT = 40;
-    private static final int DEFAULT_WINDOW_INSET_WIDTH  = 16;
-    private static final int DEFAULT_WINDOW_INSET_HEIGHT = 39;
 
     /** View modes. */
     public static final int MOVE_UNITS_MODE = 0;
@@ -516,33 +508,10 @@ public class GUI {
                 }
             });
 
-        // Determine the window size.
-        Dimension windowSize;
-        boolean windowed;
-        if (desiredWindowSize == null) {
-            if(graphicsDevice.isFullScreenSupported()) {
-                windowed = false;
-                windowSize = determineFullScreenSize(graphicsDevice);
-                logger.info("Full screen window size is " + windowSize);
-            } else {
-                windowed = true;
-                windowSize = new Dimension(-1, -1);
-                logger.warning("Full screen not supported.");
-                System.err.println(Messages.message("client.fullScreen"));
-            }
-        } else {
-            windowed = true;
-            windowSize = desiredWindowSize;
-            logger.info("Desired window size is " + windowSize);
-        }
-        if(windowed && (windowSize.width <= 0 || windowSize.height <= 0)) {
-            windowSize = determineWindowSize(graphicsDevice);
-            logger.info("Inner window size is " + windowSize);
-        }
-        this.mapViewer = new MapViewer(freeColClient, windowSize);
+        this.mapViewer = new MapViewer(freeColClient);
         this.canvas = new Canvas(freeColClient, graphicsDevice,
-                                 windowSize, windowed, mapViewer);
-        this.colonyTileMapViewer = new MapViewer(freeColClient, windowSize);
+                                 desiredWindowSize, mapViewer);
+        this.colonyTileMapViewer = new MapViewer(freeColClient);
 
         // Now that there is a canvas, prepare for language changes.
         LanguageOption o = (LanguageOption)freeColClient.getClientOptions()
@@ -568,65 +537,6 @@ public class GUI {
         mapViewer.startCursorBlinking();
         logger.info("GUI created.");
         logger.info("Starting in Move Units View Mode");
-    }
-
-    /**
-     * Estimate size of client area when using the full screen.
-     *
-     * @return A suitable window size.
-     */
-    private static Dimension determineFullScreenSize(GraphicsDevice gd) {
-        Rectangle bounds = gd.getDefaultConfiguration().getBounds();
-        return new Dimension(bounds.width - bounds.x,
-            bounds.height - bounds.y);
-    }
-
-    /**
-     * Estimate size of client area for a window of maximum size.
-     *
-     * @return A suitable window size.
-     */
-    private static Dimension determineWindowSize(GraphicsDevice gd) {
-        // This is supposed to maximize a window
-        //   setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
-        // but there have been problems.
-
-        // Get max size of window including border.
-        DisplayMode dm = gd.getDisplayMode();
-        int width = dm.getWidth();
-        int height = dm.getHeight();
-        LogBuilder lb = new LogBuilder(256);
-        lb.add("determineWindowSize\n",
-            "  Display mode size: ", width, "x", height, "\n");
-
-        // Reduce by any screen insets (windowing system menu bar etc)
-        try {
-            Insets in = Toolkit.getDefaultToolkit()
-                .getScreenInsets(gd.getDefaultConfiguration());
-            width -= in.left + in.right;
-            height -= in.bottom + in.top;
-            lb.add("  less screen insets: ", (in.left + in.right),
-                "x", (in.bottom + in.top), "\n");
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Unable to get screen insets", e);
-            width -= DEFAULT_SCREEN_INSET_WIDTH;
-            height -= DEFAULT_SCREEN_INSET_HEIGHT;
-            lb.add("  less faked screen insets: ", DEFAULT_SCREEN_INSET_WIDTH,
-                "x", DEFAULT_SCREEN_INSET_HEIGHT, "\n");
-        }
-
-        // FIXME: find better way to get size of window title and
-        // border.  The information is only available from getInsets
-        // when a window is already displayable.
-        height -= DEFAULT_WINDOW_INSET_HEIGHT;
-        width -= DEFAULT_WINDOW_INSET_WIDTH;
-        lb.add("  less faked window decoration adjust: ",
-            DEFAULT_WINDOW_INSET_WIDTH, "x", DEFAULT_WINDOW_INSET_HEIGHT, "\n");
-
-        Dimension size = new Dimension(width, height);
-        lb.add("  = ", size);
-        lb.log(logger, Level.INFO);
-        return size;
     }
 
     /**

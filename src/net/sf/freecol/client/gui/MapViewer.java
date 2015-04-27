@@ -257,15 +257,13 @@ public final class MapViewer {
      * The constructor to use.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param size The size of the GUI (= the entire screen if the app
-     *     is displayed in full-screen).
      */
-    public MapViewer(FreeColClient freeColClient, Dimension size) {
+    public MapViewer(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
-        this.size = size;
+        this.size = null;
 
-        resetMapScale();
+        setImageLibraryAndUpdateData(new ImageLibrary());
 
         cursor = null;
         blinkingMarqueeEnabled = false;
@@ -1228,6 +1226,7 @@ public final class MapViewer {
      */
     void resetMapScale() {
         setImageLibraryAndUpdateData(new ImageLibrary());
+        updateMapDisplayVariables();
     }
 
     boolean isAtMaxMapScale() {
@@ -1243,6 +1242,7 @@ public final class MapViewer {
         if (newScale >= MAP_SCALE_MAX)
             newScale = MAP_SCALE_MAX;
         setImageLibraryAndUpdateData(new ImageLibrary(newScale));
+        updateMapDisplayVariables();
     }
 
     void decreaseMapScale() {
@@ -1250,6 +1250,7 @@ public final class MapViewer {
         if (newScale <= MAP_SCALE_MIN)
             newScale = MAP_SCALE_MIN;
         setImageLibraryAndUpdateData(new ImageLibrary(newScale));
+        updateMapDisplayVariables();
     }
 
     /**
@@ -2900,8 +2901,6 @@ public final class MapViewer {
         fog.lineTo(halfWidth, tileHeight);
         fog.lineTo(0, halfHeight);
         fog.closePath();
-
-        updateMapDisplayVariables();
     }
 
     private void updateMapDisplayVariables() {
