@@ -50,7 +50,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.util.LogBuilder;
@@ -480,6 +479,8 @@ public final class TilePopup extends JPopupMenu {
             + unit.getDescription(Unit.UnitLabelType.NATIONAL)
             + " (" + Messages.message(occ) + ")";
         JMenuItem menuItem = new JMenuItem(text);
+        menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, Font.BOLD));
         menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {
@@ -528,6 +529,8 @@ public final class TilePopup extends JPopupMenu {
         StringTemplate name
             = colony.getLocationLabelFor(freeColClient.getMyPlayer());
         JMenuItem menuItem = Utility.localizedMenuItem(name);
+        menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, Font.BOLD));
         menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {
@@ -560,6 +563,8 @@ public final class TilePopup extends JPopupMenu {
         StringTemplate name
             = settlement.getLocationLabelFor(freeColClient.getMyPlayer());
         JMenuItem menuItem = Utility.localizedMenuItem(name);
+        menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, Font.BOLD));        
         menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {

@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -93,7 +94,8 @@ import static net.sf.freecol.common.util.StringUtils.*;
  */
 public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
-    private static final Logger logger = Logger.getLogger(BuildQueuePanel.class.getName());
+    private static final Logger logger = Logger.getLogger(BuildQueuePanel
+            .class.getName());
 
     private static final DataFlavor BUILD_LIST_FLAVOR
         = new DataFlavor(List.class, "BuildListFlavor");
@@ -184,8 +186,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             if (!canImport(comp, data.getTransferDataFlavors())) return false;
 
             // What actual panel component was chosen?
-            JList<? extends BuildableType> target = BuildQueuePanel.this
-                .convertJComp(comp);
+            JList<? extends BuildableType> target = BuildQueuePanel.this.convertJComp(comp);
             if (target == null) {
                 logger.warning("Build queue import failed to: " + comp);
                 return false;
@@ -446,15 +447,14 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
          */
         @Override
         public Component getListCellRendererComponent(JList<? extends BuildableType> list,
-                                                      BuildableType value,
-                                                      int index,
-                                                      boolean isSelected,
-                                                      boolean cellHasFocus) {
+                        BuildableType value,
+                        int index,
+                        boolean isSelected,
+                        boolean cellHasFocus) {
             JPanel panel = (isSelected) ? selectedPanel : itemPanel;
             panel.removeAll();
 
-            ((ImageIcon)imageLabel.getIcon()).setImage(ImageLibrary
-                .getImage(value, buildingDimension));
+            ((ImageIcon)imageLabel.getIcon()).setImage(ImageLibrary.getImage(value, buildingDimension));
 
             nameLabel.setText(Messages.getName(value));
             panel.setToolTipText(lockReasons.get(value));
@@ -472,8 +472,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             for (int i = 0; i < size; i++) {
                 AbstractGoods goods = required.get(i);
                 ImageIcon icon = new ImageIcon(lib.getSmallImage(goods.getType()));
-                JLabel goodsLabel = new JLabel(Integer.toString(goods.getAmount()),
-                                               icon, SwingConstants.CENTER);
+                JLabel goodsLabel = new JLabel(Integer.toString(goods.getAmount()), icon, SwingConstants.CENTER);
                 if (i == 0 && size > 1) {
                     panel.add(goodsLabel, "split " + size);
                 } else {
@@ -573,18 +572,33 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 }
             };
 
+        // Create Font choice
+        Font fontSubHead = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.SMALLER, Font.BOLD);
+        
         // Create the components
         JLabel header = Utility.localizedLabel("buildQueuePanel.buildQueue");
         header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.BIG));
+        
+        // JLabel SubHeads
+        JLabel bqpUnits = Utility.localizedLabel("buildQueuePanel.units");
+        bqpUnits.setFont(fontSubHead);
+        JLabel bpqBuildQueue = Utility.localizedLabel("buildQueuePanel.buildQueue");
+        bpqBuildQueue.setFont(fontSubHead);
+        bpqBuildQueue.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel bqpBuildings = Utility.localizedLabel("buildQueuePanel.buildings");
+        bqpBuildings.setFont(fontSubHead);
 
         DefaultListModel<UnitType> units = new DefaultListModel<>();
         this.unitList = new JList<>(units);
         this.unitList.setTransferHandler(buildQueueHandler);
-        this.unitList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        this.unitList.setSelectionMode(ListSelectionModel
+                .MULTIPLE_INTERVAL_SELECTION);
         this.unitList.setDragEnabled(true);
         this.unitList.addMouseListener(adapter);
-        this.unitList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "add");
+        this.unitList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), 
+                "add");
         this.unitList.getActionMap().put("add", addAction);
 
         this.constructionPanel
@@ -595,7 +609,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
         this.buildQueueList = new JList<>(current);
         this.buildQueueList.setTransferHandler(buildQueueHandler);
-        this.buildQueueList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.buildQueueList.setSelectionMode(ListSelectionModel
+                .SINGLE_SELECTION);
         this.buildQueueList.setDragEnabled(true);
         this.buildQueueList.addMouseListener(new BuildQueueMouseAdapter(false));
         this.buildQueueList.getInputMap()
@@ -604,7 +619,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    JList<BuildableType> bql = BuildQueuePanel.this.buildQueueList;
+                    JList<BuildableType> bql = BuildQueuePanel.
+                            this.buildQueueList;
                     for (BuildableType bt : bql.getSelectedValuesList()) {
                         removeBuildable(bt);
                     }
@@ -616,7 +632,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             = new DefaultListModel<>();
         this.buildingList = new JList<>(buildings);
         this.buildingList.setTransferHandler(buildQueueHandler);
-        this.buildingList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        this.buildingList.setSelectionMode(ListSelectionModel.
+                MULTIPLE_INTERVAL_SELECTION);
         this.buildingList.setDragEnabled(true);
         this.buildingList.addMouseListener(adapter);
         this.buildingList.getInputMap()
@@ -642,9 +659,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
         // Add all the components
         add(header, "span 3, align center, wrap 40");
-        add(Utility.localizedLabel("buildQueuePanel.units"), "align center");
-        add(Utility.localizedLabel("buildQueuePanel.buildQueue"), "align center");
-        add(Utility.localizedLabel("buildQueuePanel.buildings"), "align center");
+        add(bqpUnits, "align center");
+        add(bpqBuildQueue, "align center");
+        add(bqpBuildings, "align center");
         add(new JScrollPane(this.unitList), "grow");
         add(this.constructionPanel, "split 2, flowy");
         add(new JScrollPane(this.buildQueueList), "grow");
@@ -742,7 +759,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             for (Entry<String, Boolean> entry
                      : unitType.getRequiredAbilities().entrySet()) {
                 if (this.colony.hasAbility(entry.getKey()) != entry.getValue()
-                    && this.featureContainer.hasAbility(entry.getKey(), null, null)
+                    && this.featureContainer.hasAbility(entry.getKey(),
+                            null, null)
                     != entry.getValue()) {
                     List<FreeColGameObjectType> sources
                         = spec.getTypesProviding(entry.getKey(),
@@ -791,7 +809,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             } else if (!buildingType.needsGoodsToBuild()) {
                 // pre-built
                 continue;
-            } else if (unbuildableTypes.contains(buildingType.getUpgradesFrom())) {
+            } else if (unbuildableTypes.contains(buildingType
+                    .getUpgradesFrom())) {
                 unbuildableTypes.add(buildingType); // impossible upgrade path
                 continue;
             }
@@ -802,7 +821,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 lockReason.add(Messages.message(tmpl));
             }
                                                 
-            if (buildingType.getRequiredPopulation() > this.colony.getUnitCount()) {
+            if (buildingType.getRequiredPopulation() > this.colony
+                    .getUnitCount()) {
                 tmpl = StringTemplate.template("buildQueuePanel.populationTooSmall")
                     .addAmount("%number%", buildingType.getRequiredPopulation());
                 lockReason.add(Messages.message(tmpl));
@@ -811,7 +831,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             for (Entry<String, Boolean> entry
                      : buildingType.getRequiredAbilities().entrySet()) {
                 if (this.colony.hasAbility(entry.getKey()) != entry.getValue()
-                    && this.featureContainer.hasAbility(entry.getKey(), null, null)
+                    && this.featureContainer.hasAbility(entry.getKey(),
+                            null, null)
                     != entry.getValue()) {
                     List<FreeColGameObjectType> sources = getSpecification()
                         .getTypesProviding(entry.getKey(), entry.getValue());
@@ -836,8 +857,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             if (buildingType.getUpgradesFrom() != null
                 && !current.contains(buildingType.getUpgradesFrom())) {
                 if (colonyBuilding == null
-                    || colonyBuilding.getType() != buildingType.getUpgradesFrom()) {
-                    lockReason.add(Messages.getName(buildingType.getUpgradesFrom()));
+                    || colonyBuilding.getType() != buildingType
+                            .getUpgradesFrom()) {
+                    lockReason.add(Messages.getName(buildingType
+                            .getUpgradesFrom()));
                 }
             }
             if (lockReason.isEmpty()) {
@@ -934,9 +957,11 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                         buildableType)) return index + 1;
             }
         } else if (buildableType instanceof BuildingType) {
-            BuildingType upgradesFrom = ((BuildingType)buildableType).getUpgradesFrom();
+            BuildingType upgradesFrom = ((BuildingType)buildableType)
+                    .getUpgradesFrom();
             if (upgradesFrom == null) return 0;
-            Building building = this.colony.getBuilding((BuildingType)buildableType);
+            Building building = this.colony
+                    .getBuilding((BuildingType)buildableType);
             BuildingType buildingType = (building == null) ? null
                 : building.getType();
             if (buildingType == upgradesFrom) return 0;
@@ -974,8 +999,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         }
 
         if (buildableType instanceof BuildingType) {
-            BuildingType upgradesFrom = ((BuildingType)buildableType).getUpgradesFrom();
-            BuildingType upgradesTo = ((BuildingType)buildableType).getUpgradesTo();
+            BuildingType upgradesFrom = ((BuildingType)buildableType
+                    ).getUpgradesFrom();
+            BuildingType upgradesTo = ((BuildingType)buildableType)
+                    .getUpgradesTo();
             // does not depend on nothing, but still cannot be built
             if (!canBuild && upgradesFrom == null) {
                 return UNABLE_TO_BUILD;
@@ -1040,7 +1067,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         final String FAIL = "FAIL";
         if (this.colony.getOwner() == getMyPlayer()) {
             String command = event.getActionCommand();
-            List<BuildableType> buildables = getBuildableTypes(this.buildQueueList);
+            List<BuildableType> buildables = getBuildableTypes(this
+                    .buildQueueList);
             while (!buildables.isEmpty()
                 && lockReasons.get(buildables.get(0)) != null) {
                 getGUI().showInformationMessage(buildables.get(0),

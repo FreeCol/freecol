@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -34,17 +36,43 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
  * This is the About panel
+ *  
+ * Layout:
+ *  
+ * | ---------------|
+ * | apLogoLabel    |
+ * | ---------------|
+ * | apVersion      |
+ * | ---------------|
+ * | apRevision     |
+ * | ---------------|
+ * | apOfficialSite |
+ * | ---------------|
+ * | apSiteURL      |
+ * | ---------------|
+ * | apSFProject    |
+ * | ---------------|
+ * | apProjectURL   |
+ * | ---------------|
+ * | apLegal        |
+ * | ---------------|
+ * | apCopyright    |
+ * | ---------------|
+ * | okButton       |
+ * | ---------------|
+ * 
  */
 public final class AboutPanel extends FreeColPanel {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(AboutPanel.class.getName());
+    private static final Logger logger = Logger
+            .getLogger(AboutPanel.class.getName());
 
     public static final String SITE_URL
         = "http://www.freecol.org";
@@ -58,36 +86,62 @@ public final class AboutPanel extends FreeColPanel {
      */
     public AboutPanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap"));
-
+        
         // Header with image
         Image tempImage = ResourceManager.getImage("image.flavor.Title");
         if (tempImage != null) {
-            JLabel logoLabel = new JLabel(new ImageIcon(tempImage));
-            logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,2,2),
+            JLabel apLogoLabel = new JLabel(new ImageIcon(tempImage));
+            apLogoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,2,2),
                     new BevelBorder(BevelBorder.LOWERED)));
-            add(logoLabel, "center");
+            add(apLogoLabel, "center");
+        } else {
+            logger.warning("Cannot find: image.flavor.Title.");
         }
         
-        // version and links
-        add(Utility.localizedLabel("aboutPanel.version"), "newline 20");
-        add(new JLabel(FreeCol.getRevision()), "newline");
+        // Create available Font choices
+        Font fontBold = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.TINY, Font.BOLD);
+        Font fontNormal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.TINY, Font.PLAIN);
+        
+        // Version
+        JLabel apVersion = Utility.localizedLabel("aboutPanel.version");
+        apVersion.setFont(fontBold);
+        JLabel apRevision = new JLabel(FreeCol.getRevision());
+        apRevision.setFont(fontNormal);
+        add(apVersion, "newline 20");
+        add(apRevision, "newline");
 
-        add(Utility.localizedLabel("aboutPanel.officialSite"), "newline 10");
-        JButton site = Utility.getLinkButton(SITE_URL, null, SITE_URL);
-        site.addActionListener(this);
-        add(site, "newline");
+        // Official Site Link
+        JLabel apOfficialSite = new JLabel();
+        apOfficialSite = Utility.localizedLabel("aboutPanel.officialSite");
+        apOfficialSite.setFont(fontBold);
+        add(apOfficialSite, "newline 10");
+        JButton apSiteURL = Utility.getLinkButton(SITE_URL, null, SITE_URL);
+        apSiteURL.addActionListener(this);
+        apSiteURL.setFont(fontNormal);
+        add(apSiteURL, "newline");
 
-        add(Utility.localizedLabel("aboutPanel.sfProject"), "newline 10");
-        JButton project = Utility.getLinkButton(PROJECT_URL, null, PROJECT_URL);
-        project.addActionListener(this);
-        add(project, "newline");
+        // SourceForge Project Site Link
+        JLabel apSFProject = new JLabel();
+        apSFProject = Utility.localizedLabel("aboutPanel.sfProject");      
+        apSFProject.setFont(fontBold);
+        add(apSFProject, "newline 10");
+        JButton apProjectURL = Utility.getLinkButton(PROJECT_URL, null, PROJECT_URL);
+        apProjectURL.addActionListener(this);
+        apProjectURL.setFont(fontNormal);
+        add(apProjectURL, "newline");
 
-        // license disclaimer
-        add(Utility.getDefaultTextArea(Messages.message("aboutPanel.legalDisclaimer")),
-            "newline 20, width 300px");
+        // License Disclaimer
+        JTextArea apLegal = Utility.getDefaultTextArea(Messages
+                .message("aboutPanel.legalDisclaimer"));
+        apLegal.setFont(fontNormal);
+        add(apLegal, "newline 20, width 300px");
 
-        // copyright
-        add(Utility.localizedLabel("aboutPanel.copyright"), "newline 10");
+        // Copyright
+        JLabel apCopyright = Utility.localizedLabel("aboutPanel.copyright");
+        apCopyright.setFont(fontNormal);
+        add(apCopyright, "newline 10");
 
         add(okButton, "newline 20, tag ok");
     }
@@ -113,7 +167,8 @@ public final class AboutPanel extends FreeColPanel {
                 cmd = new String[] { "open" , "-a", "Safari", url };
             } else if (os.toLowerCase().contains("windows")) {
                 // Microsoft Windows, use the default browser
-                cmd = new String[] { "rundll32.exe", "url.dll,FileProtocolHandler", url};
+                cmd = new String[] { "rundll32.exe",
+                    "url.dll,FileProtocolHandler", url};
             } else if (os.toLowerCase().contains("linux")) {
                 // GNU Linux, use xdg-utils to launch the default
                 // browser (portland.freedesktop.org)
