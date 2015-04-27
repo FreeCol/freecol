@@ -1195,9 +1195,10 @@ public final class FreeCol {
             }
             // savegame was specified on command line
         }
-        new FreeColClient(savegame, windowSize,
-                          sound, splashFilename, introVideo, fontName,
-                          userMsg, spec);
+        final FreeColClient freeColClient = new FreeColClient(
+            splashFilename, fontName);
+        freeColClient.startClient(
+            windowSize, userMsg, sound, introVideo, savegame, spec);
     }
 
     /**

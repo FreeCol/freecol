@@ -36,8 +36,8 @@ public class ClientTestHelper {
         // tests where the resource manager is exercised.
         System.setProperty("java.awt.headless", "true"); 
 
-        FreeColClient client = new FreeColClient(null, null, false, null,
-                                                 false, null, null, null);
+        FreeColClient client = new FreeColClient(null, null);
+        client.startClient(null, null, false, false, null, null);
         ConnectController connectController = client.getConnectController();
         client.setFreeColServer(freeColServer);
         client.setSinglePlayer(true);

@@ -80,7 +80,7 @@ public final class FreeColClient {
 
     private final MapEditorController mapEditorController;
 
-    private final SoundController soundController;
+    private SoundController soundController;
 
     /** The server that has been started from the client-GUI. */
     private FreeColServer freeColServer = null;
@@ -133,26 +133,13 @@ public final class FreeColClient {
 
     /**
      * Creates a new <code>FreeColClient</code>.  Creates the control
-     * objects and starts the GUI.
+     * objects.
      *
-     * @param savedGame An optional saved game.
-     * @param size An optional window size.
-     * @param sound True if sounds should be played
      * @param splashFilename The name of the splash image.
-     * @param showOpeningVideo Display the opening video.
      * @param fontName An optional override of the main font.
-     * @param userMsg An optional message key to be displayed early.
-     * @param spec If non-null, a <code>Specification</code> to use to start
-     *     a new game immediately.
      */
-    public FreeColClient(final File savedGame,
-                         final Dimension size,
-                         final boolean sound,
-                         final String splashFilename,
-                         final boolean showOpeningVideo,
-                         final String fontName,
-                         final String userMsg,
-                         final Specification spec) {
+    public FreeColClient(final String splashFilename,
+                         final String fontName) {
         mapEditor = false;
         headless = "true".equals(System.getProperty("java.awt.headless",
                                                     "false"));
@@ -161,10 +148,11 @@ public final class FreeColClient {
                 || FreeColDebugger.getDebugRunTurns() <= 0) {
                 fatal(Messages.message("client.headlessDebug"));
             }
-            if (savedGame == null && spec == null) {
-                fatal(Messages.message("client.headlessRequires"));
-            }
         }
+
+        // Get the splash screen up early on to show activity.
+        gui = new GUI(this, headless);
+        gui.displaySplashScreen(splashFilename);
 
         // Look for base data directory.  Failure is fatal.
         File baseDirectory = FreeColDirectories.getBaseDirectory();
@@ -184,9 +172,7 @@ public final class FreeColClient {
         }
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
-        // Once the basic resources are in place the GUI can be started.
-        gui = new GUI(this, headless);
-        gui.displaySplashScreen(splashFilename);
+        // Once the basic resources are in place construct other things.
 
         serverAPI = new UserServerAPI(gui);
 
@@ -223,10 +209,6 @@ public final class FreeColClient {
         actionManager = new ActionManager(this);
         actionManager.initializeActions(inGameController, connectController);
 
-        // Load the client options, which handle reloading the
-        // resources specified in the active mods.
-        loadClientOptions(savedGame);
-
         if (!headless) {
             // Swing system and look-and-feel initialization.
             try {
@@ -236,7 +218,36 @@ public final class FreeColClient {
             }
         }
 
-        // Initialize Sound
+    }
+
+    /**
+     * Starts the new <code>FreeColClient</code>, including the GUI.
+     *
+     * @param size An optional window size.
+     * @param userMsg An optional message key to be displayed early.
+     * @param sound True if sounds should be played
+     * @param showOpeningVideo Display the opening video.
+     * @param savedGame An optional saved game.
+     * @param spec If non-null, a <code>Specification</code> to use to start
+     *     a new game immediately.
+     */
+    public void startClient(final Dimension size,
+                            final String userMsg,
+                            final boolean sound,
+                            final boolean showOpeningVideo,
+                            final File savedGame,
+                            final Specification spec) {
+        if (headless) {
+            if (savedGame == null && spec == null) {
+                fatal(Messages.message("client.headlessRequires"));
+            }
+        }
+
+        // Load the client options, which handle reloading the
+        // resources specified in the active mods.
+        loadClientOptions(savedGame);
+
+        // Initialize Sound (depends on client options)
         soundController = new SoundController(this, sound);
 
         // Start the GUI (headless-safe)
