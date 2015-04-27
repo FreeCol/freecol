@@ -2094,28 +2094,22 @@ public final class InGameController implements NetworkConstants {
         final boolean checkProduction = freeColClient.getClientOptions()
             .getBoolean(ClientOptions.STOCK_ACCOUNTS_FOR_PRODUCTION);
         final List<TradeRouteStop> stops = tr.getStops();
-        TradeRouteStop stop;
+        TradeRouteStop stop = unit.getStop();
         boolean result = false, more = true;
 
         // If required accumulate a summary of all the activity of
         // this unit on its trade route into this string buffer.
         LogBuilder lb = new LogBuilder((detailed && !tr.isSilent()) ? 256 : -1);
         lb.mark();
-
+        if (!TradeRoute.isStopValid(unit, stop)) {
+            lb.add(" ", Messages.message(stop.invalidStopLabel(player)));
+            clearOrders(unit);
+            return true;
+        }
+        TradeRouteStop first = stop;
         outer: for (;;) {
-            stop = unit.getStop();
-            // Complain and return if the stop is no longer valid.
-            if (!TradeRoute.isStopValid(unit, stop)) {
-                lb.add(" ", Messages.message(stop.invalidStopLabel(player)));
-                clearOrders(unit);
-                result = true;
-                break;
-            }
-
             // Is the unit at the stop already?
-            boolean atStop = Map.isSameLocation(stop.getLocation(),
-                                                unit.getLocation());
-            if (atStop) {
+            if (Map.isSameLocation(stop.getLocation(), unit.getLocation())) {
                 lb.mark();
 
                 // Anything to unload?
@@ -2165,6 +2159,14 @@ public final class InGameController implements NetworkConstants {
                     break;
                 }
 
+                if (stop == first) {
+                    // Do not reconsider starting stop.  We can get here
+                    // if there is valid goods to load but the destination
+                    // can not accept it.
+                    unit.setState(UnitState.SKIPPED);
+                    break;
+                }
+
                 // Add messages for any skipped stops now that we know
                 // a valid one has been found.
                 for (;;) {
@@ -2175,7 +2177,7 @@ public final class InGameController implements NetworkConstants {
                             .getLabelFor("tradeRoute.skipStop", player)));
                 }
 
-                continue; // Stop was updated, loop.
+                continue; // Stop was updated successfully, loop.
             }
 
             // Not at stop, give up if no moves left or the path was
