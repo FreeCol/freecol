@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -40,17 +41,17 @@ public final class FreeColStringInputDialog extends FreeColInputDialog<String> {
      * Creates a dialog to input a string field.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
      * @param text Text that explains the action to the user.
      * @param defaultValue The default value appearing in the text field.
      * @param okKey A key displayed on the "ok"-button.
      * @param cancelKey A key displayed on the optional "cancel"-button.
      */
-    public FreeColStringInputDialog(FreeColClient freeColClient,
-                                    boolean modal,
-                                    String text, String defaultValue,
-                                    String okKey, String cancelKey) {
-        super(freeColClient);
+    public FreeColStringInputDialog(FreeColClient freeColClient, JFrame frame,
+            boolean modal, String text, String defaultValue,
+            String okKey, String cancelKey) {
+        super(freeColClient, frame);
 
         textField = new JTextField(defaultValue);
         JPanel panel = new JPanel(new BorderLayout()) {
@@ -63,7 +64,7 @@ public final class FreeColStringInputDialog extends FreeColInputDialog<String> {
         panel.add(Utility.getDefaultTextArea(text));
         panel.add(textField, BorderLayout.SOUTH);
 
-        initializeInputDialog(modal, panel, null, okKey, cancelKey);
+        initializeInputDialog(frame, modal, panel, null, okKey, cancelKey);
     }
 
     /**

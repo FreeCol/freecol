@@ -25,10 +25,14 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -46,6 +50,7 @@ import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLayeredPane;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
@@ -56,6 +61,9 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.FreeColAction;
+import net.sf.freecol.client.gui.menu.FreeColMenuBar;
+import net.sf.freecol.client.gui.menu.InGameMenuBar;
+import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.panel.AboutPanel;
 import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
@@ -253,6 +261,15 @@ public final class Canvas extends JDesktopPane {
     /** The parent GUI. */
     private final GUI gui;
 
+    private final GraphicsDevice graphicsDevice;
+
+    /** The parent frame, either a window or the full screen. */
+    private FreeColFrame frame;
+
+    private boolean windowed;
+
+    private Rectangle windowBounds;
+
     private MainPanel mainPanel;
 
     private final StartGamePanel startGamePanel;
@@ -289,14 +306,19 @@ public final class Canvas extends JDesktopPane {
      * The constructor to use.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param graphicsDevice The used graphics device.
      * @param size The bounds of this <code>Canvas</code>.
+     * @param windowed If the frame should be windowed.
      * @param mapViewer The object responsible of drawing the map onto
      *     this component.
      */
-    public Canvas(final FreeColClient freeColClient, Dimension size,
+    public Canvas(final FreeColClient freeColClient,
+                  final GraphicsDevice graphicsDevice,
+                  final Dimension size, boolean windowed,
                   MapViewer mapViewer) {
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
+        this.graphicsDevice = graphicsDevice;
         chatDisplay = new ChatDisplay();
         this.mapViewer = mapViewer;
 
@@ -319,7 +341,113 @@ public final class Canvas extends JDesktopPane {
         setFocusTraversalKeysEnabled(false);
 
         createKeyBindings();
+        changeWindowedMode(windowed);
+        frame.setIconImage(ResourceManager.getImage("image.miscicon.FrameIcon"));
         logger.info("Canvas created.");
+    }
+
+    public boolean isWindowed() {
+        return windowed;
+    }
+
+    /**
+     * Change the windowed mode.
+     *
+     * @param windowed Use <code>true</code> for windowed mode
+     *     and <code>false</code> for fullscreen mode.
+     */
+    public void changeWindowedMode(boolean windowed) {
+        // Clean up the old frame
+        JMenuBar menuBar = null;
+        if (frame != null) {
+            menuBar = frame.getJMenuBar();
+            if (frame instanceof WindowedFrame) {
+                windowBounds = frame.getBounds();
+            }
+            frame.setVisible(false);
+            frame.dispose();
+        }
+        this.windowed = windowed;
+
+        // User might have moved window to new screen in a
+        // multi-screen setup, so make this.gd point to the current screen.
+        frame = windowed
+            ? new WindowedFrame(freeColClient, graphicsDevice)
+            : new FullScreenFrame(freeColClient, graphicsDevice);
+        frame.setJMenuBar(menuBar);
+        frame.setCanvas(this);
+        frame.updateBounds(windowBounds);
+        if (windowed) {
+            frame.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    logger.info("Window size changes to " + getSize());
+                }
+            });
+        }
+
+        mapViewer.forceReposition();
+        updateSizes();
+        frame.setVisible(true);
+    }
+
+    /**
+     * Start the GUI for the map editor.
+     */
+    public void startMapEditorGUI() {
+        if (frame == null) return;
+
+        // We may need to reset the zoom value to the default value
+        gui.resetMapZoom();
+
+        frame.setJMenuBar(new MapEditorMenuBar(freeColClient));
+        showMapEditorTransformPanel();
+
+        CanvasMapEditorMouseListener listener
+            = new CanvasMapEditorMouseListener(freeColClient, this);
+        addMouseListener(listener);
+        addMouseMotionListener(listener);
+    }
+
+    /**
+     * Quit the GUI.  All that is required is to exit the full screen.
+     */
+    public void quit() throws Exception {
+        if (frame != null) {
+            GraphicsConfiguration GraphicsConf = frame.getGraphicsConfiguration();
+            GraphicsDevice gd = GraphicsConf.getDevice();
+            if (!windowed) gd.setFullScreenWindow(null);
+        }
+    }
+
+    /**
+     * In game initializations.
+     */
+    public void initializeInGame() {
+        if (frame == null) return;
+
+        frame.setJMenuBar(new InGameMenuBar(freeColClient));
+        frame.paintAll(getGraphics());
+    }
+
+    /**
+     * Reset the menu bar.
+     */
+    public void resetMenuBar() {
+        if (frame == null) return;
+        JMenuBar menuBar = frame.getJMenuBar();
+        if (menuBar != null) {
+            ((FreeColMenuBar)menuBar).reset();
+        }
+    }
+
+    /**
+     * Update the menu bar.
+     */
+    public void updateMenuBar() {
+        if (frame != null && frame.getJMenuBar() != null) {
+            ((FreeColMenuBar)frame.getJMenuBar()).update();
+        }
     }
 
 
@@ -846,7 +974,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void add(Component comp, Integer i) {
         addToCanvas(comp, i);
-        gui.updateMenuBar();
+        updateMenuBar();
         freeColClient.updateActions();
     }
 
@@ -1227,8 +1355,7 @@ public final class Canvas extends JDesktopPane {
                 Image bgImage = ResourceManager.getImage("image.flavor.Canvas.map");
                 if (bgImage != null) {
                     // Draw background image with scaling.
-                    g2d.drawImage(bgImage, 0, 0, size.width, size.height,
-                                  gui.getCanvas());
+                    g2d.drawImage(bgImage, 0, 0, size.width, size.height, this);
                     String versionStr = "v. " + FreeCol.getVersion();
                     Font oldFont = g2d.getFont();
                     Color oldColor = g2d.getColor();
@@ -1265,7 +1392,7 @@ public final class Canvas extends JDesktopPane {
     public void remove(Component comp) {
         removeFromCanvas(comp);
         final boolean takeFocus = (comp != statusPanel);
-        gui.updateMenuBar();
+        updateMenuBar();
         freeColClient.updateActions();
         if (takeFocus && !isShowingSubPanel()) {
             requestFocus();
@@ -1349,7 +1476,7 @@ public final class Canvas extends JDesktopPane {
                                   ImageIcon icon, String cancelKey,
                                   List<ChoiceItem<T>> choices) {
         FreeColChoiceDialog<T> fcd
-            = new FreeColChoiceDialog<>(freeColClient, modal, obj, icon,
+            = new FreeColChoiceDialog<>(freeColClient, frame, modal, obj, icon,
                                          cancelKey, choices);
         return showFreeColDialog(fcd, tile);
     }
@@ -1370,7 +1497,7 @@ public final class Canvas extends JDesktopPane {
                                      Object obj, ImageIcon icon,
                                      String okKey, String cancelKey) {
         FreeColConfirmDialog fcd
-            = new FreeColConfirmDialog(freeColClient, modal, obj, icon,
+            = new FreeColConfirmDialog(freeColClient, frame, modal, obj, icon,
                                        okKey, cancelKey);
         return showFreeColDialog(fcd, tile);
     }
@@ -1391,7 +1518,7 @@ public final class Canvas extends JDesktopPane {
                                   StringTemplate template, String defaultValue,
                                   String okKey, String cancelKey) {
         FreeColStringInputDialog fcd
-            = new FreeColStringInputDialog(freeColClient, modal,
+            = new FreeColStringInputDialog(freeColClient, frame, modal,
                                            Messages.message(template),
                                            defaultValue, okKey, cancelKey);
         return showFreeColDialog(fcd, tile);
@@ -1468,7 +1595,7 @@ public final class Canvas extends JDesktopPane {
                                        DialogHandler<List<Goods>> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
-                new CaptureGoodsDialog(freeColClient, unit, gl),
+                new CaptureGoodsDialog(freeColClient, frame, unit, gl),
                 null, handler));
     }
 
@@ -1493,7 +1620,7 @@ public final class Canvas extends JDesktopPane {
                                                DialogHandler<FoundingFather> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
-                new ChooseFoundingFatherDialog(freeColClient, ffs),
+                new ChooseFoundingFatherDialog(freeColClient, frame, ffs),
                 null, handler));
     }
 
@@ -1503,7 +1630,7 @@ public final class Canvas extends JDesktopPane {
      * @return The modified <code>OptionGroup</code>, or null if not modified.
      */
     public OptionGroup showClientOptionsDialog() {
-        ClientOptionsDialog dialog = new ClientOptionsDialog(freeColClient);
+        ClientOptionsDialog dialog = new ClientOptionsDialog(freeColClient, frame);
         OptionGroup group = null;
         clientOptionsDialogShowing = true;
         try {
@@ -1512,7 +1639,7 @@ public final class Canvas extends JDesktopPane {
             clientOptionsDialogShowing = false;
             if (group != null) {
                 freeColClient.updateActions();
-                gui.resetMenuBar();
+                resetMenuBar();
                 // Immediately redraw the minimap if that was updated.
                 gui.updateMapControls();
             }
@@ -1593,7 +1720,7 @@ public final class Canvas extends JDesktopPane {
      * @return A list of names for a new nation.
      */
     public List<String> showConfirmDeclarationDialog() {
-        return showFreeColDialog(new ConfirmDeclarationDialog(freeColClient),
+        return showFreeColDialog(new ConfirmDeclarationDialog(freeColClient, frame),
                                  null);
     }
 
@@ -1614,7 +1741,7 @@ public final class Canvas extends JDesktopPane {
     public OptionGroup showDifficultyDialog() {
         Game game = freeColClient.getGame();
         Specification spec = game.getSpecification();
-        return showFreeColDialog(new DifficultyDialog(freeColClient, spec,
+        return showFreeColDialog(new DifficultyDialog(freeColClient, frame, spec,
                 spec.getDifficultyOptionGroup(), false),
             null);
     }
@@ -1628,7 +1755,7 @@ public final class Canvas extends JDesktopPane {
      */
     public OptionGroup showDifficultyDialog(Specification spec,
                                             OptionGroup group) {
-        return showFreeColDialog(new DifficultyDialog(freeColClient, spec, 
+        return showFreeColDialog(new DifficultyDialog(freeColClient, frame, spec, 
                 group, group.isEditable()),
             null);
     }
@@ -1643,7 +1770,7 @@ public final class Canvas extends JDesktopPane {
                                     DialogHandler<List<Goods>> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
-                new DumpCargoDialog(freeColClient, unit),
+                new DumpCargoDialog(freeColClient, frame, unit),
                 unit.getTile(), handler));
     }
 
@@ -1654,7 +1781,7 @@ public final class Canvas extends JDesktopPane {
      * @return The response returned by the dialog.
      */
     public boolean showEditOptionDialog(Option option) {
-        return showFreeColDialog(new EditOptionDialog(freeColClient, option),
+        return showFreeColDialog(new EditOptionDialog(freeColClient, frame, option),
                                  null);
     }
 
@@ -1664,7 +1791,7 @@ public final class Canvas extends JDesktopPane {
      * @param settlement The <code>IndianSettlement</code> to edit.
      */
     public void showEditSettlementDialog(IndianSettlement settlement) {
-        showFreeColDialog(new EditSettlementDialog(freeColClient, settlement),
+        showFreeColDialog(new EditSettlementDialog(freeColClient, frame, settlement),
                           null);
     }
 
@@ -1681,7 +1808,7 @@ public final class Canvas extends JDesktopPane {
                                      DialogHandler<Integer> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
-                new EmigrationDialog(freeColClient, player.getEurope(),
+                new EmigrationDialog(freeColClient, frame, player.getEurope(),
                                      fountainOfYouth),
                 null, handler));
     }
@@ -1696,7 +1823,7 @@ public final class Canvas extends JDesktopPane {
                                   DialogHandler<Boolean> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
-                new EndTurnDialog(freeColClient, units),
+                new EndTurnDialog(freeColClient, frame, units),
                 null, handler));
     }
 
@@ -1784,7 +1911,7 @@ public final class Canvas extends JDesktopPane {
                                        DialogHandler<Boolean> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
-                new FirstContactDialog(freeColClient, player, other, tile,
+                new FirstContactDialog(freeColClient, frame, player, other, tile,
                                        settlementCount),
                 tile, handler));
     }
@@ -1811,7 +1938,7 @@ public final class Canvas extends JDesktopPane {
      */
     public OptionGroup showGameOptionsDialog(boolean editable,
                                              boolean custom) {
-        GameOptionsDialog god = new GameOptionsDialog(freeColClient, editable,
+        GameOptionsDialog god = new GameOptionsDialog(freeColClient, frame, editable,
                                                       custom);
         return showFreeColDialog(god, null);
     }
@@ -1925,7 +2052,7 @@ public final class Canvas extends JDesktopPane {
                 FreeColFileFilter.freeColSaveDirectoryFilter,
             };
         }
-        return showFreeColDialog(new LoadDialog(freeColClient, directory,
+        return showFreeColDialog(new LoadDialog(freeColClient, frame, directory,
                                                 fileFilters),
                                  null);
     }
@@ -1941,7 +2068,7 @@ public final class Canvas extends JDesktopPane {
     public File showLoadDialog(File directory, FileFilter[] fileFilters) {
         File response = null;
         for (;;) {
-            response = showFreeColDialog(new LoadDialog(freeColClient,
+            response = showFreeColDialog(new LoadDialog(freeColClient, frame,
                                                         directory, fileFilters),
                                          null);
             if (response == null || response.isFile()) break;
@@ -1962,7 +2089,7 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean showLoadingSavegameDialog(boolean publicServer,
                                              boolean singlePlayer) {
-        loadingSavegameDialog = new LoadingSavegameDialog(freeColClient);
+        loadingSavegameDialog = new LoadingSavegameDialog(freeColClient, frame);
         return showFreeColDialog(loadingSavegameDialog, null);
     }
 
@@ -1982,7 +2109,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showMainPanel(String userMsg) {
         closeMenus();
-        gui.getFrame().setJMenuBar(null);
+        frame.setJMenuBar(null);
         mainPanel = new MainPanel(freeColClient);
         addCentered(mainPanel, JLayeredPane.DEFAULT_LAYER);
         if (userMsg != null) gui.showInformationMessage(userMsg);
@@ -2007,7 +2134,7 @@ public final class Canvas extends JDesktopPane {
      */
     public OptionGroup showMapGeneratorOptionsDialog(boolean editable) {
         MapGeneratorOptionsDialog mgod
-            = new MapGeneratorOptionsDialog(freeColClient, editable);
+            = new MapGeneratorOptionsDialog(freeColClient, frame, editable);
         return showFreeColDialog(mgod, null);
     }
 
@@ -2017,7 +2144,7 @@ public final class Canvas extends JDesktopPane {
      * @return The response returned by the dialog.
      */
     public Dimension showMapSizeDialog() {
-        return showFreeColDialog(new MapSizeDialog(freeColClient), null);
+        return showFreeColDialog(new MapSizeDialog(freeColClient, frame), null);
     }
 
     /**
@@ -2062,7 +2189,7 @@ public final class Canvas extends JDesktopPane {
                                   DialogHandler<Boolean> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
-                new MonarchDialog(freeColClient, action, template, monarchKey),
+                new MonarchDialog(freeColClient, frame, action, template, monarchKey),
                 null, handler));
     }
 
@@ -2079,7 +2206,7 @@ public final class Canvas extends JDesktopPane {
                                       DialogHandler<String> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
-                new FreeColStringInputDialog(freeColClient, false,
+                new FreeColStringInputDialog(freeColClient, frame, false,
                                              Messages.message(key),
                                              defaultName, "ok", null),
                 unit.getTile(), handler));
@@ -2099,7 +2226,7 @@ public final class Canvas extends JDesktopPane {
                                         DialogHandler<String> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
-                new FreeColStringInputDialog(freeColClient, false,
+                new FreeColStringInputDialog(freeColClient, frame, false,
                                              Messages.message(template),
                                              defaultName, "ok", null),
                 unit.getTile(), handler));
@@ -2124,7 +2251,7 @@ public final class Canvas extends JDesktopPane {
             || (our instanceof Colony && other instanceof Colony)) {
             throw new RuntimeException("Bad DTD args: " + our + ", " + other);
         }
-        DiplomaticTradeDialog dtd = new DiplomaticTradeDialog(freeColClient,
+        DiplomaticTradeDialog dtd = new DiplomaticTradeDialog(freeColClient, frame,
             our, other, agreement, comment);
         return showFreeColDialog(dtd, ((Location)our).getTile());
     }
@@ -2166,7 +2293,7 @@ public final class Canvas extends JDesktopPane {
      * @return The response returned by the dialog.
      */
     public Parameters showParametersDialog() {
-        return showFreeColDialog(new ParametersDialog(freeColClient),
+        return showFreeColDialog(new ParametersDialog(freeColClient, frame),
                                  null);
     }
 
@@ -2181,7 +2308,7 @@ public final class Canvas extends JDesktopPane {
     public boolean showPreCombatDialog(Unit attacker,
                                        FreeColGameObject defender,
                                        Tile tile) {
-        return showFreeColDialog(new PreCombatDialog(freeColClient,
+        return showFreeColDialog(new PreCombatDialog(freeColClient, frame,
                                                      attacker, defender),
                                  tile);
     }
@@ -2231,7 +2358,7 @@ public final class Canvas extends JDesktopPane {
      * @return The response returned by the dialog.
      */
     public String showRiverStyleDialog(Tile tile) {
-        return showFreeColDialog(new RiverStyleDialog(freeColClient), tile);
+        return showFreeColDialog(new RiverStyleDialog(freeColClient, frame), tile);
     }
 
     /**
@@ -2265,7 +2392,7 @@ public final class Canvas extends JDesktopPane {
      */
     public File showSaveDialog(File directory, FileFilter[] fileFilters,
                                String defaultName, String extension) {
-        return showFreeColDialog(new SaveDialog(freeColClient, directory,
+        return showFreeColDialog(new SaveDialog(freeColClient, frame, directory,
                                                 fileFilters, defaultName,
                                                 extension),
                                  null);
@@ -2277,7 +2404,7 @@ public final class Canvas extends JDesktopPane {
      * @return The response returned by the dialog.
      */
     public Dimension showScaleMapSizeDialog() {
-        return showFreeColDialog(new ScaleMapSizeDialog(freeColClient),
+        return showFreeColDialog(new ScaleMapSizeDialog(freeColClient, frame),
                                  null);
     }
 
@@ -2293,7 +2420,7 @@ public final class Canvas extends JDesktopPane {
     public int showSelectAmountDialog(GoodsType goodsType, int available,
                                       int defaultAmount, boolean needToPay) {
         FreeColDialog<Integer> fcd
-            = new SelectAmountDialog(freeColClient, goodsType, available,
+            = new SelectAmountDialog(freeColClient, frame, goodsType, available,
                                      defaultAmount, needToPay);
         Integer result = showFreeColDialog(fcd, null);
         return (result == null) ? -1 : result;
@@ -2310,7 +2437,7 @@ public final class Canvas extends JDesktopPane {
     public int showSelectTributeAmountDialog(StringTemplate question,
                                              int maximum) {
         FreeColDialog<Integer> fcd
-            = new SelectTributeAmountDialog(freeColClient, question, maximum);
+            = new SelectTributeAmountDialog(freeColClient, frame, question, maximum);
         Integer result = showFreeColDialog(fcd, null);
         return (result == null) ? -1 : result;
     }
@@ -2323,7 +2450,7 @@ public final class Canvas extends JDesktopPane {
      * @return A destination for the unit, or null.
      */
     public Location showSelectDestinationDialog(Unit unit) {
-        return showFreeColDialog(new SelectDestinationDialog(freeColClient,
+        return showFreeColDialog(new SelectDestinationDialog(freeColClient, frame,
                 unit), unit.getTile());
     }
 
@@ -2492,7 +2619,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showVictoryDialog(DialogHandler<Boolean> handler) {
         SwingUtilities.invokeLater(
-            new DialogCallback<>(new VictoryDialog(freeColClient),
+            new DialogCallback<>(new VictoryDialog(freeColClient, frame),
                                         null, handler));
     }
 
@@ -2505,7 +2632,7 @@ public final class Canvas extends JDesktopPane {
      * @return The response returned by the dialog.
      */
     public boolean showWarehouseDialog(Colony colony) {
-        return showFreeColDialog(new WarehouseDialog(freeColClient, colony),
+        return showFreeColDialog(new WarehouseDialog(freeColClient, frame, colony),
                                  null);
     }
 

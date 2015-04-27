@@ -28,9 +28,11 @@ import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -82,11 +84,12 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
      * Create an EditSettlementDialog.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param settlement The <code>IndianSettlement</code> to edit.
      */
-    public EditSettlementDialog(FreeColClient freeColClient,
-                                final IndianSettlement settlement) {
-        super(freeColClient);
+    public EditSettlementDialog(FreeColClient freeColClient, JFrame frame,
+            final IndianSettlement settlement) {
+        super(freeColClient, frame);
 
         this.settlement = settlement;
 
@@ -133,7 +136,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         c.add(new ChoiceItem<>(Messages.message("editSettlementDialog.removeSettlement"), fake));
         c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
             .cancelOption().defaultOption());
-        initializeDialog(DialogType.QUESTION, true, panel, GUI.createImageIcon(
+        initializeDialog(frame, DialogType.QUESTION, true, panel, GUI.createImageIcon(
             getImageLibrary().getSmallSettlementImage(settlement)), c);
     }
 

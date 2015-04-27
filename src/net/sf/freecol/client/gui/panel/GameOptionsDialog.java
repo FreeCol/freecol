@@ -20,6 +20,8 @@
 package net.sf.freecol.client.gui.panel;
 
 
+import javax.swing.JFrame;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -37,12 +39,13 @@ public final class GameOptionsDialog extends OptionsDialog {
      * Creates a game options dialog.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param editable Whether the game options can be modified.
      * @param custom Whether to load custom options.
      */
-    public GameOptionsDialog(FreeColClient freeColClient,
-                             boolean editable, boolean custom) {
-        super(freeColClient, editable,
+    public GameOptionsDialog(FreeColClient freeColClient, JFrame frame,
+            boolean editable, boolean custom) {
+        super(freeColClient, frame, editable,
             freeColClient.getGame().getGameOptions(),
             GameOptions.getXMLElementTagName(),
             FreeColDirectories.GAME_OPTIONS_FILE_NAME,
@@ -62,7 +65,7 @@ public final class GameOptionsDialog extends OptionsDialog {
             }
         }
 
-        initialize();
+        initialize(frame);
     }
 
 

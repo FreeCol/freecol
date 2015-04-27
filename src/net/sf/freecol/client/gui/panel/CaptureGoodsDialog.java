@@ -27,12 +27,15 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
 import javax.swing.ImageIcon;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -113,12 +116,13 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
      * Creates a new CaptureGoodsDialog.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param winner The <code>Unit</code> that is looting.
      * @param loot The <code>Goods</code> to loot.
      */
-    public CaptureGoodsDialog(FreeColClient freeColClient, Unit winner,
-                              List<Goods> loot) {
-        super(freeColClient);
+    public CaptureGoodsDialog(FreeColClient freeColClient, JFrame frame,
+            Unit winner, List<Goods> loot) {
+        super(freeColClient, frame);
 
         this.maxCargo = winner.getSpaceLeft();
 
@@ -184,7 +188,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         List<ChoiceItem<List<Goods>>> c = choices();
         c.add(new ChoiceItem<>(Messages.message("ok"), fake)
             .okOption().defaultOption());
-        initializeDialog(DialogType.QUESTION, false, panel,
+        initializeDialog(frame, DialogType.QUESTION, false, panel,
             new ImageIcon(getImageLibrary().getUnitImage(winner)), c);
     }
 

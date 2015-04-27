@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -64,11 +65,12 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      * Creates a dialog to set the map generator options.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param editable Whether the options may be edited.
      */
-    public MapGeneratorOptionsDialog(FreeColClient freeColClient,
-                                     boolean editable) {
-        super(freeColClient, editable,
+    public MapGeneratorOptionsDialog(FreeColClient freeColClient, JFrame frame,
+            boolean editable) {
+        super(freeColClient, frame, editable,
             freeColClient.getGame().getMapGeneratorOptions(),
             MapGeneratorOptions.getXMLElementTagName(),
             FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME,
@@ -110,7 +112,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                 panel.add(scrollPane);
             }
         }
-        initialize();
+        initialize(frame);
     }
 
 

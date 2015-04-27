@@ -24,7 +24,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JTextArea;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -54,14 +56,15 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
      * The constructor to use.
      *
      * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param frame The owner frame.
      * @param goodsType The <code>GoodsType</code> to select an amount of.
      * @param available The amount of goods available.
      * @param defaultAmount The amount to select to start with.
      * @param pay If true, check the player has sufficient funds.
      */
-    public SelectAmountDialog(FreeColClient freeColClient, GoodsType goodsType,
-                              int available, int defaultAmount, boolean pay) {
-        super(freeColClient);
+    public SelectAmountDialog(FreeColClient freeColClient, JFrame frame,
+            GoodsType goodsType, int available, int defaultAmount, boolean pay) {
+        super(freeColClient, frame);
 
         if (pay) {
             final Player player = getMyPlayer();
@@ -102,7 +105,7 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
         panel.add(this.comboBox, "wrap 20, growx");
         panel.setSize(panel.getPreferredSize());
 
-        initializeInputDialog(true, panel, null, "ok", "cancel");
+        initializeInputDialog(frame, true, panel, null, "ok", "cancel");
     }
 
     /**

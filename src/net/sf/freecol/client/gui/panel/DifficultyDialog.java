@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
@@ -69,16 +70,16 @@ public final class DifficultyDialog extends OptionsDialog
      * current game read-only.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param specification The <code>Specification</code> to base the
      *     difficulty on.
      * @param level An <code>OptionGroup</code> encapsulating the difficulty
      *     level to display.
      * @param editable Is the dialog editable?
      */
-    public DifficultyDialog(FreeColClient freeColClient,
-                            Specification specification,
-                            OptionGroup level, boolean editable) {
-        super(freeColClient, editable, level, "difficultyDialog",
+    public DifficultyDialog(FreeColClient freeColClient, JFrame frame,
+            Specification specification, OptionGroup level, boolean editable) {
+        super(freeColClient, frame, editable, level, "difficultyDialog",
               FreeColDirectories.CUSTOM_DIFFICULTY_FILE_NAME,
               "model.difficulty.custom");
 
@@ -103,7 +104,7 @@ public final class DifficultyDialog extends OptionsDialog
             this.panel.add(loadButton);
             this.panel.add(saveButton);
         }
-        initialize();
+        initialize(frame);
     }
 
 

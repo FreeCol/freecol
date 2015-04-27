@@ -24,9 +24,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -53,9 +55,10 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
      * Create a new parameters dialog.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      */
-    public ParametersDialog(FreeColClient freeColClient) {
-        super(freeColClient);
+    public ParametersDialog(FreeColClient freeColClient, JFrame frame) {
+        super(freeColClient, frame);
         /*
          * FIXME: Extend this dialog. It should be possible
          *        to specify the sizes using percentages.
@@ -106,7 +109,7 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
         c.add(new ChoiceItem<>(Messages.message("ok"), fake).okOption());
         c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
             .cancelOption().defaultOption());
-        initializeDialog(DialogType.QUESTION, true, panel, null, c);
+        initializeDialog(frame, DialogType.QUESTION, true, panel, null, c);
     }
 
 

@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -59,9 +60,10 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
      * Creates a dialog to set the options for loading a saved game.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      */
-    public LoadingSavegameDialog(FreeColClient freeColClient) {
-        super(freeColClient);
+    public LoadingSavegameDialog(FreeColClient freeColClient, JFrame frame) {
+        super(freeColClient, frame);
 
         JPanel panel = new JPanel();
         panel.setBorder(Utility.blankBorder(10, 10, 10, 10));
@@ -104,7 +106,7 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         panel.add(publicMultiplayer);
         panel.setSize(panel.getPreferredSize());
 
-        initializeConfirmDialog(true, panel, null, "ok", "cancel");
+        initializeConfirmDialog(frame, true, panel, null, "ok", "cancel");
     }
 
 

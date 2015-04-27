@@ -22,7 +22,9 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -39,9 +41,10 @@ public final class VictoryDialog extends FreeColConfirmDialog {
      * Create a Victory dialog.
      * 
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      */
-    public VictoryDialog(FreeColClient freeColClient) {
-        super(freeColClient);
+    public VictoryDialog(FreeColClient freeColClient, JFrame frame) {
+        super(freeColClient, frame);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 1", "", ""));
         panel.add(Utility.localizedHeader(Messages.nameKey("victoryDialog"),
@@ -51,7 +54,7 @@ public final class VictoryDialog extends FreeColConfirmDialog {
         panel.add(new JLabel(new ImageIcon(image)),
                   "align center");
 
-        initializeConfirmDialog(false, panel, null,
+        initializeConfirmDialog(frame, false, panel, null,
                                 "victory.yes", "victory.continue");
     }
 }

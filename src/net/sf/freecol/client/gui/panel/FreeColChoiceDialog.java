@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.util.List;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
@@ -36,9 +37,10 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
      * Internal constructor.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      */
-    protected FreeColChoiceDialog(FreeColClient freeColClient) {
-        super(freeColClient);
+    protected FreeColChoiceDialog(FreeColClient freeColClient, JFrame frame) {
+        super(freeColClient, frame);
     }
 
     /**
@@ -46,35 +48,37 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
      * ok/cancel option.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
      * @param obj An object that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param cancelKey Key for the text of the optional cancel button.
      * @param choices A list of <code>ChoiceItem</code>s to create buttons for.
      */
-    public FreeColChoiceDialog(final FreeColClient freeColClient,
-                               boolean modal, Object obj, ImageIcon icon,
-                               String cancelKey, List<ChoiceItem<T>> choices) {
-        this(freeColClient);
+    public FreeColChoiceDialog(final FreeColClient freeColClient, JFrame frame,
+            boolean modal, Object obj, ImageIcon icon, String cancelKey,
+            List<ChoiceItem<T>> choices) {
+        this(freeColClient, frame);
 
-        initializeChoiceDialog(modal, obj, icon, cancelKey, choices);
+        initializeChoiceDialog(frame, modal, obj, icon, cancelKey, choices);
     }
 
 
     /**
+     * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
      * @param obj An object that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param cancelKey Key for the text of the optional cancel button.
      * @param choices A list of <code>ChoiceItem</code>s to create buttons for.
      */
-    protected final void initializeChoiceDialog(boolean modal, Object obj,
-                                                ImageIcon icon, String cancelKey,
-                                                List<ChoiceItem<T>> choices) {
+    protected final void initializeChoiceDialog(JFrame frame, boolean modal,
+            Object obj, ImageIcon icon, String cancelKey,
+            List<ChoiceItem<T>> choices) {
         if (cancelKey != null) {
             choices.add(new ChoiceItem<>(Messages.message(cancelKey), (T)null)
                 .cancelOption().defaultOption());
         }
-        initializeDialog(DialogType.PLAIN, modal, obj, icon, choices);
+        initializeDialog(frame, DialogType.PLAIN, modal, obj, icon, choices);
     }
 }

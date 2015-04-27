@@ -21,7 +21,9 @@ package net.sf.freecol.client.gui.panel;
 
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
 import javax.swing.JTextField;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -50,14 +52,14 @@ public final class SelectTributeAmountDialog
      * The constructor to use.
      *
      * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param frame The owner frame.
      * @param question A <code>StringTemplate</code> describing the
      *     input required.
      * @param maximum The inclusive maximum integer input value.
      */
-    public SelectTributeAmountDialog(FreeColClient freeColClient,
-                                     StringTemplate question,
-                                     int maximum) {
-        super(freeColClient);
+    public SelectTributeAmountDialog(FreeColClient freeColClient, JFrame frame,
+            StringTemplate question, int maximum) {
+        super(freeColClient, frame);
 
         this.maximum = maximum;
         this.input = new JTextField(Integer.toString(maximum), COLUMNS);
@@ -68,7 +70,7 @@ public final class SelectTributeAmountDialog
         
         panel.setSize(panel.getPreferredSize());
 
-        initializeInputDialog(true, panel, null, "ok", "cancel");
+        initializeInputDialog(frame, true, panel, null, "ok", "cancel");
     }
 
     /**

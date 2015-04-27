@@ -34,9 +34,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -249,9 +251,10 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      */
-    public ConfirmDeclarationDialog(FreeColClient freeColClient) {
-        super(freeColClient);
+    public ConfirmDeclarationDialog(FreeColClient freeColClient, JFrame frame) {
+        super(freeColClient, frame);
 
         final Player player = freeColClient.getMyPlayer();
         this.flag = defaultFlags.get(player.getNationId());
@@ -353,7 +356,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
                 fake).okOption());
         c.add(new ChoiceItem<>(Messages.message("confirmDeclarationDialog.areYouSure.no"),
                 fake).cancelOption().defaultOption());
-        initializeDialog(DialogType.QUESTION, true, panel, icon, c);
+        initializeDialog(frame, DialogType.QUESTION, true, panel, icon, c);
     }
 
 

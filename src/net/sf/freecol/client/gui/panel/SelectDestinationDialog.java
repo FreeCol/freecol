@@ -35,6 +35,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
@@ -43,6 +44,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -350,9 +352,11 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      * The constructor to use.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      */
-    public SelectDestinationDialog(FreeColClient freeColClient, Unit unit) {
-        super(freeColClient);
+    public SelectDestinationDialog(FreeColClient freeColClient, JFrame frame,
+            Unit unit) {
+        super(freeColClient, frame);
 
         // Collect the goods the unit is carrying and set this.destinations.
         final List<GoodsType> goodsTypes = new ArrayList<>();
@@ -424,7 +428,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 (Location)null).okOption());
         c.add(new ChoiceItem<>(Messages.message("selectDestinationDialog.cancel"),
                 (Location)null).cancelOption().defaultOption());
-        initializeDialog(DialogType.QUESTION, true, panel, GUI.createImageIcon(
+        initializeDialog(frame, DialogType.QUESTION, true, panel, GUI.createImageIcon(
             getImageLibrary().getSmallUnitImage(unit)), c);
     }
 

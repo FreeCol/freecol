@@ -25,6 +25,8 @@ import javax.swing.JPanel;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -50,9 +52,10 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
      * Creates a dialog to choose a river style.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      */
-    public RiverStyleDialog(FreeColClient freeColClient) {
-        super(freeColClient);
+    public RiverStyleDialog(FreeColClient freeColClient, JFrame frame) {
+        super(freeColClient, frame);
 
         JPanel panel = new JPanel();
         panel.add(Utility.localizedHeader("riverStyleDialog.text", false),
@@ -66,6 +69,6 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
                 .setIcon(new ImageIcon(ResourceManager.getImage(key, 0.5f))));
         }
        
-        initializeChoiceDialog(true, panel, null, "cancel", c);
+        initializeChoiceDialog(frame, true, panel, null, "cancel", c);
     }
 }

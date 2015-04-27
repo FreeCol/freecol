@@ -35,6 +35,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -42,6 +43,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -806,6 +808,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
      * Creates a new <code>DiplomaticTradeDialog</code> instance.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param our Our <code>FreeColGameObject</code> that is negotiating.
      * @param other The other <code>FreeColGameObject</code>.
      * @param agreement The <code>DiplomaticTrade</code> agreement that
@@ -813,12 +816,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
      * @param comment An optional <code>StringTemplate</code>
      *     commentary message.
      */
-    public DiplomaticTradeDialog(FreeColClient freeColClient,
-                                 FreeColGameObject our,
-                                 FreeColGameObject other,
-                                 DiplomaticTrade agreement,
-                                 StringTemplate comment) {
-        super(freeColClient);
+    public DiplomaticTradeDialog(FreeColClient freeColClient, JFrame frame,
+            FreeColGameObject our, FreeColGameObject other,
+            DiplomaticTrade agreement, StringTemplate comment) {
+        super(freeColClient, frame);
 
         final Player player = getMyPlayer();
         final Unit ourUnit = (our instanceof Unit) ? (Unit)our : null;
@@ -992,7 +993,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         ImageIcon icon = new ImageIcon((otherColony != null)
             ? getImageLibrary().getSettlementImage(otherColony)
             : getImageLibrary().getUnitImage(otherUnit));
-        initializeDialog(DialogType.QUESTION, true, panel, icon, c);
+        initializeDialog(frame, DialogType.QUESTION, true, panel, icon, c);
 
         updateDialog();
     }

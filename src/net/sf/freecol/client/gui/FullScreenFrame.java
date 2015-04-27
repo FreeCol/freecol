@@ -55,7 +55,7 @@ public final class FullScreenFrame extends FreeColFrame {
      */
     @Override
     public void setCanvas(Canvas canvas) {
-        addWindowListener(new FullScreenFrameListener(freeColClient));
+        addWindowListener(new FullScreenFrameListener(freeColClient, this));
         super.setCanvas(canvas);
     }
 

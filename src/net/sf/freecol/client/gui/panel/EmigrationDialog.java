@@ -21,9 +21,12 @@ package net.sf.freecol.client.gui.panel;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 
 import javax.swing.JTextArea;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -43,13 +46,14 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
      * The constructor to use.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param europe The <code>Europe</code> where we can find the
      *     units that are prepared to emigrate.
      * @param foy Is this emigration due to a fountain of youth?
      */
-    public EmigrationDialog(FreeColClient freeColClient, Europe europe,
-                            boolean foy) {
-        super(freeColClient);
+    public EmigrationDialog(FreeColClient freeColClient, JFrame frame,
+            Europe europe, boolean foy) {
+        super(freeColClient, frame);
 
         final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
         final List<UnitType> recruitables
@@ -78,7 +82,7 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
 
         // TODO: Find out which, if any, icon was intended here, because
         //       there is no icon for type Europe
-        initializeChoiceDialog(false, panel,
+        initializeChoiceDialog(frame, false, panel,
             null /*GUI.createImageIcon(lib.getSmallObjectImage(europe))*/, null, c);
     }
 }

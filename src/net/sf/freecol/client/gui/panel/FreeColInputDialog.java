@@ -24,6 +24,8 @@ import javax.swing.ImageIcon;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
 
@@ -40,9 +42,10 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      * Internal constructor.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      */
-    protected FreeColInputDialog(FreeColClient freeColClient) {
-        super(freeColClient);
+    protected FreeColInputDialog(FreeColClient freeColClient, JFrame frame) {
+        super(freeColClient, frame);
     }
 
     /**
@@ -50,6 +53,7 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      * a ok/cancel option.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
      * @param obj The object containing the input fields and
      *     explanation to the user.
@@ -57,18 +61,19 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      * @param okKey The key displayed on the "ok"-button.
      * @param cancelKey The key displayed on the optional "cancel"-button.
      */
-    public FreeColInputDialog(final FreeColClient freeColClient, boolean modal,
-                              Object obj, ImageIcon icon,
-                              String okKey, String cancelKey) {
-        this(freeColClient);
+    public FreeColInputDialog(final FreeColClient freeColClient, JFrame frame,
+            boolean modal, Object obj, ImageIcon icon,
+            String okKey, String cancelKey) {
+        this(freeColClient, frame);
 
-        initializeInputDialog(modal, obj, icon, okKey, cancelKey);
+        initializeInputDialog(frame, modal, obj, icon, okKey, cancelKey);
     }
 
 
     /**
      * Initialize this input dialog.
      *
+     * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
      * @param obj The object containing the input fields and
      *     explanation to the user.
@@ -76,16 +81,15 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
      * @param okKey The key displayed on the "ok"-button.
      * @param cancelKey The key displayed on the optional "cancel"-button.
      */
-    protected final void initializeInputDialog(boolean modal, Object obj,
-                                               ImageIcon icon, String okKey,
-                                               String cancelKey) {
+    protected final void initializeInputDialog(JFrame frame, boolean modal,
+            Object obj, ImageIcon icon, String okKey, String cancelKey) {
         List<ChoiceItem<T>> c = choices();
         c.add(new ChoiceItem<>(Messages.message(okKey), (T)null).okOption());
         if (cancelKey != null) {
             c.add(new ChoiceItem<>(Messages.message(cancelKey), (T)null)
                 .cancelOption().defaultOption());
         }
-        initializeDialog(DialogType.QUESTION, modal, obj, icon, c);
+        initializeDialog(frame, DialogType.QUESTION, modal, obj, icon, c);
     }
 
     /**

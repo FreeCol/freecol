@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -55,13 +56,14 @@ public class PreCombatDialog extends FreeColConfirmDialog {
      * Create a new pre-combat dialog.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param attacker The attacker <code>Unit</code>.
      * @param defender The defender (either a <code>Unit</code> or
      *     a <code>Settlement</code>).
      */
-    public PreCombatDialog(FreeColClient freeColClient, Unit attacker,
-                           FreeColGameObject defender) {
-        super(freeColClient);
+    public PreCombatDialog(FreeColClient freeColClient, JFrame frame,
+            Unit attacker, FreeColGameObject defender) {
+        super(freeColClient, frame);
         
         final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
         final Game game = attacker.getGame();
@@ -158,7 +160,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         panel.add(finalDefenceResult);
         panel.setSize(panel.getPreferredSize());
 
-        initializeConfirmDialog(true, panel, null, "ok", "cancel");
+        initializeConfirmDialog(frame, true, panel, null, "ok", "cancel");
     }
 
     private int addLabels(JPanel panel, JLabel[] labels, boolean newline,

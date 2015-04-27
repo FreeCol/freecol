@@ -24,7 +24,6 @@ import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
@@ -36,8 +35,6 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -56,7 +53,6 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JMenuBar;
 import javax.swing.JWindow;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileFilter;
@@ -65,9 +61,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.animation.Animations;
-import net.sf.freecol.client.gui.menu.FreeColMenuBar;
-import net.sf.freecol.client.gui.menu.InGameMenuBar;
-import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
@@ -237,16 +230,9 @@ public class GUI {
     /** The canvas that implements much of the functionality. */
     private Canvas canvas;
 
-    /** The parent frame, either a window or the full screen. */
-    private FreeColFrame frame;
-
     private MapControls mapControls;
 
     private JWindow splash;
-
-    private boolean windowed;
-
-    private Rectangle windowBounds;
 
 
     /**
@@ -272,10 +258,6 @@ public class GUI {
         return canvas;
     }
 
-    public FreeColFrame getFrame() {
-        return frame;
-    }
-
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
     }
@@ -289,7 +271,7 @@ public class GUI {
     }
 
     public boolean isWindowed() {
-        return windowed;
+        return canvas.isWindowed();
     }
 
     // Initialization related methods
@@ -310,10 +292,8 @@ public class GUI {
      * Quit the GUI.  All that is required is to exit the full screen.
      */
     public void quit() throws Exception {
-        if (this.frame != null) {
-            GraphicsConfiguration GraphicsConf = this.frame.getGraphicsConfiguration();
-            GraphicsDevice gd = GraphicsConf.getDevice();
-            if (!isWindowed()) gd.setFullScreenWindow(null);
+        if (canvas != null) {
+            canvas.quit();
         }
     }
 
@@ -324,10 +304,9 @@ public class GUI {
      * @param tile An initial <code>Tile</code> to select.
      */
     public void initializeInGame(Tile tile) {
-        if (frame == null || canvas == null) return;
+        if (canvas == null) return;
 
-        frame.setJMenuBar(new InGameMenuBar(freeColClient));
-        frame.paintAll(canvas.getGraphics());
+        canvas.initializeInGame();
         enableMapControls(freeColClient.getClientOptions()
             .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
         setSelectedTile(tile, false);
@@ -539,6 +518,7 @@ public class GUI {
 
         // Determine the window size.
         Dimension windowSize;
+        boolean windowed;
         if (desiredWindowSize == null) {
             if(graphicsDevice.isFullScreenSupported()) {
                 windowed = false;
@@ -555,16 +535,14 @@ public class GUI {
             windowSize = desiredWindowSize;
             logger.info("Desired window size is " + windowSize);
         }
-        if(isWindowed() && (windowSize.width <= 0 || windowSize.height <= 0)) {
+        if(windowed && (windowSize.width <= 0 || windowSize.height <= 0)) {
             windowSize = determineWindowSize(graphicsDevice);
             logger.info("Inner window size is " + windowSize);
         }
         this.mapViewer = new MapViewer(freeColClient, windowSize);
-        this.canvas = new Canvas(freeColClient, windowSize, mapViewer);
+        this.canvas = new Canvas(freeColClient, graphicsDevice,
+                                 windowSize, windowed, mapViewer);
         this.colonyTileMapViewer = new MapViewer(freeColClient, windowSize);
-
-        changeWindowedMode(windowed);
-        frame.setIconImage(ResourceManager.getImage("image.miscicon.FrameIcon"));
 
         // Now that there is a canvas, prepare for language changes.
         LanguageOption o = (LanguageOption)freeColClient.getClientOptions()
@@ -658,56 +636,15 @@ public class GUI {
      *     and <code>false</code> for fullscreen mode.
      */
     public void changeWindowedMode(boolean windowed) {
-        // Clean up the old frame
-        JMenuBar menuBar = null;
-        if (frame != null) {
-            menuBar = frame.getJMenuBar();
-            if (frame instanceof WindowedFrame) {
-                windowBounds = frame.getBounds();
-            }
-            frame.setVisible(false);
-            frame.dispose();
-        }
-        this.windowed = windowed;
-
-        // User might have moved window to new screen in a
-        // multi-screen setup, so make this.gd point to the current screen.
-        frame = windowed
-            ? new WindowedFrame(freeColClient, graphicsDevice)
-            : new FullScreenFrame(freeColClient, graphicsDevice);
-        frame.setJMenuBar(menuBar);
-        frame.setCanvas(canvas);
-        frame.updateBounds(windowBounds);
-        if (windowed) {
-            frame.addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    logger.info("Window size changes to " + canvas.getSize());
-                }
-            });
-        }
-
-        mapViewer.forceReposition();
-        canvas.updateSizes();
-        frame.setVisible(true);
+        canvas.changeWindowedMode(windowed);
     }
 
     /**
      * Start the GUI for the map editor.
      */
     public void startMapEditorGUI() {
-        if (frame == null || canvas == null) return;
-
-        // We may need to reset the zoom value to the default value
-        resetMapZoom();
-
-        frame.setJMenuBar(new MapEditorMenuBar(freeColClient));
-        canvas.showMapEditorTransformPanel();
-
-        CanvasMapEditorMouseListener listener
-            = new CanvasMapEditorMouseListener(freeColClient, canvas);
-        canvas.addMouseListener(listener);
-        canvas.addMouseMotionListener(listener);
+        if (canvas == null) return;
+        canvas.startMapEditorGUI();
     }
 
 
@@ -857,14 +794,11 @@ public class GUI {
      * Reset the menu bar.
      */
     public void resetMenuBar() {
-        if (frame == null) return;
-        JMenuBar menuBar = frame.getJMenuBar();
-        if (menuBar != null) {
-            ((FreeColMenuBar)menuBar).reset();
-        }
+        if (canvas == null) return;
+        canvas.resetMenuBar();
     }
 
-    private void resetMapZoom() {
+    void resetMapZoom() {
         ResourceManager.clean();
         mapViewer.resetMapScale();
         refresh();
@@ -902,16 +836,15 @@ public class GUI {
         if (unit != null && !freeColClient.getMyPlayer().owns(unit)) {
             canvas.refresh();
         }
-        updateMenuBar();
+        canvas.updateMenuBar();
     }
 
     /**
      * Update the menu bar.
      */
     public void updateMenuBar() {
-        if (frame != null && frame.getJMenuBar() != null) {
-            ((FreeColMenuBar)frame.getJMenuBar()).update();
-        }
+        if (canvas == null) return;
+        canvas.updateMenuBar();
     }
 
 
@@ -2186,7 +2119,7 @@ public class GUI {
                 @Override
                 public void handle(Boolean b) {
                     igc().monarchAction(action, b);
-                    updateMenuBar();
+                    canvas.updateMenuBar();
                 }
             });
     }

@@ -22,9 +22,12 @@ package net.sf.freecol.client.gui.panel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
 import javax.swing.ImageIcon;
 
 import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -52,10 +55,11 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
      * Creates a dialog for choosing cargo for a unit to dump.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param unit The <code>Unit</code> that is dumping cargo.
      */
-    public DumpCargoDialog(FreeColClient freeColClient, Unit unit) {
-        super(freeColClient);
+    public DumpCargoDialog(FreeColClient freeColClient, JFrame frame, Unit unit) {
+        super(freeColClient, frame);
 
         this.goodsList = unit.getGoodsList();
         this.checkBoxes = new ArrayList<>(goodsList.size());
@@ -81,7 +85,7 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
             .okOption().defaultOption());
         c.add(new ChoiceItem<>(Messages.message("cancel"), fake)
             .cancelOption());
-        initializeDialog(DialogType.QUESTION, false, panel,
+        initializeDialog(frame, DialogType.QUESTION, false, panel,
             new ImageIcon(getImageLibrary().getUnitImage(unit)), c);
     }
 

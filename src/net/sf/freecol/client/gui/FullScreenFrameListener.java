@@ -32,14 +32,18 @@ import net.sf.freecol.client.FreeColClient;
 public final class FullScreenFrameListener implements WindowListener {
 
     private final FreeColClient freeColClient;
+    private final FullScreenFrame frame;
 
     /**
      * Constructs this WindowListener.
      *
      * @param freeColClient The <code>FreeColClient</code> to notify.
+     * @param frame The frame.
      */
-    public FullScreenFrameListener(FreeColClient freeColClient) {
+    public FullScreenFrameListener(FreeColClient freeColClient,
+                                   FullScreenFrame frame) {
         this.freeColClient = freeColClient;
+        this.frame = frame;
     }
 
     /**
@@ -106,7 +110,7 @@ public final class FullScreenFrameListener implements WindowListener {
         // TODO: Minimize side effect of also undoing Alt+Tab and similar,
         // if there are complaints. Maybe remember number of open dialogs
         // and/or time since using one, then test for it here.
-        freeColClient.getGUI().getFrame().setExtendedState(JFrame.NORMAL);
+        frame.setExtendedState(JFrame.NORMAL);
     }
 
     /**

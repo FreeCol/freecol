@@ -20,8 +20,10 @@
 package net.sf.freecol.client.gui.panel;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -49,15 +51,16 @@ public class FirstContactDialog extends FreeColConfirmDialog {
      * Create an FirstContactDialog.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param player The <code>Player</code> making contact.
      * @param other The <code>Player</code> to contact.
      * @param tile An optional <code>Tile</code> on offer.
      * @param settlementCount The number of settlements the other
      *     player has.
      */
-    public FirstContactDialog(FreeColClient freeColClient, Player player,
-                              Player other, Tile tile, int settlementCount) {
-        super(freeColClient);
+    public FirstContactDialog(FreeColClient freeColClient, JFrame frame,
+            Player player, Player other, Tile tile, int settlementCount) {
+        super(freeColClient, frame);
 
         MigPanel panel
             = new MigPanel(new MigLayout("wrap 1", "[center]", "[]20"));
@@ -109,6 +112,6 @@ public class FirstContactDialog extends FreeColConfirmDialog {
 
         ImageIcon icon = new ImageIcon(
             getImageLibrary().getImage(other.getNation()));
-        initializeConfirmDialog(false, panel, icon, "yes", "no");
+        initializeConfirmDialog(frame, false, panel, icon, "yes", "no");
     }
 }

@@ -31,7 +31,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -39,6 +38,7 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -83,13 +83,14 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * Protected constructor for the subclass panels.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      */
-    protected FreeColDialog(FreeColClient freeColClient) {
-        super(freeColClient.getGUI().getFrame());
+    protected FreeColDialog(FreeColClient freeColClient, JFrame frame) {
+        super(frame);
 
         this.freeColClient = freeColClient;
     }
-        
+
     /**
      * Full constructor for canvas to build a dialog in one hit (supplying
      * the getResponse() implementation).
@@ -98,6 +99,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * JOptionPane.createDialog.  We needed a way to control modality.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param type The <code>DialogType</code> to create.
      * @param modal Should this dialog be modal?
      * @param obj The main object that explains the choice for the user,
@@ -105,12 +107,12 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @param icon An optional icon to display.
      * @param options A list of options to choose from.
      */
-    public FreeColDialog(FreeColClient freeColClient, DialogType type,
-                         boolean modal, Object obj, ImageIcon icon,
-                         List<ChoiceItem<T>> options) {
-        this(freeColClient);
+    public FreeColDialog(FreeColClient freeColClient, JFrame frame,
+            DialogType type, boolean modal, Object obj, ImageIcon icon,
+            List<ChoiceItem<T>> options) {
+        this(freeColClient, frame);
 
-        initializeDialog(type, modal, obj, icon, options);
+        initializeDialog(frame, type, modal, obj, icon, options);
     }
 
 
@@ -150,6 +152,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * Complete the initialization.  Useful for subclasses that need
      * to construct a non-trivial object to display in the JOptionPane.
      *
+     * @param frame The owner frame.
      * @param type The <code>DialogType</code> to create.
      * @param modal Should this dialog be modal?
      * @param obj The main object that explains the choice for the user,
@@ -157,9 +160,9 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @param icon An optional icon to display.
      * @param options A list of options to choose from.
      */
-    protected final void initializeDialog(DialogType type, boolean modal,
-                                          Object obj, ImageIcon icon,
-                                          List<ChoiceItem<T>> options) {
+    protected final void initializeDialog(JFrame frame,
+            DialogType type, boolean modal, Object obj, ImageIcon icon,
+            List<ChoiceItem<T>> options) {
         this.modal = modal;
         this.options = options;
         int paneType = JOptionPane.QUESTION_MESSAGE;
@@ -192,7 +195,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         } catch (Exception e) {
             logger.log(Level.WARNING, "Packing failure", e);
         }
-        setLocationRelativeTo(getGUI().getFrame());
+        setLocationRelativeTo(frame);
 
         WindowAdapter adapter = new WindowAdapter() {
                 private boolean gotFocus = false;

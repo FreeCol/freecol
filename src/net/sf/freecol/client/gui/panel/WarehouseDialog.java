@@ -24,11 +24,13 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -55,10 +57,12 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
      * Creates a dialog to display the warehouse.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param colony The <code>Colony</code> containing the warehouse.
      */
-    public WarehouseDialog(FreeColClient freeColClient, Colony colony) {
-        super(freeColClient);
+    public WarehouseDialog(FreeColClient freeColClient, JFrame frame,
+            Colony colony) {
+        super(freeColClient, frame);
 
         warehousePanel = new MigPanel(new MigLayout("wrap 4"));
         warehousePanel.setOpaque(false);
@@ -85,7 +89,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
 
         ImageIcon icon = GUI.createImageIcon(
             getImageLibrary().getSmallSettlementImage(colony));
-        initializeConfirmDialog(true, panel, icon, "ok", "cancel");
+        initializeConfirmDialog(frame, true, panel, icon, "ok", "cancel");
     }
 
 

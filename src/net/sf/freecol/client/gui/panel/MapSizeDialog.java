@@ -21,8 +21,10 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
 
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -47,9 +49,10 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
      * Creates a dialog to choose the map size.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      */
-    public MapSizeDialog(FreeColClient freeColClient) {
-        super(freeColClient);
+    public MapSizeDialog(FreeColClient freeColClient, JFrame frame) {
+        super(freeColClient, frame);
 
         JLabel widthLabel = Utility.localizedLabel("width");
         widthLabel.setLabelFor(inputWidth);
@@ -65,7 +68,7 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
         panel.add(heightLabel);
         panel.add(inputHeight);
 
-        initializeInputDialog(true, panel, null, "ok", "cancel");
+        initializeInputDialog(frame, true, panel, null, "ok", "cancel");
     }
 
     /**

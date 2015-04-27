@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import javax.swing.JFrame;
+
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -34,16 +36,17 @@ public final class ClientOptionsDialog extends OptionsDialog  {
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      */
-    public ClientOptionsDialog(FreeColClient freeColClient) {
-        super(freeColClient, true, freeColClient.getClientOptions(),
+    public ClientOptionsDialog(FreeColClient freeColClient, JFrame frame) {
+        super(freeColClient, frame, true, freeColClient.getClientOptions(),
               freeColClient.getClientOptions().getId(),
               FreeColDirectories.CLIENT_OPTIONS_FILE_NAME,
               ClientOptions.getXMLElementTagName());
 
         // Client options are loaded early
 
-        initialize();
+        initialize(frame);
     }
 
 

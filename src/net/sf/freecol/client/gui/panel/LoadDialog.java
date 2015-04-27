@@ -29,6 +29,8 @@ import java.io.File;
 
 import java.util.List;
 
+import javax.swing.JFrame;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
 
@@ -46,12 +48,13 @@ public final class LoadDialog extends FreeColDialog<File> {
      * Creates a dialog to choose a file to load.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param directory The directory to display when choosing the file.
      * @param fileFilters The available file filters in the dialog.
      */
-    public LoadDialog(FreeColClient freeColClient, File directory,
-                      FileFilter[] fileFilters) {
-        super(freeColClient);
+    public LoadDialog(FreeColClient freeColClient, JFrame frame,
+            File directory, FileFilter[] fileFilters) {
+        super(freeColClient, frame);
 
         final JFileChooser fileChooser = new JFileChooser(directory);
         if (fileFilters.length > 0) {
@@ -79,7 +82,7 @@ public final class LoadDialog extends FreeColDialog<File> {
             });
 
         List<ChoiceItem<File>> c = choices();
-        initializeDialog(DialogType.QUESTION, true, fileChooser, null, c);
+        initializeDialog(frame, DialogType.QUESTION, true, fileChooser, null, c);
     }
 
 

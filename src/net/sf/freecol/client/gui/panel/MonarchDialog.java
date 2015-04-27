@@ -22,10 +22,13 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+
 import javax.swing.ImageIcon;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JTextArea;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -50,14 +53,14 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
      * Creates a dialog to handle monarch interactions.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param action The <code>MonarchAction</code> the monarch is performing.
      * @param template The <code>StringTemplate</code> describing the action.
      * @param monarchKey The resource key for the monarch image.
      */
-    public MonarchDialog(FreeColClient freeColClient,
-                         MonarchAction action, StringTemplate template,
-                         String monarchKey) {
-        super(freeColClient);
+    public MonarchDialog(FreeColClient freeColClient, JFrame frame,
+            MonarchAction action, StringTemplate template, String monarchKey) {
+        super(freeColClient, frame);
 
         final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
         final String messageId = action.getTextKey();
@@ -108,7 +111,7 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
         c.add(new ChoiceItem<>(Messages.message(noId), Boolean.FALSE)
             .cancelOption().defaultOption());
 
-        initializeDialog(DialogType.QUESTION, false, panel,
+        initializeDialog(frame, DialogType.QUESTION, false, panel,
                          new ImageIcon(lib.getMiscImage(monarchKey)), c);
     }
 }

@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -38,6 +39,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.PanelUI;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -136,9 +138,13 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
 
     /**
      * The constructor to use.
+     * 
+     * @param freeColClient The freecol client.
+     * @param frame The owner frame.
+     * @param units The unit list.
      */
-    public EndTurnDialog(FreeColClient freeColClient, List<Unit> units) {
-        super(freeColClient);
+    public EndTurnDialog(FreeColClient freeColClient, JFrame frame, List<Unit> units) {
+        super(freeColClient, frame);
 
         final Player player = getMyPlayer();
 
@@ -190,7 +196,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
 
         ImageIcon icon = new ImageIcon(
             getImageLibrary().getImage(player.getNation()));
-        initializeConfirmDialog(false, panel, icon, "ok", "cancel");
+        initializeConfirmDialog(frame, false, panel, icon, "ok", "cancel");
     }
 
     /**

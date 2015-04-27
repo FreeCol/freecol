@@ -23,8 +23,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -53,15 +55,16 @@ public final class ChooseFoundingFatherDialog
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param possibleFoundingFathers The founding fathers which can
      *     be selected.  The length of the array is the same as the
      *     number of <code>FoundingFather</code> categories and the
      *     values identifies a <code>FoundingFather</code> to be
      *     picked in each of those categories.
      */
-    public ChooseFoundingFatherDialog(FreeColClient freeColClient,
-        List<FoundingFather> possibleFoundingFathers) {
-        super(freeColClient);
+    public ChooseFoundingFatherDialog(FreeColClient freeColClient, JFrame frame,
+            List<FoundingFather> possibleFoundingFathers) {
+        super(freeColClient, frame);
 
         this.possibleFathers = possibleFoundingFathers;
         this.tb = new JTabbedPane(JTabbedPane.TOP);
@@ -89,7 +92,7 @@ public final class ChooseFoundingFatherDialog
         List<ChoiceItem<FoundingFather>> c = choices();
         c.add(new ChoiceItem<>(Messages.message("ok"), (FoundingFather)null)
             .okOption().defaultOption());
-        initializeDialog(DialogType.QUESTION, false, panel, null, c);
+        initializeDialog(frame, DialogType.QUESTION, false, panel, null, c);
     }
 
 

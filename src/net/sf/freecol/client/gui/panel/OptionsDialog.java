@@ -24,7 +24,9 @@ import java.io.File;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.FreeCol;
@@ -58,12 +60,13 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param frame The owner frame.
      * @param editable Whether the dialog is editable.
      */
-    public OptionsDialog(FreeColClient freeColClient, boolean editable,
-                         OptionGroup group, String headerKey,
-                         String defaultFileName, String optionGroupId) {
-        super(freeColClient);
+    public OptionsDialog(FreeColClient freeColClient, JFrame frame,
+            boolean editable, OptionGroup group,
+            String headerKey, String defaultFileName, String optionGroupId) {
+        super(freeColClient, frame);
 
         this.editable = editable;
         this.group = group;
@@ -139,8 +142,10 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
 
     /**
      * Initialize this dialog.
+     * 
+     * @param frame The owner frame.
      */
-    protected void initialize() {
+    protected void initialize(JFrame frame) {
         this.panel.add(this.scrollPane, "height 100%, width 100%");
         this.panel.setPreferredSize(new Dimension(850, 650));
         this.panel.setSize(this.panel.getPreferredSize());
@@ -149,7 +154,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
         c.add(new ChoiceItem<>(Messages.message("ok"), this.group).okOption());
         c.add(new ChoiceItem<>(Messages.message("cancel"), (OptionGroup)null,
                 isEditable()).cancelOption().defaultOption());
-        initializeDialog(DialogType.PLAIN, true, this.panel, null, c);
+        initializeDialog(frame, DialogType.PLAIN, true, this.panel, null, c);
     }
 
     /**
