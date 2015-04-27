@@ -353,7 +353,7 @@ public final class Canvas extends JDesktopPane {
             logger.info("Inner window size is " + initialSize);
         }
         setLocation(0, 0);
-        setSize(initialSize);
+        setPreferredSize(initialSize);
 
         setDoubleBuffered(true);
         setOpaque(false);
@@ -1485,25 +1485,6 @@ public final class Canvas extends JDesktopPane {
         if (takeFocus && !isShowingSubPanel()) {
             requestFocus();
         }
-    }
-
-
-    // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(640, 480);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Dimension getPreferredSize() {
-        return initialSize;
     }
 
 
