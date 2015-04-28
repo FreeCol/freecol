@@ -254,7 +254,7 @@ public class GUI {
         return imageLibrary;
     }
 
-    public MapViewer getMapViewer() {
+    MapViewer getMapViewer() {
         return mapViewer;
     }
 
@@ -2338,6 +2338,10 @@ public class GUI {
         mapViewer.changeViewMode(newViewMode);
     }
 
+    public Point calculateUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
+        return mapViewer.calculateUnitLabelPositionInTile(unitLabel, tileP);
+    }
+
     public void executeWithUnitOutForAnimation(final Unit unit,
                                                final Tile sourceTile,
                                                final OutForAnimationCallback r) {
@@ -2375,6 +2379,10 @@ public class GUI {
         return mapViewer.calculateTilePosition(tile);
     }
 
+    public double getTileWidthHeightRatio() {
+        return mapViewer.getTileWidthHeightRatio();
+    }
+
     public int getViewMode() {
         if (mapViewer == null) return -1;
         return mapViewer.getViewMode();
@@ -2383,6 +2391,10 @@ public class GUI {
     public boolean onScreen(Tile tileToCheck) {
         if (mapViewer == null) return true; // Lets pretend.
         return mapViewer.onScreen(tileToCheck);
+    }
+
+    public void restartBlinking() {
+        mapViewer.restartBlinking();
     }
 
     public void setFocus(Tile tileToFocus) {

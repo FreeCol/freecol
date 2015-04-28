@@ -258,7 +258,7 @@ public final class MapViewer {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public MapViewer(FreeColClient freeColClient) {
+    MapViewer(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
         this.size = null;
@@ -278,14 +278,14 @@ public final class MapViewer {
      *
      * @return The view mode.
      */
-    public int getViewMode() {
+    int getViewMode() {
         return viewMode;
     }
 
     /**
      * Toggle the current view mode.
      */
-    public void toggleViewMode() {
+    void toggleViewMode() {
         changeViewMode(1 - viewMode);
     }
 
@@ -294,7 +294,7 @@ public final class MapViewer {
      *
      * @param newViewMode The new view mode.
      */
-    public void changeViewMode(int newViewMode) {
+    void changeViewMode(int newViewMode) {
         if (newViewMode != viewMode) {
             logger.fine("Changed to " + ((newViewMode == GUI.MOVE_UNITS_MODE)
                     ? "Move Units" : "View Terrain") + " mode");
@@ -321,7 +321,7 @@ public final class MapViewer {
      *
      * @return The current <code>PathNode</code>.
      */
-    public PathNode getCurrentPath() {
+    PathNode getCurrentPath() {
         return this.currentPath;
     }
 
@@ -330,14 +330,14 @@ public final class MapViewer {
      *
      * @param path The current <code>PathNode</code>.
      */
-    public void setCurrentPath(PathNode path) {
+    void setCurrentPath(PathNode path) {
         this.currentPath = path;
     }
 
     /**
      * Sets the path of the active unit to display it.
      */
-    public void updateCurrentPathForActiveUnit() {
+    void updateCurrentPathForActiveUnit() {
         setCurrentPath((activeUnit == null
                 || activeUnit.getDestination() == null
                 || Map.isSameLocation(activeUnit.getLocation(),
@@ -349,7 +349,7 @@ public final class MapViewer {
     /**
      * Centers the map on the selected unit.
      */
-    public void centerActiveUnit() {
+    void centerActiveUnit() {
         if (activeUnit != null && activeUnit.getTile() != null) {
             setFocus(activeUnit.getTile());
         }
@@ -363,7 +363,7 @@ public final class MapViewer {
      * @param y The y-coordinate in pixels.
      * @return The Tile that is located at the given position on the screen.
      */
-    public Tile convertToMapTile(int x, int y) {
+    Tile convertToMapTile(int x, int y) {
         final Game game = freeColClient.getGame();
         if (game == null || game.getMap() == null) return null;
 
@@ -637,7 +637,7 @@ public final class MapViewer {
      *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
      * @param overlayImage The Image for the tile overlay.
      */
-    public void displayColonyTile(Graphics2D g, Tile tile, Colony colony,
+    private void displayColonyTile(Graphics2D g, Tile tile, Colony colony,
                                   Image overlayImage) {
         boolean tileCannotBeWorked = false;
         Unit unit = null;
@@ -698,7 +698,7 @@ public final class MapViewer {
      * @param sourceTile The source <code>Tile</code>.
      * @param r The code to be executed.
      */
-    public void executeWithUnitOutForAnimation(final Unit unit,
+    void executeWithUnitOutForAnimation(final Unit unit,
                                                final Tile sourceTile,
                                                final OutForAnimationCallback r) {
         final JLabel unitLabel = enterUnitOutForAnimation(unit, sourceTile);
@@ -712,7 +712,7 @@ public final class MapViewer {
     /**
      * Force the next screen repaint to reposition the tiles on the window.
      */
-    public void forceReposition() {
+    void forceReposition() {
         bottomRow = -1;
     }
 
@@ -722,7 +722,7 @@ public final class MapViewer {
      * @return The <code>Unit</code>.
      * @see #setActiveUnit
      */
-    public Unit getActiveUnit() {
+    Unit getActiveUnit() {
         return activeUnit;
     }
 
@@ -731,7 +731,7 @@ public final class MapViewer {
      *
      * @return a <code>TerrainCursor</code> value
      */
-    public TerrainCursor getCursor() {
+    TerrainCursor getCursor() {
         return cursor;
     }
 
@@ -740,7 +740,7 @@ public final class MapViewer {
      *
      * @return The Point where the mouse was initially clicked.
      */
-    public Point getDragPoint() {
+    Point getDragPoint() {
         return gotoDragPoint;
     }
 
@@ -751,7 +751,7 @@ public final class MapViewer {
      * @return The center tile of the displayed map
      * @see #setFocus(Tile)
      */
-    public Tile getFocus() {
+    Tile getFocus() {
         return focus;
     }
 
@@ -761,7 +761,7 @@ public final class MapViewer {
      * @return The path that should be drawn on the map or
      *     <code>null</code> if no path should be drawn.
      */
-    public PathNode getGotoPath() {
+    PathNode getGotoPath() {
         return gotoPath;
     }
 
@@ -788,7 +788,7 @@ public final class MapViewer {
      *
      * @return The size of this GUI.
      */
-    public Dimension getSize() {
+    Dimension getSize() {
         return size;
     }
 
@@ -798,7 +798,7 @@ public final class MapViewer {
      * @return The <code>Tile</code> selected.
      * @see #setSelectedTile(Tile, boolean)
      */
-    public Tile getSelectedTile() {
+    Tile getSelectedTile() {
         return selectedTile;
     }
 
@@ -812,7 +812,7 @@ public final class MapViewer {
      * @param tile The <code>Tile</code> on the screen.
      * @return The bounds <code>Rectangle</code>.
      */
-    public Rectangle calculateTileBounds(Tile tile) {
+    Rectangle calculateTileBounds(Tile tile) {
         Rectangle result = new Rectangle(0, 0, size.width, size.height);
         if (isTileVisible(tile)) {
             result.x = ((tile.getX() - leftColumn) * tileWidth) + leftColumnX;
@@ -835,7 +835,7 @@ public final class MapViewer {
      *     <code>null</code> if the <code>Tile</code> is not drawn on
      *     the mapboard.
      */
-    public Point calculateTilePosition(Tile t) {
+    Point calculateTilePosition(Tile t) {
         repositionMapIfNeeded();
         if (!isTileVisible(t)) return null;
 
@@ -850,7 +850,7 @@ public final class MapViewer {
      *
      * @return The ratio.
      */
-    public double getTileWidthHeightRatio() {
+    double getTileWidthHeightRatio() {
         return tileWidth / (double)tileHeight;
     }
 
@@ -862,7 +862,7 @@ public final class MapViewer {
      * @param tileP The position of the Tile on the screen.
      * @return The position where to put the label, null if tileP is null.
      */
-    public Point calculateUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
+    Point calculateUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
         if (tileP != null) {
             int labelX = tileP.x + tileWidth
                 / 2 - unitLabel.getWidth() / 2;
@@ -880,7 +880,7 @@ public final class MapViewer {
      *
      * @return True if a goto operation is in progress.
      */
-    public boolean isGotoStarted() {
+    boolean isGotoStarted() {
         return gotoStarted;
     }
 
@@ -894,7 +894,7 @@ public final class MapViewer {
      * @return <i>true</i> if the Tile will be drawn on the screen,
      *     <i>false</i> otherwise.
      */
-    public boolean onScreen(Tile tileToCheck) {
+    boolean onScreen(Tile tileToCheck) {
         if (tileToCheck == null) return false;
         repositionMapIfNeeded();
         return (tileToCheck.getY() - 2 > topRow || alignedTop)
@@ -903,10 +903,7 @@ public final class MapViewer {
             && (tileToCheck.getX() + 2 < rightColumn || alignedRight);
     }
 
-    /**
-     * Describe <code>restartBlinking</code> method here.
-     */
-    public void restartBlinking() {
+    void restartBlinking() {
         blinkingMarqueeEnabled = true;
     }
 
@@ -916,7 +913,7 @@ public final class MapViewer {
      * @param direction The <code>Direction</code> to scroll in.
      * @return True if scrolling occurred.
      */
-    public boolean scrollMap(Direction direction) {
+    boolean scrollMap(Direction direction) {
         Tile t = getFocus();
         if (t == null) return false;
         int fx = t.getX(), fy = t.getY();
@@ -958,7 +955,7 @@ public final class MapViewer {
      * @return True if the focus was set.
      * @see #setSelectedTile(Tile, boolean)
      */
-    public boolean setActiveUnit(Unit activeUnit) {
+    boolean setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm
         // The user might what to check the status of a unit - SG
         Tile tile = (activeUnit == null) ? null : activeUnit.getTile();
@@ -990,7 +987,7 @@ public final class MapViewer {
      * @param x The mouse's x position.
      * @param y The mouse's y position.
      */
-    public void setDragPoint(int x, int y) {
+    void setDragPoint(int x, int y) {
         gotoDragPoint = new Point(x, y);
     }
 
@@ -1001,7 +998,7 @@ public final class MapViewer {
      *     displayed map.
      * @see #getFocus
      */
-    public void setFocus(Tile focus) {
+    void setFocus(Tile focus) {
         this.focus = focus;
 
         gui.refresh();
@@ -1014,7 +1011,7 @@ public final class MapViewer {
      *     displayed map.
      * @see #getFocus
      */
-    public void setFocusImmediately(Tile focus) {
+    void setFocusImmediately(Tile focus) {
         this.focus = focus;
 
         forceReposition();
@@ -1027,7 +1024,7 @@ public final class MapViewer {
      * @param gotoPath The path that should be drawn on the map
      *     or <code>null</code> if no path should be drawn.
      */
-    public void setGotoPath(PathNode gotoPath) {
+    void setGotoPath(PathNode gotoPath) {
         this.gotoPath = gotoPath;
 
         gui.refresh();
@@ -1044,7 +1041,7 @@ public final class MapViewer {
      *     if on the left, zero on failure.
      * @see #getFocus
      */
-    public int setOffsetFocus(Tile tile) {
+    int setOffsetFocus(Tile tile) {
         if (tile == null) return 0;
         int where;
         final Map map = freeColClient.getGame().getMap();
@@ -1108,7 +1105,7 @@ public final class MapViewer {
      * @see #setActiveUnit
      * @see #setFocus(Tile)
      */
-    public boolean setSelectedTile(Tile newTile, boolean clearGoToOrders) {
+    boolean setSelectedTile(Tile newTile, boolean clearGoToOrders) {
         Tile oldTile = this.selectedTile;
         boolean ret = false;
         selectedTile = newTile;
@@ -1165,7 +1162,7 @@ public final class MapViewer {
      *
      * @param size a <code>Dimension</code> value
      */
-    public void setSize(Dimension size) {
+    void setSize(Dimension size) {
         this.size = size;
         updateMapDisplayVariables();
     }
@@ -1173,7 +1170,7 @@ public final class MapViewer {
     /**
      * Starts the unit-selection-cursor blinking animation.
      */
-    public void startCursorBlinking() {
+    void startCursorBlinking() {
         blinkingMarqueeEnabled = true;
 
         ActionListener taskPerformer = new ActionListener() {
@@ -1198,7 +1195,7 @@ public final class MapViewer {
     /**
      * Starts a goto operation on the mapboard.
      */
-    public void startGoto() {
+    void startGoto() {
         gotoStarted = true;
         gui.getCanvas().setCursor((java.awt.Cursor)UIManager.get("cursor.go"));
         setGotoPath(null);
@@ -1207,14 +1204,14 @@ public final class MapViewer {
     /**
      * Describe <code>stopBlinking</code> method here.
      */
-    public void stopBlinking() {
+    void stopBlinking() {
         blinkingMarqueeEnabled = false;
     }
 
     /**
      * Stops any ongoing goto operation on the mapboard.
      */
-    public void stopGoto() {
+    void stopGoto() {
         gui.getCanvas().setCursor(null);
         setGotoPath(null);
         updateCurrentPathForActiveUnit();
@@ -2917,12 +2914,12 @@ public final class MapViewer {
         rightSpace = leftSpace;
     }
 
-    public boolean shouldDisplayTileCursor(Tile tile) {
+    private boolean shouldDisplayTileCursor(Tile tile) {
         return viewMode == GUI.VIEW_TERRAIN_MODE
             && tile != null && tile.equals(selectedTile);
     }
 
-    public boolean shouldDisplayUnitCursor(Unit unit) {
+    private boolean shouldDisplayUnitCursor(Unit unit) {
         return viewMode == GUI.MOVE_UNITS_MODE
             && unit == activeUnit
             && (cursor.isActive() || unit.getMovesLeft() <= 0);
