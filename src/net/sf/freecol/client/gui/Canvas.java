@@ -1409,18 +1409,6 @@ public final class Canvas extends JDesktopPane {
     // Special handling for the startGamePanel.
 
     /**
-     * Display a chat message in the start panel.
-     *
-     * @param sender The sending player name.
-     * @param message The message to send.
-     * @param privateChat Should the message be private?
-     */
-    public void displayChat(String sender, String message, boolean privateChat) {
-        startGamePanel.displayChat(sender, message, privateChat);
-
-    }
-
-    /**
      * Refresh the player's table (called when a new player is added
      * from PreGameInputHandler.addPlayer).
      */
@@ -1968,16 +1956,6 @@ public final class Canvas extends JDesktopPane {
      */
     public void showInformationMessage(StringTemplate template) {
         showInformationMessage(null, null, null, template);
-    }
-
-    /**
-     * Show an information message using a model message.
-     *
-     * @param message The <code>ModelMessage</code> to display.
-     */
-    public void showInformationMessage(ModelMessage message) {
-        showInformationMessage(freeColClient.getGame()
-            .getMessageDisplay(message), message);
     }
 
     /**

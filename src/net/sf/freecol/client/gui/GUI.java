@@ -1605,12 +1605,6 @@ public class GUI {
         return canvas.containsInGameComponents();
     }
 
-    public void displayChat(String senderName, String message,
-                            boolean privateChat) {
-        if (canvas == null) return;
-        canvas.displayChat(senderName, message, privateChat);
-    }
-
     /**
      * Show the appropriate panel for an object.
      *
@@ -1903,12 +1897,6 @@ public class GUI {
         canvas.showInformationMessage(template);
     }
 
-    public void showInformationMessage(ModelMessage message) {
-        alertSound();
-        if (canvas == null) return;
-        canvas.showInformationMessage(message);
-    }
-
     public void showInformationMessage(Settlement displayObject,
                                        String messageId) {
         showInformationMessage(displayObject, StringTemplate.key(messageId));
@@ -1925,11 +1913,6 @@ public class GUI {
             tile = displayObject.getTile();
         }
         canvas.showInformationMessage(displayObject, tile, icon, template);
-    }
-
-    public void showInformationMessage(Unit displayObject,
-                                       String messageId) {
-        showInformationMessage(displayObject, StringTemplate.key(messageId));
     }
 
     public void showInformationMessage(Unit displayObject,
