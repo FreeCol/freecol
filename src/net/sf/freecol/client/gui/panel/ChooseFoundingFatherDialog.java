@@ -35,7 +35,7 @@ import net.sf.freecol.common.model.FoundingFather;
 
 
 /**
- * This panel displays the different founding fathers the player can work
+ * This panel displays the different Founding Fathers the player can work
  * towards recruiting.
  *
  * @see FoundingFather
@@ -56,8 +56,8 @@ public final class ChooseFoundingFatherDialog
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param frame The owner frame.
-     * @param possibleFoundingFathers The founding fathers which can
-     *     be selected.  The length of the array is the same as the
+     * @param possibleFoundingFathers The Founding Fathers which can
+     *     be selected. The length of the array is the same as the
      *     number of <code>FoundingFather</code> categories and the
      *     values identifies a <code>FoundingFather</code> to be
      *     picked in each of those categories.

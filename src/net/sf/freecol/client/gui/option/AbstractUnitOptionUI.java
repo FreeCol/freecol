@@ -27,6 +27,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.gui.panel.MigPanel;

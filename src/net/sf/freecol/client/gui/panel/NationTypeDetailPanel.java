@@ -219,5 +219,4 @@ public class NationTypeDetailPanel
         }
         panel.add(unitPanel);
     }
-
 }

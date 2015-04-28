@@ -216,5 +216,4 @@ public class FreeColProgressBar extends JPanel {
 
         g2d.dispose();
     }
-
 }

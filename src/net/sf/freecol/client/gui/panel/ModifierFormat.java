@@ -34,7 +34,11 @@ import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Turn;
 
-
+/**
+ * A class that modifies strings for use in the Panel GUI.
+ * 
+ * @author calebrw
+ */
 public class ModifierFormat {
 
     /** The decimal format to use for Modifiers. */
@@ -66,15 +70,15 @@ public class ModifierFormat {
             ? new String[] { "-", bonus.substring(1), null }
             : new String[] { "+", bonus, null };
         switch (type) {
-        case MULTIPLICATIVE:
-            // assumes multiplicative modifiers will never be negative
-            result[0] = "\u00D7";
-            break;
-        case PERCENTAGE:
-            result[2] = "%";
-            break;
-        default:
-            break;
+            case MULTIPLICATIVE:
+                // assumes multiplicative modifiers will never be negative
+                result[0] = "\u00D7";
+                break;
+            case PERCENTAGE:
+                result[2] = "%";
+                break;
+            default:
+                break;
         }
         return result;
     }

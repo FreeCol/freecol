@@ -73,7 +73,7 @@ public class LabourData {
         private int colonists;
 
         /**
-         * protential production
+         * Potential production
          */
         private int production;
 
@@ -143,7 +143,7 @@ public class LabourData {
         private int otherStudents;
 
         /**
-         * of of the other studends
+         * of the other students
          */
         private String otherStudentsName;
 

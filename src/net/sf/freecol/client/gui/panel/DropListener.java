@@ -33,7 +33,7 @@ import javax.swing.TransferHandler;
 /**
  * A DropListener should be attached to Swing components that have a
  * TransferHandler attached.  The DropListener will make sure that the
- * Swing component to which it is attached can accept dragable data.
+ * Swing component to which it is attached can accept draggable data.
  */
 public final class DropListener extends MouseAdapter {
     

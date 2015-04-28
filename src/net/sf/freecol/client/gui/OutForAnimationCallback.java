@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui;
 
 import javax.swing.JLabel;
 
+
 /**
  * A callback interface for
  * {@link MapViewer#executeWithUnitOutForAnimation(net.sf.freecol.common.model.Unit, net.sf.freecol.common.model.Tile, OutForAnimationCallback)}.

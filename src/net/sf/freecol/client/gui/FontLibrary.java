@@ -157,7 +157,7 @@ public class FontLibrary {
     }
 
     /**
-     * Create a scaled <code>Font</code> whe the scale factor is provided
+     * Create a scaled <code>Font</code> when the scale factor is provided
      * explicitly in the parameter.
      * 
      * @param fontType How the font should look like.

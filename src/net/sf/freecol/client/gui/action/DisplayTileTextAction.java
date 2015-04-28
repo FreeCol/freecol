@@ -27,6 +27,7 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+
 import static net.sf.freecol.common.util.StringUtils.*;
 
 

@@ -21,11 +21,10 @@ package net.sf.freecol.client.gui;
 
 import java.awt.GraphicsDevice;
 import java.awt.Rectangle;
-
-import javax.swing.JFrame;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.JFrame;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;

@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicOptionPaneUI;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.gui.ImageLibrary;

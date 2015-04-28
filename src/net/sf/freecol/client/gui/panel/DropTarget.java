@@ -21,10 +21,15 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
+
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
 
-
+/**
+ * Interface for dropping a unit on a tile
+ * 
+ * @author calebrw
+ */
 public interface DropTarget {
 
     /**
