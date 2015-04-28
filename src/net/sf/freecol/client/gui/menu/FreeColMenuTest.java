@@ -37,7 +37,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.FullScreenFrame;
+import net.sf.freecol.client.gui.FreeColFrame;
 
 
 /**
@@ -136,7 +136,9 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
         //JFrame frame = new JFrame("MenuDemo");
         FreeColClient client = new FreeColClient(null, null);
         client.startClient(null, null, true, true, null, null);
-        FullScreenFrame frame = new FullScreenFrame(client, GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
+        FreeColFrame frame = new FreeColFrame(client,
+            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice(),
+            null, null, true, null);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         //Create and set up the content pane.

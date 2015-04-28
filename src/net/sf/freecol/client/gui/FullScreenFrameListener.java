@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+
 import javax.swing.JFrame;
 
 import net.sf.freecol.client.FreeColClient;
@@ -32,7 +33,7 @@ import net.sf.freecol.client.FreeColClient;
 public final class FullScreenFrameListener implements WindowListener {
 
     private final FreeColClient freeColClient;
-    private final FullScreenFrame frame;
+    private final FreeColFrame frame;
 
     /**
      * Constructs this WindowListener.
@@ -41,7 +42,7 @@ public final class FullScreenFrameListener implements WindowListener {
      * @param frame The frame.
      */
     public FullScreenFrameListener(FreeColClient freeColClient,
-                                   FullScreenFrame frame) {
+                                   FreeColFrame frame) {
         this.freeColClient = freeColClient;
         this.frame = frame;
     }

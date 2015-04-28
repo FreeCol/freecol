@@ -217,8 +217,6 @@ public final class Canvas extends JDesktopPane {
     /** Used to detect resizing. */
     private Dimension oldSize = null;
 
-    private Dimension initialSize = null;
-
     private boolean clientOptionsDialogShowing = false;
 
     private LoadingSavegameDialog loadingSavegameDialog;
@@ -250,6 +248,7 @@ public final class Canvas extends JDesktopPane {
         this.mapViewer = mapViewer;
 
         // Determine the window size.
+        Dimension initialSize;
         if (desiredSize == null) {
             if(graphicsDevice.isFullScreenSupported()) {
                 windowed = false;
@@ -366,7 +365,7 @@ public final class Canvas extends JDesktopPane {
         JMenuBar menuBar = null;
         if (frame != null) {
             menuBar = frame.getJMenuBar();
-            if (frame instanceof WindowedFrame) {
+            if (this.windowed) {
                 windowBounds = frame.getBounds();
             }
             frame.setVisible(false);
@@ -376,12 +375,8 @@ public final class Canvas extends JDesktopPane {
 
         // User might have moved window to new screen in a
         // multi-screen setup, so make this.gd point to the current screen.
-        frame = windowed
-            ? new WindowedFrame(freeColClient, graphicsDevice)
-            : new FullScreenFrame(freeColClient, graphicsDevice);
-        frame.setJMenuBar(menuBar);
-        frame.setCanvas(this);
-        frame.updateBounds(windowBounds);
+        frame = new FreeColFrame(freeColClient, graphicsDevice,
+            menuBar, this, windowed, windowBounds);
         if (windowed) {
             frame.addComponentListener(new ComponentAdapter() {
                 @Override
