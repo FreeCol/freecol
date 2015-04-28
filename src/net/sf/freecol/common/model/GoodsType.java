@@ -359,11 +359,6 @@ public final class GoodsType extends FreeColGameObjectType {
         return price;
     }
 
-    /**
-     * Set the price value.
-     *
-     * @param newPrice The new price value.
-     */
     public void setPrice(final int newPrice) {
         this.price = newPrice;
     }

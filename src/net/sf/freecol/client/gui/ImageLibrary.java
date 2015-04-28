@@ -189,8 +189,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Describe <code>getStringBorderColor</code> method here.
-     *
      * The string border colors should be black unless the color of
      * the string is really dark.
      *

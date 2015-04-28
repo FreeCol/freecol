@@ -102,12 +102,6 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
 
-    /**
-     * Describe <code>putMarketData</code> method here.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @param data a <code>MarketData</code> value
-     */
     private void putMarketData(GoodsType goodsType, MarketData data) {
         marketData.put(goodsType, data);
     }

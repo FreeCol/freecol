@@ -65,11 +65,6 @@ public class FreeColToolTipUI extends BasicToolTipUI {
         return sharedInstance;
     }
 
-    /**
-     * Describe <code>setMaximumWidth</code> method here.
-     *
-     * @param width an <code>int</code> value
-     */
     public static void setMaximumWidth(int width) {
         maximumWidth = width;
     }

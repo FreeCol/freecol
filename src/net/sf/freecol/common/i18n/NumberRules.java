@@ -92,21 +92,11 @@ public class NumberRules {
         return (number == null) ? OTHER_NUMBER_RULE : number;
     }
 
-    /**
-     * Describe <code>isInitialized</code> method here.
-     *
-     * @return a <code>boolean</code> value
-     */
     public static boolean isInitialized() {
         return !numberMap.isEmpty();
     }
 
 
-    /**
-     * Describe <code>load</code> method here.
-     *
-     * @param in an <code>InputStream</code> value
-     */
     public static void load(InputStream in) {
         try (
             FreeColXMLReader xr = new FreeColXMLReader(in);
@@ -130,12 +120,6 @@ public class NumberRules {
     private static final String VERSION_TAG = "version";
 
 
-    /**
-     * Describe <code>readFromXML</code> method here.
-     *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @exception XMLStreamException if an error occurs
-     */
     private static void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
         while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String tag = xr.getLocalName();
@@ -157,12 +141,6 @@ public class NumberRules {
         }
     }
 
-    /**
-     * Describe <code>readChild</code> method here.
-     *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @exception XMLStreamException if an error occurs
-     */
     private static void readChild(FreeColXMLReader xr) throws XMLStreamException {
         String loc = xr.getAttribute(LOCALES_TAG, (String)null);
         String[] locales = (loc == null) ? null : loc.split(" ");

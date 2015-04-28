@@ -250,11 +250,6 @@ public class Region extends FreeColGameObject implements Nameable, Named {
         return this.claimable;
     }
 
-    /**
-     * Set the claimable value.
-     *
-     * @param newClaimable The new claimable value.
-     */
     public final void setClaimable(final boolean newClaimable) {
         this.claimable = newClaimable;
     }
@@ -268,11 +263,6 @@ public class Region extends FreeColGameObject implements Nameable, Named {
         return this.discoverable;
     }
 
-    /**
-     * Set the discoverable value.
-     *
-     * @param newDiscoverable The new discoverable value.
-     */
     public final void setDiscoverable(final boolean newDiscoverable) {
         this.discoverable = newDiscoverable;
         if (this.discoverable) this.prediscovered = false;
@@ -356,11 +346,6 @@ public class Region extends FreeColGameObject implements Nameable, Named {
         return this.prediscovered;
     }
 
-    /**
-     * Sets the prediscovered value.
-     *
-     * @param newPrediscovered The new prediscovered value.
-     */
     public final void setPrediscovered(final boolean newPrediscovered) {
         this.prediscovered = newPrediscovered;
     }

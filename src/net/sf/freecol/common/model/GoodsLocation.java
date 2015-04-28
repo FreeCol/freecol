@@ -81,11 +81,6 @@ public abstract class GoodsLocation extends UnitLocation {
 
     // getGoodsContainer() is part of the Location interface.
 
-    /**
-     * Set the <code>GoodsContainer</code> value.
-     *
-     * @param goodsContainer The new GoodsContainer value.
-     */
     public final void setGoodsContainer(final GoodsContainer goodsContainer) {
         this.goodsContainer = goodsContainer;
     }

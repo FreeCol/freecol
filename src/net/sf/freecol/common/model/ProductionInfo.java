@@ -41,92 +41,42 @@ public class ProductionInfo {
     private List<AbstractGoods> consumption = new ArrayList<>();
 
 
-    /**
-     * Get the <code>Consumption</code> value.
-     *
-     * @return a <code>List<AbstractGoods></code> value
-     */
     public final List<AbstractGoods> getConsumption() {
         return consumption;
     }
 
-    /**
-     * Set the <code>Consumption</code> value.
-     *
-     * @param newConsumption The new Consumption value.
-     */
     public final void setConsumption(final List<AbstractGoods> newConsumption) {
         this.consumption = newConsumption;
     }
 
-    /**
-     * Describe <code>addConsumption</code> method here.
-     *
-     * @param goods an <code>AbstractGoods</code> value
-     */
     public void addConsumption(AbstractGoods goods) {
         consumption.add(goods);
     }
 
-    /**
-     * Get the <code>Production</code> value.
-     *
-     * @return a <code>List<AbstractGoods></code> value
-     */
     public final List<AbstractGoods> getProduction() {
         return production;
     }
 
-    /**
-     * Set the <code>Production</code> value.
-     *
-     * @param newProduction The new Production value.
-     */
     public final void setProduction(final List<AbstractGoods> newProduction) {
         this.production = newProduction;
     }
 
-    /**
-     * Describe <code>addProduction</code> method here.
-     *
-     * @param goods an <code>AbstractGoods</code> value
-     */
     public void addProduction(AbstractGoods goods) {
         production.add(goods);
     }
 
-    /**
-     * Describe <code>addProduction</code> method here.
-     *
-     * @param goods an <code>AbstractGoods</code> value
-     */
     public void addProduction(List<AbstractGoods> goods) {
         production.addAll(goods);
     }
 
-    /**
-     * Get the <code>MaximumProduction</code> value.
-     *
-     * @return a <code>List<AbstractGoods></code> value
-     */
     public final List<AbstractGoods> getMaximumProduction() {
         return maximumProduction;
     }
 
-    /**
-     * Set the <code>MaximumProduction</code> value.
-     *
-     * @param newMaximumProduction The new MaximumProduction value.
-     */
     public final void setMaximumProduction(final List<AbstractGoods> newMaximumProduction) {
         this.maximumProduction = newMaximumProduction;
     }
 
-    /**
-     * Describe <code>addMaximumProduction</code> method here.
-     *
-     * @param goods an <code>AbstractGoods</code> value
-     */
     public void addMaximumProduction(AbstractGoods goods) {
         maximumProduction.add(goods);
     }
@@ -148,29 +98,14 @@ public class ProductionInfo {
         return true;
     }
 
-    /**
-     * Get the <code>MaximumConsumption</code> value.
-     *
-     * @return a <code>List<AbstractGoods></code> value
-     */
     public final List<AbstractGoods> getMaximumConsumption() {
         return maximumConsumption;
     }
 
-    /**
-     * Set the <code>MaximumConsumption</code> value.
-     *
-     * @param newMaximumConsumption The new MaximumConsumption value.
-     */
     public final void setMaximumConsumption(final List<AbstractGoods> newMaximumConsumption) {
         this.maximumConsumption = newMaximumConsumption;
     }
 
-    /**
-     * Describe <code>addMaximumConsumption</code> method here.
-     *
-     * @param goods an <code>AbstractGoods</code> value
-     */
     public void addMaximumConsumption(AbstractGoods goods) {
         maximumConsumption.add(goods);
     }

@@ -135,20 +135,10 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         return buildQueue.isEmpty();
     }
 
-    /**
-     * Get the <code>CompletionAction</code> value.
-     *
-     * @return a <code>CompletionAction</code> value
-     */
     public final CompletionAction getCompletionAction() {
         return completionAction;
     }
 
-    /**
-     * Set the <code>CompletionAction</code> value.
-     *
-     * @param newCompletionAction The new CompletionAction value.
-     */
     public final void setCompletionAction(final CompletionAction newCompletionAction) {
         this.completionAction = newCompletionAction;
     }

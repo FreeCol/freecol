@@ -726,11 +726,6 @@ public final class MapViewer {
         return activeUnit;
     }
 
-    /**
-     * Describe <code>getCursor</code> method here.
-     *
-     * @return a <code>TerrainCursor</code> value
-     */
     TerrainCursor getCursor() {
         return cursor;
     }
@@ -1157,11 +1152,6 @@ public final class MapViewer {
         return ret;
     }
 
-    /**
-     * Describe <code>setSize</code> method here.
-     *
-     * @param size a <code>Dimension</code> value
-     */
     void setSize(Dimension size) {
         this.size = size;
         updateMapDisplayVariables();
@@ -1201,9 +1191,6 @@ public final class MapViewer {
         setGotoPath(null);
     }
 
-    /**
-     * Describe <code>stopBlinking</code> method here.
-     */
     void stopBlinking() {
         blinkingMarqueeEnabled = false;
     }
@@ -2212,11 +2199,6 @@ public final class MapViewer {
         }
     }
 
-    /**
-     * Describe <code>displayCursor</code> method here.
-     *
-     * @param g a <code>Graphics2D</code>
-     */
     private void displayCursor(Graphics2D g) {
         Image cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
         g.drawImage(cursorImage, 0, 0, null);

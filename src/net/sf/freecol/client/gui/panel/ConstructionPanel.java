@@ -181,20 +181,10 @@ public class ConstructionPanel extends MigPanel
     }
 
 
-    /**
-     * Get the <code>DefaultLabel</code> value.
-     *
-     * @return a <code>StringTemplate</code> value
-     */
     public final StringTemplate getDefaultLabel() {
         return defaultLabel;
     }
 
-    /**
-     * Set the <code>DefaultLabel</code> value.
-     *
-     * @param newDefaultLabel The new DefaultLabel value.
-     */
     public final void setDefaultLabel(final StringTemplate newDefaultLabel) {
         this.defaultLabel = newDefaultLabel;
     }

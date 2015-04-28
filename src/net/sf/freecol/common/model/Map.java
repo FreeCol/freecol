@@ -406,20 +406,10 @@ public class Map extends FreeColGameObject implements Location {
         return (tiles == null) ? 0 : tiles[0].length;
     }
 
-    /**
-     * Gets the <code>Layer</code> value.
-     *
-     * @return The <code>Layer</code> value
-     */
     public final Layer getLayer() {
         return layer;
     }
 
-    /**
-     * Sets the <code>Layer</code> value.
-     *
-     * @param newLayer The new Layer value.
-     */
     public final void setLayer(final Layer newLayer) {
         this.layer = newLayer;
     }
@@ -433,11 +423,6 @@ public class Map extends FreeColGameObject implements Location {
         return minimumLatitude;
     }
 
-    /**
-     * Sets the <code>MinimumLatitude</code> value.
-     *
-     * @param newMinimumLatitude The new minimum latitude value.
-     */
     public final void setMinimumLatitude(final int newMinimumLatitude) {
         this.minimumLatitude = newMinimumLatitude;
         calculateLatitudePerRow();
@@ -452,11 +437,6 @@ public class Map extends FreeColGameObject implements Location {
         return maximumLatitude;
     }
 
-    /**
-     * Sets the <code>MaximumLatitude</code> value.
-     *
-     * @param newMaximumLatitude The new MaximumLatitude value.
-     */
     public final void setMaximumLatitude(final int newMaximumLatitude) {
         this.maximumLatitude = newMaximumLatitude;
         calculateLatitudePerRow();
@@ -471,9 +451,6 @@ public class Map extends FreeColGameObject implements Location {
         return latitudePerRow;
     }
 
-    /**
-     * Calculates the <code>LatitudePerRow</code> value.
-     */
     private final void calculateLatitudePerRow() {
         this.latitudePerRow = 1f * (maximumLatitude - minimumLatitude) /
             (getHeight() - 1);

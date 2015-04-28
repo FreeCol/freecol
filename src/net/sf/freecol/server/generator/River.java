@@ -372,12 +372,6 @@ public class River {
         return false;
     }
 
-    /**
-     * Describe <code>createDelta</code> method here.
-     *
-     * @param tile A <code>Tile</code> value
-     * @param direction a <code>Direction</code> value
-     */
     private void createDelta(Tile tile, Direction direction, RiverSection section) {
         delta(tile, direction, section, DirectionChange.LEFT_TURN.getNewDirection(direction));
         delta(tile, direction, section, DirectionChange.RIGHT_TURN.getNewDirection(direction));

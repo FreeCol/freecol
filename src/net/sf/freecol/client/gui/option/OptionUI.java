@@ -85,38 +85,18 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
         component.setOpaque(false);
     }
 
-    /**
-     * Get the <code>Option</code> value.
-     *
-     * @return an <code>T</code> value
-     */
     public final T getOption() {
         return option;
     }
 
-    /**
-     * Set the <code>Option</code> value.
-     *
-     * @param newOption The new Option value.
-     */
     public final void setOption(final T newOption) {
         this.option = newOption;
     }
 
-    /**
-     * Get the <code>Editable</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
     public final boolean isEditable() {
         return editable;
     }
 
-    /**
-     * Set the <code>Editable</code> value.
-     *
-     * @param newEditable The new Editable value.
-     */
     public final void setEditable(final boolean newEditable) {
         this.editable = newEditable;
     }
@@ -168,20 +148,10 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
 
     // Routines to be implemented/overridden
 
-    /**
-     * Get the <code>Label</code> value.
-     *
-     * @return a <code>JLabel</code> value
-     */
     public JLabel getJLabel() {
         return label;
     }
 
-    /**
-     * Set the <code>Label</code> value.
-     *
-     * @param label a <code>JLabel</code> value
-     */
     protected void setLabel(JLabel label) {
         this.label = label;
     }

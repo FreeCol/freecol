@@ -140,11 +140,6 @@ public abstract class Settlement extends GoodsLocation
         return getType().isCapital();
     }
 
-    /**
-     * Sets the capital value.
-     *
-     * @param capital The new capital value.
-     */
     public void setCapital(boolean capital) {
         if (isCapital() != capital) {
             changeType(owner.getNationType().getSettlementType(capital));

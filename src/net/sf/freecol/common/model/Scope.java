@@ -87,11 +87,6 @@ public class Scope extends FreeColObject {
         return matchesNull;
     }
 
-    /**
-     * Set the null match value.
-     *
-     * @param newMatchesNull The new null match value.
-     */
     public void setMatchesNull(final boolean newMatchesNull) {
         this.matchesNull = newMatchesNull;
     }
@@ -105,29 +100,14 @@ public class Scope extends FreeColObject {
         return matchNegated;
     }
 
-    /**
-     * Set the match negated value.
-     *
-     * @param newMatchNegated The new match negated value.
-     */
     public void setMatchNegated(final boolean newMatchNegated) {
         this.matchNegated = newMatchNegated;
     }
 
-    /**
-     * Gets the type of scope.
-     *
-     * @return The scope type.
-     */
     public String getType() {
         return type;
     }
 
-    /**
-     * Set the scope type.
-     *
-     * @param newType The new scope type.
-     */
     public void setType(final String newType) {
         this.type = newType;
     }
@@ -150,56 +130,26 @@ public class Scope extends FreeColObject {
         this.abilityId = newAbilityId;
     }
 
-    /**
-     * Gets the ability value.
-     *
-     * @return The ability value.
-     */
     public boolean getAbilityValue() {
         return abilityValue;
     }
 
-    /**
-     * Sets the ability value.
-     *
-     * @param newAbilityValue The new ability value.
-     */
     public void setAbilityValue(final boolean newAbilityValue) {
         this.abilityValue = newAbilityValue;
     }
 
-    /**
-     * Gets the method name.
-     *
-     * @return The method name.
-     */
     public String getMethodName() {
         return methodName;
     }
 
-    /**
-     * Sets the method name.
-     *
-     * @param newMethodName The new method name.
-     */
     public void setMethodName(final String newMethodName) {
         this.methodName = newMethodName;
     }
 
-    /**
-     * Gets the method value.
-     *
-     * @return The method value.
-     */
     public String getMethodValue() {
         return methodValue;
     }
 
-    /**
-     * Sets the method value.
-     *
-     * @param newMethodValue The new method value.
-     */
     public void setMethodValue(final String newMethodValue) {
         this.methodValue = newMethodValue;
     }

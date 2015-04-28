@@ -358,11 +358,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         return buildQueue.getValues();
     }
 
-    /**
-     * Set the <code>BuildQueue</code> value.
-     *
-     * @param newBuildQueue The new BuildQueue value.
-     */
     public void setBuildQueue(final List<BuildableType> newBuildQueue) {
         buildQueue.setValues(newBuildQueue);
     }
@@ -1099,11 +1094,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         buildQueue.setCurrentlyBuilding(buildable);
     }
 
-    /**
-     * Describe <code>canBuild</code> method here.
-     *
-     * @return a <code>boolean</code> value
-     */
     public boolean canBuild() {
         return canBuild(getCurrentlyBuilding());
     }

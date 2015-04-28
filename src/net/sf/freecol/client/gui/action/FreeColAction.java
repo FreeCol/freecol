@@ -213,11 +213,6 @@ public abstract class FreeColAction extends AbstractAction
         return (Integer)getValue(MNEMONIC_KEY);
     }
 
-    /**
-     * Describe <code>setMnemonic</code> method here.
-     *
-     * @param mnemonic an <code>int</code> value
-     */
     public void setMnemonic(int mnemonic) {
         putValue(MNEMONIC_KEY, mnemonic);
     }

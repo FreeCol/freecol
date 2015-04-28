@@ -98,11 +98,6 @@ public final class Limit extends FreeColGameObjectType {
         return operator;
     }
 
-    /**
-     * Set the <code>Operator</code> value.
-     *
-     * @param newOperator The new <code>Operator</code> value.
-     */
     public void setOperator(final Operator newOperator) {
         this.operator = newOperator;
     }

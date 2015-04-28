@@ -60,38 +60,18 @@ public class ProductionMap {
         }
 
 
-        /**
-         * Get the <code>Root</code> value.
-         *
-         * @return an <code>AbstractGoods</code> value
-         */
         public final AbstractGoods getRoot() {
             return root;
         }
 
-        /**
-         * Set the <code>Root</code> value.
-         *
-         * @param newRoot The new Root value.
-         */
         public final void setRoot(final AbstractGoods newRoot) {
             this.root = newRoot;
         }
 
-        /**
-         * Get the <code>Leafs</code> value.
-         *
-         * @return a <code>List<AbstractGoods></code> value
-         */
         public final List<AbstractGoods> getLeafs() {
             return leafs;
         }
 
-        /**
-         * Set the <code>Leafs</code> value.
-         *
-         * @param newLeafs The new Leafs value.
-         */
         public final void setLeafs(final List<AbstractGoods> newLeafs) {
             this.leafs = newLeafs;
         }

@@ -758,7 +758,7 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Set the current ntion options.
+     * Set the current nation options.
      *
      * @param newNationOptions The new <code>NationOptions<code> value.
      */

@@ -148,11 +148,6 @@ public class ExportData extends FreeColObject {
         return exported;
     }
 
-    /**
-     * Set the export value.
-     *
-     * @param newExport The new export value.
-     */
     public final void setExported(final boolean newExport) {
         this.exported = newExport;
     }
