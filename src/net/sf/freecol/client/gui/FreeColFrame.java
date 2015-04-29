@@ -19,8 +19,11 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Dimension;
 import java.awt.GraphicsDevice;
+import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -72,11 +75,26 @@ public class FreeColFrame extends JFrame {
             : new FullScreenFrameListener(freeColClient, this));
         setCanvas(canvas);
         setIconImage(ResourceManager.getImage("image.miscicon.FrameIcon"));
-        if (windowed && bounds != null) {
-            setBounds(bounds);
-        } else {
-            pack();
-        }   
+
+        pack(); // necessary for getInsets
+        Insets insets = getInsets();
+
+        // numbers are taken from the size of the opening video
+        setMinimumSize(new Dimension(656 + insets.left + insets.right,
+                                     480 + insets.top + insets.bottom));
+
+        if(!windowed || bounds==null || bounds.width<=0 || bounds.height<=0) {
+            bounds = gd.getDefaultConfiguration().getBounds();
+        }
+        if (windowed) {
+            Insets screenInsets = Toolkit.getDefaultToolkit()
+                    .getScreenInsets(gd.getDefaultConfiguration());
+            bounds = new Rectangle(0, 0,
+                bounds.width - (bounds.x+screenInsets.left+screenInsets.right),
+                bounds.height - (bounds.y+screenInsets.top+screenInsets.bottom));
+        }
+        setBounds(bounds);
+        logger.info("Frame created in size " + bounds.width + "x" + bounds.height);
     }
 
 

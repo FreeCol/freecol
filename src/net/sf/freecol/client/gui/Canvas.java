@@ -174,12 +174,6 @@ public final class Canvas extends JDesktopPane {
     /** Number of tries to find a clear spot on the canvas. */
     private static final int MAXTRY = 3;
 
-    /** The space not being used in windowed mode. */
-    private static final int DEFAULT_SCREEN_INSET_WIDTH  = 0;
-    private static final int DEFAULT_SCREEN_INSET_HEIGHT = 40;
-    private static final int DEFAULT_WINDOW_INSET_WIDTH  = 16;
-    private static final int DEFAULT_WINDOW_INSET_HEIGHT = 39;
-
     /** A class for frames being used as tool boxes. */
     private static class ToolBoxFrame extends JInternalFrame {}
 
@@ -247,30 +241,26 @@ public final class Canvas extends JDesktopPane {
         chatDisplay = new ChatDisplay();
         this.mapViewer = mapViewer;
 
-        // Determine the window size.
-        Dimension initialSize;
+        // Determine if windowed mode should be used and set the window size.
+        windowBounds = null;
         if (desiredSize == null) {
             if(graphicsDevice.isFullScreenSupported()) {
                 windowed = false;
-                initialSize = determineFullScreenSize(graphicsDevice);
-                logger.info("Full screen window size is " + initialSize);
+                logger.info("Full screen mode used.");
             } else {
                 windowed = true;
-                initialSize = new Dimension(-1, -1);
-                logger.warning("Full screen not supported.");
+                logger.warning("Full screen mode not supported.");
                 System.err.println(Messages.message("client.fullScreen"));
             }
         } else {
             windowed = true;
-            initialSize = desiredSize;
-            logger.info("Desired window size is " + initialSize);
+            if(desiredSize.width > 0 && desiredSize.height > 0) {
+                windowBounds = new Rectangle(desiredSize);
+                logger.info("Windowed mode using desired window size of " + desiredSize);
+            } else {
+                logger.info("Windowed mode used.");
+            }
         }
-        if(windowed && (initialSize.width <= 0 || initialSize.height <= 0)) {
-            initialSize = determineWindowSize(graphicsDevice);
-            logger.info("Inner window size is " + initialSize);
-        }
-        setLocation(0, 0);
-        setPreferredSize(initialSize);
 
         setDoubleBuffered(true);
         setOpaque(false);
@@ -292,65 +282,6 @@ public final class Canvas extends JDesktopPane {
 
     boolean isWindowed() {
         return windowed;
-    }
-
-    /**
-     * Estimate size of client area when using the full screen.
-     *
-     * @return A suitable window size.
-     */
-    private static Dimension determineFullScreenSize(GraphicsDevice gd) {
-        Rectangle bounds = gd.getDefaultConfiguration().getBounds();
-        return new Dimension(bounds.width - bounds.x,
-            bounds.height - bounds.y);
-    }
-
-    /**
-     * Estimate size of client area for a window of maximum size.
-     *
-     * @return A suitable window size.
-     */
-    private static Dimension determineWindowSize(GraphicsDevice gd) {
-        // This is supposed to maximize a window
-        //   setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
-        // but there have been problems.
-
-        // Get max size of window including border.
-        DisplayMode dm = gd.getDisplayMode();
-        int width = dm.getWidth();
-        int height = dm.getHeight();
-        LogBuilder lb = new LogBuilder(256);
-        lb.add("determineWindowSize\n",
-            "  Display mode size: ", width, "x", height, "\n");
-
-        // Reduce by any screen insets (windowing system menu bar etc)
-        try {
-            Insets in = Toolkit.getDefaultToolkit()
-                .getScreenInsets(gd.getDefaultConfiguration());
-            width -= in.left + in.right;
-            height -= in.bottom + in.top;
-            lb.add("  less screen insets: ", (in.left + in.right),
-                "x", (in.bottom + in.top), "\n");
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Unable to get screen insets", e);
-            width -= DEFAULT_SCREEN_INSET_WIDTH;
-            height -= DEFAULT_SCREEN_INSET_HEIGHT;
-            lb.add("  less faked screen insets: ", DEFAULT_SCREEN_INSET_WIDTH,
-                "x", DEFAULT_SCREEN_INSET_HEIGHT, "\n");
-        }
-
-        // FIXME: find better way to get size of window title and
-        // border.  The information is only available from getInsets
-        // when a window is already displayable.
-        height -= DEFAULT_WINDOW_INSET_HEIGHT;
-        width -= DEFAULT_WINDOW_INSET_WIDTH;
-        lb.add("  less faked window decoration adjust: ",
-            DEFAULT_WINDOW_INSET_WIDTH, "x", DEFAULT_WINDOW_INSET_HEIGHT, "\n");
-
-        Dimension size = new Dimension(width, height);
-        lb.add("  = ", size);
-        lb.log(logger, Level.INFO);
-        return size;
     }
 
     /**
