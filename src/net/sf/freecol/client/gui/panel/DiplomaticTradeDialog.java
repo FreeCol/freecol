@@ -928,7 +928,8 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         // Panel contents Header row
         JTextArea labelDemandMessage = Utility.getDefaultTextArea(this.demandMessage);
         Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, 
-                FontLibrary.FontSize.TINY, Font.BOLD);
+                FontLibrary.FontSize.TINY, Font.BOLD,
+                getImageLibrary().getScalingFactor());
         labelDemandMessage.setFont(font);
         panel.add(labelDemandMessage);
         JTextArea blank = new JTextArea(" ");
