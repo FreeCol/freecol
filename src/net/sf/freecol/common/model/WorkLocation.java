@@ -570,6 +570,18 @@ public abstract class WorkLocation extends UnitLocation
      */
     public abstract List<ProductionType> getAvailableProductionTypes(boolean unattended);
 
+    /**
+     * Evaluate this work location for a given player.
+     * To be overridden by subclasses.
+     *
+     * @param player The <code>Player</code> to evaluate for.
+     * @return A value for the player.
+     */
+    public int evaluateFor(Player player) {
+        int result = 0;
+        for (Unit u : getUnitList()) result += u.evaluateFor(player);
+        return result;
+    }
 
     /**
      * Gets a template describing whether this work location can/needs-to

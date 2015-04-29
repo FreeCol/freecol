@@ -107,7 +107,20 @@ public class GoodsTradeItem extends TradeItem {
         this.goods = goods;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int evaluateFor(Player player) {
+        final Market market = player.getMarket();
+        final Goods goods = getGoods();
+        return (market == null)
+            ? goods.getAmount() * 2 // FIXME: magic#
+            : (getSource() == player)
+            ? -market.getBidPrice(goods.getType(), goods.getAmount())
+            :  market.getSalePrice(goods.getType(), goods.getAmount());
+    }
 
+        
     // Serialization
 
     /**

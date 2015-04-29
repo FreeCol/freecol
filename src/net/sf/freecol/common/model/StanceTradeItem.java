@@ -106,6 +106,28 @@ public class StanceTradeItem extends TradeItem {
         this.stance = stance;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int evaluateFor(Player player) {
+        final Stance stance = getStance();
+        final double ratio = player.getStrengthRatio(getOther(player), false);
+        switch (stance) {
+        case WAR:
+            return (ratio < 0.33) ? Integer.MIN_VALUE
+                : (ratio < 0.5) ? -(int)Math.round(100 * ratio)
+                : (int)Math.round(100 * ratio);
+        case PEACE: case CEASE_FIRE: case ALLIANCE:
+            return (ratio > 0.66) ? Integer.MIN_VALUE
+                : (ratio > 0.5) ? -(int)Math.round(100 * ratio)
+                : (ratio > 0.33) ? (int)Math.round(100 * ratio)
+                : 1000;
+        case UNCONTACTED: default:
+            break;
+        }
+        return Integer.MIN_VALUE;
+    }
+
 
     // Serialization
 

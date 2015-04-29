@@ -115,6 +115,17 @@ public abstract class TradeItem extends FreeColObject {
         this.destination = newDestination;
     }
 
+    /**
+     * Get the other player for this trade item.
+     *
+     * @param player The <code>Player</code> we do not want.
+     * @return The <code>Player</code> we want.
+     */
+    public final Player getOther(Player player) {
+        return (player == source) ? destination : source;
+    }
+
+
     // The following routines must be supplied/overridden by the subclasses.
 
     /**
@@ -211,7 +222,15 @@ public abstract class TradeItem extends FreeColObject {
      */
     public void setUnit(Unit unit) {}
 
-
+    /**
+     * Evaluate this trade item for a given player.
+     *
+     * @param player The <code>Player</code> to evaluate for.
+     * @return A value for the player, MIN_VALUE for invalid.
+     */
+    public abstract int evaluateFor(Player player);
+    
+    
     // Serialization
 
     private static final String DESTINATION_TAG = "destination";

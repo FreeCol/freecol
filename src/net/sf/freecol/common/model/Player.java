@@ -514,6 +514,10 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     protected HighSeas highSeas = null;
 
+    /** A cached map of the current nation summary for all live nations. */
+    private final java.util.Map<Player, NationSummary> nationCache
+        = new HashMap<>();
+
 
     //
     // Constructors
@@ -3028,6 +3032,51 @@ public class Player extends FreeColGameObject implements Nameable {
         price += 100;
         return (int)applyModifiers(price, getGame().getTurn(),
                                    Modifier.LAND_PAYMENT_MODIFIER);
+    }
+
+    /**
+     * Access the nation cache.
+     *
+     * @param player The <code>Player</code> to get the summary for.
+     * @return The current <code>NationSummary</code> for a player.
+     */
+    public NationSummary getNationSummary(Player player) {
+        return nationCache.get(player);
+    }
+
+    /**
+     * Update the nation cache.
+     *
+     * @param player The <code>Player</code> to get the summary for.
+     * @param ns The new <code>NationSummary</code> for the player.
+     */
+    public void putNationSummary(Player player, NationSummary ns) {
+        nationCache.put(player, ns);
+    }
+
+    /**
+     * Clear the nation cache.
+     */
+    public void clearNationCache() {
+        nationCache.clear();
+    }
+
+    /**
+     * Get the strength ratio of this player with respect to another.
+     *
+     * This relies on an up-to-date nation cache value for the target
+     * player.
+     *
+     * @param other The other <code>Player</code>.
+     * @param naval If true, get the naval strength, else the land strength.
+     * @return The strength ratio (strength/sum(strengths)), or negative
+     *     on error.
+     */
+    public double getStrengthRatio(Player other, boolean naval) {
+        NationSummary ns = getNationSummary(other);
+        if (ns == null) return -1.0;
+        int strength = calculateStrength(naval);
+        return (double)strength / (strength + ns.getMilitaryStrength());
     }
 
 

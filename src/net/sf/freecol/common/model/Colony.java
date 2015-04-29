@@ -1761,7 +1761,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
 
-    // Defence and offense response
+    // Defence, offense and trade response
 
     /**
      * Gets the best defender type available to this colony.
@@ -1884,6 +1884,36 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             }
         }
         return enemyUnits > friendlyUnits;
+    }
+
+    /**
+     * Evaluate this colony for a given player.
+     *
+     * @param player The <code>Player</code> to evaluate for.
+     * @return A value for the player.
+     */
+    public int evaluateFor(Player player) {
+        int result = 0;
+        if (player.owns(this)) {
+            for (WorkLocation wl : getAvailableWorkLocations()) {
+                result += wl.evaluateFor(player);
+            }
+            for (Unit u : getTile().getUnitList()) {
+                result += u.evaluateFor(player);
+            }
+            for (Goods g : getCompactGoods()) {
+                result += g.evaluateFor(player);
+            }
+        } else { // Much guesswork
+            result += getDisplayUnitCount() * 1000;
+            result += 500; // Some useful goods?
+            for (Tile t : getTile().getSurroundingTiles(1)) {
+                if (t.getOwningSettlement() == this) result += 200;
+            }
+            Building stockade = getStockade();
+            if (stockade != null) result *= stockade.getLevel();
+        }
+        return result;
     }
 
 

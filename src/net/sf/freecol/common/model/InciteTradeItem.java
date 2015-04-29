@@ -100,6 +100,25 @@ public class InciteTradeItem extends TradeItem {
         return victim;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int evaluateFor(Player player) {
+        final Player victim = getVictim();
+        switch (player.getStance(victim)) {
+        case ALLIANCE:
+            return Integer.MIN_VALUE;
+        case WAR: // Not invalid, other player may not know our stance
+            return 0;
+        default:
+            break;
+        }
+        double ratio = player.getStrengthRatio(victim, false);
+        // FIXME: magic#, needs rebalancing
+        return (getSource() == player) ? -(int)Math.round(30 * ratio)
+            : (int)Math.round(30 * ratio);
+    }
+    
 
     // Serialization
 

@@ -232,11 +232,6 @@ public class EuropeanAIPlayer extends AIPlayer {
     private final java.util.Map<String, Integer> sessionRegister = new HashMap<>();
 
     /**
-     * A cached map of the current nation summary for all live nations.
-     */
-    private final java.util.Map<Player, NationSummary> nationMap = new HashMap<>();
-
-    /**
      * A cached map of Tile to best TileImprovementPlan.
      * Used to choose a tile improvement for a pioneer to work on.
      */
@@ -356,17 +351,6 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     protected List<AIColony> getBadlyDefended() {
         return badlyDefended;
-    }
-
-    /**
-     * Update the nation map.
-     */
-    public void cacheNations() {
-        nationMap.clear();
-        for (Player p : getGame().getLiveEuropeanPlayers(null)) {
-            NationSummary ns = AIMessage.askGetNationSummary(this, p);
-            nationMap.put(p, ns);
-        }            
     }
 
     /**
@@ -1589,6 +1573,23 @@ public class EuropeanAIPlayer extends AIPlayer {
                 < (int)(100.0f * prob));
     }
 
+
+    /**
+     * Get a nation summary for another player.
+     *
+     * @param player The <code>Player</code> to get the summary for.
+     * @return The current <code>NationSummary</code> for a player.
+     */
+    protected NationSummary getNationSummary(Player other) {
+        Player player = getPlayer();
+        NationSummary ns = player.getNationSummary(other);
+        if (ns == null) {
+            ns = AIMessage.askGetNationSummary(this, other);
+            player.putNationSummary(other, ns);
+        }            
+        return ns;
+    }
+
     /**
      * Get the land force strength ratio of this player with respect
      * to another.
@@ -1597,10 +1598,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return The strength ratio (strength/sum(strengths)).
      */
     protected double getStrengthRatio(Player other) {
-        NationSummary ns = nationMap.get(other);
-        int strength = getPlayer().calculateStrength(false);
-        return (ns == null) ? -1.0 : 
-            (double)strength / (strength + ns.getMilitaryStrength());
+        return getPlayer().getStrengthRatio(other, false);
     }
 
     /**
@@ -1616,96 +1614,20 @@ public class EuropeanAIPlayer extends AIPlayer {
         double navalAverage = 0.0;
         double navalStrength = 0.0;
         int nPlayers = 0;
-        for (Entry<Player, NationSummary> e : nationMap.entrySet()) {
-            Player p = e.getKey();
+        for (Player p : getGame().getLiveEuropeanPlayers(player)) {
             if (p.isREF()) continue;
+            NationSummary ns = getNationSummary(p);
             if (p == player) {
-                navalStrength = e.getValue().getNavalStrength();
+                navalStrength = ns.getNavalStrength();
             } else {
-                int ns = e.getValue().getNavalStrength();
-                if (ns >= 0) navalAverage += ns;
+                int st = ns.getNavalStrength();
+                if (st >= 0) navalAverage += st;
                 nPlayers++;
             }
         }
         if (nPlayers <= 0 || navalStrength < 0) return -1.0;
         navalAverage /= nPlayers;
         return (navalAverage == 0.0) ? -1.0 : navalStrength / navalAverage;
-    }
-
-    /**
-     * Evaluate a colony for trade purposes.
-     *
-     * @param colony The <code>Colony</code> to evaluate.
-     * @return The score.
-     */
-    private int evaluateColony(Colony colony) {
-        if (colony == null) return 0;
-        final Player player = getPlayer();
-        int result = 0;
-
-        if (player.owns(colony)) {
-            int v;
-            for (WorkLocation wl : colony.getAvailableWorkLocations()) {
-                for (Unit u : wl.getUnitList()) {
-                    result += evaluateUnit(u);
-                }
-                if (wl instanceof Building) {
-                    for (AbstractGoods ag : ((Building)wl).getType()
-                             .getRequiredGoods()) {
-                        result += evaluateGoods(ag);
-                    }
-                } else if (wl instanceof ColonyTile) {
-                    for (AbstractGoods ag : wl
-                             .getProductionInfo().getProduction()) {
-                        result += evaluateGoods(ag);
-                    }
-                }
-            }
-            for (Unit u : colony.getTile().getUnitList()) {
-                result += evaluateUnit(u);
-            }
-            for (Goods g : colony.getCompactGoods()) {
-                result += evaluateGoods(g);
-            }
-        } else {
-            // Much guesswork
-            result += colony.getDisplayUnitCount() * 1000;
-            result += 500; // Some useful goods?
-            for (Tile t : colony.getTile().getSurroundingTiles(1)) {
-                if (t.getOwningSettlement() == colony) result += 200;
-            }
-            Building stockade = colony.getStockade();
-            if (stockade != null) {
-                result *= stockade.getLevel();
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Evaluate a unit for trade purposes.
-     *
-     * @param unit The <code>Unit</code> to evaluate.
-     * @return The score.
-     */
-    private int evaluateUnit(Unit unit) {
-        final Europe europe = getPlayer().getEurope();
-
-        return (europe == null) ? 0
-            : europe.getUnitPrice(unit.getType());
-    }
-
-    /**
-     * Evaluate goods for trade purposes.
-     *
-     * @param ag The <code>AbstractGoods</code> to evaluate.
-     * @return The score.
-     */
-    private int evaluateGoods(AbstractGoods ag) {
-        final Market market = getPlayer().getMarket();
-
-        return (market == null) ? 0
-            : market.getSalePrice(ag.getType(), ag.getAmount());
     }
 
     /**
@@ -2381,7 +2303,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         sessionRegister.clear();
         clearAIUnits();
-        cacheNations();
+        player.clearNationCache();
         badlyDefended.clear();
 
         // Note call to getAIUnits().  This triggers
@@ -2563,141 +2485,46 @@ public class EuropeanAIPlayer extends AIPlayer {
         TradeItem peace = null;
         TradeItem cash = null;
         LogBuilder lb = new LogBuilder(64);
-        lb.add("Evaluate trade offer from ", other.getName(), ":");
+        lb.add("Evaluate trade offer from ", other.getName());
         TradeStatus result = null;
 
         int unacceptable = 0;
         for (TradeItem item : agreement.getTradeItems()) {
-            int value;
+            if (item instanceof StanceTradeItem) {
+                getNationSummary(other); // Freshen the name summary cache
+            }                    
+            int value = item.evaluateFor(player);
             if (item instanceof GoldTradeItem) {
                 cash = item;
-                int gold = item.getGold();
-                if (item.getSource() == player) {
-                    value = (player.checkGold(gold)) ? -gold
-                        : Integer.MIN_VALUE;
-                } else {
-                    value = gold;
-                }
-
-            } else if (item instanceof ColonyTradeItem) {
-                Colony colony = item.getColony(getGame());
-                if (item.getSource() == player) {
-                    if (!player.owns(colony)
-                        || player.getNumberOfSettlements() < 5) {
-                        value = Integer.MIN_VALUE;
-                    } else {
-                        value = -evaluateColony(colony);
-                    }
-                } else {
-                    if (player.owns(colony)) {
-                        value = Integer.MIN_VALUE;
-                    } else {
-                        value = evaluateColony(colony);
-                    }
-                }
-
-            } else if (item instanceof GoodsTradeItem) {
-                // FIXME: Unchecked!
-                Goods goods = item.getGoods();
-                if (item.getSource() == player) {
-                    value = -market.getBidPrice(goods.getType(),
-                                                goods.getAmount());
-                } else {
-                    value = market.getSalePrice(goods.getType(),
-                                                goods.getAmount());
-                }
-
-            } else if (item instanceof InciteTradeItem) { // FIXME: rebalance
-                Player victim = item.getVictim();
-                switch (player.getStance(victim)) {
-                case ALLIANCE:
-                    value = Integer.MIN_VALUE;
-                    break;
-                case WAR: // Not invalid, other player may not know our stance
-                    value = 0;
-                    break;
-                default:
-                    double ratio = getStrengthRatio(victim);
-                    if (item.getSource() == player) {
-                        value = -(int)Math.round(30 * ratio);
-                    } else {
-                        value = (int)Math.round(30 * ratio);
-                    }
-                    break;
-                }
-
             } else if (item instanceof StanceTradeItem) {
-                double ratio = getStrengthRatio(other);
-                // FIXME: evaluate whether we want this stance change
-                Stance stance = item.getStance();
-                switch (stance) {
-                case WAR:
-                    if (ratio < 0.33) {
-                        value = Integer.MIN_VALUE;
-                    } else if (ratio < 0.5) {
-                        value = -(int)Math.round(100 * ratio);
-                    } else {
-                        value = (int)Math.round(100 * ratio);
-                    }
-                    break;
-                case PEACE:
-                    if (agreement.getContext()
-                        == DiplomaticTrade.TradeContext.CONTACT) {
-                        peace = item;
-                        value = 0;
-                        break;
-                    }
-                    // Fall through
-                case CEASE_FIRE: case ALLIANCE:
+                // Handle some special cases
+                switch (item.getStance()) {
+                case ALLIANCE: case CEASE_FIRE:
                     if (franklin) {
                         peace = item;
                         value = 0;
-                    } else if (ratio > 0.66) {
-                        value = Integer.MIN_VALUE;
-                    } else if (ratio > 0.5) {
-                        value = -(int)Math.round(100 * ratio);
-                    } else if (ratio > 0.33) {
-                        value = (int)Math.round(100 * ratio);
-                    } else {
-                        value = 1000;
-                    }                       
+                    }
                     break;
-                case UNCONTACTED: default:
-                    value = Integer.MIN_VALUE;
+                case PEACE:
+                    if (agreement.getContext() == DiplomaticTrade.TradeContext.CONTACT) {
+                        peace = item;
+                        value = 0;
+                    }
                     break;
                 }
-
-            } else if (item instanceof UnitTradeItem) {
-                Unit unit = item.getUnit();
-                if (item.getSource() == player) {
-                    if (!player.owns(unit) || player.getUnits().size() < 10) {
-                        value = Integer.MIN_VALUE;
-                    } else {
-                        value = -evaluateUnit(unit);
-                    }
-                } else {
-                    if (player.owns(unit)) {
-                        value = Integer.MIN_VALUE; // Invalid
-                    } else {
-                        value = evaluateUnit(unit);
-                    }
-                }
-
-            } else {
-                throw new RuntimeException("Bogus item: " + item);
             }
-
             if (value == Integer.MIN_VALUE) unacceptable++;
             scores.put(item, value);
-            lb.add(" ", Messages.message(item.getLabel()), " = ", value);
+            lb.add(", ", Messages.message(item.getLabel()), " = ", value);
         }
-
+        lb.add(".");
+        
         // If too many items are unacceptable, reject
         double ratio = (double)unacceptable
             / (unacceptable + agreement.getTradeItems().size());
         if (ratio > 0.5 - 0.5 * agreement.getVersion()) {
             result = rejectAgreement(peace, agreement);
-            lb.add(", Too many (", unacceptable, ") unacceptable");
+            lb.add("  Too many (", unacceptable, ") unacceptable.");
         }
 
         int value = 0;
@@ -2706,8 +2533,11 @@ public class EuropeanAIPlayer extends AIPlayer {
             for (Entry<TradeItem, Integer> entry : scores.entrySet()) {
                 if (entry.getValue() == Integer.MIN_VALUE) {
                     agreement.remove(entry.getKey());
+                    lb.add("  Dropped invalid ", entry.getKey(), ".");
                 } else {
                     value += entry.getValue();
+                    lb.add("  Added valid ", entry.getKey(), " value = ", value,
+                           ".");
                 }
             }
             // If the result is non-negative,
@@ -2719,16 +2549,15 @@ public class EuropeanAIPlayer extends AIPlayer {
                     : (unacceptable == 0) ? TradeStatus.ACCEPT_TRADE
                     : (agreement.isEmpty()) ? TradeStatus.REJECT_TRADE
                     : TradeStatus.PROPOSE_TRADE;
-                lb.add(", Value = ", value);
             }
+            lb.add("  Total = ", value, ".");
         }
 
-        if (result == null) {
-            // Give up?
+        if (result == null) { // Give up?
             if (randomInt(logger, "Enough diplomacy?", getAIRandom(),
                           1 + agreement.getVersion()) > 5) {
                 result = rejectAgreement(peace, agreement);
-                lb.add(", Ran out of patience at ", agreement.getVersion());
+                lb.add("  Ran out of patience at ", agreement.getVersion(), ".");
             }
         }
 
@@ -2748,13 +2577,14 @@ public class EuropeanAIPlayer extends AIPlayer {
                 value += scores.get(item);
                 agreement.remove(item);
                 if (value > 0) break;
+                lb.add("  Dropped ", item, ", value now = ", value, ".");
             }
             if (value > 0 && !items.isEmpty()) {
                 result = TradeStatus.PROPOSE_TRADE;
-                lb.add(", Pruned until acceptable at ", value);
+                lb.add("  Pruned until acceptable at ", value, ".");
             } else {
                 result = rejectAgreement(peace, agreement);
-                lb.add(", Agreement unsalvageable");
+                lb.add("  Agreement unsalvageable at ", value, ".");
             }
         }
 

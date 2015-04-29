@@ -111,6 +111,23 @@ public class ColonyTradeItem extends TradeItem {
         return game.getFreeColGameObject(colonyId, Colony.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int evaluateFor(Player player) {
+        final Colony colony = getColony(player.getGame());
+        if (colony == null) return Integer.MIN_VALUE;
+        if (getSource() == player) {
+            if (!player.owns(colony)
+                || player.getNumberOfSettlements() < 5) {// FIXME: magic#
+                return Integer.MIN_VALUE;
+            }
+        } else {
+            if (player.owns(colony)) return Integer.MIN_VALUE;
+        }
+        return colony.evaluateFor(player);
+    }
+    
 
     // Serialization
 

@@ -3524,6 +3524,17 @@ public class Unit extends GoodsLocation
             : 0;
     }
 
+    /**
+     * Evaluate this unit for trade purposes.
+     *
+     * @param player The <code>Player</code> to evaluate for.
+     * @return A value of this unit.
+     */
+    public int evaluateFor(Player player) {
+        final Europe europe = player.getEurope();
+        return (europe == null) ? 500 : europe.getUnitPrice(getType());
+    }
+
     // @compat 0.11.0
     /**
      * Get modifiers required for combat.

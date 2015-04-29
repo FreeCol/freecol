@@ -356,6 +356,21 @@ public class Building extends WorkLocation
         return result;
     }
 
+    /**
+     * Evaluate this work location for a given player.
+     *
+     * @param player The <code>Player</code> to evaluate for.
+     * @return A value for the player.
+     */
+    @Override
+    public int evaluateFor(Player player) {
+        int result = 0;
+        for (AbstractGoods ag : getType().getRequiredGoods()) {
+            result += ag.evaluateFor(player);
+        }
+        return result + super.evaluateFor(player);
+    }
+        
 
     // Interface Location
     // Inherits:

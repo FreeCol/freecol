@@ -196,6 +196,18 @@ public class AbstractGoods extends FreeColObject implements Named {
         return (ag == null) ? 0 : ag.getAmount();
     }
 
+    /**
+     * Evaluate goods for trade purposes.
+     *
+     * @param player The <code>Player</code> to evaluate for.
+     * @return A value for the goods.
+     */
+    public int evaluateFor(Player player) {
+        final Market market = player.getMarket();
+        return (market == null) ? getAmount() * 2 // FIXME: magic#
+            : market.getSalePrice(getType(), getAmount());
+    }
+
 
     // Interface Named
 

@@ -105,6 +105,16 @@ public class GoldTradeItem extends TradeItem {
         this.gold = gold;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int evaluateFor(Player player) {
+        int gold = getGold();
+        return (getSource() == player)
+            ? (player.checkGold(gold)) ? -gold : Integer.MIN_VALUE
+            : gold;
+    }
+
 
     // Serialization
 

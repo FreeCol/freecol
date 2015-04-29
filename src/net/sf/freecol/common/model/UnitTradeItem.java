@@ -106,6 +106,19 @@ public class UnitTradeItem extends TradeItem {
         this.unit = unit;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int evaluateFor(Player player) {
+        final Unit unit = getUnit();
+        return (getSource() == player)
+            ? ((!player.owns(unit) || player.getUnits().size() < 10)
+                ? Integer.MIN_VALUE
+                : -unit.evaluateFor(player))
+            : ((player.owns(unit)) ? Integer.MIN_VALUE
+                : unit.evaluateFor(player));
+    }
+
 
     // Serialization
 
