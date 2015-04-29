@@ -29,6 +29,7 @@ import javax.swing.JMenuBar;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -70,6 +71,7 @@ public class FreeColFrame extends JFrame {
             ? new WindowedFrameListener(freeColClient)
             : new FullScreenFrameListener(freeColClient, this));
         setCanvas(canvas);
+        setIconImage(ResourceManager.getImage("image.miscicon.FrameIcon"));
         if (windowed && bounds != null) {
             setBounds(bounds);
         } else {

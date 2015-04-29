@@ -287,7 +287,6 @@ public final class Canvas extends JDesktopPane {
 
         createKeyBindings();
         changeWindowedMode(windowed);
-        frame.setIconImage(ResourceManager.getImage("image.miscicon.FrameIcon"));
         logger.info("Canvas created.");
     }
 
