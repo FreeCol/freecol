@@ -130,14 +130,14 @@ public final class Utility {
     public static final Insets EMPTY_MARGIN = new Insets(0, 0, 0, 0);
 
     /** A style context to use for panels and dialogs. */
-    public static final StyleContext STYLE_CONTEXT = new StyleContext();
-    static {
+    public static StyleContext STYLE_CONTEXT = null;
+
+    public static void initStyleContext(Font font) {
         Style defaultStyle = StyleContext.getDefaultStyleContext()
             .getStyle(StyleContext.DEFAULT_STYLE);
 
+        STYLE_CONTEXT = new StyleContext();
         Style regular = STYLE_CONTEXT.addStyle("regular", defaultStyle);
-        Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                                           FontLibrary.FontSize.TINY);
         StyleConstants.setFontFamily(regular, font.getFamily());
         StyleConstants.setFontSize(regular, font.getSize());
 

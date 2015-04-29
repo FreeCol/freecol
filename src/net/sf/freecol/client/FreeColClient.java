@@ -151,7 +151,7 @@ public final class FreeColClient {
         }
 
         // Get the splash screen up early on to show activity.
-        gui = new GUI(this, headless);
+        gui = new GUI(this, headless, 1.0f);
         gui.displaySplashScreen(splashFilename);
 
         // Look for base data directory.  Failure is fatal.
@@ -212,7 +212,7 @@ public final class FreeColClient {
         if (!headless) {
             // Swing system and look-and-feel initialization.
             try {
-                GUI.installLookAndFeel(fontName);
+                gui.installLookAndFeel(fontName);
             } catch (Exception e) {
                 fatal(Messages.message("client.laf") + "\n" + e.getMessage());
             }

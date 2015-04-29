@@ -103,9 +103,10 @@ public class FontLibrary {
      * 
      * @param fontName Can be used to choose a different font from a
      *                 user-provided name.
+     * @param scaleFactor  The applied scale factor.
     */
-    static Font createMainFont(String fontName) {
-        final float defaultSize = 12f;
+    static Font createMainFont(String fontName, float scaleFactor) {
+        final float defaultSize = 12f * scaleFactor;
         mainFont = null;
         if (fontName != null) {
             Font font = Font.decode(fontName);

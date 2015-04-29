@@ -232,11 +232,12 @@ public class GUI {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param headless If the game is running headless.
+     * @param scaleFactor The scale factor for the GUI.
      */
-    public GUI(FreeColClient freeColClient, boolean headless) {
+    public GUI(FreeColClient freeColClient, boolean headless, float scaleFactor) {
         this.freeColClient = freeColClient;
         this.graphicsDevice = headless ? null : getGoodGraphicsDevice();
-        this.imageLibrary = new ImageLibrary();
+        this.imageLibrary = new ImageLibrary(scaleFactor);
     }
 
 
@@ -273,11 +274,13 @@ public class GUI {
      * 
      * @param fontName An optional font name to be used.
      */
-    public static void installLookAndFeel(String fontName) throws FreeColException {
+    public void installLookAndFeel(String fontName) throws FreeColException {
         FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
         FreeColLookAndFeel.install(fclaf);
-        Font font = FontLibrary.createMainFont(fontName);
+        Font font = FontLibrary.createMainFont(
+            fontName, imageLibrary.getScalingFactor());
         FreeColLookAndFeel.installFont(font);
+        Utility.initStyleContext(font);
     }
 
     /**
