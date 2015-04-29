@@ -22,17 +22,14 @@ package net.sf.freecol.client.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.DisplayMode;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -99,7 +96,6 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -807,21 +803,22 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Set the blinking state.  Switching it on again needs to check
+     * Restart blinking on the map.  Switching it on again needs to check
      * for the presence of other dialogs.
-     *
-     * @param on The new desired blinking state.
      */
-    private void setBlinking(boolean on) {
-        if (on) {
-            for (FreeColDialog<?> f : dialogs) {
-                if (f.isModal()) return;
-            }
-            mapViewer.restartBlinking();
-        } else {
-            if (gui.getViewMode() != GUI.MOVE_UNITS_MODE) return;
-            mapViewer.stopBlinking();
+    private void restartBlinking() {
+        for (FreeColDialog<?> f : dialogs) {
+            if (f.isModal()) return;
         }
+        mapViewer.restartBlinking();
+    }
+
+    /**
+     * Stop blinking on the map.
+     */
+    private void stopBlinking() {
+        if (gui.getViewMode() != GUI.MOVE_UNITS_MODE) return;
+        mapViewer.stopBlinking();
     }
 
     /**
@@ -839,7 +836,7 @@ public final class Canvas extends JDesktopPane {
         T response = freeColDialog.getResponse();
         remove(freeColDialog);
         dialogRemove(freeColDialog);
-        if (freeColDialog.isModal()) setBlinking(true);
+        if (freeColDialog.isModal()) restartBlinking();
         return response;
     }
 
@@ -1436,7 +1433,7 @@ public final class Canvas extends JDesktopPane {
                 freeColDialog.getWidth(), freeColDialog.getHeight(),
                 getPopupPosition(tile)));
         dialogAdd(freeColDialog);
-        if (freeColDialog.isModal()) setBlinking(false);
+        if (freeColDialog.isModal()) stopBlinking();
         freeColDialog.requestFocus();
         freeColDialog.setVisible(true);
     }
