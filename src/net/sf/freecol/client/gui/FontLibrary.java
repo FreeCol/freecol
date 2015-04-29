@@ -81,6 +81,7 @@ public class FontLibrary {
 
     /**
      * Create a <code>FontLibrary</code> without scaling.
+     * Probably not worth using, as you could just use the static methods.
      */
     public FontLibrary() {
         this.scaleFactor = 1f;
@@ -88,6 +89,7 @@ public class FontLibrary {
 
     /**
      * Create a <code>FontLibrary</code> with scaling.
+     * Useful if you need many different fonts.
      * 
      * @param scaleFactor How much scaling should be applied.
      *                    Typically the same value as in ImageLibrary.
@@ -140,6 +142,10 @@ public class FontLibrary {
 
     /**
      * Create a <code>Font</code> in rare case one is needed without scaling.
+     * Do not use this for normal text, as it leaves out the scaling factor
+     * you should get from the appropriate ImageLibrary (there are 3 in use)!
+     * Exceptions are currently big headers and things where gui elements are
+     * not made flexible enough already to allow a changed size.
      * 
      * @param fontType How the font should look like.
      * @param fontSize Its size.
@@ -157,8 +163,12 @@ public class FontLibrary {
     }
 
     /**
-     * Create a scaled <code>Font</code> whe the scale factor is provided
+     * Create a scaled <code>Font</code> where the scale factor is provided
      * explicitly in the parameter.
+     * The equivalent of regular text, which would only complicate the
+     * source code and slow down the game if used, would be:
+     * createFont(FontType.NORMAL, FontSize.TINY, Font.PLAIN,
+     *            gui.getImageLibrary().getScalingFactor());
      * 
      * @param fontType How the font should look like.
      * @param fontSize Its relative size.
