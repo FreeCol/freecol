@@ -316,7 +316,6 @@ public final class Canvas extends JDesktopPane {
             });
         }
 
-        mapViewer.forceReposition();
         updateSizes();
         frame.setVisible(true);
     }
