@@ -93,7 +93,8 @@ public final class ColopediaPanel extends FreeColPanel
 
         add(okButton, "newline 20, span, tag ok");
 
-        getGUI().restoreSavedSize(this, 1050, 725);
+        float scale = getImageLibrary().getScalingFactor();
+        getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
         tree = buildTree();
 
         select(id);
@@ -137,7 +138,9 @@ public final class ColopediaPanel extends FreeColPanel
         tree = new JTree(treeModel) {
                 @Override
                 public Dimension getPreferredSize() {
-                    return new Dimension(200, super.getPreferredSize().height);
+                    return new Dimension(
+                        (int)(200 * getImageLibrary().getScalingFactor()),
+                        super.getPreferredSize().height);
                 }
             };
         tree.setRootVisible(false);

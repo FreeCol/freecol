@@ -343,7 +343,8 @@ public final class ColonyPanel extends PortPanel
             JComponent.WHEN_IN_FOCUSED_WINDOW, nameIM);
 
         initialize(colony);
-        getGUI().restoreSavedSize(this, 1050, 725);
+        float scale = getImageLibrary().getScalingFactor();
+        getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
     }
 
 
