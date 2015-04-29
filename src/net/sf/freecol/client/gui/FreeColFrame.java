@@ -85,13 +85,13 @@ public class FreeColFrame extends JFrame {
 
         if(!windowed || bounds==null || bounds.width<=0 || bounds.height<=0) {
             bounds = gd.getDefaultConfiguration().getBounds();
-        }
-        if (windowed) {
-            Insets screenInsets = Toolkit.getDefaultToolkit()
-                    .getScreenInsets(gd.getDefaultConfiguration());
-            bounds = new Rectangle(0, 0,
-                bounds.width - (bounds.x+screenInsets.left+screenInsets.right),
-                bounds.height - (bounds.y+screenInsets.top+screenInsets.bottom));
+            if (windowed) {
+                Insets screenInsets = Toolkit.getDefaultToolkit()
+                        .getScreenInsets(gd.getDefaultConfiguration());
+                bounds = new Rectangle(0, 0,
+                    bounds.width - (bounds.x+screenInsets.left+screenInsets.right),
+                    bounds.height - (bounds.y+screenInsets.top+screenInsets.bottom));
+            }
         }
         setBounds(bounds);
         logger.info("Frame created in size " + bounds.width + "x" + bounds.height);
