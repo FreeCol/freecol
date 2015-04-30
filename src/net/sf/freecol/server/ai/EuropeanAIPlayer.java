@@ -2567,9 +2567,9 @@ public class EuropeanAIPlayer extends AIPlayer {
             // if none are left.
             List<TradeItem> items = new ArrayList<>(agreement.getTradeItems());
             Collections.sort(items, new Comparator<TradeItem>() {
-                @Override
+                    @Override
                     public int compare(TradeItem t1, TradeItem t2) {
-                        return scores.get(t1) - scores.get(t2);
+                        return scores.get(t2) - scores.get(t1);
                     }
                 });
             while (!items.isEmpty()) {
