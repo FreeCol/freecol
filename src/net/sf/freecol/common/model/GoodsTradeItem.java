@@ -114,11 +114,20 @@ public class GoodsTradeItem extends TradeItem {
     public int evaluateFor(Player player) {
         final Market market = player.getMarket();
         final Goods goods = getGoods();
-        return (market == null)
-            ? goods.getAmount() * 2 // FIXME: magic#
-            : (getSource() == player)
-            ? -market.getBidPrice(goods.getType(), goods.getAmount())
-            :  market.getSalePrice(goods.getType(), goods.getAmount());
+        int value;
+        if (market == null) {
+            value = 2 * goods.getAmount();
+            if (getSource() == player) value = -value;
+        } else {
+            if (getSource() == player) {
+                value = -market.getBidPrice(goods.getType(), goods.getAmount());
+            } else {
+                value = market.getSalePrice(goods.getType(), goods.getAmount());
+                value = (int)Math.round(value
+                    * (1.0 - player.getTax() / 100.0));
+            }
+        }
+        return value;
     }
 
     // Override Object

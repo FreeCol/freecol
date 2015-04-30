@@ -113,20 +113,21 @@ public class StanceTradeItem extends TradeItem {
     public int evaluateFor(Player player) {
         final Stance stance = getStance();
         final double ratio = player.getStrengthRatio(getOther(player), false);
+        int value = (int)Math.round(100 * ratio);
         switch (stance) {
         case WAR:
-            return (ratio < 0.33) ? Integer.MIN_VALUE
-                : (ratio < 0.5) ? -(int)Math.round(100 * ratio)
-                : (int)Math.round(100 * ratio);
-        case PEACE: case CEASE_FIRE: case ALLIANCE:
-            return (ratio > 0.66) ? Integer.MIN_VALUE
-                : (ratio > 0.5) ? -(int)Math.round(100 * ratio)
-                : (ratio > 0.33) ? (int)Math.round(100 * ratio)
-                : 1000;
-        case UNCONTACTED: default:
+            if (ratio < 0.33) return Integer.MIN_VALUE;
+            if (ratio < 0.5) value = -value;
             break;
+        case PEACE: case CEASE_FIRE: case ALLIANCE:
+            if (ratio > 0.66) return Integer.MIN_VALUE;
+            if (ratio > 0.5) value = -value;
+            else if (ratio < 0.33) value = 1000;
+            break;
+        case UNCONTACTED: default:
+            return Integer.MIN_VALUE;
         }
-        return Integer.MIN_VALUE;
+        return (getSource() == player) ? -value : value;
     }
 
 

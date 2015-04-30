@@ -2513,9 +2513,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                     break;
                 }
             }
+            lb.add(", ", Messages.message(item.getLabel()), " = ", value);
             if (value == Integer.MIN_VALUE) unacceptable++;
             scores.put(item, value);
-            lb.add(", ", Messages.message(item.getLabel()), " = ", value);
         }
         lb.add(".");
         
@@ -2536,7 +2536,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     lb.add("  Dropped invalid ", entry.getKey(), ".");
                 } else {
                     value += entry.getValue();
-                    lb.add("  Added valid ", entry.getKey(), " value = ", value,
+                    lb.add("  Added valid ", entry.getKey(), ", total = ", value,
                            ".");
                 }
             }
@@ -2569,14 +2569,21 @@ public class EuropeanAIPlayer extends AIPlayer {
             Collections.sort(items, new Comparator<TradeItem>() {
                     @Override
                     public int compare(TradeItem t1, TradeItem t2) {
-                        return scores.get(t2) - scores.get(t1);
+                        return scores.get(t1) - scores.get(t2);
                     }
                 });
-            while (!items.isEmpty()) {
+            while (!items.isEmpty() && value < 0) {
                 TradeItem item = items.remove(0);
-                value += scores.get(item);
+                value -= scores.get(item);
+                if (value >= 50 && item instanceof GoldTradeItem) {
+                    // Counter offer smaller amount of gold, FIXME: magic#
+                    GoldTradeItem gti = (GoldTradeItem)item;
+                    gti.setGold(gti.getGold() - value / 2);
+                    value /= 2;
+                    lb.add("  Reducing gold item to ", gti.getGold(), ".");
+                    break;
+                }
                 agreement.remove(item);
-                if (value > 0) break;
                 lb.add("  Dropped ", item, ", value now = ", value, ".");
             }
             if (value > 0 && !items.isEmpty()) {
