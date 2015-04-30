@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Stance;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -229,8 +230,34 @@ public abstract class TradeItem extends FreeColObject {
      * @return A value for the player, MIN_VALUE for invalid.
      */
     public abstract int evaluateFor(Player player);
-    
-    
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof TradeItem) {
+            return Utils.equals(this.source, ((TradeItem)other).source)
+                && Utils.equals(this.destination, ((TradeItem)other).destination)
+                && super.equals(other);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(source);
+        return 37 * hash + Utils.hashCode(destination);
+    }
+
+
     // Serialization
 
     private static final String DESTINATION_TAG = "destination";

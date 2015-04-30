@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -128,6 +129,32 @@ public class ColonyTradeItem extends TradeItem {
         return colony.evaluateFor(player);
     }
     
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof ColonyTradeItem) {
+            return Utils.equals(this.colonyId, ((ColonyTradeItem)other).colonyId)
+                && Utils.equals(this.colonyName, ((ColonyTradeItem)other).colonyName)
+                && super.equals(other);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.colonyId);
+        return 37 * hash + Utils.hashCode(this.colonyName);
+    }
+
 
     // Serialization
 

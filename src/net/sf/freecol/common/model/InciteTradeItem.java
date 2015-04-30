@@ -25,6 +25,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -119,6 +120,30 @@ public class InciteTradeItem extends TradeItem {
             : (int)Math.round(30 * ratio);
     }
     
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof InciteTradeItem) {
+            return Utils.equals(this.victim, ((InciteTradeItem)other).victim)
+                && super.equals(other);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        return 37 * hash + Utils.hashCode(this.victim);
+    }
+
 
     // Serialization
 

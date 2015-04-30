@@ -25,6 +25,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Stance;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -126,6 +127,30 @@ public class StanceTradeItem extends TradeItem {
             break;
         }
         return Integer.MIN_VALUE;
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof StanceTradeItem) {
+            return this.stance == ((StanceTradeItem)other).stance
+                && super.equals(other);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        return 37 * hash + Utils.hashCode(this.stance);
     }
 
 

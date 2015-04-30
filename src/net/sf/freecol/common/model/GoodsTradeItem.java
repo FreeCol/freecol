@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -120,7 +121,30 @@ public class GoodsTradeItem extends TradeItem {
             :  market.getSalePrice(goods.getType(), goods.getAmount());
     }
 
-        
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof GoodsTradeItem) {
+            return Utils.equals(this.goods, ((GoodsTradeItem)other).goods)
+                && super.equals(other);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        return 37 * hash + Utils.hashCode(this.goods);
+    }
+
+
     // Serialization
 
     /**

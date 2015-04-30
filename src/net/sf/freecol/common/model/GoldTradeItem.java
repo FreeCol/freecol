@@ -116,6 +116,30 @@ public class GoldTradeItem extends TradeItem {
     }
 
 
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof GoldTradeItem) {
+            return this.gold == ((GoldTradeItem)other).gold
+                && super.equals(other);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        return 37 * hash + this.gold;
+    }
+
+
     // Serialization
 
     private static final String GOLD_TAG = "gold";
