@@ -228,25 +228,6 @@ public abstract class ServerAPI {
             return null;
         }
 
-        // Process multiple returns, pick out expected element
-        if (!"multiple".equals(tag) && "multiple".equals(reply.getTagName())) {
-            List<Element> replies = new ArrayList<>();
-            NodeList nodes = reply.getChildNodes();
-            Element result = null;
-
-            for (int i = 0; i < nodes.getLength(); i++) {
-                if (nodes.item(i) instanceof Element
-                    && ((Element)nodes.item(i)).getTagName().equals(tag)) {
-                    result = (Element)nodes.item(i);
-                    continue;
-                }
-                Element e = client.handleReply((Element)nodes.item(i));
-                if (e != null) replies.add(e);
-            }
-            resolve(DOMMessage.collapseElements(replies));
-            if (result != null) reply = result;
-        }
-
         // Success!
         if (tag == null || tag.equals(reply.getTagName())) {
             // Do the standard processing.
@@ -269,6 +250,25 @@ public abstract class ServerAPI {
                 }
             }
             return reply;
+        }
+
+        // Process multiple returns, pick out expected element if present
+        if ("multiple".equals(reply.getTagName())) {
+            List<Element> replies = new ArrayList<>();
+            NodeList nodes = reply.getChildNodes();
+            Element result = null;
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                if (nodes.item(i) instanceof Element
+                    && ((Element)nodes.item(i)).getTagName().equals(tag)) {
+                    result = (Element)nodes.item(i);
+                } else {
+                    Element e = client.handleReply((Element)nodes.item(i));
+                    if (e != null) replies.add(e);
+                }
+            }
+            resolve(DOMMessage.collapseElements(replies));
+            if (result != null) return result;
         }
 
         // Unexpected reply.  Whine and fail.
