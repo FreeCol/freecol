@@ -2060,12 +2060,12 @@ public class GUI {
             });
     }
 
-    public DiplomaticTrade showDiplomaticTradeDialog(FreeColGameObject our,
+    public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
                                                      FreeColGameObject other,
                                                      DiplomaticTrade agreement,
                                                      StringTemplate comment) {
         if (canvas == null) return null;
-        return canvas.showDiplomaticTradeDialog(our, other, agreement, comment);
+        return canvas.showNegotiationDialog(our, other, agreement, comment);
     }
 
     public void showNewPanel() {

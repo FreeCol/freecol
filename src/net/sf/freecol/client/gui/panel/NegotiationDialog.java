@@ -77,9 +77,9 @@ import net.sf.freecol.common.model.UnitTradeItem;
 /**
  * The panel that allows negotiations between players.
  */
-public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> {
+public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
-    private static final Logger logger = Logger.getLogger(DiplomaticTradeDialog.class.getName());
+    private static final Logger logger = Logger.getLogger(NegotiationDialog.class.getName());
 
     private static final int HUGE_DEMAND = 100000;
 
@@ -197,11 +197,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             final String command = event.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
-                    DiplomaticTradeDialog.this.addColonyTradeItem(source,
+                    NegotiationDialog.this.addColonyTradeItem(source,
                             (Colony)colonyBox.getSelectedItem());
                     break;
                 case CLEAR:
-                    DiplomaticTradeDialog.this
+                    NegotiationDialog.this
                             .removeTradeItems(ColonyTradeItem.class);
                     break;
                 default:
@@ -275,10 +275,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             if (null != command) switch (command) {
                 case ADD:
                     int amount = ((Integer)spinner.getValue());
-                    DiplomaticTradeDialog.this.addGoldTradeItem(source, amount);
+                    NegotiationDialog.this.addGoldTradeItem(source, amount);
                     break;
                 case CLEAR:
-                    DiplomaticTradeDialog.this
+                    NegotiationDialog.this
                             .removeTradeItems(GoldTradeItem.class);
                     break;
                 default:
@@ -401,11 +401,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             final String command = event.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
-                    DiplomaticTradeDialog.this.addGoodsTradeItem(source,
+                    NegotiationDialog.this.addGoodsTradeItem(source,
                             (Goods)goodsBox.getSelectedItem());
                     break;
                 case CLEAR:
-                    DiplomaticTradeDialog.this
+                    NegotiationDialog.this
                             .removeTradeItems(GoodsTradeItem.class);
                     break;
                 default:
@@ -522,11 +522,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
                 case ADD:
                     Player victim = (Player)victimBox.getSelectedItem();
                     if (victim != null) {
-                        DiplomaticTradeDialog.this
+                        NegotiationDialog.this
                                 .addInciteTradeItem(source, victim);
                     }   break;
                 case CLEAR:
-                    DiplomaticTradeDialog.this
+                    NegotiationDialog.this
                             .removeTradeItems(InciteTradeItem.class);
                     break;
                 default:
@@ -643,10 +643,10 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             if (null != command) switch (command) {
                 case ADD:
                     Stance stance = (Stance)stanceBox.getSelectedItem();
-                    DiplomaticTradeDialog.this.addStanceTradeItem(stance);
+                    NegotiationDialog.this.addStanceTradeItem(stance);
                     break;
                 case CLEAR:
-                    DiplomaticTradeDialog.this
+                    NegotiationDialog.this
                             .removeTradeItems(StanceTradeItem.class);
                     break;
                 default:
@@ -762,11 +762,11 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
             final String command = event.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
-                    DiplomaticTradeDialog.this.addUnitTradeItem(source,
+                    NegotiationDialog.this.addUnitTradeItem(source,
                             (Unit)unitBox.getSelectedItem());
                     break;
                 case CLEAR:
-                    DiplomaticTradeDialog.this
+                    NegotiationDialog.this
                             .removeTradeItems(UnitTradeItem.class);
                     break;
                 default:
@@ -805,7 +805,7 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
 
 
     /**
-     * Creates a new <code>DiplomaticTradeDialog</code> instance.
+     * Creates a new <code>NegotiationDialog</code> instance.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param frame The owner frame.
@@ -816,9 +816,9 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
      * @param comment An optional <code>StringTemplate</code>
      *     commentary message.
      */
-    public DiplomaticTradeDialog(FreeColClient freeColClient, JFrame frame,
-            FreeColGameObject our, FreeColGameObject other,
-            DiplomaticTrade agreement, StringTemplate comment) {
+    public NegotiationDialog(FreeColClient freeColClient, JFrame frame,
+                             FreeColGameObject our, FreeColGameObject other,
+                             DiplomaticTrade agreement, StringTemplate comment) {
         super(freeColClient, frame);
 
         final Player player = getMyPlayer();
@@ -828,15 +828,13 @@ public final class DiplomaticTradeDialog extends FreeColDialog<DiplomaticTrade> 
         final Colony otherColony = (other instanceof Colony) ? (Colony)other
             : null;
 
-        StringTemplate t;
-
         this.otherPlayer = ((Ownable)other).getOwner();
         this.agreement = agreement;
         this.comment = comment;
 
         StringTemplate nation = player.getNationName(),
             otherNation = otherPlayer.getNationName();
-        t = StringTemplate.template("negotiationDialog.demand")
+        StringTemplate t = StringTemplate.template("negotiationDialog.demand")
             .addStringTemplate("%nation%", nation)
             .addStringTemplate("%otherNation%", otherNation);
         this.demandMessage = Messages.message(t);

@@ -2119,7 +2119,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the <code>DiplomaticTradeDialog</code>.
+     * Displays the <code>NegotiationDialog</code>.
      *
      * @param our Our <code>FreeColGameObject</code> that is negotiating.
      * @param other The other <code>FreeColGameObject</code>.
@@ -2128,16 +2128,16 @@ public final class Canvas extends JDesktopPane {
      *     commentary message.
      * @return An updated agreement.
      */
-    DiplomaticTrade showDiplomaticTradeDialog(FreeColGameObject our,
-                                                     FreeColGameObject other,
-                                                     DiplomaticTrade agreement,
-                                                     StringTemplate comment) {
+    DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
+                                          FreeColGameObject other,
+                                          DiplomaticTrade agreement,
+                                          StringTemplate comment) {
         if ((!(our instanceof Unit) && !(our instanceof Colony))
             || (!(other instanceof Unit) && !(other instanceof Colony))
             || (our instanceof Colony && other instanceof Colony)) {
             throw new RuntimeException("Bad DTD args: " + our + ", " + other);
         }
-        DiplomaticTradeDialog dtd = new DiplomaticTradeDialog(freeColClient, frame,
+        NegotiationDialog dtd = new NegotiationDialog(freeColClient, frame,
             our, other, agreement, comment);
         return showFreeColDialog(dtd, ((Location)our).getTile());
     }

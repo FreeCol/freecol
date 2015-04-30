@@ -1255,7 +1255,7 @@ public final class InGameController implements NetworkConstants {
 
             // If it was a counter proposal, consider it.
             if (dt != null) {
-                dt = gui.showDiplomaticTradeDialog(unit, colony, dt,
+                dt = gui.showNegotiationDialog(unit, colony, dt,
                     dt.getSendMessage(player, colony));
             }
         }
@@ -1589,7 +1589,7 @@ public final class InGameController implements NetworkConstants {
             DiplomaticTrade agreement
                 = new DiplomaticTrade(game, TradeContext.DIPLOMATIC,
                                       player, colony.getOwner(), null, 0);
-            agreement = gui.showDiplomaticTradeDialog(unit, colony,
+            agreement = gui.showNegotiationDialog(unit, colony,
                 agreement, agreement.getSendMessage(player, colony));
             return (agreement == null
                 || agreement.getStatus() == TradeStatus.REJECT_TRADE) ? true
@@ -1699,7 +1699,7 @@ public final class InGameController implements NetworkConstants {
             DiplomaticTrade agreement
                 = new DiplomaticTrade(game, TradeContext.TRADE,
                     player, settlement.getOwner(), null, 0);
-            agreement = gui.showDiplomaticTradeDialog(unit, settlement,
+            agreement = gui.showNegotiationDialog(unit, settlement,
                 agreement, agreement.getSendMessage(player, settlement));
             return (agreement == null
                 || agreement.getStatus() == TradeStatus.REJECT_TRADE) ? true
@@ -3052,7 +3052,7 @@ public final class InGameController implements NetworkConstants {
         case PROPOSE_TRADE:
             t = agreement.getReceiveMessage(otherPlayer);
             DiplomaticTrade ourAgreement
-                = gui.showDiplomaticTradeDialog(our, other, agreement, t);
+                = gui.showNegotiationDialog(our, other, agreement, t);
             if (ourAgreement == null) {
                 agreement.setStatus(TradeStatus.REJECT_TRADE);
             } else {
