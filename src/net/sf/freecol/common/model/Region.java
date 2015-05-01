@@ -171,8 +171,14 @@ public class Region extends FreeColGameObject implements Nameable, Named {
      * @return The i18n-ready name for the region.
      */
     public StringTemplate getLabel() {
-        return (prediscovered || isPacific()) ? StringTemplate.key(nameKey)
-            : (name == null) ? StringTemplate.key(type.getUnknownKey())
+        if (prediscovered || isPacific()) {
+            // @compat 0.10.x
+            // Older region name keys did not end in .name
+            if (!nameKey.endsWith(".name")) return StringTemplate.key(Messages.nameKey(nameKey));
+            // end @compat 0.10.x
+            return StringTemplate.key(nameKey);
+        }
+        return (name == null) ? StringTemplate.key(type.getUnknownKey())
             : StringTemplate.name(name);
     }
 
