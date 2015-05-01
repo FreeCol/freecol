@@ -131,15 +131,22 @@ public final class FreeColClient {
     private final boolean headless;
 
 
+    public FreeColClient(final String splashFilename,
+                         final String fontName) {
+        this(splashFilename, fontName, FreeCol.GUI_SCALE_DEFAULT);
+    }
+
     /**
      * Creates a new <code>FreeColClient</code>.  Creates the control
      * objects.
      *
      * @param splashFilename The name of the splash image.
      * @param fontName An optional override of the main font.
+     * @param scale The scale factor for gui elements.
      */
     public FreeColClient(final String splashFilename,
-                         final String fontName) {
+                         final String fontName,
+                         final float scale) {
         mapEditor = false;
         headless = "true".equals(System.getProperty("java.awt.headless",
                                                     "false"));
@@ -151,7 +158,7 @@ public final class FreeColClient {
         }
 
         // Get the splash screen up early on to show activity.
-        gui = new GUI(this, headless, 1.0f);
+        gui = new GUI(this, headless, scale);
         gui.displaySplashScreen(splashFilename);
 
         // Look for base data directory.  Failure is fatal.

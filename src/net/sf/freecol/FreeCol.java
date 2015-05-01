@@ -117,6 +117,13 @@ public final class FreeCol {
     private static final String TC_DEFAULT = "freecol";
     public static final int     TIMEOUT_DEFAULT = 60; // 1 minute
     public static final int     TIMEOUT_MIN = 10; // 10s
+    private static final int GUI_SCALE_MIN_PCT = 100;
+    private static final int GUI_SCALE_MAX_PCT = 200;
+    private static final int GUI_SCALE_STEP_PCT = 25;
+    public static final float GUI_SCALE_MIN = GUI_SCALE_MIN_PCT / 100.0f;
+    public static final float GUI_SCALE_MAX = GUI_SCALE_MAX_PCT / 100.0f;
+    public static final float GUI_SCALE_STEP = GUI_SCALE_STEP_PCT / 100.0f;
+    public static final float GUI_SCALE_DEFAULT = 1.0f;
 
 
     // Cli values.  Often set to null so the default can be applied in
@@ -169,6 +176,10 @@ public final class FreeCol {
      */
     private static Dimension windowSize = new Dimension(-1, -1);
 
+    /**
+     * How much gui elements get scaled.
+     */
+    private static float guiScale = GUI_SCALE_DEFAULT;
 
 
     private FreeCol() {} // Hide constructor
@@ -472,6 +483,13 @@ public final class FreeCol {
         options.addOption(OptionBuilder.withLongOpt("full-screen")
                           .withDescription(Messages.message("cli.full-screen"))
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("gui-scale")
+                          .withDescription(Messages.message(StringTemplate
+                                  .template("cli.gui-scale")
+                                  .addName("%scales%", getValidGUIScales())))
+                          .withArgName(Messages.message("cli.arg.gui-scale"))
+                          .hasOptionalArg()
+                          .create());
         options.addOption(OptionBuilder.withLongOpt("load-savegame")
                           .withDescription(Messages.message("cli.load-savegame"))
                           .withArgName(Messages.message("cli.arg.file"))
@@ -663,6 +681,15 @@ public final class FreeCol {
 
             if (line.hasOption("full-screen")) {
                 windowSize = null;
+            }
+
+            if (line.hasOption("gui-scale")) {
+                String arg = line.getOptionValue("gui-scale");
+                if(!setGUIScale(arg)) {
+                    gripe(StringTemplate.template("cli.error.gui-scale")
+                        .addName("%scales%", getValidGUIScales())
+                        .addName("%arg%", arg));
+                }
             }
 
             if (line.hasOption("load-savegame")) {
@@ -963,6 +990,50 @@ public final class FreeCol {
     }
 
     /**
+     * Sets the scale for GUI elements.
+     * 
+     * @param arg The optional command line argument to be parsed.
+     * @return If the argument was correctly formatted.
+     */
+    public static boolean setGUIScale(String arg) {
+        boolean valid = true;
+        if(arg == null) {
+            guiScale = GUI_SCALE_MAX;
+        } else {
+            try {
+                int n = Integer.parseInt(arg);
+                if (n < GUI_SCALE_MIN_PCT) {
+                    valid = false;
+                    n = GUI_SCALE_MIN_PCT;
+                } else if(n > GUI_SCALE_MAX_PCT) {
+                    valid = false;
+                    n = GUI_SCALE_MAX_PCT;
+                } else if(n % GUI_SCALE_STEP_PCT != 0) {
+                    valid = false;
+                }
+                guiScale = ((float)(n / GUI_SCALE_STEP_PCT)) * GUI_SCALE_STEP;
+            } catch (NumberFormatException nfe) {
+                valid = false;
+                guiScale = GUI_SCALE_MAX;
+            }
+        }
+        return valid;
+    }
+
+    /**
+     * Gets the valid scale factors for the GUI.
+     * 
+     * @return A string containing these.
+     */
+    public static String getValidGUIScales() {
+        String result = "";
+        for(int i=GUI_SCALE_MIN_PCT; i<GUI_SCALE_MAX_PCT; i+=GUI_SCALE_STEP_PCT)
+            result += i + ",";
+        result += GUI_SCALE_MAX_PCT;
+        return result;
+    }
+
+    /**
      * Selects a European nation count.
      *
      * @param arg The supplied count argument.
@@ -1196,7 +1267,7 @@ public final class FreeCol {
             // savegame was specified on command line
         }
         final FreeColClient freeColClient = new FreeColClient(
-            splashFilename, fontName);
+            splashFilename, fontName, guiScale);
         freeColClient.startClient(
             windowSize, userMsg, sound, introVideo, savegame, spec);
     }
