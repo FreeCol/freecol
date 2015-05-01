@@ -1313,7 +1313,8 @@ public final class FreeCol {
             }
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
+        String quit = FreeCol.SERVER_THREAD + "Quit Game";
+        Runtime.getRuntime().addShutdownHook(new Thread(quit) {
                 @Override
                 public void run() {
                     freeColServer.getController().shutdown();
