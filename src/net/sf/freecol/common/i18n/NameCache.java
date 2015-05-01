@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import static net.sf.freecol.common.util.RandomUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -146,7 +147,8 @@ public class NameCache {
      * @return A key for the player and region type.
      */
     private static String makeRegionKey(Player player, RegionType type) {
-        return player.getNationId() + ".region." + type.getKey() + ".";
+        return player.getNationId() + ".region."
+            + lastPart(type.getKey(), ".") + ".";
     }
 
     /**
