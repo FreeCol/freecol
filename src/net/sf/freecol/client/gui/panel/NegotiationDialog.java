@@ -909,7 +909,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             throw new IllegalStateException("Bogus trade context: " + context);
         }
 
-        this.summary = new MigPanel(new MigLayout("wrap 2", "[20px][]"));
+        this.summary = new MigPanel(new MigLayout("wrap 2", "[20px:n:n][]"));
         this.summary.setOpaque(false);
         this.summary.add(Utility.getDefaultTextArea(comment), "center, span 2");
 
@@ -917,7 +917,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * Build Layout of Diplomatic Trade Dialog
          */
         MigPanel panel = new MigPanel(new MigLayout("wrap 3",
-                "[200, fill][300, fill][200, fill]", ""));
+                "[30%|40%|30%]", ""));
         // Main Panel Header
         panel.add(Utility.localizedHeader("negotiationDialog.title."
                 + agreement.getContext().getKey(), false), 
@@ -989,12 +989,12 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             str = Messages.message("negotiationDialog.cancel");
             c.add(new ChoiceItem<>(str, bogus).cancelOption().defaultOption());
         }
+        updateDialog();
+
         ImageIcon icon = new ImageIcon((otherColony != null)
             ? getImageLibrary().getSettlementImage(otherColony)
             : getImageLibrary().getUnitImage(otherUnit));
         initializeDialog(frame, DialogType.QUESTION, true, panel, icon, c);
-
-        updateDialog();
     }
 
 
