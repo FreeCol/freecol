@@ -41,6 +41,7 @@ import javax.swing.Timer;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.resources.FAFile;
 import net.sf.freecol.common.resources.ResourceManager;
+
 import static net.sf.freecol.common.util.StringUtils.*;
 
 

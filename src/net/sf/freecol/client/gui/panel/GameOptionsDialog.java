@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-
 import javax.swing.JFrame;
 
 import net.sf.freecol.client.FreeColClient;

@@ -36,6 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.FreeCol;
@@ -91,7 +92,7 @@ public final class NewPanel extends FreeColPanel
      * A current difficulty level, driven by the contents of the
      * difficulty box..  Difficulty levels are relative to the rules,
      * so this can be invalidated by a change to the current
-     * specificiation.
+     * specification.
      */
     private OptionGroup difficulty = null;
 

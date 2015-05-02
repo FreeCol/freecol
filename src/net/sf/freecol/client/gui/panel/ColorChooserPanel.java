@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;

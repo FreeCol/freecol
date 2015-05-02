@@ -239,7 +239,6 @@ public final class ReportTradePanel extends ReportPanel {
         return button;
     }
 
-    @Override
     protected Border createBorder() {
         return new EmptyBorder(0, 20, 20, 20);
     }

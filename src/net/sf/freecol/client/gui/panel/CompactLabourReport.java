@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -112,13 +113,15 @@ public final class CompactLabourReport extends ReportPanel {
     public JButton createColonyButton(final Colony colony) {
         String text = colony.getName();
         if (!unitData.isSummary()) {
-//            int unitIndex = unitData.getUnitType().getIndex();
-//
-//            int skillLevel = Unit.getSkillLevel(unitIndex);
-//            if (skillLevel <= 0 && skillLevel > -2) {
-//                //settlers and servants can be trained anywwhere a farmer can
-//                unitIndex = Unit.EXPERT_FARMER;
-//            }
+            /*
+            int unitIndex = unitData.getUnitType().getIndex();
+            
+            int skillLevel = Unit.getSkillLevel(unitIndex);
+            if (skillLevel <= 0 && skillLevel > -2) {
+            //settlers and servants can be trained anywwhere a farmer can
+            unitIndex = Unit.EXPERT_FARMER;
+            }
+            */
 
             if (colony.canTrain(unitData.getUnitType())) {
                 text = text + "*";
@@ -176,7 +179,6 @@ public final class CompactLabourReport extends ReportPanel {
         }
     }
 
-    @Override
     protected Border createBorder() {
         return new EmptyBorder(0, 20, 20, 20);
     }
@@ -270,7 +272,6 @@ public final class CompactLabourReport extends ReportPanel {
         int buildingStartRow = row;
 
         //details
-
         int otherAmateurs = data.getOtherWorkingAmateurs().getColonists();
         if (!allColonists && otherAmateurs > 0) {
             addRow(data,

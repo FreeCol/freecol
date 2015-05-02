@@ -19,10 +19,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import javax.swing.ImageIcon;
-
 import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import net.sf.freecol.client.FreeColClient;

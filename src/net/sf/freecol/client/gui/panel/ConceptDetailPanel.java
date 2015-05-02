@@ -31,6 +31,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;

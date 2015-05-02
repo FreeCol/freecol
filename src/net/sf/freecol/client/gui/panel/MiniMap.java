@@ -288,7 +288,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         unitPath.transform(AffineTransform.getTranslateInstance(0.25 * tileWidth, 0.25 * tileHeight));
         
         GeneralPath paintFull = new GeneralPath(tilePath);
-        paintFull.transform(AffineTransform.getScaleInstance(1, 1));;
+        paintFull.transform(AffineTransform.getScaleInstance(1, 1));
         
         g.setStroke(new BasicStroke(1f));
 

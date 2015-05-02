@@ -66,12 +66,12 @@ public class FoundingFather extends FreeColGameObjectType {
     private final int[] weight = new int[Turn.NUMBER_OF_AGES];
 
     /**
-     * Players that want to elect this founding father must match one
+     * Players that want to elect this Founding Father must match one
      * of these scopes.
      */
     private List<Scope> scopes = null;
 
-    /** The events triggered by this founding father. */
+    /** The events triggered by this Founding Father. */
     private List<Event> events = null;
 
     /** Holds the upgrades of Units caused by this FoundingFather. */
@@ -82,7 +82,7 @@ public class FoundingFather extends FreeColGameObjectType {
 
 
     /**
-     * Create a new founding father.
+     * Create a new Founding Father.
      *
      * @param id The object identifier.
      * @param specification The <code>Specification</code> to refer to.
@@ -153,7 +153,7 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     /**
-     * Set the events this founding father triggers.
+     * Set the events this Founding Father triggers.
      *
      * Public for the test suite.
      *
@@ -184,7 +184,7 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     /**
-     * Set the scopes on this founding father.
+     * Set the scopes on this Founding Father.
      *
      * Public for the test suite.
      *
@@ -205,7 +205,7 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     /**
-     * Get the upgrades triggered by this founding father.
+     * Get the upgrades triggered by this Founding Father.
      *
      * @return A map of old to new <code>UnitType</code>s.
      */
@@ -215,7 +215,7 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     /**
-     * Set the upgrades triggered by this founding father.
+     * Set the upgrades triggered by this Founding Father.
      *
      * Public for the test suite.
      *
@@ -247,7 +247,7 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     /**
-     * Set the units supplied by this founding father.
+     * Set the units supplied by this Founding Father.
      *
      * Public for the test suite.
      *
@@ -268,7 +268,7 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     /**
-     * Is this founding father available to the given player?
+     * Is this Founding Father available to the given player?
      *
      * Note that this does not cover restrictions due to the Age.
      *

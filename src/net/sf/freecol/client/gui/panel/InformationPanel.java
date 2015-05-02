@@ -28,6 +28,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;

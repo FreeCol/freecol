@@ -35,6 +35,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.gui.GUI;

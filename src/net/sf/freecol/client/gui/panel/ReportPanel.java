@@ -120,7 +120,7 @@ public class ReportPanel extends FreeColPanel {
         return unitTypeComparator;
     }
 
-    protected Border createBorder() {
+    private Border createBorder() {
         return new EmptyBorder(20, 20, 20, 20);
     }
 

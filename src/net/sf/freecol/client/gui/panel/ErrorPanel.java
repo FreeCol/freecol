@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;

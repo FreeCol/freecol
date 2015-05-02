@@ -43,6 +43,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.ClientOptions;
