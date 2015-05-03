@@ -83,7 +83,7 @@ public class FatherDetailPanel
         for (FoundingFather foundingFather : getSpecification().getFoundingFathers()) {
             fathersByType.get(foundingFather.getType()).add(foundingFather);
         }
-        ImageIcon icon = new ImageIcon(ImageLibrary.getMiscImage(ImageLibrary.BELLS, ICON_SIZE));
+        ImageIcon icon = new ImageIcon(ImageLibrary.getMiscImage(ImageLibrary.BELLS, ImageLibrary.ICON_SIZE));
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
             String id = FoundingFather.getTypeKey(fatherType);
             String typeName = Messages.message(id);

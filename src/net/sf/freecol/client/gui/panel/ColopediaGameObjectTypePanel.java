@@ -57,7 +57,6 @@ import net.sf.freecol.common.model.UnitType;
 public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectType>
     extends FreeColPanel implements ColopediaDetailPanel<T> {
 
-    public static final Dimension ICON_SIZE = new Dimension(32,32);
 
     private final String id;
     private ColopediaPanel colopediaPanel;
@@ -111,13 +110,13 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
         int width = 0;
         int height = 0;
         for (FreeColGameObjectType type : types) {
-            Image image = ImageLibrary.getImage(type, ICON_SIZE);
+            Image image = ImageLibrary.getImage(type, ImageLibrary.ICON_SIZE);
             if (image == null) continue;
             width = Math.max(image.getWidth(null), width);
             height = Math.max(image.getHeight(null), height);
         }
         for (FreeColGameObjectType type : types) {
-            Image image = ImageLibrary.getImage(type, ICON_SIZE);
+            Image image = ImageLibrary.getImage(type, ImageLibrary.ICON_SIZE);
             if (image == null) continue;
             int x = (width - image.getWidth(null)) / 2;
             int y = (height - image.getHeight(null)) / 2;

@@ -35,6 +35,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
@@ -74,15 +75,15 @@ public class TerrainDetailPanel
         DefaultMutableTreeNode node =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
         for (TileType t : getSpecification().getTileTypeList()) {
-            // FIXME: Use different method supporting request of an image of
-            //        fixed height taken from ICON_SIZE.
-            final float maxTileImageHeight = 96f;
+            // FIXME: Use different method supporting a direct request of an
+            //        image of fixed ICON_SIZE.
+            final float maxTileImageHeight = ImageLibrary.TILE_OVERLAY_SIZE.height;
             Image tile = MapViewer.createTileImageWithOverlayAndForest(t,
-                ICON_SIZE.height / maxTileImageHeight);
-            BufferedImage image = new BufferedImage(tile.getWidth(null), ICON_SIZE.height,
+                ImageLibrary.ICON_SIZE.height / maxTileImageHeight);
+            BufferedImage image = new BufferedImage(tile.getWidth(null), ImageLibrary.ICON_SIZE.height,
                 BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.createGraphics();
-            g.drawImage(tile, 0, (ICON_SIZE.height - tile.getHeight(null)) / 2, null);
+            g.drawImage(tile, 0, (ImageLibrary.ICON_SIZE.height - tile.getHeight(null)) / 2, null);
             g.dispose();
             ImageIcon icon = new ImageIcon(image);
             node.add(buildItem(t, icon));
