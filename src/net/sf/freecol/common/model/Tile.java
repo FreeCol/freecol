@@ -1488,19 +1488,19 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             if (!entry.getKey().isFoodType()
                 && entry.getValue() < LOW_PRODUCTION_WARNING_VALUE) {
                 ret.addStringTemplate(StringTemplate
-                    .template("buildColony.noBuildingMaterials")
+                    .template("warning.noBuildingMaterials")
                     .addNamed("%goods%", entry.getKey()));
             }
         }
 
         if (ownedBySelf) {
-            ret.add("buildColony.ownLand");
+            ret.add("warning.ownLand");
         }
         if (ownedByEuropeans) {
-            ret.add("buildColony.europeanLand");
+            ret.add("warning.europeanLand");
         }
         if (ownedByIndians) {
-            ret.add("buildColony.nativeLand");
+            ret.add("warning.nativeLand");
         }
 
         return ret;
