@@ -112,7 +112,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     // FIXME: move to options or spec?
     public static final int ALARM_RADIUS = 2;
     public static final int ALARM_TILE_IN_USE = 2;
-    public static final int ALARM_MISSIONARY_PRESENT = -10;
 
     // checkForDeath results
     public static final int IS_DEAD = -1;
@@ -1903,7 +1902,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 // Missionary helps reducing alarm a bit
                 if (settlement.hasMissionary()) {
                     Unit missionary = settlement.getMissionary();
-                    int missionAlarm = ALARM_MISSIONARY_PRESENT;
+                    int missionAlarm = getGame().getSpecification()
+                        .getInteger(GameOptions.MISSION_INFLUENCE);
                     if (missionary.hasAbility(Ability.EXPERT_MISSIONARY)) {
                         missionAlarm *= 2;
                     }

@@ -63,6 +63,11 @@ public class GameOptions {
     public static final String ENHANCED_MISSIONARIES
         = "model.option.enhancedMissionaries";
 
+    /** The strength of the influence of a Mission to the
+        alarm level of the natives in a settlement. */
+    public static final String MISSION_INFLUENCE
+        = "model.option.missionInfluence";
+
     /** Probability of a settlement with a surplus offering a gift. */
     public static final String GIFT_PROBABILITY
         = "model.option.giftProbability";

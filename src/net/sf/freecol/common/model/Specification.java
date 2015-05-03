@@ -2523,6 +2523,11 @@ public final class Specification {
                                   GameOptions.GAMEOPTIONS_COLONY, true);
         // end @compat 0.11.0
 
+        // @compat 0.11.3
+        ret |= checkIntegerOption(GameOptions.MISSION_INFLUENCE,
+                                  GameOptions.GAMEOPTIONS_MAP, -10);
+        // end @compat 0.11.3
+
         return ret;
     }
 
