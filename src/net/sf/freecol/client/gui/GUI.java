@@ -1823,9 +1823,7 @@ public class GUI {
                     // Value should be a valid slot
                     igc().emigrate(player,
                         Europe.MigrationType.convertToMigrantSlot(value));
-                    if (n > 1) {
-                        showEmigrationDialog(player, n-1, fountainOfYouth);
-                    }
+                    igc().emigrationLoop(player, n-1, fountainOfYouth);
                 }
             });
     }

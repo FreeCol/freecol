@@ -738,8 +738,7 @@ public final class InGameController extends Controller {
                 }
                 break;
             default: // Need to autorecruit a unit to keep alive.
-                player.csEmigrate(0, MigrationType.SURVIVAL,
-                        random, cs);
+                player.csEmigrate(0, MigrationType.SURVIVAL, random, cs);
                 break;
             }
             // Are there humans left?

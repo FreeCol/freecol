@@ -1353,6 +1353,20 @@ public class Player extends FreeColGameObject implements Nameable {
         return production;
     }
 
+    /**
+     * Get a message for a newly migrating unit.
+     *
+     * @param unit The <code>Unit</code> that is migrating.
+     * @return A suitable <code>ModelMessage</code>.
+     */
+    public ModelMessage getEmigrationMessage(Unit unit) {
+        return new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                "model.player.emigrate",
+                                this, unit)
+            .addNamed("%europe%", getEurope())
+            .addStringTemplate("%unit%", unit.getLabel());
+    }
+
 
     //
     // Liberty and founding fathers

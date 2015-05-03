@@ -3138,6 +3138,35 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Loop through selecting (or not when all are the same) a new unit
+     * to emigrate from Europe.  Only to be called if the player is allowed
+     * to select the unit type (i.e. FoY or has Brewster).
+     *
+     * Called from GUI.showEmigrationDialog
+     *
+     * @param player The <code>Player</code> that owns the unit.
+     * @param n The number of units known to be eligible to emigrate.
+     * @param fountainOfYouth True if this migration if due to a FoY.
+     */
+    public void emigrationLoop(Player player, int n, boolean fountainOfYouth) {
+        final Europe europe = player.getEurope();
+        if (europe == null) return;
+
+        for (;;) {
+            if (n == 0 && player.checkEmigrate()) n = 1;
+            if (n <= 0) return;
+            if (!allSame(europe.getRecruitables())) break;
+            Unit u = askEmigrate(europe,
+                                 Europe.MigrationType.getDefaultSlot());
+            if (u != null) {
+                player.addModelMessage(player.getEmigrationMessage(u));
+            }
+            n--;
+        }
+        gui.showEmigrationDialog(player, n, fountainOfYouth);
+    }
+    
+    /**
      * End the turn command.
      *
      * Called from EndTurnAction, GUI.showEndTurnDialog
@@ -4236,19 +4265,11 @@ public final class InGameController implements NetworkConstants {
             // Check for emigration.
             Europe europe = player.getEurope();
             if (player.hasAbility(Ability.SELECT_RECRUIT)) {
-                if (player.checkEmigrate()) {
-                    if (allSame(europe.getRecruitables())) {
-                        askEmigrate(europe,
-                            Europe.MigrationType.getDefaultSlot());
-                    } else {
-                        gui.showEmigrationDialog(player,
-                            Europe.MigrationType.getDefaultSlot(), false);
-                    }
-                }
+                emigrationLoop(player, 0, false);
             } else {
                 while (player.checkEmigrate()) {
                     askEmigrate(europe,
-                        Europe.MigrationType.getUnspecificSlot());
+                                Europe.MigrationType.getUnspecificSlot());
                 }
             }
             

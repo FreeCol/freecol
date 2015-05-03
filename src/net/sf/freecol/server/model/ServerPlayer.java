@@ -1384,12 +1384,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         if (isEuropean()) { // Update liberty and immigration
-            if (checkEmigrate() && !hasAbility(Ability.SELECT_RECRUIT)) {
-                // Auto-emigrate if selection not allowed.
-                csEmigrate(MigrationType.getUnspecificSlot(),
-                           MigrationType.NORMAL, random, cs);
-            } else {
+            // Auto-emigrate if selection not allowed.
+            if (hasAbility(Ability.SELECT_RECRUIT)) {
                 cs.addPartial(See.only(this), this, "immigration");
+            } else {
+                while (checkEmigrate()) {
+                    csEmigrate(MigrationType.getUnspecificSlot(),
+                               MigrationType.NORMAL, random, cs);
+                }
             }
             cs.addPartial(See.only(this), this, "liberty");
 
@@ -2237,17 +2239,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
             europe.increaseRecruitmentDifficulty();
             // Fall through
         case NORMAL:
-            updateImmigrationRequired();
             reduceImmigration();
+            updateImmigrationRequired();
             cs.addPartial(See.only(this), this,
                           "immigration", "immigrationRequired");
             if (!MigrationType.specificMigrantSlot(slot)) {
-                cs.addMessage(See.only(this),
-                    new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                     "model.player.emigrate",
-                                     this, unit)
-                        .addNamed("%europe%", europe)
-                        .addStringTemplate("%unit%", unit.getLabel()));
+                cs.addMessage(See.only(this), getEmigrationMessage(unit));
             }
             break;
         case SURVIVAL:
