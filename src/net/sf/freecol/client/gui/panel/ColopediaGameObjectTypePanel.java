@@ -57,7 +57,7 @@ import net.sf.freecol.common.model.UnitType;
 public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectType>
     extends FreeColPanel implements ColopediaDetailPanel<T> {
 
-    public static final Dimension ICON_SIZE = new Dimension(-1,32);
+    public static final Dimension ICON_SIZE = new Dimension(32,32);
 
     private final String id;
     private ColopediaPanel colopediaPanel;

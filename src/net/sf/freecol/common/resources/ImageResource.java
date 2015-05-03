@@ -145,10 +145,11 @@ public class ImageResource extends Resource
             return im;
         int w = im.getWidth();
         int h = im.getHeight();
-        if(wNew < 0)
+        if(wNew < 0 || (!(hNew < 0) && wNew*h > w*hNew)) {
             wNew = (w * hNew)/h;
-        if(hNew < 0)
+        } else if(hNew < 0 || wNew*h < w*hNew) {
             hNew = (h * wNew)/w;
+        }
         if(wNew == w && hNew == h)
             return im;
 
