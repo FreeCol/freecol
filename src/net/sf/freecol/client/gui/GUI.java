@@ -238,6 +238,7 @@ public class GUI {
         this.freeColClient = freeColClient;
         this.graphicsDevice = headless ? null : getGoodGraphicsDevice();
         this.imageLibrary = new ImageLibrary(scaleFactor);
+        logger.info("GUI constructed using scale factor " + scaleFactor);
     }
 
 
