@@ -1050,7 +1050,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
 
         for (AIColony aic : getAIColonies()) {
-            for (AIGoods aig : aic.getAIGoods()) {
+            for (AIGoods aig : aic.getExportGoods()) {
                 checkTransport(aig);
                 if (requestsTransport(aig)) {
                     transportSupply.add(aig);
@@ -2255,7 +2255,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (tip != null) tips.add(tip);
         }
 
-        for (AIGoods aig : aic.getAIGoods()) {
+        for (AIGoods aig : aic.getExportGoods()) {
             if (Map.isSameLocation(aig.getLocation(), colony)) {
                 aig.changeTransport(null);
                 aig.dispose();

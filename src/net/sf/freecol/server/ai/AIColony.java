@@ -247,7 +247,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Update any relatively static properties of the colony:
      *   - export state
-     *   - disposition of AIGoods in this colony
+     *   - disposition of export goods in this colony
      *   - tile improvements (might ignore freshly grabbed tiles)
      *   - wishes
      *
@@ -256,7 +256,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     public void update(LogBuilder lb) {
         lb.add("\n  ", colony.getName());
         resetExports();
-        updateAIGoods(lb);
+        updateExportGoods(lb);
         updateTileImprovementPlans(lb);
         updateWishes(lb);
     }
@@ -514,7 +514,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Reset the export settings.
      * This is always needed even when there is no customs house, because
-     * updateAIGoods needs to know what to export by transport.
+     * updateExportGoods needs to know what to export by transport.
      *
      * FIXME: consider market prices?
      */
@@ -736,21 +736,70 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *
      * @return A copy of the exportGoods list.
      */
-    public List<AIGoods> getAIGoods() {
-        return new ArrayList<>(exportGoods);
+    public List<AIGoods> getExportGoods() {
+        synchronized (exportGoods) {
+            // firePropertyChanges can hit exportGoods
+            return new ArrayList<>(exportGoods);
+        }
     }
 
     /**
-     * Removes the given <code>AIGoods</code> from this colony's list. The
-     * <code>AIGoods</code>-object is not disposed as part of this operation.
-     * Use that method instead to remove the object completely (this method
-     * would then be called indirectly).
+     * Clear the export goods.
+     */
+    private void clearExportGoods() {
+        synchronized (exportGoods) {
+            exportGoods.clear();
+        }
+    }
+
+    /**
+     * Add to the export goods list, and resort.
+     *
+     * @param aiGoods The <code>AIGoods</code> to add.
+     */
+    private void addExportGoods(AIGoods aiGoods) {
+        synchronized (exportGoods) {
+            exportGoods.add(aiGoods);
+        }
+    }
+
+    /**
+     * Set the export goods list.
+     *
+     * @param aiGoods The new list of <code>AIGoods</code>.
+     */
+    private void setExportGoods(List<AIGoods> aiGoods) {            
+        clearExportGoods();
+        synchronized (exportGoods) {
+            exportGoods.addAll(aiGoods);
+        }
+        sortExportGoods();
+    }
+
+    /**
+     * Sort the export goods.
+     */
+    private void sortExportGoods() {
+        synchronized (exportGoods) {
+            Collections.sort(exportGoods);
+        }
+    }
+
+    /**
+     * Removes the given <code>AIGoods</code> from the export goods
+     * for this colony.  The <code>AIGoods</code>-object is not
+     * disposed as part of this operation.  Use dropExportGoods
+     * instead to remove the object completely (this method would then
+     * be called indirectly).
      *
      * @param ag The <code>AIGoods</code> to be removed.
      * @see AIGoods#dispose()
      */
-    public void removeAIGoods(AIGoods ag) {
-        while (exportGoods.remove(ag)) {} /* Do nothing here */
+    public void removeExportGoods(AIGoods ag) {
+        synchronized (exportGoods) {
+            // firePropertyChanges can hit exportGoods
+            while (exportGoods.remove(ag)) {} /* Do nothing here */
+        }
     }
 
     /**
@@ -758,13 +807,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *
      * @param ag The <code>AIGoods</code> to drop.
      */
-    private void dropGoods(AIGoods ag) {
+    private void dropExportGoods(AIGoods ag) {
         TransportMission tm;
         if (ag.getTransport() != null
             && (tm = ag.getTransport().getMission(TransportMission.class)) != null) {
             tm.removeTransportable(ag);
         }
-        removeAIGoods(ag);
+        removeExportGoods(ag);
         ag.dispose();
     }
 
@@ -790,36 +839,29 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *
      * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void updateAIGoods(LogBuilder lb) {
+    private void updateExportGoods(LogBuilder lb) {
         if (colony.hasAbility(Ability.EXPORT)) {
-            while (!exportGoods.isEmpty()) {
-                AIGoods ag = exportGoods.remove(0);
-                goodsLog(ag, "customizes", lb);
-                dropGoods(ag);
+            for (AIGoods aig : getExportGoods()) {
+                goodsLog(aig, "customizes", lb);
+                dropExportGoods(aig);
             }
 
         } else { // does not export
-            int i = 0;
-            while (i < exportGoods.size()) {
-                AIGoods ag = exportGoods.get(i);
-                if (ag == null) {
-                    exportGoods.remove(i);
-                } else if (ag.checkIntegrity(false) < 0) {
-                    goodsLog(ag, "reaps", lb);
-                    exportGoods.remove(i);
-                    dropGoods(ag);
-                } else if (ag.getGoods().getLocation() != colony) {
+            for (AIGoods aig : getExportGoods()) {
+                if (aig == null) {
+                    removeExportGoods(aig);
+                } else if (aig.checkIntegrity(false) < 0) {
+                    goodsLog(aig, "reaps", lb);
+                    dropExportGoods(aig);
+                } else if (aig.getGoods().getLocation() != colony) {
                     // On its way, no longer of interest here, but do
                     // not dispose as that will happen when delivered.
-                    goodsLog(ag, "sends", lb);
-                    exportGoods.remove(i);
-                } else if (colony.getAdjustedNetProductionOf(ag.getGoods()
+                    goodsLog(aig, "sends", lb);
+                    removeExportGoods(aig);
+                } else if (colony.getAdjustedNetProductionOf(aig.getGoods()
                         .getType()) < 0) {
-                    goodsLog(ag, "needs", lb);
-                    exportGoods.remove(i);
-                    dropGoods(ag);
-                } else {
-                    i++;
+                    goodsLog(aig, "needs", lb);
+                    dropExportGoods(aig);
                 }
             }
 
@@ -843,33 +885,27 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 // Find all existing AI goods of type g
                 //   update amount of goods to export
                 //   reduce exportAmount at each step, dropping excess exports
-                i = 0;
-                while (i < exportGoods.size()) {
-                    AIGoods ag = exportGoods.get(i);
-                    Goods goods = ag.getGoods();
-                    if (goods.getType() != g) {
-                        i++;
-                        continue;
-                    }
+                for (AIGoods aig : getExportGoods()) {
+                    Goods goods = aig.getGoods();
+                    if (goods.getType() != g) continue;
                     int amount = goods.getAmount();
                     if (amount <= exportAmount) {
                         if (amount < GoodsContainer.CARGO_SIZE) {
                             amount = Math.min(exportAmount,
                                 GoodsContainer.CARGO_SIZE);
                             goods.setAmount(amount);
-                            ag.setTransportPriority(priority);
+                            aig.setTransportPriority(priority);
                         }
-                        goodsLog(ag, "exports", lb);
+                        goodsLog(aig, "exports", lb);
                     } else if (exportAmount >= EXPORT_MINIMUM) {
                         goods.setAmount(exportAmount);
-                        goodsLog(ag, "clamps", lb);
+                        goodsLog(aig, "clamps", lb);
                     } else {
-                        goodsLog(ag, "unexports", lb);
-                        dropGoods(ag);
+                        goodsLog(aig, "unexports", lb);
+                        dropExportGoods(aig);
                         continue;
                     }
                     exportAmount -= amount;
-                    i++;
                 }
 
                 // Export new goods, to Europe if possible.
@@ -886,8 +922,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     exportAmount -= amount;
                 }
             }
-            exportGoods.addAll(newAIGoods);
-            Collections.sort(exportGoods);
+            setExportGoods(newAIGoods);
         }
     }
 
@@ -1436,7 +1471,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         lb.add("\n\nWISHES:\n");
         for (Wish w : getWishes()) lb.add(w, "\n");
         lb.add("\n\nEXPORT GOODS:\n");
-        for (AIGoods aig : getAIGoods()) lb.add(aig, "\n");
+        for (AIGoods aig : getExportGoods()) lb.add(aig, "\n");
         return lb.toString();
     }
 
@@ -1455,24 +1490,23 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             && event.getOldValue() instanceof GoodsType) {
             GoodsType goodsType = (GoodsType)event.getOldValue();
             int left = colony.getGoodsCount(goodsType);
-            for (int i = 0; i < exportGoods.size(); i++) {
-                AIGoods export = exportGoods.get(i);
+            for (AIGoods aig : getExportGoods()) {
                 boolean remove = false;
-                if (export.isDisposed()) {
+                if (aig.isDisposed()) {
                     remove = true;
-                } else if (export.getGoods() == null) {
-                    export.changeTransport(null);
+                } else if (aig.getGoods() == null) {
+                    aig.changeTransport(null);
                     remove = true;
-                } else if (export.getGoodsType() == goodsType) {
+                } else if (aig.getGoodsType() == goodsType) {
                     if (left > 0) {
-                        export.getGoods().setAmount(left);
+                        aig.getGoods().setAmount(left);
                     } else {
-                        export.changeTransport(null);
+                        aig.changeTransport(null);
                         remove = true;
                     }
                 }
                 if (remove) {
-                    exportGoods.remove(i);
+                    removeExportGoods(aig);
                     break;
                 }
             }
@@ -1496,7 +1530,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     @Override
     public void dispose() {
         List<AIObject> objects = new ArrayList<>();
-        for (AIGoods ag : exportGoods) {
+        for (AIGoods ag : getExportGoods()) {
             if (ag.isDisposed() || ag.getGoods() == null) continue;
             if (ag.getGoods().getLocation() == colony) objects.add(ag);
         }
@@ -1552,7 +1586,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (AIGoods ag : exportGoods) {
+        for (AIGoods ag : getExportGoods()) {
             if (ag.checkIntegrity(true) < 0) continue;
             xw.writeStartElement(AI_GOODS_LIST_TAG);
 
@@ -1605,12 +1639,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        exportGoods.clear();
+        clearExportGoods();
         tileImprovementPlans.clear();
         wishes.clear();
 
         super.readChildren(xr);
-
+        sortExportGoods();
+        
         if (getColony() != null) uninitialized = false;
     }
 
@@ -1623,8 +1658,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final String tag = xr.getLocalName();
 
         if (AI_GOODS_LIST_TAG.equals(tag)) {
-            exportGoods.add(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
-                                            AIGoods.class, (AIGoods)null, true));
+            addExportGoods(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
+                                           AIGoods.class, (AIGoods)null, true));
             xr.closeTag(AI_GOODS_LIST_TAG);
 
         } else if (GOODS_WISH_LIST_TAG.equals(tag)

@@ -308,7 +308,7 @@ public class AIGoods extends TransportableAIObject {
         if (result) {
             Colony colony = carrier.getColony();
             if (colony != null) {
-                getAIMain().getAIColony(colony).removeAIGoods(this);
+                getAIMain().getAIColony(colony).removeExportGoods(this);
             }
             setGoods(new Goods(getGame(), carrier, goodsType, goodsAmount));
         }
@@ -345,7 +345,7 @@ public class AIGoods extends TransportableAIObject {
         if (destination != null) {
             if (destination instanceof Colony) {
                 AIColony aic = getAIMain().getAIColony((Colony)destination);
-                if (aic != null) aic.removeAIGoods(this);
+                if (aic != null) aic.removeExportGoods(this);
             } else if (destination instanceof Europe) {
                 // Nothing to remove.
             } else {
