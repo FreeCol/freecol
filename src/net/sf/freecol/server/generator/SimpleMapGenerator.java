@@ -276,7 +276,11 @@ public class SimpleMapGenerator implements MapGenerator {
                     map.getTile(tile.getX(), tile.getY()), is.isCapital(),
                     is.getLearnableSkill(), null);
             settlement.placeSettlement(false);
-
+            for (Tile t : is.getOwnedTiles()) {
+                map.getTile(t.getX(), t.getY())
+                    .changeOwnership(indian, settlement);
+            }
+                
             List<Unit> units = is.getUnitList();
             if (units.isEmpty()) {
                 settlement.addUnits(random);
