@@ -1454,24 +1454,25 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (event != null 
             && event.getOldValue() instanceof GoodsType) {
             GoodsType goodsType = (GoodsType)event.getOldValue();
-            int i, left = colony.getGoodsCount(goodsType);
-            AIGoods export = null;
-            for (i = 0; i < exportGoods.size(); i++) {
-                export = exportGoods.get(i);
+            int left = colony.getGoodsCount(goodsType);
+            for (int i = 0; i < exportGoods.size(); i++) {
+                AIGoods export = exportGoods.get(i);
+                boolean remove = false;
                 if (export.isDisposed()) {
-                    exportGoods.remove(i);
-                    break;
+                    remove = true;
                 } else if (export.getGoods() == null) {
-                    exportGoods.remove(i);
                     export.changeTransport(null);
-                    break;
+                    remove = true;
                 } else if (export.getGoodsType() == goodsType) {
                     if (left > 0) {
                         export.getGoods().setAmount(left);
                     } else {
-                        exportGoods.remove(i);
                         export.changeTransport(null);
+                        remove = true;
                     }
+                }
+                if (remove) {
+                    exportGoods.remove(i);
                     break;
                 }
             }
