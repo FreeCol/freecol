@@ -566,6 +566,12 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
         synchronized (units) {
             for (Unit unit : units) {
+                if (unit.getLocation() != this) {
+                    logger.warning("UnitLocation contains unit " + unit
+                        + " with bogus location " + unit.getLocation()
+                        + ", fixing.");
+                    unit.setLocationNoUpdate(this);
+                }
                 unit.toXML(xw);
             }
         }
