@@ -282,13 +282,18 @@ public class LostCityRumour extends TileItem {
         }
         int i;
         if (rumourNothing < 0) {
-            for (i = 0; Messages.containsKey("model.lostCityRumour.nothing." + i); i++);
+            i = 0;
+            for (;;) {
+                String key = Messages.descriptionKey("model.lostCityRumour.nothing." + i);
+                if (!Messages.containsKey(key)) break;
+                i++;
+            }
             rumourNothing = i;
         }
         i = randomInt(logger, "Nothing rumour", random, rumourNothing);
         return new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                "model.lostCityRumour.nothing." + i,
-                                player);
+            Messages.descriptionKey("model.lostCityRumour.nothing." + i),
+            player);
     }
     
     // Interface Named
