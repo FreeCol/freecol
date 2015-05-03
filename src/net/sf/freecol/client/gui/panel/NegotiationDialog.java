@@ -241,6 +241,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             setLayout(new MigLayout("wrap 1", "", ""));
 
             add(Utility.localizedLabel(Messages.getName("model.tradeItem.gold")));
+            add(Utility.localizedLabel(StringTemplate
+                    .template("negotiationDialog.goldAvailable")
+                    .addAmount("%amount%", gold)));
             add(this.spinner);
             add(clearButton, "split 2");
             add(addButton);
