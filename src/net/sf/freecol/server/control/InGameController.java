@@ -3326,8 +3326,9 @@ public final class InGameController extends Controller {
         }
         if (session == null) {
             if (agreement.getStatus() != TradeStatus.PROPOSE_TRADE) {
-                return DOMMessage.clientError("Missing session for "
-                    + ourUnit.getId() + "," + otherUnit.getId());
+                return DOMMessage.clientError("Missing uu1-diplomacy session for "
+                    + ourUnit.getId() + "," + otherUnit.getId()
+                    + " with " + agreement);
             }
             session = new DiplomacySession(ourUnit, otherUnit);
             ourUnit.setMovesLeft(0);
@@ -3362,8 +3363,9 @@ public final class InGameController extends Controller {
                                         ourUnit, otherColony);
         if (session == null) {
             if (agreement.getStatus() != TradeStatus.PROPOSE_TRADE) {
-                return DOMMessage.clientError("Missing diplomacy session for "
-                    + ourUnit.getId() + "," + otherColony.getId());
+                return DOMMessage.clientError("Missing uc1-diplomacy session for "
+                    + ourUnit.getId() + "," + otherColony.getId()
+                    + " with " + agreement);
             }
             session = new DiplomacySession(ourUnit, otherColony);
             ourUnit.setMovesLeft(0);
@@ -3397,8 +3399,9 @@ public final class InGameController extends Controller {
             = TransactionSession.lookup(DiplomacySession.class,
                                         otherUnit, ourColony);
         if (session == null) {
-            return DOMMessage.clientError("Missing diplomacy session for "
-                + ourColony.getId() + "," + otherUnit.getId());
+            return DOMMessage.clientError("Missing cu1-diplomacy session for "
+                + ourColony.getId() + "," + otherUnit.getId()
+                + " with " + agreement);
         }
         ServerPlayer otherPlayer = (ServerPlayer)otherUnit.getOwner();
         if (csDiplomacySession(serverPlayer, otherPlayer,
@@ -3429,8 +3432,9 @@ public final class InGameController extends Controller {
                                         ourUnit, otherColony);
         if (session == null) {
             if (status != TradeStatus.PROPOSE_TRADE) {
-                return DOMMessage.clientError("Mission session for "
-                    + ourUnit.getId() + "/" + otherColony.getId());
+                return DOMMessage.clientError("Mission uc-diplomacy session for "
+                    + ourUnit.getId() + "/" + otherColony.getId()
+                    + " with " + agreement);
             }
             session = new DiplomacySession(ourUnit, otherColony);
         }
@@ -3460,8 +3464,9 @@ public final class InGameController extends Controller {
             = TransactionSession.lookup(DiplomacySession.class,
                                         otherUnit, ourColony);
         if (session == null) {
-            return DOMMessage.clientError("Mission session for "
-                + otherUnit.getId() + "/" + ourColony.getId());
+            return DOMMessage.clientError("Mission cu-diplomacy session for "
+                + otherUnit.getId() + "/" + ourColony.getId()
+                + " with " + agreement);
         }
         ServerPlayer otherPlayer = (ServerPlayer)otherUnit.getOwner();
         if (csDiplomacySession(serverPlayer, otherPlayer, agreement, session,
