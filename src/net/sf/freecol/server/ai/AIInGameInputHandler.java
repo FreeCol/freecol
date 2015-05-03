@@ -135,55 +135,46 @@ public final class AIInGameInputHandler implements MessageHandler {
         final String tag = element.getTagName();
         Element reply = null;
         try {
-            if ("reconnect".equals(tag)) {
-                logger.warning("Reconnect on illegal operation, refer to any previous error message.");
-            } else if ("chooseFoundingFather".equals(tag)) {
-                reply = chooseFoundingFather(connection, element);
-            } else if ("diplomacy".equals(tag)) {
-                reply = diplomacy(connection, element);
-            } else if ("firstContact".equals(tag)) {
-                reply = firstContact(connection, element);
-            } else if ("fountainOfYouth".equals(tag)) {
-                reply = fountainOfYouth(connection, element);
-            } else if ("indianDemand".equals(tag)) {
-                reply = indianDemand(connection, element);
-            } else if ("lootCargo".equals(tag)) {
-                reply = lootCargo(connection, element);
-            } else if ("monarchAction".equals(tag)) {
-                reply = monarchAction(connection, element);
-            } else if ("multiple".equals(tag)) {
-                reply = multiple(connection, element);
-            } else if ("newLandName".equals(tag)) {
-                reply = newLandName(connection, element);
-            } else if ("newRegionName".equals(tag)) {
-                reply = newRegionName(connection, element);
-            } else if ("setCurrentPlayer".equals(tag)) {
-                reply = setCurrentPlayer(connection, element);
+            switch (tag) {
+            case "reconnect":
+                logger.warning("Reconnect on illegal operation, refer to any previous error message."); break;
+            case "chooseFoundingFather":
+                reply = chooseFoundingFather(connection, element); break;
+            case "diplomacy":
+                reply = diplomacy(connection, element); break;
+            case "firstContact":
+                reply = firstContact(connection, element); break;
+            case "fountainOfYouth":
+                reply = fountainOfYouth(connection, element); break;
+            case "indianDemand":
+                reply = indianDemand(connection, element); break;
+            case "lootCargo":
+                reply = lootCargo(connection, element); break;
+            case "monarchAction":
+                reply = monarchAction(connection, element); break;
+            case "multiple":
+                reply = multiple(connection, element); break;
+            case "newLandName":
+                reply = newLandName(connection, element); break;
+            case "newRegionName":
+                reply = newRegionName(connection, element); break;
+            case "setCurrentPlayer":
+                reply = setCurrentPlayer(connection, element); break;
                 
             // Since we're the server, we can see everything.
             // Therefore most of these messages are useless.  This
             // may change one day.
-            } else if ("addObject".equals(tag)) {
-            } else if ("addPlayer".equals(tag)) {
-            } else if ("animateMove".equals(tag)) {
-            } else if ("animateAttack".equals(tag)) {
-            } else if ("chat".equals(tag)) {
-            } else if ("disconnect".equals(tag)) {
-            } else if ("error".equals(tag)) {
-            } else if ("featureChange".equals(tag)) {
-            } else if ("gameEnded".equals(tag)) {
-            } else if ("logout".equals(tag)) {
-            } else if ("newTurn".equals(tag)) {
-            } else if ("remove".equals(tag)) {
-            } else if ("removeGoods".equals(tag)) {
-            } else if ("setAI".equals(tag)) {
-            } else if ("setDead".equals(tag)) {
-            } else if ("setStance".equals(tag)) {
-            } else if ("startGame".equals(tag)) {
-            } else if ("update".equals(tag)) {
-            } else if ("updateGame".equals(tag)) {
-            } else {
+            case "addObject": case "addPlayer": case "animateMove":
+            case "animateAttack": case "chat": case "disconnect":
+            case "error": case "featureChange": case "gameEnded":
+            case "logout": case "newTurn": case "remove":
+            case "removeGoods": case "setAI": case "setDead":
+            case "setStance": case "startGame": case "update":
+            case "updateGame":
+                break;
+            default:
                 logger.warning("Unknown message type: " + tag);
+                break;
             }
         } catch (Exception e) {
             logger.log(Level.WARNING, "AI input handler for " + serverPlayer

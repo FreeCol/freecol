@@ -253,66 +253,66 @@ public final class InGameInputHandler extends InputHandler {
         Element reply;
         String type = element.getTagName();
         logger.log(Level.FINEST, "Received message: " + type);
-
-        if ("disconnect".equals(type)) { // Inherited
-            reply = disconnect(element);
-        } else if ("addObject".equals(type)) {
-            reply = addObject(element);
-        } else if ("addPlayer".equals(type)) {
-            reply = addPlayer(element);
-        } else if ("animateAttack".equals(type)) {
-            reply = animateAttack(element);
-        } else if ("animateMove".equals(type)) {
-            reply = animateMove(element);
-        } else if ("chat".equals(type)) {
-            reply = chat(element);
-        } else if ("chooseFoundingFather".equals(type)) {
-            reply = chooseFoundingFather(element);
-        } else if ("closeMenus".equals(type)) {
-            reply = closeMenus();
-        } else if ("diplomacy".equals(type)) {
-            reply = diplomacy(element);
-        } else if ("error".equals(type)) {
-            reply = error(element);
-        } else if ("featureChange".equals(type)) {
-            reply = featureChange(element);
-        } else if ("firstContact".equals(type)) {
-            reply = firstContact(element);
-        } else if ("fountainOfYouth".equals(type)) {
-            reply = fountainOfYouth(element);
-        } else if ("gameEnded".equals(type)) {
-            reply = gameEnded(element);
-        } else if ("indianDemand".equals(type)) {
-            reply = indianDemand(element);
-        } else if ("lootCargo".equals(type)) {
-            reply = lootCargo(element);
-        } else if ("monarchAction".equals(type)) {
-            reply = monarchAction(element);
-        } else if ("multiple".equals(type)) {
-            reply = multiple(connection, element);
-        } else if ("newLandName".equals(type)) {
-            reply = newLandName(element);
-        } else if ("newRegionName".equals(type)) {
-            reply = newRegionName(element);
-        } else if ("newTurn".equals(type)) {
-            reply = newTurn(element);
-        } else if ("reconnect".equals(type)) {
-            reply = reconnect(element);
-        } else if ("remove".equals(type)) {
-            reply = remove(element);
-        } else if ("setAI".equals(type)) {
-            reply = setAI(element);
-        } else if ("setCurrentPlayer".equals(type)) {
-            reply = setCurrentPlayer(element);
-        } else if ("setDead".equals(type)) {
-            reply = setDead(element);
-        } else if ("setStance".equals(type)) {
-            reply = setStance(element);
-        } else if ("spyResult".equals(type)) {
-            reply = spyResult(element);
-        } else if ("update".equals(type)) {
-            reply = update(element);
-        } else {
+        switch (type) {
+        case "disconnect":
+            reply = disconnect(element); break; // Inherited
+        case "addObject":
+            reply = addObject(element); break;
+        case "addPlayer":
+            reply = addPlayer(element); break;
+        case "animateAttack":
+            reply = animateAttack(element); break;
+        case "animateMove":
+            reply = animateMove(element); break;
+        case "chat":
+            reply = chat(element); break;
+        case "chooseFoundingFather":
+            reply = chooseFoundingFather(element); break;
+        case "closeMenus":
+            reply = closeMenus(); break;
+        case "diplomacy":
+            reply = diplomacy(element); break;
+        case "error":
+            reply = error(element); break;
+        case "featureChange":
+            reply = featureChange(element); break;
+        case "firstContact":
+            reply = firstContact(element); break;
+        case "fountainOfYouth":
+            reply = fountainOfYouth(element); break;
+        case "gameEnded":
+            reply = gameEnded(element); break;
+        case "indianDemand":
+            reply = indianDemand(element); break;
+        case "lootCargo":
+            reply = lootCargo(element); break;
+        case "monarchAction":
+            reply = monarchAction(element); break;
+        case "multiple":
+            reply = multiple(connection, element); break;
+        case "newLandName":
+            reply = newLandName(element); break;
+        case "newRegionName":
+            reply = newRegionName(element); break;
+        case "newTurn":
+            reply = newTurn(element); break;
+        case "reconnect":
+            reply = reconnect(element); break;
+        case "remove":
+            reply = remove(element); break;
+        case "setAI":
+            reply = setAI(element); break;
+        case "setCurrentPlayer":
+            reply = setCurrentPlayer(element); break;
+        case "setDead":
+            reply = setDead(element); break;
+        case "setStance":
+            reply = setStance(element); break;
+        case "spyResult":
+            reply = spyResult(element); break;
+        case "update":
+            reply = update(element); break;
+        default:
             logger.warning("Unsupported message type: " + type);
             return null;
         }
