@@ -1893,6 +1893,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A value for the player.
      */
     public int evaluateFor(Player player) {
+        if (player.isAI()
+            && player.getNumberOfSettlements() < 5) {// FIXME: magic#
+            return Integer.MIN_VALUE;
+        }
         int result = 0;
         if (player.owns(this)) {
             for (WorkLocation wl : getAvailableWorkLocations()) {

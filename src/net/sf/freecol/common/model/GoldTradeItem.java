@@ -110,8 +110,8 @@ public class GoldTradeItem extends TradeItem {
      */
     public int evaluateFor(Player player) {
         int gold = getGold();
-        return (getSource() == player)
-            ? (player.checkGold(gold)) ? -gold : Integer.MIN_VALUE
+        return (!isValid()) ? Integer.MIN_VALUE
+            : (getSource() == player) ? -gold
             : gold;
     }
 

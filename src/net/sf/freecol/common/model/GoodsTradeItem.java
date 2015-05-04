@@ -115,7 +115,9 @@ public class GoodsTradeItem extends TradeItem {
         final Market market = player.getMarket();
         final Goods goods = getGoods();
         int value;
-        if (market == null) {
+        if (!isValid()) {
+            return Integer.MIN_VALUE;
+        } else if (market == null) {
             value = 2 * goods.getAmount();
             if (getSource() == player) value = -value;
         } else {
