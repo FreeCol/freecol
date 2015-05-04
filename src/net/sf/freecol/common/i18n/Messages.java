@@ -366,12 +366,16 @@ public class Messages {
         return id + DESCRIPTION_SUFFIX;
     }
 
+    public static String descriptionKey(ObjectWithId object) {
+        return descriptionKey(object.getId());
+    }
+
     public static String getDescription(String id) {
         return message(descriptionKey(id));
     }
 
     public static String getDescription(ObjectWithId object) {
-        return getDescription(object.getId());
+        return message(descriptionKey(object));
     }
 
 
