@@ -80,8 +80,7 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
         
         // Check to see if we can improve upon object.toString()
         if (object instanceof AbstractGoods) {
-            this.text = ((AbstractGoods)object).getAmount()
-                + " " + Messages.getName((AbstractGoods)object);
+            this.text = Messages.message(((AbstractGoods)object).getLabel());
         } else if (object instanceof AbstractUnit) {
             this.text = Messages.message(((AbstractUnit)object).getId());
         } else if (object instanceof Player) {
