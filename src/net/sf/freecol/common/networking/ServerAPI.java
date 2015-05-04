@@ -707,7 +707,9 @@ public abstract class ServerAPI {
                                      DiplomaticTrade agreement) {
         Element reply = askExpecting(new DiplomacyMessage(ourUnit, otherColony,
                                                           agreement),
-            DiplomacyMessage.getXMLElementTagName(), null);
+            null, null);
+        // Often returns diplomacy, but also just an update on accept or
+        // null on reject.
         if (reply == null) {
             return null;
         } else if (DiplomacyMessage.getXMLElementTagName().equals(reply.getTagName())) {
