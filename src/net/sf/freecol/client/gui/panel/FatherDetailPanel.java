@@ -119,7 +119,7 @@ public class FatherDetailPanel
                 FontLibrary.FontSize.SMALL));
             panel.add(header, "align center, wrap 20");
             if (getId().equals(id)) {
-                panel.add(Utility.getDefaultTextArea(Messages.message("colopedia.foundingFather.description"), 40));
+                panel.add(Utility.localizedTextArea("colopedia.foundingFather.description", 40));
             } else {
                 Image image = ResourceManager.getImage("image.flavor." + id);
                 if (image != null) {
@@ -165,8 +165,7 @@ public class FatherDetailPanel
 
         panel.add(header, "span, align center, wrap 40");
         panel.add(label, "top");
-        JTextArea description
-            = Utility.getDefaultTextArea(Messages.message(template), 20);
+        JTextArea description = Utility.localizedTextArea(template, 20);
         panel.add(description, "top, growx");
 
         Dimension hSize = header.getPreferredSize(),

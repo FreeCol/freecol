@@ -143,7 +143,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
             reportPanel.add(enemyPanel);
         }
 
-        reportPanel.add(Utility.getDefaultTextArea(Messages.message("report.foreignAffair.notice"), 40),
+        reportPanel.add(Utility.localizedTextArea("report.foreignAffair.notice", 40),
                         "newline 20, span 8");
 
         reportPanel.doLayout();

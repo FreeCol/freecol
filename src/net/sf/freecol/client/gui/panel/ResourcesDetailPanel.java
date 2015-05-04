@@ -120,7 +120,7 @@ public class ResourcesDetailPanel
 
         panel.add(Utility.localizedLabel("colopedia.resource.description"),
                   "newline 20");
-        panel.add(Utility.getDefaultTextArea(Messages.getDescription(type), 30),
+        panel.add(Utility.localizedTextArea(Messages.descriptionKey(type), 30),
                   "growx");
     }
 

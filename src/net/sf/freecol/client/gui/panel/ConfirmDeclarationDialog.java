@@ -269,16 +269,10 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
             .addName("%nation%", player.getNewLandName());
         this.countryField = new JTextField(Messages.message(country), 20);
 
-        String cPrompt = Messages.message("confirmDeclarationDialog.enterCountry");
-
         StringTemplate nation = StringTemplate
             .template("confirmDeclarationDialog.defaultNation")
             .addStringTemplate("%nation%", player.getNationName());
         this.nationField = new JTextField(Messages.message(nation), 20);
-
-        String nPrompt = Messages.message("confirmDeclarationDialog.enterNation");
-
-        String flagPrompt = Messages.message("confirmDeclarationDialog.createFlag");
 
         this.label = new JLabel();
         this.label.setIcon(new ImageIcon(this.flag.getImage()));
@@ -286,12 +280,12 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         // Create the main panel
         MigPanel panel = new MigPanel(new MigLayout("wrap 2", "[][fill]",
                                                     "[fill]"));
-        panel.add(Utility.getDefaultTextArea(sure), "span");
-        panel.add(Utility.getDefaultTextArea(cPrompt), "span");
+        panel.add(Utility.localizedTextArea(sure), "span");
+        panel.add(Utility.localizedTextArea("confirmDeclarationDialog.enterCountry"), "span");
         panel.add(this.countryField, "span");
-        panel.add(Utility.getDefaultTextArea(nPrompt), "span");
+        panel.add(Utility.localizedTextArea("confirmDeclarationDialog.enterNation"), "span");
         panel.add(this.nationField, "span");
-        panel.add(Utility.getDefaultTextArea(flagPrompt), "span");
+        panel.add(Utility.localizedTextArea("confirmDeclarationDialog.createFlag"), "span");
 
         panel.add(this.label, "skip, width 200, height 100");
 

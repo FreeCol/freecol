@@ -50,7 +50,7 @@ public final class ReportHistoryPanel extends ReportPanel {
 
         for (HistoryEvent event : history) {
             reportPanel.add(Utility.localizedLabel(event.getTurn().getLabel()));
-            reportPanel.add(Utility.getDefaultTextArea(event, 40));
+            reportPanel.add(Utility.localizedTextArea(event, 40));
         }
     }
 }

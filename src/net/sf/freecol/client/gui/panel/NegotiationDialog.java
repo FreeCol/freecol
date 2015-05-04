@@ -801,7 +801,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     private JPanel summary;
 
     /** Useful internal messages. */
-    private String demandMessage, offerMessage, exchangeMessage;
+    private StringTemplate demand, offer;
+    private String exchangeMessage;
 
     /** Responses. */
     private ChoiceItem<DiplomaticTrade> send = null, accept = null;
@@ -837,14 +838,12 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         StringTemplate nation = player.getNationName(),
             otherNation = otherPlayer.getNationName();
-        StringTemplate t = StringTemplate.template("negotiationDialog.demand")
+        this.demand = StringTemplate.template("negotiationDialog.demand")
             .addStringTemplate("%nation%", nation)
             .addStringTemplate("%otherNation%", otherNation);
-        this.demandMessage = Messages.message(t);
-        t = StringTemplate.template("negotiationDialog.offer")
+        this.offer = StringTemplate.template("negotiationDialog.offer")
             .addStringTemplate("%nation%", nation)
             .addStringTemplate("%otherNation%", otherNation);
-        this.offerMessage = Messages.message(t);
         this.exchangeMessage = Messages.message("negotiationDialog.exchange");
 
         NationSummary ns = igc().getNationSummary(otherPlayer);
@@ -857,12 +856,12 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             : player.getGold();
         this.goldOfferPanel = new GoldTradeItemPanel(player, gold);
 
-        String tutorial = "";
+        StringTemplate tutorial = null;
         TradeContext context = agreement.getContext();
         switch (context) {
         case CONTACT:
             if (freeColClient.tutorialMode()) {
-                tutorial = Messages.message("negotiationDialog.contact.tutorial");
+                tutorial = StringTemplate.key("negotiationDialog.contact.tutorial");
             }
             this.stancePanel = new StanceTradeItemPanel(player, otherPlayer);
             this.inciteOfferPanel = new InciteTradeItemPanel(player, otherPlayer);
@@ -914,7 +913,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         this.summary = new MigPanel(new MigLayout("wrap 2", "[20px:n:n][]"));
         this.summary.setOpaque(false);
-        this.summary.add(Utility.getDefaultTextArea(comment), "center, span 2");
+        this.summary.add(Utility.localizedTextArea(comment), "center, span 2");
 
         /**
          * Build Layout of Diplomatic Trade Dialog
@@ -927,7 +926,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
                   "span 3, center");
         
         // Panel contents Header row
-        JTextArea labelDemandMessage = Utility.getDefaultTextArea(this.demandMessage);
+        JTextArea labelDemandMessage = Utility.localizedTextArea(this.demand);
         Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, 
                 FontLibrary.FontSize.TINY, Font.BOLD,
                 getImageLibrary().getScalingFactor());
@@ -936,7 +935,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         JTextArea blank = new JTextArea(" ");
         blank.setVisible(false);
         panel.add(blank, "");
-        JTextArea labelOfferMessage = Utility.getDefaultTextArea(this.offerMessage);
+        JTextArea labelOfferMessage = Utility.localizedTextArea(this.offer);
         labelOfferMessage.setFont(font);
         panel.add(labelOfferMessage);
 
@@ -945,10 +944,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         panel.add(this.goldDemandPanel); // Left pane
             JPanel centerPanel = new MigPanel();
             centerPanel.setLayout(new MigLayout("wrap 1"));
-            if (!tutorial.equals("")) {
+            if (tutorial != null) {
                 // Display only if tutorial variable contents overriden
                 //      Can only occur if: First Contact with a forgeign Nation
-                JTextArea tutArea = Utility.getDefaultTextArea(tutorial, 30);
+                JTextArea tutArea = Utility.localizedTextArea(tutorial, 30);
                 centerPanel.add(tutArea, "center");
             }
             centerPanel.add(this.summary, "top");
@@ -1120,11 +1119,11 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         summary.removeAll();
 
-        summary.add(Utility.getDefaultTextArea(comment), "center, span 2");
+        summary.add(Utility.localizedTextArea(comment), "center, span 2");
 
         List<TradeItem> offers = agreement.getItemsGivenBy(player);
         if (!offers.isEmpty()) {
-            summary.add(new JLabel(offerMessage), "span");
+            summary.add(Utility.localizedLabel(this.offer), "span");
             for (TradeItem item : offers) {
                 summary.add(getTradeItemButton(item), "skip");
             }
@@ -1133,7 +1132,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         List<TradeItem> demands = agreement.getItemsGivenBy(otherPlayer);
         if (!demands.isEmpty()) {
             if (offers.isEmpty()) {
-                summary.add(new JLabel(demandMessage), "span");
+                summary.add(Utility.localizedLabel(this.demand), "span");
             } else {
                 summary.add(new JLabel(exchangeMessage), "newline 20, span");
             }
@@ -1260,6 +1259,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         this.inciteOfferPanel = this.inciteDemandPanel = null;
         this.unitOfferPanel = this.unitDemandPanel = null;
         this.summary = null;
-        this.demandMessage = this.offerMessage = this.exchangeMessage = null;
+        this.demand = this.offer = null;
+        this.exchangeMessage = null;
     }
 }

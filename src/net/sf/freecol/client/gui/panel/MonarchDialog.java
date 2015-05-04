@@ -77,8 +77,7 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
         if (!Messages.containsKey(hdrKey)) {
             hdrKey = "monarchDialog.default";
         }
-        String hdr = Messages.message(hdrKey);
-        JTextArea header = Utility.getDefaultTextArea(hdr);
+        JTextArea header = Utility.localizedTextArea(hdrKey);
         header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.MEDIUM));
 
@@ -96,10 +95,9 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
                 });
             panel.add(helpButton, "tag help");
         }
-        JTextArea text = Utility.getDefaultTextArea((template == null)
-            ? Messages.message(messageId)
-            : Messages.message(new StringTemplate(messageId, template)),
-            30);
+        JTextArea text = (template == null)
+            ? Utility.localizedTextArea(messageId, 30)
+            : Utility.localizedTextArea(new StringTemplate(messageId, template), 30);
         panel.add(text);
         panel.setSize(panel.getPreferredSize());
 

@@ -79,7 +79,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
 
         JTextArea tutorial = null;
         if (!player.hasContactedIndians() && freeColClient.tutorialMode()) {
-            tutorial = Utility.getDefaultTextArea(Messages.message(TUTORIAL_KEY));
+            tutorial = Utility.localizedTextArea(TUTORIAL_KEY);
         }
 
         String messageId = (tile != null)
@@ -87,11 +87,11 @@ public class FirstContactDialog extends FreeColConfirmDialog {
             : "firstContactDialog.welcomeSimple.text";
         String type = ((IndianNationType)other.getNationType())
             .getSettlementTypeKey(true);
-        StringTemplate template = StringTemplate.template(messageId)
+        JTextArea text = Utility.localizedTextArea(StringTemplate
+            .template(messageId)
             .addStringTemplate("%nation%", other.getNationName())
             .addName("%camps%", Integer.toString(settlementCount))
-            .add("%settlementType%", type);
-        JTextArea text = Utility.getDefaultTextArea(template);
+            .add("%settlementType%", type));
 
         // Resize the text areas to better match the image.
         int columns = (int)Math.floor(text.getColumns()

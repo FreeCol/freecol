@@ -275,7 +275,7 @@ public class BuildingDetailPanel
         // Notes
         panel.add(Utility.localizedLabel("colopedia.buildings.notes"),
                   "newline 20, top");
-        panel.add(Utility.getDefaultTextArea(Messages.getDescription(buildingType)),
+        panel.add(Utility.localizedTextArea(Messages.descriptionKey(buildingType)),
                   "span, growx");
     }
 

@@ -212,7 +212,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
 
         panel.add(Utility.localizedLabel("colopedia.goods.description"),
                   "newline 20");
-        panel.add(Utility.getDefaultTextArea(Messages.getDescription(type), 30),
+        panel.add(Utility.localizedTextArea(Messages.descriptionKey(type), 30),
                   "span, growx");
     }
 

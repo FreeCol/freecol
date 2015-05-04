@@ -132,7 +132,6 @@ public class ConceptDetailPanel extends FreeColPanel
             FontLibrary.FontSize.SMALL));
         panel.add(header, "align center, wrap 20");
 
-        //panel.add(getDefaultTextArea(Messages.message(id + ".description"), 40));
         JEditorPane editorPane = new JEditorPane("text/html", Messages.getDescription(id)) {
 
             @Override

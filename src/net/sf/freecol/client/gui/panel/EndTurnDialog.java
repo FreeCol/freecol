@@ -149,10 +149,9 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
         final Player player = getMyPlayer();
 
         JLabel header = Utility.localizedHeader(Messages.nameKey("endTurnDialog"), false);
-        StringTemplate template = StringTemplate
+        JTextArea text = Utility.localizedTextArea(StringTemplate
             .template("endTurnDialog.areYouSure")
-            .addAmount("%number%", units.size());
-        JTextArea text = Utility.getDefaultTextArea(template);
+            .addAmount("%number%", units.size()));
 
         DefaultListModel<UnitWrapper> model = new DefaultListModel<>();
         for (Unit unit : units) {

@@ -174,32 +174,6 @@ public final class Utility {
      * Gets a text area with standard settings suitable for use in FreeCol
      * panels.
      *
-     * @param template A <code>StringTemplate</code> for the text to
-     *     display in the text area.
-     * @return A suitable text area.
-     */
-    public static JTextArea getDefaultTextArea(StringTemplate template) {
-        return getDefaultTextArea(Messages.message(template));
-    }
-
-    /**
-     * Gets a text area with standard settings suitable for use in FreeCol
-     * panels.
-     *
-     * @param template A <code>StringTemplate</code> for the text to
-     *     display in the text area.
-     * @param columns The em-width number of columns to display the text in.
-     * @return A suitable text area.
-     */
-    public static JTextArea getDefaultTextArea(StringTemplate template,
-                                               int columns) {
-        return getDefaultTextArea(Messages.message(template), columns);
-    }
-
-    /**
-     * Gets a text area with standard settings suitable for use in FreeCol
-     * panels.
-     *
      * @param text The text to display in the text area.
      * @return A suitable text area.
      */
@@ -506,6 +480,49 @@ public final class Utility {
     public static JRadioButtonMenuItem localizedRadioButtonMenuItem(StringTemplate template,
                                                                     boolean value) {
         return new JRadioButtonMenuItem(Messages.message(template), value);
+    }
+
+    /**
+     * Get a text area containing a localized message.
+     *
+     * @param key The message key.
+     * @return A suitable <code>JTextArea</code>.
+     */
+    public static JTextArea localizedTextArea(String key) {
+        return localizedTextArea(StringTemplate.key(key));
+    }
+
+    /**
+     * Get a text area containing a localized message.
+     *
+     * @param key The message key.
+     * @param columns The em-width number of columns to display the text in.
+     * @return A suitable <code>JTextArea</code>.
+     */
+    public static JTextArea localizedTextArea(String key, int columns) {
+        return localizedTextArea(StringTemplate.key(key), columns);
+    }
+
+    /**
+     * Get a text area containing a localized message.
+     *
+     * @param template The <code>StringTemplate</code> to use.
+     * @return A suitable <code>JTextArea</code>.
+     */
+    public static JTextArea localizedTextArea(StringTemplate template) {
+        return localizedTextArea(template, DEFAULT_TEXT_COLUMNS);
+    }
+
+    /**
+     * Get a text area containing a localized message.
+     *
+     * @param template The <code>StringTemplate</code> to use.
+     * @param columns The em-width number of columns to display the text in.
+     * @return A suitable <code>JTextArea</code>.
+     */
+    public static JTextArea localizedTextArea(StringTemplate template,
+                                              int columns) {
+        return getDefaultTextArea(Messages.message(template), columns);
     }
 
     /**

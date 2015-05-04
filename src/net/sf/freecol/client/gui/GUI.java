@@ -920,7 +920,7 @@ public class GUI {
         if (canvas == null) return false;
 
         return canvas.showConfirmDialog(modal, tile,
-                                        Utility.getDefaultTextArea(template),
+                                        Utility.localizedTextArea(template),
                                         null, okKey, cancelKey);
     }
 
@@ -941,7 +941,7 @@ public class GUI {
         if (canvas == null) return false;
 
         return canvas.showConfirmDialog(modal, tile,
-                                        Utility.getDefaultTextArea(template),
+                                        Utility.localizedTextArea(template),
                                         createImageIcon(
                                             imageLibrary.getUnitImage(obj)),
                                         okKey, cancelKey);
@@ -964,7 +964,7 @@ public class GUI {
         if (canvas == null) return false;
 
         return canvas.showConfirmDialog(modal, tile,
-                                        Utility.getDefaultTextArea(template),
+                                        Utility.localizedTextArea(template),
                                         icon, okKey, cancelKey);
     }
 
@@ -1218,7 +1218,7 @@ public class GUI {
                 ArmedUnitSettlementAction.SETTLEMENT_ATTACK));
 
         return getChoice(true, settlement.getTile(),
-            Utility.getDefaultTextArea(settlement.getAlarmLevelLabel(player)),
+            Utility.localizedTextArea(settlement.getAlarmLevelLabel(player)),
             GUI.createImageIcon(imageLibrary.getSettlementImage(settlement)),
             "cancel", choices);
     }
@@ -1246,7 +1246,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("boycottedGoods.dumpGoods"),
                 BoycottAction.DUMP_CARGO));
 
-        return getChoice(true, null, Utility.getDefaultTextArea(template),
+        return getChoice(true, null, Utility.localizedTextArea(template),
                          GUI.createImageIcon(imageLibrary.getImage(goods.getType())),
                          "cancel", choices);
     }
@@ -1274,7 +1274,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("buy.moreGold"),
                                      BuyAction.HAGGLE));
 
-        return getChoice(true, unit.getTile(), Utility.getDefaultTextArea(template),
+        return getChoice(true, unit.getTile(), Utility.localizedTextArea(template),
                          GUI.createImageIcon(imageLibrary.getImage(goods.getType())),
                          "cancel", choices);
     }
@@ -1307,7 +1307,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("indianLand.take"),
                                      ClaimAction.STEAL));
 
-        return getChoice(true, tile, Utility.getDefaultTextArea(template),
+        return getChoice(true, tile, Utility.localizedTextArea(template),
                          GUI.createImageIcon(imageLibrary.getImage(owner.getNation())),
                          "indianLand.cancel", choices);
     }
@@ -1345,7 +1345,7 @@ public class GUI {
         if (choices.isEmpty()) return null;
 
         return getChoice(true, settlement.getTile(),
-                         Utility.getDefaultTextArea(template),
+                         Utility.localizedTextArea(template),
                          GUI.createImageIcon(
                              imageLibrary.getSettlementImage(settlement)),
                          "cancel", choices);
@@ -1387,7 +1387,7 @@ public class GUI {
                                      MissionaryAction.INCITE_INDIANS));
 
         return getChoice(true, unit.getTile(),
-                         Utility.getDefaultTextArea(Messages.message(template)),
+                         Utility.localizedTextArea(template),
                          GUI.createImageIcon(
                              imageLibrary.getSettlementImage(settlement)),
                          "cancel", choices);
@@ -1445,7 +1445,8 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("scoutColony.attack"),
                                      ScoutColonyAction.FOREIGN_COLONY_ATTACK));
 
-        return getChoice(true, unit.getTile(), Utility.getDefaultTextArea(template),
+        return getChoice(true, unit.getTile(),
+                         Utility.localizedTextArea(template),
                          GUI.createImageIcon(
                              imageLibrary.getSettlementImage(colony)),
                          "cancel", choices);
@@ -1507,7 +1508,7 @@ public class GUI {
                                      ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
 
         return getChoice(true, settlement.getTile(),
-                         Utility.getDefaultTextArea(Messages.message(template)),
+                         Utility.localizedTextArea(template),
                          GUI.createImageIcon(
                              imageLibrary.getSettlementImage(settlement)),
                          "cancel", choices);
@@ -1540,7 +1541,8 @@ public class GUI {
                     .addStringTemplate("%goods%", goodsTemplate)),
                 SellAction.GIFT));
 
-        return getChoice(true, unit.getTile(), Utility.getDefaultTextArea(template),
+        return getChoice(true, unit.getTile(),
+                         Utility.localizedTextArea(template),
                          GUI.createImageIcon(imageLibrary.getImage(goods.getType())),
                          "cancel", choices);
     }

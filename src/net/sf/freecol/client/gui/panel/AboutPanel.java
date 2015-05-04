@@ -135,8 +135,8 @@ public final class AboutPanel extends FreeColPanel {
         add(apProjectURL, "newline");
 
         // License Disclaimer
-        JTextArea apLegal = Utility.getDefaultTextArea(Messages
-                .message("aboutPanel.legalDisclaimer"));
+        JTextArea apLegal
+            = Utility.localizedTextArea("aboutPanel.legalDisclaimer");
         apLegal.setFont(fontNormal);
         add(apLegal, "newline 20, width 300px");
 

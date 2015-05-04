@@ -150,7 +150,7 @@ public class TerrainDetailPanel
         addProduction(panel, tileType.getPossibleProduction(false));
 
         panel.add(Utility.localizedLabel("colopedia.terrain.description"));
-        panel.add(Utility.getDefaultTextArea(Messages.getDescription(tileType)),
+        panel.add(Utility.localizedTextArea(Messages.descriptionKey(tileType)),
                   "span, growx");
     }
 
