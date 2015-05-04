@@ -241,6 +241,10 @@ public final class ResourceMapping {
             || imageResources.containsKey(key);
     }
 
+    public boolean containsColorKey(String key) {
+        return colorResources.containsKey(key);
+    }
+
     public boolean containsImageKey(String key) {
         return imageResources.containsKey(key);
     }

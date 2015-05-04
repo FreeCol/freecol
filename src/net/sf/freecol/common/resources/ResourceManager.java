@@ -231,6 +231,11 @@ public class ResourceManager {
         return mergedContainer.containsImageKey(key);
     }
 
+    public static synchronized boolean hasColorResource(final String key) {
+        //logger.finest("hasColorResource(" + key + ")");
+        return mergedContainer.containsColorKey(key);
+    }
+
     public static synchronized Map<String, Resource> getResources() {
         logger.finest("getResources");
         return mergedContainer.getResources();

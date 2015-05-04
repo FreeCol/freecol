@@ -281,16 +281,26 @@ public final class ReportColonyPanel extends ReportPanel
                                             cols, ""));
 
         // Load the customized colours, with simple fallbacks.
-        cAlarm = ResourceManager.getColor("color.report.colony.alarm");
-        cWarn = ResourceManager.getColor("color.report.colony.warning");
-        cPlain = ResourceManager.getColor("color.report.colony.plain");
-        cExport = ResourceManager.getColor("color.report.colony.export");
-        cGood = ResourceManager.getColor("color.report.colony.good");
-        if (cAlarm == null) cAlarm = Color.RED;
-        if (cWarn == null) cWarn = Color.MAGENTA;
-        if (cPlain == null) cPlain = Color.DARK_GRAY;
-        if (cExport == null) cExport = Color.GREEN;
-        if (cGood == null) cGood = Color.BLUE;
+        String key = "color.report.colony.alarm";
+        cAlarm = ResourceManager.hasColorResource(key)
+            ? ResourceManager.getColor(key)
+            : Color.RED;
+        key = "color.report.colony.warning";
+        cWarn = ResourceManager.hasColorResource(key)
+            ? ResourceManager.getColor(key)
+            : Color.MAGENTA;
+        key = "color.report.colony.plain";
+        cPlain = ResourceManager.hasColorResource(key)
+            ? ResourceManager.getColor(key)
+            : Color.DARK_GRAY;
+        key = "color.report.colony.export";
+        cExport = ResourceManager.hasColorResource(key)
+            ? ResourceManager.getColor(key)
+            : Color.GREEN;
+        key = "color.report.colony.good";
+        cGood = ResourceManager.hasColorResource(key)
+            ? ResourceManager.getColor(key)
+            : Color.BLUE;
     }
 
     private static class Suggestion {
