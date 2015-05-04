@@ -607,6 +607,7 @@ public class GUI {
 
     /**
      * Make image icon from an image.
+     * Use only if you know having null is possible!
      *
      * @param image The <code>Image</code> to create an icon for.
      * @return The <code>ImageIcon</code>.
@@ -616,15 +617,15 @@ public class GUI {
     }
 
     public ImageIcon createUnitImageIcon(Unit unit) {
-        return GUI.createImageIcon(imageLibrary.getUnitImage(unit));
+        return new ImageIcon(imageLibrary.getUnitImage(unit));
     }
 
     public ImageIcon createSettlementImageIcon(Settlement settlement) {
-        return GUI.createImageIcon(imageLibrary.getSettlementImage(settlement));
+        return new ImageIcon(imageLibrary.getSettlementImage(settlement));
     }
 
     public ImageIcon createGoodsImageIcon(GoodsType goodsType) {
-        return GUI.createImageIcon(imageLibrary.getImage(goodsType));
+        return new ImageIcon(imageLibrary.getImage(goodsType));
     }
 
     /**
@@ -942,7 +943,7 @@ public class GUI {
 
         return canvas.showConfirmDialog(modal, tile,
                                         Utility.localizedTextArea(template),
-                                        createImageIcon(
+                                        (obj == null) ? null : new ImageIcon(
                                             imageLibrary.getUnitImage(obj)),
                                         okKey, cancelKey);
     }
@@ -1219,7 +1220,7 @@ public class GUI {
 
         return getChoice(true, settlement.getTile(),
             Utility.localizedTextArea(settlement.getAlarmLevelLabel(player)),
-            GUI.createImageIcon(imageLibrary.getSettlementImage(settlement)),
+            new ImageIcon(imageLibrary.getSettlementImage(settlement)),
             "cancel", choices);
     }
 
@@ -1247,7 +1248,7 @@ public class GUI {
                 BoycottAction.DUMP_CARGO));
 
         return getChoice(true, null, Utility.localizedTextArea(template),
-                         GUI.createImageIcon(imageLibrary.getImage(goods.getType())),
+                         new ImageIcon(imageLibrary.getImage(goods.getType())),
                          "cancel", choices);
     }
 
@@ -1275,7 +1276,7 @@ public class GUI {
                                      BuyAction.HAGGLE));
 
         return getChoice(true, unit.getTile(), Utility.localizedTextArea(template),
-                         GUI.createImageIcon(imageLibrary.getImage(goods.getType())),
+                         new ImageIcon(imageLibrary.getImage(goods.getType())),
                          "cancel", choices);
     }
 
@@ -1308,7 +1309,7 @@ public class GUI {
                                      ClaimAction.STEAL));
 
         return getChoice(true, tile, Utility.localizedTextArea(template),
-                         GUI.createImageIcon(imageLibrary.getImage(owner.getNation())),
+                         new ImageIcon(imageLibrary.getImage(owner.getNation())),
                          "indianLand.cancel", choices);
     }
 
@@ -1346,7 +1347,7 @@ public class GUI {
 
         return getChoice(true, settlement.getTile(),
                          Utility.localizedTextArea(template),
-                         GUI.createImageIcon(
+                         new ImageIcon(
                              imageLibrary.getSettlementImage(settlement)),
                          "cancel", choices);
     }
@@ -1388,7 +1389,7 @@ public class GUI {
 
         return getChoice(true, unit.getTile(),
                          Utility.localizedTextArea(template),
-                         GUI.createImageIcon(
+                         new ImageIcon(
                              imageLibrary.getSettlementImage(settlement)),
                          "cancel", choices);
     }
@@ -1447,7 +1448,7 @@ public class GUI {
 
         return getChoice(true, unit.getTile(),
                          Utility.localizedTextArea(template),
-                         GUI.createImageIcon(
+                         new ImageIcon(
                              imageLibrary.getSettlementImage(colony)),
                          "cancel", choices);
     }
@@ -1509,7 +1510,7 @@ public class GUI {
 
         return getChoice(true, settlement.getTile(),
                          Utility.localizedTextArea(template),
-                         GUI.createImageIcon(
+                         new ImageIcon(
                              imageLibrary.getSettlementImage(settlement)),
                          "cancel", choices);
     }
@@ -1543,7 +1544,7 @@ public class GUI {
 
         return getChoice(true, unit.getTile(),
                          Utility.localizedTextArea(template),
-                         GUI.createImageIcon(imageLibrary.getImage(goods.getType())),
+                         new ImageIcon(imageLibrary.getImage(goods.getType())),
                          "cancel", choices);
     }
 
@@ -1913,7 +1914,7 @@ public class GUI {
         ImageIcon icon = null;
         Tile tile = null;
         if(displayObject != null) {
-            icon = createImageIcon(imageLibrary.getSettlementImage(displayObject));
+            icon = new ImageIcon(imageLibrary.getSettlementImage(displayObject));
             tile = displayObject.getTile();
         }
         canvas.showInformationMessage(displayObject, tile, icon, template);
@@ -1926,7 +1927,7 @@ public class GUI {
         ImageIcon icon = null;
         Tile tile = null;
         if(displayObject != null) {
-            icon = createImageIcon(imageLibrary.getUnitImage(displayObject));
+            icon = new ImageIcon(imageLibrary.getUnitImage(displayObject));
             tile = displayObject.getTile();
         }
         canvas.showInformationMessage(displayObject, tile, icon, template);

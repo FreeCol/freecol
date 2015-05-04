@@ -301,8 +301,7 @@ public final class ImageLibrary {
 
     public static BufferedImage getForestImage(TileType type, TileImprovementStyle riverStyle, float scale) {
         if (riverStyle != null) {
-            BufferedImage image = ResourceManager.getImage(
-                "image.tileforest." + type.getId() + ".s" + riverStyle.getMask(), scale);
+            String key = "image.tileforest." + type.getId() + ".s" + riverStyle.getMask();
             // @compat 0.10.6
             // Workaround for BR#3599586.  America_large used to contain
             // tiles with an isolated river (old river style="0"!).
@@ -310,9 +309,9 @@ public final class ImageLibrary {
             // river style.  The map is now fixed, this is just for the
             // the saved games.
             // Consider keeping the fallback, as its safer to have one.
-            if(image != null)
+            if (ResourceManager.hasImageResource(key))
             // end @compat
-                return image;
+                return ResourceManager.getImage(key, scale);
         }
         return ResourceManager.getImage("image.tileforest." + type.getId(), scale);
     }
@@ -831,15 +830,6 @@ public final class ImageLibrary {
         BufferedImage image = (grayscale)
             ? ResourceManager.getGrayscaleImage(key, scale)
             : ResourceManager.getImage(key, scale);
-        if (image == null) {
-            String complain = "No image icon for: unitType=" + unitType.getId()
-                + " role=" + roleId + " native=" + nativeEthnicity
-                + " gray=" + grayscale + " scale=" + scale
-                + " roleQual=" + roleQual + " key=" + key;
-            logger.warning(complain);
-            return null;
-            // Consider throwing a RuntimeException.
-        }
         return image;
     }
 
@@ -861,7 +851,8 @@ public final class ImageLibrary {
                                       JComponent c, Insets insets) {
         int width = c.getWidth();
         int height = c.getHeight();
-        BufferedImage image = ResourceManager.getImage(resource);
+        BufferedImage image = ResourceManager.hasImageResource(resource)
+            ? ResourceManager.getImage(resource) : null;
         int dx, dy, xmin, ymin;
 
         if (insets == null) {

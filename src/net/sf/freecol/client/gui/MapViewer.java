@@ -673,12 +673,11 @@ public final class MapViewer {
             displayCenteredImage(g, image, tileWidth, tileHeight);
         }
 
-        Image image;
-        if (unit != null
-            && (image = lib.getSmallerUnitImage(unit)) != null) {
+        if (unit != null) {
+            BufferedImage image = lib.getSmallerUnitImage(unit);
             g.drawImage(image,
-                        tileWidth/4 - image.getWidth(null) / 2,
-                        halfHeight - image.getHeight(null) / 2, null);
+                        tileWidth/4 - image.getWidth() / 2,
+                        halfHeight - image.getHeight() / 2, null);
             // Draw an occupation and nation indicator.
             Player owner = freeColClient.getMyPlayer();
             String text = Messages.message(unit.getOccupationLabel(owner, false));
@@ -2144,8 +2143,6 @@ public final class MapViewer {
             || (unit.hasTile()
                 && player != null && !player.canSee(unit.getTile()));
         Image image = lib.getUnitImage(unit, fade);
-        if (image == null) return; // Defend against resource failure
-
         Point p = calculateUnitImagePositionInTile(image);
         g.drawImage(image, p.x, p.y, null);
 
@@ -2221,9 +2218,7 @@ public final class MapViewer {
                                          Resource item,
                                          int tileWidth, int tileHeight) {
         Image bonusImage = lib.getImage(item.getType());
-        if (bonusImage != null) {
-            displayCenteredImage(g, bonusImage, tileWidth, tileHeight);
-        }
+        displayCenteredImage(g, bonusImage, tileWidth, tileHeight);
     }
 
     private static void displayLostCityRumour(Graphics2D g, ImageLibrary lib,
@@ -2505,8 +2500,6 @@ public final class MapViewer {
      */
     private JLabel createUnitLabel(Unit unit) {
         final Image unitImg = lib.getUnitImage(unit);
-        if (unitImg == null) return null;
-
         final int width = halfWidth + unitImg.getWidth(null)/2;
         final int height = unitImg.getHeight(null);
 

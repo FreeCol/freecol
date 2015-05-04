@@ -1276,11 +1276,12 @@ public final class Canvas extends JDesktopPane {
                 // TODO: Check if its right to sometimes have an unfocused map
                 //       ingame and end up here after clicking outside map.
 
-                // Get the background without scaling, to avoid wasting memory
-                // needlessly keeping an unbounded number of rescaled versions
-                // of the largest image in FreeCol, forever.
-                Image bgImage = ResourceManager.getImage("image.flavor.Canvas.map");
-                if (bgImage != null) {
+                final String bgImageKey = "image.flavor.Canvas.map";
+                if (ResourceManager.hasImageResource(bgImageKey)) {
+                    // Get the background without scaling, to avoid wasting
+                    // memory needlessly keeping an unbounded number of rescaled
+                    // versions of the largest image in FreeCol, forever.
+                    final Image bgImage = ResourceManager.getImage(bgImageKey);
                     // Draw background image with scaling.
                     g2d.drawImage(bgImage, 0, 0, size.width, size.height, this);
                     String versionStr = "v. " + FreeCol.getVersion();

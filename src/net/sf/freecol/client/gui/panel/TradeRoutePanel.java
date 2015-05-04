@@ -212,7 +212,6 @@ public final class TradeRoutePanel extends FreeColPanel {
             add(unitLabel);
             Location loc = this.unit.getLocation();
             JLabel locLabel = Utility.localizedLabel(loc.getLocationLabelFor(player));
-            //locLabel.setIcon(GUI.createImageIcon(getImageLibrary().getObjectImage(loc)));
             add(locLabel);
         }
         add(tradeRouteView, "height 360:400, width 250:");

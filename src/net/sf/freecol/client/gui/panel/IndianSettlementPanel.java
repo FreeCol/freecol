@@ -20,13 +20,13 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
@@ -82,7 +82,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         final Unit missionary = settlement.getMissionary();
         if (missionary != null) {
             add(Utility.localizedLabel(missionary.getLabel(Unit.UnitLabelType.NATIONAL),
-                GUI.createImageIcon(lib.getSmallUnitImage(missionary)),
+                new ImageIcon(lib.getSmallUnitImage(missionary)),
                 JLabel.CENTER));
         }
 
@@ -90,7 +90,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         final UnitType skillType = settlement.getLearnableSkill();
         add(Utility.localizedLabel(settlement.getLearnableSkillLabel(visited),
                 ((visited && skillType != null)
-                    ? GUI.createImageIcon(lib.getSmallUnitImage(skillType))
+                    ? new ImageIcon(lib.getSmallUnitImage(skillType))
                     : null),
                 JLabel.CENTER));
 
@@ -98,7 +98,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         final Player mostHated = settlement.getMostHated();
         add(Utility.localizedLabel(settlement.getMostHatedLabel(contacted),
                 ((contacted && mostHated != null)
-                    ? GUI.createImageIcon(lib.getSmallImage(mostHated.getNation()))
+                    ? new ImageIcon(lib.getSmallImage(mostHated.getNation()))
                     : null),
                 JLabel.CENTER));
 

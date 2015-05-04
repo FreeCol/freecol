@@ -87,18 +87,15 @@ public final class AboutPanel extends FreeColPanel {
      */
     public AboutPanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap"));
-        
+
         // Header with image
         Image tempImage = ResourceManager.getImage("image.flavor.Title");
-        if (tempImage != null) {
-            JLabel apLogoLabel = new JLabel(new ImageIcon(tempImage));
-            apLogoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,2,2),
-                    new BevelBorder(BevelBorder.LOWERED)));
-            add(apLogoLabel, "center");
-        } else {
-            logger.warning("Cannot find: image.flavor.Title.");
-        }
-        
+        JLabel apLogoLabel = new JLabel(new ImageIcon(tempImage));
+        apLogoLabel.setBorder(
+            new CompoundBorder(new EmptyBorder(2,2,2,2),
+                               new BevelBorder(BevelBorder.LOWERED)));
+        add(apLogoLabel, "center");
+
         // Create available Font choices
         Font fontBold = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.TINY, Font.BOLD,

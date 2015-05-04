@@ -86,9 +86,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
                                                "[][]20[align right]0[]", ""));
             enemyPanel.setOpaque(false);
             final Image coatOfArms = lib.getImage(enemy.getNation());
-            JLabel coatLabel = (coatOfArms != null)
-                ? new JLabel(new ImageIcon(coatOfArms))
-                : new JLabel();
+            JLabel coatLabel = new JLabel(new ImageIcon(coatOfArms));
             enemyPanel.add(coatLabel, "spany, aligny top");
 
             JLabel label = Utility.localizedLabel(enemy.getNationName());

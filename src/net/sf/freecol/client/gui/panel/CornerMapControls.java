@@ -105,7 +105,6 @@ public final class CornerMapControls extends MapControls {
                 }
             });
 
-        miniMapSkin = ResourceManager.getImage("image.skin.MiniMap");
         miniMapPanel = new MiniMapPanel();
         miniMapPanel.setFocusable(false);
         
@@ -123,7 +122,9 @@ public final class CornerMapControls extends MapControls {
         miniMapPanel.add(miniMapZoomOutButton);
         miniMapPanel.add(miniMap);
 
-        if (miniMapSkin != null) {
+        String miniMapSkinKey = "image.skin.MiniMap";
+        if (ResourceManager.hasImageResource(miniMapSkinKey)) {
+            miniMapSkin = ResourceManager.getImage(miniMapSkinKey);
             miniMapPanel.setBorder(null);
             miniMapPanel.setSize(miniMapSkin.getWidth(null),
                                  miniMapSkin.getHeight(null));
@@ -136,6 +137,7 @@ public final class CornerMapControls extends MapControls {
             miniMapZoomInButton.setLocation(4, 174);
             miniMapZoomOutButton.setLocation(264, 174);
         } else {
+            miniMapSkin = null;
             int width = miniMapZoomOutButton.getWidth()
                 + miniMapZoomInButton.getWidth() + 4 * GAP;
             miniMapPanel.setOpaque(true);

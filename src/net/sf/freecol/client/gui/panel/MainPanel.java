@@ -76,13 +76,10 @@ public final class MainPanel extends FreeColPanel {
                 : NewAction.id));
 
         Image tempImage = ResourceManager.getImage("image.flavor.Title");
-
-        if (tempImage != null) {
-            JLabel logoLabel = new JLabel(new ImageIcon(tempImage));
-            logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,0,2),
-                    new BevelBorder(BevelBorder.LOWERED)));
-            add(logoLabel);
-        }
+        JLabel logoLabel = new JLabel(new ImageIcon(tempImage));
+        logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,0,2),
+                new BevelBorder(BevelBorder.LOWERED)));
+        add(logoLabel);
 
         add(okButton, "newline 20, width 70%");
         if (canContinue) add(newButton, "width 70%");

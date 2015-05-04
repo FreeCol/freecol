@@ -85,8 +85,7 @@ public class BuildingDetailPanel
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
 
         Image buildingImage = ResourceManager.getImage("image.icon.Colopedia.buildingSection");
-        ImageIcon buildingIcon = (buildingImage == null) ? null
-            : new ImageIcon(buildingImage);
+        ImageIcon buildingIcon = new ImageIcon(buildingImage);
 
         List<BuildingType> buildingTypes = new ArrayList<>();
         Map<BuildingType, DefaultMutableTreeNode> buildingHash = new HashMap<>();

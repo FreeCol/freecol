@@ -342,7 +342,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         panel.setPreferredSize(panel.getPreferredSize()); // Prevent NPE
 
         // Use the coat of arms image icon.  Is there something better?
-        ImageIcon icon = GUI.createImageIcon(getImageLibrary().getSmallImage(player.getNation()));
+        ImageIcon icon = new ImageIcon(getImageLibrary().getSmallImage(player.getNation()));
 
         final List<String> fake = null;
         List<ChoiceItem<List<String>>> c = choices();

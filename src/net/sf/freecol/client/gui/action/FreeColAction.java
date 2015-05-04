@@ -232,15 +232,19 @@ public abstract class FreeColAction extends AbstractAction
      * @param key The identifier of the action.
      */
     protected void addImageIcons(String key) {
-        Image normal = ResourceManager.getImage("image.miscicon.button.normal." + key);
-        Image highlighted = ResourceManager.getImage("image.miscicon.button.highlighted." + key);
-        Image pressed = ResourceManager.getImage("image.miscicon.button.pressed." + key);
-        Image disabled = ResourceManager.getImage("image.miscicon.button.disabled." + key);
-        orderButtonImageCount = ((normal == null) ? 0 : 1)
-            + ((highlighted == null) ? 0 : 1)
-            + ((pressed == null) ? 0 : 1)
-            + ((disabled == null) ? 0 : 1);
+        String normalKey = "image.miscicon.button.normal." + key;
+        String highlightedKey = "image.miscicon.button.highlighted." + key;
+        String pressedKey = "image.miscicon.button.pressed." + key;
+        String disabledKey = "image.miscicon.button.disabled." + key;
+        orderButtonImageCount = (ResourceManager.hasImageResource(normalKey) ? 1 : 0)
+            + (ResourceManager.hasImageResource(highlightedKey) ? 1 : 0)
+            + (ResourceManager.hasImageResource(pressedKey) ? 1 : 0)
+            + (ResourceManager.hasImageResource(disabledKey) ? 1 : 0);
         if (hasOrderButtons()) {
+            Image normal = ResourceManager.getImage(normalKey);
+            Image highlighted = ResourceManager.getImage(highlightedKey);
+            Image pressed = ResourceManager.getImage(pressedKey);
+            Image disabled = ResourceManager.getImage(disabledKey);
             putValue(BUTTON_IMAGE, new ImageIcon(normal));
             putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(highlighted));
             putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(pressed));
