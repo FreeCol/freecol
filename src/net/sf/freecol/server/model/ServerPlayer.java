@@ -2919,14 +2919,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 colony.ejectUnits(ct, ct.getUnitList());
             }
         }
-        tiles.add(tile);
 
         // Hand over the colony.  Inform former owner of loss of owned
         // tiles, and process possible increase in line of sight.
-        colony//-til
+        // No need to display the colony tile or the attacker tile to
+        // the attacking player as the unit is yet to move
+        Set<Tile> explored = colony//-til
             .csChangeOwner(attackerPlayer, cs);//-vis(attackerPlayer,colonyPlayer)
-        Set<Tile> explored = attackerPlayer.exploreForSettlement(colony);
         explored.addAll(tiles);
+        if (attacker.hasTile()) explored.remove(attacker.getTile());
         cs.add(See.only(attackerPlayer), explored);
         cs.add(See.perhaps().always(colonyPlayer).except(attackerPlayer),
                tiles);

@@ -22,6 +22,7 @@ package net.sf.freecol.server.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.i18n.Messages;
@@ -724,8 +725,10 @@ public class ServerColony extends Colony implements ServerModelObject {
      *
      * @param newOwner The new owning <code>ServerPlayer</code>.
      * @param cs A <code>ChangeSet</code> to update.
+     * @return A set of newly explored <code>Tile</code>s as a result of the
+     *     ownership change.
      */
-    public void csChangeOwner(ServerPlayer newOwner, ChangeSet cs) {
+    public Set<Tile> csChangeOwner(ServerPlayer newOwner, ChangeSet cs) {
         final ServerPlayer owner = (ServerPlayer)getOwner();
 
         for (Tile t : getOwnedTiles()) t.cacheUnseen(newOwner);//+til
@@ -757,7 +760,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // Changing the owner might alter bonuses applied by founding fathers:
         updateSoL();
         updateProductionBonus();
-        newOwner.exploreForSettlement(this);
+        return newOwner.exploreForSettlement(this);
     }
 
     /**
