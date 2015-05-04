@@ -3256,7 +3256,7 @@ public final class InGameController extends Controller {
             if (csAcceptTrade(agreement, session, cs)) {
                 session.complete(cs);
                 sendToOthers(serverPlayer, cs);
-                return true;
+                return false;
             }
             // Trade was invalid, fall through into rejection.
         case REJECT_TRADE: default:
