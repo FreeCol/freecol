@@ -62,9 +62,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     private final GUI gui;
 
-    private Color backgroundColor = ResourceManager.getColor("color.background.MiniMap");
-    private final Image backgroundImage = ResourceManager.getImage("image.background.MiniMap");
-
     private int tileSize; //tileSize is the size (in pixels) that each tile will take up on the mini map
 
     /**
@@ -89,14 +86,12 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
 
-        backgroundColor = Color.BLACK;
         setLayout(null);
 
         tileSize = 4 * (freeColClient.getClientOptions().getInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM) + 1);
 
         addMouseListener(this);
         addMouseMotionListener(this);
-
     }
 
     /**
@@ -107,7 +102,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         setZoomOption(tileSize);
         repaint();
     }
-
 
     /**
      * Zooms out the mini map.
@@ -152,7 +146,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 && tileSize > MIN_TILE_SIZE);
     }
 
-
     private void setZoomOption(int tileSize) {
         int zoom = tileSize / 4 - 1;
         freeColClient.getClientOptions()
@@ -180,8 +173,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             || freeColClient.getGame().getMap() == null) {
             return;
         }
-
-        graphics.drawImage(backgroundImage, 0, 0, null);
+        graphics.drawImage(ResourceManager.getImage("image.background.MiniMap"),
+            0, 0, null);
         paintMap(graphics);
      }
 
@@ -192,8 +185,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     private Color getMinimapPoliticsColor(TileType type) {
         return ResourceManager.getColor("color.politics.MiniMap." + type.getId());
     }
-    
-    
+
     /**
      * Paints a representation of the mapboard onto this component.
      * @param graphics The <code>Graphics</code> context in which
@@ -218,8 +210,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         if (gui.getFocus() == null) {
             return;
         }
-
-
 
         /* xSize and ySize represent how many tiles can be represented on the
            mini map at the current zoom level */
@@ -354,13 +344,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         }
         g.setTransform(baseTransform);
 
-
         /* Defines where to draw the white rectangle on the mini map.
          * miniRectX/Y are the center of the rectangle.
          * Use miniRectWidth/Height / 2 to get the upper left corner.
          * x/yTiles are the number of tiles that fit on the large map */
-
-
         if (getParent() != null) {
             TileType tileType = freeColClient.getGame().getSpecification().getTileTypeList().get(0);
             int miniRectX = (gui.getFocus().getX() - firstColumn) * tileSize;
@@ -428,7 +415,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
     }
 
     /**
@@ -441,41 +427,25 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         focus(e);
     }
 
-
     @Override
     public void mouseReleased(MouseEvent e) {
-
     }
-
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
     }
-
 
     @Override
     public void mouseExited(MouseEvent e) {
-
     }
-
 
     @Override
     public void mouseDragged(MouseEvent e) {
         focus(e);
     }
 
-
     @Override
     public void mouseMoved(MouseEvent e) {
-
     }
 
-    public Color getBackgroundColor() {
-        return backgroundColor;
-    }
-
-    public void setBackgroundColor(Color backgroundColor) {
-        this.backgroundColor = backgroundColor;
-    }
 }
