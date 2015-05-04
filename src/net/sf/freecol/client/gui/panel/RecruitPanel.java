@@ -42,9 +42,6 @@ public final class RecruitPanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(RecruitPanel.class.getName());
 
-    /** The main text area. */
-    private final JTextArea question;
-
     /** The array of recruitable units. */
     private final JButton[] person;
 
@@ -61,7 +58,6 @@ public final class RecruitPanel extends FreeColPanel {
         super(freeColClient, new MigLayout("wrap 1", "", ""));
 
         person = new JButton[getMyPlayer().getEurope().getRecruitables().size()];
-        question = Utility.getDefaultTextArea("");
         for (int i = 0; i < person.length; i++) {
             person[i] = new JButton();
             person[i].setActionCommand(String.valueOf(i));
@@ -91,12 +87,11 @@ public final class RecruitPanel extends FreeColPanel {
             if (immigrationRequired % production > 0) turns++;
         }
         int recruitPrice = player.getRecruitPrice();
-        String header = Messages.message(StringTemplate
-            .template("recruitPanel.clickOn")
-            .addAmount("%money%", recruitPrice)
-            .addAmount("%number%", turns));
-        question.setText(header);
-        add(question, "wrap 20");
+        add(Utility.getDefaultTextArea(Messages.message(StringTemplate
+                    .template("recruitPanel.clickOn")
+                    .addAmount("%money%", recruitPrice)
+                    .addAmount("%number%", turns))),
+            "wrap 20");
 
         shouldEnable = false;
         int i = 0;
