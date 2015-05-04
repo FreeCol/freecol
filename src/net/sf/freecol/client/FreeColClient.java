@@ -376,7 +376,7 @@ public final class FreeColClient {
      *
      * @param err The error message.
      */
-    private void fatal(String err) {
+    public static void fatal(String err) {
         logger.log(Level.SEVERE, err);
         FreeCol.fatal(err);
     }

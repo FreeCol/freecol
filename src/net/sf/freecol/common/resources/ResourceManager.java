@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 
 
@@ -46,6 +47,8 @@ public class ResourceManager {
     // in thread safety issues in Java. 
     // It is currently assumed changing of mappings can happen on any thread,
     // but Resources are only retrieved or cleaned from the AWT thread.
+
+    public static final String REPLACEMENT_IMAGE = "image.miscicon.delete";
 
     /**
      * The following fields are mappings from resource IDs to
@@ -338,9 +341,13 @@ public class ResourceManager {
     }
 
     private static synchronized ImageResource getImageResource(final String key) {
-        final ImageResource r = mergedContainer.getImageResource(key);
+        ImageResource r = mergedContainer.getImageResource(key);
         if (r == null) {
             logger.warning("getImageResource(" + key + ") failed");
+            r = mergedContainer.getImageResource(REPLACEMENT_IMAGE);
+            if(r == null) {
+                FreeColClient.fatal("Failed getting replacement image.");
+            }
         }
         return r;
     }
@@ -354,8 +361,15 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static BufferedImage getImage(final String key) {
-        final ImageResource r = getImageResource(key);
-        return (r != null) ? r.getImage() : null;
+        BufferedImage image = getImageResource(key).getImage();
+        if(image == null) {
+            logger.warning("getImage(" + key + ") failed");
+            image = getImageResource(REPLACEMENT_IMAGE).getImage();
+            if(image == null) {
+                FreeColClient.fatal("Failed getting replacement image.");
+            }
+        }
+        return image;
     }
 
     /**
@@ -373,8 +387,15 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static BufferedImage getImage(final String key, final float scale) {
-        final ImageResource r = getImageResource(key);
-        return (r != null) ? r.getImage(scale) : null;
+        BufferedImage image = getImageResource(key).getImage(scale);
+        if(image == null) {
+            logger.warning("getImage(" + key + ", " + scale + ") failed");
+            image = getImageResource(REPLACEMENT_IMAGE).getImage(scale);
+            if(image == null) {
+                FreeColClient.fatal("Failed getting replacement image.");
+            }
+        }
+        return image;
     }
 
     /**
@@ -390,8 +411,15 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static BufferedImage getImage(final String key, final Dimension size) {
-        final ImageResource r = getImageResource(key);
-        return (r != null) ? r.getImage(size) : null;
+        BufferedImage image = getImageResource(key).getImage(size);
+        if(image == null) {
+            logger.warning("getImage(" + key + ", " + size + ") failed");
+            image = getImageResource(REPLACEMENT_IMAGE).getImage(size);
+            if(image == null) {
+                FreeColClient.fatal("Failed getting replacement image.");
+            }
+        }
+        return image;
     }
 
     /**
@@ -406,8 +434,15 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static BufferedImage getGrayscaleImage(final String key, final Dimension size) {
-        final ImageResource r = getImageResource(key);
-        return (r != null) ? r.getGrayscaleImage(size) : null;
+        BufferedImage image = getImageResource(key).getGrayscaleImage(size);
+        if(image == null) {
+            logger.warning("getGrayscaleImage(" + key + ", " + size + ") failed");
+            image = getImageResource(REPLACEMENT_IMAGE).getGrayscaleImage(size);
+            if(image == null) {
+                FreeColClient.fatal("Failed getting replacement image.");
+            }
+        }
+        return image;
     }
 
     /**
@@ -422,8 +457,15 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static BufferedImage getGrayscaleImage(final String key, final float scale) {
-        final ImageResource r = getImageResource(key);
-        return (r != null) ? r.getGrayscaleImage(scale) : null;
+        BufferedImage image = getImageResource(key).getGrayscaleImage(scale);
+        if(image == null) {
+            logger.warning("getGrayscaleImage(" + key + ", " + scale + ") failed");
+            image = getImageResource(REPLACEMENT_IMAGE).getGrayscaleImage(scale);
+            if(image == null) {
+                FreeColClient.fatal("Failed getting replacement image.");
+            }
+        }
+        return image;
     }
 
     /**
