@@ -49,6 +49,7 @@ public class ResourceManager {
     // but Resources are only retrieved or cleaned from the AWT thread.
 
     public static final String REPLACEMENT_IMAGE = "image.miscicon.delete";
+    public static final String REPLACEMENT_STRING = "X";
 
     /**
      * The following fields are mappings from resource IDs to
@@ -560,7 +561,7 @@ public class ResourceManager {
      */
     public static String getString(final String key) {
         final StringResource r = getStringResource(key);
-        return (r == null) ? null : r.getString();
+        return (r == null) ? REPLACEMENT_STRING : r.getString();
     }
 
 }
