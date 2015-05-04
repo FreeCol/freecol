@@ -36,6 +36,8 @@ public class ColorResource extends Resource {
 
     private static final Logger logger = Logger.getLogger(ColorResource.class.getName());
 
+    public static final Color REPLACEMENT_COLOR = Color.MAGENTA;
+
     public static final String SCHEME = "color:";
 
     private final Color color;
@@ -109,8 +111,8 @@ public class ColorResource extends Resource {
                 logger.log(Level.WARNING, "Failed to decode colour", e);
             }
         }
-        // Fall back to black.  There are places where a null colour
+        // Fall back, as there are places where a null colour
         // can cause crashes.
-        return Color.BLACK;
+        return REPLACEMENT_COLOR;
     }
 }

@@ -356,9 +356,7 @@ public class ResourceManager {
      * Returns the image specified by the given name.
      *
      * @param key The name of the resource to return.
-     * @return The image identified by <code>resource</code>
-     *      or <code>null</code> if there is no image
-     *      identified by that name.
+     * @return The image identified by <code>resource</code>.
      */
     public static BufferedImage getImage(final String key) {
         BufferedImage image = getImageResource(key).getImage();
@@ -382,9 +380,7 @@ public class ResourceManager {
      * @param scale The size of the requested image (with 1 being normal size,
      *      2 twice the size, 0.5 half the size etc). Rescaling
      *      will be performed unless using 1.
-     * @return The image identified by <code>resource</code>
-     *      or <code>null</code> if there is no image
-     *      identified by that name.
+     * @return The image identified by <code>resource</code>.
      */
     public static BufferedImage getImage(final String key, final float scale) {
         BufferedImage image = getImageResource(key).getImage(scale);
@@ -406,9 +402,7 @@ public class ResourceManager {
      * @param key The name of the resource to return.
      * @param size The size of the requested image. Rescaling
      *      will be performed if necessary.
-     * @return The image identified by <code>resource</code>
-     *      or <code>null</code> if there is no image
-     *      identified by that name.
+     * @return The image identified by <code>resource</code>.
      */
     public static BufferedImage getImage(final String key, final Dimension size) {
         BufferedImage image = getImageResource(key).getImage(size);
@@ -429,9 +423,7 @@ public class ResourceManager {
      * @param key The name of the resource to return.
      * @param size The size of the requested image. Rescaling
      *      will be performed if necessary.
-     * @return The image identified by <code>resource</code>
-     *      or <code>null</code> if there is no image
-     *      identified by that name.
+     * @return The image identified by <code>resource</code>.
      */
     public static BufferedImage getGrayscaleImage(final String key, final Dimension size) {
         BufferedImage image = getImageResource(key).getGrayscaleImage(size);
@@ -452,9 +444,7 @@ public class ResourceManager {
      * @param scale The size of the requested image (with 1 being normal size,
      *      2 twice the size, 0.5 half the size etc). Rescaling
      *      will be performed unless using 1.
-     * @return The image identified by <code>resource</code>
-     *      or <code>null</code> if there is no image
-     *      identified by that name.
+     * @return The image identified by <code>resource</code>.
      */
     public static BufferedImage getGrayscaleImage(final String key, final float scale) {
         BufferedImage image = getImageResource(key).getGrayscaleImage(scale);
@@ -503,13 +493,12 @@ public class ResourceManager {
      * @param key The name of the resource to return.
      * @return An <code>Color</code> created with the image
      *      identified by <code>resource</code> or
-     *      <code>null</code> if there is no color identified
+     *      a replacement color if there is no color identified
      *      by that name.
-     * @see #getImage(String)
      */
     public static Color getColor(final String key) {
         final ColorResource r = getColorResource(key);
-        return (r != null) ? r.getColor() : null;
+        return (r == null) ? ColorResource.REPLACEMENT_COLOR : r.getColor();
     }
 
     /**
