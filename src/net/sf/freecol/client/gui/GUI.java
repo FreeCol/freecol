@@ -1366,12 +1366,11 @@ public class GUI {
                                                 IndianSettlement settlement,
                                                 boolean canEstablish,
                                                 boolean canDenounce) {
-        StringBuilder sb = new StringBuilder(256);
-        StringTemplate t = settlement.getAlarmLevelLabel(unit.getOwner());
-        sb.append(Messages.message(t)).append("\n\n");
-        t = StringTemplate.template("missionarySettlement.question")
-            .addName("%settlement%", settlement.getName());
-        sb.append(Messages.message(t));
+        StringTemplate template = StringTemplate.label("\n\n")
+            .addStringTemplate(settlement.getAlarmLevelLabel(unit.getOwner()))
+            .addStringTemplate(StringTemplate
+                .template("missionarySettlement.question")
+                .addName("%settlement%", settlement.getName()));
 
         List<ChoiceItem<MissionaryAction>> choices = new ArrayList<>();
         if (canEstablish) {
@@ -1387,7 +1386,8 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.incite"),
                                      MissionaryAction.INCITE_INDIANS));
 
-        return getChoice(true, unit.getTile(), Utility.getDefaultTextArea(sb.toString()),
+        return getChoice(true, unit.getTile(),
+                         Utility.getDefaultTextArea(Messages.message(template)),
                          GUI.createImageIcon(
                              imageLibrary.getSettlementImage(settlement)),
                          "cancel", choices);
@@ -1464,23 +1464,23 @@ public class GUI {
         final Player player = freeColClient.getMyPlayer();
         final Player owner = settlement.getOwner();
 
-        StringBuilder sb = new StringBuilder(400);
-        sb.append(Messages.message(settlement.getAlarmLevelLabel(player)))
-            .append("\n\n");
-        String key = ((IndianNationType)owner.getNationType())
-            .getSettlementTypeKey(true);
-        sb.append(Messages.message(StringTemplate
+        StringTemplate template = StringTemplate.label("")
+            .addStringTemplate(settlement.getAlarmLevelLabel(player))
+            .addName("\n\n")
+            .addStringTemplate(StringTemplate
                 .template("scoutSettlement.greetings")
                 .addStringTemplate("%nation%", owner.getNationName())
                 .addName("%settlement%", settlement.getName())
                 .addName("%number%", numberString)
-                .add("%settlementType%", key)))
-            .append(" ");
+                .add("%settlementType%",
+                    ((IndianNationType)owner.getNationType()).getSettlementTypeKey(true)))
+            .addName(" ");
         if (settlement.getLearnableSkill() != null) {
-            sb.append(Messages.message(StringTemplate
+            template
+                .addStringTemplate(StringTemplate
                     .template("scoutSettlement.skill")
-                    .addNamed("%skill%", settlement.getLearnableSkill())))
-                .append(" ");
+                    .addNamed("%skill%", settlement.getLearnableSkill()))
+                .addName(" ");
         }
         GoodsType[] wantedGoods = settlement.getWantedGoods();
         int present = 0;
@@ -1494,7 +1494,7 @@ public class GUI {
                 String tradeKey = "%goods" + Integer.toString(i+1) + "%";
                 t.addNamed(tradeKey, wantedGoods[i]);
             }
-            sb.append(Messages.message(t)).append("\n\n");
+            template.addStringTemplate(t).addName("\n\n");
         }
 
         List<ChoiceItem<ScoutIndianSettlementAction>> choices
@@ -1507,7 +1507,7 @@ public class GUI {
                                      ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
 
         return getChoice(true, settlement.getTile(),
-                         Utility.getDefaultTextArea(sb.toString()),
+                         Utility.getDefaultTextArea(Messages.message(template)),
                          GUI.createImageIcon(
                              imageLibrary.getSettlementImage(settlement)),
                          "cancel", choices);
