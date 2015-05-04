@@ -84,8 +84,7 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
         } else if (object instanceof AbstractUnit) {
             this.text = Messages.message(((AbstractUnit)object).getId());
         } else if (object instanceof Player) {
-            this.text = Messages.message(((Player)object).getRulerNameKey())
-                + " (" + Messages.message(((Player)object).getNationName()) + ")";
+            this.text = Messages.message(((Player)object).getLabel());
         }
     }
 

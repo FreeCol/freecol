@@ -585,6 +585,19 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get a label for this player.
+     *
+     * @return A suitable <code>StringTemplate</code>.
+     */
+    public StringTemplate getLabel() {
+        return StringTemplate.label("")
+            .add(getRulerNameKey())
+            .addName(" (")
+            .addStringTemplate(getNationName())
+            .addName(")");
+    }
+
+    /**
      * Is this player the unknown enemy?
      *
      * @return True if this player is the unknown enemy.
