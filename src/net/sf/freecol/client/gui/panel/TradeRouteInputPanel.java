@@ -740,34 +740,20 @@ public final class TradeRouteInputPanel extends FreeColPanel
     private boolean verifyNewTradeRoute() {
         final Player player = getFreeColClient().getMyPlayer();
 
-        // Check that the name is unique
-        String newName = this.tradeRouteName.getText();
-        for (TradeRoute route : player.getTradeRoutes()) {
-            if (route.getName() == null) continue;
-            if (route.getName().equals(this.newRoute.getName())) continue;
-            if (route.getName().equals(newName)) {
-                getGUI().showErrorMessage(StringTemplate
-                    .template("tradeRoute.duplicateName")
-                    .addName("%name%", newName));
-                return false;
-            }
+        // Update the trade route with the current settings
+        this.newRoute.setName(tradeRouteName.getText());
+        this.newRoute.clearStops();
+        for (int index = 0; index < this.stopListModel.getSize(); index++) {
+            this.newRoute.addStop(this.stopListModel.get(index));
         }
+        this.newRoute.setSilent(this.messagesBox.isSelected());
 
-        // Verify that it has at least two stops
-        if (this.stopListModel.getSize() < 2) {
-            getGUI().showErrorMessage("tradeRoute.notEnoughStops");
+        StringTemplate err = this.newRoute.verify();
+        if (err != null) {
+            getGUI().showInformationMessage(err);
+            this.newRoute.setName(null); // Mark as unacceptable
             return false;
         }
-
-        // Check that all stops are valid
-        for (int index = 0; index < this.stopListModel.getSize(); index++) {
-            TradeRouteStop stop = this.stopListModel.get(index);
-            if (!TradeRoute.isStopValid(player, stop)) {
-                getGUI().showInformationMessage(stop.invalidStopLabel(player));
-                return false;
-            }
-        }
-
         return true;
     }
 
@@ -780,24 +766,20 @@ public final class TradeRouteInputPanel extends FreeColPanel
     @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
-        if (null != command) switch (command) {
-            case OK:
-                if (!verifyNewTradeRoute()) return;
-                this.newRoute.setName(tradeRouteName.getText());
-                this.newRoute.clearStops();
-                for (int index = 0; index < this.stopListModel.getSize(); index++) {
-                    this.newRoute.addStop(this.stopListModel.get(index));
-                }   this.newRoute.setSilent(this.messagesBox.isSelected());
-                // Return to TradeRoutePanel, which will add the route
-                // if needed, and it is valid.
-                super.actionPerformed(event);
-                break;
-            case CANCEL:
-                cancelTradeRoute();
-                break;
-            default:
-                super.actionPerformed(event);
-                break;
+        if (command == null) return;
+        switch (command) {
+        case OK:
+            if (!verifyNewTradeRoute()) return;
+            // Return to TradeRoutePanel, which will add the route
+            // if needed, and it is valid.
+            super.actionPerformed(event);
+            break;
+        case CANCEL:
+            cancelTradeRoute();
+            break;
+        default:
+            super.actionPerformed(event);
+            break;
         }
     }
 
