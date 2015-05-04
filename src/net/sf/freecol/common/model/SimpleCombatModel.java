@@ -297,17 +297,17 @@ public class SimpleCombatModel extends CombatModel {
     private void addNavalOffensiveModifiers(Unit attacker,
                                             Set<Modifier> result) {
         // Attack bonus
-        Specification spec = attacker.getSpecification();
+        final Specification spec = attacker.getSpecification();
         result.addAll(spec.getModifiers(Modifier.ATTACK_BONUS));
 
         // Goods penalty always applies
-        int count = attacker.getGoodsSpaceTaken();
-        if (count > 0) {
-            // FIXME: shouldn't this be -cargo/capacity?
-            // FIXME: magic number to spec
-            result.add(new Modifier(Modifier.OFFENCE, -12.5f * count,
-                                    ModifierType.PERCENTAGE,
-                                    Specification.CARGO_PENALTY_SOURCE));
+        int goodsCount = attacker.getGoodsSpaceTaken();
+        if (goodsCount > 0) {
+            for (Modifier m : spec.getModifiers(Modifier.CARGO_PENALTY)) {
+                Modifier c = new Modifier(m);
+                c.setValue(c.getValue() * goodsCount);
+                result.add(c);
+            }
         }
     }
 
@@ -492,13 +492,16 @@ public class SimpleCombatModel extends CombatModel {
      */
     private void addNavalDefensiveModifiers(Unit defender,
                                             Set<Modifier> result) {
+        final Specification spec = defender.getSpecification();
+
         // Cargo penalty always applies
         int goodsCount = defender.getVisibleGoodsCount();
         if (goodsCount > 0) {
-            // FIXME: should this be -cargo/capacity?
-            result.add(new Modifier(Modifier.DEFENCE, -12.5f * goodsCount,
-                                    ModifierType.PERCENTAGE,
-                                    Specification.CARGO_PENALTY_SOURCE));
+            for (Modifier m : spec.getModifiers(Modifier.CARGO_PENALTY)) {
+                Modifier c = new Modifier(m);
+                c.setValue(c.getValue() * goodsCount);
+                result.add(c);
+            }
         }
     }
 

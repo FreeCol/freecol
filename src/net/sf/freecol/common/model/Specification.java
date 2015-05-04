@@ -909,8 +909,10 @@ public final class Specification {
      * @param id The object identifier to look for.
      */
     public List<Modifier> getModifiers(String id) {
-        return allModifiers.get(id);
+        List<Modifier> result = allModifiers.get(id);
+        return (result == null) ? Collections.<Modifier>emptyList() : result;
     }
+
 
     // Option routines
 
@@ -2145,6 +2147,15 @@ public final class Specification {
             customs.addAbility(new Ability(Ability.COASTAL_ONLY, null, false));
         }
         // end @compat 0.11.0
+
+        // @compat 0.11.3
+        // Added the cargo penalty modifier
+        if (getModifiers(Modifier.CARGO_PENALTY).isEmpty()) {
+            addModifier(new Modifier(Modifier.CARGO_PENALTY, -12.5f,
+                    Modifier.ModifierType.PERCENTAGE, CARGO_PENALTY_SOURCE,
+                    Modifier.GENERAL_COMBAT_INDEX));
+        }
+        // end @compat 0.11.3
     }
 
     /**

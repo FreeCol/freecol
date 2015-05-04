@@ -56,6 +56,8 @@ public class Modifier extends Feature {
         = "model.modifier.breedingFactor";
     public static final String BUILDING_PRICE_BONUS
         = "model.modifier.buildingPriceBonus";
+    public static final String CARGO_PENALTY
+        = "model.modifier.cargoPenalty";
     public static final String COLONY_GOODS_PARTY
         = "model.modifier.colonyGoodsParty";
     public static final String CONSUME_ONLY_SURPLUS_PRODUCTION

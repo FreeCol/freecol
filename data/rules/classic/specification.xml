@@ -46,6 +46,9 @@
     <modifier id="model.modifier.amphibiousAttack"
               source="model.source.amphibiousAttack"
               value="-75" type="percentage" index="50"/>
+    <modifier id="model.modifier.cargoPenalty"
+              source="model.source.cargoPenalty"
+              value="-12.5" type="percentage" index="50"/>
     <!-- Modifiers with an increment are really templates to be instantiated
          with the specific start/end years they apply to. -->
     <modifier id="model.modifier.colonyGoodsParty"
