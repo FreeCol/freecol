@@ -61,17 +61,6 @@ public class ImageResource extends Resource
         super(resourceLocator);
     }
 
-    /**
-     * Create a new image resource to contain an image.
-     *
-     * @param image The <code>BufferedImage</code> to contain.
-     */
-    public ImageResource(BufferedImage image) {
-        super(null);
-
-        this.image = image;
-    }
-
 
     /**
      * Preload the image.
@@ -83,6 +72,10 @@ public class ImageResource extends Resource
                 try {
                     URL url = getResourceLocator().toURL();
                     image = ImageIO.read(url);
+                    if(image == null) {
+                        logger.log(Level.WARNING, "Failed to load image from: "
+                            + getResourceLocator());
+                    }
                 } catch (IOException e) {
                     logger.log(Level.WARNING, "Failed to load image from: "
                         + getResourceLocator(), e);
@@ -156,19 +149,13 @@ public class ImageResource extends Resource
         final BufferedImage cached = scaledImages.get(d);
         if (cached != null) return cached;
 
-        try {
-            BufferedImage scaled = new BufferedImage(wNew, hNew, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = scaled.createGraphics();
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-            g.drawImage(im, 0, 0, wNew, hNew, null);
-            g.dispose();
-            scaledImages.put(d, scaled);
-            return scaled;
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to scale image: "
-                + getResourceLocator(), e);
-        }
-        return null;
+        BufferedImage scaled = new BufferedImage(wNew, hNew, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = scaled.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.drawImage(im, 0, 0, wNew, hNew, null);
+        g.dispose();
+        scaledImages.put(d, scaled);
+        return scaled;
     }
 
     /**
