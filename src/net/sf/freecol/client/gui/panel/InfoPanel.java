@@ -189,7 +189,7 @@ public final class InfoPanel extends FreeColPanel {
                     for (AbstractGoods goods : tile.getType().getPossibleProduction(true)) {
                         JLabel goodsLabel = new JLabel(
                             String.valueOf(tile.getPotentialProduction(goods.getType(), null)),
-                            new ImageIcon(lib.getSmallerImage(goods.getType())),
+                            new ImageIcon(lib.getSmallerIconImage(goods.getType())),
                             JLabel.RIGHT);
                         goodsLabel.setToolTipText(Messages.getName(goods.getType()));
                         goodsLabel.setFont(font);
@@ -304,7 +304,7 @@ public final class InfoPanel extends FreeColPanel {
                     ImageIcon icon;
                     JLabel label;
                     for (Goods goods : unit.getGoodsList()) {
-                        icon = new ImageIcon(lib.getSmallImage(goods.getType()));
+                        icon = new ImageIcon(lib.getSmallIconImage(goods.getType()));
                         label = new JLabel(icon);
                         text = Messages.message(goods.getLabel(true));
                         label.setFont(font);

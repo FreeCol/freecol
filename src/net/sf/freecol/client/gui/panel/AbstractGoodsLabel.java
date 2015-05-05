@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -45,7 +46,7 @@ public class AbstractGoodsLabel extends JLabel {
      *     will visually represent.
      */
     public AbstractGoodsLabel(ImageLibrary lib, AbstractGoods abstractGoods) {
-        super(new ImageIcon(lib.getImage(abstractGoods.getType())));
+        super(new ImageIcon(lib.getIconImage(abstractGoods.getType())));
 
         this.abstractGoods = abstractGoods;
 

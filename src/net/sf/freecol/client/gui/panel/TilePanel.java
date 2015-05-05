@@ -131,7 +131,7 @@ public final class TilePanel extends FreeColPanel {
                     }
                     if (potential > 0) {
                         label = new JLabel(String.valueOf(potential),
-                                           new ImageIcon(lib.getImage(goodsType)),
+                                           new ImageIcon(lib.getIconImage(goodsType)),
                                            JLabel.CENTER);
                         if (first) {
                             add(label, "span, split, center");
@@ -145,7 +145,7 @@ public final class TilePanel extends FreeColPanel {
                             // this could happen if a resource were exploitable
                             // only by experts, for example
                             label = new JLabel(String.valueOf(expertPotential),
-                                               new ImageIcon(lib.getImage(goodsType)),
+                                               new ImageIcon(lib.getIconImage(goodsType)),
                                                JLabel.CENTER);
                             label.setToolTipText(Messages.getName(expert));
                             if (first) {

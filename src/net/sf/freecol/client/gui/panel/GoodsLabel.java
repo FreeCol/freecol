@@ -125,8 +125,8 @@ public final class GoodsLabel extends AbstractGoodsLabel
         super.setPartialChosen(partialChosen);
         ImageLibrary lib = gui.getImageLibrary();
         Image image = partialChosen
-            ? lib.getSmallImage(getType())
-            : lib.getImage(getType());
+            ? lib.getSmallIconImage(getType())
+            : lib.getIconImage(getType());
         setIcon(new ImageIcon(image));
     }
 

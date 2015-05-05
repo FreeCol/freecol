@@ -625,7 +625,7 @@ public class GUI {
     }
 
     public ImageIcon createGoodsImageIcon(GoodsType goodsType) {
-        return new ImageIcon(imageLibrary.getImage(goodsType));
+        return new ImageIcon(imageLibrary.getIconImage(goodsType));
     }
 
     /**
@@ -1248,7 +1248,7 @@ public class GUI {
                 BoycottAction.DUMP_CARGO));
 
         return getChoice(true, null, Utility.localizedTextArea(template),
-                         new ImageIcon(imageLibrary.getImage(goods.getType())),
+                         new ImageIcon(imageLibrary.getIconImage(goods.getType())),
                          "cancel", choices);
     }
 
@@ -1276,7 +1276,7 @@ public class GUI {
                                      BuyAction.HAGGLE));
 
         return getChoice(true, unit.getTile(), Utility.localizedTextArea(template),
-                         new ImageIcon(imageLibrary.getImage(goods.getType())),
+                         new ImageIcon(imageLibrary.getIconImage(goods.getType())),
                          "cancel", choices);
     }
 
@@ -1544,7 +1544,7 @@ public class GUI {
 
         return getChoice(true, unit.getTile(),
                          Utility.localizedTextArea(template),
-                         new ImageIcon(imageLibrary.getImage(goods.getType())),
+                         new ImageIcon(imageLibrary.getIconImage(goods.getType())),
                          "cancel", choices);
     }
 

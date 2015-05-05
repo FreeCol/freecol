@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Nation;
@@ -384,6 +385,24 @@ public final class ImageLibrary {
         return ResourceManager.getImage(type.getId() + ".image", size);
     }
 
+    public BufferedImage getSmallerIconImage(FreeColGameObjectType type) {
+        return getImage(type, new Dimension(
+            Math.round(scalingFactor * (ICON_SIZE.width * 0.5f)),
+            Math.round(scalingFactor * (ICON_SIZE.height * 0.5f))));
+    }
+
+    public BufferedImage getSmallIconImage(FreeColGameObjectType type) {
+        return getImage(type, new Dimension(
+            Math.round(scalingFactor * (ICON_SIZE.width * 0.75f)),
+            Math.round(scalingFactor * (ICON_SIZE.height * 0.75f))));
+    }
+
+    public BufferedImage getIconImage(FreeColGameObjectType type) {
+        return getImage(type, new Dimension(
+            Math.round(scalingFactor * ICON_SIZE.width),
+            Math.round(scalingFactor * ICON_SIZE.height)));
+    }
+
     /**
      * Returns the image with the given identifier.
      *
@@ -433,6 +452,9 @@ public final class ImageLibrary {
             } else if (display instanceof LostCityRumour) {
                 image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR,
                     combinedScale);
+            } else if (display instanceof GoodsType) {
+                FreeColGameObjectType type = (FreeColGameObjectType)display;
+                image = getSmallIconImage(type);
             } else if (display instanceof FreeColGameObjectType) {
                 FreeColGameObjectType type = (FreeColGameObjectType)display;
                 image = getImage(type, combinedScale);
@@ -480,6 +502,9 @@ public final class ImageLibrary {
                 image = getSettlementImage(settlement);
             } else if (display instanceof LostCityRumour) {
                 image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
+            } else if (display instanceof GoodsType) {
+                FreeColGameObjectType type = (FreeColGameObjectType)display;
+                image = getIconImage(type);
             } else if (display instanceof FreeColGameObjectType) {
                 FreeColGameObjectType type = (FreeColGameObjectType)display;
                 image = getImage(type);

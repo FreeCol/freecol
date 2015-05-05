@@ -471,7 +471,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             int size = required.size();
             for (int i = 0; i < size; i++) {
                 AbstractGoods goods = required.get(i);
-                ImageIcon icon = new ImageIcon(lib.getSmallImage(goods.getType()));
+                ImageIcon icon = new ImageIcon(lib.getSmallIconImage(goods.getType()));
                 JLabel goodsLabel = new JLabel(Integer.toString(goods.getAmount()), icon, SwingConstants.CENTER);
                 if (i == 0 && size > 1) {
                     panel.add(goodsLabel, "split " + size);

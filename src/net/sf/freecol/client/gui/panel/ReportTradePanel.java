@@ -86,7 +86,7 @@ public final class ReportTradePanel extends ReportPanel {
 
         String layoutConstraints = "insets 0, gap 0 0";
         String columnConstraints = "[25%!, fill]["
-            + (lib.getImage(storableGoods.get(0)).getWidth(null) * 5) / 4
+            + Math.round(lib.getScalingFactor() * (ImageLibrary.ICON_SIZE.width * 1.25f))
             + "!, fill]";
         String rowConstraints = "[fill]";
 

@@ -221,13 +221,13 @@ public final class CompactLabourReport extends ReportPanel {
             GoodsType goods = unit.getExpertProduction();
 
             ImageLibrary lib = getImageLibrary();
-            JLabel production = new JLabel(new ImageIcon(lib.getImage(goods)));
+            JLabel production = new JLabel(new ImageIcon(lib.getIconImage(goods)));
             production.setBorder(Utility.TOPCELLBORDER);
 
             headerRow.add(production, "cell " + PRODUCTION_SYMBOL_COLUMN + " 1 " + (COLUMNS - PRODUCTION_SYMBOL_COLUMN + (showNetProduction && goods.isStoredAs() ? 1 : 0)) + " 1");
 
             if (showNetProduction && goods.isStoredAs()) {
-                JLabel netProduction = new JLabel(new ImageIcon(lib.getImage(goods.getStoredAs())));
+                JLabel netProduction = new JLabel(new ImageIcon(lib.getIconImage(goods.getStoredAs())));
                 netProduction.setBorder(Utility.TOPCELLBORDER);
                 headerRow.add(netProduction, "cell " + NETPRODUCTION_SUMMARY_COLUMN + " 1");
             }
@@ -500,7 +500,7 @@ public final class CompactLabourReport extends ReportPanel {
             icon.setBorder(Utility.CELLBORDER);
             GoodsType goods = data.getUnitData().getExpertProduction();
             if (goods != null) {
-                icon.setIcon(new ImageIcon(getImageLibrary().getImage(goods)));
+                icon.setIcon(new ImageIcon(getImageLibrary().getIconImage(goods)));
             }
             reportPanel.add(icon, "cell " + PRODUCTION_SYMBOL_COLUMN + " " + row + " 1 " + rows);
         }

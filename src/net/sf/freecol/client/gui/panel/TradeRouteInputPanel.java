@@ -90,7 +90,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
 
         public CargoLabel(GoodsType type) {
-            super(new ImageIcon(getImageLibrary().getImage(type)));
+            super(new ImageIcon(getImageLibrary().getIconImage(type)));
 
             this.goodsType = type;
             setDisabledIcon(getDisabledIcon());
@@ -474,7 +474,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             panel.add(name, "span, wrap");
             for (GoodsType cargo : value.getCargo()) {
                 panel.add(new JLabel(new ImageIcon(
-                    lib.getSmallerImage(cargo))));
+                    lib.getSmallerIconImage(cargo))));
             }
             return panel;
         }

@@ -296,7 +296,7 @@ public final class QuickActionMenu extends JPopupMenu {
             t.addName("%claim%", "");
         }
         JMenuItem menuItem = Utility.localizedMenuItem(t,
-            new ImageIcon(gui.getImageLibrary().getSmallImage(type)));
+            new ImageIcon(gui.getImageLibrary().getSmallIconImage(type)));
         menuItem.setActionCommand(UnitLabel.getWorkLabel(wl)
             + "/" + wl.getId() + "/" + type.getId()
             + "/" + ((claim) ? "!" : ""));
@@ -613,7 +613,7 @@ public final class QuickActionMenu extends JPopupMenu {
             break;
         }
         Icon icon = (change == null) ? null : new ImageIcon(
-            gui.getImageLibrary().getSmallImage(change.getType()));
+            gui.getImageLibrary().getSmallIconImage(change.getType()));
 
         JMenuItem item = new JMenuItem(text, icon);
         final InGameController igc = freeColClient.getInGameController();
@@ -705,7 +705,7 @@ public final class QuickActionMenu extends JPopupMenu {
         JMenuItem name = new JMenuItem(
             Messages.getName(goods) + " (" + Messages.message("colopedia") + ")",
             new ImageIcon(
-                gui.getImageLibrary().getSmallImage(goods.getType())));
+                gui.getImageLibrary().getSmallIconImage(goods.getType())));
         name.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -817,7 +817,7 @@ public final class QuickActionMenu extends JPopupMenu {
         JMenuItem name = new JMenuItem(
             Messages.getName(ag) + " (" + Messages.message("colopedia") + ")",
             new ImageIcon(
-                gui.getImageLibrary().getSmallImage(ag.getType())));
+                gui.getImageLibrary().getSmallIconImage(ag.getType())));
         name.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
