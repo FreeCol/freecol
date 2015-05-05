@@ -1,0 +1,1421 @@
+<!doctype html>
+<!-- Server: sfs-consume-19 -->
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]>--> <html lang="en" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        
+        <meta id="webtracker" name="webtracker" content='{"event_id": "2417ae42-890a-11e4-bde1-0200ac1d1d9f", "project": "freecol", "non_clicker": 0.7960570291649056, "active_tests": ["psp_redirect_immersion"], "clicker": 0.20645917346503312}'>
+    <meta name="description" content="Download FreeCol. Colonize the New World." />
+
+
+
+<meta property="og:title" content="FreeCol"/>
+<meta property="og:type" content="product"/>
+<meta property="og:image" content="http://c.fsdn.com/allura/p/freecol/icon"/>
+<meta property="og:url" content="http://sourceforge.net/projects/freecol/"/>
+<meta property="og:site_name" content="SourceForge"/>
+<meta property="og:description" content="Download FreeCol. Colonize the New World."/>
+
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>FreeCol | SourceForge.net</title>
+        <link rel="shortcut icon" href="http://a.fsdn.com/con/img/sftheme/favicon.ico">
+        <script type="text/javascript">
+            /*global unescape, window, console, jQuery, $, net, SF, COMSCORE, DD_belatedPNG */
+            // Setup our namespace
+            if (!window.SF) { window.SF = {}; }
+            if (!window.net) { window.net = {}; }
+            if (!window.net.sf) { window.net.sf = {}; }
+            SF.cdn = 'http://a.fsdn.com/con';
+            SF.deploy_time = '1418398744';
+        </script>
+        <script src="http://a.fsdn.com/con/js/min/sf.head.js?1418398744" type="text/javascript"></script>
+        
+<!--[if lt IE 7 ]>
+  <script src="http://a.fsdn.com/con/js/sftheme/dd_belatedpng.js"></script>
+  <script> DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images </script>
+<![endif]-->
+
+<link href='//fonts.googleapis.com/css?family=Ubuntu:regular' rel='stylesheet' type='text/css'>
+<style type="text/css">
+    @font-face {
+        font-family: "Pictos";
+        src: url('http://a.fsdn.com/con/css/fonts/sftheme/pictos-web.eot');
+        src: local("☺"), url('http://a.fsdn.com/con/css/fonts/sftheme/pictos-web.woff') format('woff'), url('http://a.fsdn.com/con/css/fonts/sftheme/pictos-web.ttf') format('truetype'), url('http://a.fsdn.com/con/css/fonts/sftheme/pictos-web.svg') format('svg');
+    }
+</style>
+ <link rel="stylesheet" href="http://a.fsdn.com/con/css/sf.css?1418398744" type="text/css">
+
+
+    <style type="text/css" >.sfdl { width:250px;height:48px;padding:0;position:relative;font:bold 12px/1.17 sans-serif !important; border:1px solid #aaa;display:inline;float:left;text-decoration:none;-moz-box-shadow:rgba(255, 255, 255, 0.6) 0 1px 0 0;-webkit-box-shadow:rgba(255, 255, 255, 0.6) 0 1px 0 0;-o-box-shadow:rgba(255, 255, 255, 0.6) 0 1px 0 0;box-shadow:rgba(255, 255, 255, 0.6) 0 1px 0 0;-moz-border-radius:4px;-webkit-border-radius:4px;-o-border-radius:4px;-ms-border-radius:4px;-khtml-border-radius:4px;border-radius:4px;background:no-repeat #e5e5e5 8px center url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAANCAYAAABPeYUaAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAANFJREFUeNqcUosNgjAUbE0HcARGwAnqZxBxBCbQDXQE2UOkTIAj4AZsgPfMa1JeGqhecimU63HvvepxHFUq6mebY2nAdbi/Ur/hKg0IRv2H3WFvnX/Rj9qRcxH7A+BIjDK2eCYewQy8g2/WDJSk4w8xWDICz2ziUchyvMGLXIVJK9acE0+0VM53PIitE6bTcKJJT0wg6ESSHiwhHpbMDYszjhrDKcVkE5mO5dhZyrwNx72J2i9iGvMmODB372U/aCpV2NSlG0sGVbiBw2VM+BFgALYfPdL6UCEWAAAAAElFTkSuQmCC);background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAANCAYAAABPeYUaAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAANFJREFUeNqcUosNgjAUbE0HcARGwAnqZxBxBCbQDXQE2UOkTIAj4AZsgPfMa1JeGqhecimU63HvvepxHFUq6mebY2nAdbi/Ur/hKg0IRv2H3WFvnX/Rj9qRcxH7A+BIjDK2eCYewQy8g2/WDJSk4w8xWDICz2ziUchyvMGLXIVJK9acE0+0VM53PIitE6bTcKJJT0wg6ESSHiwhHpbMDYszjhrDKcVkE5mO5dhZyrwNx72J2i9iGvMmODB372U/aCpV2NSlG0sGVbiBw2VM+BFgALYfPdL6UCEWAAAAAElFTkSuQmCC), -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #fff), color-stop(100%, #ccc));background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAANCAYAAABPeYUaAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAANFJREFUeNqcUosNgjAUbE0HcARGwAnqZxBxBCbQDXQE2UOkTIAj4AZsgPfMa1JeGqhecimU63HvvepxHFUq6mebY2nAdbi/Ur/hKg0IRv2H3WFvnX/Rj9qRcxH7A+BIjDK2eCYewQy8g2/WDJSk4w8xWDICz2ziUchyvMGLXIVJK9acE0+0VM53PIitE6bTcKJJT0wg6ESSHiwhHpbMDYszjhrDKcVkE5mO5dhZyrwNx72J2i9iGvMmODB372U/aCpV2NSlG0sGVbiBw2VM+BFgALYfPdL6UCEWAAAAAElFTkSuQmCC), -moz-linear-gradient(top, #fff 0%, #ccc 100%);background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAANCAYAAABPeYUaAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAANFJREFUeNqcUosNgjAUbE0HcARGwAnqZxBxBCbQDXQE2UOkTIAj4AZsgPfMa1JeGqhecimU63HvvepxHFUq6mebY2nAdbi/Ur/hKg0IRv2H3WFvnX/Rj9qRcxH7A+BIjDK2eCYewQy8g2/WDJSk4w8xWDICz2ziUchyvMGLXIVJK9acE0+0VM53PIitE6bTcKJJT0wg6ESSHiwhHpbMDYszjhrDKcVkE5mO5dhZyrwNx72J2i9iGvMmODB372U/aCpV2NSlG0sGVbiBw2VM+BFgALYfPdL6UCEWAAAAAElFTkSuQmCC), linear-gradient(top, #fff 0%, #ccc 100%);background-position:8px center, 0 0;margin:0 10px 0px 0;overflow:hidden;color:#555 !important;}.sfdl:hover { cursor:pointer;text-decoration:none;background:8px center no-repeat #eee url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAANCAYAAABPeYUaAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAANFJREFUeNqcUosNgjAUbE0HcARGwAnqZxBxBCbQDXQE2UOkTIAj4AZsgPfMa1JeGqhecimU63HvvepxHFUq6mebY2nAdbi/Ur/hKg0IRv2H3WFvnX/Rj9qRcxH7A+BIjDK2eCYewQy8g2/WDJSk4w8xWDICz2ziUchyvMGLXIVJK9acE0+0VM53PIitE6bTcKJJT0wg6ESSHiwhHpbMDYszjhrDKcVkE5mO5dhZyrwNx72J2i9iGvMmODB372U/aCpV2NSlG0sGVbiBw2VM+BFgALYfPdL6UCEWAAAAAElFTkSuQmCC);}.sfdl-lite { background:0 center no-repeat #337733 none;color:white !important;height:auto;padding:0.5em 1em;text-align:center;-moz-border-radius:4px;-webkit-border-radius:4px;-o-border-radius:4px;-ms-border-radius:4px;-khtml-border-radius:4px;border-radius:4px;background-image:-webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #339933), color-stop(100%, #337733));background-image:-moz-linear-gradient(top, #339933 0%, #337733 100%);background-image:linear-gradient(top, #339933 0%, #337733 100%);}.sfdl-lite:hover { background:0 center no-repeat #339933;}.sfdl span { border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;display:block;margin:3px;margin-left:35px;padding:4px;text-align:left;color:#FFF;background:#363;background-image:-moz-linear-gradient(center top, #393 0%, #373 100%);background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0, #393),color-stop(1, #373));background-image:linear-gradient(top, #393 0%, #373 100%);overflow:hidden;height:34px;}.sfdl b { display:block;line-height:17.0px;}.sfdl small { display:block;line-height:17.0px;color:#ADC2AD; font-weight:normal;white-space:nowrap;overflow:hidden;font-size:77%;}.info-circle{ right:10px;bottom:16px;}.direct-dl{ font-size:10px;text-align:right;display:inline-block;width:100%;}</style>
+
+<style type="text/css">
+    .k980bde7f7fa980347f9f6a196c16ee423ea09f95 { display: none !important; }
+</style>
+    <link rel="alternate" type="application/rss+xml" title="FreeCol&#8230;File Releases" href="/projects/freecol/rss?path=/" />
+    <link rel="canonical" href="http://sourceforge.net/projects/freecol/">
+
+        
+<script type="text/javascript">
+    SF.adblock = true;
+    var immersion_adcode = "";
+</script>
+                
+  <script type='text/javascript'>
+
+   (function() {
+         var useSSL = 'https:' === document.location.protocol;
+         var src = (useSSL ? 'https:' : 'http:') +
+               '//www.googletagservices.com/tag/js/gpt.js';
+         document.write('<scr' + 'ipt src="' + src + '"></scr' + 'ipt>');
+   })();
+   </script>
+
+   <!-- GPT Slot Definitions -->
+   <script type='text/javascript'>
+       /*global googletag */
+       var gptadslots=[];
+       var gptadHandlers={};
+       googletag.cmd.push(function() {
+            gptadslots.push(googletag.defineSlot('/4140/ostg.sourceforge/SF_ProjectSum_728x90_A', [728, 90], 'div-gpt-ad-1394209358853-0')
+                                                    .addService(googletag.pubads())
+                                                        .setTargeting('tpc', ['freecol', 'turnbasedstrategy', 'java', 'games'])
+                                                        .setTargeting('shortname', 'freecol')
+                                                        .setTargeting('aud', ['endusers'])
+                                                        .setTargeting('dcopt', 'ist')
+                                                        .setTargeting('dc_ref', 'http://sourceforge.net/projects/freecol/')
+                                                        .setTargeting('sz', '728x90')
+                                                        .setTargeting('u', 'e:2417ae42-890a-11e4-bde1-0200ac1d1d9f')
+                                                        .setTargeting('page_type', 'pg_project'));
+             gptadslots.push(googletag.defineOutOfPageSlot('/4140/ostg.sourceforge/SF_ProjectSum_728x90_A', 'div-gpt-ad-1394209358853-0_oop')
+                                                    .addService(googletag.pubads())
+                                                        .setTargeting('tpc', ['freecol', 'turnbasedstrategy', 'java', 'games'])
+                                                        .setTargeting('shortname', 'freecol')
+                                                        .setTargeting('aud', ['endusers'])
+                                                        .setTargeting('dcopt', 'ist')
+                                                        .setTargeting('dc_ref', 'http://sourceforge.net/projects/freecol/')
+                                                        .setTargeting('sz', '728x90')
+                                                        .setTargeting('u', 'e:2417ae42-890a-11e4-bde1-0200ac1d1d9f')
+                                                        .setTargeting('page_type', 'pg_project'));
+            gptadslots.push(googletag.defineSlot('/4140/ostg.sourceforge/SF_ProjectSum_HubIcon_200x90_A', [200, 90], 'div-gpt-ad-1394209358854-0')
+                                                    .addService(googletag.pubads())
+                                                        .setTargeting('tpc', ['freecol', 'turnbasedstrategy', 'java', 'games'])
+                                                        .setTargeting('shortname', 'freecol')
+                                                        .setTargeting('aud', ['endusers'])
+                                                        .setTargeting('dc_ref', 'http://sourceforge.net/projects/freecol/')
+                                                        .setTargeting('sz', '200x90')
+                                                        .setTargeting('u', 'e:2417ae42-890a-11e4-bde1-0200ac1d1d9f')
+                                                        .setTargeting('page_type', 'pg_project'));
+            gptadslots.push(googletag.defineSlot('/4140/ostg.sourceforge/SF_ProjectSum_300x250_A', [[300, 250], [300, 600], [300, 1050]], 'div-gpt-ad-1394209358855-0')
+                                                    .addService(googletag.pubads())
+                                                        .setTargeting('tpc', ['freecol', 'turnbasedstrategy', 'java', 'games'])
+                                                        .setTargeting('shortname', 'freecol')
+                                                        .setTargeting('aud', ['endusers'])
+                                                        .setTargeting('dc_ref', 'http://sourceforge.net/projects/freecol/')
+                                                        .setTargeting('sz', '300x250,300x600,300x1050')
+                                                        .setTargeting('u', 'e:2417ae42-890a-11e4-bde1-0200ac1d1d9f')
+                                                        .setTargeting('page_type', 'pg_project'));
+            gptadslots.push(googletag.defineSlot('/4140/ostg.sourceforge/SF_ProjectSum_300x250_B', [300, 250], 'div-gpt-ad-1394209358856-0')
+                                                    .addService(googletag.pubads())
+                                                        .setTargeting('tpc', ['freecol', 'turnbasedstrategy', 'java', 'games'])
+                                                        .setTargeting('shortname', 'freecol')
+                                                        .setTargeting('aud', ['endusers'])
+                                                        .setTargeting('dc_ref', 'http://sourceforge.net/projects/freecol/')
+                                                        .setTargeting('sz', '300x250')
+                                                        .setTargeting('u', 'e:2417ae42-890a-11e4-bde1-0200ac1d1d9f')
+                                                        .setTargeting('page_type', 'pg_project'));
+            gptadslots.push(googletag.defineSlot('/4140/ostg.sourceforge/SF_ProjectSum_300x250_C', [300, 250], 'div-gpt-ad-1394209358857-0')
+                                                    .addService(googletag.pubads())
+                                                        .setTargeting('tpc', ['freecol', 'turnbasedstrategy', 'java', 'games'])
+                                                        .setTargeting('shortname', 'freecol')
+                                                        .setTargeting('aud', ['endusers'])
+                                                        .setTargeting('dc_ref', 'http://sourceforge.net/projects/freecol/')
+                                                        .setTargeting('sz', '300x250')
+                                                        .setTargeting('u', 'e:2417ae42-890a-11e4-bde1-0200ac1d1d9f')
+                                                        .setTargeting('page_type', 'pg_project'));
+            gptadslots.push(googletag.defineSlot('/4140/ostg.sourceforge/SF_TextLink_1x1_A', [1, 1], 'div-gpt-ad-1394209358858-0')
+                                                    .addService(googletag.pubads())
+                                                        .setTargeting('tpc', ['freecol', 'turnbasedstrategy', 'java', 'games'])
+                                                        .setTargeting('shortname', 'freecol')
+                                                        .setTargeting('aud', ['endusers'])
+                                                        .setTargeting('dc_ref', 'http://sourceforge.net/projects/freecol/')
+                                                        .setTargeting('sz', '1x1')
+                                                        .setTargeting('u', 'e:2417ae42-890a-11e4-bde1-0200ac1d1d9f')
+                                                        .setTargeting('page_type', 'pg_project'));
+            gptadslots.push(googletag.defineSlot('/4140/ostg.sourceforge/SF_TextLink_1x1_B', [1, 1], 'div-gpt-ad-1394209358859-0')
+                                                    .addService(googletag.pubads())
+                                                        .setTargeting('tpc', ['freecol', 'turnbasedstrategy', 'java', 'games'])
+                                                        .setTargeting('shortname', 'freecol')
+                                                        .setTargeting('aud', ['endusers'])
+                                                        .setTargeting('dc_ref', 'http://sourceforge.net/projects/freecol/')
+                                                        .setTargeting('sz', '1x1')
+                                                        .setTargeting('u', 'e:2417ae42-890a-11e4-bde1-0200ac1d1d9f')
+                                                        .setTargeting('page_type', 'pg_project'));
+            gptadslots.push(googletag.defineSlot('/4140/ostg.sourceforge/SF_ProjectSum_728x90_B', [728, 90], 'div-gpt-ad-1392148208790-0')
+                                                    .addService(googletag.pubads())
+                                                        .setTargeting('tpc', ['freecol', 'turnbasedstrategy', 'java', 'games'])
+                                                        .setTargeting('shortname', 'freecol')
+                                                        .setTargeting('aud', ['endusers'])
+                                                        .setTargeting('dc_ref', 'http://sourceforge.net/projects/freecol/')
+                                                        .setTargeting('sz', '728x90')
+                                                        .setTargeting('u', 'e:2417ae42-890a-11e4-bde1-0200ac1d1d9f')
+                                                        .setTargeting('page_type', 'pg_project'));
+            gptadslots.push(googletag.defineSlot('/4140/ostg.sourceforge/SF_Bookend_Left', [150, 1060], 'div-gpt-ad-139343511-0')
+                                                    .addService(googletag.pubads())
+                                                        .setTargeting('tpc', ['freecol', 'turnbasedstrategy', 'java', 'games'])
+                                                        .setTargeting('shortname', 'freecol')
+                                                        .setTargeting('aud', ['endusers'])
+                                                        .setTargeting('dc_ref', 'http://sourceforge.net/projects/freecol/')
+                                                        .setTargeting('sz', '150x1060')
+                                                        .setTargeting('u', 'e:2417ae42-890a-11e4-bde1-0200ac1d1d9f')
+                                                        .setTargeting('page_type', 'pg_project'));
+            gptadslots.push(googletag.defineSlot('/4140/ostg.sourceforge/SF_Bookend_Right', [150, 1060], 'div-gpt-ad-139343512-0')
+                                                    .addService(googletag.pubads())
+                                                        .setTargeting('tpc', ['freecol', 'turnbasedstrategy', 'java', 'games'])
+                                                        .setTargeting('shortname', 'freecol')
+                                                        .setTargeting('aud', ['endusers'])
+                                                        .setTargeting('dc_ref', 'http://sourceforge.net/projects/freecol/')
+                                                        .setTargeting('sz', '150x1060')
+                                                        .setTargeting('u', 'e:2417ae42-890a-11e4-bde1-0200ac1d1d9f')
+                                                        .setTargeting('page_type', 'pg_project'));
+            
+            googletag.pubads().enableSyncRendering();
+            googletag.pubads().collapseEmptyDivs();
+            googletag.enableServices();
+        });
+   </script>
+            
+
+        <script type="text/javascript" src="http://a.fsdn.com/con/js/adframe.js?1418398744"></script>
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+                _gaq.push(['1._setAccount', 'UA-32013-6']);
+                _gaq.push(['2._setAccount', 'UA-36130941-1']);
+                _gaq.push(['_setAccount', 'UA-36130941-1']);
+                _gaq.push(['1._trackPageview']);
+                _gaq.push(['2._trackPageview']);
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+        </script>
+        <script type="text/javascript">
+            var $ = jQuery.noConflict(); // jshint ignore:line
+        </script>
+    </head>
+    <body id="pg_project" class="bluesteel user">
+        
+        <div id="busy-spinner"></div>
+        
+<header id="site-header">
+    <div class="wrapper">
+        <a href="/" class="logo">
+            <span>SourceForge</span>
+        </a>
+        <form method="get" action="/directory/">
+            <input type="text" id="words" name="q" placeholder="Search">
+        </form>
+        <!--Switch to {language}-->
+        <nav id="nav-site">
+            <a href="/directory/" title="Browse our software.">Browse</a>
+            <a href="/directory/enterprise" title="Browse our Enterprise software.">Enterprise</a>
+            <a href="/blog/" title="Read the latest news from the SF HQ.">Blog</a>
+            <a href="/support" title="Contact us for help and feedback.">Help</a>
+            <a href="/jobs?source=header" title="Search 80k+ tech jobs." class="featured-link">Jobs</a>
+        </nav>
+        <nav id="nav-account">
+            
+              <div class="logged_out">
+                  <a href="https://sourceforge.net/auth/">Log In</a>
+                <span>or</span>
+                <a href="https://sourceforge.net/user/registration">Join</a>
+              </div>
+            
+        </nav>
+    </div>
+</header>
+<header id="site-sec-header">
+    <div class="wrapper">
+        <nav id="nav-hubs">
+            <h4>Solution Centers</h4>
+            <a href="http://goparallel.sourceforge.net/">Go Parallel</a>
+            <a href="http://ibmsmarteritservices.sourceforge.net/">Smarter IT</a>
+        </nav>
+        <nav id="nav-collateral">
+            
+            <a href="http://library.slashdotmedia.com/?source=sfnet_header">Resources</a>
+            
+            
+            <a href="https://sourceforge.net/user/registration">Newsletters</a>
+            
+        </nav>
+    </div>
+</header>
+
+
+        
+        <div id="messages">
+        </div>
+
+        <div id="page-body">
+<div id="banner-ads" class="ads">
+
+
+
+
+    
+
+<div id="SF_ProjectSum_728x90_A_wrapped" class="ad leaderboard False" data-unit="SF_ProjectSum_728x90_A">
+<script type="text/javascript">
+/*global googletag */
+(function(){
+    var immersionCompliment = false;
+    
+    if ((!immersion_adcode && !immersionCompliment)  || (immersion_adcode && immersionCompliment)) {
+        document.write('<div id="div-gpt-ad-1394209358853-0" ></div>');
+        googletag.cmd.push(function() {
+            googletag.display('div-gpt-ad-1394209358853-0');
+        });
+        document.write('<div id="div-gpt-ad-1394209358853-0_oop"></div>');
+        googletag.cmd.push(function() {
+            googletag.display('div-gpt-ad-1394209358853-0_oop');
+        });
+    }
+})();
+</script>
+</div>
+
+
+
+
+    
+
+<div id="SF_ProjectSum_HubIcon_200x90_A_wrapped" class="ad hub False" data-unit="SF_ProjectSum_HubIcon_200x90_A">
+<script type="text/javascript">
+/*global googletag */
+(function(){
+    var immersionCompliment = false;
+    
+    if ((!immersion_adcode && !immersionCompliment)  || (immersion_adcode && immersionCompliment)) {
+        document.write('<div id="div-gpt-ad-1394209358854-0" ></div>');
+        googletag.cmd.push(function() {
+            googletag.display('div-gpt-ad-1394209358854-0');
+        });
+    }
+})();
+</script>
+</div>
+</div><nav id="breadcrumbs">
+    <ul>
+        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a itemprop="url" href="/">Home</a></li>
+        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a itemprop="url" href="/directory">Browse</a></li><li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a itemprop="url" href="/directory/games/entertainment/turnbasedstrategy/">Turn Based Strategy</a></li><li class="project">FreeCol</li>
+    </ul>
+</nav>
+
+
+<div id="project-header">
+    
+<section id="project-icon" class="noneditable">
+    <img itemscope itemtype="http://schema.org/ImageObject" itemprop="image" alt="FreeCol Icon" src="//c.fsdn.com/allura/p/freecol/icon" height="48" width="48"/>
+</section>
+<section id="project-title">
+    <h1 itemprop="name">
+            FreeCol</h1>
+            <span id="dev-status" class="beta">beta</span>
+    <h2>
+        Colonize the New World.
+    </h2>
+    <p id="maintainers" itemprop="author" itemscope itemtype="http://schema.org/Person" class="with-icon">
+    Brought to you by:
+    <a href="/u/burschik/" itemprop="url"><span itemprop="name">burschik</span></a>, <a href="/u/mpope/" itemprop="url"><span itemprop="name">mpope</span></a>, <a href="/u/pruano/" itemprop="url"><span itemprop="name">pruano</span></a>, <a href="/u/stiangre/" itemprop="url"><span itemprop="name">stiangre</span></a></p>
+    
+</section>
+</div>
+<article id="project" class="content-wrapper" itemscope itemtype="http://schema.org/SoftwareApplication">
+    <meta itemprop="image" content="http://c.fsdn.com/allura/p/freecol/icon"/>
+    <nav>
+        
+    <div class="firstwave">
+        <ul class="b-hornav">
+            
+            <li id="menu_consume_summary" class="selected">
+                <a href="/projects/freecol/?source=navbar"><span><span>Summary</span></span></a>
+                
+            </li>
+            
+            <li id="menu_consume_files" >
+                <a href="/projects/freecol/files/?source=navbar"><span><span>Files</span></span></a>
+                
+            </li>
+            
+            <li id="menu_consume_reviews" >
+                <a href="/projects/freecol/reviews?source=navbar"><span><span>Reviews</span></span></a>
+                
+            </li>
+            
+            <li id="menu_consume_support" >
+                <a href="/projects/freecol/support?source=navbar"><span><span>Support</span></span></a>
+                
+            </li>
+            
+            <li id="menu_consume_news" >
+                <a href="/p/freecol/news/?source=navbar"><span><span>News</span></span></a>
+                
+            </li>
+            
+            <li id="menu_consume_discussion" >
+                <a href="/p/freecol/discussion/?source=navbar"><span><span>Discussion</span></span></a>
+                
+            </li>
+            
+            <li id="menu_consume_tickets ▾" >
+                <a href="/p/freecol/_list/tickets?source=navbar"><span><span>Tickets ▾</span></span></a>
+                
+                <ul>
+                    
+                    <li><a href="/p/freecol/bugs/?source=navbar">Bugs</a></li>
+                    
+                    <li><a href="/p/freecol/improvement-requests/?source=navbar">Improvement Requests</a></li>
+                    
+                    <li><a href="/p/freecol/pending-features-for-freecol/?source=navbar">Pending Features for FreeCol 1</a></li>
+                    
+                    <li><a href="/p/freecol/ideas-for-freecol/?source=navbar">Ideas for FreeCol 2</a></li>
+                    
+                    <li><a href="/p/freecol/patches/?source=navbar">Patches</a></li>
+                    
+                    <li><a href="/p/freecol/support-requests/?source=navbar">Support Requests</a></li>
+                    
+                </ul>
+                
+            </li>
+            
+            <li id="menu_consume_mailing lists" >
+                <a href="/p/freecol/mailman/?source=navbar"><span><span>Mailing Lists</span></span></a>
+                
+            </li>
+            
+            <li id="menu_consume_code" >
+                <a href="/p/freecol/git/?source=navbar"><span><span>Code</span></span></a>
+                
+            </li>
+            
+            <li id="menu_consume_old-svn" >
+                <a href="/p/freecol/code/?source=navbar"><span><span>Old-Svn</span></span></a>
+                
+            </li>
+            
+            <li id="menu_consume_wiki" >
+                <a href="/p/freecol/wiki/?source=navbar"><span><span>Wiki</span></span></a>
+                
+            </li>
+            
+            <li id="menu_consume_donate" >
+                <a href="/p/freecol/donate/?source=navbar"><span><span>Donate</span></span></a>
+                
+            </li>
+            
+        </ul>
+    </div>
+    
+    </nav>
+
+    <div id="browser-warning-placeholder"></div>
+
+    
+    <section id="main-content">
+        <section id="call-to-action">
+            <section id="counts-sharing">
+                <section class="project-info">
+                    <section class="content">
+                        <b data-icon="" class="ico" title="Star">&#9733;</b>
+                        <a href="/projects/freecol/reviews/" title="Browse reviews" id="call-to-action-reviews">4.9 Stars</a>
+                        <span>(60)</span>
+                    </section>
+                </section>
+                <section id="download-stats" class="project-info">
+                    <section class="content">
+                        <b data-icon="}" class="ico ico-downarrow" title="Down"></b>
+                        <a href="/projects/freecol/files/stats/timeline" title="Downloads This Week" id="call-to-action-stats">1,313 Downloads</a>
+                        <span>(This Week)</span>
+                    </section>
+                </section>
+                <section id="last-updated" class="project-info">
+                    <section class="content">
+                        <b data-icon="\" class="ico ico-calendar" title="Last Update"></b>
+                        Last Update:
+                        <time class="dateUpdated" datetime="2014-12-11">2014-12-11</time>
+                    </section>
+                </section>
+
+                
+<section class="social-sharing">
+    <!-- Twitter -->
+    <script src="//platform.twitter.com/widgets.js" type="text/javascript"></script>
+    <a href="https://twitter.com/share"
+       class="twitter-share-button"
+       data-count="horizontal"
+       data-url="http://sf.net/projects/freecol/"
+       data-counturl="http://sourceforge.net/projects/freecol/"
+       data-via="sourceforge"
+       data-text="Download FreeCol for free! Colonize the New World."></a>
+    <!-- Google +1 -->
+    <script type="text/javascript">
+        (function() {
+         var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+         po.src = '//apis.google.com/js/plusone.js';
+         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+         })();
+    </script>
+    
+    <div class="g-plusone"
+         data-size="medium"
+         data-annotation="bubble"
+         data-href="http://sourceforge.net/projects/freecol/"></div>
+    <!-- Facebook -->
+    <iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fsourceforge.net%2Fprojects%2Ffreecol%2F&amp;send=false&amp;layout=button_count&amp;width=80&amp;show_faces=false&amp;action=like&amp;colorscheme=light&amp;font&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:80px; height:21px;" allowTransparency="true"></iframe>
+</section>
+
+            </section>
+
+            <section id="download_button">
+                    
+                        
+                        
+<a href="/projects/freecol/files/latest/download" title="Download /freecol/freecol-0.11.1/freecol-0.11.1-installer.jar from SourceForge  - 38.5 MB" class="sfdl">
+    <span>
+        <b>Download</b>
+        <small >freecol-0.11.1-installer.jar</small>
+        
+    </span>
+</a>
+
+                    <meta itemprop="fileSize" content="38480050"/><meta itemprop="fileFormat" content="application/zip; charset=binary"/><div itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                        <meta itemprop="price" content="Free"/>
+                        <link itemprop="availability" href="http://schema.org/InStock" />
+                    </div>
+                    <a href="/projects/freecol/files/" id="files-link" title="Browse All Files">Browse All Files</a>
+                    <section class="project-info">
+                        
+                        <span class="platform-icon windows"><meta itemprop="operatingSystems" content="Windows"/>Windows</span>
+                        
+                        <span class="platform-icon mac"><meta itemprop="operatingSystems" content="Mac"/>Mac</span>
+                        
+                        <span class="platform-icon linux"><meta itemprop="operatingSystems" content="Linux"/>Linux</span>
+                        
+                    </section>
+            </section>
+        </section>
+
+        
+
+        <section id="project-screenshots">
+            <header>
+                <h2>Screenshots</h2>
+            </header>
+            <div class="slider">
+                <div class="strip">
+                    <a rel="section" class="thumbnail fancybox" href="//a.fsdn.com/con/app/proj/freecol/screenshots/307143.jpg" title="Mapboard with modern labels (FreeCol 0.10.0)">
+                        <img itemprop="screenshot" src="//a.fsdn.com/con/app/proj/freecol/screenshots/307143.jpg/182/137" width="182" height="137"  alt="Mapboard with modern labels (FreeCol 0.10.0)"/>
+                    </a>
+                    <a rel="section" class="thumbnail fancybox" href="//a.fsdn.com/con/app/proj/freecol/screenshots/307881.jpg" title="Europe panel (FreeCol 0.10.0) Italian/Black Chancery">
+                        <img itemprop="screenshot" src="//a.fsdn.com/con/app/proj/freecol/screenshots/307881.jpg/182/137" width="182" height="137"  alt="Europe panel (FreeCol 0.10.0) Italian/Black Chancery"/>
+                    </a>
+                    <a rel="section" class="thumbnail fancybox" href="//a.fsdn.com/con/app/proj/freecol/screenshots/307145.jpg" title="Colony panel (FreeCol 0.10.0)">
+                        <img itemprop="screenshot" src="//a.fsdn.com/con/app/proj/freecol/screenshots/307145.jpg/182/137" width="182" height="137"  alt="Colony panel (FreeCol 0.10.0)"/>
+                    </a>
+                    <a rel="section" class="thumbnail fancybox" href="//a.fsdn.com/con/app/proj/freecol/screenshots/200978.jpg" title="Mapboard with new tile set and compass (OpenJDK)">
+                        <img itemprop="screenshot" src="//a.fsdn.com/con/app/proj/freecol/screenshots/200978.jpg/182/137" width="182" height="137"  alt="Mapboard with new tile set and compass (OpenJDK)"/>
+                    </a>
+                    <a rel="section" class="thumbnail fancybox" href="//a.fsdn.com/con/app/proj/freecol/screenshots/234849.jpg" title="Mapboard 1024x600px with borders showing">
+                        <img itemprop="screenshot" src="//a.fsdn.com/con/app/proj/freecol/screenshots/234849.jpg/182/137" width="182" height="137"  alt="Mapboard 1024x600px with borders showing"/>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="project-description">
+            <header>
+                <h2>Description</h2>
+            </header>
+            <p id="description" itemprop="description">FreeCol is an open version of Colonization. It is a Civilization-like game in which the player has to conquer the new world.</p>
+            <p>
+            <a id="homepage" class="pspbtn" href="http://www.freecol.org" title="FreeCol Web Site" rel="nofollow">FreeCol Web Site</a>
+            </p>
+        </section>
+
+        <section id="project-categories-and-license">
+            <div class="project-container">
+                <section>
+                    <header>
+                        <h4>Categories</h4>
+                    </header><a href="/directory/games/entertainment/turnbasedstrategy/" itemprop="softwareApplicationSubCategory">Turn Based Strategy</a></section>
+                <section>
+                    <section class="project-info">
+    <header>
+        <h3>License</h3>
+    </header>
+    <section class="content"><a href="/directory/license:gpl/">GNU General Public License version 2.0 (GPLv2)</a></section>
+</section>
+
+
+                </section>
+            </div>
+        </section>
+
+        <section id="notifications">
+            <header>
+                <h2>Update Notifications</h2>
+            </header>
+            <form action="subscribe" method="post" id="subscribe-form">
+                <section id="subscribe-form-container">
+                    
+                    <input type="email" id="subscriber-email" name="XmJy44hRAG:egB6Qvbybsbn8FeJw" placeholder="john.doe@example.org" value="" required>
+                    
+                    
+                    <button type="submit" id="subscriber-submit" class="subscriber-submit">
+                        <span>
+                            
+                            Subscribe to Updates
+                            
+                        </span>
+                    </button>
+                    <p id="subscriber-existing-email" style="display: none">
+                        Sent to <code></code>.
+                        
+                    </p>
+                </section>
+                <input type="hidden" name="_visit_cookie" value="5496b80ffbd7891da3266b96"/>
+                <input type='hidden' name='timestamp' value='1419163737'/>
+                <input type='hidden' name='spinner' value='XnfnVg30s7ZFbJCUbmLr8cpBS4VY'/>
+                <p class='k980bde7f7fa980347f9f6a196c16ee423ea09f95'><label for='XmpG67RhV3aGtUt44GY4L7oBODgE'>You seem to have CSS turned off. Please don't fill out this field.</label><br/><input id='XmpG67RhV3aGtUt44GY4L7oBODgE' name='Xm5G67RhV3Wct3waarE1gYoy9ts8' type='text'/><br/></p>
+                <p class='k980bde7f7fa980347f9f6a196c16ee423ea09f95'><label for='XmpG67RhV3aCtUt44GY4L7oBODgE'>You seem to have CSS turned off. Please don't fill out this field.</label><br/><input id='XmpG67RhV3aCtUt44GY4L7oBODgE' name='Xm5G67RhV3Gct3waarE1gYoy9ts8' type='text'/><br/></p>
+            </form>
+        </section>
+<section id="ratings">
+    <header class="ui-helper-clearfix">
+        <h2>
+            User Ratings
+        </h2>
+        
+
+    </header>
+
+    
+<section class="recommended-percentage item" itemscope itemtype="http://schema.org/AggregateRating" itemprop="aggregateRating">
+        <span class="rating">
+            <span class="average" itemprop="ratingValue">4.9</span>
+            <meta itemprop="bestRating" content="5"/>
+            <meta itemprop="worstRating" content="1"/>
+            <meta itemprop="ratingCount" content="4.88333333333"/>
+            <span class="recommended">out of 5 stars</span>
+        </span>
+    </section>
+    <section class="stars">
+        <div class="star-text stars-5">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="star-text stars-4">&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="star-text stars-3">&#9733;&#9733;&#9733;</div>
+        <div class="star-text stars-2">&#9733;&#9733;</div>
+        <div class="star-text stars-1">&#9733;</div>
+    </section>
+    <section class="bargraph">
+        <div class="stars-5" style="border-left-width: 186px">
+            56
+        </div>
+        <div class="stars-4" style="border-left-width: 10px">
+            3
+        </div>
+        <div class="stars-3" style="border-left-width: 1px">
+            0
+        </div>
+        <div class="stars-2" style="border-left-width: 1px">
+            0
+        </div>
+        <div class="stars-1" style="border-left-width: 2px">
+            1
+        </div>
+    </section>
+
+    
+<div class="dimensional-ratings">
+    
+
+<div class="dimensional-rating">
+    
+    <span class="label">ease</span>
+    <span title="1 of 5" class="rating box">1 of 5</span>
+    <span title="2 of 5" class="rating box">2 of 5</span>
+    <span title="3 of 5" class="rating box">3 of 5</span>
+    <span title="4 of 5" class="rating ">4 of 5</span>
+    <span title="5 of 5" class="rating ">5 of 5</span>
+    <span class="rating-score">
+        <span class="dim-rate">3</span> / 5
+    </span>
+</div>
+
+    
+
+<div class="dimensional-rating">
+    
+    <span class="label">features</span>
+    <span title="1 of 5" class="rating box">1 of 5</span>
+    <span title="2 of 5" class="rating box">2 of 5</span>
+    <span title="3 of 5" class="rating box">3 of 5</span>
+    <span title="4 of 5" class="rating ">4 of 5</span>
+    <span title="5 of 5" class="rating ">5 of 5</span>
+    <span class="rating-score">
+        <span class="dim-rate">3</span> / 5
+    </span>
+</div>
+
+    
+
+<div class="dimensional-rating">
+    
+    <span class="label">design</span>
+    <span title="1 of 5" class="rating box">1 of 5</span>
+    <span title="2 of 5" class="rating box">2 of 5</span>
+    <span title="3 of 5" class="rating box">3 of 5</span>
+    <span title="4 of 5" class="rating box">4 of 5</span>
+    <span title="5 of 5" class="rating ">5 of 5</span>
+    <span class="rating-score">
+        <span class="dim-rate">4</span> / 5
+    </span>
+</div>
+
+    
+
+<div class="dimensional-rating">
+    
+    <span class="label">support</span>
+    <span title="1 of 5" class="rating box">1 of 5</span>
+    <span title="2 of 5" class="rating box">2 of 5</span>
+    <span title="3 of 5" class="rating box">3 of 5</span>
+    <span title="4 of 5" class="rating ">4 of 5</span>
+    <span title="5 of 5" class="rating ">5 of 5</span>
+    <span class="rating-score">
+        <span class="dim-rate">3</span> / 5
+    </span>
+</div>
+
+</div>
+
+
+
+</section>
+
+        <section id="reviews-n-ratings">
+            <header>
+                <a class="pspbtn" href="/projects/freecol/reviews/new">Write a Review</a>
+                <h2>User Reviews</h2>
+            </header>
+            <div class="sorts-n-filters">
+                <div class="drop-down-menu">
+                    <div class="sort-options">
+                        <span>Filter</span>
+                        <div class="sort-drop-down">
+                            <a href="#">All</a>
+                        </div>
+                        <ul>
+                            <li><a href="/projects/freecol/?source=navbar&amp;stars=0#reviews-n-ratings" title="Show All" class=" active">All</a></li>
+                            <li><a href="/projects/freecol/?source=navbar&amp;stars=5#reviews-n-ratings" title="Show 5 Stars" class=" star-text">&#9733;&#9733;&#9733;&#9733;&#9733;</a></li>
+                            <li><a href="/projects/freecol/?source=navbar&amp;stars=4#reviews-n-ratings" title="Show 4 Stars" class=" star-text">&#9733;&#9733;&#9733;&#9733;</a></li>
+                            <li><a href="/projects/freecol/?source=navbar&amp;stars=3#reviews-n-ratings" title="Show 3 Stars" class=" star-text">&#9733;&#9733;&#9733;</a></li>
+                            <li><a href="/projects/freecol/?source=navbar&amp;stars=2#reviews-n-ratings" title="Show 2 Stars" class=" star-text">&#9733;&#9733;</a></li>
+                            <li><a href="/projects/freecol/?source=navbar&amp;stars=1#reviews-n-ratings" title="Show 1 Star" class=" star-text">&#9733;</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <section class="content">
+                    <ul id="project-reviews" class="reviews" itemprop="reviews">
+                            <li>
+
+
+<article class="review reviewed" data-helpful-count="0">
+    <footer>
+        <span class="author-name">edanta9985</span>
+    </footer>
+    
+
+
+<div class="review-rating">
+
+<span title="1 of 5" class="rating star">1 of 5</span>
+
+<span title="2 of 5" class="rating star">2 of 5</span>
+
+<span title="3 of 5" class="rating star">3 of 5</span>
+
+<span title="4 of 5" class="rating star">4 of 5</span>
+
+<span title="5 of 5" class="rating ">5 of 5</span>
+
+</div>
+
+    <p class="review-txt ">
+        Nice Game... I Enjoy it
+    </p>
+    <div class="meta">
+        <span class="created-date">Posted 12/04/2014</span>
+    </div>
+</article>
+
+</li>
+                            <li>
+
+
+<article class="review reviewed" data-helpful-count="0">
+    <footer>
+        <span class="author-name">amandalp</span>
+    </footer>
+    
+
+
+<div class="review-rating">
+
+<span title="1 of 5" class="rating star">1 of 5</span>
+
+<span title="2 of 5" class="rating star">2 of 5</span>
+
+<span title="3 of 5" class="rating star">3 of 5</span>
+
+<span title="4 of 5" class="rating star">4 of 5</span>
+
+<span title="5 of 5" class="rating ">5 of 5</span>
+
+</div>
+
+    <p class="review-txt ">
+        Great game, addictive even.  Just wish the map was larger.  Also, neither the Spanish nor Russian translations are complete, but it&#39;s still a lot of fun in any language
+    </p>
+    <div class="meta">
+        <span class="created-date">Posted 09/15/2013</span>
+    </div>
+</article>
+
+</li>
+                            <li>
+
+
+<article class="review reviewed" data-helpful-count="0">
+    <footer>
+        <span class="author-name">sijko</span>
+    </footer>
+    
+
+
+<div class="review-rating">
+
+<span title="1 of 5" class="rating star">1 of 5</span>
+
+<span title="2 of 5" class="rating star">2 of 5</span>
+
+<span title="3 of 5" class="rating star">3 of 5</span>
+
+<span title="4 of 5" class="rating star">4 of 5</span>
+
+<span title="5 of 5" class="rating ">5 of 5</span>
+
+</div>
+
+    <p class="review-txt ">
+        It&#39;s cool, but not enough. The help items (each third) are not responding to clicks, and the map behaviour in non-fullscreen sometimes is f*dup. And make the trade routes thing more user friendly, &#39;cause even after reading the manual I can&#39;t get it, if I want for ex. only brin ore from one colony to another - I can&#39;t
+    </p>
+    <div class="meta">
+        <span class="created-date">Posted 07/25/2013</span>
+    </div>
+</article>
+
+</li>
+                            <li>
+
+
+<article class="review reviewed" data-helpful-count="0">
+    <footer>
+        <span class="author-name">anromind</span>
+    </footer>
+    
+
+
+<div class="review-rating">
+
+<span title="1 of 5" class="rating star">1 of 5</span>
+
+<span title="2 of 5" class="rating star">2 of 5</span>
+
+<span title="3 of 5" class="rating star">3 of 5</span>
+
+<span title="4 of 5" class="rating star">4 of 5</span>
+
+<span title="5 of 5" class="rating star">5 of 5</span>
+
+</div>
+
+    <p class="review-txt ">
+        OKEY :D 
+hi all
+contact me for multi player :D i wanna play whit non Al ppl :l
+    </p>
+    <div class="meta">
+        <span class="created-date">Posted 05/18/2013</span>
+    </div>
+</article>
+
+</li>
+                            <li>
+
+
+<article class="review reviewed" data-helpful-count="3.0">
+    <footer>
+        <span class="author-name">allconceptcars</span>
+    </footer>
+    
+
+
+<div class="review-rating">
+
+<span title="1 of 5" class="rating star">1 of 5</span>
+
+<span title="2 of 5" class="rating star">2 of 5</span>
+
+<span title="3 of 5" class="rating star">3 of 5</span>
+
+<span title="4 of 5" class="rating star">4 of 5</span>
+
+<span title="5 of 5" class="rating star">5 of 5</span>
+
+</div>
+
+    <p class="review-txt ">
+        Great game... but, extremely slow as in it takes a week to complete one game on the easiest level. The refresh rate along with the player response to the UI is very slow... Nonetheless, quite addictive once you get the hang of it
+    </p>
+    <div class="meta">
+        <span class="created-date">Posted 05/14/2013</span>
+    </div>
+</article>
+
+</li>
+                    </ul>
+                    <a class="pspbtn" href="/projects/freecol/reviews/?sort=created_date&amp;stars=0#reviews-n-ratings">Read more reviews</a>
+            </section>
+        </section>
+
+        <section id="project-additional-trove">
+            <header>
+                <h2>Additional Project Details</h2>
+            </header>
+            <div class="project-container">
+                <section class="project-info">
+    <header>
+        <h3>Languages</h3>
+    </header>
+    <section class="content"><a href="/directory/natlanguage:tamil/" itemprop=inLanguage>Tamil</a>, <a href="/directory/natlanguage:korean/" itemprop=inLanguage>Korean</a>, <a href="/directory/natlanguage:french/" itemprop=inLanguage>French</a>, <a href="/directory/natlanguage:ukrainian/" itemprop=inLanguage>Ukrainian</a>, <a href="/directory/natlanguage:dutch/" itemprop=inLanguage>Dutch</a>, <a href="/directory/natlanguage:persian/" itemprop=inLanguage>Persian</a>, <a href="/directory/natlanguage:polish/" itemprop=inLanguage>Polish</a>, <a href="/directory/natlanguage:lithuanian/" itemprop=inLanguage>Lithuanian</a>, <a href="/directory/natlanguage:albanian/" itemprop=inLanguage>Albanian</a>, <a href="/directory/natlanguage:macedonian/" itemprop=inLanguage>Macedonian</a>, <a href="/directory/natlanguage:czech/" itemprop=inLanguage>Czech</a>, <a href="/directory/natlanguage:afrikaans/" itemprop=inLanguage>Afrikaans</a>, <a href="/directory/natlanguage:finnish/" itemprop=inLanguage>Finnish</a>, <a href="/directory/natlanguage:italian/" itemprop=inLanguage>Italian</a>, <a href="/directory/natlanguage:hebrew/" itemprop=inLanguage>Hebrew</a>, <a href="/directory/natlanguage:esperanto/" itemprop=inLanguage>Esperanto</a>, <a href="/directory/natlanguage:catalan/" itemprop=inLanguage>Catalan</a>, <a href="/directory/natlanguage:greek/" itemprop=inLanguage>Greek</a>, <a href="/directory/natlanguage:english/" itemprop=inLanguage>English</a>, <a href="/directory/natlanguage:portuguese/" itemprop=inLanguage>Portuguese</a>, <a href="/directory/natlanguage:belarusian/" itemprop=inLanguage>Belarusian</a>, <a href="/directory/natlanguage:estonian/" itemprop=inLanguage>Estonian</a>, <a href="/directory/natlanguage:galician/" itemprop=inLanguage>Galician</a>, <a href="/directory/natlanguage:bulgarian/" itemprop=inLanguage>Bulgarian</a>, <a href="/directory/natlanguage:swedish/" itemprop=inLanguage>Swedish</a>, <a href="/directory/natlanguage:turkish/" itemprop=inLanguage>Turkish</a>, <a href="/directory/natlanguage:indonesian/" itemprop=inLanguage>Indonesian</a>, <a href="/directory/natlanguage:norwegian/" itemprop=inLanguage>Norwegian</a>, <a href="/directory/natlanguage:portuguesebrazilian/" itemprop=inLanguage>Brazilian Portuguese</a>, <a href="/directory/natlanguage:chinesesimplified/" itemprop=inLanguage>Chinese (Simplified)</a>, <a href="/directory/natlanguage:danish/" itemprop=inLanguage>Danish</a>, <a href="/directory/natlanguage:bosnian/" itemprop=inLanguage>Bosnian</a>, <a href="/directory/natlanguage:german/" itemprop=inLanguage>German</a>, <a href="/directory/natlanguage:japanese/" itemprop=inLanguage>Japanese</a>, <a href="/directory/natlanguage:spanish/" itemprop=inLanguage>Spanish</a>, <a href="/directory/natlanguage:russian/" itemprop=inLanguage>Russian</a>, <a href="/directory/natlanguage:arabic/" itemprop=inLanguage>Arabic</a>, <a href="/directory/natlanguage:hungarian/" itemprop=inLanguage>Hungarian</a>, <a href="/directory/natlanguage:basque/" itemprop=inLanguage>Basque (Euskara)</a>, <a href="/directory/natlanguage:breton/" itemprop=inLanguage>Breton</a></section>
+</section>
+
+
+                <section class="project-info">
+    <header>
+        <h3>Intended Audience</h3>
+    </header>
+    <section class="content"><a href="/directory/audience:endusers/">End Users/Desktop</a></section>
+</section>
+
+
+                <section class="project-info">
+    <header>
+        <h3>User Interface</h3>
+    </header>
+    <section class="content"><a href="/directory/environment:ui_swing/">Java Swing</a>, <a href="/directory/environment:x11/">X Window System (X11)</a>, <a href="/directory/environment:win32/">Win32 (MS Windows)</a></section>
+</section>
+
+
+                <section class="project-info">
+    <header>
+        <h3>Programming Language</h3>
+    </header>
+    <section class="content"><a href="/directory/language:java/">Java</a></section>
+</section>
+
+
+                <section id="project-awards" class="project-info">
+                    <header>
+                    <h4>Awards</h4>
+                    </header>
+                    <section class="content">
+                        <ul>
+                            <li>
+                                
+                                
+                                
+                                <a href="http://sourceforge.net/potm/potm-2007-02.php" title="Project of the Month: February 2007" rel="nofollow">
+                                    
+                                    <img src="http://a.fsdn.com/con/img/icons/award.png" alt="Project of the Month: February 2007" title="Project of the Month: February 2007" width="16" height="16"/>
+                                    
+                                </a>
+                            </li>
+                        </ul>
+                    </section>
+                </section>
+                <section class="project-info">
+                    <header>
+                        <h4>Registered</h4>
+                    </header>
+                    <section class="content">
+                        2002-01-02
+                    </section>
+                </section>
+            </div>
+        </section>
+        <section class="ads text">
+            
+
+
+
+    
+
+<div id="SF_TextLink_1x1_A_wrapped" class="ad text False" data-unit="SF_TextLink_1x1_A">
+<script type="text/javascript">
+/*global googletag */
+(function(){
+    var immersionCompliment = false;
+    
+    if ((!immersion_adcode && !immersionCompliment)  || (immersion_adcode && immersionCompliment)) {
+        document.write('<div id="div-gpt-ad-1394209358858-0" ></div>');
+        googletag.cmd.push(function() {
+            googletag.display('div-gpt-ad-1394209358858-0');
+        });
+    }
+})();
+</script>
+</div>
+            
+
+
+
+    
+
+<div id="SF_TextLink_1x1_B_wrapped" class="ad text False" data-unit="SF_TextLink_1x1_B">
+<script type="text/javascript">
+/*global googletag */
+(function(){
+    var immersionCompliment = false;
+    
+    if ((!immersion_adcode && !immersionCompliment)  || (immersion_adcode && immersionCompliment)) {
+        document.write('<div id="div-gpt-ad-1394209358859-0" ></div>');
+        googletag.cmd.push(function() {
+            googletag.display('div-gpt-ad-1394209358859-0');
+        });
+    }
+})();
+</script>
+</div>
+        </section></section>
+
+    <section id="sidebar">
+        <section class="ads">
+            
+
+
+
+    
+    
+
+<div id="SF_ProjectSum_300x250_A_wrapped" class="ad multisize False" data-unit="SF_ProjectSum_300x250_A">
+<script type="text/javascript">
+/*global googletag */
+(function(){
+    var immersionCompliment = false;
+    
+    if ((!immersion_adcode && !immersionCompliment)  || (immersion_adcode && immersionCompliment)) {
+        document.write('<div id="div-gpt-ad-1394209358855-0" ></div>');
+        googletag.cmd.push(function() {
+            googletag.display('div-gpt-ad-1394209358855-0');
+        });
+    }
+})();
+</script>
+</div>
+            
+
+
+
+    
+
+<div id="SF_ProjectSum_300x250_B_wrapped" class="ad medrec False" data-unit="SF_ProjectSum_300x250_B">
+<script type="text/javascript">
+/*global googletag */
+(function(){
+    var immersionCompliment = false;
+    
+    if ((!immersion_adcode && !immersionCompliment)  || (immersion_adcode && immersionCompliment)) {
+        document.write('<div id="div-gpt-ad-1394209358856-0" ></div>');
+        googletag.cmd.push(function() {
+            googletag.display('div-gpt-ad-1394209358856-0');
+        });
+    }
+})();
+</script>
+</div>
+        </section>
+        
+<aside class="sidebar-widget">
+	<header>
+        <h3>Recommended Projects</h3>
+	</header>
+    <ul class="vertical">
+        
+
+        
+
+            
+                <li class="item odd">
+                <a href="/projects/freeciv/" title="Freeciv"><img alt="Icon" src="//c.fsdn.com/allura/p/freeciv/icon" /></a>
+                <div class="pinfo-content recommended">
+                <a class="project-name" href="/projects/freeciv/" title="Learn more about Freeciv ">Freeciv</a>
+                <div class="summary">
+                
+                </div>
+                </div>
+
+            </li>
+            
+                <li class="item even">
+                <a href="/projects/unknownhorizons/" title="Unknown Horizons"><img alt="Icon" src="//c.fsdn.com/allura/p/unknownhorizons/icon" /></a>
+                <div class="pinfo-content recommended">
+                <a class="project-name" href="/projects/unknownhorizons/" title="Learn more about Unknown Horizons ">Unknown Horizons</a>
+                <div class="summary">
+                
+                </div>
+                </div>
+
+            </li>
+            
+                <li class="item odd last">
+                <a href="/projects/wesnoth/" title="Battle for Wesnoth"><img alt="Icon" src="//c.fsdn.com/allura/p/wesnoth/icon" /></a>
+                <div class="pinfo-content recommended">
+                <a class="project-name" href="/projects/wesnoth/" title="Learn more about Battle for Wesnoth ">Battle for Wesnoth</a>
+                <div class="summary">
+                Turn-based strategy game with a high fantasy theme 
+                </div>
+                </div>
+
+            </li>
+            
+        
+    </ul>
+</aside>
+
+        
+<script type="text/javascript" src="//gdc.indeed.com/ads/apiresults.js"></script>
+<aside class="sidebar-widget jobs-widget">
+    <header>
+        <h3>
+            <span id="itjb_at"><a href="http://www.theitjobboard.co.uk/">jobs</a> by <a id='itjb-logo-container' href="http://www.theitjobboard.co.uk/">ITJB</a></span>
+            <span id="indeed_at"><a href="http://www.indeed.com/">jobs</a> by <a href="http://www.indeed.com/" title="Job Search"><img src="http://a.fsdn.com/con/img/jobs/indeed_logo.gif" class="provider-logo" alt="Indeed job search"></a></span>
+            <span id="dice_at">
+                Powered by
+                <a href="http://www.dice.com/?CMPID=AF_SF_UP_JS_AV_OG_BN_&amp;utm_source=SourceForge&amp;utm_medium=Affiliate&amp;utm_content=&amp;utm_campaign=Advocacy_Ongoing"> <img src="http://a.fsdn.com/con/img/jobs/dice_logo.png" alt="Dice Logo" class="dice-logo"> </a>
+            </span>
+            Latest Tech Jobs
+        </h3>
+    </header>
+    <section>
+        <form action="/jobs/" method="get" id="job-search">
+            <input type="hidden" name="source" value="widget">
+            <input type="text" name="text" placeholder="Senior Java Developer (Job Title)" id="job-title" value="">
+            <input type="submit" name="submit" value="Find" id="job-search-button">
+        </form>
+    </section>
+    <ul id="job-listing">
+        <li class="item odd">
+            <span class="job-link"><a href="/jobs?source=widget">Loading...</a></span>
+            <span class="job-details">The latest tech jobs.</span>
+        </li>
+   </ul>
+   <section class="all-jobs" style="border: none;">
+        <a href="/jobs?source=widget">See All Jobs &rsaquo;&rsaquo;</a>
+    </section>
+</aside>
+
+<script type="text/javascript">
+    /*global Handlebars*/
+    $(function($) {
+        var source = $('#jobwidget-template').html();
+        var template = Handlebars.compile(source);
+
+        Handlebars.registerHelper('stripe', function(array, display_count, random, fn) {
+            var buffer = "";
+            var max_iterations = Math.min(array.length,display_count);
+            for (var i = 0, len = array.length; i < max_iterations; i++) {
+                var item = null;
+                if (random === true) {
+                    var ri = Math.floor((Math.random()*array.length)+1);
+                    item = array[ri];
+                } else {
+                    item = array[i];
+                }
+                if (item) {
+                    item.css_class = (i % 2 === 0 ? 'even' : 'odd');
+                }
+                buffer += fn.fn(item);
+            }
+            return buffer;
+        });
+
+        function load_jobBoard() {
+            $.ajax({
+                url:'/jobs/json',
+                success: function(data) {
+                    $('#job-listing').html(template(data));
+                    var provider_name = data.provider_name, attrib_id;
+                    switch (provider_name) {
+                        case 'itjb':
+                            var itjb_link = 'http://www.' + data.itjb_links["NO"] + '?' + data.itjb_tracker.logo;
+                            $('#itjb_at a').prop('href', itjb_link);
+                            attrib_id = '#itjb_at';
+                            $('#job-listing li a').each(function (index, element) {
+                                var href = $(element).prop('href');
+                                href += '&' + data.itjb_tracker.link;
+                                $(element).prop('href', href);
+                            });$('#itjb-logo-container').html('<img src="http://a.fsdn.com/con/img/jobs/ITJB_no.jpg" class="provider-logo" alt="ITJB job search" />');break;
+                        case 'indeed':
+                            attrib_id = '#indeed_at';
+                        break;
+                        default:
+                            attrib_id = '#dice_at';
+                        break;
+                    }
+                    $(attrib_id).show().siblings().hide();
+                },
+                dataType: 'json'
+            });
+        }
+        load_jobBoard();
+    });
+</script>
+
+<script type="text/x-handlebars-template" id="jobwidget-template">
+    
+    {{#stripe data.jobs 5 true}}
+    <li class="item {{css_class}}">
+    <span class="job-link"><a href="{{ this.url }}" onmousedown="{{ this.onmousedown }}">{{ this.title }}</a></span>
+        <span class="job-details">{{ this.company}} - {{ this.location}}</span>
+    </li>
+    {{/stripe}}
+    
+</script>
+
+        <section class="ads">
+            
+
+
+
+    
+
+<div id="SF_ProjectSum_300x250_C_wrapped" class="ad medrec False" data-unit="SF_ProjectSum_300x250_C">
+<script type="text/javascript">
+/*global googletag */
+(function(){
+    var immersionCompliment = false;
+    
+    if ((!immersion_adcode && !immersionCompliment)  || (immersion_adcode && immersionCompliment)) {
+        document.write('<div id="div-gpt-ad-1394209358857-0" ></div>');
+        googletag.cmd.push(function() {
+            googletag.display('div-gpt-ad-1394209358857-0');
+        });
+    }
+})();
+</script>
+</div>
+        </section>
+        
+
+<aside class="sidebar-widget project-activity-widget" id="project-activity"></aside>
+
+<script type="text/x-handlebars-template" id="project-activity-template">
+    
+    <header>
+        <h3>
+            Project Activity
+            <a id="follow-action" href="{{followee.activity_url}}activity/follow" title="{{followee.activity_name}}"{{#if following}} class="active"{{/if}}>
+                <b data-icon="S" class="ico ico-star"></b>
+            </a>
+            <a href="{{followee.activity_url}}activity/feed" title="RSS"><b data-icon="f" class="ico ico-feed"></b></a>
+        </h3>
+    </header>
+    <ul>
+        {{#stripe timeline 5 false}}
+        <li class="item {{css_class}}">
+            <h4>
+                {{#ifTagged "release"}}
+                  {{ cap this.verb }}
+                {{else}}
+                  {{ icon this.actor.activity_extras.icon_url }}
+                  {{ activity_obj this.actor }}
+                  {{ this.verb }}
+                {{/ifTagged}}
+                {{ activity_obj this.obj }}
+                {{#if this.target.activity_name}} on {{ activity_obj this.target }}{{/if}}
+            </h4>
+            {{#if this.obj.activity_extras.summary}}
+              <p>{{ this.obj.activity_extras.summary }}</p>
+            {{/if}}
+            <time datetime="{{ this.published }}" title="{{ this.published }}">{{ ago this.published }}</time>
+        </li>
+        {{/stripe}}
+    </ul>
+    <a class="all-activities" href="{{followee.activity_url}}activity">See All Activities &rsaquo;&rsaquo;</a>
+    
+</script>
+
+        <a id="report-inappropriate" href="/projects/freecol/report_inappropriate">Report inappropriate content</a>
+    </section>
+</article>
+        </div>
+  
+    <div class="project-footer-adcontainer">
+    
+
+
+
+    
+
+<div id="SF_ProjectSum_728x90_B_wrapped" class="ad leaderboard False" data-unit="SF_ProjectSum_728x90_B">
+<script type="text/javascript">
+/*global googletag */
+(function(){
+    var immersionCompliment = false;
+    
+    if ((!immersion_adcode && !immersionCompliment)  || (immersion_adcode && immersionCompliment)) {
+        document.write('<div id="div-gpt-ad-1392148208790-0" ></div>');
+        googletag.cmd.push(function() {
+            googletag.display('div-gpt-ad-1392148208790-0');
+        });
+    }
+})();
+</script>
+</div>
+    </div>
+  
+
+        
+
+          
+<footer id="site-footer">
+    <div class="wrapper">
+        <nav>
+            <h5>SourceForge</h5>
+            <a href="/about">About</a>
+            <a href="/blog/category/sitestatus/">Site Status</a>
+            <a href="http://twitter.com/sfnet_ops">@sfnet_ops</a>
+            
+
+        </nav>
+        <nav>
+            <h5>Find and Develop Software</h5>
+            <a href="/create/">Create a Project</a>
+            <a href="/directory/">Software Directory</a>
+            <a href="/top">Top Downloaded Projects</a>
+        </nav>
+        <nav>
+            <h5>Community</h5>
+            <a href="/blog/">Blog</a>
+            <a href="http://twitter.com/sourceforge">@sourceforge</a>
+            <a href="/jobs?source=footer">Job Board</a>
+            <a href="http://library.slashdotmedia.com/?source=sfnet_footer">Resources</a>
+        </nav>
+        <nav>
+            <h5>Help</h5>
+            <a href="http://p.sf.net/sourceforge/docs">Site Documentation</a>
+            <a href="/support">Support Request</a>
+            <a href="http://p.sf.net/sourceforge/irc">Real-Time Support</a>
+        </nav>
+    </div>
+</footer>
+<footer id="site-copyright-footer">
+    <div class="wrapper">
+        <div id="copyright">
+            Copyright &copy; 2014 Dice. All Rights Reserved.<br />
+            SourceForge is a <a href="http://www.diceholdingsinc.com/phoenix.zhtml?c=211152&amp;p=irol-landing">Dice Holdings, Inc.</a> service.
+        </div>
+        <nav>
+            <a href="http://slashdotmedia.com/terms-of-use/">Terms</a>
+            <a href="http://slashdotmedia.com/privacy-statement/">Privacy</a>
+            <span id='teconsent'></span>
+            <a href="http://slashdotmedia.com/opt-out-choices/">Opt Out Choices</a>
+
+
+            <a href="http://slashdotmedia.com">Advertise</a>
+            <a href="http://sourceforge.jp/">SourceForge.JP</a>
+            <a href="http://goparallel.sourceforge.net/">Go Parallel</a>
+        </nav>
+    </div>
+</footer>
+            <script src="http://a.fsdn.com/con/js/min/sf.js-it.js?1418398744" type="text/javascript"></script>
+        
+        <!-- Begin comScore Tag -->
+        <script src="http://b.scorecardresearch.com/beacon.js"></script>
+        <script type="text/javascript">
+            if (window.COMSCORE) {
+                COMSCORE.beacon({
+                    c1: 2,
+                    c2: 6035546,
+                    c3: "",
+                    c4: "",
+                    c5: "",
+                    c6: "",
+                    c15: ""
+                });
+            }
+        </script>
+        <noscript>
+            <img src="http://b.scorecardresearch.com/p?c1=2&amp;c2=6035546&amp;c3=&amp;c4=&amp;c5=&amp;c6=&amp;c15=&amp;cj=1" alt="comScore2" />
+        </noscript>
+        <!-- End comScore Tag -->
+
+<div id="screenshots-callout-content" class="callout">
+    <a href="/p/freecol/admin/screenshots">Screenshots can attract more users to your project.</a>
+</div>
+<div id="features-callout-content" class="callout">
+    <a href="/projects/freecol/edit">Features can attract more users to your project.</a>
+</div>
+<script src="http://a.fsdn.com/con/js/callouts.js?1418398744"></script>
+
+<div id="icon-dialog" title="Change the project icon">
+    <form action="/projects/freecol/update" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="_visit_cookie" value="5496b80ffbd7891da3266b96"/>
+        <label for="icon">Upload a new icon</label>
+        <div class="field">
+            <input name="icon" id="icon" class="file" type="file"/>
+        </div>
+        <p class="help">Icons must be PNG, GIF, or JPEG and less than 1 MiB in size.  They will be displayed as 48x48 images.</p>
+    </form>
+</div>
+
+
+
+            <script type="text/javascript" src="//consent-st.truste.com/get?name=notice.js&amp;domain=slashdot.org&amp;c=teconsent&amp;text=true"></script>
+            
+        
+
+<script type="text/javascript">
+    /*global _ml:true, window */
+    (function () {
+        _ml = window._ml || {};
+        _ml.pub = '771';
+        _ml.ht = 'shex';
+        _ml.ef = ['*form_loginname', '*email', '#subscriber-email', '*unickname'];
+        var s = document.getElementsByTagName('script')[0], cd = new Date(), mltag =
+            document.createElement('script');
+        mltag.type = 'text/javascript'; mltag.async = true;
+        mltag.src = '//ml314.com/tag.aspx?' + cd.getDate() + cd.getMonth() + cd.getFullYear();
+        s.parentNode.insertBefore(mltag, s);
+    })();
+</script>
+</body>
+</html>

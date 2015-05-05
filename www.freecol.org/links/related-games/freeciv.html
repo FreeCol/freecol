@@ -1,0 +1,1155 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script type="text/javascript">(window.NREUM||(NREUM={})).loader_config={xpid:"Vg4HVFVACgMGXFRXBA=="};window.NREUM||(NREUM={}),__nr_require=function(t,e,n){function r(n){if(!e[n]){var o=e[n]={exports:{}};t[n][0].call(o.exports,function(e){var o=t[n][1][e];return r(o?o:e)},o,o.exports)}return e[n].exports}if("function"==typeof __nr_require)return __nr_require;for(var o=0;o<n.length;o++)r(n[o]);return r}({QJf3ax:[function(t,e){function n(t){function e(e,n,a){t&&t(e,n,a),a||(a={});for(var c=s(e),f=c.length,u=i(a,o,r),d=0;f>d;d++)c[d].apply(u,n);return u}function a(t,e){f[t]=s(t).concat(e)}function s(t){return f[t]||[]}function c(){return n(e)}var f={};return{on:a,emit:e,create:c,listeners:s,_events:f}}function r(){return{}}var o="nr@context",i=t("gos");e.exports=n()},{gos:"7eSDFh"}],ee:[function(t,e){e.exports=t("QJf3ax")},{}],3:[function(t){function e(t,e,n,i,s){try{c?c-=1:r("err",[s||new UncaughtException(t,e,n)])}catch(f){try{r("ierr",[f,(new Date).getTime(),!0])}catch(u){}}return"function"==typeof a?a.apply(this,o(arguments)):!1}function UncaughtException(t,e,n){this.message=t||"Uncaught error with no additional information",this.sourceURL=e,this.line=n}function n(t){r("err",[t,(new Date).getTime()])}var r=t("handle"),o=t(5),i=t("ee"),a=window.onerror,s=!1,c=0;t("loader").features.err=!0,window.onerror=e,NREUM.noticeError=n;try{throw new Error}catch(f){"stack"in f&&(t(1),t(4),"addEventListener"in window&&t(2),window.XMLHttpRequest&&XMLHttpRequest.prototype&&XMLHttpRequest.prototype.addEventListener&&t(3),s=!0)}i.on("fn-start",function(){s&&(c+=1)}),i.on("fn-err",function(t,e,r){s&&(this.thrown=!0,n(r))}),i.on("fn-end",function(){s&&!this.thrown&&c>0&&(c-=1)}),i.on("internal-error",function(t){r("ierr",[t,(new Date).getTime(),!0])})},{1:8,2:5,3:9,4:7,5:20,ee:"QJf3ax",handle:"D5DuLP",loader:"G9z0Bl"}],4:[function(t){function e(){}if(window.performance&&window.performance.timing&&window.performance.getEntriesByType){var n=t("ee"),r=t("handle"),o=t(2);t("loader").features.stn=!0,t(1),n.on("fn-start",function(t){var e=t[0];e instanceof Event&&(this.bstStart=Date.now())}),n.on("fn-end",function(t,e){var n=t[0];n instanceof Event&&r("bst",[n,e,this.bstStart,Date.now()])}),o.on("fn-start",function(t,e,n){this.bstStart=Date.now(),this.bstType=n}),o.on("fn-end",function(t,e){r("bstTimer",[e,this.bstStart,Date.now(),this.bstType])}),n.on("pushState-start",function(){this.time=Date.now(),this.startPath=location.pathname+location.hash}),n.on("pushState-end",function(){r("bstHist",[location.pathname+location.hash,this.startPath,this.time])}),"addEventListener"in window.performance&&(window.performance.addEventListener("webkitresourcetimingbufferfull",function(){r("bstResource",[window.performance.getEntriesByType("resource")]),window.performance.webkitClearResourceTimings()},!1),window.performance.addEventListener("resourcetimingbufferfull",function(){r("bstResource",[window.performance.getEntriesByType("resource")]),window.performance.clearResourceTimings()},!1)),document.addEventListener("scroll",e,!1),document.addEventListener("keypress",e,!1),document.addEventListener("click",e,!1)}},{1:6,2:8,ee:"QJf3ax",handle:"D5DuLP",loader:"G9z0Bl"}],5:[function(t,e){function n(t){i.inPlace(t,["addEventListener","removeEventListener"],"-",r)}function r(t){return t[1]}var o=(t(1),t("ee").create()),i=t(2)(o),a=t("gos");if(e.exports=o,n(window),"getPrototypeOf"in Object){for(var s=document;s&&!s.hasOwnProperty("addEventListener");)s=Object.getPrototypeOf(s);s&&n(s);for(var c=XMLHttpRequest.prototype;c&&!c.hasOwnProperty("addEventListener");)c=Object.getPrototypeOf(c);c&&n(c)}else XMLHttpRequest.prototype.hasOwnProperty("addEventListener")&&n(XMLHttpRequest.prototype);o.on("addEventListener-start",function(t){if(t[1]){var e=t[1];"function"==typeof e?this.wrapped=t[1]=a(e,"nr@wrapped",function(){return i(e,"fn-",null,e.name||"anonymous")}):"function"==typeof e.handleEvent&&i.inPlace(e,["handleEvent"],"fn-")}}),o.on("removeEventListener-start",function(t){var e=this.wrapped;e&&(t[1]=e)})},{1:20,2:21,ee:"QJf3ax",gos:"7eSDFh"}],6:[function(t,e){var n=(t(2),t("ee").create()),r=t(1)(n);e.exports=n,r.inPlace(window.history,["pushState"],"-")},{1:21,2:20,ee:"QJf3ax"}],7:[function(t,e){var n=(t(2),t("ee").create()),r=t(1)(n);e.exports=n,r.inPlace(window,["requestAnimationFrame","mozRequestAnimationFrame","webkitRequestAnimationFrame","msRequestAnimationFrame"],"raf-"),n.on("raf-start",function(t){t[0]=r(t[0],"fn-")})},{1:21,2:20,ee:"QJf3ax"}],8:[function(t,e){function n(t,e,n){var r=t[0];"string"==typeof r&&(r=new Function(r)),t[0]=o(r,"fn-",null,n)}var r=(t(2),t("ee").create()),o=t(1)(r);e.exports=r,o.inPlace(window,["setTimeout","setInterval","setImmediate"],"setTimer-"),r.on("setTimer-start",n)},{1:21,2:20,ee:"QJf3ax"}],9:[function(t,e){function n(){c.inPlace(this,d,"fn-")}function r(t,e){c.inPlace(e,["onreadystatechange"],"fn-")}function o(t,e){return e}var i=t("ee").create(),a=t(1),s=t(2),c=s(i),f=s(a),u=window.XMLHttpRequest,d=["onload","onerror","onabort","onloadstart","onloadend","onprogress","ontimeout"];e.exports=i,window.XMLHttpRequest=function(t){var e=new u(t);try{i.emit("new-xhr",[],e),f.inPlace(e,["addEventListener","removeEventListener"],"-",function(t,e){return e}),e.addEventListener("readystatechange",n,!1)}catch(r){try{i.emit("internal-error",[r])}catch(o){}}return e},window.XMLHttpRequest.prototype=u.prototype,c.inPlace(XMLHttpRequest.prototype,["open","send"],"-xhr-",o),i.on("send-xhr-start",r),i.on("open-xhr-start",r)},{1:5,2:21,ee:"QJf3ax"}],10:[function(t){function e(t){if("string"==typeof t&&t.length)return t.length;if("object"!=typeof t)return void 0;if("undefined"!=typeof ArrayBuffer&&t instanceof ArrayBuffer&&t.byteLength)return t.byteLength;if("undefined"!=typeof Blob&&t instanceof Blob&&t.size)return t.size;if("undefined"!=typeof FormData&&t instanceof FormData)return void 0;try{return JSON.stringify(t).length}catch(e){return void 0}}function n(t){var n=this.params,r=this.metrics;if(!this.ended){this.ended=!0;for(var i=0;c>i;i++)t.removeEventListener(s[i],this.listener,!1);if(!n.aborted){if(r.duration=(new Date).getTime()-this.startTime,4===t.readyState){n.status=t.status;var a=t.responseType,f="arraybuffer"===a||"blob"===a||"json"===a?t.response:t.responseText,u=e(f);if(u&&(r.rxSize=u),this.sameOrigin){var d=t.getResponseHeader("X-NewRelic-App-Data");d&&(n.cat=d.split(", ").pop())}}else n.status=0;r.cbTime=this.cbTime,o("xhr",[n,r,this.startTime])}}}function r(t,e){var n=i(e),r=t.params;r.host=n.hostname+":"+n.port,r.pathname=n.pathname,t.sameOrigin=n.sameOrigin}if(window.XMLHttpRequest&&XMLHttpRequest.prototype&&XMLHttpRequest.prototype.addEventListener&&!/CriOS/.test(navigator.userAgent)){t("loader").features.xhr=!0;var o=t("handle"),i=t(2),a=t("ee"),s=["load","error","abort","timeout"],c=s.length,f=t(1);t(4),t(3),a.on("new-xhr",function(){this.totalCbs=0,this.called=0,this.cbTime=0,this.end=n,this.ended=!1,this.xhrGuids={}}),a.on("open-xhr-start",function(t){this.params={method:t[0]},r(this,t[1]),this.metrics={}}),a.on("open-xhr-end",function(t,e){"loader_config"in NREUM&&"xpid"in NREUM.loader_config&&this.sameOrigin&&e.setRequestHeader("X-NewRelic-ID",NREUM.loader_config.xpid)}),a.on("send-xhr-start",function(t,n){var r=this.metrics,o=t[0],i=this;if(r&&o){var f=e(o);f&&(r.txSize=f)}this.startTime=(new Date).getTime(),this.listener=function(t){try{"abort"===t.type&&(i.params.aborted=!0),("load"!==t.type||i.called===i.totalCbs&&(i.onloadCalled||"function"!=typeof n.onload))&&i.end(n)}catch(e){try{a.emit("internal-error",[e])}catch(r){}}};for(var u=0;c>u;u++)n.addEventListener(s[u],this.listener,!1)}),a.on("xhr-cb-time",function(t,e,n){this.cbTime+=t,e?this.onloadCalled=!0:this.called+=1,this.called!==this.totalCbs||!this.onloadCalled&&"function"==typeof n.onload||this.end(n)}),a.on("xhr-load-added",function(t,e){var n=""+f(t)+!!e;this.xhrGuids&&!this.xhrGuids[n]&&(this.xhrGuids[n]=!0,this.totalCbs+=1)}),a.on("xhr-load-removed",function(t,e){var n=""+f(t)+!!e;this.xhrGuids&&this.xhrGuids[n]&&(delete this.xhrGuids[n],this.totalCbs-=1)}),a.on("addEventListener-end",function(t,e){e instanceof XMLHttpRequest&&"load"===t[0]&&a.emit("xhr-load-added",[t[1],t[2]],e)}),a.on("removeEventListener-end",function(t,e){e instanceof XMLHttpRequest&&"load"===t[0]&&a.emit("xhr-load-removed",[t[1],t[2]],e)}),a.on("fn-start",function(t,e,n){e instanceof XMLHttpRequest&&("onload"===n&&(this.onload=!0),("load"===(t[0]&&t[0].type)||this.onload)&&(this.xhrCbStart=(new Date).getTime()))}),a.on("fn-end",function(t,e){this.xhrCbStart&&a.emit("xhr-cb-time",[(new Date).getTime()-this.xhrCbStart,this.onload,e],e)})}},{1:"XL7HBI",2:11,3:9,4:5,ee:"QJf3ax",handle:"D5DuLP",loader:"G9z0Bl"}],11:[function(t,e){e.exports=function(t){var e=document.createElement("a"),n=window.location,r={};e.href=t,r.port=e.port;var o=e.href.split("://");return!r.port&&o[1]&&(r.port=o[1].split("/")[0].split(":")[1]),r.port&&"0"!==r.port||(r.port="https"===o[0]?"443":"80"),r.hostname=e.hostname||n.hostname,r.pathname=e.pathname,"/"!==r.pathname.charAt(0)&&(r.pathname="/"+r.pathname),r.sameOrigin=!e.hostname||e.hostname===document.domain&&e.port===n.port&&e.protocol===n.protocol,r}},{}],gos:[function(t,e){e.exports=t("7eSDFh")},{}],"7eSDFh":[function(t,e){function n(t,e,n){if(r.call(t,e))return t[e];var o=n();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(t,e,{value:o,writable:!0,enumerable:!1}),o}catch(i){}return t[e]=o,o}var r=Object.prototype.hasOwnProperty;e.exports=n},{}],D5DuLP:[function(t,e){function n(t,e,n){return r.listeners(t).length?r.emit(t,e,n):(o[t]||(o[t]=[]),void o[t].push(e))}var r=t("ee").create(),o={};e.exports=n,n.ee=r,r.q=o},{ee:"QJf3ax"}],handle:[function(t,e){e.exports=t("D5DuLP")},{}],XL7HBI:[function(t,e){function n(t){var e=typeof t;return!t||"object"!==e&&"function"!==e?-1:t===window?0:i(t,o,function(){return r++})}var r=1,o="nr@id",i=t("gos");e.exports=n},{gos:"7eSDFh"}],id:[function(t,e){e.exports=t("XL7HBI")},{}],loader:[function(t,e){e.exports=t("G9z0Bl")},{}],G9z0Bl:[function(t,e){function n(){var t=p.info=NREUM.info;if(t&&t.agent&&t.licenseKey&&t.applicationID&&c&&c.body){p.proto="https"===d.split(":")[0]||t.sslForHttp?"https://":"http://",a("mark",["onload",i()]);var e=c.createElement("script");e.src=p.proto+t.agent,c.body.appendChild(e)}}function r(){"complete"===c.readyState&&o()}function o(){a("mark",["domContent",i()])}function i(){return(new Date).getTime()}var a=t("handle"),s=window,c=s.document,f="addEventListener",u="attachEvent",d=(""+location).split("?")[0],p=e.exports={offset:i(),origin:d,features:{}};c[f]?(c[f]("DOMContentLoaded",o,!1),s[f]("load",n,!1)):(c[u]("onreadystatechange",r),s[u]("onload",n)),a("mark",["firstbyte",i()])},{handle:"D5DuLP"}],20:[function(t,e){function n(t,e,n){e||(e=0),"undefined"==typeof n&&(n=t?t.length:0);for(var r=-1,o=n-e||0,i=Array(0>o?0:o);++r<o;)i[r]=t[e+r];return i}e.exports=n},{}],21:[function(t,e){function n(t){return!(t&&"function"==typeof t&&t.apply&&!t[i])}var r=t("ee"),o=t(1),i="nr@wrapper",a=Object.prototype.hasOwnProperty;e.exports=function(t){function e(t,e,r,a){function nrWrapper(){var n,i,s,f;try{i=this,n=o(arguments),s=r&&r(n,i)||{}}catch(d){u([d,"",[n,i,a],s])}c(e+"start",[n,i,a],s);try{return f=t.apply(i,n)}catch(p){throw c(e+"err",[n,i,p],s),p}finally{c(e+"end",[n,i,f],s)}}return n(t)?t:(e||(e=""),nrWrapper[i]=!0,f(t,nrWrapper),nrWrapper)}function s(t,r,o,i){o||(o="");var a,s,c,f="-"===o.charAt(0);for(c=0;c<r.length;c++)s=r[c],a=t[s],n(a)||(t[s]=e(a,f?s+o:o,i,s,t))}function c(e,n,r){try{t.emit(e,n,r)}catch(o){u([o,e,n,r])}}function f(t,e){if(Object.defineProperty&&Object.keys)try{var n=Object.keys(t);return n.forEach(function(n){Object.defineProperty(e,n,{get:function(){return t[n]},set:function(e){return t[n]=e,e}})}),e}catch(r){u([r])}for(var o in t)a.call(t,o)&&(e[o]=t[o]);return e}function u(e){try{t.emit("internal-error",e)}catch(n){}}return t||(t=r),e.inPlace=s,e.flag=i,e}},{1:20,ee:"QJf3ax"}]},{},["G9z0Bl",3,10,4]);</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="generator" content="MediaWiki 1.19.20" />
+<meta name="keywords" content="Freeciv,freeciv,Main Page,License,Features,Screenshots,Install,Interface Language,People,Contacts,Donations,Download,More distributions" />
+<meta name="description" content="Freeciv is a community site that anyone can contribute to. Discover, share and add your knowledge!" />
+<meta name="google-site-verification" content="5sWSuv7xq6EW3O7N7Ax_2GLmoOUKQAEQWQX95I1Ggy0" />
+<link rel="canonical" href="http://freeciv.wikia.com/wiki/Main_Page" />
+<link rel="apple-touch-icon" href="http://img3.wikia.nocookie.net/__cb1/freeciv/images/b/bc/Wiki.png" />
+<link rel="shortcut icon" href="http://img2.wikia.nocookie.net/__cb20070208071337/freeciv/images/6/64/Favicon.ico" />
+<link rel="search" type="application/opensearchdescription+xml" href="/opensearch_desc.php" title="Freeciv (en)" />
+<link rel="EditURI" type="application/rsd+xml" href="http://freeciv.wikia.com/api.php?action=rsd" />
+<link rel="copyright" href="http://www.wikia.com/Licensing" />
+<link rel="alternate" type="application/atom+xml" title="Freeciv Atom feed" href="/wiki/Special:RecentChanges?feed=atom" />
+<title>The Freeciv Wiki - Mods, coding, art, and more</title>
+
+<!-- CSS injected by skin and extensions -->
+<link rel="stylesheet" href="http://slot1.images2.wikia.nocookie.net/__am/1419022433/sasses/background-dynamic%3D1%26background-image%3D%26background-image-height%3D800%26background-image-width%3D2000%26color-body%3D%2523bacdd8%26color-body-middle%3D%2523bacdd8%26color-buttons%3D%2523006cb0%26color-header%3D%25233a5766%26color-links%3D%2523006cb0%26color-page%3D%2523ffffff%26page-opacity%3D100%26widthType%3D2/skins/oasis/css/oasis.scss,extensions/wikia/GlobalNavigation/styles/GlobalNavigation.scss,extensions/wikia/GlobalNavigation/styles/GlobalNavigationSearch.scss,extensions/wikia/GlobalNavigation/styles/GlobalNavigationAccountNavigation.scss,extensions/wikia/GlobalNavigation/styles/GlobalNavigationHubsMenu.scss,extensions/wikia/UserLogin/css/UserLoginDropdown.globalNavigation.scss,extensions/wikia/WallNotifications/styles/WallNotifications.globalNavigation.scss,extensions/wikia/GlobalNavigation/styles/GlobalNavigationOasis.scss,extensions/wikia/GlobalNavigation/styles/GlobalNavigationSearchOasis.scss,extensions/wikia/Qualaroo/css/Qualaroo.scss" /><style>a:lang(ar),a:lang(ckb),a:lang(fa),a:lang(kk-arab),a:lang(mzn),a:lang(ps),a:lang(ur){text-decoration:none}a.new,#quickbar a.new{color:#ba0000}
+
+/* cache key: freeciv:resourceloader:filter:minify-css:7:c88e2bcd56513749bec09a7e29cb3ffa */</style>
+
+
+<script>
+var Wikia={},
+wgWikiVertical="games",
+wgWikiCategories=[],
+wgMessages={"categoryselect-button-save":"Save","categoryselect-category-add":"Add category...","categoryselect-category-edit":"Edit category","categoryselect-category-remove":"Remove category","categoryselect-error-category-name-length":"The maximum length for a category name has been reached.","categoryselect-error-duplicate-category-name":"Category \"$1\" already exists.","categoryselect-error-empty-category-name":"Please provide a category name.","categoryselect-modal-category-name":"Provide the name of the category:","categoryselect-modal-category-sortkey":"Optionally, you may alphabetize this page on the \"$1\" category page under the name:","categoryselect-tooltip-add":"Press the Enter or Return key when done.","wikiarelatedpages-heading":"Read more"},
+JSSnippetsStack=[],
+ads={"context":{"opts":{"adsInContent":true,"enableAdsInMaps":true,"pageType":"all_ads","showAds":true},"targeting":{"enableKruxTargeting":true,"enablePageCategories":true,"pageArticleId":1812,"pageIsArticle":true,"pageName":"Main_Page","pageType":"home","skin":"oasis","wikiCategory":"gaming","wikiCustomKeyValues":"age=adult;age=teen;age=yadult;gnre=strategy;pform=pc;sex=m","wikiDbName":"freeciv","wikiLanguage":"en","wikiVertical":"Gaming"},"providers":[],"slots":[],"forceProviders":[]}},
+adslots2=[],
+adDriverLastDARTCallNoAds=[],
+adDriver2ForcedStatus=[],
+wgGaHasAds=true,
+wgEnableOpenXSPC=true,
+wgAfterContentAndJS=[],
+wgWikiFactoryTagIds=[1,13,20,21,32,35,36,131,145,100000,100056,100057,100058,100059,100095],
+wgWikiFactoryTagNames=["pc","teens_(14-17)","adults_(18-35)","adults_(35+)","rts","male_(73%)","female_(27%)","gaming","f2p","test_tag","wow","t9","skyscraper","skyscrapperwow","addriver"],
+wgCdnRootUrl="http://slot1.images.wikia.nocookie.net",
+wgCdnApiUrl="http://api.wikia.nocookie.net/__cb1419022433",
+wgDBname="freeciv",
+wgCityId="2261",
+wgContentLanguage="en",
+wgUserName=null,
+wgArticleId=1812,
+wgCategories=[],
+wgPageName="Main_Page",
+wikiaPageType="home",
+skin="oasis",
+_gaq=[],
+wgIsGASpecialWiki=null,
+wgStyleVersion="1419022433",
+wgTransactionContext={"type":"page/main/view/oasis/no_parser/average","env":"prod","wiki":"freeciv","entry_point":"page","namespace":0,"logged_in":false,"action":"view","skin":"oasis","parser_cache_used":true,"size_category":"average"};
+</script><script>window.mw||(mw={fk:1,loader:{state:function(s){preMwLdrStA=window.preMwLdrStA||[];preMwLdrStA.push(s)}}});</script>
+<script>
+function syslogReport(priority,message,context){context=context||null;var url='//jserrorslog.wikia.com/',i=new Image(),data={'@message':message,'syslog_pri':priority};if(context){data['@context']=context;}
+try{data['@fields']={server:document.cookie.match(/server.([A-Z]*).cache/)[1]};}catch(e){}
+try{i.src=url+'l?'+JSON.stringify(data);}catch(e){i.src=url+'e?'+e;}}</script><script>var wgNow = new Date();</script>
+<!-- Wikia Beacon Tracking -->
+<noscript><img src="http://a.wikia-beacon.com/__track/view?cb=1419022433&amp;c=2261&amp;lc=en&amp;lid=75&amp;x=freeciv&amp;y=c1&amp;u=0&amp;a=1812&amp;s=oasis&amp;n=0&amp;nojs=1" width="1" height="1" border="0" alt="" /></noscript>
+<script>
+(function() {
+	var result = RegExp("wikia_beacon_id=([A-Za-z0-9_-]{10})").exec(document.cookie);
+	if(result) {
+		window.beacon_id = result[1];
+	} else {
+		// something went terribly wrong
+	}
+
+	var utma = RegExp("__utma=([0-9\.]+)").exec(document.cookie);
+	var utmb = RegExp("__utmb=([0-9\.]+)").exec(document.cookie);
+
+	var trackUrl = "http://a.wikia-beacon.com/__track/view?cb=1419022433&amp;c=2261&amp;lc=en&amp;lid=75&amp;x=freeciv&amp;y=c1&amp;u=0&amp;a=1812&amp;s=oasis&amp;n=0" + ((typeof document.referrer != "undefined") ? "&amp;r=" + escape(document.referrer) : "") + "&amp;rand=" + (new Date).valueOf() + (window.beacon_id ? "&amp;beacon=" + window.beacon_id : "") + (utma && utma[1] ? "&amp;utma=" + utma[1] : "") + (utmb && utmb[1] ? "&amp;utmb=" + utmb[1] : "");
+	document.write('<'+'script type="text/javascript" src="' + trackUrl + '"><'+'/script>');
+})();
+</script><script src="http://community.wikia.com/wikia.php?controller=Optimizely&method=getCode"></script><script src="http://slot1.images1.wikia.nocookie.net/__load/-/cb%3D1419022433%26debug%3Dfalse%26lang%3Den%26only%3Dscripts%26skin%3Doasis/wikia.ext.instantGlobals,abtesting"></script>
+<script src="http://slot1.images2.wikia.nocookie.net/__load/-/cb%3D1419022433%26debug%3Dfalse%26lang%3Den%26only%3Dscripts%26skin%3Doasis/amd|wikia.tracker.stub,stub|wikia.abTest,cache,cookies,document,geo,instantGlobals,localStorage,location,log,querystring,window"></script>
+<script>/*<![CDATA[*/window.mw.fk&&delete mw;/*]]>*/</script>
+<script type="text/javascript" src="http://slot1.images.wikia.nocookie.net/__am/1419022433/groups/-/abtesting,oasis_blocking,analytics_gas_js,adengine2_tracking_js,adengine2_rubicon_rtp_js,adengine2_amazon_match_js,optimizely_blocking_js,qualaroo_blocking_js,monetization_module_top_script_js"></script>
+<!-- Make IE recognize HTML5 tags. -->
+<!--[if IE]>
+	<script>/*@cc_on'abbr article aside audio canvas details figcaption figure footer header hgroup mark menu meter nav output progress section summary time video'.replace(/\w+/g,function(n){document.createElement(n)})@*/</script>
+<![endif]-->
+
+
+
+	<meta property="fb:app_id" content="112328095453510" prefix="fb: http://www.facebook.com/2008/fbml" />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="Freeciv" />
+	<meta property="og:image" content="http://images.wikia.com/freeciv/images/b/bc/Wiki.png" />
+	<meta property="og:description" content="6th Dec 2014 – Freeciv 2.4.4 is a bugfix release in the stable 2.4 series. 22nd Nov 2014 – The second beta of Freeciv 2.5.0 has been released." />
+	<meta property="og:url" content="http://freeciv.wikia.com/wiki/Main_Page" />
+<meta name="apple-itunes-app" content="app-id=623705389">
+</head>
+<body class="mediawiki ltr ns-0 ns-subject page-Main_Page  TOC_hide oasis-one-column wikinav2 skin-oasis mainpage background-not-tiled background-dynamic">
+	<div class="background-image-gradient"></div>
+
+
+<!-- Begin comScore Tag -->
+<script type="text/javascript">
+var _comscore = _comscore || [];
+_comscore.push({ c1: "2", c2: "6177433",
+	options: {
+		url_append: "comscorekw=wikiacsid_gaming"
+	}
+});
+
+(function() {
+	var s = document.createElement("script"), el = document.getElementsByTagName("script")[0]; s.async = true;
+	s.src = (document.location.protocol == "https:" ? "https://sb" : "http://b") + ".scorecardresearch.com/beacon.js";
+	el.parentNode.insertBefore(s, el);
+})();
+</script>
+<noscript>
+<img src="http://b.scorecardresearch.com/p?c1=2&amp;c2=6177433&amp;c3=&amp;c4=&amp;c5=&amp;c6=&amp;c7=http%3A%2F%2Ffreeciv.wikia.com%2Fwiki%2FMain_Page%3Fcomscorekw%3Dwikiacsid_gaming&amp;c15=&amp;cv=2.0&amp;cj=1" />
+</noscript>
+<!-- End comScore Tag -->
+<!-- Start for QuantServe, page_view -->
+<script type="text/javascript">
+  var _qevents = _qevents || [];
+
+  (function() {
+   var elem = document.createElement('script');
+
+   elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+   elem.async = true;
+   elem.type = "text/javascript";
+   var scpt = document.getElementsByTagName('script')[0];
+   scpt.parentNode.insertBefore(elem, scpt);
+  })();
+</script>
+<script type="text/javascript">
+var quantcastLabels = "";
+if (window.wgWikiVertical) {
+	quantcastLabels += wgWikiVertical;
+	if (window.wgDartCustomKeyValues) {
+		var keyValues = wgDartCustomKeyValues.split(';');
+		for (var i=0; i<keyValues.length; i++) {
+			var keyValue = keyValues[i].split('=');
+			if (keyValue.length >= 2) {
+				quantcastLabels += ',' + wgWikiVertical + '.' + keyValue[1];
+			}
+		}
+	}
+}
+_qevents.push( { qacct:"p-8bG6eLqkH6Avk", labels:quantcastLabels } );
+</script>
+<noscript>
+<div style="display: none;"><img src="//pixel.quantserve.com/pixel/p-8bG6eLqkH6Avk.gif" height="1" width="1" alt="Quantcast"/></div>
+</noscript>
+
+<!-- Start for AmazonMatch, page_view -->
+<script id="analytics-provider-amazon-match">
+	require(["ext.wikia.adEngine.amazonMatchOld", "wikia.geo", "wikia.instantGlobals"], function (amazon, geo, globals) {
+		var ac = globals["wgAmazonMatchOldCountries"];
+
+		if (ac && ac.indexOf && ac.indexOf(geo.getCountryCode()) > -1) {
+			amazon.call();
+		}
+	});
+	require(["ext.wikia.adEngine.amazonMatch", "wikia.geo", "wikia.instantGlobals"], function (amazon, geo, globals) {
+		var ac = globals["wgAmazonMatchCountries"];
+
+		if (ac && ac.indexOf && ac.indexOf(geo.getCountryCode()) > -1) {
+			amazon.call();
+		}
+	});
+</script>
+<!-- Unsupported language for AnalyticsProviderIVW2 -->
+<!-- Start for RubiconRTP, page_view -->
+<script>
+	require(['wikia.geo', 'wikia.instantGlobals', 'ext.wikia.adEngine.rubiconRtp'], function (geo, instantGlobals, rtp) {
+		var rtpCountries = ["US","GB","BR"], country = geo.getCountryCode();
+
+		if (rtpCountries.indexOf(country) !== -1 && !instantGlobals.wgSitewideDisableRubiconRTP) {
+			rtp.call({"disabled":false,"oz_site":"7450\/11979","oz_zone":"145168","oz_ad_slot_size":"728x90","skin":["oasis"],"oz_cached_only":false,"slotname":["BOTTOM_LEADERBOARD","CORP_TOP_LEADERBOARD","HOME_TOP_LEADERBOARD","HUB_TOP_LEADERBOARD","TOP_LEADERBOARD"]});
+		}
+	});
+</script><div class="WikiaSiteWrapper">
+	<h1>Wikia</h1>
+<div class="skiplinkcontainer">
+<a class="skiplink" rel="nofollow" href="#WikiaArticle">Skip to Content</a>
+<a class="skiplink wikinav" rel="nofollow" href="#WikiHeader">Skip to Wiki Navigation</a>
+<a class="skiplink sitenav" rel="nofollow" href="#GlobalNavigation">Skip to Site Navigation</a>
+</div>
+
+<div id="ad-skin" class="wikia-ad noprint"></div>
+
+	<nav class="global-navigation" id="globalNavigation">
+	<div class="page-width">
+		<div class="global-navigation-item wikia-logo-container" id="hubsEntryPoint">
+			<a href="http://www.wikia.com" class="global-navigation-link wikia-logo" rel="nofollow"><img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" height="24" width="91" alt="Wikia" title="Wikia"></a>
+			<a class="hubs-entry-point global-navigation-link"></a>
+<nav id="hubs" class="hubs-menu">
+	<ul class="hub-list">
+					<li>
+								<a data-vertical="comics" href="http://comicshub.wikia.com/wiki/Comics_Hub" class="comics hub-link ">
+					<span class="icon"></span>
+					<span class="label">Comics</span>
+				</a>
+							</li>
+					<li>
+								<a data-vertical="tv" href="http://tvhub.wikia.com/wiki/TV_Hub" class="tv hub-link ">
+					<span class="icon"></span>
+					<span class="label">TV</span>
+				</a>
+							</li>
+					<li>
+								<a data-vertical="movies" href="http://movieshub.wikia.com/wiki/Movies_Hub" class="movies hub-link ">
+					<span class="icon"></span>
+					<span class="label">Movies</span>
+				</a>
+							</li>
+					<li>
+								<a data-vertical="music" href="http://musichub.wikia.com/wiki/Music_Hub" class="music hub-link ">
+					<span class="icon"></span>
+					<span class="label">Music</span>
+				</a>
+							</li>
+					<li>
+								<a data-vertical="books" href="http://bookshub.wikia.com/wiki/Books_Hub" class="books hub-link ">
+					<span class="icon"></span>
+					<span class="label">Books</span>
+				</a>
+							</li>
+					<li>
+								<a data-vertical="games" href="http://gameshub.wikia.com/wiki/Games_Hub" class="games hub-link  active">
+					<span class="icon"></span>
+					<span class="label">Games</span>
+				</a>
+							</li>
+					<li>
+								<a data-vertical="lifestyle" href="http://lifestylehub.wikia.com/wiki/Lifestyle_Hub" class="lifestyle hub-link ">
+					<span class="icon"></span>
+					<span class="label">Lifestyle</span>
+				</a>
+							</li>
+			</ul>
+	<div class="hub-links">
+		<div class="hub-menu-section games-links active">
+			<ul>
+			<strong>HOT</strong>
+							<li>
+					<a href="http://ow.ly/FVSfF">Block N Load Beta Codes</a>
+				</li>
+							<li>
+					<a href="http://ow.ly/Focr3">Create Your Ultimate Mercenary Band</a>
+				</li>
+							<li>
+					<a href="http://ow.ly/Focos">Civ: Beyond Earth Mods</a>
+				</li>
+							<li>
+					<a href="http://ow.ly/FP4A8">Create Your Marvel Team with Captain America</a>
+				</li>
+					</ul>
+			<ul>
+			<strong>FPS</strong>
+							<li>
+					<a href="http://ow.ly/FVSfF">Grab a Block N Load Beta Code</a>
+				</li>
+							<li>
+					<a href="http://callofduty.wikia.com/wiki/Call_of_Duty_Wiki">Call of Duty: Advanced Warfare</a>
+				</li>
+					</ul>
+			<ul>
+			<strong>FANTASY</strong>
+							<li>
+					<a href="http://dragonage.wikia.com/wiki/Portal:Dragon_Age_Inquisition_Instant_Expert">Dragon Age Inquisition</a>
+				</li>
+							<li>
+					<a href="http://www.wowwiki.com/Portal:Main">WoW: Warlords of Draenor</a>
+				</li>
+							<li>
+					<a href="http://gameofthrones.wikia.com/wiki/Game_of_Thrones:_A_Telltale_Games_Series">Game of Thrones</a>
+				</li>
+					</ul>
+			<ul>
+			<strong>PC AND MOBILE</strong>
+							<li>
+					<a href="http://ow.ly/FVSfF">Grab a Block N Load Beta Code</a>
+				</li>
+							<li>
+					<a href="http://terrabattle.wikia.com/wiki/Terra_Battle_Wiki">Terra Battle</a>
+				</li>
+							<li>
+					<a href="http://leagueoflegends.wikia.com/wiki/League_of_Legends_Wiki">League of Legends</a>
+				</li>
+							<li>
+					<a href="http://hearthstone.wikia.com/wiki/Hearthstone_Wiki">Hearthstone</a>
+				</li>
+					</ul>
+		<a class="more" href="http://gameshub.wikia.com/wiki/Games_Hub">More Games</a>
+</div>
+	</div>
+</nav>
+		</div>
+		<div class="global-navigation-item search-container">
+			<div class="search-form-wrapper">
+	<form action="http://freeciv.wikia.com/wiki/Special:Search" class="search-form" id="searchForm" method="get">
+		<span class="search-label-bold table-cell">Search</span>
+		<div class="search-select-wrapper table-cell">
+					<div class="search-select-underlay">
+				<span class="search-label-inline" id="searchLabelInline">this wikia</span>
+				<img class="chevron" id="searchFormChevron" src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D"/>
+				<select class="search-select" id="searchSelect">
+					<option value="local" selected="selected" data-search-url="http://freeciv.wikia.com/wiki/Special:Search">this wikia</option>
+					<option value="global" data-search-url="http://www.wikia.com/wiki/Special:Search">all of Wikia</option>
+				</select>
+			</div>
+				</div>
+		<div class="global-nav-search-input-wrapper table-cell">
+			<input id="searchInput" accesskey="f" autocomplete="off" class="search-input" name="search" type="text" value=""/>
+			<input name="fulltext" type="hidden" value="Search"/>
+			<input disabled id="searchInputResultLang" type="hidden" name="resultsLang" value="en"/>
+			<button class="search-submit" type="submit"></button>
+		</div>
+	</form>
+</div>
+		</div>
+		<div class="global-navigation-item start-wikia-container">
+			<a href="http://www.wikia.com/Special:CreateNewWiki" class="global-navigation-link start-wikia" title="Start a wikia"><span>Start a wikia</span></a>
+		</div>
+		<div class="global-navigation-item account-navigation-container">
+			<ul id="AccountNavigation" class="AccountNavigation">
+	<li>
+		<a data-id="login" href="/wiki/Special:UserLogin?returnto=Main_Page" rel="nofollow" title="Log in" class="ajaxLogin global-navigation-link" accesskey="o">			<div class="bubbles">
+				<div class="bubbles-count notifications-count"></div>
+			</div>
+			<div class="avatar-container anon-avatar-placeholder">
+							</div>
+		</a>
+		<div id="UserLoginDropdown" class="UserLoginDropdown">
+	<div class="ajaxRegisterContainer"><a data-id="register" href="/wiki/Special:UserSignup" rel="nofollow" class="ajaxRegister">Sign up</a></div>
+	
+<form action="/wiki/Special:UserLogin" method="post" class="WikiaForm">
+	<fieldset>
+		
+					<div class="input-group error general-errors">
+				<div class="error-msg"></div>
+			</div>
+		
+		
+									
+									<input type="hidden" name="loginToken" value="">
+											
+									<input type="hidden" name="returnto" value="Main_Page">
+											
+									<input type="hidden" name="returntoquery" value="title=Main_Page">
+											
+															<div class="input-group hide-label required">
+					
+													<label>Username</label>
+						
+						
+																												<input type="text" class="hide-label" id="usernameInput" name="username" tabindex="1" placeholder="Username">
+							
+						
+						
+											</div>
+					
+											
+															<div class="input-group hide-label required">
+					
+													<label>Password</label>
+						
+						
+														<input type="password" class="hide-label" id="passwordInput" name="password" tabindex="2" placeholder="Password">
+							
+						
+						
+											</div>
+					
+											
+															<div class="input-group">
+					
+						
+						
+														<a href="#" class="forgot-password" tabindex="0">Forgot your password?</a>							
+						
+						
+											</div>
+					
+											
+															<div class="input-group keep-logged-in">
+					
+						
+													<label>
+						
+														<input type="checkbox" class="keep-logged-in" name="keeploggedin" value="1" tabindex="3">
+								
+						
+													Stay logged in</label>
+						
+											</div>
+					
+											
+															<div class="input-group login-button">
+					
+						
+						
+														<input type="submit" class="login-button" value="Log in" tabindex="4">
+							
+						
+						
+											</div>
+					
+										</fieldset>
+
+	</form>
+	<div class="sso-login">
+		<div class="sso-login-divider">
+			<span>Or</span>
+		</div>
+
+					<a href="#" class="wikia-button wikia-button-facebook sso-login-facebook"  data-id="facebook" tabindex="5" ><img alt="" class="sprite facebook" height="14" src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" width="15" /> Connect</a>
+	</div>
+</div>
+	</li>
+</ul>
+		</div>
+			</div>
+</nav>
+<div class="WikiaTopAds" id="WikiaTopAds">
+
+	<div class="WikiaTopAdsInner">
+
+
+		<!-- BEGIN SLOTNAME: HOME_TOP_LEADERBOARD -->
+<div id="HOME_TOP_LEADERBOARD" class="wikia-ad noprint default-height">
+	<script>
+	window.adslots2.push(["HOME_TOP_LEADERBOARD"]);
+</script>
+</div>
+<!-- END SLOTNAME: HOME_TOP_LEADERBOARD -->
+
+		<!-- BEGIN SLOTNAME: TOP_BUTTON_WIDE -->
+<div id="TOP_BUTTON_WIDE" class="wikia-ad noprint default-height">
+	<script>
+	window.adslots2.push(["TOP_BUTTON_WIDE"]);
+</script>
+</div>
+<!-- END SLOTNAME: TOP_BUTTON_WIDE -->
+
+	</div>
+
+	<!-- BEGIN SLOTNAME: INVISIBLE_SKIN -->
+<div id="INVISIBLE_SKIN" class="wikia-ad noprint default-height">
+	<script>
+	window.adslots2.push(["INVISIBLE_SKIN"]);
+</script>
+</div>
+<!-- END SLOTNAME: INVISIBLE_SKIN -->
+
+</div>
+
+
+<section id="WikiaPage" class="WikiaPage V2">
+	<div id="WikiaPageBackground" class="WikiaPageBackground"></div>
+	<div class="WikiaPageContentWrapper">
+				<header id="WikiHeader" class="WikiHeader">
+	<h1 class="wordmark medium text ">
+	<a accesskey="z" href="/wiki/Main_Page">
+					Freeciv			</a>
+</h1>
+        <nav class="WikiNav">
+    	        <h1>Freeciv Navigation</h1>
+        		<ul class="nav">
+																				<li class="nav-item marked">
+						<a href="#">On the Wiki</a>
+
+													<ul class="subnav-2 accent firstChild">
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Special:WikiActivity" data-canonical="wikiactivity">Wiki Activity</a>
+
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Special:Random" data-canonical="random">Random page</a>
+
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Special:Videos" data-canonical="videos">Videos</a>
+
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Special:NewFiles" data-canonical="newfiles">Photos</a>
+
+																			</li>
+																							</ul>
+											</li>
+																												<li class="nav-item">
+						<a href="/wiki/Special:MostLinkedPages">Top content</a>
+
+													<ul class="subnav-2 accent">
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Most_popular_articles">most_popular</a>
+
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Most_visited_articles">most_visited<img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" class="chevron"></a>
+
+																					<ul class="subnav-3 subnav">
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Download">Download</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Game_Manual">Game Manual</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Units">Units</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Wonders">Wonders</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Terrain">Terrain</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Buildings">Buildings</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/NEWS-2.4.4">NEWS-2.4.4</a>
+													</li>
+																							</ul>
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Top_voted_articles">highest_ratings<img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" class="chevron"></a>
+
+																					<ul class="subnav-3 subnav">
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/O_Freeciv">O Freeciv</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/More_distributions">More distributions</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Diplomacy">Diplomacy</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Editing_rulesets">Editing rulesets</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Freeciv_is_no_Trojan">Freeciv is no Trojan</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Latest">Latest</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Spy">Spy</a>
+													</li>
+																							</ul>
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Special:Categories">Largest categories<img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" class="chevron"></a>
+
+																					<ul class="subnav-3 subnav">
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Category:NEWS">NEWS</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Category:Playing_Freeciv">Playing Freeciv</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Category:Development">Development</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Category:Units">Units</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Category:Manuals">Manuals</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Category:Technical_docs">Technical docs</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Category:Coding">Coding</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Special:Categories">see all categories</a>
+													</li>
+																							</ul>
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Newly_changed_articles">newly_changed<img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" class="chevron"></a>
+
+																					<ul class="subnav-3 subnav">
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Download">Download</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Main_Page">Main Page</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/NEWS">NEWS</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Features">Features</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Qt">Qt</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Freeciv-manual/6_(2.5)">Freeciv-manual/6 (2.5)</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/Freeciv-manual/5_(2.5)">Freeciv-manual/5 (2.5)</a>
+													</li>
+																							</ul>
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Special:MostLinkedPages">mostlinked</a>
+
+																			</li>
+																							</ul>
+											</li>
+																				<li class="nav-item">
+						<a href="/wiki/Category:Browse">Browse by category</a>
+
+											</li>
+																				<li class="nav-item">
+						<a href="/wiki/Freeciv:Community_Portal">community</a>
+
+													<ul class="subnav-2 accent">
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Top_users">Featured users<img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" class="chevron"></a>
+
+																					<ul class="subnav-3 subnav">
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/User:Hima">Hima</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/User:JTN">JTN</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/User:Dunnoob">Dunnoob</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/User:Cazfi">Cazfi</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/User:Pepeto">Pepeto</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/User:Jcreus">Jcreus</a>
+													</li>
+																																						<li class="subnav-3-item">
+														<a class="subnav-3a" href="/wiki/User:TimR">TimR</a>
+													</li>
+																							</ul>
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Freeciv:Community_Portal">portal</a>
+
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/News_archive">currentevents</a>
+
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Forum:Index">forum</a>
+
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="/wiki/Special:ListUsers/sysop">Find an admin</a>
+
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="http://community.wikia.com/wiki/gaming">Wikia Gaming hub</a>
+
+																			</li>
+																										<li class="subnav-2-item">
+										<a class="subnav-2a" href="http://irc.wikia.com/gaming/">Gaming IRC Channel</a>
+
+																			</li>
+																							</ul>
+											</li>
+																				<li class="nav-item">
+						<a href="/wiki/Help:Contents">help</a>
+
+											</li>
+										</ul>
+
+<div class="navbackground">
+	<div></div>
+	<img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" class="chevron">
+</div>    </nav>
+	    <div class="buttons">
+		<nav class="wikia-menu-button contribute secondary combined" >
+	<img alt="" class="sprite contribute" height="16" src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" width="22" /> Contribute
+	<span class="drop">
+		<img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" class="chevron">
+	</span>
+	<ul class="WikiaMenuElement">
+		<li>
+			<a href="/wiki/Special:WikiaVideoAdd"  data-id="wikiavideoadd"  >Add a Video</a>
+		</li>
+		<li>
+			<a href="/wiki/Special:Upload"  data-id="upload"  >Add a Photo</a>
+		</li>
+		<li>
+			<a href="/wiki/Special:CreatePage"  data-id="createpage"   class="createpage">Add a Page</a>
+		</li>
+		<li>
+			<a href="/wiki/Special:WikiActivity"  accesskey="g" data-id="wikiactivity"  >Wiki Activity</a>
+		</li>
+	</ul>
+</nav>
+					<a href="#" class="wikia-button share-button secondary"  data-id="shareButton"> Share<span class="share-dot"></span><span class="share-pixel"></span></a>
+    </div>
+	    <div class="hiddenLinks">
+		<a href="/wiki/Special:Watchlist" title="Special:Watchlist" accesskey="l">Watchlist</a>		<a href="/wiki/Special:Random" title="Special:Random" accesskey="x">Random page</a>		<a href="/wiki/Special:RecentChanges" title="Special:RecentChanges" accesskey="r">Recent changes</a>    </div>
+</header>
+
+				
+		
+		
+		
+		<article id="WikiaMainContent" class="WikiaMainContent">
+						<div id="WikiaMainContentContainer" class="WikiaMainContentContainer">
+				<header id="WikiaPageHeader" class="WikiaPageHeader">
+    <h1>Home</h1>
+
+	<nav class="wikia-menu-button" >
+	<a   href="/wiki/Main_Page?action=edit" data-id="source" id="ca-viewsource">
+		<img alt="" class="sprite lock" height="12" src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" width="9" /> View source	</a>
+
+	<span class="drop">
+		<img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" class="chevron">
+	</span>
+	<ul class="WikiaMenuElement">
+		<li>
+			<a href="/wiki/Main_Page?action=history"  accesskey="h" data-id="history"   id="ca-history">History</a>
+		</li>
+	</ul>
+</nav>
+			<a accesskey="t" href="/wiki/Talk:Main_Page" class="wikia-button comments secondary talk" rel="nofollow" data-id="comment"> Talk<span class="commentsbubble">139</span></a>
+        <div class="tally">
+			<em>623</em><span>pages on<br /> this wiki</span>        </div>
+		</header>
+
+
+				
+				<div id="WikiaArticle" class="WikiaArticle">
+					
+					<div class="home-top-right-ads">
+					<!-- BEGIN SLOTNAME: HOME_TOP_RIGHT_BOXAD -->
+<div id="HOME_TOP_RIGHT_BOXAD" class="wikia-ad noprint default-height">
+	<script>
+	window.adslots2.push(["HOME_TOP_RIGHT_BOXAD"]);
+</script>
+</div>
+<!-- END SLOTNAME: HOME_TOP_RIGHT_BOXAD -->
+					</div>
+
+					
+					<div id="mw-content-text" lang="en" dir="ltr" class="mw-content-ltr mw-content-text"><div class="main-page-tag-lcs main-page-tag-lcs-exploded" ><div class="lcs-container">
+<table style="width: 100%; background:#d8b8f4; border:2px solid #cea8f4; margin-top:2px;">
+<tr>
+<td style="width: 20%;">
+<h3><span class="mw-headline" id="What_is_Freeciv.3F">What is Freeciv?</span></h3>
+</td><td style="width: 80%;">
+<div class="floatright"><a href="http://img1.wikia.nocookie.net/__cb20071014074743/freeciv/images/d/d5/Two_eras.png" 	class="image image-thumbnail" 	 	 	><img src="http://img1.wikia.nocookie.net/__cb20071014074743/freeciv/images/d/d5/Two_eras.png" 	 alt="Two eras"  	class="" 	 	data-image-key="Two_eras.png" 	data-image-name="Two eras.png" 	 	 width="190"  	 height="85"  	 	 	 	></a></div>
+<p>Freeciv is a <a href="/wiki/License" title="License">Free and Open Source</a> empire-building strategy game inspired by the history of human civilization. The game commences in prehistory and your mission is to lead your tribe from the Stone Age to the Space Age...</p>
+<p><a href="/wiki/Features" title="Features">Features</a> &#8211; <a href="/wiki/Screenshots" title="Screenshots">Screenshots</a> &#8211; <a href="/wiki/Install" title="Install">Install</a> &#8211; <a href="/wiki/Interface_Language" title="Interface Language"> Languages</a> &#8211; <a href="/wiki/People" title="People"> Authors</a> &#8211; <a href="/wiki/Contacts" title="Contacts">Contacts</a> &#8211; <a href="/wiki/Donations" title="Donations"> Donate</a></p>
+</td></tr></table>
+<table style="width: 100%; background-color:transparent;">
+<tr>
+<td style="width: 20%;">
+<h3><span class="mw-headline" id="Where_is_Freeciv.3F">Where is Freeciv?</span></h3>
+</td><td style="width: 80%;">
+<p>Stable Version <b><a href="/wiki/NEWS-2.4.4" title="NEWS-2.4.4">2.4.4</a></b> released on <i>6th Dec 2014</i>&#160;:</p>
+<p style="font-variant: small-caps;"><b><a href="http://img4.wikia.nocookie.net/__cb20071014061100/freeciv/images/1/1c/Crystal_128_penguin.png" 	class="image image-thumbnail" 	 	 	><img src="http://img1.wikia.nocookie.net/__cb20071014061100/freeciv/images/thumb/1/1c/Crystal_128_penguin.png/20px-Crystal_128_penguin.png" 	 alt="Crystal 128 penguin"  	class="" 	 	data-image-key="Crystal_128_penguin.png" 	data-image-name="Crystal 128 penguin.png" 	 	 width="20"  	 height="20"  	 	 	 	></a> <a rel="nofollow" class="external text" href="http://prdownloads.sourceforge.net/freeciv/freeciv-2.4.4.tar.bz2?download">Source Code</a> <a href="http://img4.wikia.nocookie.net/__cb20071014060856/freeciv/images/e/e0/Windows_logo.png" 	class="image image-thumbnail" 	 	 	><img src="http://img1.wikia.nocookie.net/__cb20071014060856/freeciv/images/thumb/e/e0/Windows_logo.png/20px-Windows_logo.png" 	 alt="Windows logo"  	class="" 	 	data-image-key="Windows_logo.png" 	data-image-name="Windows logo.png" 	 	 width="20"  	 height="20"  	 	 	 	></a> <a rel="nofollow" class="external text" href="http://prdownloads.sourceforge.net/freeciv/Freeciv-2.4.4-win32-gtk2-setup.exe?download">Windows</a> </p></b>
+<p><a href="/wiki/Download" title="Download">Official Packages</a> &#8211; <a href="/wiki/More_distributions" title="More distributions">More Packages</a> &#8211; <a href="/wiki/Tilesets" title="Tilesets">Tilesets</a> &#8211; <a href="/wiki/Maps" title="Maps">Maps</a> &#8211; <a href="/wiki/Modpacks" title="Modpacks">Modpacks</a> &#8211; <a href="/wiki/Sound_%26_Music" title="Sound &amp; Music">Sound &amp; Music</a></p>
+<p>Old Stable Version <b><a href="/wiki/NEWS-2.3.5" title="NEWS-2.3.5">2.3.5</a></b> released on <i>8th Feb 2014</i>&#160;:</p>
+<p style="font-variant: small-caps;"><b><a href="http://img4.wikia.nocookie.net/__cb20071014061100/freeciv/images/1/1c/Crystal_128_penguin.png" 	class="image image-thumbnail" 	 	 	><img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" 	 alt="Crystal 128 penguin"  	class="lzy lzyPlcHld " 	 	data-image-key="Crystal_128_penguin.png" 	data-image-name="Crystal 128 penguin.png" 	 data-src="http://img1.wikia.nocookie.net/__cb20071014061100/freeciv/images/thumb/1/1c/Crystal_128_penguin.png/20px-Crystal_128_penguin.png"  	 width="20"  	 height="20"  	 	 	 onload="if(typeof ImgLzy===&#39;object&#39;){ImgLzy.load(this)}"  	><noscript><img src="http://img1.wikia.nocookie.net/__cb20071014061100/freeciv/images/thumb/1/1c/Crystal_128_penguin.png/20px-Crystal_128_penguin.png" 	 alt="Crystal 128 penguin"  	class="" 	 	data-image-key="Crystal_128_penguin.png" 	data-image-name="Crystal 128 penguin.png" 	 	 width="20"  	 height="20"  	 	 	 	></noscript></a> <a rel="nofollow" class="external text" href="http://prdownloads.sourceforge.net/freeciv/freeciv-2.3.5.tar.bz2?download">Source Code</a> <a href="http://img4.wikia.nocookie.net/__cb20071014060856/freeciv/images/e/e0/Windows_logo.png" 	class="image image-thumbnail" 	 	 	><img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" 	 alt="Windows logo"  	class="lzy lzyPlcHld " 	 	data-image-key="Windows_logo.png" 	data-image-name="Windows logo.png" 	 data-src="http://img1.wikia.nocookie.net/__cb20071014060856/freeciv/images/thumb/e/e0/Windows_logo.png/20px-Windows_logo.png"  	 width="20"  	 height="20"  	 	 	 onload="if(typeof ImgLzy===&#39;object&#39;){ImgLzy.load(this)}"  	><noscript><img src="http://img1.wikia.nocookie.net/__cb20071014060856/freeciv/images/thumb/e/e0/Windows_logo.png/20px-Windows_logo.png" 	 alt="Windows logo"  	class="" 	 	data-image-key="Windows_logo.png" 	data-image-name="Windows logo.png" 	 	 width="20"  	 height="20"  	 	 	 	></noscript></a> <a rel="nofollow" class="external text" href="http://prdownloads.sourceforge.net/freeciv/Freeciv-2.3.5-win32-gtk2-setup.exe?download">Windows</a> </p></b>
+<p>Beta Version <b><a href="/wiki/NEWS-2.5.0-beta2" title="NEWS-2.5.0-beta2">2.5.0-beta2</a></b> released on <i>22nd Nov 2014</i>&#160;:</p>
+<p style="font-variant: small-caps;"><b><a href="http://img4.wikia.nocookie.net/__cb20071014061100/freeciv/images/1/1c/Crystal_128_penguin.png" 	class="image image-thumbnail" 	 	 	><img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" 	 alt="Crystal 128 penguin"  	class="lzy lzyPlcHld " 	 	data-image-key="Crystal_128_penguin.png" 	data-image-name="Crystal 128 penguin.png" 	 data-src="http://img1.wikia.nocookie.net/__cb20071014061100/freeciv/images/thumb/1/1c/Crystal_128_penguin.png/20px-Crystal_128_penguin.png"  	 width="20"  	 height="20"  	 	 	 onload="if(typeof ImgLzy===&#39;object&#39;){ImgLzy.load(this)}"  	><noscript><img src="http://img1.wikia.nocookie.net/__cb20071014061100/freeciv/images/thumb/1/1c/Crystal_128_penguin.png/20px-Crystal_128_penguin.png" 	 alt="Crystal 128 penguin"  	class="" 	 	data-image-key="Crystal_128_penguin.png" 	data-image-name="Crystal 128 penguin.png" 	 	 width="20"  	 height="20"  	 	 	 	></noscript></a> <a rel="nofollow" class="external text" href="http://prdownloads.sourceforge.net/freeciv/freeciv-2.5.0-beta2.tar.bz2?download">Source Code</a> <a href="http://img4.wikia.nocookie.net/__cb20071014060856/freeciv/images/e/e0/Windows_logo.png" 	class="image image-thumbnail" 	 	 	><img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" 	 alt="Windows logo"  	class="lzy lzyPlcHld " 	 	data-image-key="Windows_logo.png" 	data-image-name="Windows logo.png" 	 data-src="http://img1.wikia.nocookie.net/__cb20071014060856/freeciv/images/thumb/e/e0/Windows_logo.png/20px-Windows_logo.png"  	 width="20"  	 height="20"  	 	 	 onload="if(typeof ImgLzy===&#39;object&#39;){ImgLzy.load(this)}"  	><noscript><img src="http://img1.wikia.nocookie.net/__cb20071014060856/freeciv/images/thumb/e/e0/Windows_logo.png/20px-Windows_logo.png" 	 alt="Windows logo"  	class="" 	 	data-image-key="Windows_logo.png" 	data-image-name="Windows logo.png" 	 	 width="20"  	 height="20"  	 	 	 	></noscript></a> <a rel="nofollow" class="external text" href="http://prdownloads.sourceforge.net/freeciv/Freeciv-2.5.0-beta2-win32-gtk2-setup.exe?download">Windows</a> </p></b>
+<p>Online Version at <a rel="nofollow" class="external text" href="http://play.freeciv.org/">play.freeciv.org</a></p>
+</td></tr></table>
+</div></div>
+<div class="main-page-tag-rcs"><div class="rcs-container">
+</div></div>
+<p><br style="clear:both;" />
+</p>
+<table style="width: 100%; background:#e0e0ff; border:2px solid #cfcfff; margin-top:2px;">
+<tr>
+<td style="width: 10%;">
+<h3><span class="mw-headline" id="Help">Help</span></h3>
+</td><td style="width: 30%;">
+<p><a href="/wiki/About" title="About" class="mw-redirect">About</a>
+</p>
+<ul><li><a href="/wiki/In_The_Beginning" title="In The Beginning">In The Beginning</a>
+</li><li><a href="/wiki/Timeline" title="Timeline">Timeline</a>
+</li><li><a href="/wiki/People" title="People">People</a>
+</li><li><a href="/wiki/License" title="License">License</a>
+</li></ul>
+</td><td style="width: 30%;">
+<p><a href="/wiki/Manual" title="Manual">Manual</a>
+</p>
+<ul><li><a href="/wiki/Game_Manual" title="Game Manual">Game Manual</a>
+</li><li><a href="/wiki/Client_Manual_1.13" title="Client Manual 1.13">Client Manual</a>
+</li><li><a href="/wiki/Server_Manual" title="Server Manual">Server Manual</a>
+</li></ul>
+<p><a href="/wiki/FAQ" title="FAQ">FAQ</a>
+</p>
+</td><td style="width: 30%;">
+<p><a href="/wiki/Tutorials" title="Tutorials">Tutorials</a>
+</p>
+<ul><li><a href="/wiki/Introduction_to_Freeciv" title="Introduction to Freeciv">Introduction to Freeciv</a>
+</li><li><a href="/wiki/How_to_Play" title="How to Play">How to Play</a>
+</li><li><a href="/wiki/Freeciv_for_Dummies" title="Freeciv for Dummies">Freeciv for Dummies</a>
+</li><li><a href="/wiki/The_Art_of_Freeciv_2.1" title="The Art of Freeciv 2.1">The Art of Freeciv</a>
+</li><li><a href="/wiki/A_Succinct_Guide_to_2.09" title="A Succinct Guide to 2.09">A Succinct Guide</a>
+</li></ul>
+</td></tr></table>
+<table style="width: 100%; background-color:transparent;">
+<tr>
+<td style="vertical-align: top; width: 50%;">
+<h3><span class="mw-headline" id="Project_News">Project News</span></h3>
+<ul><li><b>6th Dec 2014</b> &#8211; <a href="/wiki/NEWS-2.4.4" title="NEWS-2.4.4">Freeciv 2.4.4</a> is a bugfix release in the stable 2.4 series.
+</li></ul>
+<ul><li><b>22nd Nov 2014</b> &#8211; <a href="/wiki/NEWS-2.5.0-beta2" title="NEWS-2.5.0-beta2">The second beta of Freeciv 2.5.0</a> has been released.
+</li></ul>
+<ul><li><b>12th Aug 2014</b> &#8211; <a href="/wiki/NEWS-2.4.3" title="NEWS-2.4.3">Freeciv 2.4.3</a> is a new bugfix release in the stable 2.4 series.
+</li></ul>
+<ul><li><b>19th July 2014</b> &#8211; <a href="/wiki/NEWS-2.5.0" title="NEWS-2.5.0">The first beta of Freeciv 2.5.0</a> has been released. <a href="/wiki/Download" title="Download">Download</a> the source tarball and report any <a href="/wiki/Bugs" title="Bugs" class="mw-redirect">bugs</a> you spot. Binary packages for Windows will follow shortly.
+</li></ul>
+<p><a href="/wiki/News_archive" title="News archive">All news...</a>
+</p>
+<div style="text-align: right;"><i><a  class="text" href="http://freeciv.wikia.com/wiki/Template:News?action=edit">edit</a></i></div>
+</td><td style="vertical-align: top; width: 50%;">
+<h3><span class="mw-headline" id="Community_News">Community News</span></h3>
+<ul><li><b>2nd Feb 2013</b> &#8211; After ten months, the <a rel="nofollow" class="external text" href="http://forum.freeciv.org/">Freeciv forums</a> are finally back. Sorry for the delay. They've been rebuilt from scratch, so you'll need to re-register. ~<i>JTN</i>
+</li><li><b>31st Mar 2012</b> &#8211; Michał Zieliński has ported Freeciv 2.3 to Android! Visit <a rel="nofollow" class="external text" href="http://civ.zielm.com/">civ.zielm.com</a> or download the beta from Google Play.
+</li><li><b>19th Dec 2011</b> &#8211; Version 2.0 of <i>Chess</i>, the minimalistic monochrome  tileset by Xin Yu (a.k.a. <i>Anyu</i>), has been released.  <a rel="nofollow" class="external text" href="http://download.gna.org/freeciv/contrib/tilesets/chess/chess-v2.0.zip">Download</a> it today! ~<i>Daniel Markstedt</i>
+</li><li><b>18th Nov 2011</b> &#8211; A new <a rel="nofollow" class="external text" href="http://www.longturn.org">Longturn Freeciv</a> (one turn per day) server is open for players to <a rel="nofollow" class="external text" href="http://www.longturn.org/game/LT30">sign in</a>. The game runs on Freeciv 2.3, and the player maximum has been extended to 126 players. Usually we play with 20-30 players ~<i>Marduk</i>
+</li></ul>
+<div style="text-align: right;"><i><a  class="text" href="http://freeciv.wikia.com/wiki/Template:News-com?action=edit">edit</a></i></div>
+</td></tr></table>
+<table style="width: 100%;">
+<tr>
+<td style="width: 33%; background:#ffcccc; border:2px solid #ffbbbb; padding:2px 2px 4px 4px; vertical-align: top">
+<h3><span class="mw-headline" id="Community_.26_Gaming">Community &amp; Gaming</span></h3>
+<ul><li><a href="/wiki/Freeciv:Community_Portal" title="Freeciv:Community Portal">Community Portal</a>
+</li><li><a href="/wiki/Forum:Index" title="Forum:Index">Wiki Forum</a>
+</li><li><a rel="nofollow" class="external text" href="http://forum.freeciv.org/">Web Forums</a>
+</li><li><a href="/wiki/Donor_list" title="Donor list" class="mw-redirect">Donor list</a>
+</li><li><a href="/wiki/In_The_Beginning" title="In The Beginning">In The Beginning</a>
+</li><li><a href="/wiki/Timeline" title="Timeline">Timeline</a>
+</li><li><a href="/wiki/Articles" title="Articles">Articles</a>
+</li><li><a href="/wiki/Related_Links" title="Related Links">Related Links</a>
+</li><li><a href="/wiki/Freeciv_Metaserver" title="Freeciv Metaserver">Metaserver</a>
+</li><li><a href="/wiki/Longturn" title="Longturn">Longturn</a>
+</li></ul>
+</td><td style="width: 33%; background:#aaffaa; border:2px solid #99ee99; padding:2px 2px 4px 4px; vertical-align: top">
+<h3><span class="mw-headline" id="Creative_Contents">Creative Contents</span></h3>
+<ul><li><a href="/wiki/Game_Mods" title="Game Mods">Game Mods</a>
+</li></ul>
+<dl><dd><ul><li><a href="/wiki/Nations" title="Nations">Nations</a>
+</li><li><a href="/wiki/Editing_Rulesets" title="Editing Rulesets" class="mw-redirect">Editing Rulesets</a>
+</li><li><a href="/wiki/Editing_tilesets" title="Editing tilesets">Editing tilesets</a>
+</li><li><a href="/wiki/Themes" title="Themes">Themes</a>
+</li><li><a href="/wiki/Sounds" title="Sounds">Sounds</a>
+</li></ul>
+</dd></dl>
+<ul><li><a href="/wiki/Art" title="Art">Art</a>
+</li><li><a href="/wiki/Event_scripting" title="Event scripting" class="mw-redirect">Event scripting</a>
+</li></ul>
+<dl><dd><ul><li><a href="/wiki/Events_Reference_Manual" title="Events Reference Manual" class="mw-redirect">Reference Manual</a>
+</li><li><a href="/wiki/Events_Tutorial" title="Events Tutorial">Tutorial</a>
+</li><li><a href="/wiki/Events_ideas" title="Events ideas">Ideas</a>
+</li><li><a href="/wiki/Signal_Tutorial" title="Signal Tutorial">Signal Tutorial</a>
+</li></ul>
+</dd></dl>
+</td><td style="width: 33%; background:#ffffb3; border:2px solid #ffff88; padding:2px 2px 4px 4px; vertical-align: top">
+<h3><span class="mw-headline" id="Development">Development</span></h3>
+<ul><li><a href="/wiki/Coding" title="Coding">Coding</a>
+</li></ul>
+<dl><dd><ul><li><a href="/wiki/Remember" title="Remember">Remember</a>
+</li><li><a href="/wiki/How_to_Contribute" title="How to Contribute">How to Contribute</a>
+</li><li><a href="/wiki/Known_Bugs" title="Known Bugs">Known Bugs</a>
+</li><li><a href="/wiki/Bug_Reporting" title="Bug Reporting">Bug Reporting</a>
+</li><li><a href="/wiki/Commit_rules" title="Commit rules">Commit rules</a>
+</li><li><a href="/wiki/Svn" title="Svn" class="mw-redirect">Source Tree</a>
+</li></ul>
+</dd></dl>
+<ul><li><a rel="nofollow" class="external text" href="https://gna.org/bugs/?group=freeciv">Bug Tracker</a>
+</li><li><a href="/wiki/Translations" title="Translations">Translations</a>
+</li></ul>
+<dl><dd><ul><li><a href="/wiki/Localization" title="Localization">Localization</a>
+</li><li><a href="/wiki/Internationalization" title="Internationalization">Internationalization</a>
+</li></ul>
+</dd></dl>
+<ul><li><a href="/wiki/Category:Design" title="Category:Design">Category:Design</a>
+</li><li><a href="/wiki/Category:AI" title="Category:AI">Category:AI</a>
+</li><li><a href="/wiki/Category:Technical_docs" title="Category:Technical docs">Category:Technical docs</a>
+</li><li><a href="/wiki/Projects" title="Projects">Projects and Ports</a>
+</li><li><a href="/wiki/Infrastructure" title="Infrastructure">Infrastructure</a>
+</li></ul>
+</td></tr></table>
+<div style="text-align: center; background:#e1eff7;border:1px solid #bee1f7;padding:0.0em; color:black;">
+<p><b>Wiki Languages:</b> &#160;
+<a href="/wiki/Ar:Freeciv" title="Ar:Freeciv">العربية</a>&#160;&#8211;
+<a href="http://ca.freeciv.wikia.com/wiki/Freeciv_en_catal%C3%A0" class="extiw" title="w:c:ca.freeciv:Freeciv en català">Català</a>&#160;&#8211;
+<a href="/wiki/Cs:Freeciv" title="Cs:Freeciv">Česky</a>&#160;&#8211;
+<a href="http://da.freeciv.wikia.com/wiki/Forside" class="extiw" title="w:c:da.freeciv:Forside">Dansk</a>&#160;&#8211;
+<a href="http://de.freeciv.wikia.com/wiki/Hauptseite" class="extiw" title="w:c:de.freeciv:Hauptseite">Deutsch</a>&#160;&#8211;
+<strong class="selflink">English</strong>&#160;&#8211;
+<a href="/wiki/Eo:Freeciv" title="Eo:Freeciv">Esperanto</a>&#160;&#8211;
+<a href="http://es.freeciv.wikia.com/wiki/Portada" class="extiw" title="w:c:es.freeciv:Portada">Español</a>&#160;&#8211;
+<a href="http://fi.freeciv.wikia.com/wiki/Etusivu" class="extiw" title="w:c:fi.freeciv:Etusivu">Suomi</a>&#160;&#8211;
+<a href="http://fr.freeciv.wikia.com/wiki/Accueil" class="extiw" title="w:c:fr.freeciv:Accueil">Français</a>&#160;&#8211;
+<a href="/wiki/Hu:Freeciv" title="Hu:Freeciv">Magyar</a>&#160;&#8211;
+<a href="/wiki/It:Freeciv" title="It:Freeciv">Italiano</a>&#160;&#8211;
+<a href="http://ja.freeciv.wikia.com/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8" class="extiw" title="w:c:ja.Freeciv:メインページ">日本語</a>&#160;&#8211;
+<a href="/wiki/Ko:Freeciv" title="Ko:Freeciv">한국어</a>&#160;&#8211;
+<a href="/wiki/Nl:Freeciv" title="Nl:Freeciv">Nederlands</a>&#160;&#8211;
+<a href="/wiki/No:Freeciv" title="No:Freeciv">Norsk</a>&#160;&#8211;
+<a href="/wiki/Pl:Freeciv" title="Pl:Freeciv">Polski</a>&#160;&#8211;
+<a href="/wiki/Pt:Freeciv" title="Pt:Freeciv">Português</a>&#160;&#8211;
+<a href="/wiki/Ro:Freeciv" title="Ro:Freeciv">Română</a>&#160;&#8211;
+<a href="http://ru.freeciv.wikia.com/wiki/%D0%97%D0%B0%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F_%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0" class="extiw" title="w:c:ru.freeciv:Заглавная страница">Русский</a>&#160;&#8211;
+<a href="http://sr.freeciv.wikia.com/wiki/%D0%9F%D0%BE%D1%87%D0%B5%D1%82%D0%BD%D0%B0" class="extiw" title="w:c:sr.freeciv:Почетна">српски</a>&#160;&#8211;
+<a href="/wiki/Sv:Freeciv" title="Sv:Freeciv">Svenska</a>&#160;&#8211;
+<a href="/wiki/Th:Freeciv" title="Th:Freeciv">ไทย</a>&#160;&#8211;
+<a href="/wiki/Tr:Freeciv" title="Tr:Freeciv">Türkçe</a>
+</p>
+</div>
+<p><br /> 
+</p>
+<!-- 
+NewPP limit report
+Preprocessor node count: 133/300000
+Post‐expand include size: 2858/2097152 bytes
+Template argument size: 15/2097152 bytes
+Expensive parser function count: 0/100
+-->
+
+<!-- Saved in parser cache with key freeciv:pcache:idhash:1812-0!*!0!!*!2!* -->
+<noscript><link rel="stylesheet" href="http://slot1.images.wikia.nocookie.net/__cb1419022433/common/extensions/wikia/ImageLazyLoad/css/ImageLazyLoadNoScript.css" /></noscript><noscript><link rel="stylesheet" href="http://slot1.images.wikia.nocookie.net/__cb1419022433/common/extensions/wikia/TOCimprovements/TOCNoScript.css" /></noscript></div><div class="printfooter">
+Retrieved from "<a href="http://freeciv.wikia.com/wiki/Main_Page?oldid=22564">http://freeciv.wikia.com/wiki/Main_Page?oldid=22564</a>"</div>
+
+				</div>
+
+																								
+				<nav class="WikiaArticleInterlang">
+	<h3>Languages: </h3>
+	<ul>
+			<li><a href="http://de.freeciv.wikia.com/wiki/Hauptseite">Deutsch</a></li>
+			<li><a href="http://es.freeciv.wikia.com/wiki/Portada">Español</a></li>
+			<li><a href="http://ru.freeciv.wikia.com/wiki/%D0%97%D0%B0%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F_%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0">Русский</a></li>
+			<li><a href="http://fr.freeciv.wikia.com/wiki/Accueil">Français</a></li>
+			<li><a href="http://ca.freeciv.wikia.com/wiki/Freeciv_en_catal%C3%A0">Català</a></li>
+			<li><a href="http://da.freeciv.wikia.com/wiki/Forside">Dansk</a></li>
+			<li><a href="http://fi.freeciv.wikia.com/wiki/Etusivu">Suomi</a></li>
+			<li><a href="http://ja.freeciv.wikia.com/wiki/%E3%83%A1%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8">日本語</a></li>
+		</ul>
+</nav>
+
+				
+									<div id="WikiaArticleFooter" class="WikiaArticleFooter">
+						<div id="RelatedPagesModuleWrapper"></div>					</div>
+				
+								<div id="WikiaArticleBottomAd" class="noprint">
+					<!-- BEGIN SLOTNAME: PREFOOTER_LEFT_BOXAD -->
+<div id="PREFOOTER_LEFT_BOXAD" class="wikia-ad noprint default-height">
+	<script>
+	window.adslots2.push(["PREFOOTER_LEFT_BOXAD"]);
+</script>
+</div>
+<!-- END SLOTNAME: PREFOOTER_LEFT_BOXAD -->
+					<!-- BEGIN SLOTNAME: PREFOOTER_RIGHT_BOXAD -->
+<div id="PREFOOTER_RIGHT_BOXAD" class="wikia-ad noprint default-height">
+	<script>
+	window.adslots2.push(["PREFOOTER_RIGHT_BOXAD"]);
+</script>
+</div>
+<!-- END SLOTNAME: PREFOOTER_RIGHT_BOXAD -->
+				</div>
+			</div>
+		</article><!-- WikiaMainContent -->
+
+		
+		
+		<footer id="WikiaFooter" class="WikiaFooter notoolbar">
+		
+	<section>
+	<div class="header-container">
+		<h1>Around Wikia's network</h1>
+		<a id="WikiaRandomWiki" href="http://community.wikia.com/wiki/Special:RandomWiki/2261" class="wikia-button">Random Wiki</a>
+	</div>
+	<script type='text/javascript'>
+		wgAfterContentAndJS.push(function() {
+			window.OpenXSPC = {};
+			window.OpenXSPC[ 'fillElem_SPOTLIGHT_FOOTER' ] = function() {
+				var output = window.OA_output || [];
+				( 14 in output ) && $( '#SPOTLIGHT_FOOTER_1' ).html( output[ 14 ] );
+				( 15 in output ) && $( '#SPOTLIGHT_FOOTER_2' ).html( output[ 15 ] );
+				( 16 in output ) && $( '#SPOTLIGHT_FOOTER_3' ).html( output[ 16 ] );
+			};
+		});
+	</script>
+	<ul id="SPOTLIGHT_FOOTER" class="LazyLoadAd SPOTLIGHT_FOOTER">
+		<li class="WikiaSpotlight item-1" id="SPOTLIGHT_FOOTER_1"></li>
+		<li class="WikiaSpotlight item-2" id="SPOTLIGHT_FOOTER_2"></li>
+		<li class="WikiaSpotlight item-3" id="SPOTLIGHT_FOOTER_3"></li>
+	</ul>
+</section>
+</footer>
+				<footer class="global-footer row">
+	<nav>
+		<h1>Wikia Inc Navigation</h1>
+		<div class="branding black">
+			<div class="wordmark">
+				<img src="data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D" class="wordmark2">
+			</div>
+							<div class="hub"><a class="hub2" href="http://www.wikia.com/Video_Games">[ Video Games ]</a></div>
+					</div>
+		<ul>
+							<li>
+											<a href="http://www.wikia.com/About"><span>About</span></a>
+									</li>
+							<li>
+											<a href="http://community.wikia.com"><span>Community Central</span></a>
+									</li>
+							<li>
+											<a href="http://www.wikia.com/Careers">Careers</a>
+									</li>
+							<li>
+											<a href="http://www.wikia.com/Advertising">Advertise</a>
+									</li>
+							<li>
+											<a href="http://api.wikia.com/"><span>API</span></a>
+									</li>
+							<li>
+											<a href="/wiki/Special:Contact">Contact Wikia</a>
+									</li>
+							<li>
+											<a href="http://www.wikia.com/Terms_of_Use">Terms of Use</a>
+									</li>
+							<li>
+											<a href="http://www.wikia.com/Privacy_Policy">Privacy Policy</a>
+									</li>
+							<li>
+					Content is available under the [[GNU General Public License]].				</li>
+					</ul>
+	</nav>
+</footer>
+	</div>
+</section><!--WikiaPage-->
+
+	<div id="WikiaBar">
+		<div id="WikiaBarWrapper" class="WikiaBarWrapper hidden">
+				<div class="wikia-bar wikia-bar-anon">
+			<a href="#" class="arrow" data-tooltip="Collapse" data-tooltipshow="Show"></a>
+			<div class="ad">
+		<div id="WIKIA_BAR_BOXAD_1" class="noprint" style="width: 300px; position: relative;"></div>
+</div>
+<div
+	class="message"
+	data-messagetooltip="Click here for more information!"
+	data-wikiabarcontent="[{&quot;text&quot;:&quot;Grab a Block N Load Beta Code&quot;,&quot;href&quot;:&quot;http:\/\/ow.ly\/FVSfF&quot;},{&quot;text&quot;:&quot;Grab a Block N Load Beta Code&quot;,&quot;href&quot;:&quot;http:\/\/ow.ly\/FVSfF&quot;},{&quot;text&quot;:&quot;Grab a Block N Load Beta Code&quot;,&quot;href&quot;:&quot;http:\/\/ow.ly\/FVSfF&quot;},{&quot;text&quot;:&quot;Grab a Block N Load Beta Code&quot;,&quot;href&quot;:&quot;http:\/\/ow.ly\/FVSfF&quot;},{&quot;text&quot;:&quot;Grab a Block N Load Beta Code&quot;,&quot;href&quot;:&quot;http:\/\/ow.ly\/FVSfF&quot;}]"
+></div>
+	<a class="wikiabar-button" href="http://www.wikia.com/Video_Games" data-index="0">
+		<img src="http://slot1.images.wikia.nocookie.net/__cb1419022433/common/extensions/wikia/WikiaBar/images/wikiabarIcon.png" class="icon cup" />
+		<span>Video Games</span>
+	</a>
+	<a class="wikiabar-button" href="http://www.wikia.com/Entertainment" data-index="1">
+		<img src="http://slot1.images.wikia.nocookie.net/__cb1419022433/common/extensions/wikia/WikiaBar/images/wikiabarIcon.png" class="icon cup" />
+		<span>Entertainment</span>
+	</a>
+	<a class="wikiabar-button" href="http://www.wikia.com/Lifestyle" data-index="2">
+		<img src="http://slot1.images.wikia.nocookie.net/__cb1419022433/common/extensions/wikia/WikiaBar/images/wikiabarIcon.png" class="icon cup" />
+		<span>Lifestyle</span>
+	</a>
+		</div>
+			</div>
+	<div class="WikiaBarCollapseWrapper">
+		<a href="#" class="wikia-bar-collapse" data-tooltip="Collapse"></a>
+	</div>
+</div>
+
+	<!-- BEGIN SLOTNAME: GPT_FLUSH -->
+<div id="GPT_FLUSH" class="wikia-ad noprint default-height">
+	<script>
+	window.adslots2.push(["GPT_FLUSH"]);
+</script>
+</div>
+<!-- END SLOTNAME: GPT_FLUSH -->
+<!-- BEGIN SLOTNAME: INVISIBLE_1 -->
+<div id="INVISIBLE_1" class="wikia-ad noprint default-height">
+	<script>
+	window.adslots2.push(["INVISIBLE_1"]);
+</script>
+</div>
+<!-- END SLOTNAME: INVISIBLE_1 -->
+<!-- BEGIN SLOTNAME: INVISIBLE_2 -->
+<div id="INVISIBLE_2" class="wikia-ad noprint default-height">
+	<script>
+	window.adslots2.push(["INVISIBLE_2"]);
+</script>
+</div>
+<!-- END SLOTNAME: INVISIBLE_2 -->
+<!-- BEGIN SLOTNAME: SEVENONEMEDIA_FLUSH -->
+<div id="SEVENONEMEDIA_FLUSH" class="wikia-ad noprint default-height">
+	<script>
+	window.adslots2.push(["SEVENONEMEDIA_FLUSH"]);
+</script>
+</div>
+<!-- END SLOTNAME: SEVENONEMEDIA_FLUSH -->
+</div>
+	<!--[if lt IE 8]>
+		<script src="http://slot1.images.wikia.nocookie.net/__cb1419022433/common/resources/wikia/libraries/json2/json2.js"></script>
+	<![endif]-->
+
+	<!--[if lt IE 9]>
+		<script src="http://slot1.images.wikia.nocookie.net/__cb1419022433/common/resources/wikia/libraries/html5/html5.min.js"></script>
+	<![endif]-->
+
+	<!-- Combined JS files and head scripts -->
+	
+<!-- Liftium options -->
+<script>LiftiumOptions = {"pubid":999,"baseUrl":"\/__varnish_liftium\/","kv_wgDBname":"freeciv","kv_article_id":1812,"kv_wpage":"Main_Page","kv_Hub":"Gaming","kv_skin":"oasis","kv_user_lang":"en","kv_cont_lang":"en","kv_isMainPage":true,"kv_page_type":"home","geoUrl":"http:\/\/geoiplookup.wikia.com\/","kv_dart":"age=adult;age=teen;age=yadult;gnre=strategy;pform=pc;sex=m","kv_domain":"freeciv.wikia.com","hasMoreCalls":true,"isCalledAfterOnload":true,"maxLoadDelay":6000};
+</script>
+<script src="http://freeciv.wikia.com/__load/-/cb%3D1419022433%26debug%3Dfalse%26lang%3Den%26only%3Dscripts%26skin%3Doasis%26ve%3D1/startup"></script>
+<script>if(window.mw){
+mw.config.set({"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Main_Page","wgTitle":"Main Page","wgCurRevisionId":22564,"wgArticleId":1812,"wgIsArticle":true,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":[],"wgBreakFrames":false,"wgPageContentLanguage":"en","wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgRelevantPageName":"Main_Page","wgRestrictionEdit":["sysop"],"wgRestrictionMove":["sysop"],"wgIsMainPage":true,"wgTimeAgoi18n":{"year":"a year ago","years":"%d years ago","month":"a month ago","months":"%d months ago","day":"a day ago","days":"%d days ago","hour":"an hour ago","hours":"%d hours ago","minute":"a minute ago","minutes":"%d minutes ago","seconds":"a minute ago","year-from-now":"\x26lt;timeago-year-from-now\x26gt;","years-from-now":"\x26lt;timeago-year-from-now\x26gt;","month-from-now":"a month from now","months-from-now":"%d months from now","day-from-now":"a day from now","days-from-now":"%d days from now","hour-from-now":"an hour from now","hours-from-now":"%d hours from now","minute-from-now":"a minute from now","minutes-from-now":"%d minutes from now","second-from-now":"a minute from now","seconds-from-now":"a minute from now"},"sassParams":{"background-dynamic":"1","background-image":"","background-image-height":"800","background-image-width":"2000","color-body":"#bacdd8","color-body-middle":"#bacdd8","color-buttons":"#006cb0","color-header":"#3a5766","color-links":"#006cb0","color-page":"#ffffff","page-opacity":"100","widthType":2},"wgAssetsManagerQuery":"/__am/%4$d/%1$s/%3$s/%2$s","wgEnableOutboundScreenExt":true,"wgOutboundScreenRedirectDelay":15,"wgCatId":"2","wgBlankImgUrl":"data:image/gif;base64,R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAQAICTAEAOw%3D%3D","wgMainpage":"Main Page","wgIsMainpage":true,"wgIsContentNamespace":true,"wgExtensionsPath":"http://slot1.images.wikia.nocookie.net/__cb1419022433/common/extensions","wgResourceBasePath":"http://slot1.images.wikia.nocookie.net/__cb1419022433/common","wgSitename":"Freeciv","wgMWrevId":false,"wgRevisionId":22564,"wgCookieDomain":".wikia.com","wgCookiePath":"/","wgEnableWikiaPhotoGalleryExt":true,"wgOasisGrid":true,"wgEnableMediaGalleryExt":false,"wgEnableLightboxExt":true,"wgShowAdModalInterstitialTimes":3,"wgEnableWebPThumbnails":true,"fbAppId":"112328095453510","fbScript":null,"fbLogo":false,"fbLogoutURL":"/wiki/Special:UserLogout?returnto=Main_Page","fbReturnToTitle":"Main_Page","fbScriptLangCode":"en_US","wgEnableFacebookClientExt":true,"wgEnableWikiaFollowedPages":true,"wgFollowedPagesPagerLimit":15,"wgFollowedPagesPagerLimitAjax":600,"wgEnableWikiaBarExt":true,"wgEnableWikiaBarAds":true,"wgWikiaBarMainLanguages":["en","de","es","fr"],"wgVisualEditor":{"isPageWatched":false,"magnifyClipIconURL":"http://slot1.images.wikia.nocookie.net/__cb1419022433/common/skins/common/images/magnify-clip.png","pageLanguageCode":"en","pageLanguageDir":"ltr","svgMaxSize":2048,"namespacesWithSubpages":{"1":true,"2":true,"3":true,"5":true,"7":true,"8":true,"9":true,"11":true,"13":true,"15":true,"0":true,"4":true,"6":true,"10":true,"12":true,"14":true,"110":true,"111":true,"500":true,"501":true,"502":true,"503":true,"828":true,"829":true}},"wgMaxUploadSize":10485760,"wgEnableVisualEditorUI":false,"wgEnableWikiaInteractiveMaps":false,"VignettePathPrefix":null,"wgQualarooUrl":"//s3.amazonaws.com/ki.js/52510/bgJ.js","wgVisualEditorPreferred":true,"wgBuckyConfig":{"host":"//speed.wikia.net/__rum","sample":0.1,"aggregationInterval":1000,"protocol":2},"wgOasisResponsive":true,"verticalName":"Games","WikiaEnableNewCreatepage":true,"ContentNamespacesText":[""],"wgCategoryTreePageCategoryOptions":"{\"mode\":0,\"hideprefix\":20,\"showcount\":true,\"namespaces\":false}","wgCategorySelect":{"defaultNamespace":"Category","defaultNamespaces":"Category","defaultSeparator":":","defaultSortKey":"Main Page"}});
+}</script><script>if(window.mw){
+mw.loader.implement("user.options",function($){mw.user.options.set({"ccmeonemails":0,"cols":80,"date":"default","diffonly":0,"disablemail":0,"disablesuggest":0,"editfont":"default","editondblclick":0,"editsection":1,"editsectiononrightclick":0,"enotifminoredits":1,"enotifrevealaddr":0,"enotifusertalkpages":1,"enotifwatchlistpages":1,"extendwatchlist":0,"externaldiff":0,"externaleditor":0,"fancysig":0,"forceeditsummary":0,"gender":"unknown","hideminor":0,"hidepatrolled":0,"highlightbroken":1,"imagesize":1,"justify":0,"math":0,"minordefault":0,"newpageshidepatrolled":0,"nocache":0,"noconvertlink":0,"norollbackdiff":0,"numberheadings":0,"previewonfirst":0,"previewontop":1,"quickbar":5,"rcdays":7,"rclimit":50,"rememberpassword":0,"rows":25,"searchlimit":20,"showhiddencats":0,"showjumplinks":1,"shownumberswatching":1,"showtoc":1,"showtoolbar":1,"skin":"oasis","stubthreshold":0,"thumbsize":2,"underline":2,"uselivepreview":0,"usenewrc":1,"watchcreations":1,"watchdefault":1,"watchdeletion":1,
+"watchlistdays":3,"watchlisthideanons":0,"watchlisthidebots":0,"watchlisthideliu":0,"watchlisthideminor":0,"watchlisthideown":0,"watchlisthidepatrolled":0,"watchmoves":0,"wllimit":250,"htmlemails":1,"watchlistdigest":1,"enablerichtext":1,"editor":0,"visualeditor-enable":1,"visualeditor-betatempdisable":0,"visualeditor-enable-experimental":0,"visualeditor-enable-language":0,"visualeditor-hidebetawelcome":0,"useeditwarning":true,"founderemails-joins-2261":0,"founderemails-edits-2261":0,"founderemails-views-digest-2261":0,"founderemails-complete-digest-2261":0,"variant":"en","language":"en","searchNs0":true,"searchNs1":false,"searchNs2":false,"searchNs3":false,"searchNs4":false,"searchNs5":false,"searchNs6":false,"searchNs7":false,"searchNs8":false,"searchNs9":false,"searchNs10":false,"searchNs11":false,"searchNs12":false,"searchNs13":false,"searchNs14":true,"searchNs15":false,"searchNs110":false,"searchNs111":false,"searchNs500":false,"searchNs501":false,"searchNs502":false,"searchNs503"
+:false,"searchNs828":false,"searchNs829":false,"searchNs1200":false,"searchNs1201":false,"searchNs1202":false,"userlandingpage":1});;},{},{});mw.loader.implement("user.tokens",function($){mw.user.tokens.set({"editToken":"+\\","watchToken":false});;},{},{});
+
+/* cache key: freeciv:resourceloader:filter:minify-js:7:db5b6d50cebc6b2b0bb2e8ddad664c49 */
+}</script>
+<script>if(window.mw){
+mw.loader.load(["mediawiki.page.startup","mediawiki.legacy.wikibits","mediawiki.legacy.ajax","amd.shared","ext.visualEditor.wikiaViewPageTarget.init","mediawiki.user","mediawiki.page.ready","ext.wikiaInYourLang"]);
+}</script><script src="http://slot1.images.wikia.nocookie.net/__am/1419022433/groups/-/oasis_shared_core_js,adengine2_js,adengine2_late_js,adengine2_spotlights_js,oasis_shared_js,oasis_anon_with_new_global_nav_js,liftium_ads_js,liftium_ads_extra_js,adengine2_top_in_content_boxad_js,adengine2_interactive_maps_js,toc_js,qualaroo_js,global_footer_js"></script>
+<script src="/wikia.php?controller=JSMessages&amp;method=getMessages&amp;format=html&amp;packages=ConfirmModal%2CImagePlaceholder%2COasis-generic&amp;uselang=en&amp;cb=1419022433.0.74781"></script>
+<script src="http://slot1.images1.wikia.nocookie.net/__am/1419022433/group/-/global_navigation_js"></script>
+
+<script type="text/javascript">/*<![CDATA[*/ Wikia.LazyQueue.makeQueue(wgAfterContentAndJS, function(fn) {fn();}); wgAfterContentAndJS.start(); /*]]>*/</script>
+<script type="text/javascript">/*<![CDATA[*/ if (typeof AdEngine_trackPageInteractive === 'function') {wgAfterContentAndJS.push(AdEngine_trackPageInteractive);} /*]]>*/</script>
+<script src="http://freeciv.wikia.com/__load/-/cb%3D1419022433%26debug%3Dfalse%26lang%3Den%26only%3Dscripts%26skin%3Doasis/ext.siteWideMessages.anon"></script>
+
+<script type='text/javascript'>
+var agllGroup = "Gaming";
+!function(){
+var a=document.createElement("script");a.type="text/javascript";a.async=!0;var b=["http://a98dc034c7781a941eba-bac02262202668bbe918ea9fb5289cd2.r58.cf2.rackcdn.com","https://52e473ee9859b886964f-bac02262202668bbe918ea9fb5289cd2.ssl.cf2.rackcdn.com"];a.src=("https:"==document.location.protocol?b[1]:b[0])+"/c59hk50tip94.js";var c=document.getElementsByTagName("script")[0];c.parentNode.insertBefore(a,c)
+}();</script><script>var wgSassLoadedScss = ["skins\/oasis\/css\/oasis.scss","extensions\/wikia\/GlobalNavigation\/styles\/GlobalNavigation.scss","extensions\/wikia\/GlobalNavigation\/styles\/GlobalNavigationSearch.scss","extensions\/wikia\/GlobalNavigation\/styles\/GlobalNavigationAccountNavigation.scss","extensions\/wikia\/GlobalNavigation\/styles\/GlobalNavigationHubsMenu.scss","extensions\/wikia\/UserLogin\/css\/UserLoginDropdown.globalNavigation.scss","extensions\/wikia\/WallNotifications\/styles\/WallNotifications.globalNavigation.scss","extensions\/wikia\/GlobalNavigation\/styles\/GlobalNavigationOasis.scss","extensions\/wikia\/GlobalNavigation\/styles\/GlobalNavigationSearchOasis.scss","extensions\/wikia\/Qualaroo\/css\/Qualaroo.scss"];</script>
+<script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"beacon-6.newrelic.com","licenseKey":"60e97494a4","applicationID":"2068553","transactionName":"MVVbZkJVCxVSUhcIXggfekdDQAoLHEECBlRJXVhbXhsTD1ZGTA5QFVlKHV5bOhZSQxAEQ0lRT1dCVQID","queueTime":0,"applicationTime":163,"ttGuid":"","agentToken":"","atts":"HRJMEApPGEoRUEFbShtN","errorBeacon":"bam.nr-data.net","agent":"js-agent.newrelic.com\/nr-476.min.js"}</script></body>
+
+
+
+</html>

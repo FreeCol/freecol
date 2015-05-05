@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Compiling FreeCol</TITLE>
+<META NAME="description" CONTENT="Compiling FreeCol">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="FreeCol.css">
+
+<LINK REL="previous" HREF="node6.html">
+<LINK REL="up" HREF="node5.html">
+<LINK REL="next" HREF="node8.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html743"
+  HREF="node8.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html737"
+  HREF="node5.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html733"
+  HREF="node6.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html739"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html741"
+  HREF="node64.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html744"
+  HREF="node8.html">Interface</A>
+<B> Up:</B> <A NAME="tex2html738"
+  HREF="node5.html">Installation</A>
+<B> Previous:</B> <A NAME="tex2html734"
+  HREF="node6.html">System Requirements</A>
+ &nbsp; <B>  <A NAME="tex2html740"
+  HREF="node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html742"
+  HREF="node64.html">Index</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00320000000000000000">
+Compiling FreeCol</A>
+</H1>
+
+<P>
+In order to compile FreeCol you will need Java and
+<A HREF="http://ant.apache.org/">the Ant build system</A>. When these are
+installed, go to the root directory of FreeCol and type <code>ant</code> to
+build a JAR file containing the game. This process requires the
+<code>native2ascii</code><A NAME="98"></A> task, which is an optional ant
+task. Some Linux distributions place optional tasks in a different
+package, so make sure you have installed all necessary packages if you
+are a Linux user. The game is started using the command
+<code>java -Xmx128M -jar FreeCol.jar</code>.
+
+<P>
+If something goes wrong, please open a bug report at the
+<A HREF="http://sourceforge.net/projects/freecol">SourceForge page of
+  FreeCol</A>. Use the command <code>ant -projecthelp</code> to find out
+about other kinds of things you can build (this manual, for
+example). Note that you will require additional software to build the
+manual, however.
+
+<P>
+<BR><HR>
+<ADDRESS>
+Stian Grenborgen
+2009-01-14
+</ADDRESS>
+</BODY>
+</HTML>

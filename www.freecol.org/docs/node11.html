@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Game setup</TITLE>
+<META NAME="description" CONTENT="Game setup">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="FreeCol.css">
+
+<LINK REL="next" HREF="node12.html">
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="up" HREF="node9.html">
+<LINK REL="next" HREF="node12.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html824"
+  HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html818"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html812"
+  HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html820"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html822"
+  HREF="node64.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html825"
+  HREF="node12.html">Game options</A>
+<B> Up:</B> <A NAME="tex2html819"
+  HREF="node9.html">Starting the game</A>
+<B> Previous:</B> <A NAME="tex2html813"
+  HREF="node10.html">Command line options</A>
+ &nbsp; <B>  <A NAME="tex2html821"
+  HREF="node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html823"
+  HREF="node64.html">Index</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00412000000000000000">
+Game setup</A>
+</H2>
+
+<P>
+If you start FreeCol without command line options, the game will first
+open a dialog that allows you to start a new game, to open a saved
+game, to open the map editor, to set various options, and to quit.
+
+<P>
+If you decide to start a new game, you will be presented with another
+dialog, which enables you to start a single-player game, to retrieve a
+list of servers from <code>meta.freecol.org</code><A NAME="119"></A>,
+to join a <A NAME="1412"></A><SPAN  CLASS="textbf">multi-player game</SPAN>, or to start a new multi-player
+game.
+
+<P>
+If you start a single-player game, you must decide on the number of
+European players (1-8) and whether to allow additional nations (which
+were not available in the original game) and whether to allow national
+advantages to be selectable (in the original game, national advantages
+were fixed). Of course, if you wish to have more than four European
+players, you must also enable additional nations, since the original
+game only made four European nations available.
+
+<P>
+If you choose to retrieve a list of running games from the metaserver,
+your computer will attempt to establish a connection to
+<code>meta.freecol.org</code>, port <SPAN CLASS="MATH"><IMG
+ WIDTH="42" HEIGHT="19" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$3540$"></SPAN><A NAME="121"></A>. You will be
+presented with a list of games, from which you can select one to
+connect to. Please note that the list will frequently be empty, since
+not that many public multi-player games are being run.
+
+<P>
+If you wish to join a multi-player game, you must enter the
+<A NAME="1414"></A><SPAN  CLASS="textbf">IP address</SPAN> of a server that is running a FreeCol game as
+well as the port it is running on. The default port is
+<SPAN CLASS="MATH"><IMG
+ WIDTH="42" HEIGHT="19" ALIGN="BOTTOM" BORDER="0"
+ SRC="img2.png"
+ ALT="$3541$"></SPAN><A NAME="123"></A>.
+
+<P>
+If you wish to start a multi-player game, then the IP address of the
+server will be that of your computer, but you must still select a port
+to run the server on. Again, the default port is <SPAN CLASS="MATH"><IMG
+ WIDTH="42" HEIGHT="19" ALIGN="BOTTOM" BORDER="0"
+ SRC="img2.png"
+ ALT="$3541$"></SPAN>. You must also
+decide whether you want to run a public server or a private server. By
+default, you start a private game, which means that the game will not
+be available on the metaserver. Furthermore, you must decide on the
+number of European players (see above), and whether to use national
+advantages. A multi-player game may be more balanced if you do not use
+them, so that all players start with the same units and abilities.
+
+<P>
+FreeCol is a client-server game. The game server takes care of the
+game logic, and the client provides the graphical user interface. One
+or several clients can connect to the game server via the network. In
+the case of a single-player game, all other players are handled by the
+game server. At the moment, however, your client uses a network
+connection even if the server is running on the same computer.
+
+<P>
+This means that you can only run FreeCol if you have the necessary
+privileges to bind an unprivileged port. If you use a
+<A NAME="1416"></A><SPAN  CLASS="textbf">personal firewall</SPAN> that blocks the port you wish to use, you
+will need to configure your firewall accordingly. If you wish to
+retrieve a list of games from the metaserver, you also need to
+configure your firewall to permit connections to that server, port
+<SPAN CLASS="MATH"><IMG
+ WIDTH="42" HEIGHT="19" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$3540$"></SPAN>. In order to connect to a server, your client also needs to
+bind a port. Which port depends on the operating system you use.
+
+<P>
+If you are running a public game server, then your firewall must also
+permit the clients to connect to the port of the game server.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html824"
+  HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html818"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html812"
+  HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html820"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html822"
+  HREF="node64.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html825"
+  HREF="node12.html">Game options</A>
+<B> Up:</B> <A NAME="tex2html819"
+  HREF="node9.html">Starting the game</A>
+<B> Previous:</B> <A NAME="tex2html813"
+  HREF="node10.html">Command line options</A>
+ &nbsp; <B>  <A NAME="tex2html821"
+  HREF="node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html823"
+  HREF="node64.html">Index</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+Stian Grenborgen
+2009-01-14
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,2617 @@
+<!DOCTYPE html>
+<!-- Server: sfn-web-4 -->
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]>--> <html lang="en" class="no-js"> <!--<![endif]-->
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+    <title>FreeCol / Bugs</title>
+    
+<meta id="webtracker" name="webtracker" content='{&#34;event_id&#34;: &#34;f99fe562-8909-11e4-b36e-0200ac1d2936&#34;, &#34;project&#34;: &#34;freecol&#34;, &#34;action_type&#34;: &#34;tickets&#34;}' />
+
+<script src="http://a.fsdn.com/allura/nf/1418835403/_ew_/theme/sftheme/js/sftheme/modernizr.custom.90514.js"></script>
+
+<script src="http://a.fsdn.com/allura/nf/1418835403/_ew_/theme/sftheme/js/sftheme/jquery-1.8.0.min.js"></script>
+
+<script src="http://a.fsdn.com/allura/nf/1418835403/_ew_/theme/sftheme/js/sftheme/header.js"></script>
+<!--[if lt IE 7 ]>
+  <script src="http://a.fsdn.com/allura/nf/1418835403/_ew_/theme/sftheme/js/sftheme/dd_belatedpng.js"></script>
+  <script> DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images </script>
+<![endif]-->
+<link href='//fonts.googleapis.com/css?family=Ubuntu:regular' rel='stylesheet' type='text/css'>
+<style type="text/css">
+    @font-face {
+        font-family: "Pictos";
+        src: url('http://a.fsdn.com/allura/nf/1418835403/_ew_/theme/sftheme/css/fonts/sftheme/pictos-web.eot');
+        src: local("☺"), url('http://a.fsdn.com/allura/nf/1418835403/_ew_/theme/sftheme/css/fonts/sftheme/pictos-web.woff') format('woff'), url('http://a.fsdn.com/allura/nf/1418835403/_ew_/theme/sftheme/css/fonts/sftheme/pictos-web.ttf') format('truetype'), url('http://a.fsdn.com/allura/nf/1418835403/_ew_/theme/sftheme/css/fonts/sftheme/pictos-web.svg') format('svg');
+    }
+</style>
+    <script type="text/javascript">
+            /*jslint onevar: false, nomen: false, evil: true, css: true, plusplus: false, white: false, forin: true, on: true, immed: false */
+            /*global confirm, alert, unescape, window, jQuery, $, net, COMSCORE */
+    </script>
+    
+      <!-- ew:head_css -->
+
+    
+      <link rel="stylesheet"
+                type="text/css"
+                href="http://a.fsdn.com/allura/nf/1418835403/_ew_/_slim/css?href=tool%2Ftickets%2Fcss%2Ftracker.css%3Ballura%2Fcss%2Fforge%2Fhilite.css"
+                >
+    
+      <link rel="stylesheet"
+                type="text/css"
+                href="/nf/tool_icon_css?1418835403"
+                >
+    
+      <link rel="stylesheet"
+                type="text/css"
+                href="http://a.fsdn.com/allura/nf/1418835403/_ew_/theme/sftheme/css/forge.css"
+                >
+    
+      <link rel="stylesheet"
+                type="text/css"
+                href="http://a.fsdn.com/allura/nf/1418835403/_ew_/_slim/css?href=allura%2Fcss%2Fsmoothness%2Fjquery-ui-1.8.4.custom.css%3Btracker_css%2Fjquery.multiselect.css%3Btracker_css%2Fticket-list.css%3Bcss%2Fpage_list.css"
+                >
+    
+      
+<!-- /ew:head_css -->
+
+    
+    
+    
+      <!-- ew:head_js -->
+
+    
+      
+<!-- /ew:head_js -->
+
+    
+    
+
+    
+      <style type="text/css">
+        #page-body.project---init-- #top_nav { display: none; }
+#page-body.project---init-- #nav_menu_holder { display: none; margin-bottom: 0; }
+#page-body.project---init-- #content_base {margin-top: 0; }
+      </style>
+    
+    
+      <style>.XMIKAYgTmyTRskPfrsqYWHQ { display:none }</style>
+
+    
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="feed.rss"/>
+  <link rel="alternate" type="application/atom+xml" title="Atom" href="feed.atom"/>
+
+    
+    
+
+
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+
+    function _add_tracking(prefix, tracking_id, send_user) {
+        _gaq.push([prefix+'._setAccount', tracking_id]);
+        _gaq.push([prefix+'._setCustomVar', 1, 'Page Type', 'tickets', 3]);_gaq.push([prefix+'._trackPageview']);
+    }
+      _add_tracking('sfnt1', 'UA-32013-6', true);
+      _add_tracking('sfnt2', 'UA-36130941-1', true);
+    
+
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+</script>
+  </head>
+
+  <body id="forge">
+    <h2 class="hidden">
+        <span style="color:red">Error:</span> CSS did not load.<br>
+        This may happen on the first request due to CSS mimetype issues.
+        Try clearing your browser cache and refreshing.
+        <hr>
+    </h2>
+    
+    
+      <!-- ew:body_top_js -->
+
+    
+      
+<!-- /ew:body_top_js -->
+
+    
+    
+    
+<header id="site-header">
+    <div class="wrapper">
+        <a href="/" class="logo">
+            <span>SourceForge</span>
+        </a>
+        
+        <form method="get" action="/directory/">
+            <input type="text" id="words" name="q" placeholder="Search">
+        </form>
+        
+        <!--Switch to {language}-->
+        <nav id="nav-site">
+            <a href="/directory/" title="Browse our software.">Browse</a>
+            <a href="/directory/enterprise" title="Browse our Enterprise software.">Enterprise</a>
+            <a href="/blog/" title="Read the latest news from the SF HQ.">Blog</a>
+            <a href="/support" title="Contact us for help and feedback.">Help</a>
+            <a href="/jobs?source=header" title="Search 80k+ tech jobs." class="featured-link">Jobs</a>
+        </nav>
+        <nav id="nav-account">
+            
+              <div class="logged_out">
+                <a href="/auth/">Log In</a>
+                <span>or</span>
+                <a href="https://sourceforge.net/user/registration/">Join</a>
+              </div>
+            
+        </nav>
+        
+    </div>
+</header>
+<header id="site-sec-header">
+    <div class="wrapper">
+        <nav id="nav-hubs">
+            <h4>Solution Centers</h4>
+            <a href="http://goparallel.sourceforge.net/">Go Parallel</a>
+            <a href="http://ibmsmarteritservices.sourceforge.net/">Smarter IT</a>
+            <a href="http://ibmsoftwaredelivery.sourceforge.net/">Software Delivery</a>
+            <a href="http://apmsolutions.sourceforge.net/">Performance</a>
+            <a href="http://ibmsmarterdata.sourceforge.net/">Data Management</a>
+        </nav>
+        <nav id="nav-collateral">
+            <a href="http://library.slashdotmedia.com/?source=sfnet_header">Resources</a>
+            
+            <a href="">Newsletters</a>
+            
+        </nav>
+    </div>
+</header>
+    
+    
+    
+    
+    
+    <section id="page-body" class=" neighborhood-Projects project-freecol mountpoint-bugs">
+	  <div id="nav_menu_holder">
+            
+            
+
+
+
+    
+    
+    
+    
+    <nav id="breadcrumbs">
+        <ul>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a itemprop="url" href="/">Home</a></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a itemprop="url" href="/directory">Browse</a></li>
+            
+            
+                
+            
+            
+            
+                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a itemprop="url" href="/p/">Projects</a></li>
+                
+            
+            
+                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a itemprop="url" href="/p/freecol/">FreeCol</a></li>
+                
+            
+            
+                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">Bugs</li>
+                
+            
+        </ul>
+    </nav>
+    
+    
+  
+    
+    
+  
+  
+    
+      <img src="/p/freecol//icon?2013-01-10 22:27:23+00:00" class="project_icon" alt="Project Logo">
+    
+    <h1 class="project_title">
+        <a href="/p/freecol/" class="project_link">FreeCol</a>
+    </h1>
+    
+    
+    
+    <span id="dev-status" class="beta">beta</span>
+    
+    <h2 class="project_summary with-icon">
+        Colonize the New World.
+    </h2>
+    
+    <div class="brought-by with-icon">
+        Brought to you by:
+        
+        
+            
+                <a href="/u/burschik/">burschik</a>,
+            
+            
+                <a href="/u/mpope/">mpope</a>,
+            
+            
+                <a href="/u/pruano/">pruano</a>,
+            
+            
+                <a href="/u/stiangre/">stiangre</a>
+            </div>
+    
+
+            
+      </div>
+      <div id="top_nav" class="">
+        
+        
+<ul class="dropdown">
+  
+    <li class="">
+        <a href="/projects/freecol/" class="ui-icon-tool-summary-32">
+            Summary
+        </a>
+        
+        
+    </li>
+	
+    <li class="">
+        <a href="/projects/freecol/files/" class="ui-icon-tool-files-32">
+            Files
+        </a>
+        
+        
+    </li>
+	
+    <li class="">
+        <a href="/projects/freecol/reviews" class="ui-icon-tool-reviews-32">
+            Reviews
+        </a>
+        
+        
+    </li>
+	
+    <li class="">
+        <a href="/projects/freecol/support" class="ui-icon-tool-support-32">
+            Support
+        </a>
+        
+        
+    </li>
+	
+    <li class="">
+        <a href="/p/freecol/news/" class="ui-icon-tool-blog-32">
+            News
+        </a>
+        
+        
+    </li>
+	
+    <li class="">
+        <a href="/p/freecol/discussion/" class="ui-icon-tool-discussion-32">
+            Discussion
+        </a>
+        
+        
+    </li>
+	
+    <li class="selected">
+        <a href="/p/freecol/_list/tickets" class="ui-icon-tool-tickets-32">
+            Tickets ▾
+        </a>
+        
+        
+            <ul>
+                
+                    <li class="selected"><a href="/p/freecol/bugs/">Bugs</a></li>
+                
+                    <li class=""><a href="/p/freecol/improvement-requests/">Improvement Requests</a></li>
+                
+                    <li class=""><a href="/p/freecol/pending-features-for-freecol/">Pending Features for FreeCol 1</a></li>
+                
+                    <li class=""><a href="/p/freecol/ideas-for-freecol/">Ideas for FreeCol 2</a></li>
+                
+                    <li class=""><a href="/p/freecol/patches/">Patches</a></li>
+                
+                    <li class=""><a href="/p/freecol/support-requests/">Support Requests</a></li>
+                
+            </ul>
+        
+    </li>
+	
+    <li class="">
+        <a href="/p/freecol/mailman/" class="ui-icon-tool-mailman-32">
+            Mailing Lists
+        </a>
+        
+        
+    </li>
+	
+    <li class="">
+        <a href="/p/freecol/git/" class="ui-icon-tool-git-32">
+            Code
+        </a>
+        
+        
+    </li>
+	
+    <li class="">
+        <a href="/p/freecol/code/" class="ui-icon-tool-svn-32">
+            Old-Svn
+        </a>
+        
+        
+    </li>
+	
+    <li class="">
+        <a href="/p/freecol/wiki/" class="ui-icon-tool-wiki-32">
+            Wiki
+        </a>
+        
+        
+    </li>
+	
+    <li class="">
+        <a href="/p/freecol/donate/" class="ui-icon-tool-link-32">
+            Donate
+        </a>
+        
+        
+    </li>
+	
+</ul>
+
+        
+      </div>
+      <div id="content_base">
+      
+			  
+			    
+          
+
+
+<div id="sidebar">
+  
+    <form id="search" method="GET" action="/p/freecol/bugs/search/">
+      <input name="q" type="text" title="Search Bugs" placeholder="Search Bugs">
+    </form>
+  
+    
+    
+      
+        
+    
+      <ul class="sidebarmenu">
+      
+    
+    <li>
+      <a href="/p/freecol/bugs/stats"><b data-icon="Y" class="ico ico-stats"></b> <span>View Stats</span></a>
+    </li>
+  
+      
+        
+    
+      </ul>
+      
+    
+    
+      <h3 class="">Group</h3>
+    
+  
+      
+        
+    
+      <ul class="sidebarmenu">
+      
+    
+    <li>
+      <a href="/p/freecol/bugs/milestone/Fixed_trunk/" class="milestones"><span>Fixed_trunk</span></a>
+    </li>
+  
+      
+        
+    
+    <li>
+      <a href="/p/freecol/bugs/milestone/Current/" class="milestones"><span>Current</span></a>
+    </li>
+  
+      
+        
+    
+    <li>
+      <a href="/p/freecol/bugs/milestone/Unspecified/" class="milestones"><span>Unspecified</span></a>
+    </li>
+  
+      
+        
+    
+    <li>
+      <a href="/p/freecol/bugs/milestone/Fixed_0.11.0/" class="milestones"><span>Fixed_0.11.0</span></a>
+    </li>
+  
+      
+        
+    
+    <li>
+      <a href="/p/freecol/bugs/milestone/Fixed_0.11.1/" class="milestones"><span>Fixed_0.11.1</span></a>
+    </li>
+  
+      
+        
+    
+      </ul>
+      
+    
+    
+      <h3 class="">Searches</h3>
+    
+  
+      
+        
+    
+      <ul class="sidebarmenu">
+      
+    
+    <li>
+      <a href="/p/freecol/bugs/search/?q=status%3Aope%2A+OR+status%3Aclose%2A+OR+status%3Apendin%2A" class="search_bin"><span>All</span></a>
+    </li>
+  
+      
+        
+    
+    <li>
+      <a href="/p/freecol/bugs/search/?q=status%3Aclosed-invalid+or+status%3Aclosed-out-of-date+or+status%3Aclosed+or+status%3Aclosed-duplicate+or+status%3Aclosed-wont-fix+or+status%3Aclosed-fixed" class="search_bin"><span>Closed</span></a>
+    </li>
+  
+      
+        
+    
+    <li>
+      <a href="/p/freecol/bugs/search/?q=status%3Aopen+OR+status%3Aopen-WWC1D+OR+status%3Aopen-needs-info" class="search_bin"><span>Open</span></a>
+    </li>
+  
+      
+        
+    
+    <li>
+      <a href="/p/freecol/bugs/search/?q=status%3Apending-fixed" class="search_bin"><span>Pending</span></a>
+    </li>
+  
+      
+        
+    
+      </ul>
+      
+    
+    
+      <h3 class="">Help</h3>
+    
+  
+      
+        
+    
+      <ul class="sidebarmenu">
+      
+    
+    <li>
+      <a href="/p/freecol/bugs/markdown_syntax"><span>Formatting Help</span></a>
+    </li>
+  
+      
+    
+    
+      </ul>
+      
+    
+    
+      <script>
+                $(function() {
+            $.ajax({
+                url:'/p/freecol/bugs/bin_counts',
+                success: function(data) {
+                    var $spans = $('.search_bin > span');
+                    $.each(data.bin_counts, function(i, item) {
+                        $spans.each(function() {
+                            if ($(this).text() === item.label) {
+                                $(this).after('<small>' + item.count + '</small>').fadeIn('fast');
+                            }
+                        });
+                    });
+                }
+            });
+            if ($('.milestones').length > 0) {
+                $.ajax({
+                    url: '/p/freecol/bugs/milestone_counts',
+                    success: function(data) {
+                        var $spans = $('.milestones > span');
+                        $.each(data.milestone_counts, function(i, item) {
+                            $spans.each(function() {
+                                if ($(this).text() === item.name) {
+                                    $(this).after('<small>' + item.count + '</small>').fadeIn('fast');
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+        });
+      </script>
+    
+</div>
+          
+          
+			  
+			  
+          
+        
+        <div class="grid-20 pad">
+          <h2 class="dark title">Bugs
+            <!-- actions -->
+            <small>
+            
+  
+    
+    <a id="maximize-content" href="#">
+      <b data-icon="`" class="ico ico-expand" title="Maximize"> </b> Maximize
+    </a>
+    <a id="restore-content" href="#">
+      <b data-icon="J" class="ico ico-restore" title="Restore"> </b> Restore
+    </a>
+  <a href="/p/freecol/bugs/feed.rss" title="Follow"><b data-icon="f" class="ico ico-feed"></b></a>
+  
+  
+  
+
+            </small>
+            <!-- /actions -->
+          </h2>
+		
+          <div>
+            
+            
+    
+  
+    <div id="search-ticket-help-msg" class="grid-19 info"><div class="markdown_content"><h1 id="bugs">Bugs</h1>
+<p>This is the FreeCol bug tracker.  If you think you have found a bug this is the place to report it, except:</p>
+<ul>
+<li>
+<p>If it is a translation issue.  Any text message in FreeCol is orignally written in English and then translated by the volunteers at <a class="" href="https://translatewiki.net/wiki/Translating:FreeCol" rel="nofollow">translatewiki</a>.  If you have found a problem in non-English text, please go there to fix it.  Only the translatewiki maintainer commits changes to FreeCol translations.  OTOH, if a translated message contains strings "%like% %this%" (that is, English words enclosed in percentage signs) that <em>is</em> a FreeCol bug.  Except, if the words are not in English, then it is a translation bug again.  I hope that was clear!</p>
+</li>
+<li>
+<p>If it is a difference between FreeCol and Colonization 1.  These should go on the <a class="" href="https://sourceforge.net/p/freecol/pending-features-for-freecol">Pending Features for FreeCol</a> tracker.  There is further discussion of such issues on the <a class="" href="https://sourceforge.net/p/freecol/wiki/What%20Would%20Col1%20Do%3F">What Would Col1 Do? wiki</a>.</p>
+</li>
+<li>
+<p>If it is a request for an improvement rather than an actual bug.  These go <a class="" href="https://sourceforge.net/p/freecol/improvement-requests">here</a>.</p>
+</li>
+</ul>
+<h3 id="known-common-bugs">Known Common Bugs</h3>
+<h5 id="hangs-due-to-hidden-dialogs">Hangs due to hidden dialogs</h5>
+<p>There are ongoing issues with dialogs and popups disappearing behind the main FreeCol map, particularly on Windows and with full screen mode.  This makes the game appear to hang.  See <a class="" href="https://sourceforge.net/p/freecol/bugs/2328">bug report #2328</a> for some discussion of workarounds.  As far as we can tell this is a Java library issue, not something we can fix in FreeCol.</p>
+<h5 id="early-window-mode-changes">Early window mode changes</h5>
+<p>Users of openJDK may encounter crashes and hangs when switching from windowed to full screen mode or vice versa, especially during the opening video <a class="" href="https://sourceforge.net/p/freecol/bugs/2611">bug report #2611</a>.  This is due to a known bug in openJDK. Workarounds have been tried unsuccessfully, for now please just wait until into the game proper before changing windowed mode.  Hopefully the openJDK bug will be fixed soon.</p>
+<h5 id="turn-report-font">Turn report font</h5>
+<p>Sometimes the turn report uses the wrong font.  This is mysterious. If you are able to reproduce the problem reliably, or have an idea as to what triggers it, please comment on <a class="" href="https://sourceforge.net/p/freecol/bugs/2662">bug report #2662</a>.</p></div></div>
+  
+  
+    
+<div id="ticket_search_results_holder">
+  
+  <form method="get">
+  
+  
+  <p><strong>Showing
+  
+    <select class="results_per_page" name="limit">
+      
+          <option selected="selected"
+             value="25">25</option>
+      
+          <option 
+             value="50">50</option>
+      
+          <option 
+             value="100">100</option>
+      
+          <option 
+             value="250">250</option>
+      
+    </select>
+  
+  results of 72 </strong></p>
+  
+</form>
+  
+    <table class="ticket-list">
+      <thead>
+        <tr>
+          
+            <th title="Ticket Number" data-filter-toggle="ticket_num">
+              
+                #
+              
+              <ul class="ticket-filter" data-column="ticket_num">
+              <li><a data-sort-asc="ticket_num" title="Ticket Number">Sort A -> Z</a></li>
+              <li><a data-sort-desc="ticket_num" title="Ticket Number">Sort Z -> A</a></li>
+              
+               </ul>
+            </th>
+          
+            <th title="Summary" data-filter-toggle="summary">
+              
+                Summary<span class="filter-ico">&#x25BE;</span>
+              
+              <ul class="ticket-filter" data-column="summary">
+              <li><a data-sort-asc="summary" title="Summary">Sort A -> Z</a></li>
+              <li><a data-sort-desc="summary" title="Summary">Sort Z -> A</a></li>
+              
+               </ul>
+            </th>
+          
+            <th title="Milestone" data-filter-toggle="_milestone">
+              
+                Milestone<span class="filter-ico">&#x25BE;</span>
+              
+              <ul class="ticket-filter" data-column="_milestone">
+              <li><a data-sort-asc="custom_fields._milestone" title="Milestone">Sort A -> Z</a></li>
+              <li><a data-sort-desc="custom_fields._milestone" title="Milestone">Sort Z -> A</a></li>
+              
+                <li>Filter by Milestone</li>
+                <li>
+                  <select name="filter-_milestone" data-label="Milestone" multiple="multiple">
+                    
+                      <option value="Current">Current (55)</option>
+                    
+                      <option value="Fixed_0.10.1">Fixed_0.10.1 (1)</option>
+                    
+                      <option value="Fixed_trunk">Fixed_trunk (15)</option>
+                    
+                      <option value="Unspecified">Unspecified (1)</option>
+                    
+                      <option value="">Not set</option>
+                    
+                  </select>
+                </li>
+                <li class="btns">
+                  <input type="button" value="Ok" class="apply-filters">
+                </li>
+              
+               </ul>
+            </th>
+          
+            <th title="Status" data-filter-toggle="status">
+              
+                Status<span class="filter-ico">&#x25BE;</span>
+              
+              <ul class="ticket-filter" data-column="status">
+              <li><a data-sort-asc="status" title="Status">Sort A -> Z</a></li>
+              <li><a data-sort-desc="status" title="Status">Sort Z -> A</a></li>
+              
+                <li>Filter by Status</li>
+                <li>
+                  <select name="filter-status" data-label="Status" multiple="multiple">
+                    
+                      <option value="open">open (40)</option>
+                    
+                      <option value="open-WWC1D">open-WWC1D (1)</option>
+                    
+                      <option value="open-needs-info">open-needs-info (16)</option>
+                    
+                      <option value="pending-fixed">pending-fixed (15)</option>
+                    
+                      <option value="">Not set</option>
+                    
+                  </select>
+                </li>
+                <li class="btns">
+                  <input type="button" value="Ok" class="apply-filters">
+                </li>
+              
+               </ul>
+            </th>
+          
+            <th title="Owner" data-filter-toggle="assigned_to">
+              
+                Owner<span class="filter-ico">&#x25BE;</span>
+              
+              <ul class="ticket-filter" data-column="assigned_to">
+              <li><a data-sort-asc="assigned_to_username" title="Owner">Sort A -> Z</a></li>
+              <li><a data-sort-desc="assigned_to_username" title="Owner">Sort Z -> A</a></li>
+              
+                <li>Filter by Owner</li>
+                <li>
+                  <select name="filter-assigned_to" data-label="Owner" multiple="multiple">
+                    
+                      <option value="">Not set</option>
+                    
+                  </select>
+                </li>
+                <li class="btns">
+                  <input type="button" value="Ok" class="apply-filters">
+                </li>
+              
+               </ul>
+            </th>
+          
+            <th title="Creator" data-filter-toggle="reported_by">
+              
+                Creator<span class="filter-ico">&#x25BE;</span>
+              
+              <ul class="ticket-filter" data-column="reported_by">
+              <li><a data-sort-asc="reported_by" title="Creator">Sort A -> Z</a></li>
+              <li><a data-sort-desc="reported_by" title="Creator">Sort Z -> A</a></li>
+              
+                <li>Filter by Creator</li>
+                <li>
+                  <select name="filter-reported_by" data-label="Creator" multiple="multiple">
+                    
+                      <option value="*anonymous">*anonymous (2)</option>
+                    
+                      <option value="aggro80">aggro80 (1)</option>
+                    
+                      <option value="alancio">alancio (1)</option>
+                    
+                      <option value="amiddima">amiddima (1)</option>
+                    
+                      <option value="amtyurin">amtyurin (1)</option>
+                    
+                      <option value="arafurian">arafurian (1)</option>
+                    
+                      <option value="bryce">bryce (2)</option>
+                    
+                      <option value="calebrw">calebrw (11)</option>
+                    
+                      <option value="colonelmcc">colonelmcc (1)</option>
+                    
+                      <option value="corecorecore">corecorecore (1)</option>
+                    
+                      <option value="dbolton">dbolton (1)</option>
+                    
+                      <option value="evgenyrak">evgenyrak (1)</option>
+                    
+                      <option value="fraitomas">fraitomas (1)</option>
+                    
+                      <option value="frosteroid">frosteroid (1)</option>
+                    
+                      <option value="jmc_whiterose">jmc_whiterose (1)</option>
+                    
+                      <option value="kamamuracz">kamamuracz (8)</option>
+                    
+                      <option value="karamel">karamel (1)</option>
+                    
+                      <option value="keplerbr">keplerbr (1)</option>
+                    
+                      <option value="lepetitmartien">lepetitmartien (2)</option>
+                    
+                      <option value="lone_wolfsf">lone_wolfsf (5)</option>
+                    
+                      <option value="lostwizard">lostwizard (1)</option>
+                    
+                      <option value="malamute20">malamute20 (1)</option>
+                    
+                      <option value="misiulo">misiulo (1)</option>
+                    
+                      <option value="mpope">mpope (3)</option>
+                    
+                      <option value="nickshanks">nickshanks (2)</option>
+                    
+                      <option value="nutster">nutster (1)</option>
+                    
+                      <option value="phillyg">phillyg (3)</option>
+                    
+                      <option value="reflame">reflame (2)</option>
+                    
+                      <option value="simonsmall">simonsmall (4)</option>
+                    
+                      <option value="six2">six2 (1)</option>
+                    
+                      <option value="sjy68a16a3pu9oy">sjy68a16a3pu9oy (1)</option>
+                    
+                      <option value="tcrow777">tcrow777 (1)</option>
+                    
+                      <option value="tefkab">tefkab (1)</option>
+                    
+                      <option value="the_greenknight">the_greenknight (1)</option>
+                    
+                      <option value="vies">vies (1)</option>
+                    
+                      <option value="wintertime">wintertime (4)</option>
+                    
+                      <option value="">Not set</option>
+                    
+                  </select>
+                </li>
+                <li class="btns">
+                  <input type="button" value="Ok" class="apply-filters">
+                </li>
+              
+               </ul>
+            </th>
+          
+            <th title="Created" data-filter-toggle="created_date">
+              
+                Created<span class="filter-ico">&#x25BE;</span>
+              
+              <ul class="ticket-filter" data-column="created_date">
+              <li><a data-sort-asc="created_date" title="Created">Sort A -> Z</a></li>
+              <li><a data-sort-desc="created_date" title="Created">Sort Z -> A</a></li>
+              
+               </ul>
+            </th>
+          
+            <th title="Updated" data-filter-toggle="mod_date">
+              
+                Updated<span class="filter-ico">&#x25BE;</span>
+              
+              <ul class="ticket-filter" data-column="mod_date">
+              <li><a data-sort-asc="mod_date" title="Updated">Sort A -> Z</a></li>
+              <li><a data-sort-desc="mod_date" title="Updated">Sort Z -> A</a></li>
+              
+               </ul>
+            </th>
+          
+            <th title="Labels" data-filter-toggle="labels">
+              
+                Labels<span class="filter-ico">&#x25BE;</span>
+              
+              <ul class="ticket-filter" data-column="labels">
+              <li><a data-sort-asc="labels" title="Labels">Sort A -> Z</a></li>
+              <li><a data-sort-desc="labels" title="Labels">Sort Z -> A</a></li>
+              
+               </ul>
+            </th>
+          
+            <th title="Priority" data-filter-toggle="_priority">
+              
+                Priority<span class="filter-ico">&#x25BE;</span>
+              
+              <ul class="ticket-filter" data-column="_priority">
+              <li><a data-sort-asc="_priority" title="Priority">Sort A -> Z</a></li>
+              <li><a data-sort-desc="_priority" title="Priority">Sort Z -> A</a></li>
+              
+               </ul>
+            </th>
+          
+          <th id="select_col_menu">
+            <a href="#" id="col_menu" title="Select Columns"><b data-icon="x" class="ico ico-admin"></b></a>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr class=" ">
+            
+              
+                <td><a href="/p/freecol/bugs/2778/">2778</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2778/">Loss of remaining movement points inconsistent</a></td>
+              
+            
+              
+                
+                
+                  <td>Current</td>
+                
+              
+            
+              
+                <td class="open">open</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>wintertime</td>
+              
+            
+              
+              <td>
+    <span title="Sat Dec 20, 2014 10:53 AM UTC">
+      1 day ago
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Sun Dec 21, 2014 12:43 AM UTC">
+      11 hours ago
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class="even ">
+            
+              
+                <td><a href="/p/freecol/bugs/2777/">2777</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2777/">Work choosing menu in colony panel lists wrong items</a></td>
+              
+            
+              
+                
+                
+                  <td>Current</td>
+                
+              
+            
+              
+                <td class="open">open</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>wintertime</td>
+              
+            
+              
+              <td>
+    <span title="Sat Dec 20, 2014 10:38 AM UTC">
+      1 day ago
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Sun Dec 21, 2014 10:04 AM UTC">
+      2 hours ago
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class=" ">
+            
+              
+                <td><a href="/p/freecol/bugs/2776/">2776</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2776/">Freecol 11.1 is not running </a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_0.10.1</td>
+                
+              
+            
+              
+                <td class="open">open</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Mike Comber</td>
+              
+            
+              
+              <td>
+    <span title="Tue Dec 16, 2014 10:39 PM UTC">
+      5 days ago
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Tue Dec 16, 2014 10:43 PM UTC">
+      5 days ago
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>1</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class="even ">
+            
+              
+                <td><a href="/p/freecol/bugs/2775/">2775</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2775/">Create Mission doesn&#39;t always work</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Calebrw</td>
+              
+            
+              
+              <td>
+    <span title="Tue Dec 16, 2014 04:06 AM UTC">
+      5 days ago
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Wed Dec 17, 2014 08:42 AM UTC">
+      4 days ago
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class=" ">
+            
+              
+                <td><a href="/p/freecol/bugs/2774/">2774</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2774/">Mods options disappears from Preferences window after initial display</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Calebrw</td>
+              
+            
+              
+              <td>
+    <span title="Tue Dec 16, 2014 03:51 AM UTC">
+      5 days ago
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Wed Dec 17, 2014 12:57 AM UTC">
+      4 days ago
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class="even ">
+            
+              
+                <td><a href="/p/freecol/bugs/2773/">2773</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2773/">Colonists can&#39;t board after landing (Windows)</a></td>
+              
+            
+              
+                
+                
+                  <td>Current</td>
+                
+              
+            
+              
+                <td class="open">open-needs-info</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Evgeny</td>
+              
+            
+              
+              <td>
+    <span title="Mon Dec 15, 2014 08:54 AM UTC">
+      6 days ago
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Wed Dec 17, 2014 02:57 AM UTC">
+      4 days ago
+    </span>
+</td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/search?q=labels:%22Gameplay%22">Gameplay</a>, <a href="/p/freecol/bugs/search?q=labels:%22Windows%22">Windows</a></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class=" ">
+            
+              
+                <td><a href="/p/freecol/bugs/2772/">2772</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2772/">Unable to move cargo between carriers</a></td>
+              
+            
+              
+                
+                
+                  <td>Current</td>
+                
+              
+            
+              
+                <td class="open">open</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Calebrw</td>
+              
+            
+              
+              <td>
+    <span title="Fri Dec 12, 2014 06:50 AM UTC">
+      2014-12-12
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Sat Dec 13, 2014 12:33 AM UTC">
+      2014-12-13
+    </span>
+</td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/search?q=labels:%22Cargo%22">Cargo</a></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class="even ">
+            
+              
+                <td><a href="/p/freecol/bugs/2769/">2769</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2769/">Unexplorable ocean/land tiles</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Calebrw</td>
+              
+            
+              
+              <td>
+    <span title="Thu Dec 11, 2014 05:05 AM UTC">
+      2014-12-11
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Fri Dec 12, 2014 10:48 AM UTC">
+      2014-12-12
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class=" ">
+            
+              
+                <td><a href="/p/freecol/bugs/2766/">2766</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2766/">End turn message shown at wrong time</a></td>
+              
+            
+              
+                
+                
+                  <td>Current</td>
+                
+              
+            
+              
+                <td class="open">open</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>wintertime</td>
+              
+            
+              
+              <td>
+    <span title="Sun Dec 07, 2014 11:16 PM UTC">
+      2014-12-07
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Mon Dec 15, 2014 01:57 PM UTC">
+      6 days ago
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class="even ">
+            
+              
+                <td><a href="/p/freecol/bugs/2764/">2764</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2764/">Display of Roads to/from non-discovered tile</a></td>
+              
+            
+              
+                
+                
+                  <td>Current</td>
+                
+              
+            
+              
+                <td class="open">open</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Calebrw</td>
+              
+            
+              
+              <td>
+    <span title="Sun Dec 07, 2014 09:03 AM UTC">
+      2014-12-07
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Sun Dec 07, 2014 10:54 AM UTC">
+      2014-12-07
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class=" ">
+            
+              
+                <td><a href="/p/freecol/bugs/2763/">2763</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2763/">Native Village Dialog Box Formatting Error</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Calebrw</td>
+              
+            
+              
+              <td>
+    <span title="Sun Dec 07, 2014 08:16 AM UTC">
+      2014-12-07
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Tue Dec 16, 2014 10:14 AM UTC">
+      5 days ago
+    </span>
+</td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/search?q=labels:%22UI%22">UI</a></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class="even ">
+            
+              
+                <td><a href="/p/freecol/bugs/2762/">2762</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2762/">No silver production on mineral</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>wintertime</td>
+              
+            
+              
+              <td>
+    <span title="Sat Dec 06, 2014 11:31 AM UTC">
+      2014-12-06
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Sun Dec 07, 2014 05:45 AM UTC">
+      2014-12-07
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class=" ">
+            
+              
+                <td><a href="/p/freecol/bugs/2761/">2761</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2761/">Error when Exploring</a></td>
+              
+            
+              
+                
+                
+                  <td>Current</td>
+                
+              
+            
+              
+                <td class="open">open-needs-info</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Calebrw</td>
+              
+            
+              
+              <td>
+    <span title="Thu Dec 04, 2014 01:46 AM UTC">
+      2014-12-04
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Sat Dec 13, 2014 02:47 AM UTC">
+      2014-12-13
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class="even ">
+            
+              
+                <td><a href="/p/freecol/bugs/2760/">2760</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2760/">Character to building upper left corner -- No Production</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Calebrw</td>
+              
+            
+              
+              <td>
+    <span title="Thu Dec 04, 2014 01:04 AM UTC">
+      2014-12-04
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Sun Dec 07, 2014 09:26 PM UTC">
+      2014-12-07
+    </span>
+</td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/search?q=labels:%22Town%22">Town</a>, <a href="/p/freecol/bugs/search?q=labels:%22Production%22">Production</a></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class=" ">
+            
+              
+                <td><a href="/p/freecol/bugs/2759/">2759</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2759/">Server Error thrown when trying to move a character</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Calebrw</td>
+              
+            
+              
+              <td>
+    <span title="Thu Dec 04, 2014 12:48 AM UTC">
+      2014-12-04
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Sun Dec 07, 2014 09:25 PM UTC">
+      2014-12-07
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class="even ">
+            
+              
+                <td><a href="/p/freecol/bugs/2758/">2758</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2758/">Dialog Boxes show bad location text</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Calebrw</td>
+              
+            
+              
+              <td>
+    <span title="Thu Dec 04, 2014 12:43 AM UTC">
+      2014-12-04
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Sun Dec 07, 2014 07:37 AM UTC">
+      2014-12-07
+    </span>
+</td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/search?q=labels:%22GUI%22">GUI</a></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class=" ">
+            
+              
+                <td><a href="/p/freecol/bugs/2757/">2757</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2757/">Custom difficulty: saving set up doesn&#39;t work</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>lepetitmartien</td>
+              
+            
+              
+              <td>
+    <span title="Sun Nov 30, 2014 06:01 PM UTC">
+      2014-11-30
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Wed Dec 17, 2014 10:16 PM UTC">
+      4 days ago
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class="even ">
+            
+              
+                <td><a href="/p/freecol/bugs/2756/">2756</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2756/">Custom difficulty: no free area whatever the tuning</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>lepetitmartien</td>
+              
+            
+              
+              <td>
+    <span title="Sun Nov 30, 2014 05:48 PM UTC">
+      2014-11-30
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Mon Dec 01, 2014 07:06 AM UTC">
+      2014-12-01
+    </span>
+</td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/search?q=labels:%22difficulty+settings%22">difficulty settings</a></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class=" ">
+            
+              
+                <td><a href="/p/freecol/bugs/2755/">2755</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2755/"> [d744ffe] Penalties and bonuses due to liberty in a colony is not recalculated when moving colonist on a ship</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Kamamura</td>
+              
+            
+              
+              <td>
+    <span title="Thu Nov 27, 2014 03:08 PM UTC">
+      2014-11-27
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Tue Dec 02, 2014 08:29 AM UTC">
+      2014-12-02
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class="even ">
+            
+              
+                <td><a href="/p/freecol/bugs/2754/">2754</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2754/">[d744ffe] Remaining moves of a moving unit are not updated anymore</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Kamamura</td>
+              
+            
+              
+              <td>
+    <span title="Thu Nov 27, 2014 03:06 PM UTC">
+      2014-11-27
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Sat Dec 06, 2014 10:05 AM UTC">
+      2014-12-06
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class=" ">
+            
+              
+                <td><a href="/p/freecol/bugs/2753/">2753</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2753/">[43ee655] Trade refused and Kon.name</a></td>
+              
+            
+              
+                
+                
+                  <td>Current</td>
+                
+              
+            
+              
+                <td class="open">open-needs-info</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Kamamura</td>
+              
+            
+              
+              <td>
+    <span title="Wed Nov 26, 2014 05:47 PM UTC">
+      2014-11-26
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Fri Nov 28, 2014 10:03 PM UTC">
+      2014-11-28
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class="even ">
+            
+              
+                <td><a href="/p/freecol/bugs/2752/">2752</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2752/">[43ee655] It&#39;s no longer possible to recognize villages not visited</a></td>
+              
+            
+              
+                
+                
+                  <td>Current</td>
+                
+              
+            
+              
+                <td class="open">open</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Kamamura</td>
+              
+            
+              
+              <td>
+    <span title="Wed Nov 26, 2014 04:41 PM UTC">
+      2014-11-26
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Tue Dec 02, 2014 07:34 AM UTC">
+      2014-12-02
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class=" ">
+            
+              
+                <td><a href="/p/freecol/bugs/2751/">2751</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2751/">[43ee655] After certain actions, the next unit to be commanded is not properly centered</a></td>
+              
+            
+              
+                
+                
+                  <td>Current</td>
+                
+              
+            
+              
+                <td class="open">open-needs-info</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Kamamura</td>
+              
+            
+              
+              <td>
+    <span title="Wed Nov 26, 2014 04:38 PM UTC">
+      2014-11-26
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Tue Dec 02, 2014 08:36 AM UTC">
+      2014-12-02
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class="even ">
+            
+              
+                <td><a href="/p/freecol/bugs/2749/">2749</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2749/">The pioneers who are not experts don&#39;t show their remaining tools</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>Bernat</td>
+              
+            
+              
+              <td>
+    <span title="Fri Nov 21, 2014 12:01 AM UTC">
+      2014-11-21
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Sun Nov 23, 2014 02:15 AM UTC">
+      2014-11-23
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+          <tr class=" ">
+            
+              
+                <td><a href="/p/freecol/bugs/2748/">2748</a></td>
+              
+            
+              
+              <td><a href="/p/freecol/bugs/2748/">buying land from natives works without funds</a></td>
+              
+            
+              
+                
+                
+                  <td>Fixed_trunk</td>
+                
+              
+            
+              
+                <td class="open">pending-fixed</td>
+              
+            
+              
+                <td></td>
+              
+            
+              
+              <td>sjy68a16a3pu9oy5o0rpzq20lrd5</td>
+              
+            
+              
+              <td>
+    <span title="Tue Nov 18, 2014 12:45 PM UTC">
+      2014-11-18
+    </span>
+</td>
+              
+            
+              
+              <td>
+    <span title="Wed Nov 19, 2014 09:07 AM UTC">
+      2014-11-19
+    </span>
+</td>
+              
+            
+              
+              <td></td>
+              
+            
+              
+                
+                
+                  <td>5</td>
+                
+              
+            
+            <td>&nbsp;</td>
+          </tr>
+        
+      </tbody>
+    </table>
+    <form action="." id="col_list_form">
+      <input type="hidden" name="limit" value="25">
+      <input type="hidden" name="page" value="0">
+      
+      <input type="hidden" name="sort" value="ticket_num desc">
+      
+      <input type="hidden" name="q" value="{&#34;status&#34;: {&#34;$nin&#34;: [&#34;closed-invalid&#34;, &#34;closed-rejected&#34;, &#34;closed-out-of-date&#34;, &#34;closed-duplicate&#34;, &#34;closed&#34;, &#34;closed-wont-fix&#34;, &#34;closed-fixed&#34;]}}">
+      <input type="hidden" name="filter" value="">
+      <ul>
+      
+        <li class="clear">
+          <input type="hidden" name="columns-0.name" value="ticket_num">
+          <input type="hidden" name="columns-0.sort_name" value="ticket_num">
+          <input type="hidden" name="columns-0.label" value="Ticket Number">
+          <input type="checkbox" name="columns-0.active" checked="checked"> Ticket Number
+        </li>
+      
+        <li class="clear">
+          <input type="hidden" name="columns-1.name" value="summary">
+          <input type="hidden" name="columns-1.sort_name" value="summary">
+          <input type="hidden" name="columns-1.label" value="Summary">
+          <input type="checkbox" name="columns-1.active" checked="checked"> Summary
+        </li>
+      
+        <li class="clear">
+          <input type="hidden" name="columns-2.name" value="_milestone">
+          <input type="hidden" name="columns-2.sort_name" value="custom_fields._milestone">
+          <input type="hidden" name="columns-2.label" value="Milestone">
+          <input type="checkbox" name="columns-2.active" checked="checked"> Milestone
+        </li>
+      
+        <li class="clear">
+          <input type="hidden" name="columns-3.name" value="status">
+          <input type="hidden" name="columns-3.sort_name" value="status">
+          <input type="hidden" name="columns-3.label" value="Status">
+          <input type="checkbox" name="columns-3.active" checked="checked"> Status
+        </li>
+      
+        <li class="clear">
+          <input type="hidden" name="columns-4.name" value="assigned_to">
+          <input type="hidden" name="columns-4.sort_name" value="assigned_to_username">
+          <input type="hidden" name="columns-4.label" value="Owner">
+          <input type="checkbox" name="columns-4.active" checked="checked"> Owner
+        </li>
+      
+        <li class="clear">
+          <input type="hidden" name="columns-5.name" value="reported_by">
+          <input type="hidden" name="columns-5.sort_name" value="reported_by">
+          <input type="hidden" name="columns-5.label" value="Creator">
+          <input type="checkbox" name="columns-5.active" checked="checked"> Creator
+        </li>
+      
+        <li class="clear">
+          <input type="hidden" name="columns-6.name" value="created_date">
+          <input type="hidden" name="columns-6.sort_name" value="created_date">
+          <input type="hidden" name="columns-6.label" value="Created">
+          <input type="checkbox" name="columns-6.active" checked="checked"> Created
+        </li>
+      
+        <li class="clear">
+          <input type="hidden" name="columns-7.name" value="mod_date">
+          <input type="hidden" name="columns-7.sort_name" value="mod_date">
+          <input type="hidden" name="columns-7.label" value="Updated">
+          <input type="checkbox" name="columns-7.active" checked="checked"> Updated
+        </li>
+      
+        <li class="clear">
+          <input type="hidden" name="columns-8.name" value="labels">
+          <input type="hidden" name="columns-8.sort_name" value="labels">
+          <input type="hidden" name="columns-8.label" value="Labels">
+          <input type="checkbox" name="columns-8.active" checked="checked"> Labels
+        </li>
+      
+        <li class="clear">
+          <input type="hidden" name="columns-9.name" value="_priority">
+          <input type="hidden" name="columns-9.sort_name" value="_priority">
+          <input type="hidden" name="columns-9.label" value="Priority">
+          <input type="checkbox" name="columns-9.active" checked="checked"> Priority
+        </li>
+      
+      </ul>
+      <div class="clear">&nbsp;</div>
+      <input type="submit" value="Save">
+      (applies to this page only)
+      
+    </form>
+    <div id="lightbox_col_list" class="modal" style="display:none">
+  <b data-icon="D" class="ico ico-close close"></b>
+  
+    
+  
+</div>
+  
+  <div>
+  <div class="page_list">
+      <span class="pager_curpage">1</span> <a class="pager_link" href="/p/freecol/bugs/?page=1">2</a> <a class="pager_link" href="/p/freecol/bugs/?page=2">3</a> <a class="pager_link" href="/p/freecol/bugs/?page=1">&gt;</a> <a class="pager_link" href="/p/freecol/bugs/?page=2">&gt;&gt;</a> (Page 1 of 3)
+  </div>
+  <div class="clear"></div>
+</div>
+  <script type="text/javascript">
+    var q="%7B%22status%22%3A+%7B%22%24nin%22%3A+%5B%22closed-invalid%22%2C+%22closed-rejected%22%2C+%22closed-out-of-date%22%2C+%22closed-duplicate%22%2C+%22closed%22%2C+%22closed-wont-fix%22%2C+%22closed-fixed%22%5D%7D%7D", count=72, limit=25, page=0, sort="ticket_num desc";
+    var filter = {};
+  </script>
+</div>
+
+<style type="text/css">
+    tr.deleted a { color:red; }
+    tr.deleted { color:red; }
+</style>
+
+    
+
+
+          </div>
+			
+          
+        </div>
+      
+      </div>
+    </section>
+      
+<footer id="site-footer">
+    <div class="wrapper">
+        <nav>
+            <h5>SourceForge</h5>
+            <a href="/about">About</a>
+            <a href="/blog/category/sitestatus/">Site Status</a>
+            <a href="http://twitter.com/sfnet_ops">@sfnet_ops</a>
+            <a id="allura-notice" href="https://forge-allura.apache.org/p/allura/">Powered by Allura</a>
+        </nav>
+        <nav>
+            <h5>Find and Develop Software</h5>
+            <a href="/create/">Create a Project</a>
+            <a href="/directory/">Software Directory</a>
+            <a href="/top">Top Downloaded Projects</a>
+        </nav>
+        <nav>
+            <h5>Community</h5>
+            <a href="/blog/">Blog</a>
+            <a href="http://twitter.com/sourceforge">@sourceforge</a>
+            <a href="/jobs?source=footer">Job Board</a>
+            <a href="http://library.slashdotmedia.com/?source=sfnet_footer">Resources</a>
+        </nav>
+        <nav>
+            <h5>Help</h5>
+            <a href="http://p.sf.net/sourceforge/docs">Site Documentation</a>
+            <a href="/support">Support Request</a>
+            <a href="http://p.sf.net/sourceforge/irc">Real-Time Support</a>
+        </nav>
+    </div>
+</footer>
+<footer id="site-copyright-footer">
+    <div class="wrapper">
+        <div id="copyright">
+            Copyright &copy; 2014 SourceForge. All Rights Reserved.<br />
+            SourceForge is a <a href="http://www.diceholdingsinc.com/phoenix.zhtml?c=211152&amp;p=irol-landing">Dice Holdings, Inc.</a> company.
+        </div>
+        <nav>
+            <a href="http://slashdotmedia.com/terms-of-use">Terms</a>
+            <a href="http://slashdotmedia.com/privacy-statement/">Privacy</a>
+            <span id='teconsent'></span>
+            <a href="http://slashdotmedia.com/opt-out-choices">Opt Out Choices</a>
+            <a href="http://slashdotmedia.com">Advertise</a>
+            <a href="http://sourceforge.jp/">SourceForge.JP</a>
+        </nav>
+    </div>
+</footer>
+    <div id="messages">
+        
+    </div>
+    
+    
+      <!-- ew:body_js -->
+
+    
+      <script type="text/javascript" src="http://a.fsdn.com/allura/nf/1418835403/_ew_/_slim/js?href=allura%2Fjs%2Fjquery-base.js%3Ballura%2Fjs%2Fjquery.notify.js%3Ballura%2Fjs%2Fmodernizr.js%3Ballura%2Fjs%2Fsylvester.js%3Ballura%2Fjs%2Fpb.transformie.min.js%3Ballura%2Fjs%2Fallura-base.js%3Btracker_js%2Fjquery.multiselect.min.js%3Btracker_js%2Fticket-list.js%3Bjs%2Fjquery.lightbox_me.js%3Ballura%2Fjs%2Fmaximize-content.js"></script>
+    
+      
+<!-- /ew:body_js -->
+
+    
+    
+      <!-- ew:body_js_tail -->
+
+    
+      <script type="text/javascript">$(function () {
+            $('select.results_per_page').change(function () {
+                this.form.submit();});});
+$(function () {
+            var $lightbox = $('#lightbox_col_list');
+            var $trigger = $('#col_menu');
+            $trigger.bind('click', function(e) {
+                $lightbox.lightbox_me();
+                return false;
+            });
+            $($lightbox).delegate('.close', 'click', function(e) {
+                $lightbox.trigger('close');
+                return false;
+            });
+        });</script>
+    
+      
+<!-- /ew:body_js_tail -->
+
+    
+    
+    
+      
+    
+    
+   
+    <script src="//s.fsdn.com/con/js/webtracker.js" type="text/javascript"></script>
+    <!-- Google Code for Remarketing tag -->
+    <!-- Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. For instructions on adding this tag and more information on the above requirements, read the setup guide: google.com/ads/remarketingsetup -->
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        var google_conversion_id = 1002083962;
+        var google_conversion_label = "G_uGCOaBlAQQ-qzq3QM";
+        var google_custom_params = window.google_tag_params;
+        var google_remarketing_only = true;
+        /* ]]> */
+    </script>
+    <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js"> </script>
+    <script type="text/javascript" src='//consent-st.truste.com/get?name=notice.js&domain=slashdot.org&c=teconsent&text=true'></script>
+    <noscript>
+      <div style="display:inline;">
+        <img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/1002083962/?value=0&amp;label=G_uGCOaBlAQQ-qzq3QM&amp;guid=ON&amp;script=0"/>
+      </div>
+    </noscript>
+    
+  </body>
+</html>

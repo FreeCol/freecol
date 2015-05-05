@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Command line options</TITLE>
+<META NAME="description" CONTENT="Command line options">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="FreeCol.css">
+
+<LINK REL="next" HREF="node11.html">
+<LINK REL="previous" HREF="node9.html">
+<LINK REL="up" HREF="node9.html">
+<LINK REL="next" HREF="node11.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html810"
+  HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html804"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html798"
+  HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html806"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html808"
+  HREF="node64.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html811"
+  HREF="node11.html">Game setup</A>
+<B> Up:</B> <A NAME="tex2html805"
+  HREF="node9.html">Starting the game</A>
+<B> Previous:</B> <A NAME="tex2html799"
+  HREF="node9.html">Starting the game</A>
+ &nbsp; <B>  <A NAME="tex2html807"
+  HREF="node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html809"
+  HREF="node64.html">Index</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00411000000000000000">
+Command line options</A>
+</H2>
+
+<P>
+If you are in the directory in which FreeCol is installed, you can
+start the game with the command <code>java -Xmx128M -jar FreeCol.jar</code>.
+This will tell the Virtual Machine to load the game and to set the
+maximum heap size to 128 MB. Refer to the manual of your Java Virtual
+Machine for details.
+
+<P>
+There are many other Java options, but you probably won't need to
+change the default settings. FreeCol is developed in English, but it
+includes translations into several other languages, some of which are
+not very complete, however. Java will automatically select the
+translation for your locale, if available, and English otherwise. If
+you should wish to select a different language, or if language
+selection fails, you can choose a different language from the
+preferences menu.
+
+<P>
+FreeCol also provides several application-specific command line
+options:
+
+<P>
+
+<UL>
+<LI><code>--freecol-data DIR</code> Specify the directory that contains
+FreeCol's data files. In general, you will only need to use this if
+you have installed a modified copy of FreeCol's data files.
+</LI>
+<LI><code>--windowed[[=]WIDTHxHEIGHT]</code> Run FreeCol in windowed mode
+instead of full screen mode and set the window width and height. You
+will need this if your window manager or Java Virtual Machine do not
+(correctly support) FreeCol's full screen mode. If you use Linux and
+Java 5, for example, you should set the window width to the width of
+your screen, but probably set the window height slightly lower than
+the height of your screen, in order to leave space for the menu bar,
+dock etc.
+</LI>
+<LI><code>--load-savegame SAVEGAME_FILE</code> Load the given
+savegame. This is particularly useful in combination with the client
+option show savegame settings.
+</LI>
+<LI><code>--no-sound</code> Run FreeCol without sound. Note that the game
+does not yet contain any music, so the only sounds you will hear will
+be special effects.
+</LI>
+<LI><code>--usage</code> Display the help screen.
+</LI>
+<LI><code>--version</code> Display the version number.
+</LI>
+<LI><code>--server PORT</code> Start a stand-alone server on the specified
+port. If you don't know what that means, you will not need the option.
+</LI>
+<LI><code>--server-help</code> Display a help screen for the more advanced
+server options.
+</LI>
+</UL>
+
+<P>
+There are several other options that you will probably only be
+interested in if you are a developer:
+
+<P>
+
+<UL>
+<LI><code>--no-java-check</code> Skip the java version check.
+</LI>
+<LI><code>--no-memory-check</code> Skip the memory check.
+</LI>
+<LI><code>--log-level LEVEL</code> Set the java log level.
+</LI>
+<LI><code>--debug</code> Start the game in debugging mode.
+</LI>
+</UL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html810"
+  HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html804"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html798"
+  HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html806"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html808"
+  HREF="node64.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html811"
+  HREF="node11.html">Game setup</A>
+<B> Up:</B> <A NAME="tex2html805"
+  HREF="node9.html">Starting the game</A>
+<B> Previous:</B> <A NAME="tex2html799"
+  HREF="node9.html">Starting the game</A>
+ &nbsp; <B>  <A NAME="tex2html807"
+  HREF="node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html809"
+  HREF="node64.html">Index</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+Stian Grenborgen
+2009-01-14
+</ADDRESS>
+</BODY>
+</HTML>

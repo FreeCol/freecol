@@ -1,0 +1,1094 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Modifiers and Abilities</TITLE>
+<META NAME="description" CONTENT="Modifiers and Abilities">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="FreeCol.css">
+
+<LINK REL="previous" HREF="node60.html">
+<LINK REL="up" HREF="node60.html">
+<LINK REL="next" HREF="node62.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1540"
+  HREF="node62.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1534"
+  HREF="node60.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1530"
+  HREF="node60.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1536"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html1538"
+  HREF="node64.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html1541"
+  HREF="node62.html">Known bugs</A>
+<B> Up:</B> <A NAME="tex2html1535"
+  HREF="node60.html">Changing the Rules</A>
+<B> Previous:</B> <A NAME="tex2html1531"
+  HREF="node60.html">Changing the Rules</A>
+ &nbsp; <B>  <A NAME="tex2html1537"
+  HREF="node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html1539"
+  HREF="node64.html">Index</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION001110000000000000000">
+Modifiers and Abilities</A>
+</H1>
+
+<P>
+Most of the objects defined by the rule set can be customized via
+modifiers and abilities.  Abilities are boolean values (``true'' or
+``false''). If the value is not explicitly stated, it defaults to
+true. If an ability is not present, it defaults to false. Modifiers
+define a bonus or penalty to be applied to a numeric value, such as
+the number of goods produced by a unit. The modifier may be an
+additive, multiplicative or a percentage modifier. Modifiers default
+to ``identity'', which means they have no effect.
+
+<P>
+The code also checks that all abilities and modifiers it uses are
+defined by the specification. Therefore, you must define all of them,
+even if you do not use them. You can do this by setting their value to
+the default value, e.g. ``false'' in the case of an ability, or ``0''
+in the case of an additive modifier.
+
+<P>
+
+<P>
+<A NAME="2046"></A><A NAME="2047"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.addTaxToBells</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player adds the current tax rate as a bonus to bells
+production. The bonus is modified every time the tax increases or
+decreases.
+
+<P>
+<A NAME="2051"></A><A NAME="2052"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.alwaysOfferedPeace</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player is always offered peace in negotiations with AI players.
+
+<P>
+<A NAME="2056"></A><A NAME="2057"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.ambushBonus</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is granted an ambush bonus equal to the terrain's defence value.
+
+<P>
+<A NAME="2061"></A><A NAME="2062"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.ambushPenalty</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit suffers an ambush penalty equal to the terrain's defence value.
+
+<P>
+<A NAME="2066"></A><A NAME="2067"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.autoProduction</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Building
+<BR>
+Provided by:
+    Building Type</SPAN>
+
+<P>
+The building needs no units to produce goods, and will never produce
+more goods than can be stored in the colony.
+
+<P>
+<A NAME="2071"></A><A NAME="2072"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.automaticEquipment</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit automatically picks up equipment if attacked.
+
+<P>
+<A NAME="2076"></A><A NAME="2077"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.automaticPromotion</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+A unit that can be promoted will always be promoted when successful in
+battle.
+
+<P>
+<A NAME="2081"></A><A NAME="2082"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.betterForeignAffairsReport</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player is provided with more information about foreign powers.
+
+<P>
+<A NAME="2086"></A><A NAME="2087"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.bombard</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is able to bombard other units.
+
+<P>
+<A NAME="2091"></A><A NAME="2092"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.bombardShips</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Building
+<BR>
+Provided by:
+    Building Type</SPAN>
+
+<P>
+The building has the ability to bombard enemy ships on adjacent tiles.
+
+<P>
+<A NAME="2096"></A><A NAME="2097"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.bornInColony</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can be born in a colony, provided that enough food is available.
+
+<P>
+<A NAME="2101"></A><A NAME="2102"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.bornInIndianSettlement</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can be born in an Indian settlement, provided that enough food is available.
+
+<P>
+<A NAME="2106"></A><A NAME="2107"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.build</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Building
+<BR>
+Provided by:
+    Building Type</SPAN>
+
+<P>
+The building can build units or equipment.
+
+<P>
+<A NAME="2111"></A><A NAME="2112"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.buildCustomHouse</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player can build custom houses.
+
+<P>
+<A NAME="2116"></A><A NAME="2117"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.buildFactory</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player can build factories.
+
+<P>
+<A NAME="2121"></A><A NAME="2122"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.canBeCaptured</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can be captured. Land units that can not be captured are
+destroyed, naval units that can not be captured are either sunk or
+damaged.
+
+<P>
+<A NAME="2126"></A><A NAME="2127"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.canBeEquipped</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can be equipped.
+
+<P>
+<A NAME="2131"></A><A NAME="2132"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.canNotRecruitUnit</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player can not recruit specified units.
+
+<P>
+<A NAME="2136"></A><A NAME="2137"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.captureEquipment</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can capture equipment from another unit.
+
+<P>
+<A NAME="2141"></A><A NAME="2142"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.captureGoods</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can capture goods from another unit.
+
+<P>
+<A NAME="2146"></A><A NAME="2147"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.captureUnits</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can capture enemy units.
+
+<P>
+<A NAME="2151"></A><A NAME="2152"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.carryGoods</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can transport goods.
+
+<P>
+<A NAME="2156"></A><A NAME="2157"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.carryTreasure</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can transport treasures, not treasure trains.
+
+<P>
+<A NAME="2161"></A><A NAME="2162"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.carryUnits</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can transport other units.
+
+<P>
+<A NAME="2166"></A><A NAME="2167"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.convert</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is a native convert.
+
+<P>
+<A NAME="2171"></A><A NAME="2172"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.dressMissionary</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Building
+<BR>
+Provided by:
+    Building Type</SPAN>
+
+<P>
+The building can commission missionaries.
+
+<P>
+<A NAME="2176"></A><A NAME="2177"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.electFoundingFather</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player can elect Founding Fathers.
+
+<P>
+<A NAME="2181"></A><A NAME="2182"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.expertMissionary</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is an expert missionary, but not necessarily commissioned.
+
+<P>
+<A NAME="2186"></A><A NAME="2187"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.expertPioneer</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is an expert pioneer, but not necessarily equipped with tools.
+
+<P>
+<A NAME="2191"></A><A NAME="2192"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.expertScout</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is an expert scout, but not necessarily equipped with horses.
+
+<P>
+<A NAME="2196"></A><A NAME="2197"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.expertSoldier</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is an expert soldier, but not necessarily equipped with muskets.
+
+<P>
+<A NAME="2201"></A><A NAME="2202"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.expertsUseConnections</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+Experts working in factories can produce a small amount of goods even
+if the raw materials are not available in the colony.
+
+<P>
+<A NAME="2206"></A><A NAME="2207"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.export</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Building
+<BR>
+Provided by:
+    Building Type</SPAN>
+
+<P>
+The building can export goods to Europe directly.
+
+<P>
+<A NAME="2211"></A><A NAME="2212"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.foundColony</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can found new colonies.
+
+<P>
+<A NAME="2216"></A><A NAME="2217"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.foundInLostCity</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit may be generated as the result of exploring a Lost City Rumour.
+
+<P>
+<A NAME="2221"></A><A NAME="2222"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.hasPort</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Colony
+<BR>
+Provided by:
+    Map</SPAN>
+
+<P>
+The colony has access to at least one water tile. This ability can not
+be set by the specification, but it can be used as a required ability.
+
+<P>
+<A NAME="2226"></A><A NAME="2227"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.ignoreEuropeanWars</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player will not be affected by the Monarch's declarations of war.
+
+<P>
+<A NAME="2231"></A><A NAME="2232"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.improveTerrain</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is able to improve terrain.
+
+<P>
+<A NAME="2236"></A><A NAME="2237"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.independenceDeclared</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player has declared independence.
+
+<P>
+<A NAME="2241"></A><A NAME="2242"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.mercenaryUnit</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit may be offered as a mercenary unit.
+
+<P>
+<A NAME="2246"></A><A NAME="2247"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.missionary</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is able to establish missions and incite unrest in native
+settlements.
+
+<P>
+<A NAME="2251"></A><A NAME="2252"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.moveToEurope</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Tile
+<BR>
+Provided by:
+    Tile Type</SPAN>
+
+<P>
+Units on the tile are able to move to Europe.
+
+<P>
+<A NAME="2256"></A><A NAME="2257"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.multipleAttacks</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can attack more than once.
+
+<P>
+<A NAME="2261"></A><A NAME="2262"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.native</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is a native unit.
+
+<P>
+<A NAME="2266"></A><A NAME="2267"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.navalUnit</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is a naval unit.
+
+<P>
+<A NAME="2271"></A><A NAME="2272"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.pillageUnprotectedColony</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is able to steal goods from and destroy buildings in an
+unprotected colony.
+
+<P>
+<A NAME="2276"></A><A NAME="2277"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.piracy</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is a privateer.
+
+<P>
+<A NAME="2281"></A><A NAME="2282"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.produceInWater</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Building
+<BR>
+Provided by:
+    Building Type</SPAN>
+
+<P>
+The building enables units to produce on water tiles.
+
+<P>
+<A NAME="2286"></A><A NAME="2287"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.refUnit</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can be part of the Royal Expeditionary Force.
+
+<P>
+<A NAME="2291"></A><A NAME="2292"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.repairUnits</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Building
+<BR>
+Provided by:
+    Building Type</SPAN>
+
+<P>
+The building can repair units.
+
+<P>
+<A NAME="2296"></A><A NAME="2297"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.royalExpeditionaryForce</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player is a Royal Expeditionary Force.
+
+<P>
+<A NAME="2301"></A><A NAME="2302"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.rumoursAlwaysPositive</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player will always get positive results from exploring Lost City
+Rumours.
+
+<P>
+<A NAME="2306"></A><A NAME="2307"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.scoutForeignColony</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can scout out foreign colonies.
+
+<P>
+<A NAME="2311"></A><A NAME="2312"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.scoutIndianSettlement</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit can scout out native settlements.
+
+<P>
+<A NAME="2316"></A><A NAME="2317"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.selectRecruit</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player can select a unit to recruit in Europe. This also applies
+to units generated as a result of finding a Fountain of Youth.
+
+<P>
+<A NAME="2321"></A><A NAME="2322"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.teach</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Building
+<BR>
+Provided by:
+    Building Type</SPAN>
+
+<P>
+The building enables experts to teach other units. However, the
+building may place limits on the experience level of teachers.
+
+<P>
+<A NAME="2326"></A><A NAME="2327"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.tradeWithForeignColonies</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player may trade goods in foreign colonies.
+
+<P>
+<A NAME="2331"></A><A NAME="2332"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.ability.undead</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit is an undead unit (used only in revenge mode).
+
+<P>
+<A NAME="2336"></A><A NAME="2337"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.bombardBonus</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player's units are granted a bombard bonus when attacking.
+
+<P>
+<A NAME="2341"></A><A NAME="2342"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.buildingPriceBonus</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player can build or buy buildings at a reduced price.
+
+<P>
+<A NAME="2346"></A><A NAME="2347"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.defence</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit has a defence bonus or penalty.
+
+<P>
+<A NAME="2351"></A><A NAME="2352"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.landPaymentModifier</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player can buy Indian land at a reduced price.
+
+<P>
+<A NAME="2356"></A><A NAME="2357"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.lineOfSightBonus</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit has an increased line of sight.
+
+<P>
+<A NAME="2361"></A><A NAME="2362"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.minimumColonySize</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Colony
+<BR>
+Provided by:
+    Building Type, Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The population of the colony can not be voluntarily reduced below this
+number. The modifier does not in any way affect a population reduction
+due to starvation or other events.
+
+<P>
+<A NAME="2366"></A><A NAME="2367"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.movementBonus</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit has an increased movement range.
+
+<P>
+<A NAME="2371"></A><A NAME="2372"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.nativeAlarmModifier</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player generates less native alarm.
+
+<P>
+<A NAME="2376"></A><A NAME="2377"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.nativeConvertBonus</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player has a greater chance of converting natives.
+
+<P>
+<A NAME="2381"></A><A NAME="2382"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.nativeTreasureModifier</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player generates greater treasures when destroying native settlements.
+
+<P>
+<A NAME="2386"></A><A NAME="2387"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.offence</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit has an offence bonus or penalty.
+
+<P>
+<A NAME="2391"></A><A NAME="2392"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.religiousUnrestBonus</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player generates greater religious unrest in Europe.
+
+<P>
+<A NAME="2396"></A><A NAME="2397"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.sailHighSeas</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Unit
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type</SPAN>
+
+<P>
+The unit's travel time between Europe and the New World is reduced.
+
+<P>
+<A NAME="2401"></A><A NAME="2402"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.tradeBonus</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+Prices in the player's market remain stable for longer.
+
+<P>
+<A NAME="2406"></A><A NAME="2407"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.treasureTransportFee</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Player
+<BR>
+Provided by:
+    Nation, Nation Type, Founding Father</SPAN>
+
+<P>
+The player pays a smaller fee for transporting treasures to Europe.
+
+<P>
+<A NAME="2411"></A><A NAME="2412"></A>
+<BR>
+<BR><SPAN  CLASS="textbf">model.modifier.warehouseStorage</SPAN>
+
+<BR><SPAN  CLASS="textit">Affects: Building
+<BR>
+Provided by:
+    Building Type</SPAN>
+
+<P>
+The building increases the capacity of the warehouse.
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html1540"
+  HREF="node62.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html1534"
+  HREF="node60.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html1530"
+  HREF="node60.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html1536"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A> 
+<A NAME="tex2html1538"
+  HREF="node64.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index" SRC="index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html1541"
+  HREF="node62.html">Known bugs</A>
+<B> Up:</B> <A NAME="tex2html1535"
+  HREF="node60.html">Changing the Rules</A>
+<B> Previous:</B> <A NAME="tex2html1531"
+  HREF="node60.html">Changing the Rules</A>
+ &nbsp; <B>  <A NAME="tex2html1537"
+  HREF="node1.html">Contents</A></B> 
+ &nbsp; <B>  <A NAME="tex2html1539"
+  HREF="node64.html">Index</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+Stian Grenborgen
+2009-01-14
+</ADDRESS>
+</BODY>
+</HTML>
