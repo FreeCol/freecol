@@ -151,7 +151,7 @@ public class PreCombatDialog extends FreeColConfirmDialog {
 
         float defenceResult
             = FeatureContainer.applyModifiers(0f, turn, defenceModifiers);
-        JLabel finalDefenceLabel = Utility.localizedLabel("model.source.finalResult.name");
+        JLabel finalDefenceLabel = Utility.localizedLabel("finalResult");
         finalDefenceLabel.setFont(bigFont);
         panel.add(finalDefenceLabel, "skip");
         JLabel finalDefenceResult
