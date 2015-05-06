@@ -1138,6 +1138,54 @@ public class EuropeanAIPlayer extends AIPlayer {
     // Wish handling
 
     /**
+     * Suppress European trade in a goods type.  A goods party and
+     * boycott is incoming.
+     *
+     * @param goodsType The <code>GoodsType</code> to suppress.
+     * @param lb A <code>LogBuilder</code> to log to.
+     */
+    private void suppressEuropeanTrade(GoodsType type, LogBuilder lb) {
+        final Player player = getPlayer();
+        final Europe europe = player.getEurope();
+
+        lb.add("  Suppressing trade in ", type.getSuffix());
+        List<Unit> units = new ArrayList<>(europe.getUnitList());
+        units.addAll(player.getHighSeas().getUnitList());
+        for (Unit u : units) {
+            int amount;
+            AIUnit aiu;
+            if (u.isCarrier() && (amount = u.getGoodsCount(type)) > 0
+                && (aiu = getAIUnit(u)) != null
+                && AIMessage.askUnloadGoods(type, amount, aiu)) {
+                lb.add(", ", u, " sold ", amount);
+            }
+        }
+        for (AIUnit aiu : getAIUnits()) {
+            TransportMission tm = aiu.getMission(TransportMission.class);
+            if (tm != null) tm.suppressEuropeanTrade(type, lb);
+        }           
+
+        int n = 0;
+        List<GoodsWish> wishes = goodsWishes.get(type);
+        if (wishes != null) {
+            for (GoodsWish gw : wishes) {
+                if (gw.getGoodsType() == type
+                    && gw.getDestination() == europe) {
+                    if (gw.getTransportable() instanceof AIGoods) {
+                        AIGoods aig = (AIGoods)gw.getTransportable();
+                        consumeGoodsWish(aig, gw);
+                        aig.setTransportDestination(null);
+                    }
+                    gw.dispose();
+                    n++;
+                }
+            }
+            if (n > 0) lb.add(", dropped ", n, " goods wishes");
+        }
+        lb.add(".");
+    }
+                
+    /**
      * Gets a list of the wishes at a given location for a unit type.
      *
      * @param loc The <code>Location</code> to look for wishes at.
@@ -2690,18 +2738,23 @@ public class EuropeanAIPlayer extends AIPlayer {
     public boolean acceptTax(int tax) {
         boolean ret = true;
         LogBuilder lb = new LogBuilder(64);
-        lb.add("Tax demand to ", getPlayer().getId(), " of ", tax, "%: ");
         Goods toBeDestroyed = getPlayer().getMostValuableGoods();
+        lb.add("Tax demand to ", getPlayer().getName(), " of ", tax, "% with ",
+            getPlayer().getMostValuableGoods(), " ");
         GoodsType goodsType = (toBeDestroyed == null) ? null
             : toBeDestroyed.getType();
 
-        // Is this cheat to look at what the crown will destroy?
-        if (toBeDestroyed == null) {
+        if (tax <= 2) {
+            // Accept small increase.
+            ret = true;
+            lb.add("accepted: small rise.");
+        } else if (toBeDestroyed == null) {
+            // Is this cheating to look at what the crown will destroy?
             ret = false;
-            lb.add("refused: no-goods-under-threat");
+            lb.add("rejected: no-goods-under-threat.");
         } else if (goodsType.isFoodType()) {
             ret = false;
-            lb.add("refused: food-type");
+            lb.add("rejected: food-type.");
         } else if (goodsType.isBreedable()) {
             // Refuse if we already have this type under production in
             // multiple places.
@@ -2712,10 +2765,10 @@ public class EuropeanAIPlayer extends AIPlayer {
             ret = n < 2;
             if (ret) {
                 lb.add("accepted: breedable-type-", goodsType.getSuffix(), 
-                       "-missing");
+                       "-missing.");
             } else {
-                lb.add("refused: breedable-type-", goodsType.getSuffix(),
-                       "-present-in-", n, "-settlements");
+                lb.add("rejected: breedable-type-", goodsType.getSuffix(),
+                       "-present-in-", n, "-settlements.");
             }
         } else if (goodsType.isMilitaryGoods()
             || goodsType.isTradeGoods()
@@ -2725,7 +2778,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             int age = getGame().getTurn().getAge();
             ret = age < 3;
             lb.add(((ret) ? "accepted" : "rejected"),
-                   ": special-goods-in-age-", age);
+                   ": special-goods-in-age-", age, ".");
         } else {
             int averageIncome = 0;
             int numberOfGoods = 0;
@@ -2741,11 +2794,13 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             averageIncome /= numberOfGoods;
             int income = getPlayer().getIncomeAfterTaxes(toBeDestroyed.getType());
-            ret = income < averageIncome;
+            ret = income <= 0 || income > averageIncome;
             lb.add(((ret) ? "accepted" : "rejected"),
-                   ": standard-goods-with-income-", income,
-                    ((ret) ? "-less-than-" : "-greater-than-"), averageIncome);
+                ": goods(", goodsType.getSuffix(), ")-with-income(", income,
+                ((ret) ? ")non-positive-or-more-than(" : ")less-than-average("),
+                averageIncome, ").");
         }
+        if (!ret) suppressEuropeanTrade(goodsType, lb);
         lb.log(logger, Level.INFO);
         return ret;
     }

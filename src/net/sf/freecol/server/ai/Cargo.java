@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -539,6 +540,19 @@ public class Cargo {
      */
     public void resetTries() {
         this.tries = 0;
+    }
+
+    /**
+     * Does this cargo involve trade with Europe in a given goods type?
+     *
+     * @param type The <code>GoodsType</code> to check.
+     * @return True if this cargo is of the given type and to be
+     *     collected or delivered to Europe.
+     */
+    public boolean isEuropeanTrade(GoodsType type) {
+        return transportable instanceof AIGoods
+            && ((AIGoods)transportable).getGoodsType() == type
+            && getCarrierTarget() instanceof Europe;
     }
 
     /**

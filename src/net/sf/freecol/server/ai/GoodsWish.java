@@ -170,10 +170,10 @@ public class GoodsWish extends Wish {
      * amount.
      *
      * @param amount The new amount of goods wished for.
+     */
     public void setGoodsAmount(int amount) {
         amountRequested = amount;
     }
-     */
 
     /**
      * Does some specified goods satisfy this wish?

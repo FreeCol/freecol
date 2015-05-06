@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -1348,6 +1349,20 @@ public class TransportMission extends Mission {
         return queueTransportable(aiu, false, lb);
     }
     
+    /**
+     * Suppress European trade in a type of goods which is about to be
+     * boycotted.
+     *
+     * @param type The <code>GoodsType</code> to suppress.
+     * @param lb A <code>LogBuilder</code> to log to.
+     */
+    public void suppressEuropeanTrade(GoodsType type, LogBuilder lb) {
+        for (Cargo c : tCopy()) {
+            if (c.isEuropeanTrade(type)) removeCargo(c);
+        }
+    }
+
+
     // End of public TransportableAIObject manipulations
 
     // Implement Mission
