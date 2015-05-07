@@ -107,15 +107,12 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
         String name = getName();
         DefaultMutableTreeNode node =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, id, name, null));
-        int width = 0;
-        int height = 0;
+        int width = ImageLibrary.ICON_SIZE.width;
+        int height = ImageLibrary.ICON_SIZE.height;
         for (FreeColGameObjectType type : types) {
-            Image image = ImageLibrary.getImage(type, ImageLibrary.ICON_SIZE);
-            width = Math.max(image.getWidth(null), width);
-            height = Math.max(image.getHeight(null), height);
-        }
-        for (FreeColGameObjectType type : types) {
-            Image image = ImageLibrary.getImage(type, ImageLibrary.ICON_SIZE);
+            Image image = (type instanceof GoodsType)
+                ? ImageLibrary.getMiscImage("image.icon." + type.getId(), ImageLibrary.ICON_SIZE)
+                : ImageLibrary.getImage(type, ImageLibrary.ICON_SIZE);
             int x = (width - image.getWidth(null)) / 2;
             int y = (height - image.getHeight(null)) / 2;
             BufferedImage centeredImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);

@@ -57,7 +57,7 @@ public class FreeColProgressBar extends JPanel {
 
     private int iconWidth;
 
-    private final int iconHeight = 16;
+    private final int iconHeight = ImageLibrary.ICON_SIZE.height / 2;
 
     /**
      * The type of goods this progress bar is for. The default value of null
@@ -107,7 +107,7 @@ public class FreeColProgressBar extends JPanel {
 
         setBorder(Utility.PROGRESS_BORDER);
         if (goodsType != null) {
-            image = ImageLibrary.getImage(goodsType,
+            image = ImageLibrary.getMiscImage("image.icon." + goodsType.getId(),
                 new Dimension(-1, iconHeight));
             iconWidth = image.getWidth(this);
         }

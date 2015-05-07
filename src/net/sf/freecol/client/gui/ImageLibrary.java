@@ -101,7 +101,7 @@ public final class ImageLibrary {
                                DARKNESS = "image.halo.dark",
                                ICON_LOCK = "image.icon.lock",
                                ICON_COIN = "image.icon.coin",
-                               BELLS = "model.goods.bells.image";
+                               BELLS = "image.icon.model.goods.bells";
 
     public static enum PathType {
         NAVAL,
@@ -386,19 +386,19 @@ public final class ImageLibrary {
     }
 
     public BufferedImage getSmallerIconImage(FreeColGameObjectType type) {
-        return getImage(type, new Dimension(
+        return getMiscImage("image.icon." + type.getId(), new Dimension(
             Math.round(scalingFactor * (ICON_SIZE.width * 0.5f)),
             Math.round(scalingFactor * (ICON_SIZE.height * 0.5f))));
     }
 
     public BufferedImage getSmallIconImage(FreeColGameObjectType type) {
-        return getImage(type, new Dimension(
+        return getMiscImage("image.icon." + type.getId(), new Dimension(
             Math.round(scalingFactor * (ICON_SIZE.width * 0.75f)),
             Math.round(scalingFactor * (ICON_SIZE.height * 0.75f))));
     }
 
     public BufferedImage getIconImage(FreeColGameObjectType type) {
-        return getImage(type, new Dimension(
+        return getMiscImage("image.icon." + type.getId(), new Dimension(
             Math.round(scalingFactor * ICON_SIZE.width),
             Math.round(scalingFactor * ICON_SIZE.height)));
     }
