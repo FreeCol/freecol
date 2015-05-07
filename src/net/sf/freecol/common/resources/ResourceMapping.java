@@ -107,8 +107,7 @@ public final class ResourceMapping {
     }
 
     public boolean add(String key, SZAResource value) {
-        // TODO: change to startsWith("animation.") after key renaming
-        if(!key.endsWith(".animation")) {
+        if(!key.startsWith("animation.")) {
             logger.warning("Rejecting malformed resource key: " + key);
             return false;
         }

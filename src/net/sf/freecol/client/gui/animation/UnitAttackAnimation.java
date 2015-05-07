@@ -74,8 +74,8 @@ final class UnitAttackAnimation {
         String roleStr = (unit.hasDefaultRole()) ? ""
             : "." + unit.getRoleSuffix();
         String startStr = unit.getType().getId() + roleStr + ".attack.";
-        String specialId = startStr + direction.toString().toLowerCase()
-            + ".animation";
+        String specialId = "animation.unit."
+            + startStr + direction.toString().toLowerCase();
 
         SimpleZippedAnimation sza;
         sza = ResourceManager.getSimpleZippedAnimation(specialId, scale);
@@ -85,7 +85,7 @@ final class UnitAttackAnimation {
             case SW: case W: case NW: genericDirection = "w"; break;
             default:                  genericDirection = "e"; break;
             }
-            String genericId = startStr + genericDirection + ".animation";
+            String genericId = "animation.unit." + startStr + genericDirection;
             sza = ResourceManager.getSimpleZippedAnimation(genericId, scale);
         }
         return sza;
