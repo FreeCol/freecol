@@ -2217,7 +2217,7 @@ public final class MapViewer {
     private static void displayResourceTileItem(Graphics2D g, ImageLibrary lib,
                                          Resource item,
                                          int tileWidth, int tileHeight) {
-        Image bonusImage = lib.getImage(item.getType());
+        Image bonusImage = lib.getMiscImage("image.tileitem." + item.getType().getId());
         displayCenteredImage(g, bonusImage, tileWidth, tileHeight);
     }
 
