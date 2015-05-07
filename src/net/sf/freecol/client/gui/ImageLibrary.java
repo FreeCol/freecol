@@ -358,20 +358,26 @@ public final class ImageLibrary {
             scalingFactor);
     }
 
-    public static BufferedImage getBuildingImage(BuildingType buildingType, Player player, float scale) {
-        String key = buildingType.getId() + "." + player.getNationNameKey() + ".image";
+    public static BufferedImage getBuildingImage(BuildingType buildingType,
+                                                 Player player, float scale) {
+        String key = "image.buildingicon." + buildingType.getId()
+            + "." + player.getNationNameKey();
         if (!ResourceManager.hasImageResource(key)) {
-            key = buildingType.getId() + ".image";
+            key = "image.buildingicon." + buildingType.getId();
         }
         return ResourceManager.getImage(key, scale);
     }
 
-    public static BufferedImage getBuildingImage(BuildingType buildingType, float scale) {
-        return ResourceManager.getImage(buildingType.getId() + ".image", scale);
+    public static BufferedImage getBuildingImage(BuildingType buildingType,
+                                                 float scale) {
+        return ResourceManager.getImage("image.buildingicon."
+            + buildingType.getId(), scale);
     }
 
-    public static BufferedImage getBuildingImage(BuildingType buildingType, Dimension size) {
-        return ResourceManager.getImage(buildingType.getId() + ".image", size);
+    public static BufferedImage getBuildingImage(BuildingType buildingType,
+                                                 Dimension size) {
+        return ResourceManager.getImage("image.buildingicon."
+            + buildingType.getId(), size);
     }
 
     public BufferedImage getSmallerIconImage(FreeColGameObjectType type) {
