@@ -135,9 +135,7 @@ public final class ResourceMapping {
     }
 
     public boolean add(String key, ImageResource value) {
-        if(!key.startsWith("image.")
-                // TODO: remove compatibility with old style after key renaming
-                && !(key.startsWith("model.unit.") && key.endsWith(".image"))) {
+        if(!key.startsWith("image.")) {
             logger.warning("Rejecting malformed resource key: " + key);
             return false;
         }

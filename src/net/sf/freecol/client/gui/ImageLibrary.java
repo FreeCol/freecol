@@ -867,11 +867,10 @@ public final class ImageLibrary {
         // try to get an image matching the key
         String roleQual = (Role.isDefaultRoleId(roleId)) ? ""
             : "." + Role.getRoleSuffix(roleId);
-        String key = unitType.getId() + roleQual
-            + ((nativeEthnicity) ? ".native" : "")
-            + ".image";
+        String key = "image.unit." + unitType.getId() + roleQual
+            + ((nativeEthnicity) ? ".native" : "");
         if (!ResourceManager.hasImageResource(key) && nativeEthnicity) {
-            key = unitType.getId() + roleQual + ".image";
+            key = "image.unit." + unitType.getId() + roleQual;
         }
         BufferedImage image = (grayscale)
             ? ResourceManager.getGrayscaleImage(key, scale)
@@ -883,7 +882,7 @@ public final class ImageLibrary {
         String roleId = unitType.getDisplayRoleId();
         String roleQual = (Role.isDefaultRoleId(roleId)) ? ""
             : "." + Role.getRoleSuffix(roleId);
-        String key = unitType.getId() + roleQual + ".image";
+        String key = "image.unit." + unitType.getId() + roleQual;
         return ResourceManager.getImage(key, size);
     }
 
