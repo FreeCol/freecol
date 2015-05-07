@@ -359,14 +359,6 @@ public final class ImageLibrary {
         return ResourceManager.getImage(key, scale);
     }
 
-    public BufferedImage getSmallerImage(FreeColGameObjectType type) {
-        return getImage(type, scalingFactor * 0.5f);
-    }
-
-    public BufferedImage getSmallImage(FreeColGameObjectType type) {
-        return getImage(type, scalingFactor * 0.75f);
-    }
-
     /**
      * Gets the image of the given type.
      *
@@ -401,6 +393,26 @@ public final class ImageLibrary {
         return getMiscImage("image.icon." + type.getId(), new Dimension(
             Math.round(scalingFactor * ICON_SIZE.width),
             Math.round(scalingFactor * ICON_SIZE.height)));
+    }
+
+    public BufferedImage getSmallerMiscIconImage(FreeColGameObjectType type) {
+        return getMiscIconImage(type, scalingFactor * 0.5f);
+    }
+
+    public BufferedImage getSmallMiscIconImage(FreeColGameObjectType type) {
+        return getMiscIconImage(type, scalingFactor * 0.75f);
+    }
+
+    public BufferedImage getMiscIconImage(FreeColGameObjectType type) {
+        return getMiscIconImage(type, scalingFactor);
+    }
+
+    public static BufferedImage getMiscIconImage(FreeColGameObjectType type, float scale) {
+        return ResourceManager.getImage("image.miscicon." + type.getId(), scale);
+    }
+
+    public static BufferedImage getMiscIconImage(FreeColGameObjectType type, Dimension size) {
+        return ResourceManager.getImage("image.miscicon." + type.getId(), size);
     }
 
     /**
@@ -455,6 +467,9 @@ public final class ImageLibrary {
             } else if (display instanceof GoodsType) {
                 FreeColGameObjectType type = (FreeColGameObjectType)display;
                 image = getSmallIconImage(type);
+            } else if (display instanceof Nation) {
+                FreeColGameObjectType type = (FreeColGameObjectType)display;
+                image = getSmallMiscIconImage(type);
             } else if (display instanceof FreeColGameObjectType) {
                 FreeColGameObjectType type = (FreeColGameObjectType)display;
                 image = getImage(type, combinedScale);
@@ -505,6 +520,9 @@ public final class ImageLibrary {
             } else if (display instanceof GoodsType) {
                 FreeColGameObjectType type = (FreeColGameObjectType)display;
                 image = getIconImage(type);
+            } else if (display instanceof Nation) {
+                FreeColGameObjectType type = (FreeColGameObjectType)display;
+                image = getMiscIconImage(type);
             } else if (display instanceof FreeColGameObjectType) {
                 FreeColGameObjectType type = (FreeColGameObjectType)display;
                 image = getImage(type);

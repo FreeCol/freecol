@@ -111,7 +111,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
         panel.setSize(panel.getPreferredSize());
 
         ImageIcon icon = new ImageIcon(
-            getImageLibrary().getImage(other.getNation()));
+            getImageLibrary().getMiscIconImage(other.getNation()));
         initializeConfirmDialog(frame, false, panel, icon, "yes", "no");
     }
 }

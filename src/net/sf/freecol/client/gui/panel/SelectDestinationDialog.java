@@ -126,7 +126,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 Europe europe = (Europe)location;
                 Nation nation = europe.getOwner().getNation();
                 name = Messages.getName(europe);
-                this.icon = new ImageIcon(ImageLibrary.getImage(nation,
+                this.icon = new ImageIcon(ImageLibrary.getMiscIconImage(nation,
                     new Dimension(-1, CELL_HEIGHT)));
             } else if (location instanceof Map) {
                 name = Messages.message(location.getLocationLabelFor(player));

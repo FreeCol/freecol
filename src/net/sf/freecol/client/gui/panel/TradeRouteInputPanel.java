@@ -458,7 +458,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             JLabel icon, name;
             if (location instanceof Europe) {
                 Europe europe = (Europe) location;
-                Image image = lib.getSmallerImage(
+                Image image = lib.getSmallerMiscIconImage(
                     europe.getOwner().getNation());
                 icon = new JLabel(new ImageIcon(image));
                 name = Utility.localizedLabel(europe);

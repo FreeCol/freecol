@@ -1309,7 +1309,7 @@ public class GUI {
                                      ClaimAction.STEAL));
 
         return getChoice(true, tile, Utility.localizedTextArea(template),
-                         new ImageIcon(imageLibrary.getImage(owner.getNation())),
+                         new ImageIcon(imageLibrary.getMiscIconImage(owner.getNation())),
                          "indianLand.cancel", choices);
     }
 

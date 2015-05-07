@@ -85,7 +85,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
             JPanel enemyPanel = new MigPanel(new MigLayout("gapy 0",
                                                "[][]20[align right]0[]", ""));
             enemyPanel.setOpaque(false);
-            final Image coatOfArms = lib.getImage(enemy.getNation());
+            final Image coatOfArms = lib.getMiscIconImage(enemy.getNation());
             JLabel coatLabel = new JLabel(new ImageIcon(coatOfArms));
             enemyPanel.add(coatLabel, "spany, aligny top");
 

@@ -321,7 +321,7 @@ public final class PlayersTable extends JTable {
             Nation nation = (Nation) value;
             setText(Messages.getName(nation));
             setIcon(new ImageIcon(
-                gui.getImageLibrary().getSmallerImage(nation)));
+                gui.getImageLibrary().getSmallerMiscIconImage(nation)));
             return this;
         }
     }
