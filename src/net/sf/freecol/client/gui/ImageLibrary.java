@@ -337,7 +337,14 @@ public final class ImageLibrary {
         BufferedImage image = (buildable instanceof BuildingType)
             ? ImageLibrary.getBuildingImage(
                 (BuildingType) buildable, player, scale)
-            : ImageLibrary.getImage(buildable, scale);
+            : ImageLibrary.getUnitImage((UnitType)buildable, scale);
+        return image;
+    }
+
+    public static BufferedImage getBuildableImage(BuildableType buildable, Dimension size) {
+        BufferedImage image = (buildable instanceof BuildingType)
+            ? ImageLibrary.getBuildingImage((BuildingType) buildable, size)
+            : ImageLibrary.getUnitImage((UnitType)buildable, size);
         return image;
     }
 
@@ -359,22 +366,12 @@ public final class ImageLibrary {
         return ResourceManager.getImage(key, scale);
     }
 
-    /**
-     * Gets the image of the given type.
-     *
-     * @param type The <code>FreeColGameObjectType</code> to look up.
-     * @return The corresponding image.
-     */
-    public BufferedImage getImage(FreeColGameObjectType type) {
-        return getImage(type, scalingFactor);
+    public static BufferedImage getBuildingImage(BuildingType buildingType, float scale) {
+        return ResourceManager.getImage(buildingType.getId() + ".image", scale);
     }
 
-    public static BufferedImage getImage(FreeColGameObjectType type, float scale) {
-        return ResourceManager.getImage(type.getId() + ".image", scale);
-    }
-
-    public static BufferedImage getImage(FreeColGameObjectType type, Dimension size) {
-        return ResourceManager.getImage(type.getId() + ".image", size);
+    public static BufferedImage getBuildingImage(BuildingType buildingType, Dimension size) {
+        return ResourceManager.getImage(buildingType.getId() + ".image", size);
     }
 
     public BufferedImage getSmallerIconImage(FreeColGameObjectType type) {
@@ -470,9 +467,9 @@ public final class ImageLibrary {
             } else if (display instanceof Nation) {
                 FreeColGameObjectType type = (FreeColGameObjectType)display;
                 image = getSmallMiscIconImage(type);
-            } else if (display instanceof FreeColGameObjectType) {
-                FreeColGameObjectType type = (FreeColGameObjectType)display;
-                image = getImage(type, combinedScale);
+            } else if (display instanceof BuildingType) {
+                BuildingType type = (BuildingType)display;
+                image = getBuildingImage(type, combinedScale);
             } else {
                 logger.warning("could not find image of unknown type for "
                     + display);
@@ -523,9 +520,9 @@ public final class ImageLibrary {
             } else if (display instanceof Nation) {
                 FreeColGameObjectType type = (FreeColGameObjectType)display;
                 image = getMiscIconImage(type);
-            } else if (display instanceof FreeColGameObjectType) {
-                FreeColGameObjectType type = (FreeColGameObjectType)display;
-                image = getImage(type);
+            } else if (display instanceof BuildingType) {
+                BuildingType type = (BuildingType)display;
+                image = getBuildingImage(type, scalingFactor);
             } else {
                 logger.warning("could not find image of unknown type for " + display);
                 return null;
@@ -874,6 +871,14 @@ public final class ImageLibrary {
             ? ResourceManager.getGrayscaleImage(key, scale)
             : ResourceManager.getImage(key, scale);
         return image;
+    }
+
+    public static BufferedImage getUnitImage(UnitType unitType, Dimension size) {
+        String roleId = unitType.getDisplayRoleId();
+        String roleQual = (Role.isDefaultRoleId(roleId)) ? ""
+            : "." + Role.getRoleSuffix(roleId);
+        String key = unitType.getId() + roleQual + ".image";
+        return ResourceManager.getImage(key, size);
     }
 
 

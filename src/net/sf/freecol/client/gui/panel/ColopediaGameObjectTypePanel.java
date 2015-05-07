@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -117,7 +118,9 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
                     ? ImageLibrary.getMiscImage("image.tileitem." + type.getId(), ImageLibrary.ICON_SIZE)
                     : (type instanceof Nation)
                         ? ImageLibrary.getMiscIconImage(type, ImageLibrary.ICON_SIZE)
-                        : ImageLibrary.getImage(type, ImageLibrary.ICON_SIZE);
+                        : (type instanceof BuildableType)
+                            ? ImageLibrary.getBuildableImage((BuildableType)type, ImageLibrary.ICON_SIZE)
+                            : ImageLibrary.getMiscImage(ResourceManager.REPLACEMENT_IMAGE, ImageLibrary.ICON_SIZE);
             int x = (width - image.getWidth(null)) / 2;
             int y = (height - image.getHeight(null)) / 2;
             BufferedImage centeredImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
