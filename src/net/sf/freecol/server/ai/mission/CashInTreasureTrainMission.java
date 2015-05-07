@@ -126,12 +126,10 @@ public class CashInTreasureTrainMission extends Mission {
             && (tm = aiCarrier.getMission(TransportMission.class)) != null) {
             setTarget(europe);
             aiUnit.changeTransport(aiCarrier);
-            // FIXME: violently reorder the queue to deliver only, then
-            // collect the treasure
-            if (tm.queueTransportable(aiUnit, false, lb)) {
-                lb.add(" to ", aiCarrier.getUnit());
+            if (tm.forceCollection(aiUnit, lb)) {
+                lb.add(" forced collection on ", aiCarrier.getUnit());
+                return aiCarrier;
             }
-            return aiCarrier;
         }
         return null;
     }

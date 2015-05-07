@@ -1332,7 +1332,22 @@ public class TransportMission extends Mission {
         return dumpCargo(cargo, lb);
     }
 
-
+    /**
+     * Drop all collections so that cargo is delivered only, then
+     * collect this unit.  Useful for prioritizing treasure
+     * collection.
+     *
+     * @param aiu The <code>AIUnit</code> to collect.
+     * @param lb A <code>LogBuilder</code> to log to.
+     * @return True if the unit was queued.
+     */
+    public boolean forceCollection(AIUnit aiu, LogBuilder lb) {
+        for (Cargo c : tCopy()) {
+            if (c.getMode().isCollection()) removeCargo(c);
+        }            
+        return queueTransportable(aiu, false, lb);
+    }
+    
     // End of public TransportableAIObject manipulations
 
     // Implement Mission
