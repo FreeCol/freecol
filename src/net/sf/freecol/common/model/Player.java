@@ -450,7 +450,9 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * The tension levels, 0-1000, with 1000 being maximum hostility.
-     * Only used by AI.  FIXME: move this to AIPlayer
+     *
+     * Only used by AI, but resist the temptation to move it to AIPlayer, the
+     * complexity is not worth it.
      */
     protected final java.util.Map<Player, Tension> tension = new HashMap<>();
 
