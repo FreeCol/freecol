@@ -1,10 +1,15 @@
 #! /bin/sh
 # Update the copyright year in the boilerplate at the top of the files.
-# Only edit java, xml and xsd files.
-# Remember to also do FreeColMessages.properties and FreeCol.tex manually.
+#
+test -r "src/net/sf/freecol/FreeCol.java" \
+    || (echo "Run from a FreeCol git directory" ; exit 1)
+
 Y=`date +%Y`
-cd ../git || (echo "Run from the git directory" ; exit 1)
-exec find ./data ./schema ./src ./packaging ./test \
+sed -i -e "s/\(copyright 2...--\)2.../\1$Y/" doc/FreeCol.tex
+find ./data ./schema ./src ./packaging ./test \
     -type f \
-    -a \( -name \*.java -o -name \*.xml -o -name \*.xsd -o -name copyright -o -name README \) \
-    -exec sed -i -e "s/\(Copyright (C) 2...-\)..../\1$Y/" {} \;
+    -a \( -name \*.java -o -name \*.xml -o -name \*.xsd -o -name copyright \
+        -o -name README -o -name FreeColMessages.properties \) \
+    -exec sed -i -e "s/\(Copyright (C) 2...-\)2...\( *The FreeCol Team\)/\1$Y\2/" {} \;
+exec find ./www.freecol.org -name -type f -a \*.html \
+    -exec sed -i -e "s/\(&copy; 2...-\)2...\( *FreeCol\)/\1$Y\2/" {} \;
