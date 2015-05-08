@@ -156,8 +156,8 @@ public class PioneeringMission extends Mission {
             }
             if (tileImprovementPlan != null) {
                 tileImprovementPlan.setPioneer(aiUnit);
+                getEuropeanAIPlayer().removeTileImprovementPlan(tip);
             }
-            // FIXME getEuropeanAIPlayer().claimTileImprovementPlan(tip);
         }
     }
 

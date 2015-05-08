@@ -229,40 +229,47 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Stores temporary information for sessions (trading with another
      * player etc).
      */
-    private final java.util.Map<String, Integer> sessionRegister = new HashMap<>();
+    private final java.util.Map<String, Integer> sessionRegister
+        = new HashMap<>();
 
     /**
      * A cached map of Tile to best TileImprovementPlan.
      * Used to choose a tile improvement for a pioneer to work on.
      */
-    private final java.util.Map<Tile, TileImprovementPlan> tipMap = new HashMap<>();
+    private final java.util.Map<Tile, TileImprovementPlan> tipMap
+        = new HashMap<>();
 
     /**
      * A cached map of destination Location to Wishes awaiting transport.
      */
-    private final java.util.Map<Location, List<Wish>> transportDemand = new HashMap<>();
+    private final java.util.Map<Location, List<Wish>> transportDemand
+        = new HashMap<>();
 
     /** A cached list of transportables awaiting transport. */
-    private final List<TransportableAIObject> transportSupply = new ArrayList<>();
+    private final List<TransportableAIObject> transportSupply
+        = new ArrayList<>();
 
     /**
      * A mapping of goods type to the goods wishes where a colony has
      * requested that goods type.  Used to retarget goods that have
      * gone astray.
      */
-    private final java.util.Map<GoodsType, List<GoodsWish>> goodsWishes = new HashMap<>();
+    private final java.util.Map<GoodsType, List<GoodsWish>> goodsWishes
+        = new HashMap<>();
 
     /**
      * A mapping of unit type to the worker wishes for that type.
      * Used to allocate WishRealizationMissions for units.
      */
-    private final java.util.Map<UnitType, List<WorkerWish>> workerWishes = new HashMap<>();
+    private final java.util.Map<UnitType, List<WorkerWish>> workerWishes
+        = new HashMap<>();
 
     /**
      * A mapping of contiguity number to number of wagons needed in
      * that landmass.
      */
-    private final java.util.Map<Integer, Integer> wagonsNeeded = new HashMap<>();
+    private final java.util.Map<Integer, Integer> wagonsNeeded
+        = new HashMap<>();
 
     /** The colonies that start the turn badly defended. */
     private final List<AIColony> badlyDefended = new ArrayList<>();
@@ -902,6 +909,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Remove a <code>TileImprovementPlan</code> from the relevant colony.
      */
     public void removeTileImprovementPlan(TileImprovementPlan plan) {
+        if (plan == null) return;
+        if (plan.getTarget() != null) tipMap.remove(plan.getTarget(), plan);
         for (AIColony aic : getAIColonies()) {
             if (aic.removeTileImprovementPlan(plan)) break;
         }

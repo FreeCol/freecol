@@ -109,7 +109,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     private final List<Wish> wishes = new ArrayList<>();
 
     /** Plans to improve neighbouring tiles. */
-    private final List<TileImprovementPlan> tileImprovementPlans = new ArrayList<>();
+    private final List<TileImprovementPlan> tileImprovementPlans
+        = new ArrayList<>();
 
     /** When should the workers in this Colony be rearranged? */
     private Turn rearrangeTurn = new Turn(0);
@@ -1351,7 +1352,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *
      * @return True if it was successfully deleted, false otherwise
      */
-    public boolean removeTileImprovementPlan(TileImprovementPlan plan){
+    public boolean removeTileImprovementPlan(TileImprovementPlan plan) {
         return tileImprovementPlans.remove(plan);
     }
 
