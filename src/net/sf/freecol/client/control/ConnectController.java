@@ -397,13 +397,13 @@ public final class ConnectController {
         switch (state) {
         case STARTING_GAME:
             if (!login(FreeCol.getName(), host, port)) return false;
-            gui.showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false);
+            gui.showStartGamePanel(freeColClient.getGame(),
+                                   freeColClient.getMyPlayer(), false);
             freeColClient.setSinglePlayer(false);
             break;
 
         case IN_GAME:
             // Disable this check if you need to debug a multiplayer client.
-            // FIXME: allow if the server is in debug mode.
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
                 gui.showErrorMessage("client.debugConnect");
                 return false;
