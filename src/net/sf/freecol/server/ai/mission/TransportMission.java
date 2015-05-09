@@ -612,11 +612,14 @@ public class TransportMission extends Mission {
         return true;
     }
 
+   
     /**
-     * Incrementally queue a cargo to the cargoes list.  Try
-     * place it with other cargoes with the same target, but do not
-     * break the space restrictions.  If this does not work, it has
-     * to go at the end.
+     * Incrementally queue a cargo to the cargoes list.
+     *
+     * If the carrier is at the collection point favour immediate
+     * collection.  Otherwise try to place it with other cargoes with
+     * the same target, but do not break the space restrictions.  If
+     * this does not work, it has to go at the end.
      *
      * @param cargo The new <code>Cargo</code> to add.
      * @param requireMatch Fail if an existing destination is not matched.
@@ -629,27 +632,28 @@ public class TransportMission extends Mission {
         final int maxHolds = carrier.getCargoCapacity();
         final List<Cargo> ts = tCopy();
         final int newSpace = cargo.getNewSpace();
-
-        // Match an existing target?
         int candidate = -1;
-        outer: for (int i = 0; i < ts.size(); i++) {
-            Cargo tr = ts.get(i);
-            if (Map.isSameLocation(tr.getCarrierTarget(),
-                                   cargo.getCarrierTarget())) {
-                for (int j = i; j < ts.size(); j++) {
-                    int holds = (j == 0) ? carrier.getCargoSpaceTaken()
-                        : maxHolds - ts.get(j-1).getSpaceLeft();
-                    holds += newSpace;
-                    if (holds < 0 || holds > maxHolds) continue outer;
-                }
-                if (tr.getNewSpace() <= cargo.getNewSpace()) {
+
+        if (ts.isEmpty() // Trivial case
+            || (Map.isSameLocation(carrier.getLocation(), // Carrier here?
+                                   cargo.getCarrierTarget())
+                && cargo.canQueueAt(carrier, 0, ts))) {
+            candidate = 0;
+        }
+
+        if (candidate < 0) { // Match an existing target?
+            outer: for (int i = 0; i < ts.size(); i++) {
+                Cargo tr = ts.get(i);
+                if (Map.isSameLocation(tr.getCarrierTarget(),
+                                       cargo.getCarrierTarget())) {
+                    if (!cargo.canQueueAt(carrier, i, ts)) continue outer;
                     candidate = i;
                     break;
                 }
-                candidate = i+1;
-            } else if (candidate >= 0) break;
+            }
         }
-        if (candidate < 0) {
+        
+        if (candidate < 0) { // Queue at end unless match required
             if (requireMatch) return false;
             candidate = ts.size();
         }

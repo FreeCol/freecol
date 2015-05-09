@@ -584,6 +584,30 @@ public class Cargo {
     }
 
     /**
+     * Can this cargo be queued at the given index in a list of cargoes?
+     *
+     * TODO: be smarter and break out of the loop if the cargo reaches
+     * its delivery point.
+     *
+     * @param carrier The <code>Unit</code> to queue to.
+     * @param index The queuing position to test.
+     * @param cargoes A list of <code>Cargo</code>s.
+     * @return True if there is space to add the cargo.
+     */
+    public boolean canQueueAt(Unit carrier, int index, List<Cargo> cargoes) {
+        final int maxHolds = carrier.getCargoCapacity();
+        final int newSpace = this.getNewSpace();
+        Cargo tr = cargoes.get(index);
+        for (int j = index; j < cargoes.size(); j++) {
+            int holds = (j == 0) ? carrier.getCargoSpaceTaken()
+                : maxHolds - cargoes.get(j-1).getSpaceLeft();
+            holds += newSpace;
+            if (holds < 0 || holds > maxHolds) return false;
+        }
+        return true;
+    }
+
+    /**
      * Abbreviated string representation for this cargo.
      *
      * @return A short descriptive string.
