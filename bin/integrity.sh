@@ -11,11 +11,11 @@ TMPDIR=${TMPDIR-/tmp}
 check () {
     case "$1" in
     *.fsg)
-        $FCBIN --log-file "$TMPDIR/fclog-"`basename "$1" .fsg` \
-               --no-sound --splash /dev/null \
+        log="$TMPDIR/fclog-"`basename "$1" .fsg`
+        $FCBIN --log-file "$log" --no-sound --splash /dev/null \
                --check-savegame "$1" 1> /dev/null 2>&1
         case $? in
-        0) echo "${1}: ok" >&2 ;;
+        0) echo "${1}: ok" >&2 ; rm -f "$log" ;;
         1) echo "${1}: game unreadable" >&2 ;;
         2) echo "${1}: game integrity failure" >&2 ;;
         *) echo "${1}: unexpected status $?" >&2 ;;
