@@ -2695,7 +2695,8 @@ public final class InGameController extends Controller {
         }
         if (gl.getGoodsCount(goodsType) < amount) {
             return DOMMessage.clientError("Not enough goods ("
-                + gl.getGoodsCount(goodsType) + " < " + amount + ")");
+                + gl.getGoodsCount(goodsType) + " < " + amount
+                + " " + goodsType.getSuffix() + ") at " + gl);
         }
 
         ChangeSet cs = new ChangeSet();
