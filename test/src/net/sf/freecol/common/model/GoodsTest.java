@@ -116,7 +116,7 @@ public class GoodsTest extends FreeColTestCase {
 
         Goods g = new Goods(getGame(), wagon, cottonType, 75);
 
-        assertEquals("75 model.goods.cotton", g.toString());
+        assertEquals("75 cotton", g.toString());
     }
 
     public void testGetName() {
