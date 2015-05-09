@@ -33,14 +33,25 @@
     </xs:annotation>
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="Nations" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element ref="nationOption" minOccurs="0" maxOccurs="unbounded"/>
+        <!-- @compat 0.11.3 -->
+        <xs:element ref="Nations" minOccurs="0" maxOccurs="unbounded"/>
+        <!-- end @compat 0.11.3 -->
       </xs:sequence>
       <xs:attribute name="selectColors" type="xs:boolean" use="optional" />
-      <xs:attribute name="nationalAdvantages" type="NationalAdvantageType" use="required" />
-
+      <xs:attribute name="nationalAdvantages"
+                    type="NationalAdvantageType" use="required" />
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="nationOption">
+    <xs:complexType>
+      <xs:attribute name="id" type="NationId" use="required" />
+      <xs:attribute name="state" type="NationStateType" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <!-- @compat 0.11.3 -->
   <xs:element name="Nations">
     <xs:complexType>
       <xs:sequence>
@@ -53,6 +64,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <!-- end @compat 0.11.3 -->
 
   <xs:simpleType name="NationalAdvantageType">
     <xs:restriction base="xs:NMTOKEN">

@@ -200,9 +200,12 @@ public class NationOptions extends FreeColObject {
     // Note: NATION/S_TAG is capitalized to avoid collision with Nation.java.
 
     private static final String NATIONAL_ADVANTAGES_TAG = "nationalAdvantages";
-    private static final String NATION_TAG = "Nation";
-    private static final String NATIONS_TAG = "Nations";
+    private static final String NATION_OPTION_TAG = "nationOption";
     private static final String STATE_TAG = "state";
+    // @compat 0.11.3
+    private static final String OLD_NATION_TAG = "Nation";
+    private static final String OLD_NATIONS_TAG = "Nations";
+    // end @compat 0.11.3
 
 
     /**
@@ -223,10 +226,8 @@ public class NationOptions extends FreeColObject {
     public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        xw.writeStartElement(NATIONS_TAG);
-
         for (Nation nation : getSortedCopy(nations.keySet())) {
-            xw.writeStartElement(NATION_TAG);
+            xw.writeStartElement(NATION_OPTION_TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, nation);
 
@@ -234,8 +235,6 @@ public class NationOptions extends FreeColObject {
             
             xw.writeEndElement();
         }
-
-        xw.writeEndElement();
     }
 
     /**
@@ -262,39 +261,58 @@ public class NationOptions extends FreeColObject {
     }
 
     /**
+     * Defend against an invalid nation tag.  This can happen when
+     * using classic mode (no extra Europeans) but loading a map that
+     * contains the extra Europeans.
+     *
+     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @return A suitable <code>Nation</code> or null on error.
+     */
+    private Nation readNation(FreeColXMLReader xr) {
+        try {
+            return xr.getType(specification, ID_ATTRIBUTE_TAG,
+                              Nation.class, (Nation)null);
+        } catch (IllegalArgumentException iae) {
+            logger.warning("Bad nation tag: " + xr.readId());
+        }
+        return null;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         String tag = xr.getLocalName();
 
-        if (NATIONS_TAG.equals(tag)) {
+        if (NATION_OPTION_TAG.equals(tag)) {
+            Nation nation = readNation(xr);
+            NationState state = xr.getAttribute(STATE_TAG,
+                NationState.class, (NationState)null);
+            if (nation != null && state != null) {
+                nations.put(nation, state);
+            }
+            xr.closeTag(NATION_OPTION_TAG);
+
+        // @compat 0.11.3
+        } else if (OLD_NATIONS_TAG.equals(tag)) {
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 tag = xr.getLocalName();
-                if (NATION_TAG.equals(tag)) {
-                    Nation nation = null;
-                    try {
-                        // Defend against invalid nation tag.  This
-                        // can happen when using classic mode (no
-                        // extra Europeans) but loading a map that
-                        // contains the extra Europeans.
-                        nation = xr.getType(specification, ID_ATTRIBUTE_TAG,
-                                            Nation.class, (Nation)null);
-                    } catch (IllegalArgumentException iae) {
-                        logger.warning("Bad nation tag: " + xr.readId());
-                    }
-                    if (nation != null) {
-                        NationState state = xr.getAttribute(STATE_TAG,
-                            NationState.class, (NationState)null);
+                if (OLD_NATION_TAG.equals(tag)) {
+                    Nation nation = readNation(xr);
+                    NationState state = xr.getAttribute(STATE_TAG,
+                        NationState.class, (NationState)null);
+                    if (nation != null && state != null) {
                         nations.put(nation, state);
                     }
-                    xr.closeTag(NATION_TAG);
+                    xr.closeTag(OLD_NATION_TAG);
 
                 } else {
-                    throw new XMLStreamException("Bogus " + NATION_TAG
+                    throw new XMLStreamException("Bogus " + OLD_NATION_TAG
                         + " tag: " + tag);
                 }
             }
+        // end @compat 0.11.3
 
         } else {
             super.readChild(xr);
@@ -308,10 +326,9 @@ public class NationOptions extends FreeColObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append(NATIONAL_ADVANTAGES_TAG).append(": ")
-            .append(nationalAdvantages).append("\n")
-            .append(NATIONS_TAG).append(":\n");
+            .append(nationalAdvantages).append("\n");
         for (Map.Entry<Nation, NationState> entry : nations.entrySet()) {
-            sb.append("   ").append(entry.getKey().getId())
+            sb.append(" ").append(entry.getKey().getId())
                 .append(" ").append(entry.getValue())
                 .append("\n");
         }
