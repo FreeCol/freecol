@@ -272,32 +272,28 @@ public final class InfoPanel extends FreeColPanel {
                 .getImageLibrary();
             Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                 FontLibrary.FontSize.TINY, lib.getScalingFactor());
+            String text;
+            JLabel textLabel;
             if (unit != null) {
-                add(new JLabel(new ImageIcon(lib.getUnitImage(unit))),
-                    "spany, gapafter 5px");
-                String name = unit.getDescription(Unit.UnitLabelType.FULL);
-
-                // FIXME: this is too brittle!
-                int index = name.indexOf(" (");
-                if (index < 0) {
-                    JLabel nameLabel = new JLabel(name);
-                    nameLabel.setFont(font);
-                    add(nameLabel, "span");
-                } else {
-                    JLabel nameLabel0 = new JLabel(name.substring(0, index));
-                    nameLabel0.setFont(font);
-                    add(nameLabel0, "span");
-                    JLabel nameLabel1 = new JLabel(name.substring(index + 1));
-                    nameLabel1.setFont(font);
-                    add(nameLabel1, "span");
+                ImageIcon ii = new ImageIcon(lib.getUnitImage(unit));
+                JLabel imageLabel = new JLabel(ii);
+                add(imageLabel, "spany, gapafter 5px");
+                int width = getWidth() - ii.getIconWidth() - SLACK;
+                text = unit.getDescription(Unit.UnitLabelType.FULL);
+                for (String s : splitText(text, " /",
+                                          getFontMetrics(font), width)) {
+                    textLabel = new JLabel(s);
+                    textLabel.setFont(font);
+                    add(textLabel, "span 5");
                 }
 
-                String text = (unit.isInEurope())
+                text = (unit.isInEurope())
                     ? Messages.getName(unit.getOwner().getEurope())
-                    : Messages.message("infoPanel.moves") +" "+ unit.getMovesAsString();
-                JLabel textLabel = new JLabel(text);
+                    : Messages.message("infoPanel.moves")
+                        + " " + unit.getMovesAsString();
+                textLabel = new JLabel(text);
                 textLabel.setFont(font);
-                add(textLabel, "span");
+                add(textLabel, "span 5");
 
                 if (unit.isCarrier()) {
                     ImageIcon icon;
