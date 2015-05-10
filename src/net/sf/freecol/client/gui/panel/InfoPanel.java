@@ -127,7 +127,7 @@ public final class InfoPanel extends FreeColPanel {
         public TileInfoPanel() {
             super(new MigLayout("fill, wrap " + (PRODUCTION+1) + ", gap 1 1"));
 
-            setSize(230, 100);
+            setSize(260, 130);
             setOpaque(false);
         }
 
@@ -230,7 +230,7 @@ public final class InfoPanel extends FreeColPanel {
         public UnitInfoPanel() {
             super(new MigLayout("wrap 6, fill, gap 0 0", "", ""));
 
-            setSize(230, 100);
+            setSize(260, 130);
             setOpaque(false);
         }
 
@@ -335,9 +335,9 @@ public final class InfoPanel extends FreeColPanel {
         NONE, END, MAP, TILE, UNIT;
     }
 
-    private static final int PANEL_WIDTH = 256;
+    private static final int PANEL_WIDTH = 260;
 
-    public static final int PANEL_HEIGHT = 128;
+    public static final int PANEL_HEIGHT = 130;
 
     private InfoPanelMode mode = InfoPanelMode.NONE;
 
