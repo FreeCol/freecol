@@ -29,6 +29,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -89,23 +90,9 @@ public final class InfoPanel extends FreeColPanel {
                 FontLibrary.FontSize.TINY, lib.getScalingFactor());
 
             String labelString = Messages.message("infoPanel.endTurn");
-            int width = getFontMetrics(font).stringWidth(labelString);
-            if (width > 150 ) {
-                int index = getBreakingPoint(labelString);
-                if (index > 0) {
-                    JLabel label0 = new JLabel(labelString.substring(0, index));
-                    label0.setFont(font);
-                    add(label0);
-                    JLabel label1 = new JLabel(labelString.substring(index + 1));
-                    label1.setFont(font);
-                    add(label1);
-                } else {
-                    JLabel label = new JLabel(labelString);
-                    label.setFont(font);
-                    add(label);
-                }
-            } else {
-                JLabel label = new JLabel(labelString);
+            for (String s : splitText(labelString, " /",
+                                      getFontMetrics(font), 150)) {
+                JLabel label = new JLabel(s);
                 label.setFont(font);
                 add(label);
             }
