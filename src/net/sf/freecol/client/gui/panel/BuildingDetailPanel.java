@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -84,17 +86,16 @@ public class BuildingDetailPanel
         DefaultMutableTreeNode parent =
             new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
 
-        Image buildingImage = ResourceManager.getImage("image.icon.Colopedia.buildingSection");
-        ImageIcon buildingIcon = new ImageIcon(buildingImage);
-
         List<BuildingType> buildingTypes = new ArrayList<>();
         Map<BuildingType, DefaultMutableTreeNode> buildingHash = new HashMap<>();
         for (BuildingType buildingType : getSpecification().getBuildingTypeList()) {
             if (buildingType.getUpgradesFrom() == null) {
                 String name = Messages.getName(buildingType);
                 DefaultMutableTreeNode item =
-                    new DefaultMutableTreeNode(new ColopediaTreeItem(this, buildingType.getId(),
-                                                                     name, buildingIcon));
+                    new DefaultMutableTreeNode(new ColopediaTreeItem(
+                        this, buildingType.getId(), name,
+                        new ImageIcon(ImageLibrary.getBuildingImage(buildingType,
+                            new Dimension(-1, ImageLibrary.ICON_SIZE.height)))));
                 buildingHash.put(buildingType, item);
                 parent.add(item);
             } else {
@@ -109,8 +110,10 @@ public class BuildingDetailPanel
                 if (node != null) {
                     String name = Messages.getName(buildingType);
                     DefaultMutableTreeNode item =
-                        new DefaultMutableTreeNode(new ColopediaTreeItem(this, buildingType.getId(),
-                                                                         name, buildingIcon));
+                        new DefaultMutableTreeNode(new ColopediaTreeItem(
+                            this, buildingType.getId(), name,
+                            new ImageIcon(ImageLibrary.getBuildingImage(buildingType,
+                                new Dimension(-1, ImageLibrary.ICON_SIZE.height)))));
                     node.add(item);
                     buildingHash.put(buildingType, item);
                     iterator.remove();
