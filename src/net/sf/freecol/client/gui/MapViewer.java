@@ -78,10 +78,10 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
-
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -1823,7 +1823,7 @@ public final class MapViewer {
                         if (buildable != null) {
                             specs = new TextSpecification[2];
                             String t = Messages.getName(buildable)
-                                + " " + Messages.getTurnsText(colony.getTurnsToComplete(buildable));
+                                + " " + Turn.getTurnsText(colony.getTurnsToComplete(buildable));
                             specs[1] = new TextSpecification(t, productionFont);
                         }
                     }
@@ -1953,7 +1953,7 @@ public final class MapViewer {
         g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.TINY, lib.getScalingFactor()));
         if (text != null) {
-            int b = Messages.getBreakingPoint(text);
+            int b = getBreakingPoint(text);
             if (b == -1) {
                 g.drawString(text,
                     (tileWidth - g.getFontMetrics().stringWidth(text)) / 2,

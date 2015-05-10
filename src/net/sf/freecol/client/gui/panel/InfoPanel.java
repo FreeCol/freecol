@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -90,7 +91,7 @@ public final class InfoPanel extends FreeColPanel {
             String labelString = Messages.message("infoPanel.endTurn");
             int width = getFontMetrics(font).stringWidth(labelString);
             if (width > 150 ) {
-                int index = Messages.getBreakingPoint(labelString);
+                int index = getBreakingPoint(labelString);
                 if (index > 0) {
                     JLabel label0 = new JLabel(labelString.substring(0, index));
                     label0.setFont(font);

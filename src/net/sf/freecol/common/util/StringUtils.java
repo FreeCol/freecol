@@ -119,4 +119,35 @@ public class StringUtils {
         }
         return sb.toString();
     }
+
+    /**
+     * Find a breaking point in a line between two words.  The
+     * breaking point is as close to the center as possible.
+     *
+     * @param string The line for which we should determine a breaking point.
+     * @return The best breaking point or negative if none found.
+     */
+    public static int getBreakingPoint(String string) {
+        return getBreakingPoint(string, " ");
+    }
+
+    /**
+     * Find a breaking point in a line between two words.  The
+     * breaking point is as close to the center as possible.
+     *
+     * @param string The line for which we should determine a breaking point.
+     * @param delim Characters to consider as word delimiting.
+     * @return The best breaking point or negative if none found.
+     */
+    public static int getBreakingPoint(String string, String delim) {
+        int center = string.length() / 2;
+        for (int offset = 0; offset < center; offset++) {
+            if (delim.indexOf(string.charAt(center + offset)) >= 0) {
+                return center + offset;
+            } else if (delim.indexOf(string.charAt(center - offset)) >= 0) {
+                return center - offset;
+            }
+        }
+        return -1;
+    }
 }

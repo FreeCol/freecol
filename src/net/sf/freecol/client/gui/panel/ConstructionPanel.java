@@ -40,6 +40,8 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Turn;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -137,7 +139,7 @@ public class ConstructionPanel extends MigPanel
 
         if (buildable == null) {
             String clickToBuild = Messages.message(getDefaultLabel());
-            int breakingPoint = Messages.getBreakingPoint(clickToBuild);
+            int breakingPoint = getBreakingPoint(clickToBuild);
             if (breakingPoint > 0) {
                 JLabel label0 = new JLabel(
                     clickToBuild.substring(0, breakingPoint));
@@ -162,7 +164,7 @@ public class ConstructionPanel extends MigPanel
             add(label0);
             JLabel label1 = Utility.localizedLabel(StringTemplate
                 .template("constructionPanel.turnsToComplete")
-                .addName("%number%", Messages.getTurnsText(turns)));
+                .addName("%number%", Turn.getTurnsText(turns)));
             label1.setFont(font);
             add(label1);
 

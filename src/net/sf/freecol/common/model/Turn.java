@@ -309,6 +309,19 @@ public class Turn {
         return getSeason(turn) + " " + Integer.toString(getYear(turn));
     }
 
+    /**
+     * Gets a string describing the number of turns.
+     *
+     * @param turns The number of turns.
+     * @return A descriptive string.
+     */
+    public static String getTurnsText(int turns) {
+        return (turns == FreeColObject.UNDEFINED)
+            ? Messages.message("notApplicable")
+            : (turns >= 0) ? Integer.toString(turns)
+            : ">" + Integer.toString(-turns);
+    }
+
 
     // Override Object
 
