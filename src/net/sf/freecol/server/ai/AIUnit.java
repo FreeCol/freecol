@@ -401,7 +401,7 @@ public class AIUnit extends TransportableAIObject {
             && unit.getRole() == role && unit.getRoleCount() == count;
     }
 
-
+        
     // Implement TransportableAIObject
 
     /**

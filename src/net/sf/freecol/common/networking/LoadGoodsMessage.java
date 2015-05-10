@@ -129,10 +129,6 @@ public class LoadGoodsMessage extends DOMMessage {
         if (amount <= 0) {
             return DOMMessage.clientError("Amount must be positive: "
                 + amountString);
-        } else if (amount > carrier.getLoadableAmount(type)) {
-            return DOMMessage.clientError("Too much goods:  " + amountString
-                + " > " + carrier.getLoadableAmount(type)
-                + " has=" + carrier.getGoodsCount(type));
         }
 
         // Load the goods

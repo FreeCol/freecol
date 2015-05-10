@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
@@ -157,6 +158,15 @@ public class AIGoods extends TransportableAIObject {
         return goods.getAmount();
     }
 
+    /**
+     * Sets the amount of goods this <code>AIGoods</code> is controlling.
+     *
+     * @param amount The new amount of goods.
+     */
+    public final void setGoodsAmount(int amount) {
+        goods.setAmount(amount);
+    }
+
 
     // Internal
 
@@ -178,13 +188,15 @@ public class AIGoods extends TransportableAIObject {
         if (result) {
             int newAmount = carrier.getGoodsCount(type);
             if (oldAmount - newAmount != amount) {
-                logger.warning(carrier + " at " + carrier.getLocation()
-                    + " only unloaded " + (oldAmount - newAmount)
-                    + " " + type + " (" + amount + " expected)");
                 // FIXME: sort this out.
                 // For now, do not tolerate partial unloads.
+                logger.warning("Partial goods unload, expected: " + amount
+                    + ", got: " + (oldAmount - newAmount));
                 result = false;
             }
+            logger.fine("Unloaded " + amount + " " + type
+                + " from " + oldAmount + " leaving " + newAmount
+                + " off of " + carrier + " at " + carrier.getLocation());
         }   
         return result;
     }
@@ -288,31 +300,23 @@ public class AIGoods extends TransportableAIObject {
         final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
         if (aiCarrier == null) return false;
 
-        GoodsType goodsType = goods.getType();
-        int goodsAmount = goods.getAmount();
-        int oldAmount = carrier.getGoodsCount(goodsType);
-        boolean result = AIMessage.askLoadGoods(goods.getLocation(),
-            goods.getType(), goods.getAmount(), aiCarrier);
-        if (result) {
-            int newAmount = carrier.getGoodsCount(goodsType);
-            if (newAmount - oldAmount != goodsAmount) {
-                logger.warning(carrier + " at " + carrier.getLocation()
-                    + " only loaded " + (newAmount - oldAmount)
-                    + " " + goodsType
-                    + " (" + goodsAmount + " expected)");
-                goodsAmount = newAmount - oldAmount;
-                // FIXME: sort this out.  For now, tolerate partial loads.
-                result = goodsAmount > 0;
-            }
-        }
-        if (result) {
-            Colony colony = carrier.getColony();
+        final GoodsType type = goods.getType();
+        boolean failed = false;
+        int oldAmount = carrier.getGoodsCount(type),
+            goodsAmount = goods.getAmount(),
+            amount = Math.min(goodsAmount, carrier.getLoadableAmount(type));
+        if (AIMessage.askLoadGoods(goods.getLocation(), type, amount,
+                                   aiCarrier)) {
+            setGoods(new Goods(getGame(), carrier, type, amount));
+            final Colony colony = carrier.getColony();
             if (colony != null) {
                 getAIMain().getAIColony(colony).removeExportGoods(this);
             }
-            setGoods(new Goods(getGame(), carrier, goodsType, goodsAmount));
         }
-        return result;
+        logger.fine("Loaded " + amount + " " + type.getSuffix()
+            + " over " + oldAmount + " leaving " + (goodsAmount - amount)
+            + " onto " + carrier + " at " + carrier.getLocation());
+        return !failed;
     }
 
     /**
