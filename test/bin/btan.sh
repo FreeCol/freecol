@@ -43,7 +43,7 @@ statit () {
 tmp=`mktemp btan.XXXXXXXX`
 trap "rm -f '$tmp'" 0
 cat - > "$tmp"
-runs=`sed -n -e 's/^run: .*colonies: n=\([0-9]*\) mean=\([\.0-9]*\) sd=\([\.0-9]*\), buildings: \([0-9]*\)$/NC="\1";MEAN="\2";SD="\3";NB="\4"/p' "$tmp"`
+runs=`sed -n -e 's/^run: .*colonies: n=\([0-9]*\) mean=\([\.0-9]*\) sd=\([\.0-9]*\), buildings: \([0-9]*\), euroExpense: \([-0-9]*\), euroIncome: \([0-9]*\)$/NC="\1";MEAN="\2";SD="\3";NB="\4";EE="\5";EI="\6"/p' "$tmp"`
 
 N=0
 for r in $runs ; do N=`expr $N + 1`; done
@@ -76,6 +76,14 @@ blockit
 
 section "Cibola Finds"
 sed -n -e 's/^Count Cibola: *\(.*\)$/\1/p' "$tmp" | statit
+blockit
+
+section "EuroExpense"
+(for r in $runs ; do eval $r ; echo $EE ; done) | statit
+blockit
+
+section "EuroIncome"
+(for r in $runs ; do eval $r ; echo $EI ; done) | statit
 blockit
 
 section "Fountain Finds"
