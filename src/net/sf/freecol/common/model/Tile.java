@@ -1259,6 +1259,17 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Get the defence bonus as a percent.
+     *
+     * @return The percentage defence bonus.
+     */
+    public int getDefenceBonusPercentage() {
+        return (int)getType().applyModifiers(100f, getGame().getTurn(),
+                                             Modifier.DEFENCE)
+            - 100;
+    }
+
+    /**
      * Get a list of surrounding land tiles, sorted with the most
      * defensible first.  Useful when planning an attack.
      *

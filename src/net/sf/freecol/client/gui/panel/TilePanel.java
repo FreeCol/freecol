@@ -72,7 +72,8 @@ public final class TilePanel extends FreeColPanel {
         super(freeColClient, new MigLayout("wrap 2, insets 20 30 10 30",
                                            "[right, sg][left, sg]"));
 
-        TileType tileType = tile.getType();
+        final Player player = freeColClient.getMyPlayer();
+        final TileType tileType = tile.getType();
         JButton colopediaButton = Utility.localizedButton("colopedia");
         colopediaButton.setActionCommand(tile.getType().getId());
         colopediaButton.addActionListener(this);
@@ -98,6 +99,7 @@ public final class TilePanel extends FreeColPanel {
             add(Utility.localizedLabel("tilePanel.region"));
             add(Utility.localizedLabel(tile.getRegion().getLabel()));
         }
+
         if (tile.getOwner() != null) {
             StringTemplate ownerName = tile.getOwner().getNationName();
             if (ownerName != null) {
@@ -105,11 +107,26 @@ public final class TilePanel extends FreeColPanel {
                 add(Utility.localizedLabel(ownerName));
             }
         }
+
         if (tile.getOwningSettlement() != null) {
-            add(Utility.localizedLabel("tilePanel.settlement"));
-            add(new JLabel(tile.getOwningSettlement().getName()));
+            StringTemplate settlementName = tile.getOwningSettlement()
+                                                .getLocationLabelFor(player);
+            if (settlementName != null) {
+                add(Utility.localizedLabel("tilePanel.settlement"));
+                add(Utility.localizedLabel(settlementName));
+            }
         }
 
+        int defenceBonus = tile.getDefenceBonusPercentage();
+        if (defenceBonus != 0) {
+            add(Utility.localizedLabel("tilePanel.defenseBonus"));
+            add(new JLabel(Integer.toString(defenceBonus) + "%"));
+        }
+
+        int movementCost = tile.getType().getBasicMoveCost() / 3;
+        add(Utility.localizedLabel("tilePanel.movementCost"));
+        add(new JLabel(Integer.toString(movementCost)));
+        
         if (tileType != null) {
             UnitType colonist = getSpecification().getDefaultUnitType(null);
             JLabel label = null;
@@ -166,10 +183,10 @@ public final class TilePanel extends FreeColPanel {
             }
         }
 
-        Player player = FreeColDebugger.debugDisplayColonyValuePlayer();
-        if (player != null) {
-            List<Double> values = player.getAllColonyValues(tile);
-            int result = player.getColonyValue(tile);
+        Player debugPlayer = FreeColDebugger.debugDisplayColonyValuePlayer();
+        if (debugPlayer != null) {
+            List<Double> values = debugPlayer.getAllColonyValues(tile);
+            int result = debugPlayer.getColonyValue(tile);
             if (result < 0) {
                 add(new JLabel(DebugUtils.getColonyValue(tile)),
                     "newline 5, span, align center");
@@ -185,7 +202,8 @@ public final class TilePanel extends FreeColPanel {
                     add(new JLabel("... " + values.get(a)),
                         "newline 5, span, align center");
                 }
-                add(new JLabel("Result " + result), "newline 5, span, align center");
+                add(new JLabel("Result " + result),
+                    "newline 5, span, align center");
             }
         }
 
