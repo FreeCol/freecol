@@ -197,8 +197,9 @@ public final class InfoPanel extends FreeColPanel {
                         "span, align center");
                     add(new JLabel(new ImageIcon(image)), "spany");
                 }
-                revalidate();
             }
+            revalidate();
+            repaint();
         }
 
         /**
