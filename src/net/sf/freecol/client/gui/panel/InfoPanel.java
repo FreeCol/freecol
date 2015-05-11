@@ -29,6 +29,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -183,7 +184,11 @@ public final class InfoPanel extends FreeColPanel {
                     //moveLabel.setFont(font);
                     add(moveLabel, "span " + PRODUCTION);
 
-                    for (AbstractGoods goods : tile.getType().getPossibleProduction(true)) {
+                    List<AbstractGoods> produce = tile.getType()
+                        .getPossibleProduction(true);
+                    Collections.sort(produce,
+                                     AbstractGoods.goodsAmountComparator);
+                    for (AbstractGoods goods : produce) {
                         JLabel goodsLabel = new JLabel(
                             String.valueOf(tile.getPotentialProduction(goods.getType(), null)),
                             new ImageIcon(lib.getSmallIconImage(goods.getType())),
