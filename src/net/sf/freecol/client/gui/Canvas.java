@@ -1865,35 +1865,6 @@ public final class Canvas extends JDesktopPane {
     /**
      * Shows a message with some information and an "OK"-button.
      *
-     * @param messageId The messageId of the message to display.
-     */
-    void showInformationMessage(String messageId) {
-        showInformationMessage(null, null, null, StringTemplate.key(messageId));
-    }
-
-    /**
-     * Shows a message with some information and an "OK"-button.
-     *
-     * @param template The <code>StringTemplate</code> to display.
-     */
-    void showInformationMessage(StringTemplate template) {
-        showInformationMessage(null, null, null, template);
-    }
-
-    /**
-     * Shows a message with some information and an "OK"-button.
-     *
-     * @param displayObject Optional object for displaying an icon.
-     * @param messageId The messageId of the message to display.
-     */
-    void showInformationMessage(FreeColObject displayObject,
-                                       String messageId) {
-        showInformationMessage(displayObject, StringTemplate.key(messageId));
-    }
-
-    /**
-     * Shows a message with some information and an "OK"-button.
-     *
      * @param displayObject Optional object for displaying an icon.
      * @param template The <code>StringTemplate</code> to display.
      */

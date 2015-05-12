@@ -1893,13 +1893,13 @@ public class GUI {
     public void showInformationMessage(String messageId) {
         alertSound();
         if (canvas == null) return;
-        canvas.showInformationMessage(messageId);
+        canvas.showInformationMessage(null, null, null, StringTemplate.key(messageId));
     }
 
     public void showInformationMessage(StringTemplate template) {
         alertSound();
         if (canvas == null) return;
-        canvas.showInformationMessage(template);
+        canvas.showInformationMessage(null, null, null, template);
     }
 
     public void showInformationMessage(Settlement displayObject,
@@ -1949,7 +1949,7 @@ public class GUI {
                                        String messageId) {
         alertSound();
         if (canvas == null) return;
-        canvas.showInformationMessage(displayObject, messageId);
+        canvas.showInformationMessage(displayObject, StringTemplate.key(messageId));
     }
 
     public void showInformationMessage(FreeColObject displayObject,
