@@ -1292,23 +1292,19 @@ public final class InGameController implements NetworkConstants {
             return false;
         }
 
-        while (!disembarkable.isEmpty()) {
-            if (disembarkable.size() == 1) {
-                if (gui.confirm(true, tile,
-                                StringTemplate.key("disembark.text"),
-                                disembarkable.get(0), "ok", "cancel")) {
-                    moveDirection(disembarkable.get(0), direction, false);
-                }
-                break;
+        if (disembarkable.size() == 1) {
+            if (gui.confirm(true, tile,
+                            StringTemplate.key("disembark.text"),
+                            disembarkable.get(0), "ok", "cancel")) {
+                moveDirection(disembarkable.get(0), direction, false);
             }
+        } else {
             List<ChoiceItem<Unit>> choices = new ArrayList<>();
             for (Unit dUnit : disembarkable) {
                 choices.add(new ChoiceItem<>(dUnit.getDescription(Unit.UnitLabelType.NATIONAL),
                                              dUnit));
             }
-            if (disembarkable.size() > 1) {
-                choices.add(new ChoiceItem<>(Messages.message("all"), unit));
-            }
+            choices.add(new ChoiceItem<>(Messages.message("all"), unit));
 
             // Use moveDirection() to disembark units as while the
             // destination tile is known to be clear of other player
@@ -1318,9 +1314,10 @@ public final class InGameController implements NetworkConstants {
                                    Messages.message("disembark.text"),
                                    gui.createUnitImageIcon(unit),
                                    "none", choices);
-            if (u == null) { // Cancelled, done.
-                break;
-            } else if (u == unit) { // Disembark all.
+            if (u == null) {
+                // Cancelled, done.
+            } else if (u == unit) {
+                // Disembark all.
                 for (Unit dUnit : disembarkable) {
                     // Guard against loss of control when asking the
                     // server to move the unit.
@@ -1330,10 +1327,9 @@ public final class InGameController implements NetworkConstants {
                         continue;
                     }
                 }
-                return true;
+            } else {
+                moveDirection(u, direction, false);
             }
-            moveDirection(u, direction, false);
-            disembarkable.remove(u);
         }
         return true;
     }
