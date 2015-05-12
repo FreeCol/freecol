@@ -70,6 +70,7 @@ public final class TilePopup extends JPopupMenu {
 
     private final FreeColClient freeColClient;
     private final GUI gui;
+    private final MapViewer mapViewer;
     private boolean hasAnItem = false;
 
 
@@ -80,11 +81,12 @@ public final class TilePopup extends JPopupMenu {
      * @param tile The <code>Tile</code> to create a popup for.
      *       The popup menu also appears near this <code>Tile</code>.
      */
-    public TilePopup(final FreeColClient freeColClient, final Tile tile) {
+    public TilePopup(final FreeColClient freeColClient, final MapViewer mapViewer, final Tile tile) {
         super(Messages.message(tile.getSimpleLabel()));
 
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
+        this.mapViewer = mapViewer;
 
         final Player player = freeColClient.getMyPlayer();
         final Unit activeUnit = gui.getActiveUnit();
@@ -117,7 +119,7 @@ public final class TilePopup extends JPopupMenu {
                             // if unit did not move, we should show
                             // the goto path
                             if (activeUnit.getTile() == currTile) {
-                                gui.getMapViewer().updateCurrentPathForActiveUnit();
+                                mapViewer.updateCurrentPathForActiveUnit();
                             }
                         }
                     });
@@ -413,8 +415,7 @@ public final class TilePopup extends JPopupMenu {
         }
 
         final Unit activeUnit = gui.getActiveUnit();
-        Tile unitTile;
-        if (activeUnit != null && (unitTile = activeUnit.getTile()) != null) {
+        if (activeUnit != null && activeUnit.getTile() != null) {
             JMenuItem menuItem = new JMenuItem("Show search");
             menuItem.addActionListener(new ActionListener() {
                     @Override
@@ -428,7 +429,7 @@ public final class TilePopup extends JPopupMenu {
                             activeUnit.getTile(), tile, activeUnit.getCarrier(),
                             null, lb);
                         gui.showInformationMessage(lb.toString());
-                        gui.getMapViewer().setCurrentPath(path);
+                        mapViewer.setCurrentPath(path);
                         gui.refresh();                        
                     }
                 });

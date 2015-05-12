@@ -24,6 +24,7 @@ import java.awt.event.MouseMotionListener;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.AbstractCanvasListener;
+import net.sf.freecol.client.gui.MapViewer;
 
 
 /**
@@ -46,8 +47,8 @@ public class MenuMouseMotionListener extends AbstractCanvasListener
      *
      * @param freeColClient The enclosing <code>FreeColClient</code>.
      */
-    public MenuMouseMotionListener(FreeColClient freeColClient) {
-        super(freeColClient);
+    public MenuMouseMotionListener(FreeColClient freeColClient, MapViewer mapViewer) {
+        super(freeColClient, mapViewer);
     }
 
 

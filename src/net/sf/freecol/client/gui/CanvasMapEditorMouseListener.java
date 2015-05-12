@@ -59,9 +59,8 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      *
      * @param canvas The component this object gets created for.
      */
-    public CanvasMapEditorMouseListener(FreeColClient freeColClient,
-                                        Canvas canvas) {
-        super(freeColClient);
+    public CanvasMapEditorMouseListener(FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer) {
+        super(freeColClient, mapViewer);
 
         this.canvas = canvas;
     }

@@ -256,10 +256,6 @@ public class GUI {
         return imageLibrary;
     }
 
-    MapViewer getMapViewer() {
-        return mapViewer;
-    }
-
     public MapViewer getColonyTileMapViewer() {
         return colonyTileMapViewer;
     }

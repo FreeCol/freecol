@@ -53,9 +53,9 @@ public class AbstractCanvasListener {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public AbstractCanvasListener(FreeColClient freeColClient) {
+    public AbstractCanvasListener(FreeColClient freeColClient, MapViewer mapViewer) {
         this.freeColClient = freeColClient;
-        this.mapViewer = freeColClient.getGUI().getMapViewer();
+        this.mapViewer = mapViewer;
         this.scrollThread = null;
     }
 

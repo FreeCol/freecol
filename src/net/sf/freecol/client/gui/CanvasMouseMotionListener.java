@@ -52,8 +52,8 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public CanvasMouseMotionListener(FreeColClient freeColClient) {
-        super(freeColClient);
+    public CanvasMouseMotionListener(FreeColClient freeColClient, MapViewer mapViewer) {
+        super(freeColClient, mapViewer);
     }
 
 

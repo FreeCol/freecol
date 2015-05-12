@@ -325,11 +325,11 @@ public final class Canvas extends JDesktopPane {
         // We may need to reset the zoom value to the default value
         gui.resetMapZoom();
 
-        frame.setJMenuBar(new MapEditorMenuBar(freeColClient));
+        frame.setJMenuBar(new MapEditorMenuBar(freeColClient, mapViewer));
         showMapEditorTransformPanel();
 
         CanvasMapEditorMouseListener listener
-            = new CanvasMapEditorMouseListener(freeColClient, this);
+            = new CanvasMapEditorMouseListener(freeColClient, this, mapViewer);
         addMouseListener(listener);
         addMouseMotionListener(listener);
     }
@@ -351,7 +351,7 @@ public final class Canvas extends JDesktopPane {
     void initializeInGame() {
         if (frame == null) return;
 
-        frame.setJMenuBar(new InGameMenuBar(freeColClient));
+        frame.setJMenuBar(new InGameMenuBar(freeColClient, mapViewer));
         frame.paintAll(getGraphics());
     }
 
@@ -1211,7 +1211,7 @@ public final class Canvas extends JDesktopPane {
     void setupMouseListeners() {
         addMouseListener(new CanvasMouseListener(freeColClient, this,
                                                  mapViewer));
-        addMouseMotionListener(new CanvasMouseMotionListener(freeColClient));
+        addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, mapViewer));
     }
 
     /**
@@ -2427,7 +2427,7 @@ public final class Canvas extends JDesktopPane {
     void showTilePopup(Tile tile, int x, int y) {
         if (tile == null)
             return;
-        TilePopup tp = new TilePopup(freeColClient, tile);
+        TilePopup tp = new TilePopup(freeColClient, mapViewer, tile);
         if (tp.hasItem()) {
             tp.show(this, x, y);
             tp.repaint();
