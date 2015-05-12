@@ -2019,9 +2019,8 @@ public final class ColonyPanel extends PortPanel
                 setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 setOpaque(false);
                 // Size and position:
-                Dimension size = MapViewer.calculateTileSize(
-                    getGUI().getColonyTileMapViewer().getImageLibrary(),
-                    colonyTile.getTile());
+                Dimension size = getGUI().getColonyTileMapViewer()
+                    .getImageLibrary().calculateTileSize(colonyTile.getTile());
                 setSize(size);
                 setLocation(((2 - x) + y) * size.width / 2,
                     (x + y) * size.height / 2);

@@ -756,6 +756,19 @@ public final class ImageLibrary {
     }
 
     /**
+     * Get a tile size for displaying the colony tiles.
+     * 
+     * @param tile The <code>Tile</code> to get the size for.
+     * @return The tile size.
+     */
+    public Dimension calculateTileSize(Tile tile) {
+        final TileType tileType = tile.getType();
+        final BufferedImage image = getTerrainImage(tileType,
+            tile.getX(), tile.getY());
+        return new Dimension(image.getWidth(), image.getHeight());
+    }
+
+    /**
      * Returns the terrain-image for the given type.
      *
      * @param type The type of the terrain-image to return.

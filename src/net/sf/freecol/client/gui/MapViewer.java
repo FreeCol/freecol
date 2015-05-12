@@ -52,7 +52,6 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
-import javax.swing.UIManager;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -82,6 +81,7 @@ import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
+
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -582,20 +582,6 @@ public final class MapViewer {
     }
 
     /**
-     * Get a tile size for displaying the colony tiles.
-     * 
-     * @param lib The ImageLibrary.
-     * @param tile The <code>Tile</code> to get the size for.
-     * @return The tile size.
-     */
-    public static Dimension calculateTileSize(ImageLibrary lib, Tile tile) {
-        final TileType tileType = tile.getType();
-        final Image image = lib.getTerrainImage(tileType,
-            tile.getX(), tile.getY());
-        return new Dimension(image.getWidth(null), image.getHeight(null));
-    }
-
-    /**
      * Displays the 3x3 tiles for the TilesPanel in ColonyPanel.
      * 
      * @param g The <code>Graphics2D</code> object on which to draw
@@ -607,7 +593,7 @@ public final class MapViewer {
     public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
         final Tile tile = colony.getTile();
-        Dimension tileSize = calculateTileSize(lib, tile);
+        Dimension tileSize = lib.calculateTileSize(tile);
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 if (tiles[x][y] != null) {
