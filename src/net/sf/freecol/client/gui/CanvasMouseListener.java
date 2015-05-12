@@ -134,10 +134,10 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
         case MouseEvent.BUTTON1:
             // Record initial click point for purposes of dragging
             mapViewer.setDragPoint(e.getX(), e.getY());
-            if (mapViewer.isGotoStarted()) {
-                PathNode path = mapViewer.getGotoPath();
+            if (canvas.isGotoStarted()) {
+                PathNode path = canvas.getGotoPath();
                 if (path != null) {
-                    mapViewer.stopGoto();
+                    canvas.stopGoto();
                     // Move the unit
                     freeColClient.getInGameController()
                         .goToTile(mapViewer.getActiveUnit(),
@@ -157,14 +157,14 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                 Unit unit = mapViewer.getActiveUnit();
                 if (unit != null && unit.getTile() != tile) {
                     PathNode dragPath = unit.findPath(tile);
-                    mapViewer.startGoto();
-                    mapViewer.setGotoPath(dragPath);
+                    canvas.startGoto();
+                    canvas.setGotoPath(dragPath);
                 }
             }
             break;
         case MouseEvent.BUTTON3:
             // Cancel goto if one is active
-            if (mapViewer.isGotoStarted()) mapViewer.stopGoto();
+            if (canvas.isGotoStarted()) canvas.stopGoto();
             canvas.showTilePopup(tile, e.getX(), e.getY());
             break;
         default:
@@ -180,16 +180,16 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
     @Override
     public void mouseReleased(MouseEvent e) {
         try {
-            if (mapViewer.getGotoPath() != null) { // A mouse drag has ended.
-                PathNode temp = mapViewer.getGotoPath();
-                mapViewer.stopGoto();
+            if (canvas.getGotoPath() != null) { // A mouse drag has ended.
+                PathNode temp = canvas.getGotoPath();
+                canvas.stopGoto();
 
                 freeColClient.getInGameController()
                     .goToTile(mapViewer.getActiveUnit(),
                               temp.getLastNode().getTile());
 
-            } else if (mapViewer.isGotoStarted()) {
-                mapViewer.stopGoto();
+            } else if (canvas.isGotoStarted()) {
+                canvas.stopGoto();
             }
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Error in mouseReleased!", ex);

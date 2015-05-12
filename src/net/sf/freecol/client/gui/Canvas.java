@@ -53,6 +53,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
@@ -67,7 +68,6 @@ import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.common.ServerInfo;
-import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColFileFilter;
 import net.sf.freecol.common.model.Colony;
@@ -83,6 +83,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
@@ -373,6 +374,54 @@ public final class Canvas extends JDesktopPane {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar)frame.getJMenuBar()).update();
         }
+    }
+
+    /**
+     * Checks if there is currently a goto operation on the mapboard.
+     *
+     * @return True if a goto operation is in progress.
+     */
+    boolean isGotoStarted() {
+        return mapViewer.isGotoStarted();
+    }
+
+    /**
+     * Gets the path to be drawn on the map.
+     *
+     * @return The path that should be drawn on the map or
+     *     <code>null</code> if no path should be drawn.
+     */
+    PathNode getGotoPath() {
+        return mapViewer.getGotoPath();
+    }
+
+    /**
+     * Sets the path to be drawn on the map.
+     *
+     * @param gotoPath The path that should be drawn on the map
+     *     or <code>null</code> if no path should be drawn.
+     */
+    void setGotoPath(PathNode gotoPath) {
+        mapViewer.setGotoPath(gotoPath);
+        refresh();
+    }
+
+    /**
+     * Starts a goto operation.
+     */
+    void startGoto() {
+        setCursor((java.awt.Cursor)UIManager.get("cursor.go"));
+        mapViewer.startGoto();
+        refresh();
+    }
+
+    /**
+     * Stops any ongoing goto operation.
+     */
+    void stopGoto() {
+        setCursor(null);
+        mapViewer.stopGoto();
+        refresh();
     }
 
 
@@ -1211,7 +1260,7 @@ public final class Canvas extends JDesktopPane {
     void setupMouseListeners() {
         addMouseListener(new CanvasMouseListener(freeColClient, this,
                                                  mapViewer));
-        addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, mapViewer));
+        addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, this, mapViewer));
     }
 
     /**
@@ -2324,25 +2373,6 @@ public final class Canvas extends JDesktopPane {
 
         serverListPanel.initialize(serverList);
         showSubPanel(serverListPanel, true);
-    }
-
-    /**
-     * Display the appropriate panel for a given settlement.
-     *
-     * @param settlement The <code>Settlement</code> to display.
-     */
-    void showSettlement(Settlement settlement) {
-        if (settlement instanceof Colony) {
-            if (settlement.getOwner().equals(freeColClient.getMyPlayer())) {
-                showColonyPanel((Colony)settlement, null);
-            } else if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-                showForeignColony(settlement);
-            }
-        } else if (settlement instanceof IndianSettlement) {
-            showIndianSettlementPanel((IndianSettlement)settlement);
-        } else {
-            throw new IllegalStateException("Bogus settlement");
-        }
     }
 
     /**

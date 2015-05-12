@@ -78,6 +78,7 @@ import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Ability;
@@ -571,10 +572,10 @@ public class GUI {
         if (unit == null || mapViewer == null) return;
 
         // Enter "goto mode" if not already activated; otherwise cancel it
-        if (mapViewer.isGotoStarted()) {
-            mapViewer.stopGoto();
+        if (canvas.isGotoStarted()) {
+            canvas.stopGoto();
         } else {
-            mapViewer.startGoto();
+            canvas.startGoto();
 
             // Draw the path to the current mouse position, if the
             // mouse is over the screen; see also
@@ -583,7 +584,7 @@ public class GUI {
             if (pt != null) {
                 Tile tile = mapViewer.convertToMapTile(pt.x, pt.y);
                 if (tile != null && unit.getTile() != tile) {
-                    mapViewer.setGotoPath(unit.findPath(tile));
+                    canvas.setGotoPath(unit.findPath(tile));
                 }
             }
         }
@@ -598,7 +599,7 @@ public class GUI {
 
         // Action should be disabled if there is no active unit, but make sure
         if (unit == null || mapViewer == null) return;
-        mapViewer.stopGoto();
+        canvas.stopGoto();
         refresh();
     }
 
@@ -1759,6 +1760,25 @@ public class GUI {
         OptionGroup group = canvas.showClientOptionsDialog();
         if (!freeColClient.isInGame()) showMainPanel(null);
         return group;
+    }
+
+    /**
+     * Display the appropriate panel for a given settlement.
+     *
+     * @param settlement The <code>Settlement</code> to display.
+     */
+    void showSettlement(Settlement settlement) {
+        if (settlement instanceof Colony) {
+            if (settlement.getOwner().equals(freeColClient.getMyPlayer())) {
+                canvas.showColonyPanel((Colony)settlement, null);
+            } else if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
+                canvas.showForeignColony(settlement);
+            }
+        } else if (settlement instanceof IndianSettlement) {
+            canvas.showIndianSettlementPanel((IndianSettlement)settlement);
+        } else {
+            throw new IllegalStateException("Bogus settlement");
+        }
     }
 
     public ColonyPanel showColonyPanel(Colony colony, Unit unit) {

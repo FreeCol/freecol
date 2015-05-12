@@ -961,7 +961,7 @@ public final class MapViewer {
         }
 
         if (activeUnit == null || tile == null) {
-            stopGoto();
+            gui.getCanvas().stopGoto();
             freeColClient.updateActions();
         } else {
             updateCurrentPathForActiveUnit();
@@ -1013,14 +1013,15 @@ public final class MapViewer {
 
     /**
      * Sets the path to be drawn on the map.
+     * 
+     * Dont use this directly, call the method in canvas!
      *
      * @param gotoPath The path that should be drawn on the map
      *     or <code>null</code> if no path should be drawn.
      */
     void setGotoPath(PathNode gotoPath) {
         this.gotoPath = gotoPath;
-
-        gui.refresh();
+        forceReposition();
     }
 
     /**
@@ -1106,7 +1107,7 @@ public final class MapViewer {
         if (getViewMode() == GUI.MOVE_UNITS_MODE) {
             if (isNoActiveUnitAt(newTile)) {
                 if (newTile != null && newTile.hasSettlement()) {
-                    gui.getCanvas().showSettlement(newTile.getSettlement());
+                    gui.showSettlement(newTile.getSettlement());
                     return false;
                 }
 
@@ -1182,10 +1183,11 @@ public final class MapViewer {
 
     /**
      * Starts a goto operation on the mapboard.
+     * 
+     * Dont use this directly, call the method in canvas!
      */
     void startGoto() {
         gotoStarted = true;
-        gui.getCanvas().setCursor((java.awt.Cursor)UIManager.get("cursor.go"));
         setGotoPath(null);
     }
 
@@ -1195,9 +1197,10 @@ public final class MapViewer {
 
     /**
      * Stops any ongoing goto operation on the mapboard.
+     * 
+     * Dont use this directly, call the method in canvas!
      */
     void stopGoto() {
-        gui.getCanvas().setCursor(null);
         setGotoPath(null);
         updateCurrentPathForActiveUnit();
         gotoStarted = false;
