@@ -428,8 +428,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     public void removeNotify() {
         super.removeNotify();
 
-        freeColClient.getGUI().getCanvas()
-            .dialogRemove(FreeColDialog.this);
+        freeColClient.getGUI().dialogRemove(FreeColDialog.this);
 
         removeAll();
         if (this.pane != null) {

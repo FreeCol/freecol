@@ -989,7 +989,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param fcd The dialog to remove.
      */
-    public void dialogRemove(FreeColDialog<?> fcd) {
+    void dialogRemove(FreeColDialog<?> fcd) {
         dialogs.remove(fcd);
     }
 

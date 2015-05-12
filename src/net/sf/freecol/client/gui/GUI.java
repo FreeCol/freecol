@@ -65,6 +65,7 @@ import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.CornerMapControls;
 import net.sf.freecol.client.gui.panel.DialogHandler;
+import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MapControls;
@@ -1608,6 +1609,10 @@ public class GUI {
         return canvas.containsInGameComponents();
     }
 
+    public void dialogRemove(FreeColDialog<?> fcd) {
+        canvas.dialogRemove(fcd);
+    }
+
     /**
      * Show the appropriate panel for an object.
      *
@@ -2389,6 +2394,8 @@ public class GUI {
     public void setFocusImmediately(Tile tileToFocus) {
         if (mapViewer == null) return;
         mapViewer.setFocusImmediately(tileToFocus);
+        Dimension size = canvas.getSize();;
+        canvas.paintImmediately(0, 0, size.width, size.height);
     }
 
     public boolean setSelectedTile(Tile newTileToSelect,

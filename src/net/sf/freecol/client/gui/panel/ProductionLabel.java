@@ -23,7 +23,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -169,7 +171,6 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         setToolTipText((getType() == null || getAmount() == 0) ? null
             : Messages.message(getAbstractGoods().getLabel()));
 
-        final Graphics g = freeColClient.getGUI().getCanvas().getGraphics();
         final int amount = getAmount();
         boolean showMax = amount > 0 && maximumProduction > amount;
         if (amount < 0 || amount >= displayNumber || amount > maxIcons
@@ -183,8 +184,12 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             number += String.valueOf(amount);
             if (showMax) number += "/" + String.valueOf(maximumProduction);
             
+            BufferedImage dummy = new BufferedImage(1, 1,
+                BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = dummy.createGraphics();
             this.stringImage = lib.getStringImage(g, number,
                 getForeground(), getFont());
+            g.dispose();
         } else {
             this.stringImage = null;
         }

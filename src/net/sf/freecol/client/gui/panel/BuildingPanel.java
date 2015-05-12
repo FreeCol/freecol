@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -235,7 +236,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     public class UpkeepLabel extends JLabel {
 
         /** The base image to display. */
-        private final Image image;
+        private final int number;
 
         /**
          * Create an upkeep label.
@@ -245,14 +246,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
         public UpkeepLabel(int number) {
             super(new ImageIcon(freeColClient.getGUI().getImageLibrary()
                 .getMiscImage(ImageLibrary.ICON_COIN)));
-            GUI gui = freeColClient.getGUI();
-            ImageLibrary lib = gui.getImageLibrary();
-            image = lib.getStringImage(
-                gui.getCanvas().getGraphics(),
-                Integer.toString(number), getForeground(),
-                FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                    FontLibrary.FontSize.TINY, Font.BOLD,
-                    lib.getScalingFactor()));
+            this.number = number;
         }
 
         /**
@@ -261,6 +255,14 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
         @Override
         public void paintComponent(Graphics g) {
             getIcon().paintIcon(null, g, 0, 0);
+            GUI gui = freeColClient.getGUI();
+            ImageLibrary lib = gui.getImageLibrary();
+            BufferedImage image = lib.getStringImage(
+                g,
+                Integer.toString(number), getForeground(),
+                FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+                    FontLibrary.FontSize.TINY, Font.BOLD,
+                    lib.getScalingFactor()));
             g.drawImage(image,
                 (getIcon().getIconWidth() - image.getWidth(null))/2,
                 (getIcon().getIconHeight() - image.getHeight(null))/2, null);

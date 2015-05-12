@@ -1009,7 +1009,6 @@ public final class MapViewer {
         this.focus = focus;
 
         forceReposition();
-        gui.getCanvas().paintImmediately(0, 0, size.width, size.height);
     }
 
     /**
