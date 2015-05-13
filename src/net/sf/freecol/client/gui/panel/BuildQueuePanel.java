@@ -641,7 +641,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             .put(KeyStroke.getKeyStroke("ENTER"), "add");
         this.buildingList.getActionMap().put("add", addAction);
 
-        this.buyBuildable = Utility.localizedButton("buildQueuePanel.buyBuilding");
+        this.buyBuildable = Utility.localizedButton("none"); // placeholder
+        setBuyLabel(null);
         this.buyBuildable.setActionCommand(BUY);
         this.buyBuildable.addActionListener(this);
 
@@ -900,12 +901,12 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         // Update the buy button
         final boolean pay = getSpecification()
             .getBoolean(GameOptions.PAY_FOR_BUILDING);
-        if (current.getSize() == 0 || !pay) {
-            this.buyBuildable.setEnabled(false);
-        } else {
-            this.buyBuildable.setEnabled(this.colony
-                .canPayToFinishBuilding(current.getElementAt(0)));
-        }
+        BuildableType bt = (current.getSize() <= 0) ? null
+            : current.getElementAt(0);
+        this.buyBuildable.setEnabled(bt != null && pay
+            && this.colony.canPayToFinishBuilding(bt)
+            && this.colony.getTurnsToComplete(bt) > 0);
+        this.setBuyLabel(bt);
 
         // Update the construction panel
         if (current.getSize() > 0) {
@@ -913,6 +914,14 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         } else if (current.getSize() == 0) {
             this.constructionPanel.update(); // generates Building: Nothing
         }
+    }
+
+    private void setBuyLabel(BuildableType buildable) {
+        this.buyBuildable.setText(Messages.message((buildable == null)
+                ? StringTemplate.template("buildQueuePanel.buyBuilding")
+                    .add("%buildable%", "nothing")
+                : StringTemplate.template("buildQueuePanel.buyBuilding")
+                    .addNamed("%buildable%", buildable)));
     }
 
     private boolean hasBuildingType(BuildingType buildingType) {
