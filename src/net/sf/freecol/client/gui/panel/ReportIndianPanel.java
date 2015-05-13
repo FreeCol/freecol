@@ -167,6 +167,8 @@ public final class ReportIndianPanel extends ReportPanel {
                 }
                 JButton settlementButton = Utility.getLinkButton(locationName,
                     null, settlement.getTile().getId());
+                Utility.localizeToolTip(settlementButton, settlement.getTile()
+                    .getDetailedLocationLabelFor(player));
                 settlementButton.addActionListener(this);
                 reportPanel.add(settlementButton, "newline 15");
 

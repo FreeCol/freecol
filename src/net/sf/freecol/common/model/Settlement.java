@@ -676,6 +676,17 @@ public abstract class Settlement extends GoodsLocation
     public abstract int getTotalProductionOf(GoodsType goodsType);
 
     /**
+     * Has this settlement contacted a given player?
+     *
+     * Allow player == null as this is true in the map editor where
+     * the user player is moot.
+     *
+     * @param player The other <code>Player</code> to check.
+     * @return True if the settlement has contacted the player.
+     */
+    public abstract boolean hasContacted(Player player);
+
+    /**
      * Gets a label indicating the alarm level at this settlement with
      * respect to another player.
      *
@@ -684,6 +695,7 @@ public abstract class Settlement extends GoodsLocation
      */
     public abstract StringTemplate getAlarmLevelLabel(Player player);
 
+    
 
     // Serialization
 

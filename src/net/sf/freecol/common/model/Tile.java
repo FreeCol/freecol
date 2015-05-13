@@ -1020,6 +1020,69 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             .addAmount("%y%", getY());
     }
 
+    /**
+     * Get a detailed label for this tile.
+     *
+     * @return A suitable <code>StringTemplate</code>.
+     */
+    public StringTemplate getDetailedLocationLabel() {
+        Settlement nearSettlement = null;
+        for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
+            nearSettlement = tile.getSettlement();
+            if (nearSettlement != null
+                && nearSettlement.getName() != null) {
+                StringTemplate t = StringTemplate
+                    .template("model.tile.nameLocation")
+                    .addStringTemplate("%location%",
+                        getNearLocationLabel(Map.getRoughDirection(tile, this),
+                            nearSettlement.getLocationLabel()));
+                if (type == null) {
+                    t.add("%name%", "unexplored");
+                } else {
+                    t.addNamed("%name%", type);
+                }
+                return t;
+            }
+        }
+        return (region != null && region.getName() != null)
+            ? StringTemplate.template("model.tile.nameLocation")
+                .addNamed("%name%", type)
+                .addNamed("%location%", region)
+            : getSimpleLabel();
+    }
+
+    /**
+     * Get a detailed label for this tile for a given player.
+     *
+     * @param player The <code>Player</code> to produce a label for.
+     * @return A suitable <code>StringTemplate</code>.
+     */
+    public StringTemplate getDetailedLocationLabelFor(Player player) {
+        Settlement nearSettlement = null;
+        for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
+            nearSettlement = tile.getSettlement();
+            if (nearSettlement != null
+                && nearSettlement.hasContacted(player)) {
+                StringTemplate t = StringTemplate
+                    .template("model.tile.nameLocation")
+                    .addStringTemplate("%location%",
+                        getNearLocationLabel(Map.getRoughDirection(tile, this),
+                            nearSettlement.getLocationLabelFor(player)));
+                if (type == null) {
+                    t.add("%name%", "unexplored");
+                } else {
+                    t.addNamed("%name%", type);
+                }
+                return t;
+            }
+        }
+        return (region != null && region.getName() != null)
+            ? StringTemplate.template("model.tile.nameLocation")
+                .addNamed("%name%", type)
+                .addStringTemplate("%location%", region.getLabel())
+            : getSimpleLabel();
+    }
+
 
     //
     // Map / geographic routines
@@ -2070,31 +2133,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     @Override
     public StringTemplate getLocationLabel() {
-        if (settlement != null) return settlement.getLocationLabel();
-
-        Settlement nearSettlement = null;
-        for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
-            nearSettlement = tile.getSettlement();
-            if (nearSettlement != null
-                && nearSettlement.getName() != null) {
-                StringTemplate t = StringTemplate
-                    .template("model.tile.nameLocation")
-                    .addStringTemplate("%location%",
-                        getNearLocationLabel(Map.getRoughDirection(tile, this),
-                            nearSettlement.getLocationLabel()));
-                if (type == null) {
-                    t.add("%name%", "unexplored");
-                } else {
-                    t.addNamed("%name%", type);
-                }
-                return t;
-            }
-        }
-        return (region != null && region.getName() != null)
-            ? StringTemplate.template("model.tile.nameLocation")
-                .addNamed("%name%", type)
-                .addNamed("%location%", region)
-            : StringTemplate.key(type);
+        return (settlement != null) ? settlement.getLocationLabel()
+            : getDetailedLocationLabel();
     }
 
     /**
@@ -2102,29 +2142,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     @Override
     public StringTemplate getLocationLabelFor(Player player) {
-        if (settlement != null) return settlement.getLocationLabelFor(player);
-
-        Settlement nearSettlement = null;
-        for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
-            nearSettlement = tile.getSettlement();
-            if (nearSettlement != null) {
-                StringTemplate t = StringTemplate.template("nameLocation")
-                    .addStringTemplate("%location%",
-                        getNearLocationLabel(Map.getRoughDirection(tile, this),
-                            nearSettlement.getLocationLabelFor(player)));
-                if (type == null) {
-                    t.add("%name%", "unexplored");
-                } else {
-                    t.addNamed("%name%", type);
-                }
-                return t;
-            }
-        }
-        return (region != null && region.getName() != null)
-            ? StringTemplate.template("nameLocation")
-                .addNamed("%name%", type)
-                .addStringTemplate("%location%", region.getLabel())
-            : StringTemplate.key(type);
+        return (settlement != null) ? settlement.getLocationLabelFor(player)
+            : getDetailedLocationLabelFor(player);
     }
 
     /**

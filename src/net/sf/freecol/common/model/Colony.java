@@ -2848,6 +2848,14 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * {@inheritDoc}
      */
+    public boolean hasContacted(Player player) {
+        return player != null
+            && getOwner().getStance(player) != Stance.UNCONTACTED;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public StringTemplate getAlarmLevelLabel(Player player) {
         Stance stance = getOwner().getStance(player);

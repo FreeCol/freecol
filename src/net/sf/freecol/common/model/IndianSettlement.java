@@ -476,20 +476,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
-     * Has a player contacted this settlement?
-     *
-     * Allow player == null as this is true in the map editor where
-     * the user player is moot.
-     *
-     * @param player The <code>Player</code> to check.
-     * @return True if the player has contacted this settlement.
-     */
-    public boolean hasContacted(Player player) {
-        return player == null
-            || getContactLevel(player) != ContactLevel.UNCONTACTED;
-    }
-
-    /**
      * Make contact with this settlement (if it has not been
      * previously contacted).  Initialize tension level to the general
      * level with respect to the contacting player--- effectively the
@@ -1304,7 +1290,14 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * {@inheritDoc}
      */
-    @Override
+    public boolean hasContacted(Player player) {
+        return player == null
+            || getContactLevel(player) != ContactLevel.UNCONTACTED;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public StringTemplate getAlarmLevelLabel(Player player) {
         String key = (!player.hasContacted(owner))
             ? "model.indianSettlement.tension.wary"
