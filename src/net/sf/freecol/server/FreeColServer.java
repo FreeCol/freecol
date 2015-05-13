@@ -773,7 +773,7 @@ public final class FreeColServer {
             ) {
                 xw.writeStartDocument("UTF-8", "1.0");
 
-                xw.writeComment("Game version: " + FreeCol.getRevision());
+                xw.writeComment(FreeCol.getConfiguration().toString());
 
                 xw.writeStartElement(SAVED_GAME_TAG);
 

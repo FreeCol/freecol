@@ -82,6 +82,13 @@ public final class FreeCol {
     /** The extension for FreeCol saved games. */
     public static final String  FREECOL_SAVE_EXTENSION = ".fsg";
 
+    /** The Java version. */
+    private static final String JAVA_VERSION
+        = System.getProperty("java.version");
+
+    /** The maximum available memory. */
+    private static final long MEMORY_MAX = Runtime.getRuntime().maxMemory();
+
     /** A file filter to select the saved game files. */
     public static final FileFilter freeColSaveFileFilter
         = new FileFilter() {
@@ -101,7 +108,10 @@ public final class FreeCol {
     public static final int     META_SERVER_PORT = 3540;
 
     /** Specific revision number (currently the git tag of trunk at release) */
-    private static String       FREECOL_REVISION;
+    private static String       freeColRevision = null;
+
+    /** The locale, either default or command-line specified. */
+    private static Locale       locale = null;
 
 
     // Cli defaults.
@@ -176,12 +186,10 @@ public final class FreeCol {
      */
     private static Dimension windowSize = new Dimension(-1, -1);
 
-    /**
-     * How much gui elements get scaled.
-     */
+    /** How much gui elements get scaled. */
     private static float guiScale = GUI_SCALE_DEFAULT;
 
-
+   
     private FreeCol() {} // Hide constructor
 
     /**
@@ -190,11 +198,11 @@ public final class FreeCol {
      * @param args The command-line arguments.
      */
     public static void main(String[] args) {
-        FREECOL_REVISION = FREECOL_VERSION;
+        freeColRevision = FREECOL_VERSION;
         try {
             String revision = readVersion(FreeCol.class);
             if (revision != null) {
-                FREECOL_REVISION += " (Revision: " + revision + ")";
+                freeColRevision += " (Revision: " + revision + ")";
             }
         } catch (Exception e) {
             System.err.println("Unable to load Manifest: " + e.getMessage());
@@ -226,18 +234,13 @@ public final class FreeCol {
                 break;
             }
         }
-        Locale locale;
         if (localeArg == null) {
             locale = Locale.getDefault();
         } else {
-            // Strip encoding if present
-            int index = localeArg.indexOf('.');
+            int index = localeArg.indexOf('.'); // Strip encoding if present
             if (index > 0) localeArg = localeArg.substring(0, index);
-
             locale = Messages.getLocale(localeArg);
         }
-
-        // Locale established, now load some messages.
         Messages.setMessageBundle(locale);
 
         // Now that we can emit error messages, parse the other
@@ -245,16 +248,14 @@ public final class FreeCol {
         handleArgs(args);
 
         // Do the potentially fatal system checks as early as possible.
-        String version = System.getProperty("java.version");
-        if (javaCheck && JAVA_VERSION_MIN.compareTo(version) > 0) {
+        if (javaCheck && JAVA_VERSION_MIN.compareTo(JAVA_VERSION) > 0) {
             fatal(StringTemplate.template("main.javaVersion")
-                .addName("%version%", version)
+                .addName("%version%", JAVA_VERSION)
                 .addName("%minVersion%", JAVA_VERSION_MIN));
         }
-        long memory = Runtime.getRuntime().maxMemory();
-        if (memoryCheck && memory < MEMORY_MIN * 1000000) {
+        if (memoryCheck && MEMORY_MAX < MEMORY_MIN * 1000000) {
             fatal(StringTemplate.template("main.memory")
-                .addAmount("%memory%", memory)
+                .addAmount("%memory%", MEMORY_MAX)
                 .addAmount("%minMemory%", MEMORY_MIN));
         }
 
@@ -308,32 +309,7 @@ public final class FreeCol {
 
         // Report on where we are.
         if (userMsg != null) logger.info(Messages.message(userMsg));
-        File autosave = FreeColDirectories.getAutosaveDirectory();
-        File clientOptionsFile = FreeColDirectories.getClientOptionsFile();
-        File userMods = FreeColDirectories.getUserModsDirectory();
-        StringBuilder sb = new StringBuilder(256);
-        sb.append("Initialization:")
-            .append("\n  java:       ").append(version)
-            .append("\n  memory:     ").append(memory)
-            .append("\n  locale:     ").append(locale)
-            .append("\n  data:       ")
-            .append(FreeColDirectories.getDataDirectory().getPath())
-            .append("\n  userConfig: ")
-            .append(FreeColDirectories.getUserConfigDirectory().getPath())
-            .append("\n  userData:   ")
-            .append(FreeColDirectories.getUserDataDirectory().getPath())
-            .append("\n  autosave:   ")
-            .append((autosave == null) ? "NONE" : autosave.getPath())
-            .append("\n  logFile:    ")
-            .append(FreeColDirectories.getLogFilePath())
-            .append("\n  options:    ")
-            .append((clientOptionsFile == null) ? "NONE"
-                : clientOptionsFile.getPath())
-            .append("\n  save:       ")
-            .append(FreeColDirectories.getSaveDirectory().getPath())
-            .append("\n  userMods:   ")
-            .append((userMods == null) ? "NONE" : userMods.getPath());
-        logger.info(sb.toString());
+        logger.info(getConfiguration().toString());
 
         // Ready to specialize into client or server.
         if (standAloneServer) {
@@ -342,6 +318,7 @@ public final class FreeCol {
             startClient(userMsg);
         }
     }
+
 
     /**
      * Extract the package version from the class.
@@ -1087,7 +1064,7 @@ public final class FreeCol {
      * @return The current version and SVN Revision of the game.
      */
     public static String getRevision() {
-        return FREECOL_REVISION;
+        return freeColRevision;
     }
 
     /**
@@ -1240,6 +1217,43 @@ public final class FreeCol {
     public static StringTemplate badSave(File file) {
         return StringTemplate.template("error.couldNotSave")
             .addName("%name%", file.getPath());
+    }
+
+    /**
+     * We get a lot of lame bug reports with insufficient configuration
+     * information.  Get a buffer containing as much information as we can
+     * to embed in the log file and saved games.
+     *
+     * @return A <code>StringBuilder</code> full of configuration information.
+     */
+    public static StringBuilder getConfiguration() {
+        File autosave = FreeColDirectories.getAutosaveDirectory();
+        File clientOptionsFile = FreeColDirectories.getClientOptionsFile();
+        File userMods = FreeColDirectories.getUserModsDirectory();
+        StringBuilder sb = new StringBuilder(256);
+        sb.append("Configuration:")
+            .append("\n  version     ").append(getRevision())
+            .append("\n  java:       ").append(JAVA_VERSION)
+            .append("\n  memory:     ").append(MEMORY_MAX)
+            .append("\n  locale:     ").append(locale)
+            .append("\n  data:       ")
+            .append(FreeColDirectories.getDataDirectory().getPath())
+            .append("\n  userConfig: ")
+            .append(FreeColDirectories.getUserConfigDirectory().getPath())
+            .append("\n  userData:   ")
+            .append(FreeColDirectories.getUserDataDirectory().getPath())
+            .append("\n  autosave:   ")
+            .append((autosave == null) ? "NONE" : autosave.getPath())
+            .append("\n  logFile:    ")
+            .append(FreeColDirectories.getLogFilePath())
+            .append("\n  options:    ")
+            .append((clientOptionsFile == null) ? "NONE"
+                : clientOptionsFile.getPath())
+            .append("\n  save:       ")
+            .append(FreeColDirectories.getSaveDirectory().getPath())
+            .append("\n  userMods:   ")
+            .append((userMods == null) ? "NONE" : userMods.getPath());
+        return sb;
     }
 
 
