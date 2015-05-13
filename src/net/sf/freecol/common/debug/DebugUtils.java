@@ -1108,7 +1108,7 @@ public class DebugUtils {
                    " ", ((tension == null) ? "(none)"
                        : Integer.toString(tension.getValue())),
                    ((mostHated == p) ? " (most hated)" : ""),
-                   " ", Messages.message(sis.getAlarmLevelLabel(p)),
+                   " ", Messages.message(sis.getAlarmLevelKey(p)),
                    " ", sis.getContactLevel(p), "\n");
         }
 

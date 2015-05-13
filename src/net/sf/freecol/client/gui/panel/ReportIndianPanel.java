@@ -188,7 +188,7 @@ public final class ReportIndianPanel extends ReportPanel {
                 reportPanel.add(missionLabel);
 
                 reportPanel.add(Utility
-                    .localizedLabel(settlement.getAlarmLevelLabel(player)));
+                    .localizedLabel(settlement.getAlarmLevelKey(player)));
 
                 final UnitType skillType = settlement.getLearnableSkill();
                 JLabel skillLabel;

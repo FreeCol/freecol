@@ -640,12 +640,11 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @return The alarm message key.
      */
     public String getAlarmLevelKey(Player player) {
-        return "model.indianSettlement."
-            + ((!player.hasContacted(owner))
-                ? "tension.wary"
-                : (!hasContacted(player))
-                ? "tension.unknown"
-                : getAlarm(player).getKey());
+        return (!player.hasContacted(owner))
+            ? "model.indianSettlement.tension.wary"
+            : (!hasContacted(player))
+            ? "model.indianSettlement.tension.unknown"
+            : getAlarm(player).getNameKey();
     }
 
     /**
@@ -1307,7 +1306,12 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     @Override
     public StringTemplate getAlarmLevelLabel(Player player) {
-        return StringTemplate.template(getAlarmLevelKey(player))
+        String key = (!player.hasContacted(owner))
+            ? "model.indianSettlement.tension.wary"
+            : (!hasContacted(player))
+            ? "model.indianSettlement.tension.unknown"
+            : "model.indianSettlement. " + getAlarm(player).getKey();
+        return StringTemplate.template(key)
             .addStringTemplate("%nation%", getOwner().getNationName());
     }
 
