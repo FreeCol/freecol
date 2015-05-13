@@ -1229,6 +1229,9 @@ public final class FreeCol {
     public static StringBuilder getConfiguration() {
         File autosave = FreeColDirectories.getAutosaveDirectory();
         File clientOptionsFile = FreeColDirectories.getClientOptionsFile();
+        File save = FreeColDirectories.getSaveDirectory();
+        File userConfig = FreeColDirectories.getUserConfigDirectory();
+        File userData = FreeColDirectories.getUserDataDirectory();
         File userMods = FreeColDirectories.getUserModsDirectory();
         StringBuilder sb = new StringBuilder(256);
         sb.append("Configuration:")
@@ -1239,9 +1242,9 @@ public final class FreeCol {
             .append("\n  data:       ")
             .append(FreeColDirectories.getDataDirectory().getPath())
             .append("\n  userConfig: ")
-            .append(FreeColDirectories.getUserConfigDirectory().getPath())
+            .append((userConfig == null) ? "NONE" : userConfig.getPath())
             .append("\n  userData:   ")
-            .append(FreeColDirectories.getUserDataDirectory().getPath())
+            .append((userData == null) ? "NONE" : userData.getPath())
             .append("\n  autosave:   ")
             .append((autosave == null) ? "NONE" : autosave.getPath())
             .append("\n  logFile:    ")
@@ -1250,7 +1253,7 @@ public final class FreeCol {
             .append((clientOptionsFile == null) ? "NONE"
                 : clientOptionsFile.getPath())
             .append("\n  save:       ")
-            .append(FreeColDirectories.getSaveDirectory().getPath())
+            .append((save == null) ? "NONE" : save.getPath())
             .append("\n  userMods:   ")
             .append((userMods == null) ? "NONE" : userMods.getPath());
         return sb;
