@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -71,11 +72,11 @@ public final class IndianSettlementPanel extends FreeColPanel {
                     ? "indianSettlementPanel.indianCapital"
                     : "indianSettlementPanel.indianSettlement")
                 .addStringTemplate("%nation%", indian.getNationName()));
-        text += " (" + Messages.getName(settlement.getAlarm(player));
+        Tension tension = settlement.getAlarm(player);
+        if (tension != null) text += " (" + Messages.getName(tension) + ")";
         if (settlement.worthScouting(player)) {
-            text += "," + ResourceManager.getString("unscoutedIndianSettlement");
+            text += ResourceManager.getString("unscoutedIndianSettlement");
         }
-        text += ")";
         settlementLabel.setText(text);
         add(settlementLabel);
 
