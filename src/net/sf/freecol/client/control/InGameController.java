@@ -114,6 +114,65 @@ public final class InGameController implements NetworkConstants {
 
     private static final Logger logger = Logger.getLogger(InGameController.class.getName());
 
+    /** Actions when an armed unit contacts a settlement. */
+    public static enum ArmedUnitSettlementAction {
+        SETTLEMENT_ATTACK,
+        SETTLEMENT_TRIBUTE,
+    }
+
+    /** Actions when dealing with a boycott. */
+    public static enum BoycottAction {
+        PAY_ARREARS,
+        DUMP_CARGO
+    }
+
+    /** Actions when buying from the natives. */
+    public static enum BuyAction {
+        BUY,
+        HAGGLE
+    }
+
+    /** Actions when claiming land. */
+    public static enum ClaimAction {
+        ACCEPT,
+        STEAL
+    }
+
+    /** Actions with a missionary at a native settlement. */
+    public static enum MissionaryAction {
+        ESTABLISH_MISSION,
+        DENOUNCE_HERESY,
+        INCITE_INDIANS
+    }
+
+    /** Actions in scouting a colony. */
+    public static enum ScoutColonyAction {
+        FOREIGN_COLONY_NEGOTIATE,
+        FOREIGN_COLONY_SPY,
+        FOREIGN_COLONY_ATTACK
+    }
+
+    /** Actions in scouting a native settlement. */
+    public static enum ScoutIndianSettlementAction {
+        INDIAN_SETTLEMENT_SPEAK,
+        INDIAN_SETTLEMENT_TRIBUTE,
+        INDIAN_SETTLEMENT_ATTACK
+    }
+
+    /** Actions when selling to the natives. */
+    public static enum SellAction {
+        SELL,
+        HAGGLE,
+        GIFT
+    }
+
+    /** Choice of sales action at a native settlement. */
+    public static enum TradeAction {
+        BUY,
+        SELL,
+        GIFT
+    }
+
     /**
      * Selecting next unit depends on mode--- either from the active list,
      * from the going-to list, or flush going-to and end the turn.
@@ -286,7 +345,7 @@ public final class InGameController implements NetworkConstants {
         if (price < 0) { // not for sale
             return false;
         } else if (price > 0) { // for sale
-            GUI.ClaimAction act = gui.getClaimChoice(tile, player, price,
+            ClaimAction act = gui.getClaimChoice(tile, player, price,
                                                      owner);
             if (act == null) return false; // Cancelled
             switch (act) {
@@ -1164,7 +1223,7 @@ public final class InGameController implements NetworkConstants {
         if (settlement == null
             || unit.getOwner().owns(settlement)) return false;
 
-        GUI.ArmedUnitSettlementAction act
+        ArmedUnitSettlementAction act
             = gui.getArmedUnitSettlementChoice(settlement);
         if (act == null) return true; // Cancelled
         switch (act) {
@@ -1574,7 +1633,7 @@ public final class InGameController implements NetworkConstants {
         boolean canNeg = colony.getOwner() != unit.getOwner().getREFPlayer();
         askClearGotoOrders(unit);
 
-        GUI.ScoutColonyAction act
+        ScoutColonyAction act
             = gui.getScoutForeignColonyChoice(colony, unit, canNeg);
         if (act == null) return true; // Cancelled
         switch (act) {
@@ -1620,7 +1679,7 @@ public final class InGameController implements NetworkConstants {
         // Offer the choices.
         String number = askServer().scoutSettlement(unit, direction);
         if (number == null) number = Messages.message("many");
-        GUI.ScoutIndianSettlementAction act
+        ScoutIndianSettlementAction act
             = gui.getScoutIndianSettlementChoice(settlement, number);
         if (act == null) return true; // Cancelled
         switch (act) {
@@ -1741,7 +1800,7 @@ public final class InGameController implements NetworkConstants {
             boolean gif = results[2] && unit.hasGoodsCargo();
             if (!buy && !sel && !gif) break;
 
-            GUI.TradeAction act = gui.getIndianSettlementTradeChoice(settlement,
+            TradeAction act = gui.getIndianSettlementTradeChoice(settlement,
                 template, buy, sel, gif);
             if (act == null) break;
             StringTemplate t = null;
@@ -1858,7 +1917,7 @@ public final class InGameController implements NetworkConstants {
 
                 // Show dialog for buy proposal
                 boolean canBuy = player.checkGold(gold);
-                GUI.BuyAction act
+                BuyAction act
                     = gui.getBuyChoice(unit, settlement, goods, gold, canBuy);
                 if (act == null) break; // User cancelled
                 switch (act) {
@@ -1914,7 +1973,7 @@ public final class InGameController implements NetworkConstants {
                 }
 
                 // Show dialog for sale proposal
-                GUI.SellAction act = gui.getSellChoice(unit, settlement, goods, gold);
+                SellAction act = gui.getSellChoice(unit, settlement, goods, gold);
                 if (act == null) break; // Cancelled
                 switch (act) {
                 case SELL: // Accepted price, make the sale
@@ -2016,13 +2075,13 @@ public final class InGameController implements NetworkConstants {
         askClearGotoOrders(unit);
 
         // Offer the choices.
-        GUI.MissionaryAction act = gui.getMissionaryChoice(unit, settlement,
+        MissionaryAction act = gui.getMissionaryChoice(unit, settlement,
             canEstablish, canDenounce);
         if (act == null) return true;
         switch (act) {
         case ESTABLISH_MISSION: case DENOUNCE_HERESY:
             if (askServer().missionary(unit, direction,
-                    act == GUI.MissionaryAction.DENOUNCE_HERESY)
+                    act == MissionaryAction.DENOUNCE_HERESY)
                 && settlement.hasMissionary(player)) {
                 freeColClient.getSoundController()
                     .playSound("sound.event.missionEstablished");

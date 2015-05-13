@@ -48,6 +48,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController.BoycottAction;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -407,7 +408,7 @@ public final class EuropePanel extends PortPanel {
                 if (getMyPlayer().canTrade(goods.getType())) {
                     igc().sellGoods(goods);
                 } else {
-                    GUI.BoycottAction act = getGUI().getBoycottChoice(goods,
+                    BoycottAction act = getGUI().getBoycottChoice(goods,
                                                                       europe);
                     if (act != null) {
                         switch (act) {

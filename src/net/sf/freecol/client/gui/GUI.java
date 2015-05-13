@@ -59,6 +59,7 @@ import javax.swing.filechooser.FileFilter;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.client.control.InGameController.*;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
@@ -129,65 +130,6 @@ import static net.sf.freecol.common.util.StringUtils.*;
 public class GUI {
 
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
-
-    /** Actions when an armed unit contacts a settlement. */
-    public static enum ArmedUnitSettlementAction {
-        SETTLEMENT_ATTACK,
-        SETTLEMENT_TRIBUTE,
-    }
-
-    /** Actions when dealing with a boycott. */
-    public static enum BoycottAction {
-        PAY_ARREARS,
-        DUMP_CARGO
-    }
-
-    /** Actions when buying from the natives. */
-    public static enum BuyAction {
-        BUY,
-        HAGGLE
-    }
-
-    /** Actions when claiming land. */
-    public static enum ClaimAction {
-        ACCEPT,
-        STEAL
-    }
-
-    /** Actions with a missionary at a native settlement. */
-    public static enum MissionaryAction {
-        ESTABLISH_MISSION,
-        DENOUNCE_HERESY,
-        INCITE_INDIANS
-    }
-
-    /** Actions in scouting a colony. */
-    public static enum ScoutColonyAction {
-        FOREIGN_COLONY_NEGOTIATE,
-        FOREIGN_COLONY_SPY,
-        FOREIGN_COLONY_ATTACK
-    }
-
-    /** Actions in scouting a native settlement. */
-    public static enum ScoutIndianSettlementAction {
-        INDIAN_SETTLEMENT_SPEAK,
-        INDIAN_SETTLEMENT_TRIBUTE,
-        INDIAN_SETTLEMENT_ATTACK
-    }
-
-    /** Actions when selling to the natives. */
-    public static enum SellAction {
-        SELL,
-        HAGGLE,
-        GIFT
-    }
-
-    /** Choice of sales action at a native settlement. */
-    public static enum TradeAction {
-        BUY,
-        SELL,
-        GIFT
-    }
 
     /** Warning levels. */
     private static final String levels[] = {
