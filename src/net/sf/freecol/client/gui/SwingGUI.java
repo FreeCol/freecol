@@ -907,17 +907,17 @@ public class SwingGUI extends GUI {
 
     @Override
     public boolean isClientOptionsDialogShowing() {
-        return canvas.isClientOptionsDialogShowing();
+        return canvas!=null && canvas.isClientOptionsDialogShowing();
     }
 
     @Override
     public boolean isMapboardActionsEnabled() {
-        return canvas.isMapboardActionsEnabled();
+        return canvas!=null && canvas.isMapboardActionsEnabled();
     }
 
     @Override
     public boolean isShowingSubPanel() {
-        return canvas.isShowingSubPanel();
+        return canvas!=null && canvas.isShowingSubPanel();
     }
 
     @Override
@@ -1592,7 +1592,7 @@ public class SwingGUI extends GUI {
 
     @Override
     public Unit getActiveUnit() {
-        return mapViewer.getActiveUnit();
+        return mapViewer==null ? null : mapViewer.getActiveUnit();
     }
 
     @Override

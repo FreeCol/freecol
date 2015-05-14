@@ -216,6 +216,7 @@ public final class FreeColClient {
             fatal(Messages.message("client.classic") + "\n" + e.getMessage());
         }
         actionManager = new ActionManager(this);
+        actionManager.initializeActions(inGameController, connectController);
 
         if (!headless) {
             // Swing system and look-and-feel initialization.
@@ -261,8 +262,6 @@ public final class FreeColClient {
         // Start the GUI (headless-safe)
         gui.hideSplashScreen();
         gui.startGUI(size);
-        // depends on initialization done in startGUI
-        actionManager.initializeActions(inGameController, connectController);
 
         // Now the GUI is going, either:
         //   - load the saved game if one was supplied
