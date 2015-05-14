@@ -89,49 +89,6 @@ public class Messages {
 
     private static final Logger logger = Logger.getLogger(Messages.class.getName());
 
-    public static class Key {
-        
-        private final String key;
-
-        public Key(String prefix, String suffix) {
-            this.key = prefix + suffix;
-        }
-
-        @Override
-        public String toString() {
-            return this.key;
-        }
-    };
-
-    public static class NameKey extends Key {
-
-        public NameKey(String key) {
-            super(key, NAME_SUFFIX);
-        }
-    };
-
-    public static class DescriptionKey extends Key {
-
-        public DescriptionKey(String key) {
-            super(key, DESCRIPTION_SUFFIX);
-        }
-    };
-
-    public static class ShortDescriptionKey extends Key {
-
-        public ShortDescriptionKey(String key) {
-            super(key, SHORT_DESCRIPTION_SUFFIX);
-        }
-    };
-
-    public static class RulerKey extends Key {
-
-        public RulerKey(String key) {
-            super(key, RULER_SUFFIX);
-        }
-    };
-
-
     public static final String MESSAGE_FILE_PREFIX = "FreeColMessages";
 
     public static final String MESSAGE_FILE_SUFFIX = ".properties";
