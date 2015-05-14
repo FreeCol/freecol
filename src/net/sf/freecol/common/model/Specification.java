@@ -1575,10 +1575,12 @@ public final class Specification {
      */
     public List<OptionGroup> getDifficultyLevels() {
         List<OptionGroup> result = new ArrayList<>();
-        for (Option option : allOptionGroups.get(DIFFICULTY_LEVELS)
-                 .getOptions()) {
-            if (option instanceof OptionGroup) {
-                result.add((OptionGroup) option);
+        OptionGroup group = allOptionGroups.get(DIFFICULTY_LEVELS);
+        if (group != null) {
+            for (Option option : group.getOptions()) {
+                if (option instanceof OptionGroup) {
+                    result.add((OptionGroup) option);
+                }
             }
         }
         return result;
