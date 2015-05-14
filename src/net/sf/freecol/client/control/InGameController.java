@@ -1592,7 +1592,7 @@ public final class InGameController implements NetworkConstants {
 
         // Perform a short pause on an active unit's last move if
         // the option is enabled.
-        ClientOptions options = freeColClient.getClientOptions();
+        final ClientOptions options = freeColClient.getClientOptions();
         if (unit.getMovesLeft() <= 0
             && options.getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
             gui.paintImmediatelyCanvasInItsBounds();
@@ -1603,12 +1603,29 @@ public final class InGameController implements NetworkConstants {
 
         // Update the active unit and GUI.
         if (unit.isDisposed() || checkCashInTreasureTrain(unit)) return false;
-        if (tile.getColony() != null
-            && unit.isCarrier()
-            && unit.getTradeRoute() == null
-            && (unit.getDestination() == null
-                || unit.getDestination().getTile() == tile.getTile())) {
-            gui.showColonyPanel(tile.getColony(), unit);
+        if (tile.getColony() != null && unit.isCarrier()) {
+            final Colony colony = tile.getColony();
+            if (unit.getTradeRoute() == null
+                && (unit.getDestination() == null
+                    || unit.getDestination().getTile() == tile.getTile())) {
+                gui.showColonyPanel(colony, unit);
+            }
+            // Autoload sentries if selected
+            if (options.getBoolean(ClientOptions.AUTOLOAD_SENTRIES)) {
+                for (Unit u : tile.getUnitList()) {
+                    if (u.getState() != UnitState.SENTRY) continue;
+                    if (unit.couldCarry(u)) {
+                        try {
+                            askServer().embark(u, unit, null);
+                        } finally {
+                            if (u.getLocation() != unit) {
+                                u.setState(UnitState.SKIPPED);
+                            }
+                            continue;
+                        }
+                    }
+                }
+            }
         }
         if (unit.getMovesLeft() <= 0) return false;
         displayModelMessages(false);

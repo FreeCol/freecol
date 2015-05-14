@@ -392,10 +392,14 @@ public class ClientOptions extends OptionGroup {
 
     // clientOptions.other
 
-    /** Option for autoload emigrants on saling to america. */
+    /** Option to autoload emigrants on sailing to america. */
     public static final String AUTOLOAD_EMIGRANTS
         = "model.option.autoloadEmigrants";
 
+    /** Option to autoload sentried units. */
+    public static final String AUTOLOAD_SENTRIES
+        = "model.option.autoloadSentries";
+    
     /** Automatically end the turn when no units can be * made active. */
     public static final String AUTO_END_TURN
         = "model.option.autoEndTurn";
@@ -808,7 +812,12 @@ public class ClientOptions extends OptionGroup {
         addBooleanOption(STOCK_ACCOUNTS_FOR_PRODUCTION,
             "clientOptions.warehouse", false);
         // end @compat 0.11.1
-    }
+
+        // @compat 0.11.3
+        addBooleanOption(AUTOLOAD_SENTRIES,
+            "clientOptions.other", false);
+        // end @compat 0.11.3
+}
 
     private void addBooleanOption(String id, String gr, boolean val) {
         if (getOption(id) == null) {

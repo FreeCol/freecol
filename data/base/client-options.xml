@@ -289,6 +289,9 @@
       <!-- Option for autoload emigrants on sailing to america. -->
       <booleanOption id="model.option.autoloadEmigrants"
                      defaultValue="false"/>
+      <!-- Option to autoload sentried units. -->
+      <booleanOption id="model.option.autoloadSentries"
+                     defaultValue="false"/>
       <!-- Automatically ends the turn when no units can be made active. -->
       <booleanOption id="model.option.autoEndTurn"
                      defaultValue="false"/>
