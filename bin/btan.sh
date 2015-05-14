@@ -142,6 +142,9 @@ section "Wishes"
 sed -n -e 's/^Count wishes: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
+section ""
+blockit
+
 for n in $nations ; do
     section "$n"
     sed -n -e 's/^'"$n"' \([0-9]*\)$/\1/p' "$tmp" | statit
