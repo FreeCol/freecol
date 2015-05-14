@@ -1,0 +1,1666 @@
+/**
+ *  Copyright (C) 2002-2015   The FreeCol Team
+ *
+ *  This file is part of FreeCol.
+ *
+ *  FreeCol is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  FreeCol is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package net.sf.freecol.client.gui;
+
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.DisplayMode;
+import java.awt.Font;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.awt.Image;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.logging.Level;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JWindow;
+import javax.swing.Timer;
+import javax.swing.filechooser.FileFilter;
+
+import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.animation.Animations;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.client.gui.panel.ColonyPanel;
+import net.sf.freecol.client.gui.panel.ColorChooserPanel;
+import net.sf.freecol.client.gui.panel.CornerMapControls;
+import net.sf.freecol.client.gui.panel.DialogHandler;
+import net.sf.freecol.client.gui.panel.FreeColDialog;
+import net.sf.freecol.client.gui.panel.LabourData.UnitData;
+import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
+import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.client.gui.panel.Parameters;
+import net.sf.freecol.client.gui.panel.TradeRoutePanel;
+import net.sf.freecol.client.gui.panel.Utility;
+import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
+import net.sf.freecol.client.gui.video.VideoComponent;
+import net.sf.freecol.client.gui.video.VideoListener;
+import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HighScore;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Region;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.TypeCountMap;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.common.option.LanguageOption.Language;
+import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.resources.Video;
+
+import static net.sf.freecol.common.util.StringUtils.lastPart;
+
+
+/**
+ * A wrapper providing functionality for the overall GUI using Java Swing.
+ */
+public class SwingGUI extends GUI {
+
+    private final GraphicsDevice graphicsDevice;
+
+    /**
+     * This is the MapViewer instance used to paint the colony tiles
+     * in the ColonyPanel and other panels.  It should not be scaled
+     * along with the default MapViewer.
+     */
+    private MapViewer colonyTileMapViewer;
+
+    /**
+     * The MapViewer instance used to paint the main map.
+     * This does need to be scaled.
+     */
+    private MapViewer mapViewer;
+
+    /** The canvas that implements much of the functionality. */
+    private Canvas canvas;
+
+    private MapControls mapControls;
+
+    private JWindow splash;
+
+
+    /**
+     * Create the GUI.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param scaleFactor The scale factor for the GUI.
+     */
+    public SwingGUI(FreeColClient freeColClient, float scaleFactor) {
+        super(freeColClient, scaleFactor);
+        graphicsDevice = getGoodGraphicsDevice();
+        logger.info("GUI constructed using scale factor " + scaleFactor);
+    }
+
+
+    // Simple accessors
+
+    @Override
+    public Canvas getCanvas() {
+        return canvas;
+    }
+
+    @Override
+    public MapViewer getColonyTileMapViewer() {
+        return colonyTileMapViewer;
+    }
+
+    @Override
+    public boolean isWindowed() {
+        return canvas.isWindowed();
+    }
+
+    // Initialization related methods
+
+    /** 
+     * Swing system and look-and-feel initialization.
+     * 
+     * @param fontName An optional font name to be used.
+     */
+    @Override
+    public void installLookAndFeel(String fontName) throws FreeColException {
+        FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
+        FreeColLookAndFeel.install(fclaf);
+        Font font = FontLibrary.createMainFont(
+            fontName, imageLibrary.getScalingFactor());
+        FreeColLookAndFeel.installFont(font);
+        Utility.initStyleContext(font);
+    }
+
+    /**
+     * Quit the GUI.  All that is required is to exit the full screen.
+     */
+    @Override
+    public void quit() throws Exception {
+        if (canvas != null) {
+            canvas.quit();
+        }
+    }
+
+    /**
+     * In game initializations.
+     * Called from PreGameController.startGame().
+     *
+     * @param tile An initial <code>Tile</code> to select.
+     */
+    @Override
+    public void initializeInGame(Tile tile) {
+        canvas.initializeInGame();
+        enableMapControls(freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
+        setSelectedTile(tile, false);
+    }
+
+    /**
+     * Set up the mouse listeners for the canvas and map viewer.
+     */
+    @Override
+    public void setupMouseListeners() {
+        canvas.setupMouseListeners();
+    }
+
+    /**
+     * Display the splash screen.
+     *
+     * @param splashFilename The name of the file to find the image in.
+     */
+    @Override
+    public void displaySplashScreen(final String splashFilename) {
+        splash = null;
+        if (splashFilename == null)
+            return;
+        try {
+            Image im = Toolkit.getDefaultToolkit().getImage(splashFilename);
+            splash = new JWindow(graphicsDevice.getDefaultConfiguration());
+            splash.getContentPane().add(new JLabel(new ImageIcon(im)));
+            splash.pack();
+            Point start = splash.getLocation();
+            DisplayMode dm = graphicsDevice.getDisplayMode();
+            splash.setLocation(start.x + dm.getWidth()/2 - splash.getWidth() / 2,
+                start.y + dm.getHeight()/2 - splash.getHeight() / 2);
+            splash.setVisible(true);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Splash fail", e);
+            splash = null;
+        }
+    }
+
+    /**
+     * Hide the splash screen.
+     */
+    @Override
+    public void hideSplashScreen() {
+        if (splash != null) {
+            splash.setVisible(false);
+            splash.dispose();
+            splash = null;
+        }
+    }
+
+    /**
+     * Shows the <code>VideoPanel</code>.
+     *
+     * @param userMsg An optional user message.
+     */
+    @Override
+    public void showOpeningVideo(final String userMsg) {
+        canvas.closeMenus();
+        final Video video = ResourceManager.getVideo("video.opening");
+        boolean muteAudio = !freeColClient.getSoundController().canPlaySound();
+        final VideoComponent vp = new VideoComponent(video, muteAudio);
+
+        final class AbortListener implements ActionListener, KeyListener, MouseListener, VideoListener {
+
+            private Timer t = null;
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e1) {
+                execute();
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e2) {
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e3) {
+                execute();
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e4) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e5) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e6) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e7) {
+            }
+
+            @Override
+            public void stopped() {
+                execute();
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e8) {
+                execute();
+            }
+
+            private void setTimer(Timer t1) {
+                this.t = t1;
+            }
+
+            private void execute() {
+                canvas.removeKeyListener(this);
+                canvas.removeMouseListener(this);
+                vp.removeMouseListener(this);
+                //vp.removeVideoListener(this);
+                vp.stop();
+                canvas.remove(vp);
+                if (t != null) {
+                    t.stop();
+                }
+                freeColClient.getSoundController().playSound("sound.intro.general");
+                showMainPanel(userMsg);
+            }
+        }
+        AbortListener l = new AbortListener();
+        vp.addMouseListener(l);
+        //vp.addVideoListener(l);
+        canvas.showVideoComponent(vp, l, l);
+        vp.play();
+        // Cortado applet is failing to quit when finished, make sure it
+        // eventually gets kicked.  Change the magic number if we
+        // change the opening video length.
+        Timer t2 = new Timer(80000, l);
+        l.setTimer(t2);
+        t2.setRepeats(false);
+        t2.start();
+    }
+
+    /**
+     * Get a good screen device for starting FreeCol.
+     *
+     * @return A screen device, or null if none available
+     *     (as in headless mode).
+     */
+    private static GraphicsDevice getGoodGraphicsDevice() {
+        try {
+            return MouseInfo.getPointerInfo().getDevice();
+        } catch (HeadlessException he) {}
+
+        try {
+            final GraphicsEnvironment lge
+                = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            return lge.getDefaultScreenDevice();
+        } catch (HeadlessException he) {}
+
+        FreeColClient.fatal("Could not find a GraphicsDevice!");
+        return null;
+    }
+
+    /**
+     * Starts the GUI by creating and displaying the GUI-objects.
+     *
+     * @param desiredWindowSize The desired size of the GUI window.
+     */
+    @Override
+    public void startGUI(final Dimension desiredWindowSize) {
+        final ClientOptions opts = freeColClient.getClientOptions();
+
+        // Work around a Java 2D bug that seems to be X11 specific.
+        // According to:
+        //   http://www.oracle.com/technetwork/java/javase/index-142560.html
+        //
+        //   ``The use of pixmaps typically results in better
+        //     performance. However, in certain cases, the opposite is true.''
+        //
+        // The standard workaround is to use -Dsun.java2d.pmoffscreen=false,
+        // but this is too hard for some users, so provide an option to
+        // do it easily.  However respect the initial value if present.
+        //
+        // Remove this if Java 2D is ever fixed.  DHYB.
+        //
+        final String pmoffscreen = "sun.java2d.pmoffscreen";
+        BooleanOption usePixmaps
+            = (BooleanOption) opts.getOption(ClientOptions.USE_PIXMAPS);
+        String pmoffscreenValue = System.getProperty(pmoffscreen);
+        if (pmoffscreenValue == null) {
+            System.setProperty(pmoffscreen, usePixmaps.getValue().toString());
+            logger.info(pmoffscreen + " using client option: "
+                + usePixmaps.getValue());
+        } else {
+            usePixmaps.setValue(Boolean.valueOf(pmoffscreenValue));
+            logger.info(pmoffscreen + " overrides client option: "
+                + pmoffscreenValue);
+        }
+        usePixmaps.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent e) {
+                    String newValue = e.getNewValue().toString();
+                    System.setProperty(pmoffscreen, newValue);
+                    logger.info("Set " + pmoffscreen + " to: " + newValue);
+                }
+            });
+
+        this.mapViewer = new MapViewer(freeColClient);
+        this.canvas = new Canvas(freeColClient, graphicsDevice,
+                                 desiredWindowSize, mapViewer);
+        this.colonyTileMapViewer = new MapViewer(freeColClient);
+
+        // Now that there is a canvas, prepare for language changes.
+        LanguageOption o = (LanguageOption)freeColClient.getClientOptions()
+            .getOption(ClientOptions.LANGUAGE);
+        o.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent e) {
+                    Language language = (Language)e.getNewValue();
+                    logger.info("Set language to: " + language);
+                    if (Messages.AUTOMATIC.equalsIgnoreCase(language.getKey())) {
+                        showInformationMessage("info.autodetectLanguageSelected");
+                    } else {
+                        Locale l = language.getLocale();
+                        Messages.setMessageBundle(l);
+                        Messages.setModMessageBundle(l);
+                        showInformationMessage(StringTemplate
+                            .template("info.newLanguageSelected")
+                            .addName("%language%", l.getDisplayName()));
+                    }
+                }
+            });
+
+        mapViewer.startCursorBlinking();
+        logger.info("GUI created.");
+        logger.info("Starting in Move Units View Mode");
+    }
+
+    /**
+     * Change the windowed mode.
+     *
+     * @param windowed Use <code>true</code> for windowed mode
+     *     and <code>false</code> for fullscreen mode.
+     */
+    @Override
+    public void changeWindowedMode(boolean windowed) {
+        canvas.changeWindowedMode(windowed);
+    }
+
+    /**
+     * Start the GUI for the map editor.
+     */
+    @Override
+    public void startMapEditorGUI() {
+        canvas.startMapEditorGUI();
+    }
+
+
+    // Non-trivial public routines.
+
+    /**
+     * Start/stop the goto path display.
+     */
+    @Override
+    public void activateGotoPath() {
+        Unit unit = getActiveUnit();
+
+        // Action should be disabled if there is no active unit, but make sure
+        if (unit == null) return;
+
+        // Enter "goto mode" if not already activated; otherwise cancel it
+        if (canvas.isGotoStarted()) {
+            canvas.stopGoto();
+        } else {
+            canvas.startGoto();
+
+            // Draw the path to the current mouse position, if the
+            // mouse is over the screen; see also
+            // CanvasMouseMotionListener.
+            Point pt = canvas.getMousePosition();
+            if (pt != null) {
+                Tile tile = mapViewer.convertToMapTile(pt.x, pt.y);
+                if (tile != null && unit.getTile() != tile) {
+                    canvas.setGotoPath(unit.findPath(tile));
+                }
+            }
+        }
+    }
+
+    /**
+     * Stop the goto path display.
+     */
+    @Override
+    public void clearGotoPath() {
+        Unit unit = getActiveUnit();
+
+        // Action should be disabled if there is no active unit, but make sure
+        if (unit == null) return;
+        canvas.stopGoto();
+        refresh();
+    }
+
+    /**
+     * Tells the map controls that a chat message was received.
+     *
+     * @param player The player who sent the chat message.
+     * @param message The chat message.
+     * @param privateChat 'true' if the message is a private one, 'false'
+     *            otherwise.
+     * @see GUIMessage
+     */
+    @Override
+    public void displayChatMessage(Player player, String message,
+                                   boolean privateChat) {
+        canvas.displayChatMessage(new GUIMessage(
+            player.getName() + ": " + message, player.getNationColor()));
+    }
+
+    /**
+     * Refresh the GUI.
+     */
+    @Override
+    public void refresh() {
+        mapViewer.forceReposition();
+        canvas.refresh();
+    }
+
+    /**
+     * Refreshes the screen at the specified Tile.
+     *
+     * @param tile The <code>Tile</code> to refresh.
+     */
+    @Override
+    public void refreshTile(Tile tile) {
+        if (tile.getX() >= 0 && tile.getY() >= 0) {
+            canvas.repaint(mapViewer.calculateTileBounds(tile));
+        }
+    }
+
+    /**
+     * Reset the menu bar.
+     */
+    @Override
+    public void resetMenuBar() {
+        canvas.resetMenuBar();
+    }
+
+    @Override
+    protected void resetMapZoom() {
+        super.resetMapZoom();
+        mapViewer.resetMapScale();
+        refresh();
+    }
+
+    @Override
+    public boolean canZoomInMap() {
+        return !mapViewer.isAtMaxMapScale();
+    }
+
+    @Override
+    public boolean canZoomOutMap() {
+        return !mapViewer.isAtMinMapScale();
+    }
+
+    @Override
+    public void zoomInMap() {
+        super.zoomInMap();
+        mapViewer.increaseMapScale();
+        refresh();
+    }
+
+    @Override
+    public void zoomOutMap() {
+        super.zoomOutMap();
+        mapViewer.decreaseMapScale();
+        refresh();
+    }
+
+    /**
+     * Set the active unit.
+     *
+     * @param unit The <code>Unit</code> to activate.
+     */
+    @Override
+    public void setActiveUnit(Unit unit) {
+        mapViewer.setActiveUnit(unit);
+        updateMapControls();
+        if (unit != null && !freeColClient.getMyPlayer().owns(unit)) {
+            canvas.refresh();
+        }
+        canvas.updateMenuBar();
+    }
+
+    /**
+     * Update the menu bar.
+     */
+    @Override
+    public void updateMenuBar() {
+        canvas.updateMenuBar();
+    }
+
+
+    // Animation handling
+
+    /**
+     * Animate a unit attack.
+     *
+     * @param attacker The attacking <code>Unit</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @param attackerTile The <code>Tile</code> to show the attacker on.
+     * @param defenderTile The <code>Tile</code> to show the defender on.
+     * @param success Did the attack succeed?
+     */
+    @Override
+    public void animateUnitAttack(Unit attacker, Unit defender,
+                                  Tile attackerTile, Tile defenderTile,
+                                  boolean success) {
+        Animations.unitAttack(this, attacker, defender,
+                              attackerTile, defenderTile, success);
+    }
+
+    /**
+     * Animate a unit move.
+     *
+     * @param unit The <code>Unit</code> that is moving.
+     * @param srcTile The <code>Tile</code> the unit starts at.
+     * @param dstTile The <code>Tile</code> the unit moves to.
+     */
+    @Override
+    public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
+        Animations.unitMove(this, unit, srcTile, dstTile);
+    }
+
+
+    // MapControls handling
+
+    /**
+     * Enable the map controls.
+     *
+     * Called from the MapControlsAction.
+     *
+     * @param enable If true then enable.
+     */
+    @Override
+    public void enableMapControls(boolean enable) {
+        // Always instantiate in game.
+        if (enable && mapControls == null) {
+            String className = freeColClient.getClientOptions()
+                .getString(ClientOptions.MAP_CONTROLS);
+            try {
+                final String panelName = "net.sf.freecol.client.gui.panel."
+                    + lastPart(className, ".");
+                Class<?> controls = Class.forName(panelName);
+                mapControls = (MapControls)controls
+                    .getConstructor(FreeColClient.class)
+                    .newInstance(freeColClient);
+                logger.info("Instantiated " + panelName);
+            } catch (Exception e) {
+                logger.log(Level.INFO, "Fallback to CornerMapControls from "
+                    + className, e);
+                mapControls = new CornerMapControls(freeColClient);
+            }
+            if (mapControls != null) {
+                mapControls.addToComponent(canvas);
+                mapControls.update();
+            }
+        } else if (!enable && mapControls != null) {
+            mapControls.removeFromComponent(canvas);
+            mapControls = null;
+        }
+    }
+
+    @Override
+    public void updateMapControls() {
+        if (mapControls != null) mapControls.update();
+    }
+
+    @Override
+    public void updateMapControlsInCanvas() {
+        if (mapControls == null) return;
+        mapControls.removeFromComponent(canvas);
+        mapControls.addToComponent(canvas);
+    }
+
+    @Override
+    public void zoomInMapControls() {
+        if (mapControls == null) return;
+        mapControls.zoomIn();
+    }
+
+    @Override
+    public void zoomOutMapControls() {
+        if (mapControls == null) return;
+        mapControls.zoomOut();
+    }
+
+    @Override
+    public boolean canZoomInMapControls() {
+        return mapControls != null && mapControls.canZoomInMapControls();
+    }
+
+    @Override
+    public boolean canZoomOutMapControls() {
+        return mapControls != null && mapControls.canZoomOutMapControls();
+    }
+
+    @Override
+    public void miniMapToggleViewControls() {
+        if (mapControls == null) return;
+        mapControls.toggleView();
+    }
+
+    @Override
+    public void miniMapToggleFogOfWarControls() {
+        if (mapControls == null) return;
+        mapControls.toggleFogOfWar();
+    }
+
+
+    // Dialogs that return values
+
+    /**
+     * Simple confirmation dialog.
+     *
+     * @param textKey A string to use as the message key.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    @Override
+    public boolean confirm(String textKey, String okKey, String cancelKey) {
+        return canvas.showConfirmDialog(true, null,
+                                        Messages.message(textKey), null,
+                                        okKey, cancelKey);
+    }
+
+    /**
+     * General confirmation dialog.
+     *
+     * @param modal Is this a modal dialog?
+     * @param tile An optional <code>Tile</code> to expose.
+     * @param template The <code>StringTemplate</code> explaining the choice.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    @Override
+    public boolean confirm(boolean modal, Tile tile,
+                           StringTemplate template,
+                           String okKey, String cancelKey) {
+        return canvas.showConfirmDialog(modal, tile,
+                                        Utility.localizedTextArea(template),
+                                        null, okKey, cancelKey);
+    }
+
+    /**
+     * General confirmation dialog.
+     *
+     * @param modal Is this a modal dialog?
+     * @param tile An optional <code>Tile</code> to expose.
+     * @param template The <code>StringTemplate</code> explaining the choice.
+     * @param obj An optional unit to make an icon for the dialog from.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    @Override
+    public boolean confirm(boolean modal, Tile tile,
+                           StringTemplate template, Unit obj,
+                           String okKey, String cancelKey) {
+        return canvas.showConfirmDialog(modal, tile,
+                                        Utility.localizedTextArea(template),
+                                        (obj == null) ? null : new ImageIcon(
+                                            imageLibrary.getUnitImage(obj)),
+                                        okKey, cancelKey);
+    }
+
+    /**
+     * General confirmation dialog.
+     *
+     * @param modal Is this a modal dialog?
+     * @param tile An optional <code>Tile</code> to expose.
+     * @param template The <code>StringTemplate</code> explaining the choice.
+     * @param icon An optional icon for the dialog.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return True if the "ok" button was selected.
+     */
+    @Override
+    public boolean confirm(boolean modal, Tile tile,
+                           StringTemplate template, ImageIcon icon,
+                           String okKey, String cancelKey) {
+        return canvas.showConfirmDialog(modal, tile,
+                                        Utility.localizedTextArea(template),
+                                        icon, okKey, cancelKey);
+    }
+
+    /**
+     * Confirm declaration of independence.
+     *
+     * @return A list of new nation and country names.
+     */
+    @Override
+    public List<String> confirmDeclaration() {
+        return canvas.showConfirmDeclarationDialog();
+    }
+
+    /**
+     * General choice dialog.
+     *
+     * @param modal Is this a modal dialog?
+     * @param tile An optional <code>Tile</code> to expose.
+     * @param explain An object explaining the choice.
+     * @param icon An optional icon for the dialog.
+     * @param cancelKey A key for the "cancel" button.
+     * @param choices A list a <code>ChoiceItem</code>s to choose from.
+     * @return The selected value of the selected <code>ChoiceItem</code>,
+     *     or null if cancelled.
+     */
+    @Override
+    public <T> T getChoice(boolean modal, Tile tile, Object explain,
+                           ImageIcon icon,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return canvas.showChoiceDialog(modal, tile, explain, icon,
+                                       cancelKey, choices);
+    }
+
+    /**
+     * General input dialog.
+     *
+     * @param modal Is this a modal dialog?
+     * @param tile An optional <code>Tile</code> to expose.
+     * @param template A <code>StringTemplate</code> explaining the choice.
+     * @param defaultValue The default value to show initially.
+     * @param okKey A key for the "ok" button.
+     * @param cancelKey A key for the "cancel" button.
+     * @return The chosen value.
+     */
+    @Override
+    public String getInput(boolean modal, Tile tile, StringTemplate template,
+                           String defaultValue, String okKey, String cancelKey) {
+        return canvas.showInputDialog(modal, tile, template, defaultValue,
+                                      okKey, cancelKey);
+    }
+
+
+    // Trivial delegations to Canvas
+
+    @Override
+    public void closeMainPanel() {
+        canvas.closeMainPanel();
+    }
+
+    @Override
+    public void closeMenus() {
+        canvas.closeMenus();
+    }
+
+    @Override
+    public void closeStatusPanel() {
+        canvas.closeStatusPanel();
+    }
+
+    @Override
+    public boolean containsInGameComponents() {
+        return canvas.containsInGameComponents();
+    }
+
+    @Override
+    public void dialogRemove(FreeColDialog<?> fcd) {
+        canvas.dialogRemove(fcd);
+    }
+
+    /**
+     * Show the appropriate panel for an object.
+     *
+     * TODO: Improve OO.
+     *
+     * @param fco The <code>FreeColObject</code> to display.
+     */
+    @Override
+    public void displayObject(FreeColObject fco) {
+        if (fco instanceof Colony) {
+            canvas.showColonyPanel((Colony)fco, null);
+        } else if (fco instanceof Europe) {
+            canvas.showEuropePanel();
+        } else if (fco instanceof IndianSettlement) {
+            canvas.showIndianSettlementPanel((IndianSettlement)fco);
+        } else if (fco instanceof Tile) {
+            setFocus((Tile)fco);
+        } else if (fco instanceof Unit) {
+            displayObject((FreeColObject)(((Unit)fco).getLocation()));
+        } else if (fco instanceof WorkLocation) {
+            displayObject(((WorkLocation)fco).getColony());
+        }
+    }
+
+    @Override
+    public LoadingSavegameDialog getLoadingSavegameDialog() {
+        return canvas.getLoadingSavegameDialog();
+    }
+
+    @Override
+    public boolean isClientOptionsDialogShowing() {
+        return canvas.isClientOptionsDialogShowing();
+    }
+
+    @Override
+    public boolean isMapboardActionsEnabled() {
+        return canvas.isMapboardActionsEnabled();
+    }
+
+    @Override
+    public boolean isShowingSubPanel() {
+        return canvas.isShowingSubPanel();
+    }
+
+    @Override
+    public void paintImmediatelyCanvasIn(Rectangle rectangle) {
+        canvas.paintImmediately(rectangle);
+    }
+
+    @Override
+    public void paintImmediatelyCanvasInItsBounds() {
+        canvas.paintImmediately(canvas.getBounds());
+    }
+
+    @Override
+    public void refreshPlayersTable() {
+        canvas.refreshPlayersTable();
+    }
+
+    @Override
+    public void removeFromCanvas(Component component) {
+        canvas.remove(component);
+    }
+
+    @Override
+    public void removeInGameComponents() {
+        canvas.removeInGameComponents();
+    }
+
+    @Override
+    public void removeTradeRoutePanel(TradeRoutePanel panel) {
+        canvas.removeTradeRoutePanel(panel);
+    }
+
+    @Override
+    public void requestFocusForSubPanel() {
+        canvas.getShowingSubPanel().requestFocus();
+    }
+
+    @Override
+    public boolean requestFocusInWindow() {
+        return canvas.requestFocusInWindow();
+    }
+
+    @Override
+    public void restoreSavedSize(Component comp, int w, int h) {
+        canvas.restoreSavedSize(comp, new Dimension(w, h));
+    }
+
+    @Override
+    public void restoreSavedSize(Component comp, Dimension size) {
+        canvas.restoreSavedSize(comp, size);
+    }
+
+    @Override
+    public void returnToTitle() {
+        canvas.returnToTitle();
+        freeColClient.getSoundController().playSound("sound.intro.general");
+    }
+
+    @Override
+    public void showAboutPanel() {
+        canvas.showAboutPanel();
+    }
+
+    @Override
+    public void showBuildQueuePanel(Colony colony) {
+        canvas.showBuildQueuePanel(colony);
+    }
+
+    @Override
+    public void showBuildQueuePanel(Colony colony, Runnable callBack) {
+        canvas.showBuildQueuePanel(colony, callBack);
+    }
+
+    @Override
+    public void showCaptureGoodsDialog(final Unit unit, List<Goods> gl,
+                                       final String defenderId) {
+        canvas.showCaptureGoodsDialog(unit, gl,
+            new DialogHandler<List<Goods>>() {
+                @Override
+                public void handle(List<Goods> gl) {
+                    igc().lootCargo(unit, gl, defenderId);
+                }
+            });
+    }
+
+    @Override
+    public void showChatPanel() {
+        canvas.showChatPanel();
+    }
+
+    @Override
+    public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs) {
+        canvas.showChooseFoundingFatherDialog(ffs,
+            new DialogHandler<FoundingFather>() {
+                @Override
+                public void handle(FoundingFather ff) {
+                    igc().chooseFoundingFather(ffs, ff);
+                }
+            });
+    }
+
+    @Override
+    public OptionGroup showClientOptionsDialog() {
+        OptionGroup group = canvas.showClientOptionsDialog();
+        if (!freeColClient.isInGame()) showMainPanel(null);
+        return group;
+    }
+
+    @Override
+    protected void showForeignColony(Settlement settlement) {
+        canvas.showForeignColony(settlement);
+    }
+
+    @Override
+    public ColonyPanel showColonyPanel(Colony colony, Unit unit) {
+        return canvas.showColonyPanel(colony, unit);
+    }
+
+    @Override
+    public void showColopediaPanel(String nodeId) {
+        canvas.showColopediaPanel(nodeId);
+    }
+
+    @Override
+    public ColorChooserPanel showColorChooserPanel(ActionListener al) {
+        return canvas.showColorChooserPanel(al);
+    }
+
+    @Override
+    public void showCompactLabourReport() {
+        canvas.showCompactLabourReport();
+    }
+
+    @Override
+    public void showCompactLabourReport(UnitData unitData) {
+        canvas.showCompactLabourReport(unitData);
+    }
+
+    @Override
+    public void showDeclarationPanel() {
+        canvas.showDeclarationPanel();
+    }
+
+    @Override
+    public OptionGroup showDifficultyDialog() {
+        return canvas.showDifficultyDialog();
+    }
+
+    @Override
+    public OptionGroup showDifficultyDialog(Specification spec,
+                                            OptionGroup group) {
+        return canvas.showDifficultyDialog(spec, group);
+    }
+
+    @Override
+    public void showDumpCargoDialog(Unit unit) {
+        canvas.showDumpCargoDialog(unit,
+            new DialogHandler<List<Goods>>() {
+                @Override
+                public void handle(List<Goods> goodsList) {
+                    for (Goods g : goodsList) igc().unloadCargo(g, true);
+                }
+            });
+    }
+
+    @Override
+    public boolean showEditOptionDialog(Option option) {
+        return canvas.showEditOptionDialog(option);
+    }
+
+    @Override
+    public void showEmigrationDialog(final Player player, final int n,
+                                     final boolean fountainOfYouth) {
+        canvas.showEmigrationDialog(player, fountainOfYouth,
+            new DialogHandler<Integer>() {
+                @Override
+                public void handle(Integer value) {
+                    // Value should be a valid slot
+                    igc().emigrate(player,
+                        Europe.MigrationType.convertToMigrantSlot(value));
+                    igc().emigrationLoop(player, n-1, fountainOfYouth);
+                }
+            });
+    }
+
+    @Override
+    public void showEndTurnDialog(final List<Unit> units) {
+        canvas.showEndTurnDialog(units,
+            new DialogHandler<Boolean>() {
+                @Override
+                public void handle(Boolean value) {
+                    if (value != null && value) {
+                        igc().endTurn(false);
+                    }
+                }
+            });
+    }
+
+    @Override
+    public void showErrorMessage(StringTemplate template) {
+        canvas.showErrorMessage(Messages.message(template));
+    }
+
+    @Override
+    public void showErrorMessage(String messageId) {
+        canvas.showErrorMessage(messageId);
+    }
+
+    @Override
+    public void showErrorMessage(String messageID, String message) {
+        canvas.showErrorMessage(messageID, message);
+    }
+
+    @Override
+    public void showEuropePanel() {
+        canvas.showEuropePanel();
+    }
+
+    @Override
+    public void showEventPanel(String header, String image, String footer) {
+        canvas.showEventPanel(header, image, footer);
+    }
+
+    @Override
+    public void showFindSettlementPanel() {
+        canvas.showFindSettlementPanel();
+    }
+
+    @Override
+    public OptionGroup showGameOptionsDialog(boolean editable, boolean custom) {
+        return canvas.showGameOptionsDialog(editable, custom);
+    }
+
+    @Override
+    public void showHighScoresPanel(String messageId, List<HighScore> scores) {
+        canvas.showHighScoresPanel(messageId, scores);
+    }
+
+    @Override
+    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
+        canvas.showIndianSettlementPanel(indianSettlement);
+    }
+
+    @Override
+    public void showInformationMessage(String messageId) {
+        super.showInformationMessage(messageId);
+        canvas.showInformationMessage(null, null, null, StringTemplate.key(messageId));
+    }
+
+    @Override
+    public void showInformationMessage(StringTemplate template) {
+        super.showInformationMessage(template);
+        canvas.showInformationMessage(null, null, null, template);
+    }
+
+    @Override
+    public void showInformationMessage(Settlement displayObject,
+                                       StringTemplate template) {
+        super.showInformationMessage(displayObject, template);
+        ImageIcon icon = null;
+        Tile tile = null;
+        if(displayObject != null) {
+            icon = new ImageIcon(imageLibrary.getSettlementImage(displayObject));
+            tile = displayObject.getTile();
+        }
+        canvas.showInformationMessage(displayObject, tile, icon, template);
+    }
+
+    @Override
+    public void showInformationMessage(Unit displayObject,
+                                       StringTemplate template) {
+        super.showInformationMessage(displayObject, template);
+        ImageIcon icon = null;
+        Tile tile = null;
+        if(displayObject != null) {
+            icon = new ImageIcon(imageLibrary.getUnitImage(displayObject));
+            tile = displayObject.getTile();
+        }
+        canvas.showInformationMessage(displayObject, tile, icon, template);
+    }
+
+    @Override
+    public void showInformationMessage(Tile displayObject,
+                                       StringTemplate template) {
+        super.showInformationMessage(displayObject, template);
+        canvas.showInformationMessage(displayObject, displayObject, null, template);
+    }
+
+    @Override
+    public void showInformationMessage(FreeColObject displayObject,
+                                       String messageId) {
+        super.showInformationMessage(displayObject, messageId);
+        canvas.showInformationMessage(displayObject, StringTemplate.key(messageId));
+    }
+
+    @Override
+    public void showInformationMessage(FreeColObject displayObject,
+                                       StringTemplate template) {
+        super.showInformationMessage(displayObject, template);
+        canvas.showInformationMessage(displayObject, template);
+    }
+
+    @Override
+    public File showLoadDialog(File directory) {
+        return canvas.showLoadDialog(directory);
+    }
+
+    @Override
+    public File showLoadDialog(File directory, FileFilter[] fileFilters) {
+        return canvas.showLoadDialog(directory, fileFilters);
+    }
+
+    @Override
+    public boolean showLoadingSavegameDialog(boolean publicServer,
+                                             boolean singlePlayer) {
+        return canvas.showLoadingSavegameDialog(publicServer, singlePlayer);
+    }
+
+    @Override
+    public void showLogFilePanel() {
+        canvas.showLogFilePanel();
+    }
+
+    @Override
+    public void showMainPanel(String userMsg) {
+        canvas.showMainPanel(userMsg);
+    }
+
+    @Override
+    public OptionGroup showMapGeneratorOptionsDialog(boolean editable) {
+        return canvas.showMapGeneratorOptionsDialog(editable);
+    }
+
+    @Override
+    public Dimension showMapSizeDialog() {
+        return canvas.showMapSizeDialog();
+    }
+
+    @Override
+    public void showModelMessages(List<ModelMessage> modelMessages) {
+        canvas.showModelMessages(modelMessages);
+    }
+
+    @Override
+    public void showMonarchDialog(final MonarchAction action,
+                                  StringTemplate template, String monarchKey) {
+        canvas.showMonarchDialog(action, template, monarchKey,
+            new DialogHandler<Boolean>() {
+                @Override
+                public void handle(Boolean b) {
+                    igc().monarchAction(action, b);
+                    canvas.updateMenuBar();
+                }
+            });
+    }
+
+    @Override
+    public void showNameNewLandDialog(String key, final String defaultName,
+                                      final Unit unit) {
+        canvas.showNameNewLandDialog(key, defaultName, unit,
+            new DialogHandler<String>() {
+                @Override
+                public void handle(String name) {
+                    if (name == null || name.isEmpty()) name = defaultName;
+                    igc().nameNewLand(unit, name);
+                }
+            });
+    }
+
+    @Override
+    public void showNameNewRegionDialog(StringTemplate template,
+                                        final String defaultName,
+                                        final Unit unit, final Tile tile,
+                                        final Region region) {
+        canvas.showNameNewRegionDialog(template, defaultName, unit,
+            new DialogHandler<String>() {
+                @Override
+                public void handle(String name) {
+                    if (name == null || name.isEmpty()) name = defaultName;
+                    igc().nameNewRegion(tile, unit, region, name);
+                }
+            });
+    }
+
+    @Override
+    public void showFirstContactDialog(final Player player, final Player other,
+                                       final Tile tile, int settlementCount) {
+        canvas.showFirstContactDialog(player, other, tile, settlementCount,
+            new DialogHandler<Boolean>() {
+                @Override
+                public void handle(Boolean b) {
+                    igc().firstContact(player, other, tile, b);
+                }
+            });
+    }
+
+    @Override
+    public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
+                                                     FreeColGameObject other,
+                                                     DiplomaticTrade agreement,
+                                                     StringTemplate comment) {
+        return canvas.showNegotiationDialog(our, other, agreement, comment);
+    }
+
+    @Override
+    public void showNewPanel() {
+        canvas.showNewPanel();
+    }
+
+    @Override
+    public void showNewPanel(Specification specification) {
+        canvas.showNewPanel(specification);
+    }
+
+    @Override
+    public void showSpyColonyPanel(final Tile tile, Runnable callback) {
+        ColonyPanel panel = canvas.showSpyColonyPanel(tile);
+        panel.addClosingCallback(callback);
+    }
+
+    @Override
+    public Parameters showParametersDialog() {
+        return canvas.showParametersDialog();
+    }
+
+    @Override
+    public boolean showPreCombatDialog(Unit attacker,
+                                       FreeColGameObject defender, Tile tile) {
+        return canvas.showPreCombatDialog(attacker, defender, tile);
+    }
+
+    @Override
+    public void showPurchasePanel() {
+        canvas.showPurchasePanel();
+    }
+
+    @Override
+    public void showRecruitPanel() {
+        canvas.showRecruitPanel();
+    }
+
+    @Override
+    public void showReportCargoPanel() {
+        canvas.showReportCargoPanel();
+    }
+
+    @Override
+    public void showReportColonyPanel() {
+        canvas.showReportColonyPanel();
+    }
+
+    @Override
+    public void showReportContinentalCongressPanel() {
+        canvas.showReportContinentalCongressPanel();
+    }
+
+    @Override
+    public void showReportEducationPanel() {
+        canvas.showReportEducationPanel();
+    }
+
+    @Override
+    public void showReportExplorationPanel() {
+        canvas.showReportExplorationPanel();
+    }
+
+    @Override
+    public void showReportForeignAffairPanel() {
+        canvas.showReportForeignAffairPanel();
+    }
+
+    @Override
+    public void showReportHistoryPanel() {
+        canvas.showReportHistoryPanel();
+    }
+
+    @Override
+    public void showReportIndianPanel() {
+        canvas.showReportIndianPanel();
+    }
+
+    @Override
+    public void showReportLabourDetailPanel(UnitType unitType,
+            Map<UnitType, Map<Location, Integer>> data,
+            TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
+        canvas.showReportLabourDetailPanel(unitType, data, unitCount,
+                                           colonies);
+    }
+
+    @Override
+    public void showReportLabourPanel() {
+        canvas.showReportLabourPanel();
+    }
+
+    @Override
+    public void showReportMilitaryPanel() {
+        canvas.showReportMilitaryPanel();
+    }
+
+    @Override
+    public void showReportNavalPanel() {
+        canvas.showReportNavalPanel();
+    }
+
+    @Override
+    public void showReportProductionPanel() {
+        canvas.showReportProductionPanel();
+    }
+
+    @Override
+    public void showReportReligiousPanel() {
+        canvas.showReportReligiousPanel();
+    }
+
+    @Override
+    public void showReportRequirementsPanel() {
+        canvas.showReportRequirementsPanel();
+    }
+
+    @Override
+    public void showReportTradePanel() {
+        canvas.showReportTradePanel();
+    }
+
+    @Override
+    public void showReportTurnPanel(List<ModelMessage> messages) {
+        canvas.showReportTurnPanel(messages);
+    }
+
+    @Override
+    public File showSaveDialog(File directory, String defaultName) {
+        return canvas.showSaveDialog(directory, defaultName);
+    }
+
+    @Override
+    public File showSaveDialog(File directory, FileFilter[] fileFilters,
+                               String defaultName, String extension) {
+        return canvas.showSaveDialog(directory, fileFilters, defaultName,
+                                     extension);
+    }
+
+    @Override
+    public Dimension showScaleMapSizeDialog() {
+        return canvas.showScaleMapSizeDialog();
+    }
+
+    @Override
+    public int showSelectAmountDialog(GoodsType goodsType, int available,
+                                      int defaultAmount, boolean needToPay) {
+        return canvas.showSelectAmountDialog(goodsType, available,
+                                             defaultAmount, needToPay);
+    }
+
+    @Override
+    public int showSelectTributeAmountDialog(StringTemplate question,
+                                             int maximum) {
+        return canvas.showSelectTributeAmountDialog(question, maximum);
+    }
+
+    @Override
+    public Location showSelectDestinationDialog(Unit unit) {
+        return canvas.showSelectDestinationDialog(unit);
+    }
+
+    @Override
+    public void showServerListPanel(List<ServerInfo> serverList) {
+        canvas.showServerListPanel(serverList);
+    }
+
+    @Override
+    public void showStartGamePanel(Game game, Player player,
+                                   boolean singlePlayerMode) {
+        canvas.showStartGamePanel(game, player, singlePlayerMode);
+    }
+
+    @Override
+    public void showStatisticsPanel() {
+        canvas.showStatisticsPanel();
+    }
+
+    @Override
+    public void showStatusPanel(String message) {
+        canvas.showStatusPanel(message);
+    }
+
+    @Override
+    public void showTilePanel(Tile tile) {
+        canvas.showTilePanel(tile);
+    }
+
+    @Override
+    public void showTilePopUpAtSelectedTile() {
+        TerrainCursor cursor = mapViewer.getCursor();
+        canvas.showTilePopup(mapViewer.getSelectedTile(),
+            cursor.getCanvasX(), cursor.getCanvasY());
+    }
+
+    @Override
+    public void showTradeRoutePanel(Unit unit) {
+        canvas.showTradeRoutePanel(unit);
+    }
+
+    @Override
+    public void showTradeRouteInputPanel(TradeRoute newRoute,
+                                         Runnable callBack) {
+        canvas.showTradeRouteInputPanel(newRoute, callBack);
+    }
+
+    @Override
+    public void showTrainPanel() {
+        canvas.showTrainPanel();
+    }
+
+    @Override
+    public void showVictoryDialog() {
+        canvas.showVictoryDialog(new DialogHandler<Boolean>() {
+                @Override
+                public void handle(Boolean result) {
+                    igc().victory(result);
+                }
+            });
+    }
+
+    @Override
+    public boolean showWarehouseDialog(Colony colony) {
+        return canvas.showWarehouseDialog(colony);
+    }
+
+    @Override
+    public void showWorkProductionPanel(Unit unit) {
+        canvas.showWorkProductionPanel(unit);
+    }
+
+    @Override
+    public void updateEuropeanSubpanels() {
+        canvas.updateEuropeanSubpanels();
+    }
+
+    @Override
+    public void updateGameOptions() {
+        canvas.updateGameOptions();
+    }
+
+    @Override
+    public void updateMapGeneratorOptions() {
+        canvas.updateMapGeneratorOptions();
+    }
+
+    // Trivial delegations to MapViewer
+
+    @Override
+    public void centerActiveUnit() {
+        mapViewer.centerActiveUnit();
+    }
+
+    @Override
+    public void changeViewMode(int newViewMode) {
+        mapViewer.changeViewMode(newViewMode);
+    }
+
+    @Override
+    public Point calculateUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
+        return mapViewer.calculateUnitLabelPositionInTile(unitLabel, tileP);
+    }
+
+    @Override
+    public void executeWithUnitOutForAnimation(final Unit unit,
+                                               final Tile sourceTile,
+                                               final OutForAnimationCallback r) {
+        mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
+    }
+
+    @Override
+    public Unit getActiveUnit() {
+        return mapViewer.getActiveUnit();
+    }
+
+    @Override
+    public Tile getFocus() {
+        return mapViewer.getFocus();
+    }
+
+    @Override
+    public float getMapScale() {
+        return mapViewer.getMapScale();
+    }
+
+    @Override
+    public Tile getSelectedTile() {
+        return mapViewer.getSelectedTile();
+    }
+
+    @Override
+    public Rectangle getTileBounds(Tile tile) {
+        return mapViewer.calculateTileBounds(tile);
+    }
+
+    @Override
+    public Point getTilePosition(Tile tile) {
+        return mapViewer.calculateTilePosition(tile);
+    }
+
+    @Override
+    public double getTileWidthHeightRatio() {
+        return mapViewer.getTileWidthHeightRatio();
+    }
+
+    @Override
+    public int getViewMode() {
+        return mapViewer.getViewMode();
+    }
+
+    @Override
+    public boolean onScreen(Tile tileToCheck) {
+        return mapViewer.onScreen(tileToCheck);
+    }
+
+    @Override
+    public void restartBlinking() {
+        mapViewer.restartBlinking();
+    }
+
+    @Override
+    public void setFocus(Tile tileToFocus) {
+        mapViewer.setFocus(tileToFocus);
+    }
+
+    @Override
+    public void setFocusImmediately(Tile tileToFocus) {
+        mapViewer.setFocusImmediately(tileToFocus);
+        Dimension size = canvas.getSize();
+        canvas.paintImmediately(0, 0, size.width, size.height);
+    }
+
+    @Override
+    public boolean setSelectedTile(Tile newTileToSelect,
+                                   boolean clearGoToOrders) {
+        return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
+    }
+
+    @Override
+    public void toggleViewMode() {
+        mapViewer.toggleViewMode();
+    }
+
+}

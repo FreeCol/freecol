@@ -38,6 +38,7 @@ import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.control.PreGameInputHandler;
 import net.sf.freecol.client.control.SoundController;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.networking.UserServerAPI;
 import net.sf.freecol.common.FreeColSeed;
@@ -158,7 +159,8 @@ public final class FreeColClient {
         }
 
         // Get the splash screen up early on to show activity.
-        gui = new GUI(this, headless, scale);
+        gui = headless ? new GUI(this, scale)
+                       : new SwingGUI(this, scale);
         gui.displaySplashScreen(splashFilename);
 
         // Look for base data directory.  Failure is fatal.
@@ -214,7 +216,6 @@ public final class FreeColClient {
             fatal(Messages.message("client.classic") + "\n" + e.getMessage());
         }
         actionManager = new ActionManager(this);
-        actionManager.initializeActions(inGameController, connectController);
 
         if (!headless) {
             // Swing system and look-and-feel initialization.
@@ -260,6 +261,8 @@ public final class FreeColClient {
         // Start the GUI (headless-safe)
         gui.hideSplashScreen();
         gui.startGUI(size);
+        // depends on initialization done in startGUI
+        actionManager.initializeActions(inGameController, connectController);
 
         // Now the GUI is going, either:
         //   - load the saved game if one was supplied
