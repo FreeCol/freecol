@@ -61,10 +61,9 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -74,12 +73,12 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
@@ -190,8 +189,9 @@ public final class ColonyPanel extends PortPanel
         super(freeColClient,
             new MigLayout("fill, wrap 2, insets 2",
                           "[390!][fill]",
-                          "[][]0[]0[][growprio 200,shrinkprio 10]"
-                          + "[growprio 150,shrinkprio 50]"));
+                          "[growprio 100,shrinkprio 10][]0[]0[]"
+                          + "[growprio 150,shrinkprio 50]"
+                          + "[growprio 150,shrinkprio 50][]"));
 
         // Do not just use colony.getOwner() == getMyPlayer() because
         // in debug mode we are in the *server* colony, and the equality
@@ -275,7 +275,7 @@ public final class ColonyPanel extends PortPanel
 
         // Make the colony label
         this.nameBox.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+            FontLibrary.FontSize.SMALL, getImageLibrary().getScalingFactor()));
         if (editable) {
             for (Colony c : freeColClient.getMySortedColonies()) {
                 this.nameBox.addItem(c);
@@ -420,8 +420,11 @@ public final class ColonyPanel extends PortPanel
         tilesPanel.initialize();
         warehousePanel.initialize();
 
-        add(this.nameBox, "height 48:, grow");
-        add(netProductionPanel, "growx");
+        add(this.nameBox, "height 42:, grow");
+        int tmp = (int)(ImageLibrary.ICON_SIZE.height
+            * gui.getImageLibrary().getScalingFactor());
+        add(netProductionPanel,
+            "grow, height " + (tmp+10) + ":" + (2*tmp+10) + ":" + (2*tmp+10));
         add(tilesScroll, "width 390!, height 200!, top");
         add(buildingsScroll, "span 1 3, grow");
         add(populationPanel, "grow");
