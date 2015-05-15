@@ -117,8 +117,8 @@ public class ImageResource extends Resource
         final BufferedImage im = getImage();
         if(scale == 1.0f || im == null)
             return im;
-        return getImage(new Dimension((int)(im.getWidth() * scale),
-                                      (int)(im.getHeight() * scale)));
+        return getImage(new Dimension(Math.round(im.getWidth() * scale),
+                                      Math.round(im.getHeight() * scale)));
     }
 
     /**
@@ -129,7 +129,7 @@ public class ImageResource extends Resource
      * @return The <code>BufferedImage</code> with the required dimension.
      */
     public BufferedImage getImage(Dimension d) {
-        final BufferedImage im = getImage();
+        BufferedImage im = getImage();
         if (im == null)
             return null;
         int wNew = d.width;
@@ -139,9 +139,9 @@ public class ImageResource extends Resource
         int w = im.getWidth();
         int h = im.getHeight();
         if(wNew < 0 || (!(hNew < 0) && wNew*h > w*hNew)) {
-            wNew = (w * hNew)/h;
+            wNew = (2*w*hNew + (h+1)) / (2*h);
         } else if(hNew < 0 || wNew*h < w*hNew) {
-            hNew = (h * wNew)/w;
+            hNew = (2*h*wNew + (w+1)) / (2*w);
         }
         if(wNew == w && hNew == h)
             return im;
@@ -149,13 +149,35 @@ public class ImageResource extends Resource
         final BufferedImage cached = scaledImages.get(d);
         if (cached != null) return cached;
 
-        BufferedImage scaled = new BufferedImage(wNew, hNew, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = scaled.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g.drawImage(im, 0, 0, wNew, hNew, null);
-        g.dispose();
-        scaledImages.put(d, scaled);
-        return scaled;
+        // Directly scaling to less than half size would ignore some pixels.
+        // Prevent that by halving the base image size as often as needed.
+        while(wNew*2 <= w && hNew*2 <= h) {
+            w = (w+1)/2;
+            h = (h+1)/2;
+            BufferedImage halved = new BufferedImage(w, h,
+                BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = halved.createGraphics();
+            // For halving bilinear should most correctly average 2x2 pixels.
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.drawImage(im, 0, 0, w, h, null);
+            g.dispose();
+            im = halved;
+        }
+
+        if(wNew != w || hNew != h) {
+            BufferedImage scaled = new BufferedImage(wNew, hNew,
+                BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = scaled.createGraphics();
+            // Bicubic should give best quality for odd scaling factors.
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            g.drawImage(im, 0, 0, wNew, hNew, null);
+            g.dispose();
+            im = scaled;
+        }
+        scaledImages.put(d, im);
+        return im;
     }
 
     /**
@@ -165,21 +187,21 @@ public class ImageResource extends Resource
      * @return The <code>BufferedImage</code>.
      */
     public BufferedImage getGrayscaleImage(Dimension d) {
-        final BufferedImage cachedGrayscaleImage = grayscaleImages.get(d);
-        if (cachedGrayscaleImage != null) return cachedGrayscaleImage;
         final BufferedImage cached = grayscaleImages.get(d);
         if (cached != null) return cached;
         final BufferedImage im = getImage(d);
         if (im == null) return null;
         int width = im.getWidth();
         int height = im.getHeight();
-        ColorConvertOp filter = new ColorConvertOp(
-            ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+        // TODO: Find out why making a copy is necessary here to prevent
+        //       images from getting too dark.
         BufferedImage srcImage = new BufferedImage(width, height,
             BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = srcImage.createGraphics();
         g.drawImage(im, 0, 0, null);
         g.dispose();
+        ColorConvertOp filter = new ColorConvertOp(
+            ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         final BufferedImage grayscaleImage = filter.filter(srcImage, null);
         grayscaleImages.put(d, grayscaleImage);
         return grayscaleImage;
@@ -195,9 +217,9 @@ public class ImageResource extends Resource
      */
     public BufferedImage getGrayscaleImage(float scale) {
         final BufferedImage im = getImage();
-        if (im == null) return im;
-        return getGrayscaleImage(new Dimension((int) (im.getWidth() * scale),
-                                               (int) (im.getHeight() * scale)));
+        if (im == null) return null;
+        return getGrayscaleImage(new Dimension(Math.round(im.getWidth() * scale),
+                                               Math.round(im.getHeight() * scale)));
     }
 
     public int getCount() {

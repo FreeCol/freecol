@@ -30,6 +30,7 @@ import java.awt.GraphicsDevice;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -1332,6 +1333,8 @@ public final class Canvas extends JDesktopPane {
                     // versions of the largest image in FreeCol, forever.
                     final Image bgImage = ResourceManager.getImage(bgImageKey);
                     // Draw background image with scaling.
+                    g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                        RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                     g2d.drawImage(bgImage, 0, 0, size.width, size.height, this);
                     String versionStr = "v. " + FreeCol.getVersion();
                     Font oldFont = g2d.getFont();
