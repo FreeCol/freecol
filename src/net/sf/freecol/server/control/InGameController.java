@@ -1096,12 +1096,30 @@ public final class InGameController extends Controller {
             if (enemies.isEmpty()) break;
             Player enemy = getRandomMember(logger, "Choose enemy",
                                            enemies, random);
+            double strengthRatio = serverPlayer.getStrengthRatio(enemy, false);
+            List<AbstractUnit> warSupport 
+                = monarch.getWarSupport(strengthRatio, random);
+            int warGold = 0;
+            if (!warSupport.isEmpty()) {
+                serverPlayer.createUnits(warSupport,
+                    serverPlayer.getEurope());//-vis: safe, Europe
+                warGold = spec.getInteger(GameOptions.WAR_SUPPORT_GOLD);
+                warGold += (warGold/10) * (randomInt(logger, "War support gold",
+                                                     random, 5) - 2);
+                serverPlayer.modifyGold(warGold);
+                cs.addPartial(See.only(serverPlayer), serverPlayer,
+                              "gold", "score");
+            }    
             serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)enemy,
                                         true, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action, StringTemplate
-                    .template(messageId)
-                    .addStringTemplate("%nation%", enemy.getNationName()),
+                    .template((warSupport.isEmpty()) ? messageId
+                        : "model.monarch.action.declareWarSupported.text")
+                        .addStringTemplate("%nation%", enemy.getNationName())
+                        .addStringTemplate("%force%",
+                            abstractUnitTemplate(", ", warSupport))
+                        .addAmount("%gold%", warGold),
                     monarchKey));
             break;
         case SUPPORT_LAND: case SUPPORT_SEA:

@@ -333,20 +333,26 @@ public final class Monarch extends FreeColGameObject implements Named {
      * The Royal Expeditionary Force, which the Monarch will send to
      * crush the player's rebellion.
      */
-    private Force expeditionaryForce = new Force();
+    private Force expeditionaryForce;
 
     /**
      * The Foreign Intervention Force, which some random country will
      * send to support the player's rebellion.
      */
-    private Force interventionForce = new Force();
+    private Force interventionForce;
 
     /**
      * A force of mercenaries, which some random country will offer to
      * send to support the player's rebellion.
      */
-    private Force mercenaryForce = new Force();
+    private Force mercenaryForce;
 
+    /**
+     * A force of military units typically provided when the monarch declares
+     * war.
+     */
+    private Force warSupportForce;
+    
     // Caches.  Do not serialize.
     /** The naval unit types suitable for support actions. */
     private List<UnitType> navalTypes = null;
@@ -377,15 +383,9 @@ public final class Monarch extends FreeColGameObject implements Named {
         if (player == null) {
             throw new IllegalStateException("player == null");
         }
-
         this.player = player;
 
-        final Specification spec = getSpecification();
-        UnitListOption op;
-        op = (UnitListOption)spec.getOption(GameOptions.REF_FORCE);
-        expeditionaryForce = new Force(op, Ability.REF_UNIT);
-        op = (UnitListOption)spec.getOption(GameOptions.INTERVENTION_FORCE);
-        interventionForce = new Force(op, null);
+        requireForces();
     }
 
     /**
@@ -398,8 +398,34 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public Monarch(Game game, String id) {
         super(game, id);
+
+        // @compat 0.10.7(REF), 0.11.1(Intervention,Mecenary),
+        //   0.11.3(War Support)
+        requireForces();
+        // end @compat 0.11.3
     }
 
+
+    /**
+     * Various Forces have been introduced (or renamed in the case of
+     * the REF) at various points of FreeCol history.  To ensure
+     * compatibility, check if they are empty and if so initialize
+     * from the corresponding option.
+     *
+     * Can be moved back into the main constructor in due course.
+     */
+    private void requireForces() {
+        final Specification spec = getSpecification();
+        UnitListOption op;
+        op = (UnitListOption)spec.getOption(GameOptions.REF_FORCE);
+        expeditionaryForce = new Force(op, Ability.REF_UNIT);
+        op = (UnitListOption)spec.getOption(GameOptions.MERCENARY_FORCE);
+        mercenaryForce = new Force(op, null);
+        op = (UnitListOption)spec.getOption(GameOptions.INTERVENTION_FORCE);
+        interventionForce = new Force(op, null);
+        op = (UnitListOption)spec.getOption(GameOptions.WAR_SUPPORT_FORCE);
+        warSupportForce = new Force(op, null);
+    }
 
     /**
      * Get the force describing the REF.
@@ -839,6 +865,36 @@ public final class Monarch extends FreeColGameObject implements Named {
         return support;
     }
 
+    /**
+     * Check if the monarch provides support for a war.
+     *
+     * @param strengthRatio The strength ratio with respect to the new enemy.
+     * @param random A pseudo-random number source.
+     * @return A list of <code>AbstractUnit</code>s provided as support.
+     */
+    public List<AbstractUnit> getWarSupport(double strengthRatio,
+                                            Random random) {
+        List<AbstractUnit> result = new ArrayList<AbstractUnit>();
+        // Strength ratio is in [0, 1].  We do not really know what
+        // Col1 did to decide whether to provide war support, so the
+        // current idea is to support in negative proportion to the
+        // strength ratio, such that we always support if the enemy is
+        // stronger (ratio < 0.5), and never support if more than 50%
+        // stronger (ratio > 0.6).
+        double p = 10.0 * (0.6 - strengthRatio);
+        if (p >= 1.0 // Avoid calling randomDouble if unnecessary
+            || p > randomDouble(logger, "War support (" + p + ")?", random)) {
+            result.addAll(warSupportForce.getUnits());
+            for (AbstractUnit au : result) { // Randomize the result slightly
+                int amount = au.getNumber();
+                amount += randomInt(logger, "Vary war force " + au.getId(),
+                                    random, 3) - 1;
+                au.setNumber(amount);
+            }
+        }
+        return result;
+    }
+        
     /**
      * Gets some units available as mercenaries.
      *

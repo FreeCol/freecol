@@ -2749,6 +2749,14 @@
               <number value="2" />
             </unitOption>
           </unitListOption>
+          <unitListOption id="model.option.warSupportForce">
+            <unitOption id="model.option.warSupportForce.veteranSoldier">
+              <unitType value="model.unit.veteranSoldier"/>
+              <role value="model.role.soldier"/>
+              <number value="6"/>
+            </unitOption>
+          </unitListOption>
+          <integerOption id="model.option.warSupportGold" value="2500"/>
         </optionGroup>
         <optionGroup id="model.difficulty.government" editable="false">
           <integerOption id="model.option.badGovernmentLimit" value="8"/>
@@ -2889,6 +2897,14 @@
               <number value="2" />
             </unitOption>
           </unitListOption>
+          <unitListOption id="model.option.warSupportForce">
+            <unitOption id="model.option.warSupportForce.veteranSoldier">
+              <unitType value="model.unit.veteranSoldier"/>
+              <role value="model.role.soldier"/>
+              <number value="5"/>
+            </unitOption>
+          </unitListOption>
+          <integerOption id="model.option.warSupportGold" value="2000"/>
         </optionGroup>
         <optionGroup id="model.difficulty.government" editable="false">
           <integerOption id="model.option.badGovernmentLimit" value="7"/>
@@ -3024,6 +3040,14 @@
               <number value="2" />
             </unitOption>
           </unitListOption>
+          <unitListOption id="model.option.warSupportForce">
+            <unitOption id="model.option.warSupportForce.veteranSoldier">
+              <unitType value="model.unit.veteranSoldier"/>
+              <role value="model.role.soldier"/>
+              <number value="4"/>
+            </unitOption>
+          </unitListOption>
+          <integerOption id="model.option.warSupportGold" value="1500"/>
         </optionGroup>
         <optionGroup id="model.difficulty.government" editable="false">
           <integerOption id="model.option.badGovernmentLimit" value="6"/>
@@ -3152,6 +3176,14 @@
               <number value="2" />
             </unitOption>
           </unitListOption>
+          <unitListOption id="model.option.warSupportForce">
+            <unitOption id="model.option.warSupportForce.veteranSoldier">
+              <unitType value="model.unit.veteranSoldier"/>
+              <role value="model.role.soldier"/>
+              <number value="3"/>
+            </unitOption>
+          </unitListOption>
+          <integerOption id="model.option.warSupportGold" value="1000"/>
         </optionGroup>
         <optionGroup id="model.difficulty.government" editable="false">
           <integerOption id="model.option.badGovernmentLimit" value="5"/>
@@ -3280,6 +3312,14 @@
               <number value="2" />
             </unitOption>
           </unitListOption>
+          <unitListOption id="model.option.warSupportForce">
+            <unitOption id="model.option.warSupportForce.veteranSoldier">
+              <unitType value="model.unit.veteranSoldier"/>
+              <role value="model.role.soldier"/>
+              <number value="2"/>
+            </unitOption>
+          </unitListOption>
+          <integerOption id="model.option.warSupportGold" value="500"/>
         </optionGroup>
         <optionGroup id="model.difficulty.government" editable="false">
           <integerOption id="model.option.badGovernmentLimit" value="4"/>
@@ -3443,6 +3483,14 @@
               <number value="2" />
             </unitOption>
           </unitListOption>
+          <unitListOption id="model.option.warSupportForce">
+            <unitOption id="model.option.warSupportForce.veteranSoldier">
+              <unitType value="model.unit.veteranSoldier"/>
+              <role value="model.role.soldier"/>
+              <number value="2"/>
+            </unitOption>
+          </unitListOption>
+          <integerOption id="model.option.warSupportGold" value="500"/>
         </optionGroup>
         <optionGroup id="model.difficulty.government">
           <integerOption id="model.option.badGovernmentLimit" value="4" minimumValue="0" maximumValue="100"/>

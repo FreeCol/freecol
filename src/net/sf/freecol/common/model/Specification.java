@@ -2158,6 +2158,7 @@ public final class Specification {
                     Modifier.GENERAL_COMBAT_INDEX));
         }
         // end @compat 0.11.3
+        
     }
 
     /**
@@ -2377,6 +2378,21 @@ public final class Specification {
                                             GameOptions.DIFFICULTY_CHEAT,
                                             10);
         // end @compat 0.10.7
+
+        // @compat 0.11.3
+        id = GameOptions.WAR_SUPPORT_FORCE;
+        ulo = checkDifficultyUnitListOption(id, GameOptions.DIFFICULTY_MONARCH);
+        if (ulo != null) {
+            AbstractUnitOption support = new AbstractUnitOption(id, this);
+            support.setValue(new AbstractUnit("model.unit.veteranSoldier",
+                                              "model.role.soldier", 4));
+            ulo.getValue().add(support);
+            ret = true;
+        }
+        ret |= checkDifficultyIntegerOption(GameOptions.WAR_SUPPORT_GOLD,
+                                            GameOptions.DIFFICULTY_MONARCH,
+                                            1500);
+        // end @compat 0.11.3
 
         return ret;
     }

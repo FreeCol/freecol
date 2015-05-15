@@ -398,6 +398,13 @@ public class GameOptions {
     public static final String MERCENARY_FORCE
         = "model.option.mercenaryForce";
 
+    /** The base mercenary force sometimes supplied with a war declaration. */
+    public static final String WAR_SUPPORT_FORCE
+        = "model.option.warSupportForce";
+
+    /** The base amount of gold sometimes supplied with a war declaration. */
+    public static final String WAR_SUPPORT_GOLD
+        = "model.option.warSupportGold";
 
     /** Government (difficulty) group. */
     public static final String DIFFICULTY_GOVERNMENT
