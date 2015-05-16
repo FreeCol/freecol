@@ -31,7 +31,7 @@ blockit () {
 }
 
 section () {
-    printf "%-15s" "$1"
+    printf "%-16s" "$1"
 }
 
 statit () {
@@ -43,7 +43,7 @@ statit () {
 tmp=`mktemp btan.XXXXXXXX`
 trap "rm -f '$tmp'" 0
 cat - > "$tmp"
-runs=`sed -n -e 's/^run: .*colonies: n=\([0-9]*\) mean=\([\.0-9]*\) sd=\([\.0-9]*\), buildings: \([0-9]*\), euroExpense: \([-0-9]*\), euroIncome: \([0-9]*\)$/NC="\1";MEAN="\2";SD="\3";NB="\4";EE="\5";EI="\6"/p' "$tmp"`
+runs=`sed -n -e 's/^run: .*colonies: n=\([0-9]*\) mean=\([\.0-9]*\) sd=\([\.0-9]*\), buildings: \([0-9]*\), euroExpense: \([0-9]*\), euroIncome: \([0-9]*\)$/NC="\1";MEAN="\2";SD="\3";NB="\4";EE="\5";EI="\6"/p' "$tmp"`
 
 N=0
 for r in $runs ; do N=`expr $N + 1`; done
@@ -74,6 +74,10 @@ section "SettlementFalls"
 sed -n -e 's/^Count native-fall: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
+section "Cashins"
+sed -n -e 's/^Count cashins: *\(.*\)$/\1/p' "$tmp" | statit
+blockit
+
 section "Cibola Finds"
 sed -n -e 's/^Count Cibola: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
@@ -88,10 +92,6 @@ blockit
 
 section "Fountain Finds"
 sed -n -e 's/^Count fountain: *\(.*\)$/\1/p' "$tmp" | statit
-blockit
-
-section "Cashins"
-sed -n -e 's/^Count cashins: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
 section "Defences"
