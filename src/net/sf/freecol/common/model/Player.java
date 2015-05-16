@@ -1600,6 +1600,7 @@ public class Player extends FreeColGameObject implements Nameable {
         java.util.Map<String, Turn> result = new HashMap<>();
         for (HistoryEvent e : getHistory()) {
             if (e.getEventType() == HistoryEvent.HistoryEventType.FOUNDING_FATHER) {
+System.err.println("FOUND " + e.toString() + "/" + e.getReplacement("%father%"));
                 result.put(e.getReplacement("%father%").getId(),
                            e.getTurn());
             }

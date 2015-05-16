@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
 
 
@@ -63,11 +64,11 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP);
         tabs.setOpaque(false);
 
-        Player player = getMyPlayer();
+        final Player player = getMyPlayer();
+        final FoundingFather currentFather = player.getCurrentFather();
 
         JPanel recruitingPanel = new MigPanel();
         recruitingPanel.setLayout(new MigLayout("center, wrap 1", "center"));
-        FoundingFather currentFather = player.getCurrentFather();
         if (currentFather == null) {
             recruitingPanel.add(new JLabel(none), "wrap 20");
         } else {
@@ -115,18 +116,22 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             Turn turn = null;
             if (player.hasFather(father)) {
                 image = ImageLibrary.getFoundingFatherImage(father, false);
-                turn = electionTurns.get(name);
+                turn = electionTurns.get(Messages.nameKey(father));
             } else {
                 image = ImageLibrary.getFoundingFatherImage(father, true);
             }
             panel.add(new JLabel(new ImageIcon(image)), "newline");
-            JButton button = Utility.getLinkButton(name, null, father.getId());
+            JButton button = Utility.getLinkButton(Messages.getName(father),
+                                                   null, father.getId());
             button.addActionListener(this);
             panel.add(button);
-            if (turn != null) {
-                panel.add(Utility.localizedLabel("report.continentalCongress.elected"));
-                panel.add(Utility.localizedLabel(turn.getLabel()));
-            }
+            panel.add((turn != null)
+                ? Utility.localizedLabel(StringTemplate
+                    .template("report.continentalCongress.elected")
+                    .addStringTemplate("%turn%", turn.getLabel()))
+                : (father == currentFather)
+                ? Utility.localizedLabel("report.continentalCongress.recruiting")
+                : Utility.localizedLabel("report.continentalCongress.available"));
         }
         panels.clear();
         setMainComponent(tabs);
