@@ -611,46 +611,82 @@ public final class Canvas extends JDesktopPane {
      * @return A <code>Point</code> to place the component at or null
      *     on failure.
      */
-    private Point getClearSpace(int x, int y, int w, int h, int tries) {
-        Rectangle bounds = this.getBounds();
+    private Point getClearSpace(final int x, final int y,
+                                final int w, final int h, int tries) {
+        final Rectangle bounds = this.getBounds();
         if (!bounds.contains(x, y)) return null;
+
         tries = 3 * tries + 1; // 3 new candidates per level
         List<Point> todo = new ArrayList<>();
         Point p = new Point(x, y);
         todo.add(p);
+
+        List<Component> allComponents = new ArrayList<>();
+        for (Component c : this.getComponents()) {
+            if (c instanceof GrayLayer || !c.isValid()) {
+                // GrayLayer always intersects and blocks early
+                // dialogs like FF-selection
+                continue;
+            }
+            allComponents.add(c);
+        }
+        for (FreeColDialog<?> fcd : dialogs) allComponents.add(fcd);
+
+        // Find the position with the least overlap
+        int bestScore = Integer.MAX_VALUE;
+        Point best = p;
         while (!todo.isEmpty()) {
             p = todo.remove(0);
             Rectangle r = new Rectangle(p.x, p.y, w, h);
             if (!bounds.contains(r)) {
                 continue;
             }
-            Component c = null;
-            for (Component child : this.getComponents()) {
-                if (child.getBounds().intersects(r)) {
-                    c = child;
-                    break;
-                }
-            }
-            if (c == null) {
-                for (FreeColDialog<?> fcd : dialogs) {
-                    if (fcd.getBounds().intersects(r)) {
-                        c = fcd;
-                        break;
+
+            // Find the most overlapping component at this position,
+            // as well as the globally least.
+            int foundScore = 0;
+            Component found = null;
+            for (Component c : allComponents) {
+                if (c.getBounds().intersects(r)) {
+                    Rectangle rr = c.getBounds().intersection(r);
+                    int score = (int)Math.round(rr.getWidth() * rr.getHeight());
+                    if (foundScore < score) {
+                        foundScore = score;
+                        found = c;
                     }
                 }
             }
-            if (c == null) {
+            if (found == null) { // Can not improve on no overlap, return now
                 return p;
             }
+            if (bestScore > foundScore) {
+                bestScore = foundScore;
+                best = p;
+            }
+            // Guarantee eventual completion
             if (--tries <= 0) break;
 
-            int n = todo.size();
-            todo.add(n, new Point(c.getX() + c.getWidth() + 1,
-                                  c.getY() + c.getHeight() + 1));
-            todo.add(n, new Point(x, c.getY() + c.getHeight() + 1));
-            todo.add(n, new Point(c.getX() + c.getWidth() + 1, y));
+            int n = todo.size(),
+                // Some alternative new positions
+                //   0: move right/down to avoid the collision
+                //   1: move as far as possible right/down
+                //   2: wrap back to the far left
+                x0 = found.getX() + found.getWidth() + 1,
+                y0 = found.getY() + found.getHeight() + 1,
+                x1 = bounds.x + bounds.width - w - 1,
+                y1 = bounds.y + bounds.height - h - 1,
+                x2 = bounds.x,
+                y2 = bounds.y;
+            boolean x0ok = bounds.contains(x0 + w, y),
+                y0ok = bounds.contains(x, y0 + h),
+                x1ok = bounds.contains(x1, y),
+                y1ok = bounds.contains(x, y1);
+            todo.add(n, new Point((x0ok) ? x0 : (x1ok) ? x1 : x2,
+                                  (y0ok) ? y0 : (y1ok) ? y1 : y2));
+            todo.add(n, new Point(x, (y0ok) ? y0 : (y1ok) ? y1 : y2));
+            todo.add(n, new Point((x0ok) ? x0 : (x1ok) ? x1 : x2, y));
         }
-        return new Point(x, y);
+        return best;
     }
 
     /**
