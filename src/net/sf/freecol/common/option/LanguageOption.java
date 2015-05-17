@@ -197,20 +197,26 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             throw new RuntimeException("No language files could be found"
                 + " in the <" + i18nDirectory + "> directory.");
         }
-        String prefix = Messages.MESSAGE_FILE_PREFIX + "_";
-        int prefixLength = prefix.length();
         for (File file : files) {
-            if (file.getName() == null
-                || !file.getName().startsWith(prefix)) continue;
-            final String languageID = file.getName()
-                .substring(prefixLength, file.getName().indexOf('.'));
-            // qqq contains explanations only
-            if ("qqq".equals(languageID)) continue;
+            String nam = file.getName();
+            if (nam == null
+                || !nam.startsWith(Messages.MESSAGE_FILE_PREFIX)
+                || !nam.endsWith(Messages.MESSAGE_FILE_SUFFIX)) continue;
+            String languageId
+                = nam.substring(Messages.MESSAGE_FILE_PREFIX.length(),
+                    nam.length() - Messages.MESSAGE_FILE_SUFFIX.length());
+            if ("".equals(languageId)) { // FreeColMessages.properties
+                languageId = "en";
+            } else if ("qqq".equals(languageId)) { // qqq is explanations only
+                continue;
+            } else if (languageId.startsWith("_")) {
+                languageId = languageId.substring(1);
+            }
             try {
-                languages.add(new Language(languageID,
-                                           Messages.getLocale(languageID)));
+                languages.add(new Language(languageId,
+                                           Messages.getLocale(languageId)));
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to add: " + languageID, e);
+                logger.log(Level.WARNING, "Failed to add: " + languageId, e);
             }
         }
         Collections.sort(languages);
