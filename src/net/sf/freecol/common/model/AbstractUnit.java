@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
@@ -168,6 +171,51 @@ public class AbstractUnit extends FreeColObject {
         Role role = getRole(spec);
         UnitType type = spec.getUnitType(getId());
         return n * (type.getOffence() + role.getOffence());
+    }
+
+    /**
+     * Calculate the approximate offence power of a list of units.
+     *
+     * @param spec A <code>Specification</code> to look up the type in.
+     * @param units A list of <code>AbstractUnit</code>s.
+     * @return The approximate offence power.
+     */
+    public static double calculateStrength(Specification spec,
+                                           List<AbstractUnit> units) { 
+        float result = 0;
+        for (AbstractUnit au : units) result += au.getOffence(spec);
+        return result;
+    }
+
+    /**
+     * Get a deep copy of a list of abstract units.
+     *
+     * @param units The list of <code>AbstractUnit</code>s to copy.
+     * @return A list of <code>AbstractUnit</code>s.
+     */
+    public static List<AbstractUnit> deepCopy(List<AbstractUnit> units) {
+        List<AbstractUnit> result = new ArrayList<>();
+        for (AbstractUnit au : units) {
+            result.add(new AbstractUnit(au.getId(), au.getRoleId(),
+                                        au.getNumber()));
+        }
+        return result;
+    }
+
+    /**
+     * Get a template for a list of abstract units.
+     *
+     * @param base The label template base.
+     * @param units The list of <code>AbstractUnit</code>s to use.
+     * @return A suitable <code>StringTemplate</code>.
+     */
+    public static StringTemplate getListLabel(String base,
+                                              List<AbstractUnit> units) {
+        StringTemplate template = StringTemplate.label(base);
+        for (AbstractUnit au : units) {
+            template.addStringTemplate(au.getLabel());
+        }
+        return template;
     }
 
 

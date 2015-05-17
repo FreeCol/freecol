@@ -125,21 +125,21 @@ public final class Monarch extends FreeColGameObject implements Named {
         /**
          * Gets all units.
          *
-         * @return A list of all units.
+         * @return A copy of the list of all units.
          */
         public final List<AbstractUnit> getUnits() {
-            List<AbstractUnit> result = new ArrayList<>(landUnits);
-            result.addAll(navalUnits);
+            List<AbstractUnit> result = getLandUnits();
+            result.addAll(getNavalUnits());
             return result;
         }
 
         /**
          * Gets the naval units.
          *
-         * @return A list of the naval units.
+         * @return A copy of the list of the naval units.
          */
         public final List<AbstractUnit> getNavalUnits() {
-            return navalUnits;
+            return AbstractUnit.deepCopy(navalUnits);
         }
 
         /**
@@ -148,7 +148,7 @@ public final class Monarch extends FreeColGameObject implements Named {
          * @return A list of the  land units.
          */
         public final List<AbstractUnit> getLandUnits() {
-            return landUnits;
+            return AbstractUnit.deepCopy(landUnits);
         }
 
         /**
@@ -204,13 +204,9 @@ public final class Monarch extends FreeColGameObject implements Named {
          *     consider the land units.
          * @return The approximate offence power.
          */
-        public float calculateStrength(boolean naval) {
-            final Specification spec = getSpecification();
-            float result = 0;
-            for (AbstractUnit au : (naval) ? navalUnits : landUnits) {
-                result += au.getOffence(spec);
-            }
-            return result;
+        public double calculateStrength(boolean naval) {
+            return AbstractUnit.calculateStrength(getSpecification(),
+                (naval) ? navalUnits : landUnits);
         }
 
 
@@ -868,29 +864,63 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Check if the monarch provides support for a war.
      *
-     * @param strengthRatio The strength ratio with respect to the new enemy.
+     * @param enemy The enemy <code>Player</code>.
      * @param random A pseudo-random number source.
      * @return A list of <code>AbstractUnit</code>s provided as support.
      */
-    public List<AbstractUnit> getWarSupport(double strengthRatio,
-                                            Random random) {
+    public List<AbstractUnit> getWarSupport(Player enemy, Random random) {
+        final Specification spec = getSpecification();
+        final double baseStrength = player.calculateStrength(false);
+        final double enemyStrength = enemy.calculateStrength(false);
+        final double strengthRatio
+            = Player.strengthRatio(baseStrength, enemyStrength);
         List<AbstractUnit> result = new ArrayList<AbstractUnit>();
-        // Strength ratio is in [0, 1].  We do not really know what
-        // Col1 did to decide whether to provide war support, so the
-        // current idea is to support in negative proportion to the
-        // strength ratio, such that we always support if the enemy is
-        // stronger (ratio < 0.5), and never support if more than 50%
-        // stronger (ratio > 0.6).
-        double p = 10.0 * (0.6 - strengthRatio);
+        // We do not really know what Col1 did to decide whether to
+        // provide war support, so we have made something up.
+        //
+        // Strength ratios are in [0, 1].  Support is granted in negative
+        // proportion to the base strength ratio, such that we always
+        // support if the enemy is stronger (ratio < 0.5), and never
+        // support if the player is more than 50% stronger (ratio >
+        // 0.6).  However if war support force sufficiently large with
+        // respect to the current player and enemy forces it will be
+        // reduced.
+        // The principle at work is that the Crown is cautious/stingy.
+        final double NOSUPPORT = 0.6;
+        double p = 10.0 * (NOSUPPORT - strengthRatio);
         if (p >= 1.0 // Avoid calling randomDouble if unnecessary
-            || p > randomDouble(logger, "War support (" + p + ")?", random)) {
+            || (p > 0.0 && p > randomDouble(logger, "War support?", random))) {
             result.addAll(warSupportForce.getUnits());
-            for (AbstractUnit au : result) { // Randomize the result slightly
-                int amount = au.getNumber();
-                amount += randomInt(logger, "Vary war force " + au.getId(),
-                                    random, 3) - 1;
-                au.setNumber(amount);
+            double supportStrength, fullRatio, strength, ratio;
+            supportStrength = warSupportForce.calculateStrength(false);
+            fullRatio = Player.strengthRatio(baseStrength + supportStrength,
+                                             enemyStrength);
+            if (fullRatio < NOSUPPORT) { // Full support, some randomization
+                for (AbstractUnit au : result) {
+                    int amount = au.getNumber();
+                    amount += randomInt(logger, "Vary war force " + au.getId(),
+                                        random, 3) - 1;
+                    au.setNumber(amount);
+                }
+            } else if (enemyStrength <= 0.0) { // Enemy is defenceless: 1 unit
+                while (result.size() > 1) result.remove(0);
+                result.get(0).setNumber(1);
+            } else { // Reduce force until below NOSUPPORT or single unit/s
+                outer: for (AbstractUnit au : result) {
+                    for (int n = au.getNumber() - 1; n >= 1; n--) {
+                        au.setNumber(n);
+                        strength = AbstractUnit.calculateStrength(spec, result);
+                        ratio = Player.strengthRatio(baseStrength + strength,
+                                                     enemyStrength);
+                        if (ratio < NOSUPPORT) break outer;
+                    }
+                }
             }
+            strength = AbstractUnit.calculateStrength(spec, result);
+            ratio = Player.strengthRatio(baseStrength+strength, enemyStrength);
+            logger.finest("War support:"
+                + " initially=" + supportStrength + "/" + fullRatio
+                + " finally=" + strength + "/" + ratio);
         }
         return result;
     }

@@ -971,15 +971,6 @@ public final class InGameController extends Controller {
         return template;
     }
 
-    private StringTemplate abstractUnitTemplate(String base,
-                                                List<AbstractUnit> units) {
-        StringTemplate template = StringTemplate.label(base);
-        for (AbstractUnit au : units) {
-            template.addStringTemplate(au.getLabel());
-        }
-        return template;
-    }
-
     /**
      * Resolves a tax raise.
      *
@@ -1096,9 +1087,8 @@ public final class InGameController extends Controller {
             if (enemies.isEmpty()) break;
             Player enemy = getRandomMember(logger, "Choose enemy",
                                            enemies, random);
-            double strengthRatio = serverPlayer.getStrengthRatio(enemy, false);
             List<AbstractUnit> warSupport 
-                = monarch.getWarSupport(strengthRatio, random);
+                = monarch.getWarSupport(enemy, random);
             int warGold = 0;
             if (!warSupport.isEmpty()) {
                 serverPlayer.createUnits(warSupport,
@@ -1109,7 +1099,10 @@ public final class InGameController extends Controller {
                 serverPlayer.modifyGold(warGold);
                 cs.addPartial(See.only(serverPlayer), serverPlayer,
                               "gold", "score");
-            }    
+                logger.fine("War support v " + enemy.getNation().getSuffix()
+                    + " " + warGold + " gold + " + Messages.message(AbstractUnit
+                        .getListLabel(", ", warSupport)));
+            }
             serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)enemy,
                                         true, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
@@ -1118,7 +1111,7 @@ public final class InGameController extends Controller {
                         : "model.monarch.action.declareWarSupported.text")
                         .addStringTemplate("%nation%", enemy.getNationName())
                         .addStringTemplate("%force%",
-                            abstractUnitTemplate(", ", warSupport))
+                            AbstractUnit.getListLabel(", ", warSupport))
                         .addAmount("%gold%", warGold),
                     monarchKey));
             break;
@@ -1133,7 +1126,7 @@ public final class InGameController extends Controller {
                 new MonarchActionMessage(action, StringTemplate
                     .template(messageId)
                     .addStringTemplate("%addition%",
-                        abstractUnitTemplate(", ", support)),
+                        AbstractUnit.getListLabel(", ", support)),
                     monarchKey));
             break;
         case MONARCH_MERCENARIES:
@@ -1145,7 +1138,7 @@ public final class InGameController extends Controller {
                 .template(messageId)
                 .addAmount("%gold%", mercPrice)
                 .addStringTemplate("%mercenaries%",
-                    abstractUnitTemplate(", ", mercenaries)),
+                    AbstractUnit.getListLabel(", ", mercenaries)),
                 monarchKey);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
                    message);
@@ -1162,7 +1155,7 @@ public final class InGameController extends Controller {
                 .addName("%leader%", NameCache.getMercenaryLeaderName(n))
                 .addAmount("%gold%", hessPrice)
                 .addStringTemplate("%mercenaries%",
-                    abstractUnitTemplate(", ", hessians)),
+                    AbstractUnit.getListLabel(", ", hessians)),
                 "image.flavor.model.mercenaries." + n);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
                    message);

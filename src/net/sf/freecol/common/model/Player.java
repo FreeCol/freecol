@@ -1600,7 +1600,6 @@ public class Player extends FreeColGameObject implements Nameable {
         java.util.Map<String, Turn> result = new HashMap<>();
         for (HistoryEvent e : getHistory()) {
             if (e.getEventType() == HistoryEvent.HistoryEventType.FOUNDING_FATHER) {
-System.err.println("FOUND " + e.toString() + "/" + e.getReplacement("%father%"));
                 result.put(e.getReplacement("%father%").getId(),
                            e.getTurn());
             }
@@ -1652,12 +1651,10 @@ System.err.println("FOUND " + e.toString() + "/" + e.getReplacement("%father%"))
      * @param naval If true consider naval units, otherwise land units.
      * @return A measure of the military viability of this player.
      */
-    public float getRebelStrengthRatio(boolean naval) {
-        if (getPlayerType() != PlayerType.COLONIAL) return 0f;
-        float ref = getMonarch().getExpeditionaryForce()
-            .calculateStrength(naval);
-        float pla = calculateStrength(naval);
-        return pla / (ref + pla);
+    public double getRebelStrengthRatio(boolean naval) {
+        if (getPlayerType() != PlayerType.COLONIAL) return 0.0;
+        return strengthRatio(calculateStrength(naval),
+            getMonarch().getExpeditionaryForce().calculateStrength(naval));
     }
 
 
@@ -3106,9 +3103,19 @@ System.err.println("FOUND " + e.toString() + "/" + e.getReplacement("%father%"))
         NationSummary ns = getNationSummary(other);
         if (ns == null) return -1.0;
         int strength = calculateStrength(naval);
-        return (double)strength / (strength + ns.getMilitaryStrength());
+        return strengthRatio((double)strength, ns.getMilitaryStrength());
     }
 
+    /**
+     * Abstraction of the strength ratio calculation.
+     *
+     * @param ours The player strength.
+     * @param theirs The enemy strength.
+     * @return The resulting strength ratio.
+     */
+    public static double strengthRatio(double ours, double theirs) {
+        return (ours == 0.0) ? 0.0 : ours / (ours + theirs);
+    }
 
     //
     // Claiming of tiles
