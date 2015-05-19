@@ -2719,8 +2719,9 @@ public final class InGameController extends Controller {
 
         ChangeSet cs = new ChangeSet();
         moveGoods(gl, goodsType, amount, carrier);
-        logger.finest(gl.getId() + " loaded " + amount
-            + " " + goodsType.getSuffix() + " onto " + carrier);
+        logger.finest(Messages.message(loc.getLocationLabel())
+            + " loaded " + amount + " " + goodsType.getSuffix()
+            + " onto " + carrier);
         cs.add(See.only(serverPlayer), gl.getGoodsContainer());
         cs.add(See.only(serverPlayer), carrier.getGoodsContainer());
         if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
@@ -2754,8 +2755,9 @@ public final class InGameController extends Controller {
         if (carrier.getSettlement() != null) {
             Settlement settlement = carrier.getSettlement();
             moveGoods(carrier, goodsType, amount, settlement);
-            logger.finest(carrier + " unloaded " + amount
-                + " " + goodsType.getSuffix() + " to " + settlement.getName());
+            logger.finest(carrier
+                + " unloaded " + amount + " " + goodsType.getSuffix()
+                + " to " + settlement.getName());
             cs.add(See.only(serverPlayer), settlement.getGoodsContainer());
             cs.add(See.only(serverPlayer), carrier.getGoodsContainer());
             if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
