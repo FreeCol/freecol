@@ -138,6 +138,23 @@ public enum Direction implements Named {
     }
 
     /**
+     * Gets the direction with east-west part mirrored.
+     *
+     * @return The mirrored <code>Direction</code>.
+     */
+    public Direction getEWMirroredDirection() {
+        switch(this) {
+        case NW: return Direction.NE;
+        case W: return Direction.E;
+        case SW: return Direction.SE;
+        case NE: return Direction.NW;
+        case E: return Direction.W;
+        case SE: return Direction.SW;
+        default: return this;
+        }
+    }
+
+    /**
      * Gets a random Direction.
      *
      * @param logMe A string to log with the random results.

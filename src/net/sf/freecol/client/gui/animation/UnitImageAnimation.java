@@ -19,12 +19,14 @@
 
 package net.sf.freecol.client.gui.animation;
 
+import java.awt.Image;
 import java.awt.Rectangle;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.io.sza.AnimationEvent;
 import net.sf.freecol.common.io.sza.ImageAnimationEvent;
@@ -38,11 +40,12 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class UnitImageAnimation {
     
+    private final GUI gui;
     private final Unit unit;
     private final Tile tile;
     private final SimpleZippedAnimation animation;
-    private final GUI gui;
-    
+    private final boolean mirror;
+
     /**
      * Constructor
      *
@@ -51,13 +54,13 @@ public final class UnitImageAnimation {
      * @param animation The animation to show.
      */
     public UnitImageAnimation(GUI gui, Unit unit, Tile tile,
-                              SimpleZippedAnimation animation) {
+                              SimpleZippedAnimation animation, boolean mirror) {
         this.gui = gui;
         this.unit = unit;
         this.tile = tile;
         this.animation = animation;
+        this.mirror = mirror;
     }
-    
 
     /**
      * Do the animation.
@@ -75,7 +78,12 @@ public final class UnitImageAnimation {
                     if (event instanceof ImageAnimationEvent) {
                         final ImageAnimationEvent ievent = (ImageAnimationEvent) event;
                         final ImageIcon icon = (ImageIcon)unitLabel.getIcon();
-                        icon.setImage(ievent.getImage());
+                        Image image = ievent.getImage();
+                        if(mirror) {
+                            // FIXME: Add mirroring functionality to SimpleZippedAnimation
+                            image = ImageLibrary.createMirroredImage(image);
+                        }
+                        icon.setImage(image);
                         gui.paintImmediatelyCanvasIn(getDirtyAnimationArea());
 
                         time = ievent.getDurationInMs()
@@ -92,7 +100,7 @@ public final class UnitImageAnimation {
             }
         });
     }
-    
+
     protected Rectangle getDirtyAnimationArea() {
         return gui.getTileBounds(tile);
     }

@@ -32,13 +32,13 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 final class UnitAttackAnimation {
 
+    private final GUI gui;
     private final Unit attacker;
     private final Unit defender;
     private final Tile attackerTile;
     private final Tile defenderTile;
     private final boolean success;
-    private final GUI gui;
-
+    private boolean mirror = false;
 
     /**
      * Build a new attack animation.
@@ -61,6 +61,26 @@ final class UnitAttackAnimation {
         this.success = success;
     }
 
+    private SimpleZippedAnimation getAnimation(String startStr,
+                                               float scale,
+                                               Direction direction) {
+        SimpleZippedAnimation sza;
+        String specialId = startStr + direction.toString().toLowerCase();
+        sza = ResourceManager.getSimpleZippedAnimation(specialId, scale);
+        if(sza != null) {
+            mirror = false;
+            return sza;
+        }
+
+        specialId = startStr + direction.getEWMirroredDirection().toString().toLowerCase();
+        sza = ResourceManager.getSimpleZippedAnimation(specialId, scale);
+        if(sza != null) {
+            mirror = true;
+            return sza;
+        }
+        return null;
+    }
+
     /**
      * Find the animation for a unit attack.
      *
@@ -73,21 +93,35 @@ final class UnitAttackAnimation {
         float scale = gui.getMapScale();
         String roleStr = (unit.hasDefaultRole()) ? ""
             : "." + unit.getRoleSuffix();
-        String startStr = unit.getType().getId() + roleStr + ".attack.";
-        String specialId = "animation.unit."
-            + startStr + direction.toString().toLowerCase();
+        String startStr = "animation.unit." + unit.getType().getId() + roleStr
+                        + ".attack.";
 
         SimpleZippedAnimation sza;
-        sza = ResourceManager.getSimpleZippedAnimation(specialId, scale);
-        if (sza == null) {
-            String genericDirection;
-            switch (direction) {
-            case SW: case W: case NW: genericDirection = "w"; break;
-            default:                  genericDirection = "e"; break;
-            }
-            String genericId = "animation.unit." + startStr + genericDirection;
-            sza = ResourceManager.getSimpleZippedAnimation(genericId, scale);
-        }
+        sza = getAnimation(startStr, scale, direction);
+        if(sza != null) return sza;
+
+        sza = getAnimation(startStr, scale, direction.getNextDirection());
+        if(sza != null) return sza;
+        sza = getAnimation(startStr, scale, direction.getPreviousDirection());
+        if(sza != null) return sza;
+
+        sza = getAnimation(startStr, scale, direction.getNextDirection()
+                                                     .getNextDirection());
+        if(sza != null) return sza;
+        sza = getAnimation(startStr, scale, direction.getPreviousDirection()
+                                                     .getPreviousDirection());
+        if(sza != null) return sza;
+
+        sza = getAnimation(startStr, scale, direction.getNextDirection()
+                                                     .getNextDirection()
+                                                     .getNextDirection());
+        if(sza != null) return sza;
+        sza = getAnimation(startStr, scale, direction.getPreviousDirection()
+                                                     .getPreviousDirection()
+                                                     .getPreviousDirection());
+        if(sza != null) return sza;
+
+        sza = getAnimation(startStr, scale, direction.getReverseDirection());
         return sza;
     }
 
@@ -100,7 +134,7 @@ final class UnitAttackAnimation {
 
         if (gui.getAnimationSpeed(attacker) > 0) {
             if ((sza = getAnimation(attacker, direction)) != null) {
-                new UnitImageAnimation(gui, attacker, attackerTile, sza)
+                new UnitImageAnimation(gui, attacker, attackerTile, sza, mirror)
                     .animate();
             }
         }
@@ -109,7 +143,7 @@ final class UnitAttackAnimation {
             && gui.getAnimationSpeed(defender) > 0) {
             direction = direction.getReverseDirection();
             if ((sza = getAnimation(defender, direction)) != null) {
-                new UnitImageAnimation(gui, defender, defenderTile, sza)
+                new UnitImageAnimation(gui, defender, defenderTile, sza, mirror)
                     .animate();
             }
         }
