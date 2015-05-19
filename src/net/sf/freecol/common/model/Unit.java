@@ -40,10 +40,9 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
-// @compat 0.10.x
-// end @compat 0.10.x
 
 import org.w3c.dom.Element;
 
@@ -1552,6 +1551,38 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get the next stop after the current one where the unit has work to
+     * do in its trade route.
+     *
+     * @param checkProduction Account for the time it takes to get to the stop.
+     * @return The next <code>TradeRouteStop</code> to visit.
+     */
+    public TradeRouteStop getNextStop(boolean checkProduction) {
+        List<TradeRouteStop> stops = getCurrentStops();
+        if (stops == null) return null;
+        if (atStop(stops.get(0))) stops.remove(0);
+        for (TradeRouteStop trs : stops) {
+            int turns = (checkProduction) ? getTurnsToReach(trs.getLocation())
+                : 0;
+            if (trs.hasWork(this, turns)) return trs;
+        }
+        return null;
+    }
+        
+    /**
+     * Get the stop the unit is heading for or at.
+     *
+     * @return The target <code>Stop</code>.
+     */
+    public List<TradeRouteStop> getCurrentStops() {
+        if (validateCurrentStop() < 0) return null;
+        List<TradeRouteStop> stops
+            = new ArrayList<TradeRouteStop>(getTradeRoute().getStops());
+        rotate(stops, currentStop);
+        return stops;
+    }
+
+    /**
      * Get the current trade route stop.
      *
      * @return The current stop index.
@@ -1590,6 +1621,16 @@ public class Unit extends GoodsLocation
             }
         }
         return currentStop;
+    }
+
+    /**
+     * Convenience function to check if a unit is at a stop.
+     *
+     * @param stop The <code>TradeRouteStop</code> to check.
+     * @return True if the unit is at the given stop.
+     */
+    public boolean atStop(TradeRouteStop stop) {
+        return Map.isSameLocation(getLocation(), stop.getLocation());
     }
 
     /**

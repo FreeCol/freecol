@@ -2165,117 +2165,109 @@ public final class InGameController implements NetworkConstants {
             .getBoolean(ClientOptions.SHOW_GOODS_MOVEMENT);
         final boolean checkProduction = freeColClient.getClientOptions()
             .getBoolean(ClientOptions.STOCK_ACCOUNTS_FOR_PRODUCTION);
-        final List<TradeRouteStop> stops = tr.getStops();
-        TradeRouteStop stop = unit.getStop();
-        boolean result = false, more = true;
+        final List<TradeRouteStop> stops = unit.getCurrentStops();
+        boolean result = false;
 
-        // If required accumulate a summary of all the activity of
-        // this unit on its trade route into this string buffer.
-        LogBuilder lb = new LogBuilder((detailed && !tr.isSilent()) ? 256 : -1);
+        // If required, accumulate a summary of all the activity of
+        // this unit on its trade route.
+        LogBuilder lb = new LogBuilder((detailed && !tr.isSilent()) ? 256
+            : -1);
         lb.mark();
-        if (!TradeRoute.isStopValid(unit, stop)) {
-            lb.add(" ", Messages.message(stop.invalidStopLabel(player)));
-            clearOrders(unit);
-            return true;
+
+        // Validate the whole route.
+        boolean valid = true;
+        for (TradeRouteStop trs : stops) {
+            if (!TradeRoute.isStopValid(unit, trs)) {
+                lb.add(" ", Messages.message(trs.invalidStopLabel(player)));
+                valid = false;
+            }
         }
-        TradeRouteStop first = stop;
-        outer: for (;;) {
-            // Is the unit at the stop already?
-            if (Map.isSameLocation(stop.getLocation(), unit.getLocation())) {
-                lb.mark();
+        if (!valid) {
+            clearOrders(unit);
+            stops.clear();
+            result = unit.getMovesLeft() > 0;
+        }
 
-                // Anything to unload?
-                unloadUnitAtStop(unit, lb);
+        // Try to find work to do on the current list of stops.
+        while (!stops.isEmpty()) {
+            TradeRouteStop stop = stops.remove(0);
 
-                // Anything to load?
-                loadUnitAtStop(unit, lb);
-
-                // Wrap load/unload messages.
-                lb.grew(" ", Messages.message(stop
-                        .getLabelFor("tradeRoute.atStop", player)));
-
-                // If the un/load consumed the moves, break now before
-                // updating the stop.  This allows next move to arrive
-                // here again having taken a second shot at
-                // un/loading, but this time should not have consumed
-                // the moves.
-                if (unit.getMovesLeft() <= 0) break;
-
-                // Try to find the next stop with work to do.
-                int index = unit.validateCurrentStop();
-                int next = index;
-                for (;;) {
-                    if (++next >= stops.size()) next = 0;
-                    if (next == index) {
-                        // No work was found anywhere on the trade
-                        // route, so we should skip this unit.
-                        lb.add(" ", Messages.message("tradeRoute.wait"));
-                        unit.setState(UnitState.SKIPPED);
-                        break outer;
-                    }
-                    stop = stops.get(next);
-                    if (!TradeRoute.isStopValid(unit, stop)) {
-                        // Invalid stop found, throw the unit off the route.
-                        lb.add(" ", Messages.message(stop.invalidStopLabel(player)));
-                        clearOrders(unit);
-                        result = true;
-                        break outer;
-                    }
-                    int turns = (!checkProduction) ? 0
-                        : unit.getTurnsToReach(stop.getLocation());
-                    if (stop.hasWork(unit, turns)) break;
-                }
-                // A new stop was found, inform the server, skip on error.
-                if (!askServer().setCurrentStop(unit, next)) {
-                    unit.setState(UnitState.SKIPPED);
+            if (!unit.atStop(stop)) {
+                // Not at stop, give up if no moves left or the path was
+                // exhausted on a previous round.
+                if (unit.getMovesLeft() <= 0
+                    || unit.getState() == UnitState.SKIPPED) {
+                    lb.add(" ", Messages.message(stop
+                            .getLabelFor("tradeRoute.toStop", player)));
                     break;
                 }
 
-                if (stop == first) {
-                    // Do not reconsider starting stop.  We can get here
-                    // if there is valid goods to load but the destination
-                    // can not accept it.
+                // Find a path to the stop, skip if none.
+                Location destination = stop.getLocation();
+                PathNode path = unit.findPath(destination);
+                if (path == null) {
+                    lb.add(" ", Messages.message(stop
+                            .getLabelFor("tradeRoute.pathStop", player)));
                     unit.setState(UnitState.SKIPPED);
                     break;
                 }
-
-                // Add messages for any skipped stops now that we know
-                // a valid one has been found.
-                for (;;) {
-                    if (++index >= stops.size()) index = 0;
-                    if (index == next) break;
-                    TradeRouteStop skip = stops.get(index);
-                    lb.add(" ", Messages.message(skip
-                            .getLabelFor("tradeRoute.skipStop", player)));
+                
+                // Try to follow the path.  If the unit does not reach
+                // the stop it is finished for now.
+                movePath(unit, path);
+                if (!unit.atStop(stop)) {
+                    unit.setState(UnitState.SKIPPED);
+                    break;
                 }
-
-                continue; // Stop was updated successfully, loop.
             }
 
-            // Not at stop, give up if no moves left or the path was
-            // exhausted on a previous round.
-            if (unit.getMovesLeft() <= 0
-                || unit.getState() == UnitState.SKIPPED
-                || !more) {
-                lb.add(" ", Messages.message(stop
-                        .getLabelFor("tradeRoute.toStop", player)));
-                break;
-            }
+            // At the stop, do the work available.
+            lb.mark();
+            unloadUnitAtStop(unit, lb); // Anything to unload?
+            loadUnitAtStop(unit, lb);   // Anything to load?
+            lb.grew(" ", Messages.message(stop.getLabelFor("tradeRoute.atStop",
+                                                           player)));
 
-            // Find a path to the stop.  Skip if none.
-            Location destination = stop.getLocation();
-            PathNode path = unit.findPath(destination);
-            if (path == null) {
-                lb.add(" ", Messages.message(stop
-                        .getLabelFor("tradeRoute.pathStop", player)));
+            // If the un/load consumed the moves, break now before
+            // updating the stop.  This allows next turn to retry
+            // un/loading, but this time it will not consume the moves.
+            if (unit.getMovesLeft() <= 0) break;
+
+            // Find the next stop with work to do.
+            TradeRouteStop next = unit.getNextStop(checkProduction);
+            if (next == null) {
+                // No work was found anywhere on the trade route,
+                // so we should skip this unit.
+                lb.add(" ", Messages.message("tradeRoute.wait"));
                 unit.setState(UnitState.SKIPPED);
                 break;
             }
-
-            // Try to follow the path.  Mark if the path is complete
-            // but loop so as to check for unload before returning.
-            more = movePath(unit, path);
-            if (!more) unit.setState(UnitState.SKIPPED);
+            // Add a message for any skipped stops.
+            List<TradeRouteStop> skipped
+                = tr.getStopSublist(stops.get(0), next);
+            if (!skipped.isEmpty()) {
+                StringTemplate t = StringTemplate.label("")
+                    .add("tradeRoute.skipped");
+                String sep = " ";
+                for (TradeRouteStop trs : skipped) {
+                    t.addName(sep)
+                        .addStringTemplate(trs.getLocation()
+                            .getLocationLabelFor(player));
+                    sep = ", ";
+                }
+                t.addName(".");
+                lb.add(" ", Messages.message(t));
+            }
+            // Bring the next stop to the head of the stops list if it
+            // is present.
+            while (!stops.isEmpty() && stops.get(0) != next) {
+                stops.remove(0);
+            }
+            // Set the new stop, skip on error.
+            if (!askServer().setCurrentStop(unit, tr.getIndex(next))) {
+                unit.setState(UnitState.SKIPPED);
+                break;
+            }
         }
 
         if (lb.grew()) {
@@ -2291,7 +2283,6 @@ public final class InGameController implements NetworkConstants {
                 player.addModelMessage(m);
             }
         }
-        if (result) result = unit.getMovesLeft() > 0;
         return result;
     }
 
@@ -2374,29 +2365,33 @@ public final class InGameController implements NetworkConstants {
      * Gets a message describing a goods loading.
      *
      * @param type The <code>GoodsType</code> the type of goods being loaded.
-     * @param amount The amount of goods loaded.
+     * @param amount The amount of goods actually loaded.
      * @param present The amount of goods already at the location.
      * @param export The amount of goods available to export.
-     * @param demand The amount of goods the unit should load according to
+     * @param toLoad The amount of goods the unit should load according to
      *     the trade route orders.
      * @return A summary of the load.
      */
     private String getLoadGoodsMessage(GoodsType type,
                                        int amount, int present,
-                                       int export, int demand) {
+                                       int export, int toLoad) {
         String key;
         int more;
 
-        if (demand < export) {
-            // Loaded %amount% %goods% lacking space for %more% more
-            key = "tradeRoute.loadStopImport";
-            more = export - demand;
-        } else if (present > export && demand > export) {
-            key = (amount == 0)
+        if (amount == 0) {
+            key = (present == 0)
+                // Loaded no %goods% from an empty warehouse.
+                ? "tradeRoute.loadStopNone"
                 // Loaded no %goods% with %more% more retained...
-                ? "tradeRoute.loadStopNoExport"
-                // Loaded %amount% %goods% with %more% more retained...
-                : "tradeRoute.loadStopExport";
+                : "tradeRoute.loadStopNoExport";
+            more = present;
+        } else if (toLoad < export) {
+            key = "tradeRoute.loadStopImport";
+            // Loaded %amount% %goods% lacking space for %more% more
+            more = export - toLoad;
+        } else if (present > export && toLoad > export) {
+            // Loaded %amount% %goods% with %more% more retained...
+            key = "tradeRoute.loadStopExport";
             more = present - export;
         } else {
             // Loaded %amount% %goods%

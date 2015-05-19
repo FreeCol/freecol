@@ -4061,7 +4061,8 @@ public final class InGameController extends Controller {
             List<TradeRouteStop> stops = tradeRoute.getStops();
             int found = -1;
             for (int i = 0; i < stops.size(); i++) {
-                if (unit.getLocation() == stops.get(i).getLocation()) {
+                if (Map.isSameLocation(unit.getLocation(),
+                                       stops.get(i).getLocation())) {
                     found = i;
                     break;
                 }

@@ -159,6 +159,26 @@ public class TradeRoute extends FreeColGameObject
     }
 
     /**
+     * Get a list of the trade route stops in this trade route, starting
+     * at a given stop (inclusive) and a final stop (exclusive).
+     *
+     * @param start The starting <code>TradeRouteStop</code>.
+     * @param end The end <code>TradeRouteStop</code>.
+     * @return A list of stops, or null on error.
+     */
+    public List<TradeRouteStop> getStopSublist(TradeRouteStop start,
+                                               TradeRouteStop end) {
+        int i0 = getIndex(start), in = getIndex(end);
+        if (i0 < 0 || in < 0) return null;
+        List<TradeRouteStop> result = new ArrayList<>();
+        while (i0 != in) {
+            result.add(stops.get(i0));
+            if (++i0 >= stops.size()) i0 = 0;
+        }
+        return result;
+    }
+
+    /**
      * Add a new <code>TradeRouteStop</code> to this trade route.
      *
      * @param stop The <code>TradeRouteStop</code> to add.
@@ -174,6 +194,21 @@ public class TradeRoute extends FreeColGameObject
      */
     public void removeStop(TradeRouteStop stop) {
         stops.remove(stop);
+    }
+
+    /**
+     * Get the index of a stop in this trade route.
+     *
+     * @param stop The <code>TradeRouteStop</code> to look for.
+     * @return The index of the given stop, or negative on failure.
+     */
+    public int getIndex(TradeRouteStop stop) {
+        int i = 0;
+        for (TradeRouteStop trs : stops) {
+            if (trs == stop) return i;
+            i++;
+        }
+        return -1;
     }
 
     /**
