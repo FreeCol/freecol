@@ -187,4 +187,32 @@ public class CollectionUtils {
             }
         }
     }
+
+    /**
+     * Check if two lists contents are equal but also checks for null.
+     *
+     * @param one First list to compare
+     * @param two Second list to compare
+     * @return True if the list contents are all either both null or
+     *     equal in the sense of their equals() method.
+     */
+    public static <T> boolean listEquals(List<T> one, List<T> two) {
+        if (one == null) return two == null;
+        if (two == null) return false;
+        
+        Iterator<T> oneI = one.iterator();
+        Iterator<T> twoI = two.iterator();
+        for (;;) {
+            if (oneI.hasNext()) {
+                if (twoI.hasNext()) {
+                    if (!Utils.equals(oneI.next(), twoI.next())) break;
+                } else {
+                    break;
+                }
+            } else {
+                return !twoI.hasNext();
+            }
+        }
+        return false;
+    }                
 }

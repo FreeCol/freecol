@@ -27,6 +27,8 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -345,6 +347,47 @@ public class ProductionType extends FreeColObject {
             }
         }
         return best;
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof ProductionType) {
+            ProductionType pt = (ProductionType)o;
+            return super.equals(o)
+                && this.unattended == pt.unattended
+                && Utils.equals(this.productionLevel, pt.productionLevel)
+                && listEquals(this.outputs, pt.outputs)
+                && listEquals(this.inputs, pt.inputs);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + ((this.unattended) ? 1 : 0);
+        hash = 31 * hash + Utils.hashCode(this.productionLevel);
+        if (this.outputs != null) {
+            for (AbstractGoods ag : this.outputs) {
+                hash = 31 * hash + Utils.hashCode(ag);
+            }
+        }
+        if (this.inputs != null) {
+            for (AbstractGoods ag : this.inputs) {
+                hash = 31 * hash + Utils.hashCode(ag);
+            }
+        }
+        return hash;
     }
 
 

@@ -48,7 +48,7 @@ public class Utils {
 
 
     /**
-     * Will check if both objects are equal but also checks for null.
+     * Check if two objects are equal but also checks for null.
      *
      * @param one First object to compare
      * @param two Second object to compare

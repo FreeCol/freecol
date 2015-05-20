@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -102,7 +103,7 @@ public abstract class WorkLocation extends UnitLocation
      * @param newProductionType The new <code>ProductionType</code> value.
      */
     public final void setProductionType(final ProductionType newProductionType) {
-        if (newProductionType != productionType) {
+        if (!Utils.equals(newProductionType, productionType)) {
             productionType = newProductionType;
             colony.invalidateCache();
             logger.fine("Production type at " + this

@@ -240,7 +240,10 @@ public class AbstractGoods extends FreeColObject implements Named {
      */
     @Override
     public int hashCode() {
-        return 31 * Utils.hashCode(type) + amount;
+        int hash = super.hashCode();
+        hash = 31 * hash + Utils.hashCode(this.type);
+        hash = 31 * hash + this.amount;
+        return hash;
     }
 
 
