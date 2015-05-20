@@ -1651,15 +1651,19 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         GoodsContainer container = carrier.getGoodsContainer();
         container.saveState();
-        if (serverPlayer.buy(container, type, amount) < 0) {
+        int gold = serverPlayer.getGold();
+        int buyAmount = serverPlayer.buy(container, type, amount);
+        if (buyAmount < 0) {
             return DOMMessage.clientError("Player " + serverPlayer.getName()
-                + " tried to buy " + amount + " " + type);
+                + " tried to buy " + amount + " " + type.getSuffix());
         }
-        serverPlayer.propagateToEuropeanMarkets(type, -amount, random);
+        serverPlayer.propagateToEuropeanMarkets(type, -buyAmount, random);
         serverPlayer.csFlushMarket(type, cs);
         carrier.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         cs.add(See.only(serverPlayer), carrier);
+        logger.finest(carrier + " bought " + buyAmount + " " + type.getSuffix()
+            + " in Europe for " + (serverPlayer.getGold() - gold));
         // Action occurs in Europe, nothing is visible to other players.
         return cs.build(serverPlayer);
     }
@@ -1680,12 +1684,18 @@ public final class InGameController extends Controller {
         GoodsContainer container = carrier.getGoodsContainer();
         container.saveState();
         if (serverPlayer.canTrade(type, Access.EUROPE)) {
-            amount = serverPlayer.sell(container, type, amount);
-            if (amount > 0) {
-                serverPlayer.propagateToEuropeanMarkets(type, amount, random);
+            int gold = serverPlayer.getGold();
+            int sellAmount = serverPlayer.sell(container, type, amount);
+            if (sellAmount < 0) {
+                return DOMMessage.clientError("Player " + serverPlayer.getName()
+                    + " tried to sell " + amount + " " + type.getSuffix());
             }
+            serverPlayer.propagateToEuropeanMarkets(type, sellAmount, random);
             serverPlayer.csFlushMarket(type, cs);
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
+            logger.finest(carrier + " sold " + sellAmount
+                + " " + type.getSuffix()
+                + " in Europe for " + (serverPlayer.getGold() - gold));
         } else {
             // Dumping goods in Europe
             moveGoods(carrier, type, amount, null);
