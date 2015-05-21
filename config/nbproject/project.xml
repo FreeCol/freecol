@@ -48,6 +48,14 @@
                     <target>clean</target>
                     <target>package</target>
                 </action>
+                <action name="debug">
+                    <script>nbproject/ide-targets.xml</script>
+                    <target>debug-nb</target>
+                </action>
+                <action name="profile">
+                    <script>nbproject/ide-targets.xml</script>
+                    <target>profile-nb</target>
+                </action>
             </ide-actions>
             <export>
                 <type>folder</type>
@@ -80,6 +88,8 @@
                     <ide-action name="javadoc"/>
                     <ide-action name="run"/>
                     <ide-action name="test"/>
+                    <ide-action name="debug"/>
+                    <ide-action name="profile"/>
                 </context-menu>
             </view>
             <subprojects/>
