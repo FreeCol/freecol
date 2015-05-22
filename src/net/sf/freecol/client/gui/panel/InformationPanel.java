@@ -75,15 +75,18 @@ public class InformationPanel extends FreeColPanel {
                 "[510]", "[242]20[20]"));
 
         final GUI gui = getGUI();
+        final float scale = gui.getImageLibrary().getScalingFactor();
         JPanel textPanel = new MigPanel();
         textPanel.setOpaque(false);
         textPanel.setLayout(new MigLayout("wrap 2", "", ""));
         for (int i = 0; i < texts.length; i++) {
             if (images != null && images[i] != null) {
                 textPanel.add(new JLabel(images[i]));
-                textPanel.add(Utility.getDefaultTextArea(texts[i], 30));
+                textPanel.add(Utility.getDefaultTextArea(texts[i],
+                    Math.round(48/scale)));
             } else {
-                textPanel.add(Utility.getDefaultTextArea(texts[i], 30), "skip");
+                textPanel.add(Utility.getDefaultTextArea(texts[i],
+                    Math.round(56/scale)), "skip");
             }
             StringTemplate disp = displayLabel(fcos[i]);
             if (disp == null) continue;
