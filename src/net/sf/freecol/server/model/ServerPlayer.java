@@ -1148,7 +1148,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return True if the market price had changed.
      */
     public boolean csFlushMarket(GoodsType type, ChangeSet cs) {
-        Market market = getMarket();
+        final Market market = getMarket();
         boolean ret = market.hasPriceChanged(type);
         if (ret) {
             // This type of goods has changed price, so we will update
@@ -1171,11 +1171,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *     negative on failure.
      */
     public int buy(GoodsContainer container, GoodsType type, int amount) {
-        Market market = getMarket();
-        int price = market.getBidPrice(type, amount);
+        final Market market = getMarket();
+        final int price = market.getBidPrice(type, amount);
         if (!checkGold(price)) return -1;
-        logger.finest(getName() + " buys " + amount + " " + type
-            + " for " + price);
 
         modifyGold(-price);
         market.modifySales(type, -amount);
@@ -1198,14 +1196,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return The amount actually added to the market, or negative on failure.
      */
     public int sell(GoodsContainer container, GoodsType type, int amount) {
-        Market market = getMarket();
-        int price = market.getSalePrice(type, amount);
-        logger.finest(getName() + " sells " + amount + " " + type
-            + " for " + price);
-
+        final Market market = getMarket();
         final int tax = getTax();
-        int incomeBeforeTaxes = price;
-        int incomeAfterTaxes = ((100 - tax) * incomeBeforeTaxes) / 100;
+        final int incomeBeforeTaxes = market.getSalePrice(type, amount);
+        final int incomeAfterTaxes = ((100 - tax) * incomeBeforeTaxes) / 100;
+        
         modifyGold(incomeAfterTaxes);
         market.modifySales(type, amount);
         if (container != null) container.addGoods(type, -amount);
