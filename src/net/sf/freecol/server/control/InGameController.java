@@ -1655,7 +1655,8 @@ public final class InGameController extends Controller {
         carrier.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         cs.add(See.only(serverPlayer), carrier);
-        logger.finest(carrier + " bought " + buyAmount + " " + type.getSuffix()
+        logger.finest(carrier + " bought " + amount + "(" + buyAmount + ")"
+            + " " + type.getSuffix()
             + " in Europe for " + (serverPlayer.getGold() - gold));
         // Action occurs in Europe, nothing is visible to other players.
         return cs.build(serverPlayer);
@@ -1686,7 +1687,7 @@ public final class InGameController extends Controller {
             serverPlayer.propagateToEuropeanMarkets(type, sellAmount, random);
             serverPlayer.csFlushMarket(type, cs);
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-            logger.finest(carrier + " sold " + sellAmount
+            logger.finest(carrier + " sold " + amount + "(" + sellAmount + ")"
                 + " " + type.getSuffix()
                 + " in Europe for " + (serverPlayer.getGold() - gold));
         } else {
