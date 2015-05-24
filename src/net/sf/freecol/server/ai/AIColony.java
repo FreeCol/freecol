@@ -920,7 +920,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     newGoods.setTransportPriority(priority);
                     newAIGoods.add(newGoods);
                     goodsLog(newGoods, "makes", lb);
-logger.finest("AIGOODS: " + newGoods + " created at " + colony + " in " + getGame().getTurn().getNumber());
                 }
             }
             setExportGoods(newAIGoods);

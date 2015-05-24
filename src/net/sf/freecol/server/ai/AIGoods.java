@@ -184,8 +184,6 @@ public class AIGoods extends TransportableAIObject {
                 // FIXME: sort this out.
                 // For now, do not tolerate partial unloads.
                 result = false;
-            } else {
-logger.finest("AIGOODS: " + this + " unloaded from " + carrier + " at " + carrier.getLocation() + " in " + getGame().getTurn().getNumber());
             }
         }   
         return result;
