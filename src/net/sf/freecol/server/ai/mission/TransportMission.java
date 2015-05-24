@@ -806,6 +806,7 @@ public class TransportMission extends Mission {
             for (Goods g : goodsPresent) {
                 AIGoods aig = new AIGoods(getAIMain(), carrier, g.getType(),
                                           g.getAmount(), null);
+logger.finest("AIGOODS: " + aig + " BOGUS at " + carrier + " in " + getGame().getTurn().getNumber());
                 todo.add(aig);
             }
         }
