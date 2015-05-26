@@ -75,7 +75,7 @@ public class IndianBringGiftMission extends Mission {
     public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
         super(aiMain, aiUnit, target);
 
-        this.collected = false;
+        this.collected = hasGift();
     }
 
     /**
