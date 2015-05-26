@@ -78,12 +78,12 @@ public class StringTemplate extends FreeColObject {
     protected StringTemplate() {}
 
     /**
-     * Creates a new <code>StringTemplate</code> instance.
+     * Copy an existing template, but with a new identifier.
      *
      * @param id The object identifier.
      * @param template A <code>StringTemplate</code> to copy.
      */
-    public StringTemplate(String id, StringTemplate template) {
+    protected StringTemplate(String id, StringTemplate template) {
         setId(id);
         this.templateType = template.templateType;
         this.defaultId = template.defaultId;
@@ -120,7 +120,14 @@ public class StringTemplate extends FreeColObject {
 
     // Factory methods
 
+    public static StringTemplate copy(String id, StringTemplate template) {
+        return new StringTemplate(id, template);
+    }
+
     public static StringTemplate name(String value) {
+        if (value == null) {
+            logger.warning("NULL NAME TEMPLATE\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+        }
         return new StringTemplate(value, null, TemplateType.NAME);
     }
 

@@ -186,7 +186,7 @@ public final class ReportTurnPanel extends ReportPanel {
             case WAREHOUSE_CAPACITY:
                 JButton ignoreButton = new JButton("x");
                 Utility.localizeToolTip(ignoreButton, 
-                    new StringTemplate("report.turn.ignore", message));
+                    StringTemplate.copy("report.turn.ignore", message));
                 final ModelMessage m = message;
                 ignoreButton.addActionListener(new ActionListener() {
                         @Override

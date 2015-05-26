@@ -97,7 +97,7 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
         }
         JTextArea text = (template == null)
             ? Utility.localizedTextArea(messageId, 30)
-            : Utility.localizedTextArea(new StringTemplate(messageId, template), 30);
+            : Utility.localizedTextArea(StringTemplate.copy(messageId, template), 30);
         panel.add(text);
         panel.setSize(panel.getPreferredSize());
 
