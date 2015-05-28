@@ -363,52 +363,6 @@ public class MessagesTest extends FreeColTestCase {
             .equals(Messages.message("key3")));
     }
 
-    public void testTurnChoices() {
-        String mapping = "monarch={{turn:%turn%|1492=bob|SPRING 1493=anson"
-            + "|AUTUMN 1493-1588=paul|1589-SPRING 1612=james"
-            + "|AUTUMN 1612-AUTUMN 1667=nathan|default=fred}}";
-
-        ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
-        try {
-            Messages.loadMessages(stream);
-        } catch (IOException ioe) { fail(); }
-
-        StringTemplate t = StringTemplate.template("monarch")
-            .addName("%turn%", Turn.toString(1));
-        assertTrue("bob"
-            .equals(Messages.message(t)));
-
-        t = StringTemplate.template("monarch")
-            .addName("%turn%", Turn.toString(2));
-        assertTrue("anson"
-            .equals(Messages.message(t)));
-
-        t = StringTemplate.template("monarch")
-            .addName("%turn%", "AUTUMN 1493");
-        assertTrue("paul"
-            .equals(Messages.message(t)));
-
-        t = StringTemplate.template("monarch")
-            .addName("%turn%", Turn.toString(100));
-        assertTrue("james"
-            .equals(Messages.message(t)));
-
-        t = StringTemplate.template("monarch")
-            .addName("%turn%", Turn.toString(150));
-        assertTrue("nathan"
-            .equals(Messages.message(t)));
-
-        t = StringTemplate.template("monarch")
-            .addName("%turn%", "YEAR 1624");
-        assertTrue("nathan"
-            .equals(Messages.message(t)));
-
-        t = StringTemplate.template("monarch")
-            .addName("%turn%", Turn.toString(1000));
-        assertTrue("fred"
-            .equals(Messages.message(t)));
-    }
-
     public void testREFMessages() {
         StringTemplate template = StringTemplate
             .template(Monarch.MonarchAction.ADD_TO_REF.getTextKey())

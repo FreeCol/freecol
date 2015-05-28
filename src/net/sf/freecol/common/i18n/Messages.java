@@ -116,9 +116,6 @@ public class Messages {
      * formats.
      */
     private static final Map<String, Selector> tagMap = new HashMap<>();
-    static {
-        tagMap.put("turn", new TurnSelector());
-    }
 
 
     // Message bundle initialization
