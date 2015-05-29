@@ -34,6 +34,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
@@ -108,6 +109,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             tabs.addTab(Messages.message(FoundingFather.getTypeKey(type)), null,
                         imageScrollPane, null);
         }
+        final int age = getGame().getAge();
         Map<String, Turn> electionTurns = getMyPlayer().getElectionTurns();
         for (FoundingFather father : getSpecification().getFoundingFathers()) {
             String name = Messages.getName(father);
@@ -132,6 +134,9 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
                 : (father == currentFather)
                 ? Utility.localizedLabel("report.continentalCongress.recruiting")
                 : Utility.localizedLabel("report.continentalCongress.available"));
+            if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
+                panel.add(new JLabel(String.valueOf(father.getWeight(age))));
+            }
         }
         panels.clear();
         setMainComponent(tabs);

@@ -53,6 +53,7 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
+import net.sf.freecol.common.option.TextOption;
 import net.sf.freecol.common.option.UnitListOption;
 
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -76,6 +77,9 @@ public final class Specification {
 
     /** The default role. */
     public static final String DEFAULT_ROLE_ID = "model.role.default";
+
+    /** How many game ages. */
+    public static final int NUMBER_OF_AGES = 3;
 
     public static class Source extends FreeColGameObjectType {
 
@@ -235,6 +239,9 @@ public final class Specification {
 
     /** The name of the difficulty level option group. */
     private String difficultyLevel = null;
+
+    /** The turn number for the game ages for FF recruitment. */
+    private final int[] ages = new int[NUMBER_OF_AGES];
 
 
     /**
@@ -623,14 +630,35 @@ public final class Specification {
         }
 
         // Initialize the Turn class using GameOptions.
-        try {
-            int startingYear = getInteger(GameOptions.STARTING_YEAR);
-            int seasonYear = getInteger(GameOptions.SEASON_YEAR);
-            if (seasonYear < startingYear) seasonYear = startingYear;
-            Turn.setStartingYear(startingYear);
-            Turn.setSeasonYear(seasonYear);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to set year options", e);
+        Turn.initialize(getInteger(GameOptions.STARTING_YEAR),
+                        getInteger(GameOptions.SEASON_YEAR));
+        {
+            TextOption agesOption = (TextOption)getOption(GameOptions.AGES);
+            String agesValue = agesOption.getValue();
+            String a[] = agesValue.split(",");
+            boolean badAges = a.length != NUMBER_OF_AGES-1;
+            if (!badAges) {
+                try {
+                    ages[0] = 1;
+                    ages[1] = Turn.yearToTurn(Integer.parseInt(a[0]));
+                    ages[2] = Turn.yearToTurn(Integer.parseInt(a[1]));
+                    if (ages[1] < 1 || ages[2] < 1) {
+                        badAges = true;
+                    } else if (ages[1] > ages[2]) {
+                        int tmp = ages[1];
+                        ages[1] = ages[2];
+                        ages[2] = tmp;
+                    }
+                } catch (NumberFormatException nfe) {
+                    badAges = true;
+                }
+            }
+            if (badAges) {
+                logger.warning("Bad ages: " + agesValue);
+                ages[0] = 1;   // First turn
+                ages[1] = Turn.yearToTurn(1600);
+                ages[2] = Turn.yearToTurn(1700);
+            }
         }
 
         // Apply the customs on coast restriction
@@ -643,6 +671,7 @@ public final class Specification {
         logger.info("Specification clean following " + why + " complete"
             + ", starting year=" + Turn.getStartingYear()
             + ", season year=" + Turn.getSeasonYear()
+            + ", ages=[" + ages[0] + "," + ages[1] + "," + ages[2] + "]"
             + ", " + allTypes.size() + " FreeColGameObjectTypes"
             + ", " + allAbilities.size() + " Abilities"
             + ", " + buildingTypeList.size() + " BuildingTypes"
@@ -1692,6 +1721,23 @@ public final class Specification {
         return getType(id, Disaster.class);
     }
 
+    // -- Ages --
+
+    /**
+     * Gets the age corresponding to a given turn.
+     *
+     * @param year The turn integer value.
+     * @return The age of this turn.
+     */
+    public int getAge(Turn turn) {
+        int n = turn.getNumber();
+        return (n < ages[0]) ? -1
+            : (n < ages[1]) ? 0
+            : (n < ages[2]) ? 1
+            : 2;
+    }        
+
+
     // General type retrieval
 
     /**
@@ -2557,6 +2603,8 @@ public final class Specification {
                                   GameOptions.GAMEOPTIONS_MAP, -10);
         ret |= checkIntegerOption(GameOptions.INDEPENDENCE_TURN,
                                   GameOptions.GAMEOPTIONS_YEARS, 468);
+        ret |= checkStringOption(GameOptions.AGES,
+                                 GameOptions.GAMEOPTIONS_YEARS, "109,309");
         // end @compat 0.11.3
 
         return ret;

@@ -570,7 +570,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         }
 
-        if (game.getTurn().getAge() >= 2
+        if (game.getTurn().getNumber() > 300
             && player.isAtWar()
             && randoms[cheatIndex++] < offensiveLandUnitCheatPercent) {
             // Find a target to attack.
@@ -1490,7 +1490,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return The desired number of scouts for this player.
      */
     public int scoutsNeeded() {
-        return (getGame().getTurn().getAge() <= 1) ? 3 : 1;
+        return 3 - (getGame().getTurn().getNumber() / 100);
     }
 
     /**
@@ -2784,10 +2784,10 @@ public class EuropeanAIPlayer extends AIPlayer {
             || goodsType.isBuildingMaterial()) {
             // By age 3 we should be able to produce enough ourselves.
             // FIXME: check whether we have an armory, at least
-            int age = getGame().getTurn().getAge();
-            ret = age < 3;
+            int turn = getGame().getTurn().getNumber();
+            ret = turn < 300;
             lb.add(((ret) ? "accepted" : "rejected"),
-                   ": special-goods-in-age-", age, ".");
+                   ": special-goods-in-turn-", turn, ".");
         } else {
             int averageIncome = 0;
             int numberOfGoods = 0;
@@ -2827,7 +2827,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     @Override
     public FoundingFather selectFoundingFather(List<FoundingFather> ffs) {
-        int age = getGame().getTurn().getAge();
+        final int age = getGame().getAge();
         FoundingFather bestFather = null;
         int bestWeight = Integer.MIN_VALUE;
         for (FoundingFather father : ffs) {
