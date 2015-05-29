@@ -216,9 +216,9 @@ public class GameOptions {
         = "model.option.victoryDefeatHumans";
 
 
-    /** Year game option group. */
-    public static final String GAMEOPTIONS_YEAR
-        = "gameOptions.year";
+    /** Years game option group. */
+    public static final String GAMEOPTIONS_YEARS
+        = "gameOptions.years";
 
     /**
      * The year in which the game starts. At the moment, changing this

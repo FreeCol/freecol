@@ -2477,7 +2477,7 @@ public final class Specification {
         // SAVEGAME_VERSION == 11
 
         // @compat 0.10.0
-        ret |= checkOptionGroup(GameOptions.GAMEOPTIONS_YEAR);
+        ret |= checkOptionGroup(GameOptions.GAMEOPTIONS_YEARS);
         String[] years = {
             GameOptions.STARTING_YEAR,
             GameOptions.SEASON_YEAR,
@@ -2488,7 +2488,7 @@ public final class Specification {
         int[] values = { 1492, 1600, 1600, 1850, 1800 };
         for (int index = 0; index < years.length; index++) {
             ret |= checkIntegerOption(years[index],
-                                      GameOptions.GAMEOPTIONS_YEAR,
+                                      GameOptions.GAMEOPTIONS_YEARS,
                                       values[index]);
         }
         ret |= checkBooleanOption(GameOptions.ENHANCED_MISSIONARIES,
