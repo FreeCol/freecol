@@ -144,18 +144,6 @@ public final class InGameController extends Controller {
 
     private static final Logger logger = Logger.getLogger(InGameController.class.getName());
 
-    /**
-     * Score bonus on declaring independence = (1780, Spring) - turn
-     * 1780 is documented in the Col1 manual:
-     *   ``if you've declared your independence before 1780, your score
-     *     is increased; the sooner you declare; the better your Bonus.''
-     * which suggests this needs to be turn based and cut off at the earliest
-     * turn in 1780.
-     */
-    public static final int SCORE_INDEPENDENCE_YEAR = 1780;
-    public static final Turn.Season SCORE_INDEPENDENCE_SEASON
-        = Turn.Season.SPRING;
-    
     /** The server random number source. */
     private final Random random;
 
@@ -1291,6 +1279,8 @@ public final class InGameController extends Controller {
      */
     public Element declareIndependence(ServerPlayer serverPlayer,
                                        String nationName, String countryName) {
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
         ChangeSet cs = new ChangeSet();
 
         // Cross the Rubicon
@@ -1301,13 +1291,12 @@ public final class InGameController extends Controller {
 
         // Do not add history event to cs as we are going to update the
         // entire player.  Likewise clear model messages.
-        Turn turn = getGame().getTurn();
+        Turn turn = game.getTurn();
         HistoryEvent h = new HistoryEvent(turn,
             HistoryEvent.HistoryEventType.DECLARE_INDEPENDENCE, serverPlayer);
-        h.setScore(Math.max(0, Turn.yearToTurn(SCORE_INDEPENDENCE_YEAR,
-                                               SCORE_INDEPENDENCE_SEASON)
-                - turn.getNumber()));
-        cs.addGlobalHistory(getGame(), h);
+        final int independenceTurn = spec.getInteger(GameOptions.INDEPENDENCE_TURN);
+        h.setScore(Math.max(0, independenceTurn - turn.getNumber()));
+        cs.addGlobalHistory(game, h);
         serverPlayer.clearModelMessages();
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
@@ -1343,8 +1332,6 @@ public final class InGameController extends Controller {
         // Generalized continental army muster.
         // Do not use UnitType.getTargetType.
         java.util.Map<UnitType, UnitType> upgrades = new HashMap<>();
-        final Game game = getGame();
-        final Specification spec = game.getSpecification();
         for (UnitType unitType : spec.getUnitTypeList()) {
             UnitType upgrade = unitType.getTargetType(ChangeType.INDEPENDENCE,
                                                       serverPlayer);

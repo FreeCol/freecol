@@ -2555,6 +2555,8 @@ public final class Specification {
         // @compat 0.11.3
         ret |= checkIntegerOption(GameOptions.MISSION_INFLUENCE,
                                   GameOptions.GAMEOPTIONS_MAP, -10);
+        ret |= checkIntegerOption(GameOptions.INDEPENDENCE_TURN,
+                                  GameOptions.GAMEOPTIONS_YEARS, 468);
         // end @compat 0.11.3
 
         return ret;

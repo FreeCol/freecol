@@ -251,6 +251,17 @@ public class GameOptions {
     public static final String LAST_COLONIAL_YEAR
         = "model.option.lastColonialYear";
 
+    /**
+     * Score bonus on declaring independence = (1780, Spring) - turn
+     * 1780 is documented in the Col1 manual:
+     *   ``if you've declared your independence before 1780, your score
+     *     is increased; the sooner you declare; the better your Bonus.''
+     * which suggests this needs to be turn based and cut off at the earliest
+     * turn in 1780.
+     */
+    public static final String INDEPENDENCE_TURN
+        = "model.option.independenceTurn";
+
 
     /**
      * Prices game option group.

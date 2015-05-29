@@ -3674,6 +3674,10 @@
         <!-- The last year of the game for a colonial player. -->
         <integerOption id="model.option.lastColonialYear"
                        value="1800" minimumValue="1492" maximumValue="1900" />
+        <!-- Col1 gives a bonus for declaring independence before 1780.
+             1780 implies turn is (1600 - 1492) + 2 * (1780 - 1600) = 468. -->
+        <integerOption id="model.option.independenceTurn"
+                       value="468" minimumValue="308" />
       </optionGroup>
     </optionGroup>
 
