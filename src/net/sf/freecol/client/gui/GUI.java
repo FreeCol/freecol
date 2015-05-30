@@ -272,7 +272,7 @@ public class GUI {
      */
     protected ImageIcon createObjectImageIcon(FreeColObject display) {
         return (display == null) ? null
-            : createImageIcon(imageLibrary.getObjectImage(display));
+            : createImageIcon(imageLibrary.getObjectImage(display, 2f));
     }
 
     /**

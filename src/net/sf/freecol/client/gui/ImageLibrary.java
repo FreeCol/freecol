@@ -437,71 +437,19 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the appropriate small BufferedImage for a FreeColObject.
-     *
-     * @param display The FreeColObject to display.
-     * @return The appropriate BufferedImage.
-     * @deprecated Please use a more specific method.
-     */
-    @Deprecated
-    public BufferedImage getSmallObjectImage(FreeColObject display) {
-        try {
-            BufferedImage image;
-            if (display instanceof Goods) {
-                display = ((Goods)display).getType();
-            } else if (display instanceof Player) {
-                display = ((Player)display).getNation();
-            }
-
-            final float scale = 0.75f;
-            final float combinedScale = scalingFactor * scale;
-            if (display instanceof Unit) {
-                Unit unit = (Unit)display;
-                image = getUnitImage(unit, combinedScale);
-            } else if (display instanceof UnitType) {
-                UnitType unitType = (UnitType)display;
-                image = getUnitImage(unitType, combinedScale);
-            } else if (display instanceof Settlement) {
-                Settlement settlement = (Settlement)display;
-                image = getSettlementImage(settlement, combinedScale);
-            } else if (display instanceof LostCityRumour) {
-                image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR,
-                    combinedScale);
-            } else if (display instanceof GoodsType) {
-                FreeColGameObjectType type = (FreeColGameObjectType)display;
-                image = getSmallIconImage(type);
-            } else if (display instanceof Nation) {
-                FreeColGameObjectType type = (FreeColGameObjectType)display;
-                image = getSmallMiscIconImage(type);
-            } else if (display instanceof BuildingType) {
-                BuildingType type = (BuildingType)display;
-                image = getBuildingImage(type, combinedScale);
-            } else {
-                logger.warning("could not find image of unknown type for "
-                    + display);
-                return null;
-            }
-
-            if (image == null) {
-                logger.warning("could not find image for " + display);
-                return null;
-            }
-            return image;
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "could not find image", e);
-            return null;
-        }
-    }
-
-    /**
      * Returns the appropriate BufferedImage for a FreeColObject.
-     * Please use a more specific method.
+     * Please, use a more specific method!
      *
      * @param display The FreeColObject to display.
+     * @param scale How much the image should be scaled.
      * @return The appropriate BufferedImage.
      */
-    public BufferedImage getObjectImage(FreeColObject display) {
+    public BufferedImage getObjectImage(FreeColObject display, float scale) {
         try {
+            final float combinedScale = scalingFactor * scale;
+            final Dimension size = new Dimension(
+                Math.round(combinedScale*ICON_SIZE.width),
+                Math.round(combinedScale*ICON_SIZE.height));
             BufferedImage image;
             if (display instanceof Goods) {
                 display = ((Goods)display).getType();
@@ -511,24 +459,24 @@ public final class ImageLibrary {
 
             if (display instanceof Unit) {
                 Unit unit = (Unit)display;
-                image = getUnitImage(unit);
+                image = getUnitImage(unit, size);
             } else if (display instanceof UnitType) {
                 UnitType unitType = (UnitType)display;
-                image = getUnitImage(unitType);
+                image = getUnitImage(unitType, size);
             } else if (display instanceof Settlement) {
                 Settlement settlement = (Settlement)display;
-                image = getSettlementImage(settlement);
+                image = getSettlementImage(settlement, size);
             } else if (display instanceof LostCityRumour) {
-                image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
+                image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, size);
             } else if (display instanceof GoodsType) {
                 FreeColGameObjectType type = (FreeColGameObjectType)display;
                 image = getIconImage(type);
             } else if (display instanceof Nation) {
                 FreeColGameObjectType type = (FreeColGameObjectType)display;
-                image = getMiscIconImage(type);
+                image = getMiscIconImage(type, size);
             } else if (display instanceof BuildingType) {
                 BuildingType type = (BuildingType)display;
-                image = getBuildingImage(type, scalingFactor);
+                image = getBuildingImage(type, size);
             } else {
                 logger.warning("could not find image of unknown type for " + display);
                 return null;
@@ -891,12 +839,37 @@ public final class ImageLibrary {
         return image;
     }
 
+    public static BufferedImage getUnitImage(Unit unit, Dimension size) {
+        return getUnitImage(unit.getType(), unit.getRole().getId(),
+            unit.hasNativeEthnicity(), size);
+    }
+
     public static BufferedImage getUnitImage(UnitType unitType, Dimension size) {
         String roleId = unitType.getDisplayRoleId();
         String roleQual = (Role.isDefaultRoleId(roleId)) ? ""
             : "." + Role.getRoleSuffix(roleId);
         String key = "image.unit." + unitType.getId() + roleQual;
         return ResourceManager.getImage(key, size);
+    }
+
+    public static BufferedImage getUnitImage(UnitType unitType, String roleId,
+                                             boolean nativeEthnicity,
+                                             Dimension size) {
+        // units that can only be native don't need the .native key part
+        if (unitType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)) {
+            nativeEthnicity = false;
+        }
+
+        // try to get an image matching the key
+        String roleQual = (Role.isDefaultRoleId(roleId)) ? ""
+            : "." + Role.getRoleSuffix(roleId);
+        String key = "image.unit." + unitType.getId() + roleQual
+            + ((nativeEthnicity) ? ".native" : "");
+        if (!ResourceManager.hasImageResource(key) && nativeEthnicity) {
+            key = "image.unit." + unitType.getId() + roleQual;
+        }
+        BufferedImage image = ResourceManager.getImage(key, size);
+        return image;
     }
 
 
