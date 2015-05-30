@@ -83,7 +83,7 @@ public class InformationPanel extends FreeColPanel {
             if (images != null && images[i] != null) {
                 textPanel.add(new JLabel(images[i]));
                 textPanel.add(Utility.getDefaultTextArea(texts[i],
-                    Math.round(48/scale)));
+                    Math.round(46/scale)));
             } else {
                 textPanel.add(Utility.getDefaultTextArea(texts[i],
                     Math.round(56/scale)), "skip");
