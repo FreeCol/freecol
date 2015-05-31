@@ -825,15 +825,6 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get the age for the current turn.
-     *
-     * @return The age (0-2).
-     */
-    public int getAge() {
-        return getSpecification().getAge(turn);
-    }
-    
-    /**
      * Get the combat model in this game.
      *
      * @return The <code>CombatModel</code>.

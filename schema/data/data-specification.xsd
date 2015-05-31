@@ -679,7 +679,6 @@
         <xs:element ref="audioMixerOption"/>
         <xs:element ref="optionGroup"/>
         <xs:element ref="unitListOption"/>
-        <xs:element ref="textOption"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="recursive" use="optional" type="xs:boolean"/>
@@ -724,14 +723,6 @@
   <xs:element name="languageOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="textOption">
-    <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="value" use="optional" type="xs:string"/>
-      <xs:attribute name="defaultValue" use="optional" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 

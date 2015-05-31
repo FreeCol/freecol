@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.88
+<!-- XSD for specification version 0.87
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -64,7 +64,6 @@
      0.85: Add role-change element to Role.
      0.86: expended-equipment becomes required-role in tileimprovement-type.
      0.87: Add defaultUnit attribute to unit-type.
-     0.88: Add textOption to OptionGroup.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -770,7 +769,6 @@
         <xs:element ref="audioMixerOption"/>
         <xs:element ref="optionGroup"/>
         <xs:element ref="unitListOption"/>
-        <xs:element ref="textOption"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="recursive" use="optional" type="xs:boolean"/>
@@ -888,14 +886,6 @@
   <xs:element name="languageOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="textOption">
-    <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="value" use="optional" type="xs:string"/>
-      <xs:attribute name="defaultValue" use="optional" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 

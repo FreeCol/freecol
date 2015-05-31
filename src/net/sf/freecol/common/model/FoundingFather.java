@@ -63,7 +63,7 @@ public class FoundingFather extends FreeColGameObjectType {
      * The probability of this FoundingFather being offered for selection,
      * across the game ages.
      */
-    private final int[] weight = new int[Specification.NUMBER_OF_AGES];
+    private final int[] weight = new int[Turn.NUMBER_OF_AGES];
 
     /**
      * Players that want to elect this Founding Father must match one
@@ -135,11 +135,11 @@ public class FoundingFather extends FreeColGameObjectType {
      * Get the weight of this FoundingFather.
      * This is used to select a random FoundingFather.
      *
-     * @param age The age ([0, 2])
+     * @param age The age (currently 1 -- 3).
      * @return The weight of this father in the given age.
      */
     public int getWeight(int age) {
-        return (age >= 0 && age < weight.length) ? weight[age] : 0;
+        return (age >= 1 && age <= weight.length) ? weight[age-1] : 0;
     }
 
     /**

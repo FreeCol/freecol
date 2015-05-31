@@ -141,18 +141,18 @@ public final class SpecificationTest extends FreeColTestCase {
     public void testFoundingFathers() {
         final FoundingFather smith
             = spec().getFoundingFather("model.foundingFather.adamSmith");
-        assertNotNull(smith);
-        assertEquals(FoundingFather.FoundingFatherType.TRADE, smith.getType());
+        assertFalse(smith == null);
+        assertTrue(smith.getType() == FoundingFather.FoundingFatherType.TRADE);
         // weight is some value in [0, 10]
-        assertTrue(smith.getWeight(0) >= 0);
         assertTrue(smith.getWeight(1) >= 0);
         assertTrue(smith.getWeight(2) >= 0);
-        assertTrue(smith.getWeight(0) <= 10);
+        assertTrue(smith.getWeight(3) >= 0);
         assertTrue(smith.getWeight(1) <= 10);
         assertTrue(smith.getWeight(2) <= 10);
+        assertTrue(smith.getWeight(3) <= 10);
 
-        assertEquals(0, smith.getWeight(-1));
-        assertEquals(0, smith.getWeight(34));
+        assertTrue(smith.getWeight(0) == 0);
+        assertTrue(smith.getWeight(34) == 0);
         // check for ability
         assertTrue(smith.hasAbility(Ability.BUILD_FACTORY));
     }

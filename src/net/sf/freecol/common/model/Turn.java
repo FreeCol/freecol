@@ -75,11 +75,23 @@ public class Turn {
         }
     }
 
-    /** The starting year (1492 in Col1). */
-    private static int startingYear;
+    /**
+     * The first years of the "ages" of the game, which are only used
+     * for weighting {@link FoundingFather}s.
+     */
+    private static final int[] ages = { 1492, 1600, 1700 };
 
-    /** The year where the seasons split (1600 in Col1). */
-    private static int seasonYear;
+    /** Index in ages of the starting year. */
+    private static final int STARTING_YEAR_INDEX = 0;
+
+    /** Index in ages of the year the seasons begin. */
+    private static final int SEASON_YEAR_INDEX = 1;
+    
+    /**
+     * The number of ages.
+     * Used by FoundingFather for age-dependent weights.
+     */
+    public static final int NUMBER_OF_AGES = ages.length;
 
 
     /** The numerical value of the Turn, never less than one. */
@@ -95,20 +107,6 @@ public class Turn {
         this.turn = turn;
     }
 
-
-    /**
-     * Initialize the fundamental Turn constants.  Called from the spec
-     * initialization when the values are available and checked.
-     *
-     * @param newStartingYear The starting year for the game.
-     * @param newSeasonYear The year at which the seasons split.
-     */
-    public static synchronized void initialize(int newStartingYear,
-                                               int newSeasonYear) {
-        startingYear = newStartingYear;
-        seasonYear = newSeasonYear;
-    }
-    
 
     /**
      * Converts an integer year to a turn-integer-value.
@@ -156,6 +154,30 @@ public class Turn {
      */
     public int getNumber() {
         return turn;
+    }
+
+    /**
+     * Gets the age corresponding to the current turn.
+     *
+     * @return The age of this turn.
+     */
+    public int getAge() {
+        return getAge(getYear());
+    }
+
+    /**
+     * Gets the age corresponding to a given turn.
+     *
+     * @param year The turn integer value.
+     * @return The age of this turn.
+     */
+    public static int getAge(int year) {
+        for (int index = 0; index < ages.length; index++) {
+            if (year < ages[index]) {
+                return index;
+            }
+        }
+        return ages.length;
     }
 
     /**
@@ -229,7 +251,16 @@ public class Turn {
      * @return The numeric value of the starting year.
      */
     public static final int getStartingYear() {
-        return startingYear;
+        return ages[STARTING_YEAR_INDEX];
+    }
+
+    /**
+     * Sets the starting year.
+     *
+     * @param newStartingYear The new starting year value.
+     */
+    public static final void setStartingYear(final int newStartingYear) {
+        ages[STARTING_YEAR_INDEX] = newStartingYear;
     }
 
     /**
@@ -238,7 +269,16 @@ public class Turn {
      * @return The numeric value of the season year.
      */
     public static final int getSeasonYear() {
-        return seasonYear;
+        return ages[SEASON_YEAR_INDEX];
+    }
+
+    /**
+     * Sets the season year.
+     *
+     * @param newSeasonYear The new season year value.
+     */
+    public static final void setSeasonYear(final int newSeasonYear) {
+        ages[SEASON_YEAR_INDEX] = newSeasonYear;
     }
 
     /**
