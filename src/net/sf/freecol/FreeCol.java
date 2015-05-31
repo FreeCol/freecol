@@ -276,19 +276,23 @@ public final class FreeCol {
             });
 
         // Now we can find the client options, allow the options
-        // setting to override the locale.  We have users whose
-        // machines default to Finnish but play FreeCol in English.
+        // setting to override the locale, if no command line option
+        // had been specified.
+        // We have users whose machines default to Finnish but play
+        // FreeCol in English.
         // If the user has selected automatic language selection, do
         // nothing, since we have already set up the default locale.
-        String clientLanguage = ClientOptions.getLanguageOption();
-        Locale clientLocale;
-        if (clientLanguage != null
-            && !Messages.AUTOMATIC.equalsIgnoreCase(clientLanguage)
-            && (clientLocale = Messages.getLocale(clientLanguage)) != locale) {
-            locale = clientLocale;
-            Messages.setMessageBundle(locale);
+        if(localeArg == null) {
+            String clientLanguage = ClientOptions.getLanguageOption();
+            Locale clientLocale;
+            if (clientLanguage != null
+                && !Messages.AUTOMATIC.equalsIgnoreCase(clientLanguage)
+                && (clientLocale = Messages.getLocale(clientLanguage)) != locale) {
+                locale = clientLocale;
+                Messages.setMessageBundle(locale);
+            }
+            logger.info("Loaded messages for " + locale);
         }
-        logger.info("Loaded messages for " + locale);
 
         // Now we have the user mods directory and the locale is now
         // stable, load the mods and their messages.
