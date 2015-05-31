@@ -214,26 +214,14 @@ public final class FreeCol {
 
         // We can not even emit localized error messages until we find
         // the data directory, which might have been specified on the
-        // command line.  Take care to use the *last* instance.
-        String dataDirectoryArg = null;
-        for (int i = args.length - 2; i >= 0; i--) {
-            if ("--freecol-data".equals(args[i])) {
-                dataDirectoryArg = args[++i];
-                break;
-            }
-        }
+        // command line.
+        String dataDirectoryArg = findArg("--freecol-data", args);
         String err = FreeColDirectories.setDataDirectory(dataDirectoryArg);
         if (err != null) fatal(err); // This must not fail.
 
         // Now we have the data directory, establish the base locale.
         // Beware, the locale may change!
-        String localeArg = null;
-        for (int i = args.length - 2; i >= 0; i--) {
-            if ("--default-locale".equals(args[i])) {
-                localeArg = args[++i];
-                break;
-            }
-        }
+        String localeArg = findArg("--default-locale", args);
         if (localeArg == null) {
             locale = Locale.getDefault();
         } else {
@@ -372,6 +360,23 @@ public final class FreeCol {
      */
     public static void gripe(String key) {
         System.err.println(Messages.message(key));
+    }
+
+    /**
+     * Find an option before the real option handling can get started.
+     * Takes care to use the *last* instance.
+     *
+     * @param option The option to find.
+     * @param args The  command-line arguments.
+     * @return The option's parameter.
+     */
+    private static String findArg(String option, String[] args) {
+        for (int i = args.length - 2; i >= 0; i--) {
+            if (option.equals(args[i])) {
+                return args[i+1];
+            }
+        }
+        return null;
     }
 
     /**
