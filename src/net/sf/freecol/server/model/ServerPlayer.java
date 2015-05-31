@@ -721,8 +721,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public List<FoundingFather> getRandomFoundingFathers(Random random) {
         // Build weighted random choice for each father type
-        Specification spec = getGame().getSpecification();
-        int age = getGame().getTurn().getAge();
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
+        final int age = game.getAge();
         EnumMap<FoundingFatherType, List<RandomChoice<FoundingFather>>> choices
             = new EnumMap<>(FoundingFatherType.class);
         for (FoundingFather father : spec.getFoundingFathers()) {

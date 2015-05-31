@@ -256,11 +256,16 @@ public class GameOptions {
      * 1780 is documented in the Col1 manual:
      *   ``if you've declared your independence before 1780, your score
      *     is increased; the sooner you declare; the better your Bonus.''
-     * which suggests this needs to be turn based and cut off at the earliest
-     * turn in 1780.
+     * which suggests this needs to cut off at 1780.  Using turns
+     * rather than years though so that scores are equivalent in games
+     * with &gt;2 seasons.
      */
     public static final String INDEPENDENCE_TURN
         = "model.option.independenceTurn";
+
+    /** The "ages" where founding father weights change, specified as years. */
+    public static final String AGES
+        = "model.option.ages";
 
 
     /**
