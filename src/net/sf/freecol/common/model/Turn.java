@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.i18n.NameCache;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -28,58 +29,14 @@ import static net.sf.freecol.common.util.StringUtils.*;
  */
 public class Turn {
 
-    /**
-     * The season.  Normally not distingished before 1600, then split
-     * into SPRING and AUTUMN.
-     */
-    public static enum Season implements Named {
-        YEAR,
-        SPRING,
-        AUTUMN;
-
-
-        /**
-         * Get the suffix for a save game name for a turn with this season.
-         *
-         * @return The save game suffix.
-         */
-        public String getSaveGameSeasonSuffix() {
-            switch (this) {
-            case YEAR:
-                break;
-            case SPRING:
-                return "_1_" + Messages.getName(this);
-            case AUTUMN:
-                return "_2_" + Messages.getName(this);
-            }
-            return "";
-        }
-
-        /**
-         * Get the stem key for this season.
-         *
-         * @return The stem key.
-         */
-        private String getKey() {
-            return "season." + getEnumKey(this);
-        }
-
-        // Interface Named
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getNameKey() {
-            return Messages.nameKey("model." + getKey());
-        }
-    }
-
     /** The starting year (1492 in Col1). */
-    private static int startingYear;
+    private static int startingYear = 1492;
 
     /** The year where the seasons split (1600 in Col1). */
-    private static int seasonYear;
+    private static int seasonYear = 1600;
+
+    /** The number of seasons. */
+    private static int seasonNumber = 2;
 
 
     /** The numerical value of the Turn, never less than one. */
@@ -96,50 +53,91 @@ public class Turn {
     }
 
 
+    public static synchronized void initialize(int newStartingYear,
+                                               int newSeasonYear,
+                                               int newSeasonNumber) {
+        initializeYears(newStartingYear, newSeasonYear);
+        initializeSeasons(newSeasonNumber);
+    }
+
     /**
-     * Initialize the fundamental Turn constants.  Called from the spec
-     * initialization when the values are available and checked.
+     * Initialize the fundamental Turn year constants.  Called from
+     * the spec cleanup when the values are available and checked.
      *
      * @param newStartingYear The starting year for the game.
      * @param newSeasonYear The year at which the seasons split.
      */
-    public static synchronized void initialize(int newStartingYear,
-                                               int newSeasonYear) {
+    public static synchronized void initializeYears(int newStartingYear,
+                                                    int newSeasonYear) {
         startingYear = newStartingYear;
         seasonYear = newSeasonYear;
     }
-    
 
     /**
-     * Converts an integer year to a turn-integer-value.
-     * Allows for the season split.
+     * Initialize the fundamental Turn season constant.  Called as soon
+     * as the messages are available as this is needed in both client and
+     * server.
      *
-     * @param year A year.
+     * @param newSeasonNumber The number of seasons.
+     */
+    public static synchronized void initializeSeasons(int newSeasonNumber) {
+        seasonNumber = newSeasonNumber;
+    }
+    
+    /**
+     * Gets the starting year.
+     *
+     * @return The numeric value of the starting year.
+     */
+    public static final synchronized int getStartingYear() {
+        return startingYear;
+    }
+
+    /**
+     * Gets the season year (the year the seasons split).
+     *
+     * @return The numeric value of the season year.
+     */
+    public static final synchronized int getSeasonYear() {
+        return seasonYear;
+    }
+
+    /**
+     * Gets the number of seasons.
+     *
+     * @return The number of seasons.
+     */
+    public static final synchronized int getSeasonNumber() {
+        return seasonNumber;
+    }
+
+    /**
+     * Converts a year to a turn number.
+     *
+     * @param year The year to convert.
      * @return The integer value of the corresponding turn.
      */
     public static int yearToTurn(int year) {
-        return yearToTurn(year, Season.YEAR);
+        return yearToTurn(year, 0);
     }
 
     /**
      * Converts an integer year and specified season to a turn-integer-value.
      *
-     * @param year an <code>int</code> value
-     * @param season a <code>Season</code> value
+     * @param year The year to convert.
+     * @param season The season index.
      * @return The integer value of the corresponding turn.
      */
-    public static int yearToTurn(int year, Season season) {
-        int turn = 1;
-        if (year >= getStartingYear()) {
-            turn += year - getStartingYear();
-            if (year >= getSeasonYear()) {
-                turn += (year - getSeasonYear());
-                if (season == Season.AUTUMN) {
-                    turn++;
-                }
+    public static int yearToTurn(int year, int season) {
+        int ret = 1, startingYear = getStartingYear();
+        if (year >= startingYear) {
+            ret += year - startingYear;
+            int seasonYear = getSeasonYear();
+            if (year >= seasonYear) {
+                ret += (year - seasonYear) * (getSeasonNumber() - 1) + season;
             }
         }
-        return turn;
+        return ret;
     }
 
     /**
@@ -173,29 +171,30 @@ public class Turn {
      * @return The calculated year based on the turn number.
      */
     public static int getYear(int turn) {
-        int year = turn - 1 + getStartingYear();
-        return (year < getSeasonYear()) ? year
-            : getSeasonYear() + (year - getSeasonYear())/2;
+        int year = turn - 1 + getStartingYear(), seasonYear = getSeasonYear();
+        return (year < seasonYear) ? year
+            : seasonYear + (year - seasonYear) / getSeasonNumber();
     }
 
     /**
-     * Gets the Season of the given Turn number.
+     * Gets the season index of the given turn number.
      *
      * @param turn The turn number to calculate from.
-     * @return The season corresponding to the turn number.
+     * @return The season index corresponding to the turn number or negative
+     *     if before the season year.
      */
-    public static Season getSeason(int turn) {
+    public static int getSeason(int turn) {
         int year = turn - 1 + getStartingYear();
-        return (year < getSeasonYear()) ? Season.YEAR
-            : (year % 2 == 0) ? Season.SPRING : Season.AUTUMN;
+        return (year < getSeasonYear()) ? -1 : year % getSeasonNumber();
     }
 
     /**
-     * Gets the Season of this Turn.
+     * Gets the season index of this turn.
      *
-     * @return a <code>Season</code> value
+     * @return The season index corresponding to the current turn
+     *     number, or negative if before the season year.
      */
-    public Season getSeason() {
+    public int getSeason() {
         return getSeason(turn);
     }
 
@@ -215,30 +214,14 @@ public class Turn {
      * @return A <code>StringTemplate</code> describing the turn.
      */
     public static StringTemplate getLabel(int turn) {
-        Season season = getSeason(turn);
+        int season = getSeason(turn);
         StringTemplate t = StringTemplate.label("");
-        t.add(season.getNameKey());
-        if (season != Season.YEAR) t.addName(" ");
+        if (season >= 0) {
+            t.addName(NameCache.getSeasonName(season));
+            t.addName(" ");
+        }
         t.addName(Integer.toString(getYear(turn)));
         return t;
-    }
-
-    /**
-     * Gets the starting year.
-     *
-     * @return The numeric value of the starting year.
-     */
-    public static final int getStartingYear() {
-        return startingYear;
-    }
-
-    /**
-     * Gets the season year (the year the seasons split).
-     *
-     * @return The numeric value of the season year.
-     */
-    public static final int getSeasonYear() {
-        return seasonYear;
     }
 
     /**
@@ -256,17 +239,18 @@ public class Turn {
      * @return True if this turn is the season year.
      */
     public boolean isFirstSeasonTurn() {
-        return turn == yearToTurn(getSeasonYear(), Season.SPRING);
+        return turn == yearToTurn(getSeasonYear());
     }
 
     /**
-     * Gets a non-localized string representation of the given turn.
+     * Get the suffix for a save game name for this turn.
      *
-     * @return A string with the format: "<i>season year</i>", such as
-     *     "SPRING 1602", "YEAR 1503"...
+     * @return The save game suffix.
      */
-    public static String toString(int turn) {
-        return getSeason(turn) + " " + Integer.toString(getYear(turn));
+    public String getSaveGameSuffix() {
+        final int season = getSeason();
+        return toString() + "_" + String.valueOf(season+1)
+            + "_" + NameCache.getSeasonName(season);
     }
 
     /**
@@ -309,6 +293,6 @@ public class Turn {
      */
     @Override
     public String toString() {
-        return toString(turn);
+        return String.valueOf(turn);
     }
 }

@@ -494,8 +494,7 @@ public final class InGameController implements NetworkConstants {
         final Turn turn = game.getTurn();
         return (/* player.getName() + "_" */ gid
             + "_" + Messages.message(player.getNationName())
-            + "_" + Integer.toString(turn.getYear())
-            + turn.getSeason().getSaveGameSeasonSuffix())
+            + "_" + turn.getSaveGameSuffix())
             .replaceAll(" ", "_");
     }
 

@@ -72,6 +72,11 @@ public class NameCache {
     private static List<String> riverNames = null;
     private static final Object riverNameLock = new Object();
 
+    /** Season names. */
+    private static List<String> seasonNames = null;
+    private static final Object seasonNamesLock = new Object();
+    private static int seasonNumber = 0;
+    
     /** Settlement names. */
     private static final Map<Player, String> capitalNames
         = new HashMap<>();
@@ -185,6 +190,52 @@ public class NameCache {
         }
     }
 
+    /**
+     * Initialize the seasonNames collection.
+     *
+     * @return The number of seasons.
+     */
+    private static int requireSeasonNames() {
+        synchronized (seasonNamesLock) {
+            if (seasonNames == null) {
+                seasonNames = new ArrayList<>();
+                collectNames("model.season.", seasonNames);
+                seasonNumber = seasonNames.size();
+            }
+            return seasonNumber;
+        }
+    }
+
+    /**
+     * Initialize the seasonNames collection, insisting on sensible defaults.
+     *
+     * @param defaultNames Default season names to apply if there are too few.
+     * @return The number of seasons.
+     */
+    public static int requireSeasonNames(String[] defaultNames) {
+        int n = requireSeasonNames();
+        if (n < 2) {
+            synchronized (seasonNamesLock) {
+                seasonNames.clear();
+                for (String s : defaultNames) seasonNames.add(s);
+                n = seasonNumber = seasonNames.size();
+            }
+        }
+        return n;
+    }
+
+    /**
+     * Get the nth season name.
+     *
+     * @param index The index to look up.
+     * @return The season name, or null on failure.
+     */
+    public static String getSeasonName(int index) {
+        requireSeasonNames();
+        return (index < 0 || index >= seasonNumber) ? null
+            : seasonNames.get(index);
+    }
+    
     /**
      * Initialize the settlement names for a player.
      *

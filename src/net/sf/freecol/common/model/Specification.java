@@ -43,6 +43,7 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
@@ -80,6 +81,10 @@ public final class Specification {
 
     /** How many game ages. */
     public static final int NUMBER_OF_AGES = 3;
+
+    /** The default season names. */
+    private static final String[] DEFAULT_SEASON_NAMES = { "Spring", "Autumn" };
+
 
     public static class Source extends FreeColGameObjectType {
 
@@ -629,9 +634,10 @@ public final class Specification {
             option.generateChoices();
         }
 
-        // Initialize the Turn class using GameOptions.
+        // Initialize the Turn class using GameOptions and messages.
         Turn.initialize(getInteger(GameOptions.STARTING_YEAR),
-                        getInteger(GameOptions.SEASON_YEAR));
+                        getInteger(GameOptions.SEASON_YEAR),
+                        NameCache.requireSeasonNames(DEFAULT_SEASON_NAMES));
         {
             Option agesOption = getOption(GameOptions.AGES);
             boolean badAges = !(agesOption instanceof TextOption);
