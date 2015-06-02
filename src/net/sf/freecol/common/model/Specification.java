@@ -82,9 +82,6 @@ public final class Specification {
     /** How many game ages. */
     public static final int NUMBER_OF_AGES = 3;
 
-    /** The default season names. */
-    private static final String[] DEFAULT_SEASON_NAMES = { "Spring", "Autumn" };
-
 
     public static class Source extends FreeColGameObjectType {
 
@@ -637,7 +634,7 @@ public final class Specification {
         // Initialize the Turn class using GameOptions and messages.
         Turn.initialize(getInteger(GameOptions.STARTING_YEAR),
                         getInteger(GameOptions.SEASON_YEAR),
-                        NameCache.requireSeasonNames(DEFAULT_SEASON_NAMES));
+                        getInteger(GameOptions.SEASONS));
         {
             Option agesOption = getOption(GameOptions.AGES);
             boolean badAges = !(agesOption instanceof TextOption);
@@ -680,6 +677,7 @@ public final class Specification {
             + ", starting year=" + Turn.getStartingYear()
             + ", season year=" + Turn.getSeasonYear()
             + ", ages=[" + ages[0] + "," + ages[1] + "," + ages[2] + "]"
+            + ", seasons=" + Turn.getSeasonNumber()
             + ", " + allTypes.size() + " FreeColGameObjectTypes"
             + ", " + allAbilities.size() + " Abilities"
             + ", " + buildingTypeList.size() + " BuildingTypes"
@@ -2613,6 +2611,8 @@ public final class Specification {
                                   GameOptions.GAMEOPTIONS_YEARS, 468);
         ret |= checkTextOption(GameOptions.AGES,
                                GameOptions.GAMEOPTIONS_YEARS, "1600,1700");
+        ret |= checkIntegerOption(GameOptions.SEASONS,
+                                  GameOptions.GAMEOPTIONS_YEARS, 2);
         // end @compat 0.11.3
 
         return ret;

@@ -267,7 +267,11 @@ public class GameOptions {
     public static final String AGES
         = "model.option.ages";
 
-
+    /** The number of seasons. */
+    public static final String SEASONS
+        = "model.option.seasons";
+    
+    
     /**
      * Prices game option group.
      * This group is synthesized at game initialization.

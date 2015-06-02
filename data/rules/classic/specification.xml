@@ -3680,6 +3680,9 @@
                        value="468" minimumValue="308" />
         <!-- Years at which the founding father weights change. -->
         <textOption id="model.option.ages" defaultValue="1600,1700" />
+        <!-- The number of seasons in the year. -->
+        <integerOption id="model.option.seasons"
+                       value="2" minimumValue="2" maximumValue="366" />
       </optionGroup>
     </optionGroup>
 

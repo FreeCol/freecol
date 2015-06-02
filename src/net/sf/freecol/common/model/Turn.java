@@ -53,34 +53,19 @@ public class Turn {
     }
 
 
-    public static synchronized void initialize(int newStartingYear,
-                                               int newSeasonYear,
-                                               int newSeasonNumber) {
-        initializeYears(newStartingYear, newSeasonYear);
-        initializeSeasons(newSeasonNumber);
-    }
-
     /**
      * Initialize the fundamental Turn year constants.  Called from
      * the spec cleanup when the values are available and checked.
      *
      * @param newStartingYear The starting year for the game.
      * @param newSeasonYear The year at which the seasons split.
+     * @param newSeasonNumebr The number of seasons in the year.
      */
-    public static synchronized void initializeYears(int newStartingYear,
-                                                    int newSeasonYear) {
+    public static synchronized void initialize(int newStartingYear,
+                                               int newSeasonYear,
+                                               int newSeasonNumber) {
         startingYear = newStartingYear;
         seasonYear = newSeasonYear;
-    }
-
-    /**
-     * Initialize the fundamental Turn season constant.  Called as soon
-     * as the messages are available as this is needed in both client and
-     * server.
-     *
-     * @param newSeasonNumber The number of seasons.
-     */
-    public static synchronized void initializeSeasons(int newSeasonNumber) {
         seasonNumber = newSeasonNumber;
     }
     
