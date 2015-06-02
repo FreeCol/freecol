@@ -249,8 +249,12 @@ public class Turn {
      */
     public String getSaveGameSuffix() {
         final int season = getSeason();
-        return toString() + "_" + String.valueOf(season+1)
-            + "_" + NameCache.getSeasonName(season);
+        String result = String.valueOf(getYear());
+        if (season >= 0) {
+            result += "_" + String.valueOf(season+1)
+                + "_" + NameCache.getSeasonName(season);
+        }
+        return result;
     }
 
     /**
