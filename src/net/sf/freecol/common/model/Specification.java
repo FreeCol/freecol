@@ -175,7 +175,7 @@ public final class Specification {
     private final List<Role> roles = new ArrayList<>();
     // readerMap("tile-types")
     private final List<TileType> tileTypeList = new ArrayList<>();
-    // readerMap("tileimprovement-types")
+    // readerMap("tile-improvement-types")
     private final List<TileImprovementType> tileImprovementTypeList = new ArrayList<>();
     // readerMap("unit-types")
     private final List<UnitType> unitTypeList = new ArrayList<>();
@@ -295,8 +295,12 @@ public final class Specification {
                       new TypeReader<>(Role.class, roles));
         readerMap.put(TILE_TYPES_TAG,
                       new TypeReader<>(TileType.class, tileTypeList));
-        readerMap.put(TILEIMPROVEMENT_TYPES_TAG,
+        readerMap.put(TILE_IMPROVEMENT_TYPES_TAG,
                       new TypeReader<>(TileImprovementType.class, tileImprovementTypeList));
+        // @compat 0.11.3
+        readerMap.put(OLD_TILEIMPROVEMENT_TYPES_TAG,
+                      new TypeReader<>(TileImprovementType.class, tileImprovementTypeList));
+        // end @compat 0.11.3
         readerMap.put(UNIT_TYPES_TAG,
                       new TypeReader<>(UnitType.class, unitTypeList));
 
@@ -2713,13 +2717,15 @@ public final class Specification {
     private static final String RESOURCE_TYPES_TAG = "resource-types";
     private static final String ROLES_TAG = "roles";
     private static final String TILE_TYPES_TAG = "tile-types";
-    private static final String TILEIMPROVEMENT_TYPES_TAG = "tileimprovement-types";
+    private static final String TILE_IMPROVEMENT_TYPES_TAG = "tile-improvement-types";
     private static final String UNIT_TYPES_TAG = "unit-types";
     private static final String VERSION_TAG = "version";
     // @compat 0.10.x
     private static final String EQUIPMENT_TYPES_TAG = "equipment-types";
     // end @compat 0.10.x
-
+    // @compat 0.11.3
+    private static final String OLD_TILEIMPROVEMENT_TYPES_TAG = "tileimprovement-types";
+    // end @compat 0.11.3
 
     /**
      * Write an XML-representation of this object to the given stream.
@@ -2749,7 +2755,7 @@ public final class Specification {
         writeSection(xw, RESOURCE_TYPES_TAG, resourceTypeList);
         writeSection(xw, TILE_TYPES_TAG, tileTypeList);
         writeSection(xw, ROLES_TAG, roles);
-        writeSection(xw, TILEIMPROVEMENT_TYPES_TAG, tileImprovementTypeList);
+        writeSection(xw, TILE_IMPROVEMENT_TYPES_TAG, tileImprovementTypeList);
         writeSection(xw, UNIT_TYPES_TAG, unitTypeList);
         writeSection(xw, BUILDING_TYPES_TAG, buildingTypeList);
         writeSection(xw, FOUNDING_FATHERS_TAG, foundingFathers);

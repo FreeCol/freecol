@@ -9,7 +9,7 @@
         <xs:element ref="tile-types"/>
         <xs:element ref="roles"/>
         <xs:element ref="equipment-types"/>
-        <xs:element ref="tileimprovement-types"/>
+        <xs:element ref="tile-improvement-types"/>
         <xs:element ref="unit-types"/>
         <xs:element ref="building-types"/>
         <xs:element ref="founding-fathers"/>
@@ -20,6 +20,9 @@
         <xs:element ref="modifiers"/>
         <xs:element ref="events"/>
         <xs:element ref="disasters"/>
+        <!-- @compat 0.11.3 -->
+        <xs:element ref="tileimprovement-types"/>
+        <!-- end @compat 0.11.3 -->
       </xs:choice>
       <xs:attribute name="id" type="xs:ID"/>
       <xs:attribute name="extends" type="xs:string"/>
@@ -231,6 +234,7 @@
     </xs:complexType>
   </xs:element>
 
+  <!-- @compat 0.11.3 -->
   <xs:element name="tileimprovement-types">
     <xs:complexType>
       <xs:sequence>
@@ -272,7 +276,50 @@
       <!-- end @compat 0.10.x -->
     </xs:complexType>
   </xs:element>
+  <!-- end @compat 0.11.3 -->
 
+  <xs:element name="tile-improvement-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="tile-improvement-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="delete" type="TileImprovementTypeId" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="tile-improvement-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="scope"/>
+        <xs:choice>
+          <xs:element ref="modifier"/>
+          <xs:element ref="change"/>
+          <xs:element name="disaster">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:string"/>
+              <xs:attribute name="probability" type="xs:int"/>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="natural" type="xs:boolean"/>
+      <xs:attribute name="add-work-turns" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="occupation-string" type="xs:string"/>
+      <xs:attribute name="required-role" use="optional" type="RoleId"/>
+      <xs:attribute name="expended-amount" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="magnitude" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="movement-cost" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="exposeResourcePercent" type="xs:nonNegativeInteger"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
+      <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>
+      <xs:attribute name="deliver-amount" type="xs:nonNegativeInteger"/>
+      <!-- end @compat 0.10.x -->
+    </xs:complexType>
+  </xs:element>
+  
   <xs:element name="change">
     <xs:complexType>
       <xs:sequence minOccurs="0">

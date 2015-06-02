@@ -626,9 +626,9 @@ public final class TileImprovementType extends FreeColGameObjectType {
     /**
      * Gets the tag name of the root element representing this object.
      *
-     * @return "tileimprovement-type".
+     * @return "tile-improvement-type".
      */
     public static String getXMLElementTagName() {
-        return "tileimprovement-type";
+        return "tile-improvement-type";
     }
 }
