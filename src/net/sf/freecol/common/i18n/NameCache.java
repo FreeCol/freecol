@@ -51,9 +51,13 @@ public class NameCache {
 
     private static final Logger logger = Logger.getLogger(NameCache.class.getName());
 
+    /** Default season names to use if nameCache.season.* not found. */
+    private static final String[] DEFAULT_SEASON_IDS
+        = { "model.season.spring.name", "model.season.autumn.name" };
+    
     private final static String CIBOLA_PREFIX
         = "nameCache.lostCityRumour.cityName.";
-    
+
     /** Cities of Cibola. */
     private static List<String> cibolaKeys = null;
     private static final Object cibolaLock = new Object();
@@ -199,29 +203,18 @@ public class NameCache {
         synchronized (seasonNamesLock) {
             if (seasonNames == null) {
                 seasonNames = new ArrayList<>();
-                collectNames("model.season.", seasonNames);
+                collectNames("nameCache.season.", seasonNames);
                 seasonNumber = seasonNames.size();
+                if (seasonNumber < 2) {
+                    seasonNames.clear();
+                    for (String s : DEFAULT_SEASON_IDS) {
+                        seasonNames.add(Messages.message(s));
+                    }
+                    seasonNumber = seasonNames.size();
+                }
             }
             return seasonNumber;
         }
-    }
-
-    /**
-     * Initialize the seasonNames collection, insisting on sensible defaults.
-     *
-     * @param defaultNames Default season names to apply if there are too few.
-     * @return The number of seasons.
-     */
-    public static int requireSeasonNames(String[] defaultNames) {
-        int n = requireSeasonNames();
-        if (n < 2) {
-            synchronized (seasonNamesLock) {
-                seasonNames.clear();
-                for (String s : defaultNames) seasonNames.add(s);
-                n = seasonNumber = seasonNames.size();
-            }
-        }
-        return n;
     }
 
     /**
@@ -232,8 +225,10 @@ public class NameCache {
      */
     public static String getSeasonName(int index) {
         requireSeasonNames();
-        return (index < 0 || index >= seasonNumber) ? null
-            : seasonNames.get(index);
+        if (index >= 0 && index < seasonNumber) return seasonNames.get(index);
+        return Messages.message(StringTemplate
+            .template("nameCache.season.default")
+            .addAmount("%number%", index));
     }
     
     /**
