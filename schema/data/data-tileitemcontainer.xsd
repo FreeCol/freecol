@@ -28,7 +28,36 @@
   <xs:include schemaLocation="data-tileimprovement.xsd" />
   <xs:include schemaLocation="data-lostCityRumour.xsd" />
 
+  <!-- @compat 0.11.3 -->
+  <xs:simpleType name="tileitemcontainerId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="tileitemcontainer:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:element name="tileitemcontainer">
+    <xs:annotation>
+      <xs:documentation>
+        Contains TileItems and can be used by a Tile to
+        make certain tasks easier.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="resource" />
+        <xs:element ref="tileimprovement" />
+        <xs:element ref="lostCityRumour" />
+      </xs:choice>
+      <xs:attribute name="id" type="tileitemcontainerId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="tileitemcontainerId" use="optional"/>
+      <!-- end @compat -->
+      <xs:attribute name="tile" type="TileId" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <!-- end @compat 0.11.3 -->
+
+  <xs:element name="tileItemContainer">
     <xs:annotation>
       <xs:documentation>
         Contains TileItems and can be used by a Tile to

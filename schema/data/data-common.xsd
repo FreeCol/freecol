@@ -163,7 +163,7 @@
 
   <xs:simpleType name="TileItemContainerId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="tileitemcontainer:([0-9])+" />
+      <xs:pattern value="tileItemContainer:([0-9])+" />
     </xs:restriction>
   </xs:simpleType>
 

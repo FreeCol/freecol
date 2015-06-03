@@ -2335,7 +2335,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     // @compat 0.10.1
     public static final String OLD_UNITS_TAG = "units";
     // end @compat
-
+    // @compat 0.11.3
+    public static final String OLD_TILE_ITEM_CONTAINER_TAG = "tileitemcontainer";
+    // end @compat 0.11.3
+    
 
     /**
      * {@inheritDoc}
@@ -2681,7 +2684,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             pet.fixCache();
         // end @compat 0.10.7
 
-        } else if (TileItemContainer.getXMLElementTagName().equals(tag)) {
+        } else if (TileItemContainer.getXMLElementTagName().equals(tag)
+                   // @compat 0.11.3
+                   || OLD_TILE_ITEM_CONTAINER_TAG.equals(tag)
+                   // end @compat 0.11.3
+                   ) {
             tileItemContainer = xr.readFreeColGameObject(game,
                 TileItemContainer.class);
 

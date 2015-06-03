@@ -675,9 +675,9 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Gets the tag name of the root element representing this object.
      *
-     * @return "tileitemcontainer".
+     * @return "tileItemContainer".
      */
     public static String getXMLElementTagName() {
-        return "tileitemcontainer";
+        return "tileItemContainer";
     }
 }
