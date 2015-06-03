@@ -81,10 +81,8 @@ public final class Market extends FreeColGameObject implements Ownable {
          * and seed these objects with the initial amount of each type
          * of goods.
          */
-        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            if (goodsType.isStorable()) {
-                putMarketData(goodsType, new MarketData(game, goodsType));
-            }
+        for (GoodsType goodsType : getSpecification().getStorableGoodsTypeList()) {
+            putMarketData(goodsType, new MarketData(game, goodsType));
         }
     }
 

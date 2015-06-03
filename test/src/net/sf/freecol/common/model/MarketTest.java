@@ -39,11 +39,9 @@ public class MarketTest extends FreeColTestCase {
 
         Specification s = spec();
 
-        for (GoodsType good : s.getGoodsTypeList()) {
-            if (good.isStorable()) {
-                assertEquals(good.toString(), good.getInitialBuyPrice(), dm.getCostToBuy(good));
-                assertEquals(good.toString(), good.getInitialSellPrice(), dm.getPaidForSale(good));
-            }
+        for (GoodsType good : s.getStorableGoodsTypeList()) {
+            assertEquals(good.toString(), good.getInitialBuyPrice(), dm.getCostToBuy(good));
+            assertEquals(good.toString(), good.getInitialSellPrice(), dm.getPaidForSale(good));
         }
     }
 

@@ -1127,8 +1127,7 @@ public class DebugUtils {
 
         lb.add("\nPrices (buy 1/100 / sell 1/100)\n");
         GoodsType[] wanted = sis.getWantedGoods();
-        for (GoodsType type : sSpec.getGoodsTypeList()) {
-            if (!type.isStorable()) continue;
+        for (GoodsType type : sSpec.getStorableGoodsTypeList()) {
             int i;
             for (i = wanted.length - 1; i >= 0; i--) {
                 if (type == wanted[i]) break;

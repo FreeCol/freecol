@@ -418,8 +418,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             nextRearrange = Math.max(0, Math.min(nextRearrange, when-1));
         }
         int warehouse = colony.getWarehouseCapacity();
-        for (GoodsType g : spec.getGoodsTypeList()) {
-            if (!g.isStorable() || g.isFoodType()) continue;
+        for (GoodsType g : spec.getStorableGoodsTypeList()) {
+            if (g.isFoodType()) continue;
             int have = colony.getGoodsCount(g);
             int net = colony.getAdjustedNetProductionOf(g);
             if (net >= 0 && (have >= warehouse || g.limitIgnored())) continue;
@@ -530,9 +530,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // we do not produce (might have been gifted) should always be
         // fully exported.  Other raw and manufactured goods should be
         // exported only to the extent of not filling the warehouse.
-        for (GoodsType g : spec.getGoodsTypeList()) {
-            if (g.isStorable()
-                && !g.isFoodType()
+        for (GoodsType g : spec.getStorableGoodsTypeList()) {
+            if (!g.isFoodType()
                 && !g.isBuildingMaterial()
                 && !g.isMilitaryGoods()
                 && !g.isTradeGoods()) {

@@ -357,15 +357,13 @@ public final class EuropePanel extends PortPanel {
 
             final Market market = getMyPlayer().getMarket();
             ImageLibrary lib = getImageLibrary();
-            for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-                if (goodsType.isStorable()) {
-                    MarketLabel label = new MarketLabel(lib, goodsType, market);
-                    label.setTransferHandler(defaultTransferHandler);
-                    label.addMouseListener(pressListener);
-                    MarketData md = market.getMarketData(goodsType);
-                    if (md != null) md.addPropertyChangeListener(label);
-                    add(label);
-                }
+            for (GoodsType goodsType : getSpecification().getStorableGoodsTypeList()) {
+                MarketLabel label = new MarketLabel(lib, goodsType, market);
+                label.setTransferHandler(defaultTransferHandler);
+                label.addMouseListener(pressListener);
+                MarketData md = market.getMarketData(goodsType);
+                if (md != null) md.addPropertyChangeListener(label);
+                add(label);
             }
         }
 

@@ -67,11 +67,9 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
         warehousePanel = new MigPanel(new MigLayout("wrap 4"));
         warehousePanel.setOpaque(false);
         for (GoodsType type : freeColClient.getGame().getSpecification()
-                 .getGoodsTypeList()) {
-            if (type.isStorable()) {
-                warehousePanel.add(new WarehouseGoodsPanel(freeColClient,
-                                                           colony, type));
-            }
+                 .getStorableGoodsTypeList()) {
+            warehousePanel.add(new WarehouseGoodsPanel(freeColClient,
+                                                       colony, type));
         }
 
         JScrollPane scrollPane = new JScrollPane(warehousePanel,

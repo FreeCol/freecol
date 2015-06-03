@@ -1580,8 +1580,7 @@ public final class ColonyPanel extends PortPanel
                 : options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS);
             final Game game = colony.getGame();
             final Specification spec = colony.getSpecification();
-            for (GoodsType goodsType : spec.getGoodsTypeList()) {
-                if (!goodsType.isStorable()) continue;
+            for (GoodsType goodsType : spec.getStorableGoodsTypeList()) {
                 int count = colony.getGoodsCount(goodsType);
                 if (count >= threshold) {
                     Goods goods = new Goods(game, colony, goodsType, count);

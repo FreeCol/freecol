@@ -191,6 +191,7 @@ public final class Specification {
     /* Containers derived from readerMap containers */
 
     // Derived from readerMap container: goodsTypeList
+    private final List<GoodsType> storableGoodsTypeList = new ArrayList<>();
     private final List<GoodsType> farmedGoodsTypeList = new ArrayList<>();
     private final List<GoodsType> foodGoodsTypeList = new ArrayList<>();
     private final List<GoodsType> newWorldGoodsTypeList = new ArrayList<>();
@@ -198,7 +199,6 @@ public final class Specification {
     private final List<GoodsType> libertyGoodsTypeList = new ArrayList<>();
     private final List<GoodsType> immigrationGoodsTypeList = new ArrayList<>();
     private final List<GoodsType> rawBuildingGoodsTypeList = new ArrayList<>();
-    private int storableTypes = 0;
 
     // Derived from readerMap container: nations
     private final List<Nation> europeanNations = new ArrayList<>();
@@ -528,6 +528,7 @@ public final class Specification {
         // predicates are likely to fail until this is done.
         GoodsType.setDerivedAttributes(this);
 
+        storableGoodsTypeList.clear();
         farmedGoodsTypeList.clear();
         foodGoodsTypeList.clear();
         newWorldGoodsTypeList.clear();
@@ -535,8 +536,10 @@ public final class Specification {
         libertyGoodsTypeList.clear();
         immigrationGoodsTypeList.clear();
         rawBuildingGoodsTypeList.clear();
-        storableTypes = 0;
         for (GoodsType goodsType : goodsTypeList) {
+            if (goodsType.isStorable()) {
+                storableGoodsTypeList.add(goodsType);
+            }
             if (goodsType.isFarmed()) {
                 farmedGoodsTypeList.add(goodsType);
             }
@@ -557,9 +560,6 @@ public final class Specification {
             }
             if (goodsType.isRawBuildingMaterial() && !goodsType.isFoodType()) {
                 rawBuildingGoodsTypeList.add(goodsType);
-            }
-            if (goodsType.isStorable()) {
-                storableTypes++;
             }
         }
 
@@ -1148,6 +1148,10 @@ public final class Specification {
 
     public List<GoodsType> getGoodsTypeList() {
         return new ArrayList<>(goodsTypeList);
+    }
+
+    public List<GoodsType> getStorableGoodsTypeList() {
+        return new ArrayList<>(storableGoodsTypeList);
     }
 
     public List<GoodsType> getFarmedGoodsTypeList() {

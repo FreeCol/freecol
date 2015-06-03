@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
@@ -70,12 +71,8 @@ public final class ReportTradePanel extends ReportPanel {
         goodsHeader.setBorder(new EmptyBorder(20, 20, 0, 20));
         scrollPane.setColumnHeaderView(goodsHeader);
 
-        List<GoodsType> storableGoods = new ArrayList<>();
-        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            if (goodsType.isStorable()) {
-                storableGoods.add(goodsType);
-            }
-        }
+        final Specification spec = getSpecification();
+        List<GoodsType> storableGoods = spec.getStorableGoodsTypeList();
         Market market = player.getMarket();
 
         // Display Panel

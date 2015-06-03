@@ -1025,13 +1025,11 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
      */
     private List<Goods> getAnyGoods(GoodsLocation gl) {
         List<Goods> goodsList = new ArrayList<>();
-        for (GoodsType type : getSpecification().getGoodsTypeList()) {
-            if (type.isStorable()) {
-                Goods g = new Goods(getGame(), null, type,
-                                    GoodsContainer.CARGO_SIZE);
-                g.setLocation(gl);
-                goodsList.add(g);
-            }
+        for (GoodsType type : getSpecification().getStorableGoodsTypeList()) {
+            Goods g = new Goods(getGame(), null, type,
+                                GoodsContainer.CARGO_SIZE);
+            g.setLocation(gl);
+            goodsList.add(g);
         }
         return goodsList;
     }

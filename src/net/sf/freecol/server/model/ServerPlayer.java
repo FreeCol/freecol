@@ -1769,7 +1769,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void csYearlyGoodsAdjust(Random random, ChangeSet cs) {
         final Game game = getGame();
         final List<GoodsType> goodsTypes = game.getSpecification()
-            .getGoodsTypeList();
+            .getStorableGoodsTypeList();
         final Market market = getMarket();
 
         // Pick a random type of storable goods to add/remove an extra
@@ -1780,7 +1780,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Remove standard amount, and the extra amount.
         for (GoodsType type : goodsTypes) {
-            if (type.isStorable() && market.hasBeenTraded(type)) {
+            if (market.hasBeenTraded(type)) {
                 boolean add = market.getAmountInMarket(type)
                     < type.getInitialAmount();
                 int amount = game.getTurn().getNumber() / 10;

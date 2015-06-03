@@ -158,8 +158,8 @@ public class IndianDemandMission extends Mission {
                 }
             }
             // Storable building materials (what do the natives need tools for?)
-            for (GoodsType preferred : spec.getGoodsTypeList()) {
-                if (preferred.isBuildingMaterial() && preferred.isStorable()) {
+            for (GoodsType preferred : spec.getStorableGoodsTypeList()) {
+                if (preferred.isBuildingMaterial()) {
                     int amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
                         return new Goods(getGame(), target, preferred,
@@ -168,7 +168,7 @@ public class IndianDemandMission extends Mission {
                 }
             }
             // Trade goods
-            for (GoodsType preferred : spec.getGoodsTypeList()) {
+            for (GoodsType preferred : spec.getStorableGoodsTypeList()) {
                 if (preferred.isTradeGoods()) {
                     int amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
@@ -178,8 +178,8 @@ public class IndianDemandMission extends Mission {
                 }
             }
             // Refined goods
-            for (GoodsType preferred : spec.getGoodsTypeList()) {
-                if (preferred.isRefined() && preferred.isStorable()) {
+            for (GoodsType preferred : spec.getStorableGoodsTypeList()) {
+                if (preferred.isRefined()) {
                     int amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
                         return new Goods(getGame(), target, preferred,

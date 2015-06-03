@@ -1318,8 +1318,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 wl.clear();
             }
         }
-        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            if (!goodsType.isStorable()) continue;
+        for (GoodsType goodsType : getSpecification().getStorableGoodsTypeList()) {
             List<GoodsWish> gl = goodsWishes.get(goodsType);
             if (gl == null) {
                 goodsWishes.put(goodsType, new ArrayList<GoodsWish>());
@@ -2794,12 +2793,10 @@ public class EuropeanAIPlayer extends AIPlayer {
             // FIXME: consider the amount of goods produced. If we
             // depend on shipping huge amounts of cheap goods, we
             // don't want these goods to be boycotted.
-            List<GoodsType> goodsTypes = getSpecification().getGoodsTypeList();
+            List<GoodsType> goodsTypes = getSpecification().getStorableGoodsTypeList();
             for (GoodsType type : goodsTypes) {
-                if (type.isStorable()) {
-                    averageIncome += getPlayer().getIncomeAfterTaxes(type);
-                    numberOfGoods++;
-                }
+                averageIncome += getPlayer().getIncomeAfterTaxes(type);
+                numberOfGoods++;
             }
             averageIncome /= numberOfGoods;
             int income = getPlayer().getIncomeAfterTaxes(toBeDestroyed.getType());
