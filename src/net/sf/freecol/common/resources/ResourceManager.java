@@ -222,6 +222,15 @@ public class ResourceManager {
         preloadThread.start();
     }
 
+    /**
+     * When it is anticipated that a resource could not exist use
+     * this method for checking beforehand.
+     * Other metods below are specializations running faster or
+     * allowing to check for many keys at once.
+     * 
+     * @param key The resource to check for.
+     * @return true when the resource exists.
+     */
     public static synchronized boolean hasResource(final String key) {
         logger.finest("hasResource(" + key + ")");
         return mergedContainer.containsKey(key);
@@ -359,7 +368,11 @@ public class ResourceManager {
     }
 
     /**
-     * Returns the image specified by the given name.
+     * Returns the image specified by the given key.
+     * Trying to get non-existing images from any of the below methods
+     * is an error. To make modding easier and prevent edited resource
+     * files from crashing the game, a replacement image is returned
+     * and a warning logged.
      *
      * @param key The name of the resource to return.
      * @return The image identified by <code>resource</code>.
@@ -466,6 +479,10 @@ public class ResourceManager {
 
     /**
      * Returns the animation specified by the given name.
+     * As the artwork is still incomplete and animations exist only for
+     * some military units, null can still be returned in many cases.
+     * FIXME: Check using hasResource before calling this, then replace
+     *        null return with calling FreeColClient.fatal on error.
      *
      * @param key The name of the resource to return.
      * @return The animation identified by <code>resource</code>
@@ -495,6 +512,8 @@ public class ResourceManager {
 
     /**
      * Returns the <code>Color</code> with the given name.
+     * Trying to get a non-existing color is an error and will return
+     * magenta as replacement color to prevent crashes when modding.
      *
      * @param key The name of the resource to return.
      * @return An <code>Color</code> created with the image
@@ -509,6 +528,8 @@ public class ResourceManager {
 
     /**
      * Gets the font with the given name.
+     * Trying to get a nonexisting font is an error and will result
+     * in only getting the emergency font to prevent crashes when modding.
      *
      * @param key The name of the resource to query.
      * @return The <code>Font</code> found in a FontResource, which
@@ -523,6 +544,10 @@ public class ResourceManager {
 
     /**
      * Gets an audio resource with the given name.
+     * This can return null as there as not all necessary sounds have
+     * been added to the game.
+     * FIXME: Change calling code to check using hasResource, then
+     *        replace null return with calling FreeColClient.fatal on error.
      *
      * @param key The name of the resource to query.
      * @return A <code>File</code> containing the audio data.
@@ -534,6 +559,9 @@ public class ResourceManager {
 
     /**
      * Gets the <code>Video</code> represented by the given resource.
+     * This can return null as there is only one video in FreeCol.
+     * FIXME: Consider calling FreeColClient.fatal on error.
+     * 
      * @param key The name of the resource to return.
      * @return The <code>Video</code> in it's original size.
      */
@@ -544,6 +572,8 @@ public class ResourceManager {
 
     /**
      * Gets a FAFile resource with the given name.
+     * This can return null as there is only one FAFile in FreeCol.
+     * FIXME: Consider calling FreeColClient.fatal on error.
      *
      * @param key The name of the resource to query.
      * @return The <code>FAFile</code> found in a FAFileResource.
@@ -555,6 +585,8 @@ public class ResourceManager {
 
     /**
      * Gets a string resource with the given name.
+     * Trying to get a nonexisting string is an error, but returns
+     * a replacement string to prevent crashes.
      *
      * @param key The name of the resource to query.
      * @return The string value.
