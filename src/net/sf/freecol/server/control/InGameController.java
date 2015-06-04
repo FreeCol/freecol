@@ -1329,6 +1329,19 @@ public final class InGameController extends Controller {
         }
         serverPlayer.csLoseLocation(europe, cs);
 
+        // Create the REF.
+        ServerPlayer refPlayer = createREFPlayer(serverPlayer);
+        // Update the intervention force
+        serverPlayer.getMonarch().updateInterventionForce();
+        String otherKey = Nation.getRandomNonPlayerNationNameKey(game, random);
+        cs.addMessage(See.only(serverPlayer),
+                      new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                       "declareIndependence.interventionForce",
+                                       serverPlayer)
+                      .add("%nation%", otherKey)
+                      .addAmount("%number%", spec.getInteger(GameOptions.INTERVENTION_BELLS)));
+        serverPlayer.csChangeStance(Stance.WAR, refPlayer, true, cs);
+
         // Generalized continental army muster.
         // Do not use UnitType.getTargetType.
         java.util.Map<UnitType, UnitType> upgrades = new HashMap<>();
@@ -1368,7 +1381,7 @@ public final class InGameController extends Controller {
                 }
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                        "declareIndpendence.continentalArmyMuster",
+                        "declareIndependence.continentalArmyMuster",
                         serverPlayer, colony)
                     .addName("%colony%", colony.getName())
                     .addAmount("%number%", n)
@@ -1377,18 +1390,6 @@ public final class InGameController extends Controller {
                 limit -= n;
             }
         }
-
-        // Create the REF.
-        ServerPlayer refPlayer = createREFPlayer(serverPlayer);
-        // Update the intervention force
-        serverPlayer.getMonarch().updateInterventionForce();
-        String otherKey = Nation.getRandomNonPlayerNationNameKey(game, random);
-        cs.addMessage(See.only(serverPlayer),
-                      new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                       "declareIndependence.interventionForce",
-                                       serverPlayer)
-                      .add("%nation%", otherKey)
-                      .addAmount("%number%", spec.getInteger(GameOptions.INTERVENTION_BELLS)));
 
         // Now the REF is ready, we can dispose of the European connection.
         cs.addRemove(See.only(serverPlayer), null, europe);//-vis: not on map
@@ -1412,7 +1413,6 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%newNation%", serverPlayer.getNationName())
                 .add("%ruler%", serverPlayer.getRulerNameKey()));
         cs.add(See.only(serverPlayer), serverPlayer);
-        serverPlayer.csChangeStance(Stance.WAR, refPlayer, true, cs);
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         sendToOthers(serverPlayer, cs);
