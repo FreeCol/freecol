@@ -1252,7 +1252,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (old != Stance.UNCONTACTED) {
                 cs.addMessage(See.only(other),
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                        "model.player." + stance.getKey() + ".declared", this)
+                        stance.getDeclarationKey(), this)
                     .addStringTemplate("%nation%", getNationName()));
             }
             cs.addStance(See.only(this), this, stance, otherPlayer);
@@ -1275,7 +1275,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (old != Stance.UNCONTACTED) {
                 cs.addMessage(See.only(this),
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                        "model.player." + stance + ".declared", otherPlayer)
+                        stance.getDeclarationKey(), otherPlayer)
                     .addStringTemplate("%nation%", otherPlayer.getNationName()));
             }
             cs.addStance(See.only(this), otherPlayer, stance, this);
