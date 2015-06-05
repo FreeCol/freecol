@@ -876,6 +876,73 @@ public class ChangeSet {
     }
 
     /**
+     * Encapsulate a new player change.
+     */
+    private static class PlayerChange extends Change {
+        private final ServerPlayer player;
+
+        /**
+         * Build a new PlayerChange.
+         *
+         * @param see The visibility of this change.
+         * @param player The <code>Player</code> to add.
+         */
+        public PlayerChange(See see, ServerPlayer player) {
+            super(see);
+            this.player = player;
+        }
+
+        /**
+         * Gets the sort priority.
+         *
+         * @return "CHANGE_EARLY".
+         */
+        @Override
+        public int getPriority() {
+            return ChangePriority.CHANGE_EARLY.getPriority();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isNotifiable(ServerPlayer serverPlayer) {
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Element toElement(ServerPlayer serverPlayer, Document doc) {
+            final Game game = serverPlayer.getGame();
+            Element element = doc.createElement("addPlayer");
+            element.appendChild(this.player.toXMLElement(doc, serverPlayer));
+            return element;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void attachToElement(Element element) {} // Noop
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("[").append(getClass().getName())
+                .append(" ").append(see)
+                .append(" #").append(getPriority())
+                .append(" ").append(player.getId())
+                .append("]");
+            return sb.toString();
+        }
+    }
+
+    /**
      * Encapsulates removing some objects.
      *
      * -vis: If removing settlements or units, visibility changes.
@@ -1585,6 +1652,18 @@ public class ChangeSet {
     public ChangeSet addPartial(See see, FreeColGameObject fcgo,
                                 String... fields) {
         changes.add(new PartialObjectChange(see, fcgo, fields));
+        return this;
+    }
+
+    /**
+     * Helper function to add a new player to a ChangeSet.
+     *
+     * @param player The new <code>ServerPlayer</code> to add.
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet addPlayer(ServerPlayer serverPlayer) {
+        changes.add(new PlayerChange(See.all().except(serverPlayer),
+                                     serverPlayer));
         return this;
     }
 

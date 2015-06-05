@@ -361,7 +361,7 @@ public final class InGameController extends Controller {
     public ServerPlayer createREFPlayer(ServerPlayer serverPlayer) {
         Nation refNation = serverPlayer.getNation().getREFNation();
         Monarch monarch = serverPlayer.getMonarch();
-        ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
+        ServerPlayer refPlayer = getFreeColServer().makeAIPlayer(refNation);
         Europe europe = refPlayer.getEurope();
 
         // Inherit rebel player knowledge of the seas, coasts, claimed
@@ -1208,6 +1208,7 @@ public final class InGameController extends Controller {
 
         // Create the REF.
         ServerPlayer refPlayer = createREFPlayer(serverPlayer);
+        cs.addPlayer(refPlayer);
         // Update the intervention force
         serverPlayer.getMonarch().updateInterventionForce();
         String otherKey = Nation.getRandomNonPlayerNationNameKey(game, random);

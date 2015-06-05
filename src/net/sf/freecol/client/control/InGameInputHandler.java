@@ -387,13 +387,16 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element addPlayer(Element element) {
         final Game game = getGame();
-        Element playerElement = (Element)element
-            .getElementsByTagName(Player.getXMLElementTagName()).item(0);
-        String id = FreeColObject.readId(playerElement);
-        if (game.getFreeColGameObject(id, Player.class) == null) {
-            game.addPlayer(new Player(game, playerElement));
-        } else {
-            game.getFreeColGameObject(id).readFromXMLElement(playerElement);
+        NodeList nodes = element.getChildNodes();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element playerElement = (Element)nodes.item(i);
+            String id = FreeColObject.readId(playerElement);
+            Player p = game.getFreeColGameObject(id, Player.class);
+            if (p == null) {
+                game.addPlayer(new Player(game, playerElement));
+            } else {
+                p.readFromXMLElement(playerElement);
+            }
         }
         return null;
     }

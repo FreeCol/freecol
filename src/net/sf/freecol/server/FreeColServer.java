@@ -25,7 +25,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Random;
@@ -1112,21 +1114,23 @@ public final class FreeColServer {
      * @exception FreeColException on map generation failure.
      */
     public Game buildGame() throws FreeColException {
-        final Game game = getGame();
+        final ServerGame game = getGame();
         final Specification spec = game.getSpecification();
         final AIMain aiMain = new AIMain(this);
         setAIMain(aiMain);
 
+        List<ServerPlayer> newAI = new ArrayList<>();
         game.setFreeColGameObjectListener(aiMain);
         for (Entry<Nation, NationState> entry
                  : game.getNationOptions().getNations().entrySet()) {
             if (entry.getKey().isUnknownEnemy()) continue;
             if (entry.getValue() != NationState.NOT_AVAILABLE
                 && game.getPlayer(entry.getKey().getId()) == null) {
-                addAIPlayer(entry.getKey());
+                newAI.add(makeAIPlayer(entry.getKey()));
             }
         }
         Collections.sort(game.getPlayers(), Player.playerComparator);
+        game.updatePlayers(newAI);
 
         // We need a fake unknown enemy player
         establishUnknownEnemy(game);
@@ -1167,14 +1171,14 @@ public final class FreeColServer {
     }
 
     /**
-     * Adds a new AIPlayer to the Game.
+     * Make a new AI player and add it to the game.
      *
      * Public so the controller can add REF players.
      *
      * @param nation The <code>Nation</code> to add.
      * @return The new AI <code>ServerPlayer</code>.
      */
-    public ServerPlayer addAIPlayer(Nation nation) {
+    public ServerPlayer makeAIPlayer(Nation nation) {
         DummyConnection theConnection
             = new DummyConnection("Server connection - " + nation.getId(),
                 getInGameInputHandler());
@@ -1184,7 +1188,6 @@ public final class FreeColServer {
         DummyConnection aiConnection
             = new DummyConnection("AI connection - " + nation.getId(),
                 new AIInGameInputHandler(this, aiPlayer, getAIMain()));
-
         aiConnection.setConnection(theConnection);
         theConnection.setConnection(aiConnection);
         getServer().addDummyConnection(theConnection);
@@ -1193,12 +1196,6 @@ public final class FreeColServer {
         // Add to the AI, which was previously deferred because the
         // player type was unknown.
         getAIMain().setFreeColGameObject(aiPlayer.getId(), aiPlayer);
-
-        // Send message to all players except to the new player:
-        // FIXME: null-destination-player is unnecessarily generous visibility
-        Element element = DOMMessage.createMessage("addPlayer");
-        element.appendChild(aiPlayer.toXMLElement(element.getOwnerDocument()));
-        getServer().sendToAll(element, theConnection);
         return aiPlayer;
     }
 

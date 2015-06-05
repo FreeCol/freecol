@@ -197,6 +197,17 @@ public class ServerGame extends Game implements ServerModelObject {
     }
 
     /**
+     * Update the players.
+     *
+     * @param players A list of new <code>ServerPlayer</code>s.
+     */
+    public void updatePlayers(List<ServerPlayer> players) {
+        ChangeSet cs = new ChangeSet();
+        for (ServerPlayer sp : players) cs.addPlayer(sp);
+        sendToAll(cs);
+    }
+
+    /**
      * Get a unique identifier to identify a <code>FreeColGameObject</code>.
      * 
      * @return A unique identifier.
