@@ -22,6 +22,7 @@ package net.sf.freecol.server.control;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -116,6 +117,7 @@ import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
@@ -351,6 +353,7 @@ public final class InGameController extends Controller {
     /**
      * Create the Royal Expeditionary Force player corresponding to
      * a given player that is about to rebel.
+     *
      * Public for the test suite.
      *
      * FIXME: this should eventually generate changes for the REF player.
@@ -363,7 +366,6 @@ public final class InGameController extends Controller {
         Monarch monarch = serverPlayer.getMonarch();
         ServerPlayer refPlayer = getFreeColServer().makeAIPlayer(refNation);
         Europe europe = refPlayer.getEurope();
-
         // Inherit rebel player knowledge of the seas, coasts, claimed
         // land but not full detailed scouting knowledge.
         Set<Tile> explore = new HashSet<>();
@@ -1154,7 +1156,7 @@ public final class InGameController extends Controller {
      * @param countryName The new name for its residents.
      * @return An <code>Element</code> encapsulating this action.
      */
-    public Element declareIndependence(ServerPlayer serverPlayer,
+    public Element declareIndependence(final ServerPlayer serverPlayer,
                                        String nationName, String countryName) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
@@ -1213,12 +1215,18 @@ public final class InGameController extends Controller {
         serverPlayer.getMonarch().updateInterventionForce();
         String otherKey = Nation.getRandomNonPlayerNationNameKey(game, random);
         cs.addMessage(See.only(serverPlayer),
-                      new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                       "declareIndependence.interventionForce",
-                                       serverPlayer)
-                      .add("%nation%", otherKey)
-                      .addAmount("%number%", spec.getInteger(GameOptions.INTERVENTION_BELLS)));
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                             "declareIndependence.interventionForce",
+                             serverPlayer)
+                .add("%nation%", otherKey)
+                .addAmount("%number%",
+                    spec.getInteger(GameOptions.INTERVENTION_BELLS)));
         serverPlayer.csChangeStance(Stance.WAR, refPlayer, true, cs);
+
+        // Now the REF is ready, we can dispose of the European connection.
+        cs.addRemove(See.only(serverPlayer), null, europe);//-vis: not on map
+        europe.dispose();
+        // Do not clean up the Monarch, it contains the intervention force
 
         // Generalized continental army muster.
         // Do not use UnitType.getTargetType.
@@ -1269,11 +1277,80 @@ public final class InGameController extends Controller {
             }
         }
 
-        // Now the REF is ready, we can dispose of the European connection.
-        cs.addRemove(See.only(serverPlayer), null, europe);//-vis: not on map
-        europe.dispose();
-        // Do not clean up the Monarch, it contains the intervention force
+        // Most hostile contacted non-warring natives declare war on
+        // you and peace with the REF, least hostile contacted natives
+        // declare peace on you and war on the REF.  If they are the
+        // same nation, go to the next most hostile nation that may
+        // already be at war.
+        List<Player> natives = new ArrayList<>();
+        for (Player p : game.getLiveNativePlayers(null)) {
+            if (p.hasContacted(serverPlayer)) natives.add(p);
+        }
+        if (!natives.isEmpty()) {
+            Collections.sort(natives, new Comparator<Player>() {
+                    public int compare(Player p1, Player p2) {
+                        return p1.getTension(serverPlayer).getValue()
+                            - p2.getTension(serverPlayer).getValue();
+                    }
+                });
+            ServerPlayer good = (ServerPlayer)natives.get(0);
+            logger.info("Native ally following independence: " + good);
+            cs.addMessage(See.only(serverPlayer),
+                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                 "declareIndependence.nativeSupport", good)
+                    .addStringTemplate("%nation%", good.getNationName())
+                    .add("%ruler%", serverPlayer.getRulerNameKey())
+                          );
+            int delta;
+            switch (good.getStance(serverPlayer)) {
+            case ALLIANCE: case PEACE: default:
+                delta = 0;
+                break;
+            case CEASE_FIRE:
+                delta = Tension.Level.HAPPY.getLimit()
+                    - good.getTension(serverPlayer).getValue();
+                break;
+            case WAR:
+                delta = Tension.Level.CONTENT.getLimit()
+                    - good.getTension(serverPlayer).getValue();
+                break;
+            }
+            good.csModifyTension(serverPlayer, delta, cs);
+            Player.makeContact(good, refPlayer);
+            good.csModifyTension(refPlayer,
+                Tension.Level.HATEFUL.getLimit(), cs);
 
+            reverse(natives);
+            ServerPlayer bad = null;
+            for (Player p : natives) {
+                if (p == good
+                    || p.getStance(serverPlayer) == Stance.ALLIANCE) break;
+                bad = (ServerPlayer)p;
+                if (!p.atWarWith(serverPlayer)) break;
+            }
+            logger.info("Native enemy following independence: " + bad);
+            if (bad != null) {
+                switch (bad.getStance(serverPlayer)) {
+                case PEACE: case CEASE_FIRE:
+                    delta = Tension.Level.HATEFUL.getLimit()
+                        - bad.getTension(serverPlayer).getValue();
+                    break;
+                case WAR: default:
+                    delta = 0;
+                    break;
+                }
+                cs.addMessage(See.only(serverPlayer),
+                    new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                     "declareIndependence.nativeHostile", bad)
+                        .addStringTemplate("%nation%", bad.getNationName()));
+                if (delta != 0) bad.csModifyTension(serverPlayer, delta, cs);
+                Player.makeContact(bad, refPlayer);
+                bad.csModifyTension(refPlayer,
+                    -bad.getTension(refPlayer).getValue(), cs);
+            }
+        }
+
+        //
         // Pity to have to update such a heavy object as the player,
         // but we do this, at most, once per player.  Other players
         // only need a partial player update and the stance change.
