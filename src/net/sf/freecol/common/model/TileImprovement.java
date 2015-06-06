@@ -679,9 +679,9 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * Gets the tag name of the root element representing this object.
      *
-     * @return "tileimprovement".
+     * @return "tileImprovement".
      */
     public static String getXMLElementTagName() {
-        return "tileimprovement";
+        return "tileImprovement";
     }
 }

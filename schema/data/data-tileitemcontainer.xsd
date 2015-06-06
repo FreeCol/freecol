@@ -67,8 +67,11 @@
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="resource" />
-        <xs:element ref="tileimprovement" />
+        <xs:element ref="tileImprovement" />
         <xs:element ref="lostCityRumour" />
+        <!-- @compat 0.11.3 -->
+        <xs:element ref="tileimprovement" />
+        <!-- end @compat 0.11.3 -->
       </xs:choice>
       <xs:attribute name="id" type="TileItemContainerId" use="required"/>
       <!-- @compat 0.10.x -->

@@ -75,13 +75,16 @@
       <xs:element ref="goodsContainer"/>
       <xs:element ref="equipment"/>
       <xs:element ref="units"/>
-      <xs:element ref="tileimprovement">
+      <xs:element ref="tileImprovement">
         <xs:annotation>
           <xs:documentation>
             The TileImprovement this Unit is working on.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
+      <!-- @compat 0.11.3 -->
+      <xs:element ref="tileimprovement"/>
+      <!-- end @compat 0.11.3 -->
     </xs:choice>
 
     <xs:attribute name="id" type="UnitId" use="required" />

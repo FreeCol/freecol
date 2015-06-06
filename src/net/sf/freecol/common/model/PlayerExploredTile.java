@@ -189,6 +189,9 @@ public class PlayerExploredTile extends FreeColGameObject {
     private static final String PLAYER_TAG = "player";
     private static final String TILE_TAG = "tile";
     private static final String WANTED_GOODS_TAG = "wantedGoods";
+    // @compat 0.11.3
+    private static final String OLD_TILE_IMPROVEMENT_TAG = "tileimprovement";
+    // end @compat 0.11.3
 
 
     /**
@@ -338,7 +341,11 @@ public class PlayerExploredTile extends FreeColGameObject {
         } else if (Resource.getXMLElementTagName().equals(tag)) {
             addTileItem(xr.readFreeColGameObject(game, Resource.class));
 
-        } else if (TileImprovement.getXMLElementTagName().equals(tag)) {
+        } else if (TileImprovement.getXMLElementTagName().equals(tag)
+                   // @compat 0.11.3
+                   || OLD_TILE_IMPROVEMENT_TAG.equals(tag)
+                   // end @compat 0.11.3
+                   ) {
             addTileItem(xr.readFreeColGameObject(game, TileImprovement.class));
 
         } else {

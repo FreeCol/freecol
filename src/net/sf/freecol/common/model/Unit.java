@@ -4181,6 +4181,9 @@ public class Unit extends GoodsLocation
     private final TypeCountMap<EquipmentType> equipment
         = new TypeCountMap<>();
     // end @compat 0.10.x
+    // @compat 0.11.3
+    private static final String OLD_TILE_IMPROVEMENT_TAG = "tileimprovement";
+    // end @compat 0.11.3
 
 
     /**
@@ -4517,7 +4520,11 @@ public class Unit extends GoodsLocation
             }
         // end @compat 0.10.5
 
-        } else if (TileImprovement.getXMLElementTagName().equals(tag)) {
+        } else if (TileImprovement.getXMLElementTagName().equals(tag)
+                   // @compat 0.11.3
+                   || OLD_TILE_IMPROVEMENT_TAG.equals(tag)
+                   // end @compat 0.11.3
+                   ) {
             workImprovement = xr.readFreeColGameObject(game,
                                                        TileImprovement.class);
 
