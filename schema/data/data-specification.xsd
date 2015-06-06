@@ -27,7 +27,10 @@
       <xs:attribute name="id" type="xs:ID"/>
       <xs:attribute name="extends" type="xs:string"/>
       <xs:attribute name="version" type="xs:string"/>
+      <xs:attribute name="difficulty-level" type="xs:string"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="difficultyLevel" type="xs:string"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 

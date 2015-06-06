@@ -2704,7 +2704,7 @@ public final class Specification {
     // Serialization
 
     private static final String BUILDING_TYPES_TAG = "building-types";
-    private static final String DIFFICULTY_LEVEL_TAG = "difficultyLevel";
+    private static final String DIFFICULTY_LEVEL_TAG = "difficulty-level";
     private static final String DISASTERS_TAG = "disasters";
     private static final String EUROPEAN_NATION_TYPES_TAG = "european-nation-types";
     private static final String EVENTS_TAG = "events";
@@ -2724,6 +2724,7 @@ public final class Specification {
     private static final String EQUIPMENT_TYPES_TAG = "equipment-types";
     // end @compat 0.10.x
     // @compat 0.11.3
+    private static final String OLD_DIFFICULTY_LEVEL_TAG = "difficultyLevel";
     private static final String OLD_TILEIMPROVEMENT_TYPES_TAG = "tileimprovement-types";
     // end @compat 0.11.3
 
@@ -2799,6 +2800,12 @@ public final class Specification {
         if (difficultyLevel == null) {
             difficultyLevel = xr.getAttribute(DIFFICULTY_LEVEL_TAG,
                                               (String)null);
+            // @compat 0.11.3
+            if (difficultyLevel == null) {
+                difficultyLevel = xr.getAttribute(OLD_DIFFICULTY_LEVEL_TAG,
+                                                  (String)null);
+            }
+            // end @compat 0.11.3
         }
 
         version = xr.getAttribute(VERSION_TAG, (String)null);

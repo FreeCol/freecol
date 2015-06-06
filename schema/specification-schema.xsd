@@ -66,6 +66,7 @@
      0.87: Add defaultUnit attribute to unit-type.
      0.88: Add textOption to OptionGroup.
      0.89: tileimprovement-type/s -> tile-improvement-type/s
+     0.90: difficultyLevel -> difficulty-level
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -87,6 +88,7 @@
 
       You should have received a copy of the GNU General Public License
       along with FreeCol. If not, see http://www.gnu.org/licenses
+
     </xs:documentation>
   </xs:annotation>
 
@@ -116,7 +118,10 @@
       <xs:attribute name="id" type="xs:ID"/>
       <xs:attribute name="extends" type="xs:string"/>
       <xs:attribute name="version" type="xs:string"/>
+      <xs:attribute name="difficulty-level" type="xs:string"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="difficultyLevel" type="xs:string"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 
@@ -428,9 +433,7 @@
 
   <xs:element name="action">
     <xs:complexType>
-      <xs:attribute name="tileimprovement-type" use="required" type="TileImprovementTypeId"/>
       <xs:attribute name="name" use="required" type="xs:string"/>
-      <xs:attribute name="image-id" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
@@ -797,6 +800,177 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:complexType name="feature">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
+    </xs:sequence>
+    <xs:attribute name="id" use="required" type="xs:string"/>
+    <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
+    <xs:attribute name="delete" type="xs:boolean"/>
+    <xs:attribute name="source" type="xs:string"/>
+    <xs:attribute name="duration" type="xs:int"/>
+    <xs:attribute name="temporary" type="xs:boolean"/>
+  </xs:complexType>
+
+  <xs:element name="ability">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="feature">
+          <xs:attribute name="value" type="xs:boolean"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="modifier" type="modifier" />
+
+  <xs:complexType name="modifier">
+    <xs:complexContent>
+      <xs:extension base="feature">
+        <xs:attribute name="type">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="additive"/>
+              <xs:enumeration value="multiplicative"/>
+              <xs:enumeration value="percentage"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="value" type="xs:float"/>
+        <xs:attribute name="increment" use="optional" type="xs:float"/>
+        <xs:attribute name="incrementType" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="additive"/>
+              <xs:enumeration value="multiplicative"/>
+              <xs:enumeration value="percentage"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="index" type="xs:nonNegativeInteger"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="scope" type="ScopeType" />
+
+  <xs:element name="required-ability">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="value" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- @compat 0.10.0 -->
+  <xs:element name="required-location-ability">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="value" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- end @compat 0.10.0 -->
+
+  <xs:element name="required-goods">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="GoodsTypeId"/>
+      <xs:attribute name="value" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="role-change">
+    <xs:complexType>
+      <xs:attribute name="from" use="required" type="xs:string"/>
+      <xs:attribute name="capture" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="consumes">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="GoodsTypeId"/>
+      <xs:attribute name="value" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- @compat 0.10.7 -->
+  <xs:element name="default-equipment">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="EquipmentTypeId"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- end @compat -->
+
+  <xs:element name="default-role">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="RoleId"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="upgrade">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
+      </xs:sequence>
+      <xs:attribute name="unit" use="optional" type="xs:string"/>
+      <xs:attribute name="delete" type="xs:boolean"/>
+      <!-- TODO: change these types to percentage -->
+      <xs:attribute name="learnFromNatives" type="PercentageType"/>
+      <xs:attribute name="learnFromExperience" type="PercentageType"/>
+      <xs:attribute name="learnInLostCity" type="PercentageType"/>
+      <xs:attribute name="learnInSchool" type="PercentageType"/>
+      <xs:attribute name="promotion" type="PercentageType"/>
+      <xs:attribute name="creation" type="PercentageType"/>
+      <xs:attribute name="independence" type="PercentageType"/>
+      <xs:attribute name="enterColony" type="PercentageType"/>
+      <xs:attribute name="turnsToLearn" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="conversion" type="PercentageType"/>
+      <!-- TODO: these are downgrades, but serialization can not
+        handle non-static XML Element tag names! We need to combine
+        upgrade and downgrade into a typechange. -->
+      <xs:attribute name="capture" type="PercentageType"/>
+      <xs:attribute name="demotion" type="PercentageType"/>
+      <xs:attribute name="clearSkill" type="PercentageType"/>
+      <xs:attribute name="undead" type="PercentageType"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="downgrade">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
+      </xs:sequence>
+      <xs:attribute name="unit" use="optional" type="xs:string"/>
+      <xs:attribute name="delete" type="xs:boolean"/>
+      <xs:attribute name="capture" type="PercentageType"/>
+      <xs:attribute name="demotion" type="PercentageType"/>
+      <xs:attribute name="clearSkill" type="PercentageType"/>
+      <xs:attribute name="undead" type="PercentageType"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="limit">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="leftHandSide" type="OperandType" />
+        <xs:element name="rightHandSide" type="OperandType" />
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" />
+      <xs:attribute name="operator" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="LT"/>
+            <xs:enumeration value="LE"/>
+            <xs:enumeration value="GT"/>
+            <xs:enumeration value="GE"/>
+            <xs:enumeration value="EQ"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- Options.  funkyCapitalized -->
+  
   <xs:element name="options">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -1039,195 +1213,12 @@
     </xs:complexType>
   </xs:element>
 
-  <xs:complexType name="feature">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
-    </xs:sequence>
-    <xs:attribute name="id" use="required" type="xs:string"/>
-    <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
-    <xs:attribute name="delete" type="xs:boolean"/>
-    <xs:attribute name="source" type="xs:string"/>
-    <xs:attribute name="duration" type="xs:int"/>
-    <xs:attribute name="temporary" type="xs:boolean"/>
-  </xs:complexType>
 
-  <xs:element name="ability">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="feature">
-          <xs:attribute name="value" type="xs:boolean"/>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
+  <!-- Types.  funkyCapitalized -->
 
-  <xs:element name="modifier" type="modifier" />
-
-  <xs:complexType name="modifier">
-    <xs:complexContent>
-      <xs:extension base="feature">
-        <xs:attribute name="type">
-          <xs:simpleType>
-            <xs:restriction base="xs:token">
-              <xs:enumeration value="additive"/>
-              <xs:enumeration value="multiplicative"/>
-              <xs:enumeration value="percentage"/>
-            </xs:restriction>
-          </xs:simpleType>
-        </xs:attribute>
-        <xs:attribute name="value" type="xs:float"/>
-        <xs:attribute name="increment" use="optional" type="xs:float"/>
-        <xs:attribute name="incrementType" use="optional">
-          <xs:simpleType>
-            <xs:restriction base="xs:token">
-              <xs:enumeration value="additive"/>
-              <xs:enumeration value="multiplicative"/>
-              <xs:enumeration value="percentage"/>
-            </xs:restriction>
-          </xs:simpleType>
-        </xs:attribute>
-        <xs:attribute name="index" type="xs:nonNegativeInteger"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:element name="scope" type="ScopeType" />
-
-  <xs:element name="required-ability">
-    <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="value" type="xs:boolean"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="required-location-ability">
-    <xs:annotation>
-      <xs:documentation>
-        0.10.0 compatibility only
-      </xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="value" type="xs:boolean"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="required-goods">
-    <xs:complexType>
-      <xs:attribute name="id" use="required" type="GoodsTypeId"/>
-      <xs:attribute name="value" type="xs:nonNegativeInteger"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="role-change">
-    <xs:complexType>
-      <xs:attribute name="from" use="required" type="xs:string"/>
-      <xs:attribute name="capture" use="required" type="xs:string"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="consumes">
-    <xs:complexType>
-      <xs:attribute name="id" use="required" type="GoodsTypeId"/>
-      <xs:attribute name="value" type="xs:nonNegativeInteger"/>
-    </xs:complexType>
-  </xs:element>
-
-  <!-- @compat 0.10.7 -->
-  <xs:element name="default-equipment">
-    <xs:complexType>
-      <xs:attribute name="id" use="required" type="EquipmentTypeId"/>
-    </xs:complexType>
-  </xs:element>
-  <!-- end @compat -->
-
-  <xs:element name="default-role">
-    <xs:complexType>
-      <xs:attribute name="id" use="required" type="RoleId"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="upgrade">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
-      </xs:sequence>
-      <xs:attribute name="unit" use="optional" type="xs:string"/>
-      <xs:attribute name="delete" type="xs:boolean"/>
-      <!-- TODO: change these types to percentage -->
-      <xs:attribute name="learnFromNatives" type="PercentageType"/>
-      <xs:attribute name="learnFromExperience" type="PercentageType"/>
-      <xs:attribute name="learnInLostCity" type="PercentageType"/>
-      <xs:attribute name="learnInSchool" type="PercentageType"/>
-      <xs:attribute name="promotion" type="PercentageType"/>
-      <xs:attribute name="creation" type="PercentageType"/>
-      <xs:attribute name="independence" type="PercentageType"/>
-      <xs:attribute name="enterColony" type="PercentageType"/>
-      <xs:attribute name="turnsToLearn" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="conversion" type="PercentageType"/>
-      <!-- TODO: these are downgrades, but serialization can not
-        handle non-static XML Element tag names! We need to combine
-        upgrade and downgrade into a typechange. -->
-      <xs:attribute name="capture" type="PercentageType"/>
-      <xs:attribute name="demotion" type="PercentageType"/>
-      <xs:attribute name="clearSkill" type="PercentageType"/>
-      <xs:attribute name="undead" type="PercentageType"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="downgrade">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
-      </xs:sequence>
-      <xs:attribute name="unit" use="optional" type="xs:string"/>
-      <xs:attribute name="delete" type="xs:boolean"/>
-      <xs:attribute name="capture" type="PercentageType"/>
-      <xs:attribute name="demotion" type="PercentageType"/>
-      <xs:attribute name="clearSkill" type="PercentageType"/>
-      <xs:attribute name="undead" type="PercentageType"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="limit">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element name="leftHandSide" type="OperandType" />
-        <xs:element name="rightHandSide" type="OperandType" />
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:string" />
-      <xs:attribute name="operator" use="required">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="LT"/>
-            <xs:enumeration value="LE"/>
-            <xs:enumeration value="GT"/>
-            <xs:enumeration value="GE"/>
-            <xs:enumeration value="EQ"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:complexType name="RandomRange">
-    <xs:sequence minOccurs="0">
-      <xs:element name="scope" type="ScopeType"/>
-    </xs:sequence>
-    <xs:attribute name="probability" use="required" type="PercentageType"/>
-    <xs:attribute name="minimum" use="required" type="xs:integer"/>
-    <xs:attribute name="maximum" use="required" type="xs:integer"/>
-    <xs:attribute name="factor" use="required" type="xs:integer"/>
-  </xs:complexType>
-
-  <xs:complexType name="ScopeType">
-    <xs:attribute name="matchesNull" type="xs:boolean"/>
-    <xs:attribute name="matchNegated" type="xs:boolean"/>
-    <xs:attribute name="type" type="xs:string"/>
-    <xs:attribute name="ability-id" type="AbilityId"/>
-    <xs:attribute name="ability-value" type="xs:boolean"/>
-    <xs:attribute name="method-name" type="xs:string"/>
-    <xs:attribute name="method-value" type="xs:string"/>
+  <xs:complexType name="AbstractGoodsType">
+    <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
+    <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
   </xs:complexType>
 
   <xs:complexType name="OperandType">
@@ -1261,20 +1252,6 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="PlunderType">
-    <xs:attribute name="probability" type="PercentageType"/>
-    <xs:attribute name="minimum" type="xs:int"/>
-    <xs:attribute name="maximum" type="xs:int"/>
-    <xs:attribute name="factor" type="xs:int"/>
-  </xs:complexType>
-
-  <xs:complexType name="AbstractGoodsType">
-    <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
-    <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
-  </xs:complexType>
-
-  <!-- Game Object Types -->
-
   <xs:simpleType name="PercentageType">
     <xs:restriction base="xs:integer">
       <xs:minInclusive value="0"/>
@@ -1282,8 +1259,28 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:complexType name="RandomRange">
+    <xs:sequence minOccurs="0">
+      <xs:element name="scope" type="ScopeType"/>
+    </xs:sequence>
+    <xs:attribute name="probability" use="required" type="PercentageType"/>
+    <xs:attribute name="minimum" use="required" type="xs:integer"/>
+    <xs:attribute name="maximum" use="required" type="xs:integer"/>
+    <xs:attribute name="factor" use="required" type="xs:integer"/>
+  </xs:complexType>
 
-  <!-- Either a building type or a unit type -->
+  <xs:complexType name="ScopeType">
+    <xs:attribute name="matchesNull" type="xs:boolean"/>
+    <xs:attribute name="matchNegated" type="xs:boolean"/>
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="ability-id" type="AbilityId"/>
+    <xs:attribute name="ability-value" type="xs:boolean"/>
+    <xs:attribute name="method-name" type="xs:string"/>
+    <xs:attribute name="method-value" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- Identifier types (all simple).  funkyCapitalized -->
+  
   <xs:simpleType name="AbilityId">
     <xs:restriction base="xs:string">
       <xs:pattern value="model\.ability\.([a-zA-Z]+)" />
