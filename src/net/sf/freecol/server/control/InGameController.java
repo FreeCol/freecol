@@ -389,7 +389,7 @@ public final class InGameController extends Controller {
         // around 0.10.5, the game in BR#2435 has it.  For now, just add
         // enough ships to carry all the units.
         UnitType ut = monarch.getNavalREFUnitType();
-        while (exf.getSpaceRequired() < exf.getCapacity()) {
+        while (exf.getSpaceRequired() > exf.getCapacity()) {
             AbstractUnit au
                 = new AbstractUnit(ut, Specification.DEFAULT_ROLE_ID, 1);
             exf.add(au);
