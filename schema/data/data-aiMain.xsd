@@ -149,12 +149,19 @@
                   <!-- end @compat -->
                 </xs:complexType>
               </xs:element>
+              <!-- @compat 0.11.3 -->
               <xs:element name="tileimprovementplanListElement">
                 <xs:complexType>
                   <xs:attribute name="id" type="xs:string" use="required"/>
                   <!-- @compat 0.10.7 -->
                   <xs:attribute name="ID" type="xs:string" use="optional" />
                   <!-- end @compat -->
+                </xs:complexType>
+              </xs:element>
+              <!-- end @compat 0.11.3 -->
+              <xs:element name="tileImprovementPlanListElement">
+                <xs:complexType>
+                  <xs:attribute name="id" type="xs:string" use="required"/>
                 </xs:complexType>
               </xs:element>
             </xs:choice>
@@ -213,6 +220,16 @@
             <xs:attribute name="transportPriority" type="xs:int" />
           </xs:complexType>
         </xs:element>
+        <xs:element name="tileImprovementPlan">
+          <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="type" type="TileImprovementTypeId" />
+            <xs:attribute name="value" type="xs:int" />
+            <xs:attribute name="target" type="TileId" />
+            <xs:attribute name="pioneer" type="UnitId" />
+          </xs:complexType>
+        </xs:element>
+        <!-- @compat 0.11.3 -->
         <xs:element name="tileimprovementplan">
           <xs:complexType>
             <xs:attribute name="id" type="xs:string" use="required"/>
@@ -225,6 +242,7 @@
             <xs:attribute name="pioneer" type="UnitId" />
           </xs:complexType>
         </xs:element>
+        <!-- end @compat 0.11.3 -->
       </xs:choice>
 
       <xs:attribute name="nextId" type="xs:int" use="required" />

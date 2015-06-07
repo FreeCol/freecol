@@ -744,7 +744,6 @@ public class PioneeringMission extends Mission {
     // Serialization
 
     private static final String TARGET_TAG = "target";
-    private static final String TILE_IMPROVEMENT_PLAN_TAG = "tileImprovementPlan";
 
 
     /**
@@ -758,7 +757,7 @@ public class PioneeringMission extends Mission {
             xw.writeAttribute(TARGET_TAG, target.getId());
 
             if (tileImprovementPlan != null) {
-                xw.writeAttribute(TILE_IMPROVEMENT_PLAN_TAG,
+                xw.writeAttribute(TileImprovementPlan.getXMLElementTagName(),
                                   tileImprovementPlan);
             }
         }
@@ -776,8 +775,8 @@ public class PioneeringMission extends Mission {
         // Do not use setTarget in serialization
         target = xr.getLocationAttribute(getGame(), TARGET_TAG, false);
 
-        tileImprovementPlan = (xr.hasAttribute(TILE_IMPROVEMENT_PLAN_TAG))
-            ? xr.makeAIObject(aiMain, TILE_IMPROVEMENT_PLAN_TAG,
+        tileImprovementPlan = (xr.hasAttribute(TileImprovementPlan.getXMLElementTagName()))
+            ? xr.makeAIObject(aiMain, TileImprovementPlan.getXMLElementTagName(),
                 TileImprovementPlan.class, (TileImprovementPlan)null, true)
             : null;
     }

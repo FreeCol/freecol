@@ -1571,7 +1571,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     // @compat 0.10.3
     private static final String OLD_GOODS_WISH_TAG
         = GoodsWish.getXMLElementTagName() + "Wish" + LIST_ELEMENT;
-    private static final String OLD_TILE_IMPROVEMENT_PLAN_TAG
+    private static final String OLD_TILE_IMPROVEMENT_PLAN_LIST_TAG
         = "tileimprovementplan" + LIST_ELEMENT;
     private static final String OLD_WORKER_WISH_TAG
         = WorkerWish.getXMLElementTagName() + "Wish" + LIST_ELEMENT;
@@ -1672,7 +1672,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         } else if (TILE_IMPROVEMENT_PLAN_LIST_TAG.equals(tag)
             // @compat 0.10.3
-            || OLD_TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
+            || OLD_TILE_IMPROVEMENT_PLAN_LIST_TAG.equals(tag)
             // end @compat
                    ) {
             tileImprovementPlans.add(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,

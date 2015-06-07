@@ -157,7 +157,7 @@
 
   <xs:simpleType name="TileImprovementPlanId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="tileimprovementplan:([0-9])+" />
+      <xs:pattern value="tileImprovementPlan:([0-9])+" />
     </xs:restriction>
   </xs:simpleType>
 

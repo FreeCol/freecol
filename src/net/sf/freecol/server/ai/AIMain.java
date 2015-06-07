@@ -460,11 +460,13 @@ public class AIMain extends FreeColObject
     // @compat 0.10.3
     private static final String COLONIAL_AI_PLAYER_TAG = "colonialAIPlayer";
     private static final String GOODS_WISH_TAG = "GoodsWish";
-    private static final String TILE_IMPROVEMENT_PLAN_TAG = "tileimprovementplan";
     // end @compat
     // @compat 0.10.7
     private static final String OLD_NEXT_ID_TAG = "nextID";
     // end @compat
+    // @compat 0.11.3
+    private static final String OLD_TILE_IMPROVEMENT_PLAN_TAG = "tileimprovementplan";
+    // end @compat 0.11.3
 
 
     /**
@@ -594,7 +596,7 @@ public class AIMain extends FreeColObject
 
             } else if (TileImprovementPlan.getXMLElementTagName().equals(tag)
                 // @compat 0.10.3
-                || TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
+                || OLD_TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
                 // end @compat
                        ) {
                 new TileImprovementPlan(this, xr);
