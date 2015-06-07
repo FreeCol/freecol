@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.model;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +35,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -97,6 +99,8 @@ import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -279,6 +283,45 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void setConnection(Connection connection) {
         this.connection = connection;
         connected = (connection != null);
+    }
+
+    /**
+     * Send a change set to this player.
+     *
+     * @param cs The <code>ChangeSet</code> to send.
+     */
+    public void send(ChangeSet cs) {
+        askElement(cs.build(this));
+    }
+    
+    /**
+     * Send an element to this player.
+     * Do not use (sole use in send() above). This will go away.
+     *
+     * @param request An <code>Element</code> containing the update.
+     */
+    private void askElement(Element request) {
+        if (this.connection == null) return;
+
+        while (request != null) {
+            Element reply;
+            try {
+                reply = this.connection.ask(request);
+                if (reply == null) break;
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Could not send \""
+                    + request.getTagName() + "\"-message.", e);
+                break;
+            }
+
+            try {
+                request = this.connection.handle(reply);
+            } catch (FreeColException fce) {
+                logger.log(Level.WARNING, "Exception processing reply \""
+                    + reply.getTagName() + "\"-message.", fce);
+                break;
+            }
+        }
     }
 
     /**

@@ -543,17 +543,6 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Send an element to all players except one.
-     * Deprecated, please avoid if possible.
-     *
-     * @param serverPlayer A <code>ServerPlayer</code> to exclude.
-     * @param element An <code>Element</code> to send.
-     */
-    private void sendToOthers(ServerPlayer serverPlayer, Element element) {
-        sendToList(getOtherLivePlayers(serverPlayer), element);
-    }
-
-    /**
      * Send an update to a list of players.
      *
      * @param serverPlayers The <code>ServerPlayer</code>s to send to.
@@ -564,60 +553,13 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Send an element to a list of players.
-     * Deprecated, please avoid if possible.
-     *
-     * @param serverPlayers The <code>ServerPlayer</code>s to send to.
-     * @param element An <code>Element</code> to send.
-     */
-    private void sendToList(List<ServerPlayer> serverPlayers, Element element) {
-        if (element != null) {
-            for (ServerPlayer s : serverPlayers) {
-                askElement(s, element);
-            }
-        }
-    }
-
-    /**
      * Send an element to a specific player.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to update.
      * @param cs A <code>ChangeSet</code> to build an <code>Element</code> with.
      */
     private void sendElement(ServerPlayer serverPlayer, ChangeSet cs) {
-        askElement(serverPlayer, cs.build(serverPlayer));
-    }
-
-    /**
-     * Send an element to a specific player.
-     * Deprecated, please avoid if possible.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to update.
-     * @param request An <code>Element</code> containing the update.
-     */
-    private void askElement(ServerPlayer serverPlayer, Element request) {
-        Connection connection = serverPlayer.getConnection();
-        if (connection == null) return;
-
-        while (request != null) {
-            Element reply;
-            try {
-                reply = connection.ask(request);
-                if (reply == null) break;
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Could not send \""
-                    + request.getTagName() + "\"-message.", e);
-                break;
-            }
-
-            try {
-                request = connection.handle(reply);
-            } catch (FreeColException fce) {
-                logger.log(Level.WARNING, "Exception processing reply \""
-                    + reply.getTagName() + "\"-message.", fce);
-                break;
-            }
-        }
+        serverPlayer.send(cs);
     }
 
     /**
