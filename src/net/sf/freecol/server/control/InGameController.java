@@ -221,7 +221,7 @@ public final class InGameController extends Controller {
     public void yearlyGoodsAdjust(ServerPlayer serverPlayer) {
         ChangeSet cs = new ChangeSet();
         serverPlayer.csYearlyGoodsAdjust(random, cs);
-        sendElement(serverPlayer, cs);
+        serverPlayer.send(cs);
     }
 
     /**
@@ -237,7 +237,7 @@ public final class InGameController extends Controller {
         serverPlayer.csAddFoundingFather(father, random, cs);
         cs.addAttribute(See.only(serverPlayer), "flush",
                         Boolean.TRUE.toString());
-        sendElement(serverPlayer, cs);
+        serverPlayer.send(cs);
     }
 
     /**
@@ -485,9 +485,9 @@ public final class InGameController extends Controller {
             boolean single = getFreeColServer().isSinglePlayer();
             reply = future.get(FreeCol.getTimeout(single), TimeUnit.SECONDS);
         } catch (TimeoutException te) {
-            sendElement(serverPlayer,
-                new ChangeSet().addTrivial(See.only(serverPlayer),
-                    "closeMenus", ChangePriority.CHANGE_NORMAL));
+            serverPlayer.send(new ChangeSet()
+                .addTrivial(See.only(serverPlayer), "closeMenus",
+                            ChangePriority.CHANGE_NORMAL));
             reply = null;
         } catch (InterruptedException | ExecutionException e) {
             reply = null;
@@ -549,17 +549,7 @@ public final class InGameController extends Controller {
      * @param cs The <code>ChangeSet</code> encapsulating the update.
      */
     private void sendToList(List<ServerPlayer> serverPlayers, ChangeSet cs) {
-        for (ServerPlayer s : serverPlayers) sendElement(s, cs);
-    }
-
-    /**
-     * Send an element to a specific player.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to update.
-     * @param cs A <code>ChangeSet</code> to build an <code>Element</code> with.
-     */
-    private void sendElement(ServerPlayer serverPlayer, ChangeSet cs) {
-        serverPlayer.send(cs);
+        for (ServerPlayer s : serverPlayers) s.send(cs);
     }
 
     /**
@@ -764,11 +754,11 @@ public final class InGameController extends Controller {
                 && debugOnlyAITurns > 0;
             if (debugSkip) {
                 sendToOthers(player, cs);
-                sendElement(player, cs);
+                player.send(cs);
                 continue;
             }
             sendToList(getOtherLivePlayers(player, serverPlayer), cs);
-            if (player != serverPlayer) sendElement(player, cs);
+            if (player != serverPlayer) player.send(cs);
             return cs.build(serverPlayer);
         }
     }
@@ -913,7 +903,7 @@ public final class InGameController extends Controller {
                           boolean result) {
         ChangeSet cs = new ChangeSet();
         serverPlayer.csRaiseTax(taxRaise, goods, result, cs);
-        sendElement(serverPlayer, cs);
+        serverPlayer.send(cs);
     }
 
     /**
