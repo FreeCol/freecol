@@ -1108,13 +1108,25 @@ public final class FreeColServer {
      * Builds a new game using the parameters that exist in the game
      * as it stands.
      *
-     * @return The update game.
+     * @return The updated game.
      * @exception FreeColException on map generation failure.
      */
     public Game buildGame() throws FreeColException {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        final AIMain aiMain = initializeAI(true);
+        final AIMain aiMain = new AIMain(this);
+        setAIMain(aiMain);
+
+        game.setFreeColGameObjectListener(aiMain);
+        for (Entry<Nation, NationState> entry
+                 : game.getNationOptions().getNations().entrySet()) {
+            if (entry.getKey().isUnknownEnemy()) continue;
+            if (entry.getValue() != NationState.NOT_AVAILABLE
+                && game.getPlayer(entry.getKey().getId()) == null) {
+                addAIPlayer(entry.getKey());
+            }
+        }
+        Collections.sort(game.getPlayers(), Player.playerComparator);
 
         // We need a fake unknown enemy player
         establishUnknownEnemy(game);
@@ -1155,39 +1167,6 @@ public final class FreeColServer {
     }
 
     /**
-     * Add the AI and players.
-     *
-     * @param allNations If true, add all missing nations.
-     *     If false, just the natives as required by the map generator.
-     * @return The AI.
-     */
-    public AIMain initializeAI(boolean allNations) {
-        final Game game = getGame();
-        final Specification spec = game.getSpecification();
-
-        AIMain aiMain = new AIMain(this);
-        setAIMain(aiMain);
-
-        if (allNations) {
-            game.setFreeColGameObjectListener(aiMain);
-            for (Entry<Nation, NationState> entry
-                     : game.getNationOptions().getNations().entrySet()) {
-                if (entry.getKey().isUnknownEnemy()) continue;
-                if (entry.getValue() != NationState.NOT_AVAILABLE
-                    && game.getPlayer(entry.getKey().getId()) == null) {
-                    addAIPlayer(entry.getKey());
-                }
-            }
-        } else {
-            for (Nation nation : spec.getIndianNations()) {
-                addAIPlayer(nation);
-            }
-        }
-        Collections.sort(game.getPlayers(), Player.playerComparator);
-        return aiMain;
-    }
-
-    /**
      * Adds a new AIPlayer to the Game.
      *
      * Public so the controller can add REF players.
@@ -1208,7 +1187,6 @@ public final class FreeColServer {
 
         aiConnection.setConnection(theConnection);
         theConnection.setConnection(aiConnection);
-
         getServer().addDummyConnection(theConnection);
 
         getGame().addPlayer(aiPlayer);
@@ -1218,9 +1196,9 @@ public final class FreeColServer {
 
         // Send message to all players except to the new player:
         // FIXME: null-destination-player is unnecessarily generous visibility
-        Element player = DOMMessage.createMessage("addPlayer");
-        player.appendChild(aiPlayer.toXMLElement(player.getOwnerDocument()));
-        getServer().sendToAll(player, theConnection);
+        Element element = DOMMessage.createMessage("addPlayer");
+        element.appendChild(aiPlayer.toXMLElement(element.getOwnerDocument()));
+        getServer().sendToAll(element, theConnection);
         return aiPlayer;
     }
 
