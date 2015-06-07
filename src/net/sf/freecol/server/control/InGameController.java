@@ -4185,9 +4185,10 @@ public final class InGameController extends Controller {
      */
     public Element chat(ServerPlayer serverPlayer, String message,
                         boolean pri) {
-        sendToOthers(serverPlayer,
-                     new ChatMessage(serverPlayer, message, false)
-                     .toXMLElement());
+        sendToOthers(serverPlayer, new ChangeSet()
+            .add(See.all().except(serverPlayer),
+                 ChangeSet.ChangePriority.CHANGE_NORMAL,
+                 new ChatMessage(serverPlayer, message, false)));
         return null;
     }
 
