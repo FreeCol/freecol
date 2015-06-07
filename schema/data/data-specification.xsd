@@ -136,7 +136,10 @@
       <xs:attribute name="can-settle" type="xs:boolean"/>
       <xs:attribute name="is-connected" type="xs:boolean"/>
       <xs:attribute name="is-elevation" type="xs:boolean"/>
+      <xs:attribute name="production-level" type="xs:string"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="productionLevel" type="xs:string"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 
@@ -165,7 +168,10 @@
       </xs:choice>
       <xs:attribute name="delete" use="optional" type="xs:string"/>
       <xs:attribute name="unattended" type="xs:boolean"/>
+      <xs:attribute name="production-level" type="xs:string"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="productionLevel" type="xs:string"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 

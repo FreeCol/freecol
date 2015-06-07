@@ -397,9 +397,12 @@ public class ProductionType extends FreeColObject {
     private static final String GOODS_TYPE_TAG = "goods-type";
     private static final String INPUT_TAG = "input";
     private static final String OUTPUT_TAG = "output";
-    private static final String PRODUCTION_LEVEL_TAG = "productionLevel";
+    private static final String PRODUCTION_LEVEL_TAG = "production-level";
+    // @compat 0.11.3
+    private static final String OLD_PRODUCTION_LEVEL_TAG = "productionLevel";
+    // end @compat 0.11.3
 
-
+    
     /**
      * {@inheritDoc}
      */
@@ -462,6 +465,11 @@ public class ProductionType extends FreeColObject {
         unattended = xr.getAttribute(UNATTENDED_TAG, false);
 
         productionLevel = xr.getAttribute(PRODUCTION_LEVEL_TAG, (String)null);
+        // @compat 0.11.3
+        if (productionLevel == null) {
+            productionLevel = xr.getAttribute(OLD_PRODUCTION_LEVEL_TAG, (String)null);
+        }
+        // end @compat 0.11.3
     }
 
     /**

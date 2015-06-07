@@ -67,6 +67,7 @@
      0.88: Add textOption to OptionGroup.
      0.89: tileimprovement-type/s -> tile-improvement-type/s
      0.90: difficultyLevel -> difficulty-level
+     0.91: productionLevel -> production-level
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -201,11 +202,6 @@
   <xs:element name="tile-type">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="modifier"/>
-        <xs:element ref="gen"/>
-        <xs:element ref="skirmish"/>
-        <xs:element ref="resource"/>
-        <xs:element ref="production"/>
         <xs:element ref="ability"/>
         <xs:element name="disaster">
           <xs:complexType>
@@ -213,34 +209,29 @@
             <xs:attribute name="probability" type="xs:int"/>
           </xs:complexType>
         </xs:element>
+        <xs:element name="gen">
+          <xs:complexType>
+            <xs:attribute name="humidityMin" use="required" type="xs:int"/>
+            <xs:attribute name="humidityMax" use="required" type="xs:int"/>
+            <xs:attribute name="temperatureMin" use="required" type="xs:int"/>
+            <xs:attribute name="temperatureMax" use="required" type="xs:int"/>
+            <xs:attribute name="altitudeMin" use="required" type="xs:int"/>
+            <xs:attribute name="altitudeMax" use="required" type="xs:int"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="modifier"/>
+        <xs:element ref="production"/>
+        <xs:element ref="resource"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="basic-move-cost" use="required" type="xs:nonNegativeInteger"/>
       <xs:attribute name="basic-work-turns" use="required" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="is-forest" type="xs:boolean"/>
-      <xs:attribute name="is-water" type="xs:boolean"/>
-      <xs:attribute name="is-elevation" type="xs:boolean"/>
       <xs:attribute name="can-settle" type="xs:boolean"/>
       <xs:attribute name="is-connected" type="xs:boolean"/>
-      <xs:attribute name="productionLevel" type="xs:string"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="gen">
-    <xs:complexType>
-      <xs:attribute name="humidityMin" use="required" type="xs:int"/>
-      <xs:attribute name="humidityMax" use="required" type="xs:int"/>
-      <xs:attribute name="temperatureMin" use="required" type="xs:int"/>
-      <xs:attribute name="temperatureMax" use="required" type="xs:int"/>
-      <xs:attribute name="altitudeMin" use="required" type="xs:int"/>
-      <xs:attribute name="altitudeMax" use="required" type="xs:int"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="skirmish">
-    <xs:complexType>
-      <xs:attribute name="defence-factor" use="required" type="xs:int"/>
+      <xs:attribute name="is-forest" type="xs:boolean"/>
+      <xs:attribute name="is-elevation" type="xs:boolean"/>
+      <xs:attribute name="is-water" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
 
@@ -259,7 +250,10 @@
       </xs:choice>
       <xs:attribute name="delete" use="optional" type="xs:string"/>
       <xs:attribute name="unattended" type="xs:boolean"/>
+      <xs:attribute name="production-level" type="xs:string"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="productionLevel" type="xs:string"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 

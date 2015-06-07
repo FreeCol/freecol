@@ -164,13 +164,13 @@
     <tile-type id="model.tile.scrubForest" basic-move-cost="3" basic-work-turns="4" is-forest="true">
       <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
-      <production unattended="true" productionLevel="veryHigh">
+      <production unattended="true" production-level="veryHigh">
         <output goods-type="model.goods.grain" value="3"/>
       </production>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="2"/>
       </production>
-      <production unattended="true" productionLevel="veryLow">
+      <production unattended="true" production-level="veryLow">
         <output goods-type="model.goods.grain" value="1"/>
       </production>
       <production>

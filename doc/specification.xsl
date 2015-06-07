@@ -525,9 +525,9 @@
 
   <xsl:template match="production">
     <xsl:choose>
-      <xsl:when test="@productionLevel">
-        <xsl:variable name="productionLevel" select="@productionLevel"/>
-        <div class="{$productionLevel}">
+      <xsl:when test="@production-level">
+        <xsl:variable name="production-level" select="@production-level"/>
+        <div class="{$production-level}">
           <xsl:apply-templates select="input"/>
           <xsl:apply-templates select="output"/>
         </div>

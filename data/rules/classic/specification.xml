@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.90">
+<freecol-specification id="classic" version="0.91">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -425,11 +425,11 @@
       <gen humidityMin="0" humidityMax="25"
            temperatureMin="10" temperatureMax="40"
            altitudeMin="1" altitudeMax="2"/>
-      <production unattended="true" productionLevel="veryHigh">
+      <production unattended="true" production-level="veryHigh">
         <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.cotton" value="1"/>
       </production>
-      <production unattended="true" productionLevel="veryLow">
+      <production unattended="true" production-level="veryLow">
         <output goods-type="model.goods.grain" value="1"/>
         <output goods-type="model.goods.cotton" value="1"/>
       </production>
@@ -651,11 +651,11 @@
            altitudeMin="1" altitudeMax="2"/>
       <modifier id="model.modifier.defence"
                 type="percentage" value="50" index="50"/>
-      <production unattended="true" productionLevel="veryHigh">
+      <production unattended="true" production-level="veryHigh">
         <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.furs" value="2"/>
       </production>
-      <production unattended="true" productionLevel="veryLow">
+      <production unattended="true" production-level="veryLow">
         <output goods-type="model.goods.grain" value="1"/>
         <output goods-type="model.goods.furs" value="2"/>
       </production>
@@ -755,10 +755,10 @@
       <gen humidityMin="0" humidityMax="100"
            temperatureMin="-20" temperatureMax="0"
            altitudeMin="1" altitudeMax="3"/>
-      <production unattended="true" productionLevel="veryHigh">
+      <production unattended="true" production-level="veryHigh">
         <output goods-type="model.goods.grain" value="2"/>
       </production>
-      <production unattended="true" productionLevel="high">
+      <production unattended="true" production-level="high">
         <output goods-type="model.goods.grain" value="1"/>
       </production>
       <disaster id="model.disaster.blizzard" probability="100"/>
