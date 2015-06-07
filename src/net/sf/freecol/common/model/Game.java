@@ -506,6 +506,18 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Get live players in the game, optionally excluding supplied ones.
+     *
+     * @param players The <code>Player</code>s to exclude.
+     * @return A list of live <code>Player</code>s, with exclusions.
+     */
+    public List<Player> getOtherLivePlayers(Player... players) {
+        List<Player> result = getLivePlayers(null);
+        for (Player other : players) result.remove(other);
+        return result;
+    }
+
+    /**
      * Get the live European players in this game.
      *
      * @param other An optional <code>Player</code> to omit.

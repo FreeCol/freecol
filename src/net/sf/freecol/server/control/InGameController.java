@@ -254,7 +254,7 @@ public final class InGameController extends Controller {
                              ServerPlayer other, boolean symmetric) {
         ChangeSet cs = new ChangeSet();
         if (serverPlayer.csChangeStance(stance, other, symmetric, cs)) {
-            sendToAll(cs);
+            getGame().sendToAll(cs);
         }
     }
 
@@ -272,7 +272,7 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps().always(owner), colony.getOwnedTiles());
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         owner.invalidateCanSeeTiles();//+vis(owner)
-        sendToAll(cs);
+        getGame().sendToAll(cs);
     }
 
     /**
@@ -289,7 +289,7 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps().always(owner), unit.getTile());
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         owner.invalidateCanSeeTiles();//+vis(owner)
-        sendToAll(cs);
+        getGame().sendToAll(cs);
     }
 
     /**
@@ -313,7 +313,7 @@ public final class InGameController extends Controller {
             for (ModelMessage message : messages) {
                 cs.addMessage(See.all(), message);
             }
-            sendToAll(cs);
+            getGame().sendToAll(cs);
         }
         return messages.size();
     }
@@ -497,62 +497,6 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Get a list of all live server players, optionally excluding
-     * supplied ones.
-     *
-     * @param serverPlayers The <code>ServerPlayer</code>s to exclude.
-     * @return A list of all connected server players, with exclusions.
-     */
-    private List<ServerPlayer> getOtherLivePlayers(ServerPlayer... serverPlayers) {
-        List<ServerPlayer> result = new ArrayList<>();
-        outer: for (Player otherPlayer : getGame().getLivePlayers(null)) {
-            ServerPlayer enemyPlayer = (ServerPlayer)otherPlayer;
-            if (!enemyPlayer.isConnected()) continue;
-            for (ServerPlayer exclude : serverPlayers) {
-                if (enemyPlayer == exclude) continue outer;
-            }
-            result.add(enemyPlayer);
-        }
-        return result;
-    }
-
-    /**
-     * Send a set of changes to all live players, and optional extras.
-     *
-     * @param serverPlayers Optional extra <code>ServerPlayer</code>s
-     *     to include (useful when a player dies).
-     * @param cs The <code>ChangeSet</code> to send.
-     */
-    private void sendToAll(ChangeSet cs, ServerPlayer... serverPlayers) {
-        List<ServerPlayer> live = getOtherLivePlayers();
-        for (ServerPlayer sp : serverPlayers) {
-            if (!live.contains(sp)) live.add(sp);
-        }
-        sendToList(live, cs);
-    }
-    
-
-    /**
-     * Send an update to all players except one.
-     *
-     * @param serverPlayer A <code>ServerPlayer</code> to exclude.
-     * @param cs The <code>ChangeSet</code> encapsulating the update.
-     */
-    private void sendToOthers(ServerPlayer serverPlayer, ChangeSet cs) {
-        sendToList(getOtherLivePlayers(serverPlayer), cs);
-    }
-
-    /**
-     * Send an update to a list of players.
-     *
-     * @param serverPlayers The <code>ServerPlayer</code>s to send to.
-     * @param cs The <code>ChangeSet</code> encapsulating the update.
-     */
-    private void sendToList(List<ServerPlayer> serverPlayers, ChangeSet cs) {
-        for (ServerPlayer s : serverPlayers) s.send(cs);
-    }
-
-    /**
      * Visits a native settlement, possibly scouting it full if it is
      * as a result of a scout actually asking to speak to the chief,
      * or for other settlement-contacting events such as missionary
@@ -569,7 +513,7 @@ public final class InGameController extends Controller {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csVisit(ServerPlayer serverPlayer, IndianSettlement is,
-                            int scout, ChangeSet cs) {
+                         int scout, ChangeSet cs) {
         final ServerPlayer owner = (ServerPlayer)is.getOwner();
         if (serverPlayer.csContact(owner, cs)) {
             serverPlayer.csNativeFirstContact(owner, null, cs);
@@ -616,7 +560,7 @@ public final class InGameController extends Controller {
             if (game.isNextPlayerInNewTurn()) {
                 ChangeSet next = new ChangeSet();
                 game.csNextTurn(next);
-                sendToAll(next);
+                game.sendToAll(next);
 
                 LogBuilder lb = new LogBuilder(512);
                 lb.add("New turn ", game.getTurn(), " for ");
@@ -644,7 +588,7 @@ public final class InGameController extends Controller {
                 player.csWithdraw(cs);
                 logger.info("For " + serverPlayer.getSuffix()
                     + ", " + player.getNation() + " is dead.");
-                sendToAll(cs, player);
+                game.sendToAll(cs, player);
                 continue;
             case ServerPlayer.IS_ALIVE:
                 if (player.isREF() && player.checkForREFDefeat()) {
@@ -653,7 +597,7 @@ public final class InGameController extends Controller {
                     }
                     player.csWithdraw(cs);
                     logger.info(player.getNation() + " is defeated.");
-                    sendToAll(cs, player);
+                    game.sendToAll(cs, player);
                     continue;
                 }
                 break;
@@ -665,8 +609,8 @@ public final class InGameController extends Controller {
             // FIXME: see if this can be relaxed so we can run large
             // AI-only simulations.
             boolean human = false;
-            for (Player p : game.getLivePlayers(null)) {
-                if (!p.isAI() && ((ServerPlayer)p).isConnected()) {
+            for (ServerPlayer sp : game.getConnectedPlayers()) {
+                if (!sp.isAI()) {
                     human = true;
                     break;
                 }
@@ -680,7 +624,7 @@ public final class InGameController extends Controller {
 
                 cs.addTrivial(See.all(), "gameEnded",
                               ChangePriority.CHANGE_NORMAL);
-                sendToOthers(serverPlayer, cs);
+                game.sendToOthers(serverPlayer, cs);
                 return cs.build(serverPlayer);
             }
 
@@ -705,7 +649,7 @@ public final class InGameController extends Controller {
                 // If the teleportREF option is enabled, teleport it in.
                 REFAIPlayer refAIPlayer = (REFAIPlayer)freeColServer
                     .getAIPlayer(player);
-                boolean teleport = getGame().getSpecification()
+                boolean teleport = game.getSpecification()
                     .getBoolean(GameOptions.TELEPORT_REF);
                 if (refAIPlayer.initialize(teleport)) {
                     csLaunchREF(player, teleport, cs);
@@ -753,11 +697,12 @@ public final class InGameController extends Controller {
                 && freeColServer.isSinglePlayer()
                 && debugOnlyAITurns > 0;
             if (debugSkip) {
-                sendToOthers(player, cs);
+                game.sendToOthers(player, cs);
                 player.send(cs);
                 continue;
             }
-            sendToList(getOtherLivePlayers(player, serverPlayer), cs);
+            game.sendToList(game.getConnectedPlayers(player, serverPlayer),
+                            cs);
             if (player != serverPlayer) player.send(cs);
             return cs.build(serverPlayer);
         }
@@ -1113,7 +1058,7 @@ public final class InGameController extends Controller {
         boolean highScore = HighScore.newHighScore(serverPlayer);
         ChangeSet cs = new ChangeSet();
         serverPlayer.csWithdraw(cs); // Clean up the player.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         cs.addAttribute(See.only(serverPlayer),
                         "highScore", Boolean.toString(highScore));
         return cs.build(serverPlayer);
@@ -1196,7 +1141,7 @@ public final class InGameController extends Controller {
         unit.dispose();
 
         // Others can see the cash in message.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -1347,7 +1292,7 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer), serverPlayer);
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -1371,7 +1316,7 @@ public final class InGameController extends Controller {
         cs.addPartial(See.all(), fcgo, "name");
 
         // Others may be able to see the name change.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -1652,7 +1597,7 @@ public final class InGameController extends Controller {
                         Tile newTile) {
         ChangeSet cs = new ChangeSet();
         unit.csMove(newTile, random, cs);
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -1670,7 +1615,7 @@ public final class InGameController extends Controller {
         // Others might see rumour disappear
         ChangeSet cs = new ChangeSet();
         cs.add(See.perhaps(), tile);
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -1717,7 +1662,7 @@ public final class InGameController extends Controller {
         cs.addRegion(serverPlayer, unit, region, name);
 
         // Others do find out about region name changes.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -1819,7 +1764,7 @@ public final class InGameController extends Controller {
                 + " to=" + destination.getId());
         }
 
-        if (others) sendToOthers(serverPlayer, cs);
+        if (others) getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -1848,7 +1793,7 @@ public final class InGameController extends Controller {
         serverUnit.csEmbark(carrier, cs);
 
         // Others might see the unit disappear, or the carrier capacity.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -1886,7 +1831,7 @@ public final class InGameController extends Controller {
         }
 
         // Others can (potentially) see the location.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -1911,7 +1856,7 @@ public final class InGameController extends Controller {
             logger.log(Level.WARNING, "Combat FAIL", e);
             return DOMMessage.clientError(e.getMessage());
         }
-        sendToOthers(attackerPlayer, cs);
+        getGame().sendToOthers(attackerPlayer, cs);
         return cs.build(attackerPlayer);
     }
 
@@ -1996,7 +1941,7 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer), tile);
 
         // Others always see the unit, it may have died or been taught.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -2194,7 +2139,7 @@ public final class InGameController extends Controller {
 
         // Other players may be able to see unit disappearing, or
         // learning.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -2256,7 +2201,7 @@ public final class InGameController extends Controller {
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Others can see missionary disappear
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -2308,7 +2253,7 @@ public final class InGameController extends Controller {
 
         // Others can see missionary disappear and settlement acquire
         // mission.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -2373,7 +2318,7 @@ public final class InGameController extends Controller {
         }
 
         // Others might include enemy.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -2484,7 +2429,7 @@ public final class InGameController extends Controller {
                       + " at " + settlement.getName() + " for " + amount);
 
         // Others can see the unit capacity.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -2540,7 +2485,7 @@ public final class InGameController extends Controller {
                       + " at " + settlement.getName() + " for " + amount);
 
         // Others can see the unit capacity.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -2599,7 +2544,7 @@ public final class InGameController extends Controller {
                     + " to settlement: " + settlement.getName());
 
         // Others can see unit capacity, receiver gets it own items.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -2693,7 +2638,7 @@ public final class InGameController extends Controller {
                 + " " + goodsType.getSuffix() + " to " + carrier.getLocation());
             cs.add(See.perhaps(), (FreeColGameObject)carrier.getLocation());
             // Others might see a capacity change.
-            sendToOthers(serverPlayer, cs);
+            getGame().sendToOthers(serverPlayer, cs);
         }
         return cs.build(serverPlayer);
     }
@@ -2755,7 +2700,7 @@ public final class InGameController extends Controller {
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Others can see the unit removal and the space it leaves.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -2772,7 +2717,7 @@ public final class InGameController extends Controller {
      */
     public Element buildSettlement(ServerPlayer serverPlayer, Unit unit,
                                    String name) {
-        final Game game = serverPlayer.getGame();
+        final ServerGame game = getGame();
         final Specification spec = game.getSpecification();
         ChangeSet cs = new ChangeSet();
 
@@ -2802,7 +2747,7 @@ public final class InGameController extends Controller {
             settlement.equipForRole(unit, spec.getDefaultRole(), 0);
 
             // Coronado
-            for (ServerPlayer sp : getOtherLivePlayers(serverPlayer)) {
+            for (ServerPlayer sp : game.getConnectedPlayers(serverPlayer)) {
                 if (!sp.hasAbility(Ability.SEE_ALL_COLONIES)) continue;
                 cs.add(See.only(sp), sp.exploreForSettlement(settlement));//-vis(sp)
                 sp.invalidateCanSeeTiles();//+vis(sp)
@@ -2850,7 +2795,7 @@ public final class InGameController extends Controller {
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Others can see tile changes.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -2884,7 +2829,7 @@ public final class InGameController extends Controller {
         }
 
         // Others might see a tile ownership change.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -2913,7 +2858,7 @@ public final class InGameController extends Controller {
         serverPlayer.csDisposeSettlement(settlement, cs);//+vis
 
         // FIXME: Player.settlements is still being fixed on the client side.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -2935,7 +2880,7 @@ public final class InGameController extends Controller {
 
         if (settlement != null && serverPlayer.isEuropean()) {
             // Define Coronado to make all colony-owned tiles visible
-            for (ServerPlayer sp : getOtherLivePlayers(serverPlayer)) {
+            for (ServerPlayer sp : getGame().getConnectedPlayers(serverPlayer)) {
                 if (sp.isEuropean()
                     && sp.hasAbility(Ability.SEE_ALL_COLONIES)) {
                     sp.exploreTile(tile);
@@ -2946,7 +2891,7 @@ public final class InGameController extends Controller {
         }
 
         // Others can see the tile.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -3163,7 +3108,7 @@ public final class InGameController extends Controller {
             other.addMissionBan(serverPlayer);
         }
 
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -3199,7 +3144,7 @@ public final class InGameController extends Controller {
             agreement.setStatus(TradeStatus.ACCEPT_TRADE);
             if (csAcceptTrade(agreement, session, cs)) {
                 session.complete(cs);
-                sendToOthers(serverPlayer, cs);
+                getGame().sendToOthers(serverPlayer, cs);
                 return false;
             }
             // Trade was invalid, fall through into rejection.
@@ -3207,7 +3152,7 @@ public final class InGameController extends Controller {
             agreement = session.getAgreement();
             agreement.setStatus(TradeStatus.REJECT_TRADE);
             session.complete(cs);
-            sendToOthers(serverPlayer, cs);
+            getGame().sendToOthers(serverPlayer, cs);
             return false;
         }
 
@@ -3234,7 +3179,7 @@ public final class InGameController extends Controller {
             agreement.setStatus(TradeStatus.ACCEPT_TRADE);
             if (csAcceptTrade(agreement, session, cs)) {
                 session.complete(cs);
-                sendToOthers(serverPlayer, cs);
+                getGame().sendToOthers(serverPlayer, cs);
                 break;
             }
             // Trade was invalid, fall through into rejection.
@@ -3242,7 +3187,7 @@ public final class InGameController extends Controller {
             agreement.setStatus(TradeStatus.REJECT_TRADE);
             session.setAgreement(agreement);
             session.complete(cs);
-            sendToOthers(serverPlayer, cs);
+            getGame().sendToOthers(serverPlayer, cs);
             break;
         }
         return true;
@@ -3479,7 +3424,7 @@ public final class InGameController extends Controller {
         unit.setLocation(workLocation);//-vis: safe/colony,-til if not in colony
         cs.add(See.perhaps(), colony.getTile());
         // Others can see colony change size
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -3529,7 +3474,7 @@ public final class InGameController extends Controller {
             // Others can see cargo capacity change.
             session.complete(cs);
             cs.add(See.perhaps(), winner);
-            sendToOthers(serverPlayer, cs);
+            getGame().sendToOthers(serverPlayer, cs);
         }
         return cs.build(serverPlayer);
     }
@@ -3723,7 +3668,7 @@ public final class InGameController extends Controller {
             }
         }
 
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -3926,7 +3871,7 @@ public final class InGameController extends Controller {
         }
 
         // Others might be able to see the unit.
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 
@@ -4117,7 +4062,7 @@ public final class InGameController extends Controller {
      */
     public Element chat(ServerPlayer serverPlayer, String message,
                         boolean pri) {
-        sendToOthers(serverPlayer, new ChangeSet()
+        getGame().sendToOthers(serverPlayer, new ChangeSet()
             .add(See.all().except(serverPlayer),
                  ChangeSet.ChangePriority.CHANGE_NORMAL,
                  new ChatMessage(serverPlayer, message, false)));
@@ -4215,7 +4160,7 @@ public final class InGameController extends Controller {
         // and possibly see the units.
         cs.add(See.all(), serverPlayer);
         cs.add(See.perhaps(), start);
-        sendToOthers(serverPlayer, cs);
+        getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
     }
 

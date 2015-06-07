@@ -106,6 +106,62 @@ public class ServerGame extends Game implements ServerModelObject {
         readFromXML(xr);
     }
 
+
+    /**
+     * Get a list of connected server players, optionally excluding
+     * supplied ones.
+     *
+     * @param serverPlayers The <code>ServerPlayer</code>s to exclude.
+     * @return A list of all connected server players, with exclusions.
+     */
+    public List<ServerPlayer> getConnectedPlayers(ServerPlayer... serverPlayers) {
+        List<ServerPlayer> result = new ArrayList<>();
+        outer: for (Player otherPlayer : getLivePlayers(null)) {
+            ServerPlayer enemyPlayer = (ServerPlayer)otherPlayer;
+            if (!enemyPlayer.isConnected()) continue;
+            for (ServerPlayer exclude : serverPlayers) {
+                if (enemyPlayer == exclude) continue outer;
+            }
+            result.add(enemyPlayer);
+        }
+        return result;
+    }
+
+    /**
+     * Send a change set to all live players, and optional extras.
+     *
+     * @param cs The <code>ChangeSet</code> to send.
+     * @param serverPlayers Optional extra <code>ServerPlayer</code>s
+     *     to include (useful when a player dies).
+     */
+    public void sendToAll(ChangeSet cs, ServerPlayer... serverPlayers) {
+        List<ServerPlayer> live = getConnectedPlayers();
+        for (ServerPlayer sp : serverPlayers) {
+            if (!live.contains(sp)) live.add(sp);
+        }
+        sendToList(live, cs);
+    }
+    
+    /**
+     * Send a change set to all players, optionally excluding one.
+     *
+     * @param serverPlayer A <code>ServerPlayer</code> to exclude.
+     * @param cs The <code>ChangeSet</code> encapsulating the update.
+     */
+    public void sendToOthers(ServerPlayer serverPlayer, ChangeSet cs) {
+        sendToList(getConnectedPlayers(serverPlayer), cs);
+    }
+
+    /**
+     * Send a change set to a list of players.
+     *
+     * @param serverPlayers The list of <code>ServerPlayer</code>s to send to.
+     */
+    public void sendToList(List<ServerPlayer> serverPlayers, ChangeSet cs) {
+        for (ServerPlayer s : serverPlayers) s.send(cs);
+    }
+    
+
     /**
      * Makes a trivial server object in this game given a server object tag
      * and an identifier.
