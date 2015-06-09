@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.91">
+<freecol-specification id="classic" version="0.92">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -270,19 +270,19 @@
        Parent options: ref, name, basic-move-cost, basic-work-turns
        Children:
        - gen
-         - humidityMin, humidityMax,
+         - humidity-minimum, humidity-maximum,
            - humidity is a percentage of water vapor saturation (0 is
              absolute dryness, 100 is total saturation)
-         - temperatureMin, temperatureMax,
+         - temperature-minimum, temperature-maximum,
            - temperature in degrees Celsius (from -20 to +40; 0 being the
              water freezing point)
-         - altitudeMin, altitudeMax,
+         - altitude-minimum, altitude-maximum,
            - altitude (values of -3 to 3)
              - land (values 1 to 3), less negative numbers have a higher
                chance of appearing near shore
              - water (values -3 to -1), more negative numbers have a
                higher chance of appearing further from shore
-         - latitudeMin, latitudeMax
+         - latitude-minimum, latitude-maximum
            - undefined (default = "0,0")
        - production if any must have the following structure:
          <production [unattended="<boolean>"] [productionLevel="<level>"]>
@@ -296,9 +296,9 @@
   <tile-types>
     <tile-type id="model.tile.plains"
                basic-move-cost="3" basic-work-turns="3">
-      <gen humidityMin="0" humidityMax="60"
-           temperatureMin="0" temperatureMax="15"
-           altitudeMin="1" altitudeMax="2"/>
+      <gen humidity-minimum="0" humidity-maximum="60"
+           temperature-minimum="0" temperature-maximum="15"
+           altitude-minimum="1" altitude-maximum="2"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="5"/>
         <output goods-type="model.goods.cotton" value="2"/>
@@ -317,9 +317,9 @@
     </tile-type>
     <tile-type id="model.tile.grassland"
                basic-move-cost="3" basic-work-turns="3">
-      <gen humidityMin="25" humidityMax="70"
-           temperatureMin="10" temperatureMax="25"
-           altitudeMin="1" altitudeMax="1"/>
+      <gen humidity-minimum="25" humidity-maximum="70"
+           temperature-minimum="10" temperature-maximum="25"
+           altitude-minimum="1" altitude-maximum="1"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.tobacco" value="3"/>
@@ -334,9 +334,9 @@
     </tile-type>
     <tile-type id="model.tile.prairie"
                basic-move-cost="3" basic-work-turns="3">
-      <gen humidityMin="20" humidityMax="50"
-           temperatureMin="15" temperatureMax="30"
-           altitudeMin="1" altitudeMax="1"/>
+      <gen humidity-minimum="20" humidity-maximum="50"
+           temperature-minimum="15" temperature-maximum="30"
+           altitude-minimum="1" altitude-maximum="1"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.cotton" value="3"/>
@@ -352,9 +352,9 @@
     </tile-type>
     <tile-type id="model.tile.savannah"
                basic-move-cost="3" basic-work-turns="3">
-      <gen humidityMin="25" humidityMax="70"
-           temperatureMin="30" temperatureMax="40"
-           altitudeMin="1" altitudeMax="1"/>
+      <gen humidity-minimum="25" humidity-maximum="70"
+           temperature-minimum="30" temperature-maximum="40"
+           altitude-minimum="1" altitude-maximum="1"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="4"/>
         <output goods-type="model.goods.sugar" value="3"/>
@@ -369,9 +369,9 @@
     </tile-type>
     <tile-type id="model.tile.marsh"
                basic-move-cost="6" basic-work-turns="5">
-      <gen humidityMin="50" humidityMax="100"
-           temperatureMin="5" temperatureMax="15"
-           altitudeMin="2" altitudeMax="2"/>
+      <gen humidity-minimum="50" humidity-maximum="100"
+           temperature-minimum="5" temperature-maximum="15"
+           altitude-minimum="2" altitude-maximum="2"/>
       <modifier id="model.modifier.defence"
                 type="percentage" value="25" index="50"/>
       <production unattended="true">
@@ -395,9 +395,9 @@
     </tile-type>
     <tile-type id="model.tile.swamp"
                basic-move-cost="6" basic-work-turns="7">
-      <gen humidityMin="50" humidityMax="100"
-           temperatureMin="10" temperatureMax="40"
-           altitudeMin="1" altitudeMax="1"/>
+      <gen humidity-minimum="50" humidity-maximum="100"
+           temperature-minimum="10" temperature-maximum="40"
+           altitude-minimum="1" altitude-maximum="1"/>
       <modifier id="model.modifier.defence"
                 type="percentage" value="25" index="50"/>
       <production unattended="true">
@@ -422,9 +422,9 @@
     </tile-type>
     <tile-type id="model.tile.desert"
                basic-move-cost="3" basic-work-turns="3">
-      <gen humidityMin="0" humidityMax="25"
-           temperatureMin="10" temperatureMax="40"
-           altitudeMin="1" altitudeMax="2"/>
+      <gen humidity-minimum="0" humidity-maximum="25"
+           temperature-minimum="10" temperature-maximum="40"
+           altitude-minimum="1" altitude-maximum="2"/>
       <production unattended="true" production-level="veryHigh">
         <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.cotton" value="1"/>
@@ -452,9 +452,9 @@
     </tile-type>
     <tile-type id="model.tile.tundra"
                basic-move-cost="3" basic-work-turns="4">
-      <gen humidityMin="0" humidityMax="100"
-           temperatureMin="-5" temperatureMax="5"
-           altitudeMin="1" altitudeMax="3"/>
+      <gen humidity-minimum="0" humidity-maximum="100"
+           temperature-minimum="-5" temperature-maximum="5"
+           altitude-minimum="1" altitude-maximum="3"/>
       <production unattended="true">
         <output goods-type="model.goods.grain" value="3"/>
         <output goods-type="model.goods.ore" value="2"/>
@@ -475,9 +475,9 @@
     </tile-type>
     <tile-type id="model.tile.mixedForest"
                basic-move-cost="6" basic-work-turns="4" is-forest="true">
-      <gen humidityMin="0" humidityMax="60"
-           temperatureMin="0" temperatureMax="15"
-           altitudeMin="1" altitudeMax="2"/>
+      <gen humidity-minimum="0" humidity-maximum="60"
+           temperature-minimum="0" temperature-maximum="15"
+           altitude-minimum="1" altitude-maximum="2"/>
       <modifier id="model.modifier.defence"
                 type="percentage" value="50" index="50"/>
       <production unattended="true">
@@ -502,9 +502,9 @@
     </tile-type>
     <tile-type id="model.tile.coniferForest"
                basic-move-cost="6" basic-work-turns="4" is-forest="true">
-      <gen humidityMin="25" humidityMax="70"
-           temperatureMin="10" temperatureMax="25"
-           altitudeMin="1" altitudeMax="1"/>
+      <gen humidity-minimum="25" humidity-maximum="70"
+           temperature-minimum="10" temperature-maximum="25"
+           altitude-minimum="1" altitude-maximum="1"/>
       <modifier id="model.modifier.defence"
                 type="percentage" value="50" index="50"/>
       <production unattended="true">
@@ -528,9 +528,9 @@
     </tile-type>
     <tile-type id="model.tile.broadleafForest"
                basic-move-cost="6" basic-work-turns="4" is-forest="true">
-      <gen humidityMin="20" humidityMax="50"
-           temperatureMin="15" temperatureMax="30"
-           altitudeMin="1" altitudeMax="1"/>
+      <gen humidity-minimum="20" humidity-maximum="50"
+           temperature-minimum="15" temperature-maximum="30"
+           altitude-minimum="1" altitude-maximum="1"/>
       <modifier id="model.modifier.defence"
                 type="percentage" value="50" index="50"/>
       <production unattended="true">
@@ -554,9 +554,9 @@
     </tile-type>
     <tile-type id="model.tile.tropicalForest"
                basic-move-cost="6" basic-work-turns="6" is-forest="true">
-      <gen humidityMin="25" humidityMax="70"
-           temperatureMin="30" temperatureMax="40"
-           altitudeMin="1" altitudeMax="1"/>
+      <gen humidity-minimum="25" humidity-maximum="70"
+           temperature-minimum="30" temperature-maximum="40"
+           altitude-minimum="1" altitude-maximum="1"/>
       <modifier id="model.modifier.defence"
                 type="percentage" value="50" index="50"/>
       <production unattended="true">
@@ -581,9 +581,9 @@
     </tile-type>
     <tile-type id="model.tile.wetlandForest"
                basic-move-cost="9" basic-work-turns="6" is-forest="true">
-      <gen humidityMin="50" humidityMax="100"
-           temperatureMin="5" temperatureMax="15"
-           altitudeMin="2" altitudeMax="2"/>
+      <gen humidity-minimum="50" humidity-maximum="100"
+           temperature-minimum="5" temperature-maximum="15"
+           altitude-minimum="2" altitude-maximum="2"/>
       <modifier id="model.modifier.defence"
                 type="percentage" value="50" index="50"/>
       <production unattended="true">
@@ -613,9 +613,9 @@
     </tile-type>
     <tile-type id="model.tile.rainForest"
                basic-move-cost="9" basic-work-turns="7" is-forest="true">
-      <gen humidityMin="50" humidityMax="100"
-           temperatureMin="10" temperatureMax="40"
-           altitudeMin="1" altitudeMax="1"/>
+      <gen humidity-minimum="50" humidity-maximum="100"
+           temperature-minimum="10" temperature-maximum="40"
+           altitude-minimum="1" altitude-maximum="1"/>
       <modifier id="model.modifier.defence"
                 type="percentage" value="75" index="50"/>
       <production unattended="true">
@@ -646,9 +646,9 @@
     </tile-type>
     <tile-type id="model.tile.scrubForest"
                basic-move-cost="3" basic-work-turns="4" is-forest="true">
-      <gen humidityMin="0" humidityMax="25"
-           temperatureMin="10" temperatureMax="40"
-           altitudeMin="1" altitudeMax="2"/>
+      <gen humidity-minimum="0" humidity-maximum="25"
+           temperature-minimum="10" temperature-maximum="40"
+           altitude-minimum="1" altitude-maximum="2"/>
       <modifier id="model.modifier.defence"
                 type="percentage" value="50" index="50"/>
       <production unattended="true" production-level="veryHigh">
@@ -685,9 +685,9 @@
     </tile-type>
     <tile-type id="model.tile.borealForest"
                basic-move-cost="6" basic-work-turns="4" is-forest="true">
-      <gen humidityMin="0" humidityMax="100"
-           temperatureMin="-5" temperatureMax="5"
-           altitudeMin="1" altitudeMax="3"/>
+      <gen humidity-minimum="0" humidity-maximum="100"
+           temperature-minimum="-5" temperature-maximum="5"
+           altitude-minimum="1" altitude-maximum="3"/>
       <modifier id="model.modifier.defence"
                 type="percentage" value="50" index="50"/>
       <production unattended="true">
@@ -711,9 +711,9 @@
     </tile-type>
     <tile-type id="model.tile.hills"
                basic-move-cost="6" basic-work-turns="4" is-elevation="true">
-      <gen humidityMin="0" humidityMax="100"
-           temperatureMin="-20" temperatureMax="40"
-           altitudeMin="2" altitudeMax="3"/>
+      <gen humidity-minimum="0" humidity-maximum="100"
+           temperature-minimum="-20" temperature-maximum="40"
+           altitude-minimum="2" altitude-maximum="3"/>
       <modifier id="model.modifier.defence"
                 type="percentage" value="100" index="50"/>
       <production unattended="true">
@@ -734,9 +734,9 @@
     <tile-type id="model.tile.mountains"
                basic-move-cost="9" basic-work-turns="7"
                is-elevation="true" can-settle="false">
-      <gen humidityMin="0" humidityMax="100"
-           temperatureMin="-20" temperatureMax="40"
-           altitudeMin="3" altitudeMax="3"/>
+      <gen humidity-minimum="0" humidity-maximum="100"
+           temperature-minimum="-20" temperature-maximum="40"
+           altitude-minimum="3" altitude-maximum="3"/>
       <modifier id="model.modifier.defence"
                 type="percentage" value="150" index="50"/>
       <production>
@@ -752,9 +752,9 @@
     </tile-type>
     <tile-type id="model.tile.arctic"
                basic-move-cost="6" basic-work-turns="4">
-      <gen humidityMin="0" humidityMax="100"
-           temperatureMin="-20" temperatureMax="0"
-           altitudeMin="1" altitudeMax="3"/>
+      <gen humidity-minimum="0" humidity-maximum="100"
+           temperature-minimum="-20" temperature-maximum="0"
+           altitude-minimum="1" altitude-maximum="3"/>
       <production unattended="true" production-level="veryHigh">
         <output goods-type="model.goods.grain" value="2"/>
       </production>
@@ -766,9 +766,9 @@
     <tile-type id="model.tile.ocean"
                basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="true">
-      <gen humidityMin="0" humidityMax="100"
-           temperatureMin="-20" temperatureMax="40"
-           altitudeMin="-2" altitudeMax="-1"/>
+      <gen humidity-minimum="0" humidity-maximum="100"
+           temperature-minimum="-20" temperature-maximum="40"
+           altitude-minimum="-2" altitude-maximum="-1"/>
       <production>
         <output goods-type="model.goods.fish" value="2"/>
       </production>
@@ -778,8 +778,8 @@
     <tile-type id="model.tile.lake"
                basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="false">
-      <gen humidityMin="0" humidityMax="100"
-           temperatureMin="-20" temperatureMax="40"
+      <gen humidity-minimum="0" humidity-maximum="100"
+           temperature-minimum="-20" temperature-maximum="40"
            altitudeMin="-2" altitudeMax="-1"/>
       <production>
         <output goods-type="model.goods.fish" value="2"/>
@@ -790,8 +790,8 @@
     <tile-type id="model.tile.highSeas"
                basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false" is-connected="true">
-      <gen humidityMin="0" humidityMax="100"
-           temperatureMin="-20" temperatureMax="40"
+      <gen humidity-minimum="0" humidity-maximum="100"
+           temperature-minimum="-20" temperatureMax="40"
            altitudeMin="-3" altitudeMax="-2"/>
       <production>
         <output goods-type="model.goods.fish" value="2"/>
@@ -801,7 +801,7 @@
     <tile-type id="model.tile.greatRiver"
                basic-move-cost="3" basic-work-turns="4" is-water="true"
                can-settle="false">
-      <gen humidityMin="0" humidityMax="100"
+      <gen humidity-minimum="0" humidity-maximum="100"
            temperatureMin="-20" temperatureMax="40"
            altitudeMin="-3" altitudeMax="-2" />
       <production>

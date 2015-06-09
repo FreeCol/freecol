@@ -68,6 +68,7 @@
      0.89: tileimprovement-type/s -> tile-improvement-type/s
      0.90: difficultyLevel -> difficulty-level
      0.91: productionLevel -> production-level
+     0.92: Fix capitalization in tile-type/gen/*.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -211,12 +212,22 @@
         </xs:element>
         <xs:element name="gen">
           <xs:complexType>
-            <xs:attribute name="humidityMin" use="required" type="xs:int"/>
-            <xs:attribute name="humidityMax" use="required" type="xs:int"/>
-            <xs:attribute name="temperatureMin" use="required" type="xs:int"/>
-            <xs:attribute name="temperatureMax" use="required" type="xs:int"/>
-            <xs:attribute name="altitudeMin" use="required" type="xs:int"/>
-            <xs:attribute name="altitudeMax" use="required" type="xs:int"/>
+            <xs:attribute name="humidity-minimum" use="optional" type="xs:int"/>
+            <xs:attribute name="humidity-maximum" use="optional" type="xs:int"/>
+            <xs:attribute name="temperature-minimum" use="optional" type="xs:int"/>
+            <xs:attribute name="temperature-maximum" use="optional" type="xs:int"/>
+            <xs:attribute name="altitude-minimum" use="optional" type="xs:int"/>
+            <xs:attribute name="altitude-maximum" use="optional" type="xs:int"/>
+            <!-- @compat 0.11.3
+                 When this goes away, make the above attributes "required".
+            -->
+            <xs:attribute name="humidityMin" use="optional" type="xs:int"/>
+            <xs:attribute name="humidityMax" use="optional" type="xs:int"/>
+            <xs:attribute name="temperatureMin" use="optional" type="xs:int"/>
+            <xs:attribute name="temperatureMax" use="optional" type="xs:int"/>
+            <xs:attribute name="altitudeMin" use="optional" type="xs:int"/>
+            <xs:attribute name="altitudeMax" use="optional" type="xs:int"/>
+            <!-- end @compat 0.11.3 -->
           </xs:complexType>
         </xs:element>
         <xs:element ref="modifier"/>

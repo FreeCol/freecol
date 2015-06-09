@@ -404,16 +404,16 @@ public final class TileType extends FreeColGameObjectType {
 
     // Serialization
 
-    private static final String ALTITUDE_MIN_TAG = "altitudeMin";
-    private static final String ALTITUDE_MAX_TAG = "altitudeMax";
+    private static final String ALTITUDE_MIN_TAG = "altitude-minimum";
+    private static final String ALTITUDE_MAX_TAG = "altitude-maximum";
     private static final String BASIC_MOVE_COST_TAG = "basic-move-cost";
     private static final String BASIC_WORK_TURNS_TAG = "basic-work-turns";
     private static final String CAN_SETTLE_TAG = "can-settle";
     private static final String DISASTER_TAG = "disaster";
     private static final String GEN_TAG = "gen";
     private static final String GOODS_TYPE_TAG = "goods-type";
-    private static final String HUMIDITY_MIN_TAG = "humidityMin";
-    private static final String HUMIDITY_MAX_TAG = "humidityMax";
+    private static final String HUMIDITY_MIN_TAG = "humidity-minimum";
+    private static final String HUMIDITY_MAX_TAG = "humidity-maximum";
     private static final String IS_CONNECTED_TAG = "is-connected";
     private static final String IS_ELEVATION_TAG = "is-elevation";
     private static final String IS_FOREST_TAG = "is-forest";
@@ -421,14 +421,22 @@ public final class TileType extends FreeColGameObjectType {
     private static final String PROBABILITY_TAG = "probability";
     private static final String PRODUCTION_TAG = "production";
     private static final String RESOURCE_TAG = "resource";
-    private static final String TEMPERATURE_MIN_TAG = "temperatureMin";
-    private static final String TEMPERATURE_MAX_TAG = "temperatureMax";
+    private static final String TEMPERATURE_MIN_TAG = "temperature-minimum";
+    private static final String TEMPERATURE_MAX_TAG = "temperature-maximum";
     private static final String TYPE_TAG = "type";
     // @compat 0.10.x
     private static final String PRIMARY_PRODUCTION_TAG = "primary-production";
     private static final String SECONDARY_PRODUCTION_TAG = "secondary-production";
     private static final String TILE_PRODUCTION_TAG = "tile-production";
     // end @compat 0.10.x
+    // @compat 0.11.3
+    private static final String OLD_ALTITUDE_MIN_TAG = "altitudeMin";
+    private static final String OLD_ALTITUDE_MAX_TAG = "altitudeMax";
+    private static final String OLD_HUMIDITY_MIN_TAG = "humidityMin";
+    private static final String OLD_HUMIDITY_MAX_TAG = "humidityMax";
+    private static final String OLD_TEMPERATURE_MIN_TAG = "temperatureMin";
+    private static final String OLD_TEMPERATURE_MAX_TAG = "temperatureMax";
+    // end @compat 0.11.3
 
 
     /**
@@ -562,6 +570,26 @@ public final class TileType extends FreeColGameObjectType {
             temperature[1] = xr.getAttribute(TEMPERATURE_MAX_TAG, 40);
             altitude[0] = xr.getAttribute(ALTITUDE_MIN_TAG, 0);
             altitude[1] = xr.getAttribute(ALTITUDE_MAX_TAG, 0);
+            // @compat 0.11.3
+            if (xr.hasAttribute(OLD_HUMIDITY_MIN_TAG)) {
+                humidity[0] = xr.getAttribute(OLD_HUMIDITY_MIN_TAG, 0);
+            }
+            if (xr.hasAttribute(OLD_HUMIDITY_MAX_TAG)) {
+                humidity[1] = xr.getAttribute(OLD_HUMIDITY_MAX_TAG, 100);
+            }
+            if (xr.hasAttribute(OLD_TEMPERATURE_MIN_TAG)) {
+                temperature[0] = xr.getAttribute(OLD_TEMPERATURE_MIN_TAG, -20);
+            }
+            if (xr.hasAttribute(OLD_TEMPERATURE_MAX_TAG)) {
+                temperature[1] = xr.getAttribute(OLD_TEMPERATURE_MAX_TAG, 40);
+            }
+            if (xr.hasAttribute(OLD_ALTITUDE_MIN_TAG)) {
+                altitude[0] = xr.getAttribute(OLD_ALTITUDE_MIN_TAG, 0);
+            }
+            if (xr.hasAttribute(OLD_ALTITUDE_MAX_TAG)) {
+                altitude[1] = xr.getAttribute(OLD_ALTITUDE_MAX_TAG, 0);
+            }
+            // end @compat 0.11.3
             xr.closeTag(GEN_TAG);
 
         } else if (PRODUCTION_TAG.equals(tag)
