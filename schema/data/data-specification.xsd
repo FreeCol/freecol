@@ -204,9 +204,13 @@
         <xs:element ref="role-change"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="maximumCount" type="xs:nonNegativeInteger"/>
       <xs:attribute name="downgrade" type="RoleId"/>
+      <xs:attribute name="expert-unit" type="UnitTypeId"/>
+      <xs:attribute name="maximum-count" type="xs:nonNegativeInteger"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="expertUnit" type="UnitTypeId"/>
+      <xs:attribute name="maximumCount" type="xs:nonNegativeInteger"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 

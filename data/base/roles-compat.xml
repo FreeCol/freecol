@@ -28,7 +28,7 @@
     <role id="model.role.default"/>
 
     <role id="model.role.scout"
-          expertUnit="model.unit.seasonedScout">
+          expert-unit="model.unit.seasonedScout">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="false"/>
       <required-ability id="model.ability.refUnit" value="false"/>
@@ -50,7 +50,7 @@
     </role>
 
     <role id="model.role.soldier"
-          expertUnit="model.unit.veteranSoldier">
+          expert-unit="model.unit.veteranSoldier">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="false"/>
       <required-ability id="model.ability.refUnit" value="false"/>
@@ -65,7 +65,7 @@
     </role>
 
     <role id="model.role.dragoon" downgrade="model.role.soldier"
-          expertUnit="model.unit.veteranSoldier">
+          expert-unit="model.unit.veteranSoldier">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="false"/>
       <required-ability id="model.ability.refUnit" value="false"/>
@@ -83,7 +83,7 @@
     </role>
 
     <role id="model.role.pioneer"
-          expertUnit="model.unit.hardyPioneer" maximumCount="5">
+          expert-unit="model.unit.hardyPioneer" maximum-count="5">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="false"/>
       <required-ability id="model.ability.refUnit" value="false"/>
@@ -94,7 +94,7 @@
     </role>
 
     <role id="model.role.missionary"
-          expertUnit="model.unit.jesuitMissionary">
+          expert-unit="model.unit.jesuitMissionary">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.dressMissionary" value="true"/>
       <required-ability id="model.ability.native" value="false"/>
@@ -108,7 +108,7 @@
     </role>
 
     <role id="model.role.infantry"
-          expertUnit="model.unit.kingsRegular">
+          expert-unit="model.unit.kingsRegular">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="false"/>
       <required-ability id="model.ability.refUnit" value="true"/>
@@ -124,7 +124,7 @@
     </role>
 
     <role id="model.role.cavalry" downgrade="model.role.infantry"
-          expertUnit="model.unit.kingsRegular">
+          expert-unit="model.unit.kingsRegular">
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.native" value="false"/>
       <required-ability id="model.ability.refUnit" value="true"/>

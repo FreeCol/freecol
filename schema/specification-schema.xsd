@@ -69,6 +69,7 @@
      0.90: difficultyLevel -> difficulty-level
      0.91: productionLevel -> production-level
      0.92: Fix capitalization in tile-type/gen/*.
+     0.93: Fix capitalization in role.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -288,9 +289,13 @@
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
-      <xs:attribute name="maximumCount" type="xs:nonNegativeInteger"/>
       <xs:attribute name="downgrade" type="RoleId"/>
+      <xs:attribute name="expert-unit" type="UnitTypeId"/>
+      <xs:attribute name="maximum-count" type="xs:nonNegativeInteger"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="expertUnit" type="UnitTypeId"/>
+      <xs:attribute name="maximumCount" type="xs:nonNegativeInteger"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 

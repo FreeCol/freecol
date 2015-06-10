@@ -451,9 +451,13 @@ public class Role extends BuildableType {
     private static final String CAPTURE_TAG = "capture";
     private static final String DOWNGRADE_TAG = "downgrade";
     private static final String FROM_TAG = "from";
-    private static final String EXPERT_UNIT_TAG = "expertUnit";
-    private static final String MAXIMUM_COUNT_TAG = "maximumCount";
+    private static final String EXPERT_UNIT_TAG = "expert-unit";
+    private static final String MAXIMUM_COUNT_TAG = "maximum-count";
     private static final String ROLE_CHANGE_TAG = "role-change";
+    // @compat 0.11.3
+    private static final String OLD_EXPERT_UNIT_TAG = "expertUnit";
+    private static final String OLD_MAXIMUM_COUNT_TAG = "maximumCount";
+    // end @compat 0.11.3
 
 
     /**
@@ -506,10 +510,21 @@ public class Role extends BuildableType {
         downgrade = xr.getType(spec, DOWNGRADE_TAG,
                                Role.class, (Role)null);
 
-        expertUnit = xr.getType(spec, EXPERT_UNIT_TAG,
-                                UnitType.class, (UnitType)null);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_EXPERT_UNIT_TAG)) {
+            expertUnit = xr.getType(spec, OLD_EXPERT_UNIT_TAG,
+                                    UnitType.class, (UnitType)null);
+        } else
+        // end @compat 0.11.3
+            expertUnit = xr.getType(spec, EXPERT_UNIT_TAG,
+                                    UnitType.class, (UnitType)null);
 
-        maximumCount = xr.getAttribute(MAXIMUM_COUNT_TAG, 1);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_MAXIMUM_COUNT_TAG)) {
+            maximumCount = xr.getAttribute(OLD_MAXIMUM_COUNT_TAG, 1);
+        } else
+        // end @compat 0.11.3
+            maximumCount = xr.getAttribute(MAXIMUM_COUNT_TAG, 1);
     }
 
     /**
