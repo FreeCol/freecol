@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.94">
+<freecol-specification id="classic" version="0.95">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -1256,9 +1256,9 @@
   </tile-improvement-types>
 
   <unit-types>
-    <!-- ATTENTION: skillTaught can NOT be inherited because it defaults to the unit type itself! -->
+    <!-- ATTENTION: skill-taught can NOT be inherited because it defaults to the unit type itself! -->
     <unit-type id="colonist" abstract="true" 
-               offence="0" defence="1" movement="3" lineOfSight="1">
+               offence="0" defence="1" movement="3" line-of-sight="1">
       <ability id="model.ability.person" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -1271,8 +1271,8 @@
       <consumes id="model.goods.bells" value="1" />
     </unit-type>
     <unit-type id="model.unit.freeColonist" extends="colonist"
-               defaultUnit="true" scoreValue="3" skill="0"
-               recruitProbability="20" maximumExperience="200">
+               default-unit="true" score-value="3" skill="0"
+               recruit-probability="20" maximum-experience="200">
       <ability id="model.ability.bornInColony" value="true"/>
       <ability id="model.ability.foundInLostCity" value="true"/>
       <required-goods id="model.goods.food" value="200"/>
@@ -1302,115 +1302,115 @@
     </unit-type>
     <unit-type id="model.unit.expertFarmer" extends="colonist" price="1100"
                skill="1" expert-production="model.goods.grain"
-               recruitProbability="1" scoreValue="4">
+               recruit-probability="1" score-value="4">
       <modifier id="model.goods.grain" index="30"
                 type="additive" value="3"/>
     </unit-type>
     <unit-type id="model.unit.expertFisherman" extends="colonist" price="1000"
                skill="1" expert-production="model.goods.fish"
-               recruitProbability="1" scoreValue="4">
+               recruit-probability="1" score-value="4">
       <modifier id="model.goods.fish" index="30"
                 type="additive" value="3"/>
     </unit-type>
     <unit-type id="model.unit.expertFurTrapper" extends="colonist"
                skill="1" expert-production="model.goods.furs"
-               scoreValue="4" >
+               score-value="4" >
       <modifier id="model.goods.furs" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertSilverMiner" extends="colonist" price="900"
                skill="1" expert-production="model.goods.silver"
-               recruitProbability="1" scoreValue="4">
+               recruit-probability="1" score-value="4">
       <modifier id="model.goods.silver" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertLumberJack" extends="colonist" price="700"
                skill="1" expert-production="model.goods.lumber"
-               recruitProbability="1" scoreValue="4">
+               recruit-probability="1" score-value="4">
       <modifier id="model.goods.lumber" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertOreMiner" extends="colonist" price="600"
                skill="1" expert-production="model.goods.ore"
-               recruitProbability="1" scoreValue="4">
+               recruit-probability="1" score-value="4">
       <modifier id="model.goods.ore" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterSugarPlanter" extends="colonist"
                skill="2" expert-production="model.goods.sugar"
-               scoreValue="5" >
+               score-value="5" >
       <modifier id="model.goods.sugar" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterCottonPlanter" extends="colonist"
                skill="2" expert-production="model.goods.cotton"
-               scoreValue="5" >
+               score-value="5" >
       <modifier id="model.goods.cotton" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterTobaccoPlanter" extends="colonist"
                skill="2" expert-production="model.goods.tobacco"
-               scoreValue="5" >
+               score-value="5" >
       <modifier id="model.goods.tobacco" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.firebrandPreacher" extends="colonist" price="1500"
                skill="3" expert-production="model.goods.crosses"
-               recruitProbability="1" scoreValue="6">
+               recruit-probability="1" score-value="6">
       <modifier id="model.goods.crosses" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.elderStatesman" extends="colonist" price="1900"
                skill="3" expert-production="model.goods.bells"
-               recruitProbability="1" scoreValue="6">
+               recruit-probability="1" score-value="6">
       <modifier id="model.goods.bells" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterCarpenter" extends="colonist" price="1000"
                skill="1" expert-production="model.goods.hammers"
-               recruitProbability="1" scoreValue="4">
+               recruit-probability="1" score-value="4">
       <modifier id="model.goods.hammers" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterDistiller" extends="colonist" price="1100"
                skill="2" expert-production="model.goods.rum"
-               recruitProbability="1" scoreValue="5">
+               recruit-probability="1" score-value="5">
       <modifier id="model.goods.rum" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterWeaver" extends="colonist" price="1300"
                skill="2" expert-production="model.goods.cloth"
-               recruitProbability="1" scoreValue="5">
+               recruit-probability="1" score-value="5">
       <modifier id="model.goods.cloth" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterTobacconist" extends="colonist" price="1200"
                skill="2" expert-production="model.goods.cigars"
-               recruitProbability="1" scoreValue="5">
+               recruit-probability="1" score-value="5">
       <modifier id="model.goods.cigars" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterFurTrader" extends="colonist" price="950"
                skill="2" expert-production="model.goods.coats"
-               recruitProbability="1" scoreValue="5">
+               recruit-probability="1" score-value="5">
       <modifier id="model.goods.coats" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterBlacksmith" extends="colonist" price="1050"
                skill="2" expert-production="model.goods.tools"
-               recruitProbability="1" scoreValue="5">
+               recruit-probability="1" score-value="5">
       <modifier id="model.goods.tools" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterGunsmith" extends="colonist" price="850"
                skill="2" expert-production="model.goods.muskets"
-               recruitProbability="1" scoreValue="5">
+               recruit-probability="1" score-value="5">
       <modifier id="model.goods.muskets" index="30"
                 type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.seasonedScout" extends="colonist"
                skill="1"
-               recruitProbability="1" scoreValue="4">
+               recruit-probability="1" score-value="4">
       <default-role id="model.role.scout"/>
       <ability id="model.ability.expertScout" value="true"/>
       <modifier id="model.modifier.exploreLostCityRumour"
@@ -1418,13 +1418,13 @@
     </unit-type>
     <unit-type id="model.unit.hardyPioneer" extends="colonist" price="1200"
                skill="1"
-               recruitProbability="1" scoreValue="4">
+               recruit-probability="1" score-value="4">
       <default-role id="model.role.pioneer"/>
       <ability id="model.ability.expertPioneer" value="true"/>
     </unit-type>
     <unit-type id="model.unit.veteranSoldier" extends="colonist" price="2000"
                skill="2"
-               recruitProbability="1" scoreValue="5">
+               recruit-probability="1" score-value="5">
       <default-role id="model.role.soldier"/>
       <ability id="model.ability.mercenaryUnit" value="true"/>
       <ability id="model.ability.expertSoldier" value="true"/>
@@ -1438,7 +1438,7 @@
     </unit-type>
     <unit-type id="model.unit.jesuitMissionary" extends="colonist" price="1400"
                skill="3"
-               recruitProbability="1" scoreValue="5">
+               recruit-probability="1" score-value="5">
       <default-role id="model.role.missionary"/>
       <downgrade unit="model.unit.freeColonist" capture="100" clearSkill="100"/>
       <ability id="model.ability.expertMissionary" value="true"/>
@@ -1446,7 +1446,7 @@
     </unit-type>
     <unit-type id="model.unit.indenturedServant" extends="colonist"
                skill="-1"
-               recruitProbability="20" scoreValue="2">
+               recruit-probability="20" score-value="2">
       <downgrade unit="model.unit.freeColonist" delete="true"/>
       <upgrade unit="model.unit.freeColonist" turnsToLearn="4" promotion="100"/>
       <upgrade unit="model.unit.expertFarmer" learnFromNatives="100" learnInSchool="0"/>
@@ -1480,7 +1480,7 @@
     </unit-type>
     <unit-type id="model.unit.pettyCriminal" extends="colonist"
                skill="-2"
-               recruitProbability="20" scoreValue="1">
+               recruit-probability="20" score-value="1">
       <downgrade unit="model.unit.freeColonist" delete="true" />
       <upgrade unit="model.unit.indenturedServant" turnsToLearn="4" promotion="100"/>
       <upgrade unit="model.unit.seasonedScout" learnInLostCity="100" learnInSchool="0"/>
@@ -1505,8 +1505,8 @@
     </unit-type>
     <unit-type id="model.unit.indianConvert" 
                skill="0"
-               offence="0" defence="1" movement="3" lineOfSight="1"
-               maximumAttrition="10" scoreValue="3">
+               offence="0" defence="1" movement="3" line-of-sight="1"
+               maximum-attrition="10" score-value="3">
       <consumes id="model.goods.food" value="2"/>
       <consumes id="model.goods.bells" value="1"/>
       <downgrade unit="model.unit.freeColonist" delete="true"/>
@@ -1546,7 +1546,7 @@
     </unit-type>
     <unit-type id="model.unit.brave"
                offence="1" defence="1"
-               defaultUnit="true" movement="3" lineOfSight="1" space="1">
+               default-unit="true" movement="3" line-of-sight="1" space="1">
       <required-ability id="model.ability.native"/>
       <consumes id="model.goods.food" value="2"/>
       <consumes id="model.goods.rum" value="1"/>
@@ -1570,7 +1570,7 @@
       <ability id="model.ability.foundColony" value="true"/>
     </unit-type>
     <unit-type id="model.unit.colonialRegular" extends="colonist"
-               skillTaught="model.unit.veteranSoldier" skill="3">
+               skill-taught="model.unit.veteranSoldier" skill="3">
       <downgrade unit="model.unit.veteranSoldier" demotion="100" capture="100" clearSkill="100"/>
       <required-ability id="model.ability.independenceDeclared"/>
       <ability id="model.ability.demoteOnAllEquipLost" value="true"/>
@@ -1582,7 +1582,7 @@
                 type="additive" value="3" index="20"/>
     </unit-type>
     <unit-type id="model.unit.kingsRegular" extends="colonist"
-               defaultUnit="true" skill="4">
+               default-unit="true" skill="4">
       <required-ability id="model.ability.royalExpeditionaryForce"/>
       <ability id="model.ability.refUnit" value="true"/>
       <ability id="model.ability.disposeOnAllEquipLost" value="true"/>
@@ -1603,15 +1603,15 @@
     </unit-type>
     <unit-type id="model.unit.caravel" extends="ship" price="1000"
                offence="0" defence="2" movement="12"
-               lineOfSight="1" space="2" spaceTaken="24" hitPoints="6"
-               scoreValue="3">
+               line-of-sight="1" space="2" spaceTaken="24" hit-points="6"
+               score-value="3">
       <required-goods id="model.goods.hammers" value="128"/>
       <required-goods id="model.goods.tools" value="40"/>
     </unit-type>
     <unit-type id="model.unit.frigate" extends="ship" price="5000"
                offence="16" defence="16" movement="18"
-               lineOfSight="2" space="4" spaceTaken="32" hitPoints="6"
-               scoreValue="6">
+               line-of-sight="2" space="4" spaceTaken="32" hit-points="6"
+               score-value="6">
       <required-goods id="model.goods.hammers" value="512"/>
       <required-goods id="model.goods.tools" value="200"/>
       <ability id="model.ability.captureGoods" value="true"/>
@@ -1619,15 +1619,15 @@
     </unit-type>
     <unit-type id="model.unit.galleon" extends="ship" price="3000"
                offence="0" defence="10" movement="18"
-               lineOfSight="2" space="6" spaceTaken="64" hitPoints="6"
-               scoreValue="5">
+               line-of-sight="2" space="6" spaceTaken="64" hit-points="6"
+               score-value="5">
       <required-goods id="model.goods.hammers" value="320"/>
       <required-goods id="model.goods.tools" value="100"/>
     </unit-type>
     <unit-type id="model.unit.manOWar" extends="ship"
                offence="24" defence="24" movement="18"
-               lineOfSight="2" space="6" spaceTaken="64" hitPoints="6"
-               scoreValue="8">
+               line-of-sight="2" space="6" spaceTaken="64" hit-points="6"
+               score-value="8">
       <required-goods id="model.goods.hammers" value="1024"/>
       <required-goods id="model.goods.tools" value="300"/>
       <required-ability id="model.ability.independentNation"/>
@@ -1636,26 +1636,26 @@
     </unit-type>
     <unit-type id="model.unit.merchantman" extends="ship" price="2000"
                offence="0" defence="6" movement="15"
-               lineOfSight="1" space="4" spaceTaken="32" hitPoints="6"
-               scoreValue="4">
+               line-of-sight="1" space="4" spaceTaken="32" hit-points="6"
+               score-value="4">
       <required-goods id="model.goods.hammers" value="192"/>
       <required-goods id="model.goods.tools" value="80"/>
     </unit-type>
     <unit-type id="model.unit.privateer" extends="ship" price="2000"
                offence="8" defence="8" movement="24"
-               lineOfSight="2" space="2" spaceTaken="24" hitPoints="6"
-               scoreValue="4">
+               line-of-sight="2" space="2" spaceTaken="24" hit-points="6"
+               score-value="4">
       <required-goods id="model.goods.hammers" value="256"/>
       <required-goods id="model.goods.tools" value="120"/>
       <ability id="model.ability.captureGoods" value="true"/>
       <ability id="model.ability.piracy" value="true"/>
     </unit-type>
-    <unit-type id="wagon" abstract="true" lineOfSight="1">
+    <unit-type id="wagon" abstract="true" line-of-sight="1">
       <ability id="model.ability.foundColony" value="false"/>
     </unit-type>
     <unit-type id="model.unit.artillery" extends="wagon" price="500"
                offence="7" defence="5" movement="3"
-               scoreValue="2">
+               score-value="2">
       <required-goods id="model.goods.hammers" value="192"/>
       <required-goods id="model.goods.tools" value="40"/>
       <downgrade unit="model.unit.damagedArtillery" demotion="100"/>
@@ -1667,19 +1667,19 @@
     </unit-type>
     <unit-type id="model.unit.damagedArtillery" extends="wagon"
                offence="5" defence="3" movement="3"
-               scoreValue="1">
+               score-value="1">
       <ability id="model.ability.captureUnits" value="true"/>
       <ability id="model.ability.bombard" value="true"/>
     </unit-type>
     <unit-type id="model.unit.treasureTrain" extends="wagon"
                offence="0" defence="0" movement="3"
-               scoreValue="1" spaceTaken="6">
+               score-value="1" spaceTaken="6">
       <ability id="model.ability.carryTreasure" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
     </unit-type>
     <unit-type id="model.unit.wagonTrain" extends="wagon"
                offence="0" defence="1" movement="6"
-               scoreValue="1" spaceTaken="12" space="2">
+               score-value="1" spaceTaken="12" space="2">
       <required-goods id="model.goods.hammers" value="40"/>
       <limit id="model.limit.wagonTrains" operator="LT">
         <leftHandSide operandType="UNITS" scopeLevel="PLAYER" />
@@ -1693,14 +1693,14 @@
         expert-production="model.goods.grain" />
     -->
     <unit-type id="model.unit.revenger"
-               offence="666" defence="666" movement="18" lineOfSight="3">
+               offence="666" defence="666" movement="18" line-of-sight="3">
       <required-ability id="model.ability.undead"/>
       <ability id="model.ability.undead" value="true"/>
       <ability id="model.ability.multipleAttacks" value="true"/>
     </unit-type>
     <unit-type id="model.unit.flyingDutchman" extends="ship"
-               offence="666" defence="666" movement="36" lineOfSight="3"
-               space="6" hitPoints="6">
+               offence="666" defence="666" movement="36" line-of-sight="3"
+               space="6" hit-points="6">
       <required-ability id="model.ability.undead"/>
       <ability id="model.ability.captureGoods" value="true"/>
       <ability id="model.ability.undead" value="true"/>

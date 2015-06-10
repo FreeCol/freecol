@@ -71,6 +71,7 @@
      0.92: Fix capitalization in tile-type/gen/*.
      0.93: Fix capitalization in role.
      0.94: exposeResourcePercent -> expose-resource-percent
+     0.95: Fix capitalization in unitType.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -480,23 +481,36 @@
       <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="abstract" use="optional" type="xs:boolean"/>
       <xs:attribute name="extends" use="optional" type="xs:string" />
-      <xs:attribute name="defaultUnit" use="optional" type="xs:boolean"/>
+      <xs:attribute name="default-unit" use="optional" type="xs:boolean"/>
       <xs:attribute name="offence" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="defence" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="movement" use="optional" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="lineOfSight" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="line-of-sight" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="skill" type="xs:int"/>
       <xs:attribute name="space" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="spaceTaken" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="space-taken" type="xs:nonNegativeInteger"/>
       <xs:attribute name="price" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="hit-points" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="recruit-probability" type="PercentageType"/>
+      <xs:attribute name="expert-production" type="GoodsTypeId"/>
+      <xs:attribute name="skill-taught" type="xs:string"/>
+      <xs:attribute name="score-value" type="xs:int"/>
+      <xs:attribute name="maximum-experience" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="maximum-attrition" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="increasing-price" type="xs:nonNegativeInteger"/>
+
+      <!-- @compat 0.11.3 -->
+      <xs:attribute name="defaultUnit" use="optional" type="xs:boolean"/>
+      <xs:attribute name="lineOfSight" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="spaceTaken" type="xs:nonNegativeInteger"/>
       <xs:attribute name="hitPoints" type="xs:nonNegativeInteger"/>
       <xs:attribute name="recruitProbability" type="PercentageType"/>
-      <xs:attribute name="expert-production" type="GoodsTypeId"/>
       <xs:attribute name="skillTaught" type="xs:string"/>
       <xs:attribute name="scoreValue" type="xs:int"/>
       <xs:attribute name="maximumExperience" type="xs:nonNegativeInteger"/>
       <xs:attribute name="maximumAttrition" type="xs:nonNegativeInteger"/>
       <xs:attribute name="increasingPrice" type="xs:nonNegativeInteger"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 

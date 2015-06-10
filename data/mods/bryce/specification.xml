@@ -253,9 +253,9 @@
   </tile-improvement-types>
 
   <unit-types>
-    <unit-type id="model.unit.indianConvert" offence="0"  defence="1"
-               movement="3" lineOfSight="1" maximumAttrition="10"
-               scoreValue="3" skill="0">
+    <unit-type id="model.unit.indianConvert" offence="0" defence="1"
+               movement="3" line-of-sight="1" maximum-attrition="10"
+               score-value="3" skill="0">
       <ability id="model.ability.person" value="true"/>
       <ability id="model.ability.convert" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>

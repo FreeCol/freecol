@@ -701,27 +701,36 @@ public final class UnitType extends BuildableType implements Consumer {
     private static final String DEFAULT_EQUIPMENT_TAG = "default-equipment";
     // end @compat
     private static final String DEFAULT_ROLE_TAG = "default-role";
-    private static final String DEFAULT_UNIT_TAG = "defaultUnit";
+    private static final String DEFAULT_UNIT_TAG = "default-unit";
     private static final String DEFENCE_TAG = "defence";
     private static final String EXPERT_PRODUCTION_TAG = "expert-production";
-    private static final String HIT_POINTS_TAG = "hitPoints";
-    private static final String LINE_OF_SIGHT_TAG = "lineOfSight";
+    private static final String HIT_POINTS_TAG = "hit-points";
+    private static final String LINE_OF_SIGHT_TAG = "line-of-sight";
     private static final String MOVEMENT_TAG = "movement";
-    private static final String MAXIMUM_EXPERIENCE_TAG = "maximumExperience";
-    private static final String MAXIMUM_ATTRITION_TAG = "maximumAttrition";
+    private static final String MAXIMUM_EXPERIENCE_TAG = "maximum-experience";
+    private static final String MAXIMUM_ATTRITION_TAG = "maximum-attrition";
     private static final String OFFENCE_TAG = "offence";
     private static final String PRICE_TAG = "price";
-    private static final String RECRUIT_PROBABILITY_TAG = "recruitProbability";
-    private static final String SCORE_VALUE_TAG = "scoreValue";
+    private static final String RECRUIT_PROBABILITY_TAG = "recruit-probability";
+    private static final String SCORE_VALUE_TAG = "score-value";
     private static final String SKILL_TAG = "skill";
-    private static final String SKILL_TAUGHT_TAG = "skillTaught";
+    private static final String SKILL_TAUGHT_TAG = "skill-taught";
     private static final String SPACE_TAG = "space";
-    private static final String SPACE_TAKEN_TAG = "spaceTaken";
-
+    private static final String SPACE_TAKEN_TAG = "space-taken";
     private static final String DOWNGRADE_TAG = "downgrade";
     private static final String UNIT_TAG = "unit";
     private static final String UPGRADE_TAG = "upgrade";
-
+    // @compat 0.11.3
+    private static final String OLD_DEFAULT_UNIT_TAG = "defaultUnit";
+    private static final String OLD_HIT_POINTS_TAG = "hitPoints";
+    private static final String OLD_LINE_OF_SIGHT_TAG = "lineOfSight";
+    private static final String OLD_MAXIMUM_EXPERIENCE_TAG = "maximumExperience";
+    private static final String OLD_MAXIMUM_ATTRITION_TAG = "maximumAttrition";
+    private static final String OLD_RECRUIT_PROBABILITY_TAG = "recruitProbability";
+    private static final String OLD_SCORE_VALUE_TAG = "scoreValue";
+    private static final String OLD_SKILL_TAUGHT_TAG = "skillTaught";
+    private static final String OLD_SPACE_TAKEN_TAG = "spaceTaken";
+    // end @compat 0.11.3
 
     /**
      * {@inheritDoc}
@@ -818,31 +827,78 @@ public final class UnitType extends BuildableType implements Consumer {
 
         defence = xr.getAttribute(DEFENCE_TAG, parent.defence);
 
-        defaultUnit = xr.getAttribute(DEFAULT_UNIT_TAG, false);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_DEFAULT_UNIT_TAG)) {
+            defaultUnit = xr.getAttribute(OLD_DEFAULT_UNIT_TAG, false);
+        } else
+        // end @compat 0.11.3
+            defaultUnit = xr.getAttribute(DEFAULT_UNIT_TAG, false);
 
         movement = xr.getAttribute(MOVEMENT_TAG, parent.movement);
 
-        lineOfSight = xr.getAttribute(LINE_OF_SIGHT_TAG, parent.lineOfSight);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_LINE_OF_SIGHT_TAG)) {
+            lineOfSight = xr.getAttribute(OLD_LINE_OF_SIGHT_TAG, parent.lineOfSight);
+        } else
+        // end @compat 0.11.3
+            lineOfSight = xr.getAttribute(LINE_OF_SIGHT_TAG, parent.lineOfSight);
 
-        scoreValue = xr.getAttribute(SCORE_VALUE_TAG, parent.scoreValue);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_SCORE_VALUE_TAG)) {
+            scoreValue = xr.getAttribute(OLD_SCORE_VALUE_TAG, parent.scoreValue);
+        } else
+        // end @compat 0.11.3
+            scoreValue = xr.getAttribute(SCORE_VALUE_TAG, parent.scoreValue);
 
         space = xr.getAttribute(SPACE_TAG, parent.space);
 
-        hitPoints = xr.getAttribute(HIT_POINTS_TAG, parent.hitPoints);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_HIT_POINTS_TAG)) {
+            hitPoints = xr.getAttribute(OLD_HIT_POINTS_TAG, parent.hitPoints);
+        } else
+        // end @compat 0.11.3
+            hitPoints = xr.getAttribute(HIT_POINTS_TAG, parent.hitPoints);
 
-        spaceTaken = xr.getAttribute(SPACE_TAKEN_TAG, parent.spaceTaken);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_SPACE_TAKEN_TAG)) {
+            spaceTaken = xr.getAttribute(OLD_SPACE_TAKEN_TAG, parent.spaceTaken);
+        } else
+        // end @compat 0.11.3
+            spaceTaken = xr.getAttribute(SPACE_TAKEN_TAG, parent.spaceTaken);
 
-        maximumExperience = xr.getAttribute(MAXIMUM_EXPERIENCE_TAG,
-                                            parent.maximumExperience);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_MAXIMUM_EXPERIENCE_TAG)) {
+            maximumExperience = xr.getAttribute(OLD_MAXIMUM_EXPERIENCE_TAG,
+                                                parent.maximumExperience);
+        } else
+        // end @compat 0.11.3
+            maximumExperience = xr.getAttribute(MAXIMUM_EXPERIENCE_TAG,
+                                                parent.maximumExperience);
 
-        maximumAttrition = xr.getAttribute(MAXIMUM_ATTRITION_TAG,
-                                           parent.maximumAttrition);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_MAXIMUM_ATTRITION_TAG)) {
+            maximumAttrition = xr.getAttribute(OLD_MAXIMUM_ATTRITION_TAG,
+                                               parent.maximumAttrition);
+        } else
+        // end @compat 0.11.3
+            maximumAttrition = xr.getAttribute(MAXIMUM_ATTRITION_TAG,
+                                               parent.maximumAttrition);
 
-        skillTaught = xr.getType(spec, SKILL_TAUGHT_TAG,
-                                 UnitType.class, this);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_SKILL_TAUGHT_TAG)) {
+            skillTaught = xr.getType(spec, OLD_SKILL_TAUGHT_TAG, UnitType.class, this);
+        } else
+        // end @compat 0.11.3
+            skillTaught = xr.getType(spec, SKILL_TAUGHT_TAG, UnitType.class, this);
 
-        recruitProbability = xr.getAttribute(RECRUIT_PROBABILITY_TAG,
-                                             parent.recruitProbability);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_RECRUIT_PROBABILITY_TAG)) {
+            recruitProbability = xr.getAttribute(OLD_RECRUIT_PROBABILITY_TAG,
+                                                 parent.recruitProbability);
+        } else
+        // end @compat 0.11.3
+            recruitProbability = xr.getAttribute(RECRUIT_PROBABILITY_TAG,
+                                                 parent.recruitProbability);
 
         skill = xr.getAttribute(SKILL_TAG, parent.skill);
 
