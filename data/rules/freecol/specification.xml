@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="freecol" version="0.99" extends="classic">
+<freecol-specification id="freecol" version="0.100" extends="classic">
 
   <goods-types>
     <goods-type id="model.goods.horses" is-farmed="false"
@@ -122,16 +122,16 @@
   <nations>
     <nation id="model.nation.portuguese" color="0x00ff00"
             nation-type="model.nationType.naval" selectable="true"
-            preferredLatitude="-16" ref="model.nation.portugueseREF"/>
+            preferred-latitude="-16" ref="model.nation.portugueseREF"/>
     <nation id="model.nation.swedish" color="0x00bfff"
             nation-type="model.nationType.building" selectable="true"
-            preferredLatitude="-39" ref="model.nation.swedishREF"/>
+            preferred-latitude="-39" ref="model.nation.swedishREF"/>
     <nation id="model.nation.danish" color="0xff00bf"
             nation-type="model.nationType.agriculture" selectable="true"
-            preferredLatitude="-64" ref="model.nation.danishREF"/>
+            preferred-latitude="-64" ref="model.nation.danishREF"/>
     <nation id="model.nation.russian" color="0xffffff"
             nation-type="model.nationType.furTrapping" selectable="true"
-            preferredLatitude="-55" startsOnEastCoast="false"
+            preferred-latitude="-55" starts-on-east-coast="false"
             ref="model.nation.russianREF"/>
     <nation id="model.nation.portugueseREF" color="0xbfff00"
             nation-type="model.nationType.ref"/>

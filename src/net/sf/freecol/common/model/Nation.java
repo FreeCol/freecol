@@ -273,10 +273,14 @@ public class Nation extends FreeColGameObjectType {
 
     private static final String COLOR_TAG = "color";
     private static final String NATION_TYPE_TAG = "nation-type";
-    private static final String PREFERRED_LATITUDE_TAG = "preferredLatitude";
+    private static final String PREFERRED_LATITUDE_TAG = "preferred-latitude";
     private static final String REF_TAG = "ref";
     private static final String SELECTABLE_TAG = "selectable";
-    private static final String STARTS_ON_EAST_COAST_TAG = "startsOnEastCoast";
+    private static final String STARTS_ON_EAST_COAST_TAG = "starts-on-east-coast";
+    // @compat 0.11.3
+    private static final String OLD_PREFERRED_LATITUDE_TAG = "preferredLatitude";
+    private static final String OLD_STARTS_ON_EAST_COAST_TAG = "startsOnEastCoast";
+    // end @compat 0.11.3
 
 
     /**
@@ -313,9 +317,19 @@ public class Nation extends FreeColGameObjectType {
 
         selectable = xr.getAttribute(SELECTABLE_TAG, false);
 
-        preferredLatitude = xr.getAttribute(PREFERRED_LATITUDE_TAG, 0);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_PREFERRED_LATITUDE_TAG)) {
+            preferredLatitude = xr.getAttribute(OLD_PREFERRED_LATITUDE_TAG, 0);
+        } else
+        // end @compat 0.11.3
+            preferredLatitude = xr.getAttribute(PREFERRED_LATITUDE_TAG, 0);
 
-        startsOnEastCoast = xr.getAttribute(STARTS_ON_EAST_COAST_TAG, true);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_STARTS_ON_EAST_COAST_TAG)) {
+            startsOnEastCoast = xr.getAttribute(OLD_STARTS_ON_EAST_COAST_TAG, true);
+        } else
+        // end @compat 0.11.3
+            startsOnEastCoast = xr.getAttribute(STARTS_ON_EAST_COAST_TAG, true);
 
         refNation = xr.getType(spec, REF_TAG, Nation.class, (Nation)null);
 

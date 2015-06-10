@@ -742,9 +742,13 @@
             <xs:attribute name="color" use="optional" type="xs:string"/>
             <xs:attribute name="nation-type" use="required" type="NationTypeId"/>
             <xs:attribute name="selectable" type="xs:boolean"/>
+            <xs:attribute name="ref" type="xs:string"/>
+            <xs:attribute name="preferred-latitude" type="xs:int"/>
+            <xs:attribute name="starts-on-east-coast" type="xs:boolean"/>
+            <!-- @compat 0.11.3 -->
             <xs:attribute name="preferredLatitude" type="xs:int"/>
             <xs:attribute name="startsOnEastCoast" type="xs:boolean"/>
-            <xs:attribute name="ref" type="xs:string"/>
+            <!-- end @compat 0.11.3 -->
           </xs:complexType>
         </xs:element>
       </xs:sequence>

@@ -1,81 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- XSD for specification version 0.89
      CHANGELOG:
-     0.26: add capture-equipment
-     0.27: add limits
-     0.28: move limits into other elements
-     0.29: add events
-     0.30: extend string options
-     0.31: change difficulty selection for tile types
-     0.32: change difficulty selection for european nation types
-     0.33: add scoreValue to event
-     0.34: add abstract buildable types
-     0.35: remove minimap-color from tile-type
-     0.36: change image-id of improvement action to string
-     0.37: remove art element from tile-type
-     0.38: remove overlay attribute from tileimprovement-type
-     0.39: remove color from nation and add audio options
-     0.40: change tile(s) children of tile improvement to scope
-     0.41: add consumes element to unit-type
-     0.42: remove pathImage attribute from unit-type
-     0.43: add attributes id and extends to specification
-     0.44: add delete element
-     0.45: add delete attribute to upgrade, downgrade, ability and modifier
-     0.46: add undead downgrade
-     0.47: remove index from player
-     0.48: add difficultyLevel attribute for in-game specification
-     0.49: marketData add goods-type attribute and make ID a MarketDataId
-     0.50: allow OptionGroups to contain OptionGroups
-     0.51: remove improvementaction-type and difficultyLevels
-     0.52: add upkeep attribute to building-type
-     0.53: add exposeResourcePercent attribute to tileimprovement-type
-     0.54: add settlement type
-     0.55: add increment and incrementType to modifier
-     0.56: add scope to plunder and gifts elements
-     0.57: add tradeBonus attribute to settlement
-     0.58: change unit type changes to use percentages rather than booleans
-     0.59: add maximumExperience attribute to UnitType
-     0.60: add offeredFathers to player
-     0.61: add moveToEurope to tile
-     0.62: add settlementType to indianSettlement
-     0.63: remove anthem from nation
-     0.64: add preferredLatitude and startsOnEastCoast to nation
-     0.65: add REF size option
-     0.66: make immigrants a unit option, too
-     0.67: expand tile type change
-     0.68: add role as a game object type
-     0.69: add attribute editable to option group
-     0.70: add disasters, and duration to features
-     0.71: exportData is a FreeColObject, should use id attribute, not ID
-     0.72: allow preserveAttributes attribute to aid spec fragment authors
-     0.73: generalize preserveAttributes to preserve
-     0.74: add convertThreshold to settlement
-     0.75: add generalized production element
-     0.76: change attribute name from "colonyCenterTile" to "unattended"
-     0.77: nation has a color attribute again
-     0.78: added production-weight, low-production-threshold,
-           zero-production-factor to goods-type
-     0.79: upgrade role from enum to role
-     0.80: replace unit type default equipment with default role
-     0.81: Percentage option values are PercentageType.
-     0.82: Add conversion update type.
-     0.83: Add delete attribute to production.
-     0.84: Add is-military to goods type.
-     0.85: Add role-change element to Role.
-     0.86: expended-equipment becomes required-role in tileimprovement-type.
-     0.87: Add defaultUnit attribute to unit-type.
-     0.88: Add textOption to OptionGroup.
-     0.89: tileimprovement-type/s -> tile-improvement-type/s
-     0.90: difficultyLevel -> difficulty-level
-     0.91: productionLevel -> production-level
-     0.92: Fix capitalization in Tile-type/gen/*.
-     0.93: Fix capitalization in Role.
-     0.94: exposeResourcePercent -> expose-resource-percent
-     0.95: Fix capitalization in UnitType.
-     0.96: Fix capitalization in BuildingType.
-     0.97: scoreValue -> score-value in Event.
-     0.98: Fix capitalization in national settlement type.
-     0.99: Downcase disaster amount enum.
+     0.26:  add capture-equipment
+     0.27:  add limits
+     0.28:  move limits into other elements
+     0.29:  add events
+     0.30:  extend string options
+     0.31:  change difficulty selection for tile types
+     0.32:  change difficulty selection for european nation types
+     0.33:  add scoreValue to event
+     0.34:  add abstract buildable types
+     0.35:  remove minimap-color from tile-type
+     0.36:  change image-id of improvement action to string
+     0.37:  remove art element from tile-type
+     0.38:  remove overlay attribute from tileimprovement-type
+     0.39:  remove color from nation and add audio options
+     0.40:  change tile(s) children of tile improvement to scope
+     0.41:  add consumes element to unit-type
+     0.42:  remove pathImage attribute from unit-type
+     0.43:  add attributes id and extends to specification
+     0.44:  add delete element
+     0.45:  add delete attribute to upgrade, downgrade, ability and modifier
+     0.46:  add undead downgrade
+     0.47:  remove index from player
+     0.48:  add difficultyLevel attribute for in-game specification
+     0.49:  marketData add goods-type attribute and make ID a MarketDataId
+     0.50:  allow OptionGroups to contain OptionGroups
+     0.51:  remove improvementaction-type and difficultyLevels
+     0.52:  add upkeep attribute to building-type
+     0.53:  add exposeResourcePercent attribute to tileimprovement-type
+     0.54:  add settlement type
+     0.55:  add increment and incrementType to modifier
+     0.56:  add scope to plunder and gifts elements
+     0.57:  add tradeBonus attribute to settlement
+     0.58:  change unit type changes to use percentages rather than booleans
+     0.59:  add maximumExperience attribute to UnitType
+     0.60:  add offeredFathers to player
+     0.61:  add moveToEurope to tile
+     0.62:  add settlementType to indianSettlement
+     0.63:  remove anthem from nation
+     0.64:  add preferredLatitude and startsOnEastCoast to nation
+     0.65:  add REF size option
+     0.66:  make immigrants a unit option, too
+     0.67:  expand tile type change
+     0.68:  add role as a game object type
+     0.69:  add attribute editable to option group
+     0.70:  add disasters, and duration to features
+     0.71:  exportData is a FreeColObject, should use id attribute, not ID
+     0.72:  allow preserveAttributes attribute to aid spec fragment authors
+     0.73:  generalize preserveAttributes to preserve
+     0.74:  add convertThreshold to settlement
+     0.75:  add generalized production element
+     0.76:  change attribute name from "colonyCenterTile" to "unattended"
+     0.77:  nation has a color attribute again
+     0.78:  added production-weight, low-production-threshold,
+            zero-production-factor to goods-type
+     0.79:  upgrade role from enum to role
+     0.80:  replace unit type default equipment with default role
+     0.81:  Percentage option values are PercentageType.
+     0.82:  Add conversion update type.
+     0.83:  Add delete attribute to production.
+     0.84:  Add is-military to goods type.
+     0.85:  Add role-change element to Role.
+     0.86:  expended-equipment becomes required-role in tileimprovement-type.
+     0.87:  Add defaultUnit attribute to unit-type.
+     0.88:  Add textOption to OptionGroup.
+     0.89:  tileimprovement-type/s -> tile-improvement-type/s
+     0.90:  difficultyLevel -> difficulty-level
+     0.91:  productionLevel -> production-level
+     0.92:  Fix capitalization in Tile-type/gen/*.
+     0.93:  Fix capitalization in Role.
+     0.94:  exposeResourcePercent -> expose-resource-percent
+     0.95:  Fix capitalization in UnitType.
+     0.96:  Fix capitalization in BuildingType.
+     0.97:  scoreValue -> score-value in Event.
+     0.98:  Fix capitalization in national settlement type.
+     0.99:  Downcase disaster amount enum.
+     0.100: Fix capitalization in Nation.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -832,9 +833,13 @@
             <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
             <xs:attribute name="nation-type" use="required" type="NationTypeId"/>
             <xs:attribute name="selectable" type="xs:boolean"/>
+            <xs:attribute name="ref" type="xs:string"/>
+            <xs:attribute name="preferred-latitude" type="xs:int"/>
+            <xs:attribute name="starts-on-east-coast" type="xs:boolean"/>
+            <!-- @compat 0.11.3 -->
             <xs:attribute name="preferredLatitude" type="xs:int"/>
             <xs:attribute name="startsOnEastCoast" type="xs:boolean"/>
-            <xs:attribute name="ref" type="xs:string"/>
+            <!-- end @compat 0.11.3 -->
           </xs:complexType>
         </xs:element>
       </xs:sequence>
