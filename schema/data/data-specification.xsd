@@ -1096,13 +1096,17 @@
   </xs:complexType>
 
   <xs:complexType name="ScopeType">
-    <xs:attribute name="matchesNull" type="xs:boolean"/>
-    <xs:attribute name="matchNegated" type="xs:boolean"/>
+    <xs:attribute name="matches-null" type="xs:boolean"/>
+    <xs:attribute name="match-negated" type="xs:boolean"/>
     <xs:attribute name="type" type="xs:string"/>
     <xs:attribute name="ability-id" type="AbilityId"/>
     <xs:attribute name="ability-value" type="xs:boolean"/>
     <xs:attribute name="method-name" type="xs:string"/>
     <xs:attribute name="method-value" type="xs:string"/>
+    <!-- @compat 0.11.3 -->
+    <xs:attribute name="matchesNull" type="xs:boolean"/>
+    <xs:attribute name="matchNegated" type="xs:boolean"/>
+    <!-- end @compat 0.11.3 -->
   </xs:complexType>
 
   <xs:complexType name="OperandType">

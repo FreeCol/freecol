@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.103">
+<freecol-specification id="classic" version="0.104">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -195,7 +195,7 @@
                 type="additive" value="2"/>
       <modifier id="model.goods.grain" index="10"
                 type="additive" value="2">
-        <scope type="model.unit.expertFarmer" matchesNull="false"/>
+        <scope type="model.unit.expertFarmer" matches-null="false"/>
       </modifier>
       <modifier id="model.goods.furs" index="10"
                 type="additive" value="2"/>
@@ -244,7 +244,7 @@
                 type="additive" value="2"/>
       <modifier id="model.goods.grain" index="10"
                 type="additive" value="2">
-        <scope type="model.unit.expertFarmer" matchesNull="false"/>
+        <scope type="model.unit.expertFarmer" matches-null="false"/>
       </modifier>
     </resource-type>
     <resource-type id="model.resource.grain">
@@ -252,7 +252,7 @@
                 type="additive" value="2"/>
       <modifier id="model.goods.grain" index="10"
                 type="additive" value="2">
-        <scope type="model.unit.expertFarmer" matchesNull="false"/>
+        <scope type="model.unit.expertFarmer" matches-null="false"/>
       </modifier>
     </resource-type>
     <resource-type id="model.resource.fish">
@@ -260,7 +260,7 @@
                 type="additive" value="3"/>
       <modifier id="model.goods.fish" index="10"
                 type="additive" value="3">
-        <scope type="model.unit.expertFisherman" matchesNull="false"/>
+        <scope type="model.unit.expertFisherman" matches-null="false"/>
       </modifier>
     </resource-type>
   </resource-types>
@@ -1156,9 +1156,9 @@
                            add-work-turns="0" magnitude="1"
                            movement-cost="1" zIndex="150">
       <scope method-name="isWater" method-value="false"/>
-      <scope type="model.tile.arctic" matchNegated="true"/>
-      <scope type="model.tile.hills" matchNegated="true"/>
-      <scope type="model.tile.mountains" matchNegated="true"/>
+      <scope type="model.tile.arctic" match-negated="true"/>
+      <scope type="model.tile.hills" match-negated="true"/>
+      <scope type="model.tile.mountains" match-negated="true"/>
       <disaster id="model.disaster.flood"/>
       <modifier id="model.goods.grain" index="50"
                 type="additive" value="1"/>
@@ -1197,9 +1197,9 @@
                            zIndex="120">
       <scope method-name="isWater" method-value="false" />
       <scope method-name="isForested" method-value="false" />
-      <scope type="model.tile.arctic" matchNegated="true" />
-      <scope type="model.tile.hills" matchNegated="true" />
-      <scope type="model.tile.mountains" matchNegated="true" />
+      <scope type="model.tile.arctic" match-negated="true" />
+      <scope type="model.tile.hills" match-negated="true" />
+      <scope type="model.tile.mountains" match-negated="true" />
       <modifier id="model.goods.grain" index="50"
                 type="additive" value="1"/>
       <modifier id="model.goods.sugar" index="50"
@@ -1242,14 +1242,14 @@
     <tile-improvement-type id="model.improvement.fishBonusLand" natural="true"
                            zIndex="250">
       <scope method-name="isWater" method-value="true" />
-      <scope type="model.tile.highSeas" matchNegated="true" />
+      <scope type="model.tile.highSeas" match-negated="true" />
       <modifier id="model.goods.fish" index="50"
                 type="additive" value="2"/>
     </tile-improvement-type>
     <tile-improvement-type id="model.improvement.fishBonusRiver" natural="true"
                            zIndex="250">
       <scope method-name="isWater" method-value="true" />
-      <scope type="model.tile.highSeas" matchNegated="true" />
+      <scope type="model.tile.highSeas" match-negated="true" />
       <modifier id="model.goods.fish" index="50"
                 type="additive" value="1"/>
     </tile-improvement-type>
@@ -2107,7 +2107,7 @@
       <required-goods id="model.goods.tools" value="20"/>
       <modifier id="model.goods.bells" index="70"
                 type="percentage" value="50">
-        <scope ability-id="model.ability.person" matchNegated="true"/>
+        <scope ability-id="model.ability.person" match-negated="true"/>
       </modifier>
     </building-type>
     <building-type id="model.building.newspaper"
@@ -2119,7 +2119,7 @@
       <modifier id="model.goods.bells" delete="true" />
       <modifier id="model.goods.bells" index="70"
                 type="percentage" value="100">
-        <scope ability-id="model.ability.person" matchNegated="true"/>
+        <scope ability-id="model.ability.person" match-negated="true"/>
       </modifier>
     </building-type>
     <building-type id="model.building.customHouse"
@@ -2194,7 +2194,7 @@
                      weight1="10" weight2="1" weight3="1">
       <modifier id="model.goods.furs" index="40"
                 type="percentage" value="100">
-        <scope ability-id="model.ability.person" matchNegated="false"/>
+        <scope ability-id="model.ability.person" match-negated="false"/>
       </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.laSalle" type="exploration"
@@ -2240,7 +2240,7 @@
                      weight1="4" weight2="5" weight3="6">
       <modifier id="model.goods.bells" index="40"
                 type="percentage" value="50">
-        <scope ability-id="model.ability.person" matchNegated="true"/>
+        <scope ability-id="model.ability.person" match-negated="true"/>
       </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.pocahontas" type="political"
@@ -2257,7 +2257,7 @@
            set to the current tax. -->
       <modifier id="model.goods.bells" index="40"
                 type="percentage" value="0">
-        <scope ability-id="model.ability.person" matchNegated="true"/>
+        <scope ability-id="model.ability.person" match-negated="true"/>
       </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.simonBolivar" type="political"
@@ -2284,7 +2284,7 @@
                      weight1="8" weight2="5" weight3="2">
       <modifier id="model.goods.crosses" index="40"
                 type="percentage" value="50">
-        <scope ability-id="model.ability.person" matchNegated="true"/>
+        <scope ability-id="model.ability.person" match-negated="true"/>
       </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.fatherJeanDeBrebeuf" type="religious"

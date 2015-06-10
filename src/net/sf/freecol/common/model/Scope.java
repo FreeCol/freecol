@@ -294,11 +294,15 @@ public class Scope extends FreeColObject {
 
     private static final String ABILITY_ID_TAG = "ability-id";
     private static final String ABILITY_VALUE_TAG = "ability-value";
-    private static final String MATCH_NEGATED_TAG = "matchNegated";
-    private static final String MATCHES_NULL_TAG = "matchesNull";
+    private static final String MATCH_NEGATED_TAG = "match-negated";
+    private static final String MATCHES_NULL_TAG = "matches-null";
     private static final String METHOD_NAME_TAG = "method-name";
     private static final String METHOD_VALUE_TAG = "method-value";
     private static final String TYPE_TAG = "type";
+    // @compat 0.11.3
+    private static final String OLD_MATCH_NEGATED_TAG = "matchNegated";
+    private static final String OLD_MATCHES_NULL_TAG = "matchesNull";
+    // end @compat 0.11.3
 
 
     /**
@@ -341,9 +345,19 @@ public class Scope extends FreeColObject {
         // Scopes do not have ids, no super.readAttributes().
         // However, they might in future.
 
-        matchNegated = xr.getAttribute(MATCH_NEGATED_TAG, false);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_MATCH_NEGATED_TAG)) {
+            matchNegated = xr.getAttribute(OLD_MATCH_NEGATED_TAG, false);
+        } else
+        // end @compat 0.11.3
+            matchNegated = xr.getAttribute(MATCH_NEGATED_TAG, false);
 
-        matchesNull = xr.getAttribute(MATCHES_NULL_TAG, true);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_MATCHES_NULL_TAG)) {
+            matchesNull = xr.getAttribute(OLD_MATCHES_NULL_TAG, true);
+        } else
+        // end @compat 0.11.3
+            matchesNull = xr.getAttribute(MATCHES_NULL_TAG, true);
 
         type = xr.getAttribute(TYPE_TAG, (String)null);
         // @compat 0.10.x
@@ -378,8 +392,8 @@ public class Scope extends FreeColObject {
         if (methodName != null) {
             sb.append(" ").append(methodName).append("=").append(methodValue);
         }
-        if (matchesNull) sb.append(" matchesNull");
-        if (matchNegated) sb.append(" matchNegated");
+        if (matchesNull) sb.append(" matches-null");
+        if (matchNegated) sb.append(" match-negated");
         sb.append("]");
         return sb.toString();
     }

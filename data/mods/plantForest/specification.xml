@@ -26,9 +26,9 @@
                            magnitude="2">
       <scope method-name="isForested"      method-value="false" />
       <scope method-name="isWater"         method-value="false" />
-      <scope type="model.tile.arctic"      matchNegated="true" />
-      <scope type="model.tile.hills"       matchNegated="true" />
-      <scope type="model.tile.mountains"   matchNegated="true" />
+      <scope type="model.tile.arctic"      match-negated="true" />
+      <scope type="model.tile.hills"       match-negated="true" />
+      <scope type="model.tile.mountains"   match-negated="true" />
       <change from="model.tile.plains"     to="model.tile.mixedForest"/>
       <change from="model.tile.grassland"  to="model.tile.coniferForest"/>
       <change from="model.tile.prairie"    to="model.tile.broadleafForest"/>
