@@ -73,6 +73,7 @@
      0.94: exposeResourcePercent -> expose-resource-percent
      0.95: Fix capitalization in UnitType.
      0.96: Fix capitalization in BuildingType.
+     0.97: scoreValue -> score-value in Event.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -627,7 +628,10 @@
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="value" type="xs:string"/>
+      <xs:attribute name="score-value" type="xs:integer"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="scoreValue" type="xs:integer"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 

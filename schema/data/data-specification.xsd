@@ -533,7 +533,10 @@
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="value" type="xs:string"/>
+      <xs:attribute name="score-value" type="xs:integer"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="scoreValue" type="xs:integer"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 

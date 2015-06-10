@@ -138,7 +138,10 @@ public class Event extends FreeColGameObjectType {
 
     // Serialization
 
-    private static final String SCORE_VALUE_TAG = "scoreValue";
+    private static final String SCORE_VALUE_TAG = "score-value";
+    // @compat 0.11.3
+    private static final String OLD_SCORE_VALUE_TAG = "scoreValue";
+    // end @compat 0.11.3
 
 
     /**
@@ -176,7 +179,12 @@ public class Event extends FreeColGameObjectType {
 
         value = xr.getAttribute(VALUE_TAG, (String)null);
 
-        scoreValue = xr.getAttribute(SCORE_VALUE_TAG, 0);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_SCORE_VALUE_TAG)) {
+            scoreValue = xr.getAttribute(OLD_SCORE_VALUE_TAG, 0);
+        } else
+        // end @compat 0.11.3
+            scoreValue = xr.getAttribute(SCORE_VALUE_TAG, 0);
     }
 
     /**

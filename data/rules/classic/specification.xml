@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.96">
+<freecol-specification id="classic" version="0.97">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -64,7 +64,7 @@
   </modifiers>
 
   <events>
-    <event id="model.event.declareIndependence" scoreValue="100">
+    <event id="model.event.declareIndependence" score-value="100">
       <limit id="model.limit.independence.rebels" operator="GE">
         <leftHandSide scopeLevel="PLAYER" method-name="getSoL" />
         <rightHandSide value="50" />
