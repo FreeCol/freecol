@@ -428,7 +428,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
     private static final String DELIVER_GOODS_TYPE_TAG = "deliver-goods-type";
     private static final String DISASTER_TAG = "disaster";
     private static final String EXPENDED_AMOUNT_TAG = "expended-amount";
-    private static final String EXPOSE_RESOURCE_PERCENT_TAG = "exposeResourcePercent";
+    private static final String EXPOSE_RESOURCE_PERCENT_TAG = "expose-resource-percent";
     private static final String FROM_TAG = "from";
     private static final String MAGNITUDE_TAG = "magnitude";
     private static final String MOVEMENT_COST_TAG = "movement-cost";
@@ -442,6 +442,10 @@ public final class TileImprovementType extends FreeColGameObjectType {
     // @compat 0.10.x
     private static final String EXPENDED_EQUIPMENT_TYPE_TAG = "expended-equipment-type";
     // end @compat 0.10.x
+    // @compat 0.11.3
+    private static final String OLD_EXPOSE_RESOURCE_PERCENT_TAG = "exposeResourcePercent";
+
+    // end @compat 0.11.3
 
 
     /**
@@ -552,7 +556,12 @@ public final class TileImprovementType extends FreeColGameObjectType {
 
         zIndex = xr.getAttribute(ZINDEX_TAG, 0);
 
-        exposeResourcePercent = xr.getAttribute(EXPOSE_RESOURCE_PERCENT_TAG, 0);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_EXPOSE_RESOURCE_PERCENT_TAG)) {
+            exposeResourcePercent = xr.getAttribute(OLD_EXPOSE_RESOURCE_PERCENT_TAG, 0);
+        } else
+        // end @compat 0.11.3
+            exposeResourcePercent = xr.getAttribute(EXPOSE_RESOURCE_PERCENT_TAG, 0);
     }
 
     /**

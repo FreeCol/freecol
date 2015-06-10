@@ -70,6 +70,7 @@
      0.91: productionLevel -> production-level
      0.92: Fix capitalization in tile-type/gen/*.
      0.93: Fix capitalization in role.
+     0.94: exposeResourcePercent -> expose-resource-percent
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -422,7 +423,10 @@
       <xs:attribute name="magnitude" type="xs:nonNegativeInteger"/>
       <xs:attribute name="movement-cost" type="xs:nonNegativeInteger"/>
       <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="expose-resource-percent" type="xs:nonNegativeInteger"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="exposeResourcePercent" type="xs:nonNegativeInteger"/>
+      <!-- end @compat 0.11.3 -->
       <!-- @compat 0.10.x -->
       <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
       <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>

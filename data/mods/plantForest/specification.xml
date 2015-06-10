@@ -19,11 +19,11 @@
     *
   -->
 <freecol-specification id="plantForest">
-  <tileimprovement-types>
-    <tileimprovement-type id="model.improvement.plantForest" add-work-turns="9"
-                          expended-equipment-type="model.equipment.tools"
-                          expended-amount="4"
-                          magnitude="2">
+  <tile-improvement-types>
+    <tile-improvement-type id="model.improvement.plantForest" add-work-turns="9"
+                           expended-equipment-type="model.equipment.tools"
+                           expended-amount="4"
+                           magnitude="2">
       <scope method-name="isForested"      method-value="false" />
       <scope method-name="isWater"         method-value="false" />
       <scope type="model.tile.arctic"      matchNegated="true" />
@@ -37,6 +37,6 @@
       <change from="model.tile.swamp"      to="model.tile.rainForest"/>
       <change from="model.tile.desert"     to="model.tile.scrubForest"/>
       <change from="model.tile.tundra"     to="model.tile.borealForest"/>
-    </tileimprovement-type>
-  </tileimprovement-types>
+    </tile-improvement-type>
+  </tile-improvement-types>
 </freecol-specification>

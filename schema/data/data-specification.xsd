@@ -334,7 +334,10 @@
       <xs:attribute name="magnitude" type="xs:nonNegativeInteger"/>
       <xs:attribute name="movement-cost" type="xs:nonNegativeInteger"/>
       <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="expose-resource-percent" type="xs:nonNegativeInteger"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="exposeResourcePercent" type="xs:nonNegativeInteger"/>
+      <!-- end @compat 0.11.3 -->
       <!-- @compat 0.10.x -->
       <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
       <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>
