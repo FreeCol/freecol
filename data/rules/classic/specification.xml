@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.95">
+<freecol-specification id="classic" version="0.96">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -1740,7 +1740,7 @@
     </building-type>
     <building-type id="model.building.lumberMill"
                    extends="model.building.carpenterHouse"
-                   upgradesFrom="model.building.carpenterHouse"
+                   upgrades-from="model.building.carpenterHouse"
                    required-population="3" upkeep="10">
       <production>
         <input goods-type="model.goods.lumber" value="6"/>
@@ -1760,7 +1760,7 @@
     </building-type>
     <building-type id="model.building.blacksmithShop"
                    extends="model.building.blacksmithHouse"
-                   upgradesFrom="model.building.blacksmithHouse"
+                   upgrades-from="model.building.blacksmithHouse"
                    upkeep="5">
       <production>
         <input goods-type="model.goods.ore" value="6"/>
@@ -1771,7 +1771,7 @@
     </building-type>
     <building-type id="model.building.ironWorks"
                    extends="model.building.blacksmithShop"
-                   upgradesFrom="model.building.blacksmithShop"
+                   upgrades-from="model.building.blacksmithShop"
                    required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.ore" value="6"/>
@@ -1790,7 +1790,7 @@
     </building-type>
     <building-type id="model.building.tobacconistShop"
                    extends="model.building.tobacconistHouse"
-                   upgradesFrom="model.building.tobacconistHouse"
+                   upgrades-from="model.building.tobacconistHouse"
                    upkeep="5">
       <production>
         <input goods-type="model.goods.tobacco" value="6"/>
@@ -1801,7 +1801,7 @@
     </building-type>
     <building-type id="model.building.cigarFactory"
                    extends="model.building.tobacconistShop"
-                   upgradesFrom="model.building.tobacconistShop"
+                   upgrades-from="model.building.tobacconistShop"
                    required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.tobacco" value="6"/>
@@ -1820,7 +1820,7 @@
     </building-type>
     <building-type id="model.building.weaverShop"
                    extends="model.building.weaverHouse"
-                   upgradesFrom="model.building.weaverHouse"
+                   upgrades-from="model.building.weaverHouse"
                    upkeep="5">
       <production>
         <input goods-type="model.goods.cotton" value="6"/>
@@ -1831,7 +1831,7 @@
     </building-type>
     <building-type id="model.building.textileMill"
                    extends="model.building.weaverShop"
-                   upgradesFrom="model.building.weaverShop"
+                   upgrades-from="model.building.weaverShop"
                    required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.cotton" value="6"/>
@@ -1850,7 +1850,7 @@
     </building-type>
     <building-type id="model.building.rumDistillery"
                    extends="model.building.distillerHouse"
-                   upgradesFrom="model.building.distillerHouse"
+                   upgrades-from="model.building.distillerHouse"
                    upkeep="5">
       <production>
         <input goods-type="model.goods.sugar" value="6"/>
@@ -1861,7 +1861,7 @@
     </building-type>
     <building-type id="model.building.rumFactory"
                    extends="model.building.rumDistillery"
-                   upgradesFrom="model.building.rumDistillery"
+                   upgrades-from="model.building.rumDistillery"
                    required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.sugar" value="6"/>
@@ -1880,7 +1880,7 @@
     </building-type>
     <building-type id="model.building.furTradingPost"
                    extends="model.building.furTraderHouse"
-                   upgradesFrom="model.building.furTraderHouse"
+                   upgrades-from="model.building.furTraderHouse"
                    upkeep="5">
       <production>
         <input goods-type="model.goods.furs" value="6"/>
@@ -1891,7 +1891,7 @@
     </building-type>
     <building-type id="model.building.furFactory"
                    extends="model.building.furTradingPost"
-                   upgradesFrom="model.building.furTradingPost"
+                   upgrades-from="model.building.furTradingPost"
                    required-population="6" upkeep="15">
       <production>
         <input goods-type="model.goods.furs" value="6"/>
@@ -1903,23 +1903,23 @@
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.schoolhouse"
-                   workplaces="1" minSkill="1" maxSkill="1"
+                   workplaces="1" minimum-skill="1" maximum-skill="1"
                    required-population="4" upkeep="5">
       <required-goods id="model.goods.hammers" value="64"/>
       <ability id="model.ability.teach" value="true"/>
     </building-type>
     <building-type id="model.building.college"
                    extends="model.building.schoolhouse"
-                   workplaces="2" maxSkill="2"
-                   upgradesFrom="model.building.schoolhouse"
+                   workplaces="2" maximum-skill="2"
+                   upgrades-from="model.building.schoolhouse"
                    required-population="8" upkeep="10">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="50"/>
     </building-type>
     <building-type id="model.building.university"
                    extends="model.building.college"
-                   workplaces="3" maxSkill="4"
-                   upgradesFrom="model.building.college"
+                   workplaces="3" maximum-skill="4"
+                   upgrades-from="model.building.college"
                    required-population="10" upkeep="15">
       <required-goods id="model.goods.hammers" value="200"/>
       <required-goods id="model.goods.tools" value="100"/>
@@ -1938,7 +1938,7 @@
     </building-type>
     <building-type id="model.building.magazine"
                    extends="model.building.armory"
-                   upgradesFrom="model.building.armory"
+                   upgrades-from="model.building.armory"
                    required-population="8" upkeep="10">
       <production>
         <input goods-type="model.goods.tools" value="6"/>
@@ -1949,7 +1949,7 @@
     </building-type>
     <building-type id="model.building.arsenal"
                    extends="model.building.magazine"
-                   upgradesFrom="model.building.magazine"
+                   upgrades-from="model.building.magazine"
                    upkeep="15">
       <production>
         <input goods-type="model.goods.tools" value="9"/>
@@ -1967,7 +1967,7 @@
     </building-type>
     <building-type id="model.building.church"
                    extends="model.building.chapel"
-                   upgradesFrom="model.building.chapel"
+                   upgrades-from="model.building.chapel"
                    workplaces="3"
                    required-population="3" upkeep="5">
       <production unattended="true">
@@ -1981,7 +1981,7 @@
     </building-type>
     <building-type id="model.building.cathedral"
                    extends="model.building.church"
-                   upgradesFrom="model.building.church"
+                   upgrades-from="model.building.church"
                    required-population="8" upkeep="15">
       <production unattended="true">
         <output goods-type="model.goods.crosses" value="3"/>
@@ -2003,7 +2003,7 @@
     </building-type>
     <building-type id="model.building.fort"
                    extends="model.building.stockade"
-                   upgradesFrom="model.building.stockade"
+                   upgrades-from="model.building.stockade"
                    upkeep="10">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="100"/>
@@ -2014,7 +2014,7 @@
     </building-type>
     <building-type id="model.building.fortress"
                    extends="model.building.fort"
-                   upgradesFrom="model.building.fort"
+                   upgrades-from="model.building.fort"
                    required-population="8" upkeep="15">
       <required-goods id="model.goods.hammers" value="320"/>
       <required-goods id="model.goods.tools" value="200"/>
@@ -2029,7 +2029,7 @@
     </building-type>
     <building-type id="model.building.warehouse"
                    extends="model.building.depot"
-                   upgradesFrom="model.building.depot"
+                   upgrades-from="model.building.depot"
                    upkeep="5">
       <required-goods id="model.goods.hammers" value="80"/>
       <modifier id="model.modifier.warehouseStorage"
@@ -2037,7 +2037,7 @@
     </building-type>
     <building-type id="model.building.warehouseExpansion"
                    extends="model.building.warehouse"
-                   upgradesFrom="model.building.warehouse"
+                   upgrades-from="model.building.warehouse"
                    upkeep="5">
       <required-goods id="model.goods.hammers" value="80"/>
       <required-goods id="model.goods.tools" value="20"/>
@@ -2063,7 +2063,7 @@
     </building-type>
     <building-type id="model.building.stables"
                    extends="model.building.country"
-                   upgradesFrom="model.building.country"
+                   upgrades-from="model.building.country"
                    upkeep="5">
       <production unattended="true">
         <input goods-type="model.goods.food" value="1"/>
@@ -2082,7 +2082,7 @@
     </building-type>
     <building-type id="model.building.drydock"
                    extends="model.building.docks"
-                   upgradesFrom="model.building.docks"
+                   upgrades-from="model.building.docks"
                    required-population="4" upkeep="10">
       <required-goods id="model.goods.hammers" value="80"/>
       <required-goods id="model.goods.tools" value="50"/>
@@ -2092,7 +2092,7 @@
     </building-type>
     <building-type id="model.building.shipyard"
                    extends="model.building.drydock"
-                   upgradesFrom="model.building.drydock"
+                   upgrades-from="model.building.drydock"
                    required-population="8" upkeep="15">
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
@@ -2112,7 +2112,7 @@
     </building-type>
     <building-type id="model.building.newspaper"
                    extends="model.building.printingPress"
-                   upgradesFrom="model.building.printingPress"
+                   upgrades-from="model.building.printingPress"
                    required-population="4" upkeep="10">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="50"/>

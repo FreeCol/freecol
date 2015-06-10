@@ -68,10 +68,11 @@
      0.89: tileimprovement-type/s -> tile-improvement-type/s
      0.90: difficultyLevel -> difficulty-level
      0.91: productionLevel -> production-level
-     0.92: Fix capitalization in tile-type/gen/*.
-     0.93: Fix capitalization in role.
+     0.92: Fix capitalization in Tile-type/gen/*.
+     0.93: Fix capitalization in Role.
      0.94: exposeResourcePercent -> expose-resource-percent
-     0.95: Fix capitalization in unitType.
+     0.95: Fix capitalization in UnitType.
+     0.96: Fix capitalization in BuildingType.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -540,10 +541,15 @@
       <xs:attribute name="workplaces" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="required-population" type="xs:nonNegativeInteger"/>
       <xs:attribute name="priority" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="minimum-skill" type="xs:int"/>
+      <xs:attribute name="maximum-skill" type="xs:int"/>
+      <xs:attribute name="upgrades-from" type="BuildingTypeId"/>
+      <xs:attribute name="upkeep" type="xs:int"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="minSkill" type="xs:int"/>
       <xs:attribute name="maxSkill" type="xs:int"/>
       <xs:attribute name="upgradesFrom" type="BuildingTypeId"/>
-      <xs:attribute name="upkeep" type="xs:int"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 

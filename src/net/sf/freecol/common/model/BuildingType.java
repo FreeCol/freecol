@@ -344,16 +344,23 @@ public final class BuildingType extends BuildableType {
 
     // Serialization
 
-    private static final String BASIC_PRODUCTION_TAG = "basicProduction";
-    private static final String CONSUMES_TAG = "consumes";
-    private static final String MAX_SKILL_TAG = "maxSkill";
-    private static final String MIN_SKILL_TAG = "minSkill";
+    private static final String MAXIMUM_SKILL_TAG = "maximum-skill";
+    private static final String MINIMUM_SKILL_TAG = "minimum-skill";
     private static final String PRIORITY_TAG = "priority";
-    private static final String PRODUCES_TAG = "produces";
     private static final String PRODUCTION_TAG = "production";
-    private static final String UPGRADES_FROM_TAG = "upgradesFrom";
+    private static final String UPGRADES_FROM_TAG = "upgrades-from";
     private static final String UPKEEP_TAG = "upkeep";
     private static final String WORKPLACES_TAG = "workplaces";
+    // @compat 0.10.6
+    private static final String BASIC_PRODUCTION_TAG = "basicProduction";
+    private static final String CONSUMES_TAG = "consumes";
+    private static final String PRODUCES_TAG = "produces";
+    // end @compat 0.10.6
+    // @compat 0.11.3
+    private static final String OLD_MAX_SKILL_TAG = "maxSkill";
+    private static final String OLD_MIN_SKILL_TAG = "minSkill";
+    private static final String OLD_UPGRADES_FROM_TAG = "upgradesFrom";
+    // end @compat 0.11.3
 
 
     /**
@@ -370,11 +377,11 @@ public final class BuildingType extends BuildableType {
         xw.writeAttribute(WORKPLACES_TAG, workPlaces);
 
         if (minSkill != UNDEFINED) {
-            xw.writeAttribute(MIN_SKILL_TAG, minSkill);
+            xw.writeAttribute(MINIMUM_SKILL_TAG, minSkill);
         }
 
         if (maxSkill < INFINITY) {
-            xw.writeAttribute(MAX_SKILL_TAG, maxSkill);
+            xw.writeAttribute(MAXIMUM_SKILL_TAG, maxSkill);
         }
 
         if (upkeep > 0) {
@@ -412,8 +419,14 @@ public final class BuildingType extends BuildableType {
         BuildingType parent = xr.getType(spec, EXTENDS_TAG,
             BuildingType.class, this);
 
-        upgradesFrom = xr.getType(spec, UPGRADES_FROM_TAG,
-            BuildingType.class, (BuildingType)null);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_UPGRADES_FROM_TAG)) {
+            upgradesFrom = xr.getType(spec, OLD_UPGRADES_FROM_TAG,
+                BuildingType.class, (BuildingType)null);
+        } else
+        // end @compat 0.11.3
+            upgradesFrom = xr.getType(spec, UPGRADES_FROM_TAG,
+                BuildingType.class, (BuildingType)null);
         if (upgradesFrom == null) {
             level = 1;
         } else {
@@ -423,9 +436,19 @@ public final class BuildingType extends BuildableType {
 
         workPlaces = xr.getAttribute(WORKPLACES_TAG, parent.workPlaces);
 
-        minSkill = xr.getAttribute(MIN_SKILL_TAG, parent.minSkill);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_MIN_SKILL_TAG)) {
+            minSkill = xr.getAttribute(OLD_MIN_SKILL_TAG, parent.minSkill);
+        } else
+        // end @compat 0.11.3
+            minSkill = xr.getAttribute(MINIMUM_SKILL_TAG, parent.minSkill);
 
-        maxSkill = xr.getAttribute(MAX_SKILL_TAG, parent.maxSkill);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_MAX_SKILL_TAG)) {
+            maxSkill = xr.getAttribute(OLD_MAX_SKILL_TAG, parent.maxSkill);
+        } else
+        // end @compat 0.11.3
+            maxSkill = xr.getAttribute(MAXIMUM_SKILL_TAG, parent.maxSkill);
 
         upkeep = xr.getAttribute(UPKEEP_TAG, parent.upkeep);
 

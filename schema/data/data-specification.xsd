@@ -449,10 +449,15 @@
       <xs:attribute name="workplaces" use="optional" type="xs:nonNegativeInteger"/>
       <xs:attribute name="required-population" type="xs:nonNegativeInteger"/>
       <xs:attribute name="priority" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="minimum-skill" type="xs:int"/>
+      <xs:attribute name="maximum-skill" type="xs:int"/>
+      <xs:attribute name="upgrades-from" type="BuildingTypeId"/>
+      <xs:attribute name="upkeep" type="xs:int"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="minSkill" type="xs:int"/>
       <xs:attribute name="maxSkill" type="xs:int"/>
       <xs:attribute name="upgradesFrom" type="BuildingTypeId"/>
-      <xs:attribute name="upkeep" type="xs:int"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 

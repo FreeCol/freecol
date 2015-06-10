@@ -100,7 +100,7 @@
       <modifier id="model.goods.bells" type="additive" value="1"/>
     </building-type>
     <building-type id="model.building.CityHall" workplaces="3"
-                   upgradesFrom="model.building.townHall"
+                   upgrades-from="model.building.townHall"
                    required-population="6" >
       <production>
         <output goods-type="model.goods.bells" value="6"/>
@@ -110,7 +110,7 @@
       <required-goods id="model.goods.tools" value="48"/>
     </building-type>
     <building-type id="model.building.Capitol" workplaces="3"
-                   upgradesFrom="model.building.CityHall"
+                   upgrades-from="model.building.CityHall"
                    required-population="9">
       <production>
         <output goods-type="model.goods.bells" value="9"/>
@@ -126,7 +126,7 @@
       </production>
     </building-type>
     <building-type id="model.building.CordageMakerShop"  workplaces="3"
-                   upgradesFrom="model.building.CordageMakerHouse">
+                   upgrades-from="model.building.CordageMakerHouse">
       <production>
         <input goods-type="model.goods.hemp" value="6"/>
         <output goods-type="model.goods.cordage" value="6"/>
@@ -135,7 +135,7 @@
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
     <building-type id="model.building.CordageFactory" workplaces="3"
-                   upgradesFrom="model.building.CordageMakerShop"
+                   upgrades-from="model.building.CordageMakerShop"
                    required-population="8">
       <production>
         <input goods-type="model.goods.hemp" value="9"/>
