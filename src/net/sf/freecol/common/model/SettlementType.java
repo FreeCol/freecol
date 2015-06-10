@@ -277,18 +277,30 @@ public class SettlementType extends FreeColGameObjectType {
     // Serialization
 
     private static final String CAPITAL_TAG = "capital";
-    private static final String CLAIMABLE_RADIUS_TAG = "claimableRadius";
-    private static final String CONVERT_THRESHOLD_TAG = "convertThreshold";
-    private static final String EXTRA_CLAIMABLE_RADIUS_TAG = "extraClaimableRadius";
+    private static final String CLAIMABLE_RADIUS_TAG = "claimable-radius";
+    private static final String CONVERT_THRESHOLD_TAG = "convert-threshold";
+    private static final String EXTRA_CLAIMABLE_RADIUS_TAG = "extra-claimable-radius";
     private static final String GIFTS_TAG = "gifts";
-    private static final String MAXIMUM_GROWTH_TAG = "maximumGrowth";
-    private static final String MAXIMUM_SIZE_TAG = "maximumSize";
-    private static final String MINIMUM_GROWTH_TAG = "minimumGrowth";
-    private static final String MINIMUM_SIZE_TAG = "minimumSize";
+    private static final String MAXIMUM_GROWTH_TAG = "maximum-growth";
+    private static final String MAXIMUM_SIZE_TAG = "maximum-size";
+    private static final String MINIMUM_GROWTH_TAG = "minimum-growth";
+    private static final String MINIMUM_SIZE_TAG = "minimum-size";
     private static final String PLUNDER_TAG = "plunder";
-    private static final String TRADE_BONUS_TAG = "tradeBonus";
-    private static final String VISIBLE_RADIUS_TAG = "visibleRadius";
-    private static final String WANDERING_RADIUS_TAG = "wanderingRadius";
+    private static final String TRADE_BONUS_TAG = "trade-bonus";
+    private static final String VISIBLE_RADIUS_TAG = "visible-radius";
+    private static final String WANDERING_RADIUS_TAG = "wandering-radius";
+    // @compat 0.11.3
+    private static final String OLD_CLAIMABLE_RADIUS_TAG = "claimableRadius";
+    private static final String OLD_CONVERT_THRESHOLD_TAG = "convertThreshold";
+    private static final String OLD_EXTRA_CLAIMABLE_RADIUS_TAG = "extraClaimableRadius";
+    private static final String OLD_MAXIMUM_GROWTH_TAG = "maximumGrowth";
+    private static final String OLD_MAXIMUM_SIZE_TAG = "maximumSize";
+    private static final String OLD_MINIMUM_GROWTH_TAG = "minimumGrowth";
+    private static final String OLD_MINIMUM_SIZE_TAG = "minimumSize";
+    private static final String OLD_TRADE_BONUS_TAG = "tradeBonus";
+    private static final String OLD_VISIBLE_RADIUS_TAG = "visibleRadius";
+    private static final String OLD_WANDERING_RADIUS_TAG = "wanderingRadius";
+    // end @compat 0.11.3
 
 
     /**
@@ -346,29 +358,75 @@ public class SettlementType extends FreeColGameObjectType {
 
         capital = xr.getAttribute(CAPITAL_TAG, capital);
 
-        minimumSize = xr.getAttribute(MINIMUM_SIZE_TAG, minimumSize);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_MINIMUM_SIZE_TAG)) {
+            minimumSize = xr.getAttribute(OLD_MINIMUM_SIZE_TAG, minimumSize);
+        } else
+        // end @compat 0.11.3
+            minimumSize = xr.getAttribute(MINIMUM_SIZE_TAG, minimumSize);
 
-        maximumSize = xr.getAttribute(MAXIMUM_SIZE_TAG, maximumSize);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_MAXIMUM_SIZE_TAG)) {
+            maximumSize = xr.getAttribute(OLD_MAXIMUM_SIZE_TAG, maximumSize);
+        } else
+        // end @compat 0.11.3
+            maximumSize = xr.getAttribute(MAXIMUM_SIZE_TAG, maximumSize);
 
-        visibleRadius = xr.getAttribute(VISIBLE_RADIUS_TAG, visibleRadius);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_VISIBLE_RADIUS_TAG)) {
+            visibleRadius = xr.getAttribute(OLD_VISIBLE_RADIUS_TAG, visibleRadius);
+        } else
+        // end @compat 0.11.3
+            visibleRadius = xr.getAttribute(VISIBLE_RADIUS_TAG, visibleRadius);
 
-        claimableRadius = xr.getAttribute(CLAIMABLE_RADIUS_TAG,
-                                          claimableRadius);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_CLAIMABLE_RADIUS_TAG)) {
+            claimableRadius = xr.getAttribute(OLD_CLAIMABLE_RADIUS_TAG, claimableRadius);
+        } else
+        // end @compat 0.11.3
+            claimableRadius = xr.getAttribute(CLAIMABLE_RADIUS_TAG, claimableRadius);
 
-        extraClaimableRadius = xr.getAttribute(EXTRA_CLAIMABLE_RADIUS_TAG,
-                                               extraClaimableRadius);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_EXTRA_CLAIMABLE_RADIUS_TAG)) {
+            extraClaimableRadius = xr.getAttribute(OLD_EXTRA_CLAIMABLE_RADIUS_TAG, extraClaimableRadius);
+        } else
+        // end @compat 0.11.3
+            extraClaimableRadius = xr.getAttribute(EXTRA_CLAIMABLE_RADIUS_TAG, extraClaimableRadius);
 
-        wanderingRadius = xr.getAttribute(WANDERING_RADIUS_TAG,
-                                          wanderingRadius);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_WANDERING_RADIUS_TAG)) {
+            wanderingRadius = xr.getAttribute(OLD_WANDERING_RADIUS_TAG, wanderingRadius);
+        } else
+        // end @compat 0.11.3
+            wanderingRadius = xr.getAttribute(WANDERING_RADIUS_TAG, wanderingRadius);
 
-        minimumGrowth = xr.getAttribute(MINIMUM_GROWTH_TAG, minimumGrowth);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_MINIMUM_GROWTH_TAG)) {
+            minimumGrowth = xr.getAttribute(OLD_MINIMUM_GROWTH_TAG, minimumGrowth);
+        } else
+        // end @compat 0.11.3
+            minimumGrowth = xr.getAttribute(MINIMUM_GROWTH_TAG, minimumGrowth);
 
-        maximumGrowth = xr.getAttribute(MAXIMUM_GROWTH_TAG, maximumGrowth);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_MAXIMUM_GROWTH_TAG)) {
+            maximumGrowth = xr.getAttribute(OLD_MAXIMUM_GROWTH_TAG, maximumGrowth);
+        } else
+        // end @compat 0.11.3
+            maximumGrowth = xr.getAttribute(MAXIMUM_GROWTH_TAG, maximumGrowth);
 
-        tradeBonus = xr.getAttribute(TRADE_BONUS_TAG, tradeBonus);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_TRADE_BONUS_TAG)) {
+            tradeBonus = xr.getAttribute(OLD_TRADE_BONUS_TAG, tradeBonus);
+        } else
+        // end @compat 0.11.3
+            tradeBonus = xr.getAttribute(TRADE_BONUS_TAG, tradeBonus);
 
-        convertThreshold = xr.getAttribute(CONVERT_THRESHOLD_TAG,
-                                           convertThreshold);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_CONVERT_THRESHOLD_TAG)) {
+            convertThreshold = xr.getAttribute(OLD_CONVERT_THRESHOLD_TAG, convertThreshold);
+        } else
+        // end @compat 0.11.3
+            convertThreshold = xr.getAttribute(CONVERT_THRESHOLD_TAG, convertThreshold);
     }
 
     /**

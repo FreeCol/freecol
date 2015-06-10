@@ -74,6 +74,7 @@
      0.95: Fix capitalization in UnitType.
      0.96: Fix capitalization in BuildingType.
      0.97: scoreValue -> score-value in Event.
+     0.98: Fix capitalization in national settlement type.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -789,6 +790,17 @@
       <xs:attribute name="id" use="required" type="SettlementTypeId"/>
       <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="capital" type="xs:boolean"/>
+      <xs:attribute name="claimable-radius" type="xs:integer"/>
+      <xs:attribute name="extra-claimable-radius" type="xs:integer"/>
+      <xs:attribute name="visible-radius" type="xs:integer"/>
+      <xs:attribute name="wandering-radius" type="xs:integer"/>
+      <xs:attribute name="minimum-size" type="xs:integer"/>
+      <xs:attribute name="maximum-size" type="xs:integer"/>
+      <xs:attribute name="minimum-growth" type="xs:integer"/>
+      <xs:attribute name="maximum-growth" type="xs:integer"/>
+      <xs:attribute name="trade-bonus" type="xs:integer"/>
+      <xs:attribute name="convert-threshold" type="xs:integer"/>
+      <!-- @compat 0.11.3 -->
       <xs:attribute name="claimableRadius" type="xs:integer"/>
       <xs:attribute name="extraClaimableRadius" type="xs:integer"/>
       <xs:attribute name="visibleRadius" type="xs:integer"/>
@@ -799,6 +811,7 @@
       <xs:attribute name="maximumGrowth" type="xs:integer"/>
       <xs:attribute name="tradeBonus" type="xs:integer"/>
       <xs:attribute name="convertThreshold" type="xs:integer"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 
