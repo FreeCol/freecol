@@ -77,6 +77,7 @@
      0.98:  Fix capitalization in national settlement type.
      0.99:  Downcase disaster amount enum.
      0.100: Fix capitalization in Nation.
+     0.101: Fix capitalization in Limit.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -1011,19 +1012,32 @@
 
   <xs:element name="limit">
     <xs:complexType>
-      <xs:sequence>
-        <xs:element name="leftHandSide" type="OperandType" />
-        <xs:element name="rightHandSide" type="OperandType" />
-      </xs:sequence>
+      <xs:choice minOccurs="1" maxOccurs="1">
+        <xs:sequence>
+          <xs:element name="left-hand-side" type="OperandType" />
+          <xs:element name="right-hand-side" type="OperandType" />
+        </xs:sequence>
+        <xs:sequence>
+          <xs:element name="leftHandSide" type="OperandType" />
+          <xs:element name="rightHandSide" type="OperandType" />
+        </xs:sequence>
+      </xs:choice>
       <xs:attribute name="id" type="xs:string" />
       <xs:attribute name="operator" use="required">
         <xs:simpleType>
           <xs:restriction base="xs:token">
+            <xs:enumeration value="lt"/>
+            <xs:enumeration value="le"/>
+            <xs:enumeration value="gt"/>
+            <xs:enumeration value="ge"/>
+            <xs:enumeration value="eq"/>
+            <!-- @compat 0.11.3 -->
             <xs:enumeration value="LT"/>
             <xs:enumeration value="LE"/>
             <xs:enumeration value="GT"/>
             <xs:enumeration value="GE"/>
             <xs:enumeration value="EQ"/>
+            <!-- end @compat 0.11.3 -->
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

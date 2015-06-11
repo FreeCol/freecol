@@ -1041,19 +1041,34 @@
 
   <xs:element name="limit">
     <xs:complexType>
-      <xs:sequence>
-        <xs:element name="leftHandSide" type="OperandType" />
-        <xs:element name="rightHandSide" type="OperandType" />
-      </xs:sequence>
+      <xs:choice minOccurs="1" maxOccurs="1">
+        <xs:sequence>
+          <xs:element name="left-hand-side" type="OperandType" />
+          <xs:element name="right-hand-side" type="OperandType" />
+        </xs:sequence>
+        <!-- @compat 0.11.3 -->
+        <xs:sequence>
+          <xs:element name="leftHandSide" type="OperandType" />
+          <xs:element name="rightHandSide" type="OperandType" />
+        </xs:sequence>
+        <!-- end @compat 0.11.3 -->
+      </xs:choice>
       <xs:attribute name="id" type="xs:string" />
       <xs:attribute name="operator" use="required">
         <xs:simpleType>
           <xs:restriction base="xs:token">
+            <xs:enumeration value="lt"/>
+            <xs:enumeration value="le"/>
+            <xs:enumeration value="gt"/>
+            <xs:enumeration value="ge"/>
+            <xs:enumeration value="eq"/>
+            <!-- @compat 0.11.3 -->
             <xs:enumeration value="LT"/>
             <xs:enumeration value="LE"/>
             <xs:enumeration value="GT"/>
             <xs:enumeration value="GE"/>
             <xs:enumeration value="EQ"/>
+            <!-- end @compat 0.11.3 -->
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

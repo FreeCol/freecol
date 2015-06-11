@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.100">
+<freecol-specification id="classic" version="0.101">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -65,35 +65,35 @@
 
   <events>
     <event id="model.event.declareIndependence" score-value="100">
-      <limit id="model.limit.independence.rebels" operator="GE">
-        <leftHandSide scopeLevel="PLAYER" method-name="getSoL" />
-        <rightHandSide value="50" />
+      <limit id="model.limit.independence.rebels" operator="ge">
+        <left-hand-side scopeLevel="PLAYER" method-name="getSoL" />
+        <right-hand-side value="50" />
       </limit>
-      <limit id="model.limit.independence.coastalColonies" operator="GT">
-        <leftHandSide operandType="SETTLEMENTS" scopeLevel="PLAYER"
-                      method-name="isConnectedPort" method-value="true" />
-        <rightHandSide value="0" />
+      <limit id="model.limit.independence.coastalColonies" operator="gt">
+        <left-hand-side operandType="SETTLEMENTS" scopeLevel="PLAYER"
+                        method-name="isConnectedPort" method-value="true" />
+        <right-hand-side value="0" />
       </limit>
-      <limit id="model.limit.independence.year" operator="LE">
-        <leftHandSide operandType="YEAR" scopeLevel="GAME"/>
-        <rightHandSide operandType="OPTION" scopeLevel="GAME"
-                       type="model.option.lastColonialYear"/>
+      <limit id="model.limit.independence.year" operator="le">
+        <left-hand-side operandType="YEAR" scopeLevel="GAME"/>
+        <right-hand-side operandType="OPTION" scopeLevel="GAME"
+                         type="model.option.lastColonialYear"/>
       </limit>
       <ability id="model.ability.independenceDeclared" />
       <ability id="model.ability.independentNation" />
     </event>
     <event id="model.event.spanishSuccession">
-      <limit id="model.limit.spanishSuccession.year" operator="GE">
-        <leftHandSide scopeLevel="GAME" operandType="YEAR"/>
-        <rightHandSide value="1600"/>
+      <limit id="model.limit.spanishSuccession.year" operator="ge">
+        <left-hand-side scopeLevel="GAME" operandType="YEAR"/>
+        <right-hand-side value="1600"/>
       </limit>
-      <limit id="model.limit.spanishSuccession.weakestPlayer" operator="LT">
-        <leftHandSide scopeLevel="PLAYER" method-name="getSoL" />
-        <rightHandSide value="50" />
+      <limit id="model.limit.spanishSuccession.weakestPlayer" operator="lt">
+        <left-hand-side scopeLevel="PLAYER" method-name="getSoL" />
+        <right-hand-side value="50" />
       </limit>
-      <limit id="model.limit.spanishSuccession.strongestPlayer" operator="GT">
-        <leftHandSide scopeLevel="PLAYER" method-name="getSoL" />
-        <rightHandSide value="50" />
+      <limit id="model.limit.spanishSuccession.strongestPlayer" operator="gt">
+        <left-hand-side scopeLevel="PLAYER" method-name="getSoL" />
+        <right-hand-side value="50" />
       </limit>
     </event>
   </events>
@@ -1681,9 +1681,9 @@
                offence="0" defence="1" movement="6"
                score-value="1" spaceTaken="12" space="2">
       <required-goods id="model.goods.hammers" value="40"/>
-      <limit id="model.limit.wagonTrains" operator="LT">
-        <leftHandSide operandType="UNITS" scopeLevel="PLAYER" />
-        <rightHandSide operandType="SETTLEMENTS" scopeLevel="PLAYER" />
+      <limit id="model.limit.wagonTrains" operator="lt">
+        <left-hand-side operandType="UNITS" scopeLevel="PLAYER" />
+        <right-hand-side operandType="SETTLEMENTS" scopeLevel="PLAYER" />
       </limit>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>

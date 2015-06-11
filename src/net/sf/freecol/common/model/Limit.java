@@ -83,9 +83,9 @@ public final class Limit extends FreeColGameObjectType {
      */
     public Limit(String id, Operand lhs, Operator op, Operand rhs) {
         setId(id);
-        leftHandSide = lhs;
-        rightHandSide = rhs;
-        operator = op;
+        this.leftHandSide = lhs;
+        this.rightHandSide = rhs;
+        this.operator = op;
     }
 
 
@@ -290,9 +290,13 @@ public final class Limit extends FreeColGameObjectType {
 
     // Serialization
 
-    private static final String LEFT_HAND_SIDE_TAG = "leftHandSide";
+    private static final String LEFT_HAND_SIDE_TAG = "left-hand-side";
     private static final String OPERATOR_TAG = "operator";
-    private static final String RIGHT_HAND_SIDE_TAG = "rightHandSide";
+    private static final String RIGHT_HAND_SIDE_TAG = "right-hand-side";
+    // @compat 0.11.3
+    private static final String OLD_LEFT_HAND_SIDE_TAG = "leftHandSide";
+    private static final String OLD_RIGHT_HAND_SIDE_TAG = "rightHandSide";
+    // end @compat 0.11.3
 
 
     /**
@@ -302,9 +306,7 @@ public final class Limit extends FreeColGameObjectType {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        // Force operator to be an upper case string (do not use the
-        // writeAttribute(... Enum) routine which downcases).
-        xw.writeAttribute(OPERATOR_TAG, operator.toString());
+        xw.writeAttribute(OPERATOR_TAG, operator);
     }
 
     /**
@@ -337,10 +339,18 @@ public final class Limit extends FreeColGameObjectType {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (LEFT_HAND_SIDE_TAG.equals(tag)) {
+        if (LEFT_HAND_SIDE_TAG.equals(tag)
+            // @compat 0.11.3
+            || OLD_LEFT_HAND_SIDE_TAG.equals(tag)
+            // end @compat 0.11.3
+            ) {
             leftHandSide = new Operand(xr);
 
-        } else if (RIGHT_HAND_SIDE_TAG.equals(tag)) {
+        } else if (RIGHT_HAND_SIDE_TAG.equals(tag)
+                   // @compat 0.11.3
+                   || OLD_RIGHT_HAND_SIDE_TAG.equals(tag)
+                   // end @compat 0.11.3
+                   ) {
             rightHandSide = new Operand(xr);
 
         } else {
