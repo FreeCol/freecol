@@ -79,6 +79,7 @@
      0.100: Fix capitalization in Nation.
      0.101: Fix capitalization in Limit.
      0.102: Fix capitalization in UnitTypeChange.
+     0.103: incrementType -> increment-type
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -902,16 +903,11 @@
         </xs:attribute>
         <xs:attribute name="value" type="xs:float"/>
         <xs:attribute name="increment" use="optional" type="xs:float"/>
-        <xs:attribute name="incrementType" use="optional">
-          <xs:simpleType>
-            <xs:restriction base="xs:token">
-              <xs:enumeration value="additive"/>
-              <xs:enumeration value="multiplicative"/>
-              <xs:enumeration value="percentage"/>
-            </xs:restriction>
-          </xs:simpleType>
-        </xs:attribute>
+        <xs:attribute name="increment-type" type="ModifierType"/>
         <xs:attribute name="index" type="xs:nonNegativeInteger"/>
+        <!-- @compat 0.11.3 -->
+        <xs:attribute name="incrementType" type="ModifierType"/>
+        <!-- @compat 0.11.3 -->
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1308,6 +1304,19 @@
     <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
     <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
   </xs:complexType>
+
+  <xs:simpleType name="ModifierType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="additive" />
+      <xs:enumeration value="multiplicative" />
+      <xs:enumeration value="percentage" />
+      <!-- @compat 0.10.7 -->
+      <xs:enumeration value="ADDITIVE" />
+      <xs:enumeration value="MULTIPLICATIVE" />
+      <xs:enumeration value="PERCENTAGE" />
+      <!-- end @compat -->
+    </xs:restriction>
+  </xs:simpleType>
 
   <xs:complexType name="OperandType">
     <xs:complexContent>

@@ -580,9 +580,12 @@ public class Modifier extends Feature {
     // Serialization
 
     private static final String INCREMENT_TAG = "increment";
-    private static final String INCREMENT_TYPE_TAG = "incrementType";
+    private static final String INCREMENT_TYPE_TAG = "increment-type";
     private static final String INDEX_TAG = "index";
     private static final String TYPE_TAG = "type";
+    // @compat 0.11.3
+    private static final String OLD_INCREMENT_TYPE_TAG = "incrementType";
+    // end @compat 0.11.3
 
 
     /**
@@ -619,7 +622,14 @@ public class Modifier extends Feature {
 
         value = xr.getAttribute(VALUE_TAG, UNKNOWN);
 
-        if (xr.hasAttribute(INCREMENT_TYPE_TAG)) {
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_INCREMENT_TYPE_TAG)) {
+            incrementType = xr.getAttribute(OLD_INCREMENT_TYPE_TAG,
+                                            ModifierType.class,
+                                            (ModifierType)null);
+            increment = xr.getAttribute(INCREMENT_TAG, UNKNOWN);
+        // end @compat 0.11.3
+        } else if (xr.hasAttribute(INCREMENT_TYPE_TAG)) {
             incrementType = xr.getAttribute(INCREMENT_TYPE_TAG,
                                             ModifierType.class,
                                             (ModifierType)null);

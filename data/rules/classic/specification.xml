@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.102">
+<freecol-specification id="classic" version="0.103">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -54,7 +54,7 @@
     <modifier id="model.modifier.colonyGoodsParty"
               source="model.source.colonyGoodsParty"
               value="50" type="percentage" duration="25"
-              increment="-2" incrementType="additive" index="90"/>
+              increment="-2" increment-type="additive" index="90"/>
     <modifier id="model.goods.food" value="0" type="additive"/>
     <!-- Ship trade penalty modifiers are instantiated on the fly from the
          corresponding option and the sense of application. -->

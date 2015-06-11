@@ -45,12 +45,13 @@
       <xs:attribute name="value" type="xs:float" use="required" />
       <xs:attribute name="type" type="ModifierType" use="required" />
 
-      <xs:attribute name="incrementType" type="ModifierType"
-		    use="optional" />
+      <xs:attribute name="increment-type" type="ModifierType" use="optional" />
       <xs:attribute name="increment" type="xs:float" use="optional" />
       <xs:attribute name="duration" type="xs:int" use="optional" />
       <xs:attribute name="temporary" type="xs:boolean" use="optional" />
-
+      <!-- @compat 0.11.3 -->
+      <xs:attribute name="incrementType" type="ModifierType" use="optional" />
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 
