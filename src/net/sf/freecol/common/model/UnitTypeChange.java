@@ -54,20 +54,30 @@ public class UnitTypeChange extends FreeColObject {
 
     public static final Map<ChangeType, String> tags
         = new EnumMap<>(ChangeType.class);
+    public static final Map<ChangeType, String> compatTags
+        = new EnumMap<>(ChangeType.class);
     static {
-        tags.put(ChangeType.EDUCATION, "learnInSchool");
-        tags.put(ChangeType.NATIVES, "learnFromNatives");
-        tags.put(ChangeType.EXPERIENCE, "learnFromExperience");
-        tags.put(ChangeType.LOST_CITY, "learnInLostCity");
+        tags.put(ChangeType.EDUCATION, "learn-in-school");
+        tags.put(ChangeType.NATIVES, "learn-from-natives");
+        tags.put(ChangeType.EXPERIENCE, "learn-from-experience");
+        tags.put(ChangeType.LOST_CITY, "learn-in-lost-city");
         tags.put(ChangeType.PROMOTION, "promotion");
-        tags.put(ChangeType.CLEAR_SKILL, "clearSkill");
+        tags.put(ChangeType.CLEAR_SKILL, "clear-skill");
         tags.put(ChangeType.DEMOTION, "demotion");
         tags.put(ChangeType.CAPTURE, "capture");
         tags.put(ChangeType.CREATION, "creation");
-        tags.put(ChangeType.ENTER_COLONY, "enterColony");
+        tags.put(ChangeType.ENTER_COLONY, "enter-colony");
         tags.put(ChangeType.INDEPENDENCE, "independence");
         tags.put(ChangeType.CONVERSION, "conversion");
         tags.put(ChangeType.UNDEAD, "undead");
+        // @compat 0.11.3
+        compatTags.put(ChangeType.EDUCATION, "learnInSchool");
+        compatTags.put(ChangeType.NATIVES, "learnFromNatives");
+        compatTags.put(ChangeType.EXPERIENCE, "learnFromExperience");
+        compatTags.put(ChangeType.CLEAR_SKILL, "clearSkill");
+        compatTags.put(ChangeType.LOST_CITY, "learnInLostCity");
+        compatTags.put(ChangeType.ENTER_COLONY, "enterColony");
+        // end @compat 0.11.3
     }
 
     /** The new unit type to change to. */
@@ -228,8 +238,11 @@ public class UnitTypeChange extends FreeColObject {
 
     // Serialization
 
-    private static final String TURNS_TO_LEARN_TAG = "turnsToLearn";
+    private static final String TURNS_TO_LEARN_TAG = "turns-to-learn";
     private static final String UNIT_TAG = "unit";
+    // @compat 0.11.3
+    private static final String OLD_TURNS_TO_LEARN_TAG = "turnsToLearn";
+    // end @compat 0.11.3
 
 
     /**
@@ -278,13 +291,24 @@ public class UnitTypeChange extends FreeColObject {
             newUnitType = xr.getType(spec, UNIT_TAG,
                                      UnitType.class, (UnitType)null);
 
-            turnsToLearn = xr.getAttribute(TURNS_TO_LEARN_TAG, UNDEFINED);
+            // @compat 0.11.3
+            if (xr.hasAttribute(OLD_TURNS_TO_LEARN_TAG)) {
+                turnsToLearn = xr.getAttribute(OLD_TURNS_TO_LEARN_TAG, UNDEFINED);
+            } else
+            // end @compat 0.11.3
+                turnsToLearn = xr.getAttribute(TURNS_TO_LEARN_TAG, UNDEFINED);
             if (turnsToLearn > 0) {
                 changeTypes.put(ChangeType.EDUCATION, 100);
             }
 
             for (ChangeType type : ChangeType.values()) {
                 int value = xr.getAttribute(tags.get(type), -1);
+                // @compat 0.11.3
+                if (value < 0) {
+                    String x = compatTags.get(type);
+                    if (x != null) value = xr.getAttribute(x, -1);
+                }
+                // end @compat 0.11.3
                 if (value >= 0) {
                     changeTypes.put(type, Math.min(100, value));
                 }

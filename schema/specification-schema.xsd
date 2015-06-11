@@ -78,6 +78,7 @@
      0.99:  Downcase disaster amount enum.
      0.100: Fix capitalization in Nation.
      0.101: Fix capitalization in Limit.
+     0.102: Fix capitalization in UnitTypeChange.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -973,26 +974,34 @@
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
       </xs:sequence>
-      <xs:attribute name="unit" use="optional" type="xs:string"/>
       <xs:attribute name="delete" type="xs:boolean"/>
-      <!-- TODO: change these types to percentage -->
-      <xs:attribute name="learnFromNatives" type="PercentageType"/>
-      <xs:attribute name="learnFromExperience" type="PercentageType"/>
-      <xs:attribute name="learnInLostCity" type="PercentageType"/>
-      <xs:attribute name="learnInSchool" type="PercentageType"/>
-      <xs:attribute name="promotion" type="PercentageType"/>
-      <xs:attribute name="creation" type="PercentageType"/>
-      <xs:attribute name="independence" type="PercentageType"/>
-      <xs:attribute name="enterColony" type="PercentageType"/>
-      <xs:attribute name="turnsToLearn" type="xs:nonNegativeInteger"/>
       <xs:attribute name="conversion" type="PercentageType"/>
+      <xs:attribute name="creation" type="PercentageType"/>
+      <xs:attribute name="enter-colony" type="PercentageType"/>
+      <xs:attribute name="independence" type="PercentageType"/>
+      <xs:attribute name="learn-from-experience" type="PercentageType"/>
+      <xs:attribute name="learn-from-natives" type="PercentageType"/>
+      <xs:attribute name="learn-in-lost-city" type="PercentageType"/>
+      <xs:attribute name="learn-in-school" type="PercentageType"/>
+      <xs:attribute name="promotion" type="PercentageType"/>
+      <xs:attribute name="turns-to-learn" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="unit" use="optional" type="xs:string"/>
       <!-- TODO: these are downgrades, but serialization can not
         handle non-static XML Element tag names! We need to combine
         upgrade and downgrade into a typechange. -->
       <xs:attribute name="capture" type="PercentageType"/>
+      <xs:attribute name="clear-skill" type="PercentageType"/>
       <xs:attribute name="demotion" type="PercentageType"/>
-      <xs:attribute name="clearSkill" type="PercentageType"/>
       <xs:attribute name="undead" type="PercentageType"/>
+      <!-- @compat 0.11.3 -->
+      <xs:attribute name="learnFromNatives" type="PercentageType"/>
+      <xs:attribute name="learnFromExperience" type="PercentageType"/>
+      <xs:attribute name="learnInLostCity" type="PercentageType"/>
+      <xs:attribute name="learnInSchool" type="PercentageType"/>
+      <xs:attribute name="enterColony" type="PercentageType"/>
+      <xs:attribute name="turnsToLearn" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="clearSkill" type="PercentageType"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 
@@ -1001,12 +1010,15 @@
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
       </xs:sequence>
-      <xs:attribute name="unit" use="optional" type="xs:string"/>
       <xs:attribute name="delete" type="xs:boolean"/>
       <xs:attribute name="capture" type="PercentageType"/>
+      <xs:attribute name="clear-skill" type="PercentageType"/>
       <xs:attribute name="demotion" type="PercentageType"/>
-      <xs:attribute name="clearSkill" type="PercentageType"/>
       <xs:attribute name="undead" type="PercentageType"/>
+      <xs:attribute name="unit" use="optional" type="xs:string"/>
+      <!-- @compat 0.11.3 -->
+      <xs:attribute name="clearSkill" type="PercentageType"/>
+      <!-- end @compat 0.11.3 -->
     </xs:complexType>
   </xs:element>
 

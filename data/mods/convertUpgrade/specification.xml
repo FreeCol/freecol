@@ -28,7 +28,7 @@
 
   <unit-types>
     <unit-type id="model.unit.indianConvert" preserve="true">
-      <upgrade unit="model.unit.freeColonist" enterColony="100">
+      <upgrade unit="model.unit.freeColonist" enter-colony="100">
         <scope ability-id="model.ability.upgradeConvertsAtColony" />
       </upgrade>
     </unit-type>

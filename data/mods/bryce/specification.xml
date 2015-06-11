@@ -275,7 +275,7 @@
       <modifier id="model.goods.hammers" type="additive" value="-2" />
       <modifier id="model.goods.tools" type="additive" value="-2" />
       <downgrade unit="model.unit.freeColonist" delete="true" />
-      <upgrade unit="model.unit.freeColonist" learnInSchool="0"/>
+      <upgrade unit="model.unit.freeColonist" learn-in-school="0"/>
       <consumes id="model.goods.food" value="2" />
       <consumes id="model.goods.bells" value="1" />
     </unit-type>

@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="freecol" version="0.101" extends="classic">
+<freecol-specification id="freecol" version="0.102" extends="classic">
 
   <goods-types>
     <goods-type id="model.goods.horses" is-farmed="false"
