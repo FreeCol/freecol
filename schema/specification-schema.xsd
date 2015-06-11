@@ -81,6 +81,7 @@
      0.102: Fix capitalization in UnitTypeChange.
      0.103: incrementType -> increment-type
      0.104: Fix capitalization in Scope.
+     0.105: Fix capitalization in Operand.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -1023,12 +1024,12 @@
     <xs:complexType>
       <xs:choice minOccurs="1" maxOccurs="1">
         <xs:sequence>
-          <xs:element name="left-hand-side" type="OperandType" />
-          <xs:element name="right-hand-side" type="OperandType" />
+          <xs:element name="left-hand-side" type="Operand" />
+          <xs:element name="right-hand-side" type="Operand" />
         </xs:sequence>
         <xs:sequence>
-          <xs:element name="leftHandSide" type="OperandType" />
-          <xs:element name="rightHandSide" type="OperandType" />
+          <xs:element name="leftHandSide" type="Operand" />
+          <xs:element name="rightHandSide" type="Operand" />
         </xs:sequence>
       </xs:choice>
       <xs:attribute name="id" type="xs:string" />
@@ -1299,7 +1300,7 @@
   </xs:element>
 
 
-  <!-- Types.  funkyCapitalized -->
+  <!-- Low level types.  FunkyCapitalized -->
 
   <xs:complexType name="AbstractGoodsType">
     <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
@@ -1319,37 +1320,37 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:complexType name="OperandType">
+  <xs:complexType name="Operand">
     <xs:complexContent>
       <xs:extension base="ScopeType">
-        <xs:attribute name="operandType">
-          <xs:simpleType>
-            <xs:restriction base="xs:token">
-              <xs:enumeration value="UNITS" />
-              <xs:enumeration value="BUILDINGS" />
-              <xs:enumeration value="SETTLEMENTS" />
-              <xs:enumeration value="FOUNDING_FATHERS" />
-              <xs:enumeration value="YEAR" />
-              <xs:enumeration value="OPTION" />
-              <xs:enumeration value="NONE" />
-            </xs:restriction>
-          </xs:simpleType>
-        </xs:attribute>
-        <xs:attribute name="scopeLevel">
-          <xs:simpleType>
-            <xs:restriction base="xs:token">
-              <xs:enumeration value="SETTLEMENT" />
-              <xs:enumeration value="PLAYER" />
-              <xs:enumeration value="GAME" />
-              <xs:enumeration value="NONE" />
-            </xs:restriction>
-          </xs:simpleType>
-        </xs:attribute>
+        <xs:attribute name="operand-type" type="OperandType" />
+        <xs:attribute name="scope-level" type="ScopeLevel" />
         <xs:attribute name="value" type="xs:integer" />
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-
+  
+  <xs:simpleType name="OperandType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="units" />
+      <xs:enumeration value="buildings" />
+      <xs:enumeration value="settlements" />
+      <xs:enumeration value="founding_fathers" />
+      <xs:enumeration value="year" />
+      <xs:enumeration value="option" />
+      <xs:enumeration value="none" />
+      <!-- @compat 0.11.3 -->
+      <xs:enumeration value="UNITS" />
+      <xs:enumeration value="BUILDINGS" />
+      <xs:enumeration value="SETTLEMENTS" />
+      <xs:enumeration value="FOUNDING_FATHERS" />
+      <xs:enumeration value="YEAR" />
+      <xs:enumeration value="OPTION" />
+      <xs:enumeration value="NONE" />
+      <!-- end @compat 0.11.3 -->
+    </xs:restriction>
+  </xs:simpleType>
+  
   <xs:simpleType name="PercentageType">
     <xs:restriction base="xs:integer">
       <xs:minInclusive value="0"/>
@@ -1367,6 +1368,21 @@
     <xs:attribute name="factor" use="required" type="xs:integer"/>
   </xs:complexType>
 
+  <xs:simpleType name="ScopeLevel">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="settlement" />
+      <xs:enumeration value="player" />
+      <xs:enumeration value="game" />
+      <xs:enumeration value="none" />
+      <!-- @compat 0.11.3 -->
+      <xs:enumeration value="SETTLEMENT" />
+      <xs:enumeration value="PLAYER" />
+      <xs:enumeration value="GAME" />
+      <xs:enumeration value="NONE" />
+      <!-- end @compat 0.11.3 -->
+    </xs:restriction>
+  </xs:simpleType>
+  
   <xs:complexType name="ScopeType">
     <xs:attribute name="matches-null" type="xs:boolean"/>
     <xs:attribute name="match-negated" type="xs:boolean"/>
@@ -1380,6 +1396,7 @@
     <xs:attribute name="matchNegated" type="xs:boolean"/>
     <!-- end @compat 0.11.3 -->
   </xs:complexType>
+
 
   <!-- Identifier types (all simple).  funkyCapitalized -->
   

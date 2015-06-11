@@ -66,17 +66,17 @@
   <events>
     <event id="model.event.declareIndependence" score-value="100">
       <limit id="model.limit.independence.rebels" operator="ge">
-        <left-hand-side scopeLevel="PLAYER" method-name="getSoL" />
+        <left-hand-side scope-level="player" method-name="getSoL" />
         <right-hand-side value="50" />
       </limit>
       <limit id="model.limit.independence.coastalColonies" operator="gt">
-        <left-hand-side operandType="SETTLEMENTS" scopeLevel="PLAYER"
+        <left-hand-side operand-type="settlements" scope-level="player"
                         method-name="isConnectedPort" method-value="true" />
         <right-hand-side value="0" />
       </limit>
       <limit id="model.limit.independence.year" operator="le">
-        <left-hand-side operandType="YEAR" scopeLevel="GAME"/>
-        <right-hand-side operandType="OPTION" scopeLevel="GAME"
+        <left-hand-side operand-type="year" scope-level="game"/>
+        <right-hand-side operand-type="option" scope-level="game"
                          type="model.option.lastColonialYear"/>
       </limit>
       <ability id="model.ability.independenceDeclared" />
@@ -84,15 +84,15 @@
     </event>
     <event id="model.event.spanishSuccession">
       <limit id="model.limit.spanishSuccession.year" operator="ge">
-        <left-hand-side scopeLevel="GAME" operandType="YEAR"/>
+        <left-hand-side operand-type="year" scope-level="game"/>
         <right-hand-side value="1600"/>
       </limit>
       <limit id="model.limit.spanishSuccession.weakestPlayer" operator="lt">
-        <left-hand-side scopeLevel="PLAYER" method-name="getSoL" />
+        <left-hand-side scope-level="player" method-name="getSoL" />
         <right-hand-side value="50" />
       </limit>
       <limit id="model.limit.spanishSuccession.strongestPlayer" operator="gt">
-        <left-hand-side scopeLevel="PLAYER" method-name="getSoL" />
+        <left-hand-side scope-level="player" method-name="getSoL" />
         <right-hand-side value="50" />
       </limit>
     </event>
@@ -1682,8 +1682,8 @@
                score-value="1" spaceTaken="12" space="2">
       <required-goods id="model.goods.hammers" value="40"/>
       <limit id="model.limit.wagonTrains" operator="lt">
-        <left-hand-side operandType="UNITS" scopeLevel="PLAYER" />
-        <right-hand-side operandType="SETTLEMENTS" scopeLevel="PLAYER" />
+        <left-hand-side operand-type="units" scope-level="player" />
+        <right-hand-side operand-type="settlements" scope-level="player" />
       </limit>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>

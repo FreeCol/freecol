@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -365,8 +366,12 @@ public class Operand extends Scope {
 
     // Serialization
 
-    private static final String OPERAND_TYPE_TAG = "operandType";
-    private static final String SCOPE_LEVEL_TAG = "scopeLevel";
+    private static final String OPERAND_TYPE_TAG = "operand-type";
+    private static final String SCOPE_LEVEL_TAG = "scope-level";
+    // @compat 0.11.3
+    private static final String OLD_OPERAND_TYPE_TAG = "operandType";
+    private static final String OLD_SCOPE_LEVEL_TAG = "scopeLevel";
+    // end @compat 0.11.3
 
 
     /**
@@ -376,9 +381,9 @@ public class Operand extends Scope {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(OPERAND_TYPE_TAG, operandType.toString());
+        xw.writeAttribute(OPERAND_TYPE_TAG, operandType);
 
-        xw.writeAttribute(SCOPE_LEVEL_TAG, scopeLevel.toString());
+        xw.writeAttribute(SCOPE_LEVEL_TAG, scopeLevel);
 
         if (value != null) {
             xw.writeAttribute(VALUE_TAG, value);
