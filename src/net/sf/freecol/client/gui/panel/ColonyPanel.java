@@ -1379,7 +1379,6 @@ public final class ColonyPanel extends PortPanel
         /**
          * {@inheritDoc}
          */
-        @Override
         public boolean accepts(Unit unit) {
             return !unit.isCarrier();
         }
@@ -1387,7 +1386,6 @@ public final class ColonyPanel extends PortPanel
         /**
          * {@inheritDoc}
          */
-        @Override
         public boolean accepts(Goods goods) {
             return false;
         }
@@ -1395,7 +1393,6 @@ public final class ColonyPanel extends PortPanel
         /**
          * {@inheritDoc}
          */
-        @Override
         public Component add(Component comp, boolean editState) {
             Container oldParent = comp.getParent();
             if (editState) {
@@ -1427,6 +1424,11 @@ public final class ColonyPanel extends PortPanel
                 return add(comp);
             }
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        public int suggested(GoodsType type) { return -1; } // N/A
 
 
         // Override JPanel
@@ -1603,7 +1605,6 @@ public final class ColonyPanel extends PortPanel
         /**
          * {@inheritDoc}
          */
-        @Override
         public boolean accepts(Unit unit) {
             return false;
         }
@@ -1611,7 +1612,6 @@ public final class ColonyPanel extends PortPanel
         /**
          * {@inheritDoc}
          */
-        @Override
         public boolean accepts(Goods goods) {
             return true;
         }
@@ -1619,7 +1619,6 @@ public final class ColonyPanel extends PortPanel
         /**
          * {@inheritDoc}
          */
-        @Override
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof GoodsLabel)) {
@@ -1631,6 +1630,14 @@ public final class ColonyPanel extends PortPanel
             }
 
             return add(comp);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public int suggested(GoodsType type) {
+            Colony colony = getColony();
+            return colony.getWarehouseCapacity() - colony.getGoodsCount(type);
         }
 
 
@@ -1854,7 +1861,6 @@ public final class ColonyPanel extends PortPanel
             /**
              * {@inheritDoc}
              */
-            @Override
             public boolean accepts(Unit unit) {
                 return unit.isPerson();
             }
@@ -1862,7 +1868,6 @@ public final class ColonyPanel extends PortPanel
             /**
              * {@inheritDoc}
              */
-            @Override
             public boolean accepts(Goods goods) {
                 return false;
             }
@@ -1870,7 +1875,6 @@ public final class ColonyPanel extends PortPanel
             /**
              * {@inheritDoc}
              */
-            @Override
             public Component add(Component comp, boolean editState) {
                 if (editState) {
                     if (comp instanceof UnitLabel) {
@@ -1884,6 +1888,11 @@ public final class ColonyPanel extends PortPanel
                 }
                 return null;
             }
+
+            /**
+             * {@inheritDoc}
+             */
+            public int suggested(GoodsType type) { return -1; } // N/A
 
 
             // Interface PropertyChangeListener
@@ -2202,7 +2211,6 @@ public final class ColonyPanel extends PortPanel
             /**
              * {@inheritDoc}
              */
-            @Override
             public boolean accepts(Unit unit) {
                 return unit.isPerson();
             }
@@ -2210,7 +2218,6 @@ public final class ColonyPanel extends PortPanel
             /**
              * {@inheritDoc}
              */
-            @Override
             public boolean accepts(Goods goods) {
                 return false;
             }
@@ -2218,7 +2225,6 @@ public final class ColonyPanel extends PortPanel
             /**
              * {@inheritDoc}
              */
-            @Override
             public Component add(Component comp, boolean editState) {
                 if (editState) {
                     if (comp instanceof UnitLabel) {
@@ -2235,6 +2241,11 @@ public final class ColonyPanel extends PortPanel
                 update();
                 return comp;
             }
+
+            /**
+             * {@inheritDoc}
+             */
+            public int suggested(GoodsType type) { return -1; } // N/A
 
 
             // Interface PropertyChangeListener

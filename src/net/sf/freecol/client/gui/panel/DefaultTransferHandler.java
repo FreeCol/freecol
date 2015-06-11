@@ -372,6 +372,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 Goods goods = label.getGoods();
 
                 // Import the data.
+                int amount = GoodsContainer.CARGO_SIZE;
                 if (label.isPartialChosen()) {
                     int defaultAmount = goods.getAmount();
                     if (goods.getLocation() instanceof GoodsLocation) {
@@ -383,14 +384,20 @@ public final class DefaultTransferHandler extends TransferHandler {
                                 goods.getAmount() - loc.getGoodsCapacity());
                         }
                     }
-                    int amount = getAmount(goods.getType(), goods.getAmount(),
-                                           defaultAmount, false);
+                    if (comp instanceof DropTarget) {
+                        int alt = ((DropTarget)comp).suggested(goods.getType());
+                        if (alt >= 0 && alt < defaultAmount) {
+                            defaultAmount = alt;
+                        }
+                    }
+                    amount = getAmount(goods.getType(), goods.getAmount(),
+                                       defaultAmount, false);
                     if (amount <= 0) return false;
-                    goods.setAmount(amount);
                 } else if (goods.getAmount() > GoodsContainer.CARGO_SIZE) {
-                    goods.setAmount(GoodsContainer.CARGO_SIZE);
+                    amount = GoodsContainer.CARGO_SIZE;
                 }
-
+                goods.setAmount(amount);
+                
                 if (comp instanceof UnitLabel) {
                     return equipUnitIfPossible((UnitLabel)comp, goods);
 

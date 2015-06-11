@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
@@ -183,7 +184,6 @@ public class CargoPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean accepts(Unit unit) {
         return true;
     }
@@ -191,7 +191,6 @@ public class CargoPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean accepts(Goods goods) {
         return true;
     }
@@ -199,7 +198,6 @@ public class CargoPanel extends FreeColPanel
     /**
      * {@inheritDoc}
      */
-    @Override
     public Component add(Component comp, boolean editState) {
         if (carrier == null) return null;
 
@@ -246,6 +244,13 @@ public class CargoPanel extends FreeColPanel
             super.add(comp);
         }
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int suggested(GoodsType type) {
+        return carrier.getLoadableAmount(type);
     }
 
 

@@ -142,7 +142,6 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
-        @Override
         public boolean accepts(Unit unit) {
             return unit.isNaval() && !unit.isDamaged();
         }
@@ -150,7 +149,6 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
-        @Override
         public boolean accepts(Goods goods) {
             return false;
         }
@@ -158,7 +156,6 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
-        @Override
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof UnitLabel)) {
@@ -207,6 +204,11 @@ public final class EuropePanel extends PortPanel {
             EuropePanel.this.refresh();
             return c;
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        public int suggested(GoodsType type) { return -1; } // N/A
     }
 
     /**
@@ -238,7 +240,6 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
-        @Override
         public boolean accepts(Unit unit) {
             return !unit.isNaval();
         }
@@ -246,7 +247,6 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
-        @Override
         public boolean accepts(Goods goods) {
             return false;
         }
@@ -254,12 +254,16 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
-        @Override
         public Component add(Component comp, boolean editState) {
             Component c = add(comp);
             update();
             return c;
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        public int suggested(GoodsType type) { return -1; } // N/A
 
 
         // Override Container
@@ -378,7 +382,6 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
-        @Override
         public boolean accepts(Unit unit) {
             return false;
         }
@@ -386,7 +389,6 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
-        @Override
         public boolean accepts(Goods goods) {
             return true;
         }
@@ -394,7 +396,6 @@ public final class EuropePanel extends PortPanel {
         /**
          * {@inheritDoc}
          */
-        @Override
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof GoodsLabel)) {
@@ -406,8 +407,8 @@ public final class EuropePanel extends PortPanel {
                 if (getMyPlayer().canTrade(goods.getType())) {
                     igc().sellGoods(goods);
                 } else {
-                    BoycottAction act = getGUI().getBoycottChoice(goods,
-                                                                      europe);
+                    BoycottAction act = getGUI()
+                        .getBoycottChoice(goods, europe);
                     if (act != null) {
                         switch (act) {
                         case PAY_ARREARS:
@@ -429,6 +430,13 @@ public final class EuropePanel extends PortPanel {
             }
             EuropePanel.this.refresh();
             return comp;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public int suggested(GoodsType type) {
+            return -1; // No good choice
         }
 
 

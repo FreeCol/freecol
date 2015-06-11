@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -60,4 +61,12 @@ public interface DropTarget {
      */
     public Component add(Component comp, boolean editState);
 
+    /**
+     * Get a suggested amount of goods to add, used when partial
+     * amounts are selected.
+     *
+     * @param goodsType The <code>GoodsType</code> proposed to add.
+     * @return A good amount of goods to add.
+     */
+    public int suggested(GoodsType goodsType);
 }
