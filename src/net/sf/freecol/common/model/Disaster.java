@@ -123,7 +123,7 @@ public class Disaster extends FreeColGameObjectType {
 
         xw.writeAttribute(NATURAL_TAG, natural);
 
-        xw.writeAttribute(EFFECTS_TAG, numberOfEffects.toString());
+        xw.writeAttribute(EFFECTS_TAG, numberOfEffects);
     }
 
     /**
@@ -151,9 +151,9 @@ public class Disaster extends FreeColGameObjectType {
 
         natural = xr.getAttribute(NATURAL_TAG, parent.natural);
 
-        String str = xr.getAttribute(EFFECTS_TAG, (String)null);
-        numberOfEffects = (str == null) ? parent.numberOfEffects
-            : Effects.valueOf(str);
+        numberOfEffects = (xr.hasAttribute(EFFECTS_TAG))
+            ? xr.getAttribute(EFFECTS_TAG, Effects.class, Effects.ONE)
+            : parent.numberOfEffects;
     }
 
     /**

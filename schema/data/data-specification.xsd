@@ -560,9 +560,14 @@
       <xs:attribute name="effects">
         <xs:simpleType>
           <xs:restriction base="xs:token">
+            <xs:enumeration value="one"/>
+            <xs:enumeration value="several"/>
+            <xs:enumeration value="all"/>
+            <!-- @compat 0.11.3 -->
             <xs:enumeration value="ONE"/>
             <xs:enumeration value="SEVERAL"/>
             <xs:enumeration value="ALL"/>
+            <!-- end @compat 0.11.3 -->
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

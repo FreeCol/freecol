@@ -75,6 +75,7 @@
      0.96: Fix capitalization in BuildingType.
      0.97: scoreValue -> score-value in Event.
      0.98: Fix capitalization in national settlement type.
+     0.99: Downcase disaster amount enum.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -657,9 +658,14 @@
       <xs:attribute name="effects">
         <xs:simpleType>
           <xs:restriction base="xs:token">
+            <xs:enumeration value="one"/>
+            <xs:enumeration value="several"/>
+            <xs:enumeration value="all"/>
+            <!-- @compat 0.11.3 -->
             <xs:enumeration value="ONE"/>
             <xs:enumeration value="SEVERAL"/>
             <xs:enumeration value="ALL"/>
+            <!-- end @compat 0.11.3 -->
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.98">
+<freecol-specification id="classic" version="0.99">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -813,7 +813,7 @@
   </tile-types>
 
   <disasters>
-    <disaster id="model.disaster.common" abstract="true" effects="SEVERAL"
+    <disaster id="model.disaster.common" abstract="true" effects="several"
               natural="true">
       <effect id="model.disaster.effect.lossOfMoney" probability="10"/>
       <effect id="model.disaster.effect.lossOfGoods" probability="10"/>
