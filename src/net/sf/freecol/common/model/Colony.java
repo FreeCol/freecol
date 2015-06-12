@@ -230,7 +230,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public ExportData getExportData(final GoodsType goodsType) {
         ExportData result = exportData.get(goodsType.getId());
         if (result == null) {
-            result = new ExportData(goodsType);
+            result = new ExportData(goodsType, getWarehouseCapacity());
             setExportData(result);
         }
         return result;
@@ -2746,7 +2746,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
         final int present = Math.max(0, getGoodsCount(goodsType)
             + turns * getNetProductionOf(goodsType));
-        int capacity = getWarehouseCapacity();
+        final ExportData ed = getExportData(goodsType);
+        int capacity = ed.getEffectiveImportLevel(getWarehouseCapacity());
         return Math.max(0, capacity - present);
     }
 
@@ -3004,7 +3005,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
         } else if (ExportData.getXMLElementTagName().equals(tag)) {
             ExportData data = new ExportData(xr);
-            exportData.put(data.getId(), data);
+            setExportData(data);
         
         } else {
             super.readChild(xr);

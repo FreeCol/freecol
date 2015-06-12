@@ -38,6 +38,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ExportData;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 
@@ -120,6 +121,8 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
 
         private final JSpinner highLevel;
 
+        private final JSpinner importLevel;
+        
         private final JSpinner exportLevel;
 
 
@@ -127,6 +130,8 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
                                    GoodsType goodsType) {
             super("WarehouseGoodsPanelUI");
 
+            final boolean enhancedTradeRoutes = colony.getSpecification()
+                .getBoolean(GameOptions.ENHANCED_TRADE_ROUTES);
             this.colony = colony;
             this.goodsType = goodsType;
             final int capacity = colony.getWarehouseCapacity();
@@ -145,7 +150,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
             GoodsLabel goodsLabel = new GoodsLabel(
                 freeColClient.getGUI(), goods);
             goodsLabel.setHorizontalAlignment(JLabel.LEADING);
-            add(goodsLabel, "span 1 2");
+            add(goodsLabel, "span 1 3");
 
             // low level settings
             String str;
@@ -163,6 +168,19 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
             Utility.localizeToolTip(highLevel,
                 "warehouseDialog.highLevel.shortDescription");
             add(highLevel);
+
+            if (enhancedTradeRoutes) { // import level settings
+                int importInit = exportData.getEffectiveImportLevel(capacity);
+                SpinnerNumberModel importLevelModel
+                    = new SpinnerNumberModel(importInit, 0,
+                        (goodsType.limitIgnored()) ? maxCapacity : capacity, 1);
+                importLevel = new JSpinner(importLevelModel);
+                Utility.localizeToolTip(importLevel,
+                    "warehouseDialog.importLevel.shortDescription");
+                add(importLevel);
+            } else {
+                importLevel = null;
+            }
 
             // export checkbox
             export = new JCheckBox(Messages.message("warehouseDialog.export"),
@@ -191,17 +209,22 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
                 .getNumber().intValue();
             int highLevelValue = ((SpinnerNumberModel)highLevel.getModel())
                 .getNumber().intValue();
+            int importLevelValue = (importLevel == null) ? -1
+                : ((SpinnerNumberModel)importLevel.getModel())
+                    .getNumber().intValue();
             int exportLevelValue = ((SpinnerNumberModel)exportLevel.getModel())
                 .getNumber().intValue();
             ExportData exportData = colony.getExportData(goodsType);
+            int importValue = exportData.getEffectiveImportLevel(colony.getWarehouseCapacity());
             boolean changed = (export.isSelected() != exportData.getExported())
                 || (lowLevelValue != exportData.getLowLevel())
                 || (highLevelValue != exportData.getHighLevel())
+                || (importLevel != null && importLevelValue != importValue)
                 || (exportLevelValue != exportData.getExportLevel());
-
             exportData.setExported(export.isSelected());
             exportData.setLowLevel(lowLevelValue);
             exportData.setHighLevel(highLevelValue);
+            exportData.setImportLevel(importLevelValue);
             exportData.setExportLevel(exportLevelValue);
             if (changed) {
                 freeColClient.getInGameController()

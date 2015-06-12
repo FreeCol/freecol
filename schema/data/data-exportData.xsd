@@ -31,6 +31,7 @@
       <xs:attribute name="exported" type="xs:boolean" use="required" />
       <xs:attribute name="highLevel" type="xs:int" use="required" />
       <xs:attribute name="lowLevel" type="xs:int" use="required" />
+      <xs:attribute name="importLevel" type="xs:int" use="required" />
       <xs:attribute name="exportLevel" type="xs:int" use="required" />
     </xs:complexType>
   </xs:element>

@@ -43,7 +43,14 @@ public class ExportData extends FreeColObject {
     /** The low water mark for the goods type. */
     private int lowLevel = LOW_LEVEL_DEFAULT;
 
-    /** The amount of goods to retain, goods beyond this amount are exported. */
+    /**
+     * The amount of goods to import to, do not import when this is present.
+     */
+    private int importLevel = -1;
+
+    /**
+     * The amount of goods to retain, goods beyond this amount are exported.
+     */
     private int exportLevel = EXPORT_LEVEL_DEFAULT;
 
     /** Whether to export or not. */
@@ -54,9 +61,11 @@ public class ExportData extends FreeColObject {
      * Creates a new <code>ExportData</code> instance with default settings.
      *
      * @param goodsType The <code>GoodsType</code> this data refers to.
+     * @param importLevel The import level to use.
      */
-    public ExportData(GoodsType goodsType) {
+    public ExportData(GoodsType goodsType, int importLevel) {
         setId(goodsType.getId());
+        setImportLevel(importLevel);
     }
 
     /**
@@ -85,7 +94,7 @@ public class ExportData extends FreeColObject {
      * @return The high water mark.
      */
     public final int getHighLevel() {
-        return highLevel;
+        return this.highLevel;
     }
 
     /**
@@ -105,7 +114,7 @@ public class ExportData extends FreeColObject {
      * @return The low water mark.
      */
     public final int getLowLevel() {
-        return lowLevel;
+        return this.lowLevel;
     }
 
     /**
@@ -120,12 +129,43 @@ public class ExportData extends FreeColObject {
     }
 
     /**
+     * Get the import level.
+     *
+     * @return The import level.
+     */
+    public final int getImportLevel() {
+        return this.importLevel;
+    }
+
+    /**
+     * Get the effective import level given the warehouse capacity to default
+     * to when the actual import level is invalid.
+     *
+     * @param capacity The warehouse capacity.
+     * @return The effective import level.
+     */     
+    public final int getEffectiveImportLevel(int capacity) {
+        return (this.importLevel >= 0) ? this.importLevel : capacity;
+    }
+
+    /**
+     * Set the import level.
+     *
+     * @param newImportLevel The new import level value.
+     * @return This export data.
+     */
+    public final ExportData setImportLevel(final int newImportLevel) {
+        this.importLevel = newImportLevel;
+        return this;
+    }
+
+    /**
      * Get the export level.
      *
      * @return The export level.
      */
     public final int getExportLevel() {
-        return exportLevel;
+        return this.exportLevel;
     }
 
     /**
@@ -140,14 +180,19 @@ public class ExportData extends FreeColObject {
     }
 
     /**
-     * Is the goods type of this export data to be exported?
+     * Can the goods type of this export data to be exported?
      *
      * @return True if this goods type is to be exported.
      */
     public final boolean getExported() {
-        return exported;
+        return this.exported;
     }
 
+    /**
+     * Set export status of the goods type of this export data.
+     *
+     * @param newExport The new export status.
+     */
     public final void setExported(final boolean newExport) {
         this.exported = newExport;
     }
@@ -157,6 +202,7 @@ public class ExportData extends FreeColObject {
 
     private static final String EXPORTED_TAG = "exported";
     private static final String EXPORT_LEVEL_TAG = "exportLevel";
+    private static final String IMPORT_LEVEL_TAG = "importLevel";
     private static final String HIGH_LEVEL_TAG = "highLevel";
     private static final String LOW_LEVEL_TAG = "lowLevel";
 
@@ -174,6 +220,8 @@ public class ExportData extends FreeColObject {
 
         xw.writeAttribute(LOW_LEVEL_TAG, lowLevel);
 
+        xw.writeAttribute(IMPORT_LEVEL_TAG, importLevel);
+
         xw.writeAttribute(EXPORT_LEVEL_TAG, exportLevel);
     }
 
@@ -189,6 +237,8 @@ public class ExportData extends FreeColObject {
         highLevel = xr.getAttribute(HIGH_LEVEL_TAG, HIGH_LEVEL_DEFAULT);
 
         lowLevel = xr.getAttribute(LOW_LEVEL_TAG, LOW_LEVEL_DEFAULT);
+
+        importLevel = xr.getAttribute(IMPORT_LEVEL_TAG, -1);
 
         exportLevel = xr.getAttribute(EXPORT_LEVEL_TAG, EXPORT_LEVEL_DEFAULT);
     }
