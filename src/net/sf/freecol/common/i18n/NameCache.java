@@ -228,7 +228,7 @@ public class NameCache {
         if (index >= 0 && index < seasonNumber) return seasonNames.get(index);
         return Messages.message(StringTemplate
             .template("nameCache.season.default")
-            .addAmount("%number%", index));
+            .addAmount("%number%", index+1));
     }
     
     /**

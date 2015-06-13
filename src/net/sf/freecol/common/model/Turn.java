@@ -236,7 +236,8 @@ public class Turn {
         final int season = getSeason();
         String result = String.valueOf(getYear());
         if (season >= 0) {
-            result += "_" + String.valueOf(season+1)
+            final int SeasonNumberDigits = String.valueOf(getSeasonNumber()).length(); // for leading zeroes
+            result += "_" + String.format("%0"+String.valueOf(SeasonNumberDigits)+"d", season+1)
                 + "_" + NameCache.getSeasonName(season);
         }
         return result;
