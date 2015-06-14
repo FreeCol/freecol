@@ -358,6 +358,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         return buildQueue.getValues();
     }
 
+    /**
+     * Set the build queue value.
+     *
+     * @param newBuildQueue A list of new values for the build queue.
+     */
     public void setBuildQueue(final List<BuildableType> newBuildQueue) {
         buildQueue.setValues(newBuildQueue);
     }
@@ -1169,9 +1174,15 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 }
             }
         } else if (buildableType instanceof UnitType) {
-            if (!buildableType.hasAbility(Ability.PERSON)
-                && !hasAbility(Ability.BUILD, buildableType)) {
-                return NoBuildReason.MISSING_BUILD_ABILITY;
+            if (!buildableType.hasAbility(Ability.PERSON)) {
+                boolean ok = hasAbility(Ability.BUILD, buildableType);
+                if (!ok) {
+                    for (BuildableType bt : assumeBuilt) {
+                        ok = bt.hasAbility(Ability.BUILD, buildableType);
+                        if (ok) break;
+                    }
+                }
+                if (!ok) return NoBuildReason.MISSING_BUILD_ABILITY;
             }
         }
         return NoBuildReason.NONE;
