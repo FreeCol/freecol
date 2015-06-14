@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -42,6 +43,7 @@ public class UnitWas implements Comparable<UnitWas> {
     private final GoodsType work;
     private final int workAmount;
     private final int movesLeft;
+    private final List<Unit> units;
     private final Colony colony;
 
 
@@ -59,6 +61,7 @@ public class UnitWas implements Comparable<UnitWas> {
         this.work = unit.getWorkType();
         this.workAmount = getAmount(loc, work);
         this.movesLeft = unit.getMovesLeft();
+        this.units = new ArrayList<>(unit.getUnitList());
         this.colony = unit.getColony();
         if (unit.getGoodsContainer() != null) {
             unit.getGoodsContainer().saveState();
@@ -139,6 +142,9 @@ public class UnitWas implements Comparable<UnitWas> {
         }
         if (unit.getGoodsContainer() != null) {
             unit.getGoodsContainer().fireChanges();
+        }
+        if (!units.equals(unit.getUnitList())) {
+            unit.firePropertyChange(Unit.CARGO_CHANGE, null, unit);
         }
         if (movesLeft != newMovesLeft) {
             unit.firePropertyChange(Unit.MOVE_CHANGE, movesLeft, newMovesLeft);
