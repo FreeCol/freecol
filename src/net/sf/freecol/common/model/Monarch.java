@@ -209,7 +209,29 @@ public final class Monarch extends FreeColGameObject implements Named {
                 (naval) ? navalUnits : landUnits);
         }
 
+        // @compat 0.10.x
+        public void fixOldREFRoles() {
+            Iterator<AbstractUnit> aui = landUnits.iterator();
+            List<AbstractUnit> todo = new ArrayList<>();
+            while (aui.hasNext()) {
+                AbstractUnit au = aui.next();
+                if ("SOLDIER".equals(au.getRoleId())
+                    || "model.role.soldier".equals(au.getRoleId())) {
+                    au.setRoleId("model.role.infantry");
+                    aui.remove();
+                    todo.add(au);
+                } else if ("DRAGOON".equals(au.getRoleId())
+                    || "model.role.dragoon".equals(au.getRoleId())) {
+                    au.setRoleId("model.role.cavalry");
+                    aui.remove();
+                    todo.add(au);
+                }
+            }
+            while (!todo.isEmpty()) add(todo.remove(0));
+        }
+        // end @compat 0.10.x
 
+                    
         // Serialization
 
         public static final String LAND_UNITS_TAG = "landUnits";
@@ -357,7 +379,8 @@ public final class Monarch extends FreeColGameObject implements Named {
     /** The land unit types suitable for support actions. */
     private List<UnitType> landTypes = null;
     /** The roles identifiers suitable for land units with support actions. */
-    private Role mountedRole = null, armedRole = null;
+    private Role mountedRole = null, armedRole = null,
+        refMountedRole, refArmedRole;
     /** The land unit types suitable for mercenary support. */
     private List<UnitType> mercenaryTypes = null;
     /** The naval unit types suitable for the REF. */
@@ -524,16 +547,25 @@ public final class Monarch extends FreeColGameObject implements Named {
             }
         }
         for (Role r : spec.getMilitaryRoles()) {
-            if (r.isAvailableTo(player, landTypes.get(0))) {
-                boolean armed = r.hasAbility(Ability.ARMED);
-                boolean mounted = r.hasAbility(Ability.MOUNTED);
-                if (mountedRole == null && armed && mounted) {
+            boolean ok = r.isAvailableTo(player, landTypes.get(0));
+            boolean armed = r.hasAbility(Ability.ARMED);
+            boolean mounted = r.hasAbility(Ability.MOUNTED);
+            boolean ref = r.requiresAbility(Ability.REF_UNIT);
+            if (armed && mounted) {
+                if (ok && !ref && mountedRole == null) {
                     mountedRole = r;
-                } else if (armedRole == null && armed && !mounted) {
+                } else if (!ok && ref && refMountedRole == null) {
+                    refMountedRole = r;
+                }
+            } else if (armed && !mounted) {
+                if (ok && !ref && armedRole == null) {
                     armedRole = r;
+                } else if (!ok && ref && refArmedRole == null) {
+                    refArmedRole = r;
                 }
             }
         }
+        
     }
 
     /**
@@ -746,8 +778,8 @@ public final class Monarch extends FreeColGameObject implements Named {
             || !unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
             ? spec.getDefaultRole()
             : (randomInt(logger, "Choose land role", random, 3) == 0)
-            ? mountedRole
-            : armedRole;
+            ? refMountedRole
+            : refArmedRole;
         int number = (needNaval) ? 1
             : randomInt(logger, "Choose land#", random, 3) + 1;
         AbstractUnit result = new AbstractUnit(unitType, role.getId(), number);
@@ -1126,6 +1158,9 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         if (EXPEDITIONARY_FORCE_TAG.equals(tag)) {
             expeditionaryForce.readFromXML(xr);
+            // @compat 0.11.3
+            expeditionaryForce.fixOldREFRoles();
+            // end @compat 0.11.3
 
         } else if (INTERVENTION_FORCE_TAG.equals(tag)) {
             interventionForce.readFromXML(xr);
