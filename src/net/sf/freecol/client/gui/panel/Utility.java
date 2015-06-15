@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 
@@ -171,6 +172,22 @@ public final class Utility {
     }
 
     /**
+     * Creates a text area with standard settings suitable for use in FreeCol
+     * panels, without setting its size.
+     *
+     * @param text The text to display in the text area.
+     * @return A suitable text area.
+     */
+    public static JTextArea createTextArea(String text) {
+        JTextArea textArea = new JTextArea(text);
+        textArea.setOpaque(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setFocusable(false);
+        return textArea;
+    }
+
+    /**
      * Gets a text area with standard settings suitable for use in FreeCol
      * panels.
      *
@@ -183,20 +200,30 @@ public final class Utility {
 
     /**
      * Gets a text area with standard settings suitable for use in FreeCol
-     * panels.
+     * panels, which adapt their size based on what they contain.
      *
      * @param text The text to display in the text area.
      * @param columns The em-width number of columns to display the text in.
      * @return A suitable text area.
      */
     public static JTextArea getDefaultTextArea(String text, int columns) {
-        JTextArea textArea = new JTextArea(text);
+        JTextArea textArea = createTextArea(text);
         textArea.setColumns(columns);
-        textArea.setOpaque(false);
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setFocusable(false);
         textArea.setSize(textArea.getPreferredSize());
+        return textArea;
+    }
+
+    /**
+     * Gets a text area with standard settings suitable for use in FreeCol
+     * panels, which can not adapt their size.
+     *
+     * @param text The text to display in the text area.
+     * @param size The size of the area to display the text in.
+     * @return A suitable text area.
+     */
+    public static JTextArea getDefaultTextArea(String text, Dimension size) {
+        JTextArea textArea = createTextArea(text);
+        textArea.setPreferredSize(size);
         return textArea;
     }
 

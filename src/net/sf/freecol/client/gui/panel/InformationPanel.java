@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -75,7 +76,6 @@ public class InformationPanel extends FreeColPanel {
                 "[510]", "[242]20[20]"));
 
         final GUI gui = getGUI();
-        final float scale = gui.getImageLibrary().getScalingFactor();
         JPanel textPanel = new MigPanel();
         textPanel.setOpaque(false);
         textPanel.setLayout(new MigLayout("wrap 2", "", ""));
@@ -83,10 +83,10 @@ public class InformationPanel extends FreeColPanel {
             if (images != null && images[i] != null) {
                 textPanel.add(new JLabel(images[i]));
                 textPanel.add(Utility.getDefaultTextArea(texts[i],
-                    Math.round(42/scale)));
+                    new Dimension(490-images[i].getIconWidth(), 225)));
             } else {
                 textPanel.add(Utility.getDefaultTextArea(texts[i],
-                    Math.round(56/scale)), "skip");
+                    new Dimension(490, 225)), "skip");
             }
             StringTemplate disp = displayLabel(fcos[i]);
             if (disp == null) continue;
