@@ -1384,18 +1384,6 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="RoleId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="model\.role\.([a-zA-Z]+)" />
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="EquipmentTypeId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="model\.equipment(\.indian)?\.([a-zA-Z]+)" />
-    </xs:restriction>
-  </xs:simpleType>
-
   <xs:simpleType name="BuildingTypeId">
     <xs:restriction base="xs:string">
       <xs:pattern value="model\.building\.([a-zA-Z]+)" />
@@ -1407,6 +1395,14 @@
       <xs:pattern value="model\.difficulty\.([a-zA-Z]+)" />
     </xs:restriction>
   </xs:simpleType>
+
+  <!-- @compat 0.10.x -->
+  <xs:simpleType name="EquipmentTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.equipment(\.indian)?\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+  <!-- end @compat 0.10.x -->
 
   <xs:simpleType name="FoundingFatherId">
     <xs:restriction base="xs:string">
@@ -1444,6 +1440,18 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:simpleType name="RoleId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.role\.([a-zA-Z]+)" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SettlementTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.settlement(\.[a-zA-Z]+)+" />
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:simpleType name="TileImprovementTypeId">
     <xs:restriction base="xs:string">
       <xs:pattern value="model\.improvement\.([a-zA-Z]+)" />
@@ -1459,12 +1467,6 @@
   <xs:simpleType name="UnitTypeId">
     <xs:restriction base="xs:string">
       <xs:pattern value="model\.unit\.([a-zA-Z]+)" />
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="SettlementTypeId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="model\.settlement(\.[a-zA-Z]+)+" />
     </xs:restriction>
   </xs:simpleType>
 

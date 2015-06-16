@@ -1157,48 +1157,4 @@
     </xs:restriction>
   </xs:simpleType>
 
-
-  <!-- Either a building type or a unit type -->
-  <xs:simpleType name="AbilityId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="model\.ability\.([a-zA-Z]+)" />
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="RoleId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="model\.role\.([a-zA-Z]+)" />
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="EquipmentTypeId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="model\.equipment(\.indian)?\.([a-zA-Z]+)" />
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="BuildingTypeId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="model\.building\.([a-zA-Z]+)" />
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="DifficultyLevelId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="model\.difficulty\.([a-zA-Z]+)" />
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="FoundingFatherId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="model\.foundingFather\.([a-zA-Z]+)" />
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="SettlementTypeId">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="model\.settlement(\.[a-zA-Z]+)+" />
-    </xs:restriction>
-  </xs:simpleType>
-
 </xs:schema>
