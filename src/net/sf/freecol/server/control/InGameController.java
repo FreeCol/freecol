@@ -132,6 +132,7 @@ import net.sf.freecol.server.model.ServerEurope;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerRegion;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.server.model.TradeSession;
 import net.sf.freecol.server.model.TransactionSession;
@@ -1736,8 +1737,10 @@ public final class InGameController extends Controller {
      */
     public Element setNewRegionName(ServerPlayer serverPlayer, Unit unit,
                                     Region region, String name) {
+        final Game game = getGame();
+        ServerRegion serverRegion = (ServerRegion)region;
         ChangeSet cs = new ChangeSet();
-        cs.addRegion(serverPlayer, unit, region, name);
+        serverRegion.csDiscover(serverPlayer, game.getTurn(), name, cs);
 
         // Others do find out about region name changes.
         getGame().sendToOthers(serverPlayer, cs);

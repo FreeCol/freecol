@@ -81,33 +81,36 @@ public class Region extends FreeColGameObject implements Nameable, Named {
         }
     }
 
-    /** The name of this Region. */
+    /** The name of this region, given by a player. */
     protected String name;
+
+    /** The name key for this region if it is a predefined one. */
+    protected String nameKey;
 
     /** The type of region. */
     protected RegionType type;
 
-    /** Key used to retrieve description from Messages. */
-    protected String nameKey;
-
-    /** The parent Region of this Region. */
+    /** The parent region of this region. */
     protected Region parent;
 
+    /** The child regions of this region. */
+    protected List<Region> children = null;
+
     /**
-     * Whether this Region is claimable.  Ocean Regions and non-leaf
-     * Regions should not be claimable.
+     * Whether this region is claimable.
+     * Ocean regions and non-leaf regions are not claimable.
      */
     protected boolean claimable = false;
 
     /**
-     * Whether this Region is discoverable.  The Eastern Ocean regions
+     * Whether this region is discoverable.  The Eastern Ocean regions
      * should not be discoverable.  In general, non-leaf regions should
      * not be discoverable.  The Pacific Ocean is an exception however,
      * unless players start there.
      */
     protected boolean discoverable = false;
 
-    /** Which Turn the Region was discovered in. */
+    /** Which Turn the region was discovered in. */
     protected Turn discoveredIn;
 
     /** Which Player the Region was discovered by. */
@@ -119,17 +122,14 @@ public class Region extends FreeColGameObject implements Nameable, Named {
      */
     protected String discoverer;
 
-    /** Whether the Region is already discovered when the game starts. */
+    /** Whether the region is already discovered when the game starts. */
     protected boolean prediscovered = false;
 
     /**
-     * How much discovering this Region contributes to your score.
-     * This should be zero unless the Region is discoverable.
+     * How much discovering this region contributes to your score.
+     * This should be zero unless the region is discoverable.
      */
     protected int scoreValue = 0;
-
-    /** The child Regions of this Region. */
-    protected List<Region> children = null;
 
 
     /**
@@ -151,6 +151,15 @@ public class Region extends FreeColGameObject implements Nameable, Named {
         super(game, id);
     }
 
+
+    /**
+     * Does this region have a name?
+     *
+     * @return True if the region has been named or was predefined.
+     */
+    public boolean hasName() {
+        return this.name != null || this.nameKey != null;
+    }
 
     /**
      * Is this region the Pacific Ocean?
@@ -357,33 +366,6 @@ public class Region extends FreeColGameObject implements Nameable, Named {
     }
 
     /**
-     * Discover this region.
-     *
-     * @param unit The discovering <code>Unit</code>.
-     * @param turn The discovery <code>Turn</code>.
-     * @param newName The name of the region.
-     * @return A <code>HistoryEvent</code> documenting the discovery.
-     */
-    public HistoryEvent discover(Unit unit, Turn turn, String newName) {
-        final Player player = unit.getOwner();
-        if (!isPacific()) this.name = newName;
-        this.discoveredBy = player;
-        this.discoveredIn = turn;
-        this.discoverable = false;
-        for (Region r : getChildren()) r.setDiscoverable(false);
-        int score = (isDiscoverable()
-            && getSpecification().getBoolean(GameOptions.EXPLORATION_POINTS)) 
-            ? getScoreValue()
-            : 0;
-        HistoryEvent h = new HistoryEvent(turn,
-            HistoryEvent.HistoryEventType.DISCOVER_REGION, player)
-                .addStringTemplate("%nation%", player.getNationName())
-                .addName("%region%", newName);
-        h.setScore(getScoreValue());
-        return h;
-    }
-
-    /**
      * Gets the score for discovering this region.
      *
      * @return The score.
@@ -401,7 +383,31 @@ public class Region extends FreeColGameObject implements Nameable, Named {
         this.scoreValue = newScoreValue;
     }
 
-
+    /**
+     * Discover this region (and its children).
+     *
+     * @param player The discovering <code>Player</code>.
+     * @param turn The <code>Turn</code> of discovery.
+     * @return A list of discovered <code>Region</code>s.
+     */
+    public List<Region> discover(Player player, Turn turn) {
+        List<Region> result = new ArrayList<>();
+        this.discoveredBy = player;
+        this.discoveredIn = turn;
+        this.discoverable = false;
+        result.add(this);
+        for (Region r : getChildren()) {
+            if (r.isDiscoverable()) {
+                r.discoveredBy = player;
+                r.discoveredIn = turn;
+                r.discoverable = false;
+                result.add(r);
+            }
+        }
+        return result;
+    }
+    
+    
     // Implement Nameable
 
     /**

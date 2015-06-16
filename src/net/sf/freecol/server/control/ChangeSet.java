@@ -1668,25 +1668,6 @@ public class ChangeSet {
     }
 
     /**
-     * Helper function to add a region discovery to a ChangeSet.
-     * Also adds the history to all Europeans.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> that is discovering.
-     * @param unit The <code>Unit</code> discovering the region.
-     * @param region The <code>Region</code> to discover.
-     * @param name The name of the region.
-     * @return The updated <code>ChangeSet</code>.
-     */
-    public ChangeSet addRegion(ServerPlayer serverPlayer, Unit unit,
-                               Region region, String name) {
-        Game game = serverPlayer.getGame();
-        HistoryEvent h = region.discover(unit, game.getTurn(), name);
-        changes.add(new ObjectChange(See.all(), region));
-        addGlobalHistory(game, h);
-        return this;
-    }
-
-    /**
      * Helper function to add a removal to a ChangeSet.
      *
      * -vis: If disposing of units or colonies, this routine changes

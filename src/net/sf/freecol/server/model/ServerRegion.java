@@ -27,9 +27,16 @@ import java.awt.Rectangle;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Turn;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -130,22 +137,6 @@ public class ServerRegion extends Region {
     }
 
     /**
-     * Add the given tile to this region.
-     *
-     * @param tile A <code>Tile</code> to add.
-     */
-    public void addTile(Tile tile) {
-        tile.setRegion(this);
-        size++;
-        if (bounds.x == 0 && bounds.width == 0
-            || bounds.y == 0 && bounds.height == 0) {
-            bounds.setBounds(tile.getX(), tile.getY(), 0, 0);
-        } else {
-            bounds.add(tile.getX(), tile.getY());
-        }
-    }
-
-    /**
      * Get the center of the regions bounds.
      *
      * @return An two element array [x,y] of the center coordinate.
@@ -164,6 +155,46 @@ public class ServerRegion extends Region {
     public boolean containsCenter(ServerRegion other) {
         int[] xy = other.getCenter();
         return bounds.contains(xy[0], xy[1]);
+    }
+
+    /**
+     * Add the given tile to this region.
+     *
+     * @param tile A <code>Tile</code> to add.
+     */
+    public void addTile(Tile tile) {
+        tile.setRegion(this);
+        size++;
+        if (bounds.x == 0 && bounds.width == 0
+            || bounds.y == 0 && bounds.height == 0) {
+            bounds.setBounds(tile.getX(), tile.getY(), 0, 0);
+        } else {
+            bounds.add(tile.getX(), tile.getY());
+        }
+    }
+
+    /**
+     * Discover this region.
+     *
+     * @param player The discovering <code>Player</code>.
+     * @param turn The discovery <code>Turn</code>.
+     * @param newName The name of the region.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csDiscover(Player player, Turn turn, String newName,
+                           ChangeSet cs) {
+        final int score = (isDiscoverable()
+            && getSpecification().getBoolean(GameOptions.EXPLORATION_POINTS)) 
+            ? this.scoreValue
+            : 0;
+        if (!hasName()) this.name = newName;
+        for (Region r : discover(player, turn)) cs.add(See.all(), r);
+        HistoryEvent h = new HistoryEvent(turn,
+            HistoryEvent.HistoryEventType.DISCOVER_REGION, player)
+                .addStringTemplate("%nation%", player.getNationName())
+                .addName("%region%", newName);
+        h.setScore(score);
+        cs.addGlobalHistory(getGame(), h);
     }
 
     /**
