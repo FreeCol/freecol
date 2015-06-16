@@ -3931,7 +3931,8 @@ public final class InGameController implements NetworkConstants {
         Turn currTurn = game.getTurn();
         if (currTurn.isFirstSeasonTurn()) {
             player.addModelMessage(new ModelMessage("twoTurnsPerYear", player)
-                .addStringTemplate("%year%", currTurn.getLabel()));
+                .addStringTemplate("%year%", currTurn.getLabel())
+                .addAmount("%amount%", currTurn.getSeasonNumber()));
         }
         return true;
     }
