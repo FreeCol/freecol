@@ -124,7 +124,7 @@ public class FreeColMapLoader implements MapLoader {
             }
         }
         for (Region region : regions.values()) {
-            map.putRegion(region);
+            map.addRegion(region);
         }
         map.setLayer(highestLayer);
         game.setMap(map);

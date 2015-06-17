@@ -268,8 +268,8 @@ public class Map extends FreeColGameObject implements Location {
     /** Variable used to convert rows to latitude. */
     private float latitudePerRow;
 
-    /** The regions, indexed by object identifier. */
-    private final java.util.Map<String, Region> regions = new HashMap<>();
+    /** The regions on the map. */
+    private final List<Region> regions = new ArrayList<>();
 
     /** The search tracing status.  Do not serialize. */
     private boolean traceSearch = false;
@@ -482,7 +482,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return All the regions in this map.
      */
     public Collection<Region> getRegions() {
-        return regions.values();
+        return regions;
     }
 
     /**
@@ -491,8 +491,12 @@ public class Map extends FreeColGameObject implements Location {
      * @param key The name key to lookup the region with.
      * @return The region with the given name key, or null if not found.
      */
-    public Region getRegion(final String key) {
-        return regions.get(key);
+    public Region getRegionByKey(final String key) {
+        if (key == null) return null;
+        for (Region r : regions) {
+            if (key.equals(r.getNameKey())) return r;
+        }
+        return null;
     }
 
     /**
@@ -504,21 +508,19 @@ public class Map extends FreeColGameObject implements Location {
      */
     public Region getRegionByName(final String name) {
         if (name == null) return null;
-        for (Region region : regions.values()) {
-            if (name.equals(region.getName())) {
-                return region;
-            }
+        for (Region r : regions) {
+            if (name.equals(r.getName())) return r;
         }
         return null;
     }
 
     /**
-     * Puts a region into this map.
+     * Adds a region to this map.
      *
-     * @param region The <code>Region</code> to put.
+     * @param region The <code>Region</code> to add.
      */
-    public void putRegion(final Region region) {
-        regions.put(region.getNameKey(), region);
+    public void addRegion(final Region region) {
+        regions.add(region);
     }
 
 
@@ -2430,7 +2432,7 @@ public class Map extends FreeColGameObject implements Location {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Region region : getSortedCopy(regions.values())) {
+        for (Region region : getSortedCopy(regions)) {
             region.toXML(xw);
         }
 
@@ -2514,7 +2516,7 @@ public class Map extends FreeColGameObject implements Location {
         final String tag = xr.getLocalName();
 
         if (Region.getXMLElementTagName().equals(tag)) {
-            putRegion(xr.readFreeColGameObject(game, Region.class));
+            addRegion(xr.readFreeColGameObject(game, Region.class));
 
         } else if (Tile.getXMLElementTagName().equals(tag)) {
             Tile t = xr.readFreeColGameObject(game, Tile.class);

@@ -366,40 +366,40 @@ public class SimpleMapGenerator implements MapGenerator {
                 break;
             }
             indians.add(player);
-            List<String> regionNames
-                = ((IndianNationType) player.getNationType()).getRegionNames();
+            List<String> regionKeys
+                = ((IndianNationType)player.getNationType()).getRegionNames();
             Territory territory = null;
-            if (regionNames == null || regionNames.isEmpty()) {
+            if (regionKeys == null || regionKeys.isEmpty()) {
                 territory = new Territory(player, map.getRandomLandTile(random));
                 territoryMap.put(player.getId(), territory);
             } else {
-                for (String name : regionNames) {
-                    if (territoryMap.get(name) == null) {
-                        ServerRegion region = (ServerRegion) map.getRegion(name);
+                for (String key : regionKeys) {
+                    if (territoryMap.get(key) == null) {
+                        ServerRegion region = (ServerRegion)map.getRegionByKey(key);
                         if (region == null) {
                             territory = new Territory(player, map.getRandomLandTile(random));
                         } else {
                             territory = new Territory(player, region);
                         }
-                        territoryMap.put(name, territory);
-                        lb.add("Allocated region ", name,
+                        territoryMap.put(key, territory);
+                        lb.add("Allocated region ", key,
                             " for ", player, ".\n");
                         break;
                     }
                 }
                 if (territory == null) {
                     lb.add("Failed to allocate preferred region ",
-                        regionNames.get(0), " for ", player.getNation(), "\n");
-                    outer: for (String name : regionNames) {
-                        Territory otherTerritory = territoryMap.get(name);
-                        for (String otherName : ((IndianNationType) otherTerritory.player.getNationType())
+                        regionKeys.get(0), " for ", player.getNation(), "\n");
+                    outer: for (String key : regionKeys) {
+                        Territory otherTerritory = territoryMap.get(key);
+                        for (String otherKey : ((IndianNationType) otherTerritory.player.getNationType())
                                  .getRegionNames()) {
-                            if (territoryMap.get(otherName) == null) {
+                            if (territoryMap.get(otherKey) == null) {
                                 ServerRegion foundRegion = otherTerritory.region;
-                                otherTerritory.region = (ServerRegion) map.getRegion(otherName);
-                                territoryMap.put(otherName, otherTerritory);
+                                otherTerritory.region = (ServerRegion)map.getRegionByKey(otherKey);
+                                territoryMap.put(otherKey, otherTerritory);
                                 territory = new Territory(player, foundRegion);
-                                territoryMap.put(name, territory);
+                                territoryMap.put(key, territory);
                                 break outer;
                             }
                         }

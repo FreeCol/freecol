@@ -462,7 +462,7 @@ public class TerrainGenerator {
             landregions[c] = new ServerRegion(game, null, RegionType.LAND,
                                               null);
             landregions[c].setDiscoverable(true);
-            map.putRegion(landregions[c]);
+            map.addRegion(landregions[c]);
         }
 
         // Add tiles to ServerRegions
@@ -555,7 +555,7 @@ public class TerrainGenerator {
                     RegionType.MOUNTAIN, startTile.getRegion());
                 mountainRegion.setDiscoverable(true);
                 mountainRegion.setClaimable(true);
-                map.putRegion(mountainRegion);
+                map.addRegion(mountainRegion);
                 Direction direction = Direction.getRandomDirection("getLand",
                     logger, random);
                 int length = maximumLength
@@ -664,7 +664,7 @@ public class TerrainGenerator {
                     if (river.flowFromSource(tile)) {
                         lb.add("Created new river with length ",
                             river.getLength(), "\n");
-                        map.putRegion(riverRegion);
+                        map.addRegion(riverRegion);
                         rivers.add(river);
                         counter++;
                     } else {
@@ -745,7 +745,7 @@ public class TerrainGenerator {
 
             ServerRegion lakeRegion = new ServerRegion(game, null,
                                                        RegionType.LAKE, null);
-            map.putRegion(lakeRegion);
+            map.addRegion(lakeRegion);
             // Pretend lakes are discovered with the surrounding terrain?
             todo.clear();
             todo.add(tile);
@@ -932,7 +932,7 @@ public class TerrainGenerator {
             lb.add("Imported regions: ");
             for (Region r : importGame.getMap().getRegions()) {
                 ServerRegion region = new ServerRegion(game, r);
-                map.putRegion(region);
+                map.addRegion(region);
                 regionMap.put(r.getId(), region);
                 lb.add(" ", region.toString());
             }

@@ -207,17 +207,17 @@ public class ServerRegion extends Region {
     public static void makeFixedOceans(Map map, LogBuilder lb) {
         final Game game = map.getGame();
         ServerRegion pacific = (ServerRegion)map
-            .getRegion("model.region.pacific");
+            .getRegionByKey("model.region.pacific");
         ServerRegion northPacific = (ServerRegion)map
-            .getRegion("model.region.northPacific");
+            .getRegionByKey("model.region.northPacific");
         ServerRegion southPacific = (ServerRegion)map
-            .getRegion("model.region.southPacific");
+            .getRegionByKey("model.region.southPacific");
         ServerRegion atlantic = (ServerRegion)map
-            .getRegion("model.region.atlantic");
+            .getRegionByKey("model.region.atlantic");
         ServerRegion northAtlantic = (ServerRegion)map
-            .getRegion("model.region.northAtlantic");
+            .getRegionByKey("model.region.northAtlantic");
         ServerRegion southAtlantic = (ServerRegion)map
-            .getRegion("model.region.southAtlantic");
+            .getRegionByKey("model.region.southAtlantic");
         if (pacific != null && atlantic != null
             && northPacific != null && northAtlantic != null
             && southPacific != null && southAtlantic != null) return;
@@ -227,40 +227,40 @@ public class ServerRegion extends Region {
                 "model.region.pacific", RegionType.OCEAN, null);
             pacific.setDiscoverable(true);
             pacific.setScoreValue(PACIFIC_SCORE_VALUE);
-            map.putRegion(pacific);
+            map.addRegion(pacific);
         }
         if (atlantic == null) {
             atlantic = new ServerRegion(game,
                 "model.region.atlantic", RegionType.OCEAN, null);
             atlantic.setPrediscovered(true);
             atlantic.setDiscoverable(false);
-            map.putRegion(atlantic);
+            map.addRegion(atlantic);
         }
         if (northPacific == null) {
             northPacific = new ServerRegion(game,
                 "model.region.northPacific", RegionType.OCEAN, pacific);
             northPacific.setDiscoverable(false);
-            map.putRegion(northPacific);
+            map.addRegion(northPacific);
         }
         if (southPacific == null) {
             southPacific = new ServerRegion(game,
                 "model.region.southPacific", RegionType.OCEAN, pacific);
             southPacific.setDiscoverable(false);
-            map.putRegion(southPacific);
+            map.addRegion(southPacific);
         }
         if (northAtlantic == null) {
             northAtlantic = new ServerRegion(game,
                 "model.region.northAtlantic", RegionType.OCEAN, atlantic);
             northAtlantic.setPrediscovered(true);
             northAtlantic.setDiscoverable(false);
-            map.putRegion(northAtlantic);
+            map.addRegion(northAtlantic);
         }
         if (southAtlantic == null) {
             southAtlantic = new ServerRegion(game,
                 "model.region.southAtlantic", RegionType.OCEAN, atlantic);
             southAtlantic.setPrediscovered(true);
             southAtlantic.setDiscoverable(false);
-            map.putRegion(southAtlantic);
+            map.addRegion(southAtlantic);
         }
         // Fill the ocean regions by first filling the quadrants individually,
         // then allow the quadrants to overflow into their horizontally
@@ -380,12 +380,12 @@ public class ServerRegion extends Region {
         final int arcticHeight = Map.POLAR_HEIGHT;
         final int antarcticHeight = map.getHeight() - Map.POLAR_HEIGHT - 1;
         ServerRegion arctic = (ServerRegion)map
-            .getRegion("model.region.arctic");
+            .getRegionByKey("model.region.arctic");
         if (arctic == null) {
             arctic = new ServerRegion(game,
                 "model.region.arctic", RegionType.LAND, null);
             arctic.setPrediscovered(true);
-            map.putRegion(arctic);
+            map.addRegion(arctic);
             for (int x = 0; x < map.getWidth(); x++) {
                 for (int y = 0; y < arcticHeight; y++) {
                     if (map.isValid(x, y)) {
@@ -396,12 +396,12 @@ public class ServerRegion extends Region {
             }
         }
         ServerRegion antarctic = (ServerRegion)map
-            .getRegion("model.region.antarctic");
+            .getRegionByKey("model.region.antarctic");
         if (antarctic == null) {
             antarctic = new ServerRegion(game,
                 "model.region.antarctic", RegionType.LAND, null);
             antarctic.setPrediscovered(true);
-            map.putRegion(antarctic);
+            map.addRegion(antarctic);
             for (int x = 0; x < map.getWidth(); x++) {
                 for (int y = antarcticHeight; y < map.getHeight(); y++) {
                     if (map.isValid(x, y)) {
@@ -421,83 +421,83 @@ public class ServerRegion extends Region {
         final int thirdHeight = map.getHeight()/3;
         final int twoThirdHeight = 2 * thirdHeight;
         ServerRegion northWest = (ServerRegion)map
-            .getRegion("model.region.northWest");
+            .getRegionByKey("model.region.northWest");
         if (northWest == null) {
             northWest = new ServerRegion(game,
                 "model.region.northWest", RegionType.LAND, null);
-            map.putRegion(northWest);
+            map.addRegion(northWest);
         }
         northWest.setBounds(new Rectangle(0,0,thirdWidth,thirdHeight));
         northWest.setPrediscovered(true);
         ServerRegion north = (ServerRegion)map
-            .getRegion("model.region.north");
+            .getRegionByKey("model.region.north");
         if (north == null) {
             north = new ServerRegion(game,
                 "model.region.north", RegionType.LAND, null);
-            map.putRegion(north);
+            map.addRegion(north);
         }
         north.setBounds(new Rectangle(thirdWidth,0,thirdWidth,thirdHeight));
         north.setPrediscovered(true);
         ServerRegion northEast = (ServerRegion)map
-            .getRegion("model.region.northEast");
+            .getRegionByKey("model.region.northEast");
         if (northEast == null) {
             northEast = new ServerRegion(game,
                 "model.region.northEast", RegionType.LAND, null);
-            map.putRegion(northEast);
+            map.addRegion(northEast);
         }
         northEast.setBounds(new Rectangle(twoThirdWidth,0,thirdWidth,thirdHeight));
         northEast.setPrediscovered(true);
         ServerRegion west = (ServerRegion)map
-            .getRegion("model.region.west");
+            .getRegionByKey("model.region.west");
         if (west == null) {
             west = new ServerRegion(game,
                 "model.region.west", RegionType.LAND, null);
-            map.putRegion(west);
+            map.addRegion(west);
         }
         west.setBounds(new Rectangle(0,thirdHeight,thirdWidth,thirdHeight));
         west.setPrediscovered(true);
         ServerRegion center = (ServerRegion)map
-            .getRegion("model.region.center");
+            .getRegionByKey("model.region.center");
         if (center == null) {
             center = new ServerRegion(game,
                 "model.region.center", RegionType.LAND, null);
-            map.putRegion(center);
+            map.addRegion(center);
         }
         center.setBounds(new Rectangle(thirdWidth,thirdHeight,thirdWidth,thirdHeight));
         center.setPrediscovered(true);
         ServerRegion east = (ServerRegion)map
-            .getRegion("model.region.east");
+            .getRegionByKey("model.region.east");
         if (east == null) {
             east = new ServerRegion(game,
                 "model.region.east", RegionType.LAND, null);
-            map.putRegion(east);
+            map.addRegion(east);
         }
         east.setBounds(new Rectangle(twoThirdWidth,thirdHeight,thirdWidth,thirdHeight));
         east.setPrediscovered(true);
         ServerRegion southWest = (ServerRegion)map
-            .getRegion("model.region.southWest");
+            .getRegionByKey("model.region.southWest");
         if (southWest == null) {
             southWest = new ServerRegion(game,
                 "model.region.southWest", RegionType.LAND, null);
-            map.putRegion(southWest);
+            map.addRegion(southWest);
         }
         southWest.setBounds(new Rectangle(0,twoThirdHeight,thirdWidth,thirdHeight));
         southWest.setPrediscovered(true);
         ServerRegion south = (ServerRegion)map
-            .getRegion("model.region.south");
+            .getRegionByKey("model.region.south");
         if (south == null) {
             south = new ServerRegion(game,
                 "model.region.south", RegionType.LAND, null);
-            map.putRegion(south);
+            map.addRegion(south);
         }
         south.setBounds(new Rectangle(thirdWidth,twoThirdHeight,thirdWidth,thirdHeight));
         south.setPrediscovered(true);
         ServerRegion southEast = (ServerRegion)map
-            .getRegion("model.region.southEast");
+            .getRegionByKey("model.region.southEast");
         if (southEast == null) {
             southEast = new ServerRegion(game,
                 "model.region.southEast", RegionType.LAND, null);
-            map.putRegion(southEast);
+            map.addRegion(southEast);
         }
         southEast.setBounds(new Rectangle(twoThirdWidth,twoThirdHeight,thirdWidth,thirdHeight));
         southEast.setPrediscovered(true);
