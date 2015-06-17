@@ -389,8 +389,8 @@ public class NameCache {
      * @return A suitable name.
      */
     public static String getRegionName(Player player, Region region) {
-        if (region.isPacific()) {
-            return Messages.message(Region.PACIFIC_NAME_KEY);
+        if (region.hasName()) {
+            return Messages.message(region.getLabel());
         }
         final net.sf.freecol.common.model.Map map = player.getGame().getMap();
         String name;

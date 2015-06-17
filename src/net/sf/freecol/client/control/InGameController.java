@@ -3889,9 +3889,11 @@ public final class InGameController implements NetworkConstants {
      */
     public void newRegionName(Region region, String defaultName, Tile tile,
                               Unit unit) {
-        if (region.isPacific()) {
-            gui.showEventPanel(Messages.message("event.discoverPacific"),
-                               "image.flavor.event.discoverPacific", null);
+        if (region.hasName()) {
+            if (region.isPacific()) {
+                gui.showEventPanel(Messages.message("event.discoverPacific"),
+                                   "image.flavor.event.discoverPacific", null);
+            }
             nameNewRegion(tile, unit, region, defaultName);
         } else {
             gui.showNameNewRegionDialog(StringTemplate
