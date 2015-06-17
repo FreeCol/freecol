@@ -459,11 +459,8 @@ public class TerrainGenerator {
         int landIndex = 1;
         for (int c = 1; c <= continents; c++) {
             // c starting at 1, c=0 is all water tiles
-            String id;
-            do {
-                id = RegionType.LAND.getNameKey() + Integer.toString(landIndex++);
-            } while (map.getRegion(id) != null);
-            landregions[c] = new ServerRegion(game, id, RegionType.LAND, null);
+            landregions[c] = new ServerRegion(game, null, RegionType.LAND,
+                                              null);
             landregions[c].setDiscoverable(true);
             map.putRegion(landregions[c]);
         }
@@ -554,8 +551,7 @@ public class TerrainGenerator {
                     if (!t.isLand()) continue nextTry;
                 }
 
-                ServerRegion mountainRegion = new ServerRegion(game,
-                    RegionType.MOUNTAIN.getNameKey() + tries,
+                ServerRegion mountainRegion = new ServerRegion(game, null,
                     RegionType.MOUNTAIN, startTile.getRegion());
                 mountainRegion.setDiscoverable(true);
                 mountainRegion.setClaimable(true);
@@ -660,9 +656,8 @@ public class TerrainGenerator {
                 }
                 if (riverMap.get(tile) == null) {
                     // no river here yet
-                    ServerRegion riverRegion = new ServerRegion(game,
-                        RegionType.RIVER.getNameKey() + i, RegionType.RIVER,
-                        tile.getRegion());
+                    ServerRegion riverRegion = new ServerRegion(game, null,
+                        RegionType.RIVER, tile.getRegion());
                     riverRegion.setDiscoverable(true);
                     riverRegion.setClaimable(true);
                     River river = new River(map, riverMap, riverRegion, random);
@@ -748,14 +743,10 @@ public class TerrainGenerator {
             Tile tile = lakes.get(0);
             if (tile.getRegion() != null) continue;
 
-            String id;
-            while (game.getFreeColGameObject(id = RegionType.LAKE.getNameKey()
-                    + lakeCount) != null) lakeCount++;
-            ServerRegion lakeRegion = new ServerRegion(game, id,
+            ServerRegion lakeRegion = new ServerRegion(game, null,
                                                        RegionType.LAKE, null);
             map.putRegion(lakeRegion);
             // Pretend lakes are discovered with the surrounding terrain?
-            lakeRegion.setPrediscovered(false);
             todo.clear();
             todo.add(tile);
             while (!todo.isEmpty()) {
