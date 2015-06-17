@@ -2455,12 +2455,12 @@ public class EuropeanAIPlayer extends AIPlayer {
                 lb.add(", EXCEPTION: ", e.getMessage());
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }
-            if (unit.isDisposed()) {
+            if (unit.isDisposed() || unit.getLocation() == null) {
                 aiu.dropTransport();
                 lb.add(", DIED.");
                 continue;
             }
-
+            
             updateTransport(aiu, oldTarget, lb);
             
             // Units with moves left should be requeued.  If they are on a
