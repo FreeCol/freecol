@@ -52,6 +52,9 @@ public class IndianDemandMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(IndianDemandMission.class.getName());
 
+    /** The minimum amount of goods to demand. */
+    private static final int GOODS_DEMAND_MIN = 30;
+    
     /** The tag for this mission. */
     private static final String tag = "AI native demander";
 
@@ -125,10 +128,10 @@ public class IndianDemandMission extends Mission {
         int dx = spec.getInteger(GameOptions.NATIVE_DEMANDS) + 1;
         final GoodsType food = spec.getPrimaryFoodType();
         Goods goods = null;
+        int amount = capAmount(target.getGoodsCount(food), dx);
         if (tension.compareTo(Tension.Level.CONTENT) <= 0
-            && target.getGoodsCount(food) >= GoodsContainer.CARGO_SIZE) {
-            return new Goods(getGame(), target, food,
-                             capAmount(target.getGoodsCount(food), dx));
+            && target.getGoodsCount(food) >= amount) {
+            return new Goods(getGame(), target, food, amount);
         } else if (tension.compareTo(Tension.Level.DISPLEASED) <= 0) {
             Market market = target.getOwner().getMarket();
             int value = 0;
@@ -150,7 +153,7 @@ public class IndianDemandMission extends Mission {
             // Military goods
             for (GoodsType preferred : spec.getGoodsTypeList()) {
                 if (preferred.isMilitaryGoods()) {
-                    int amount = target.getGoodsCount(preferred);
+                    amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
                         return new Goods(getGame(), target, preferred,
                                          capAmount(amount, dx));
@@ -160,7 +163,7 @@ public class IndianDemandMission extends Mission {
             // Storable building materials (what do the natives need tools for?)
             for (GoodsType preferred : spec.getStorableGoodsTypeList()) {
                 if (preferred.isBuildingMaterial()) {
-                    int amount = target.getGoodsCount(preferred);
+                    amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
                         return new Goods(getGame(), target, preferred,
                                          capAmount(amount, dx));
@@ -170,7 +173,7 @@ public class IndianDemandMission extends Mission {
             // Trade goods
             for (GoodsType preferred : spec.getStorableGoodsTypeList()) {
                 if (preferred.isTradeGoods()) {
-                    int amount = target.getGoodsCount(preferred);
+                    amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
                         return new Goods(getGame(), target, preferred,
                                          capAmount(amount, dx));
@@ -180,7 +183,7 @@ public class IndianDemandMission extends Mission {
             // Refined goods
             for (GoodsType preferred : spec.getStorableGoodsTypeList()) {
                 if (preferred.isRefined()) {
-                    int amount = target.getGoodsCount(preferred);
+                    amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
                         return new Goods(getGame(), target, preferred,
                                          capAmount(amount, dx));
@@ -206,7 +209,7 @@ public class IndianDemandMission extends Mission {
     }
 
     private int capAmount(int amount, int difficulty) {
-        return Math.min(Math.max(amount * difficulty / 6, 30),
+        return Math.min(Math.max(amount * difficulty / 6, GOODS_DEMAND_MIN),
                         GoodsContainer.CARGO_SIZE); // One load of goods max
     }
 
