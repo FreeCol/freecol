@@ -2621,6 +2621,8 @@ public final class Specification {
                                GameOptions.GAMEOPTIONS_YEARS, "1600,1700");
         ret |= checkIntegerOption(GameOptions.SEASONS,
                                   GameOptions.GAMEOPTIONS_YEARS, 2);
+        ret |= checkBooleanOption(GameOptions.DISEMBARK_IN_COLONY,
+                                  GameOptions.GAMEOPTIONS_COLONY, false);
         // end @compat 0.11.3
 
         return ret;

@@ -1056,6 +1056,14 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
         }
 
+        // Disembark in colony.
+        if (isCarrier() && !isEmpty() && newTile.getColony() != null
+            && getSpecification().getBoolean(GameOptions.DISEMBARK_IN_COLONY)) {
+            for (Unit u : getUnitList()) {
+                ((ServerUnit)u).csMove(newTile, random, cs);
+            }
+        }
+                
         // Check for slowing units.
         Unit slowedBy = getSlowedBy(newTile, random);
         if (slowedBy != null) {

@@ -3614,6 +3614,9 @@
         <!-- Customs houses can only be constructed in coastal colonies? -->
         <booleanOption id="model.option.customsOnCoast"
                        defaultValue="false"/>
+        <!-- Disembark all units on arriving in a colony. -->
+        <booleanOption id="model.option.disembarkInColony"
+                       defaultValue="true"/>
         <!-- Whether experts have connections, producing without raw
              materials in factories -->
         <booleanOption id="model.option.expertsHaveConnections"

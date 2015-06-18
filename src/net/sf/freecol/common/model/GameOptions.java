@@ -132,6 +132,10 @@ public class GameOptions {
     public static final String CUSTOMS_ON_COAST
         = "model.option.customsOnCoast";
 
+    /** All units disembark when a carrier arrives in a colony (Col1). */
+    public static final String DISEMBARK_IN_COLONY
+        = "model.option.disembarkInColony";
+
     /**
      * Whether experts have connections, producing without raw
      * materials in factories.

@@ -210,6 +210,9 @@
         <!-- Does the Custom House sell boycotted goods -->
         <booleanOption id="model.option.customIgnoreBoycott"
                        defaultValue="false"/>
+        <!-- Disembark all units on arriving in a colony. -->
+        <booleanOption id="model.option.disembarkInColony"
+                       defaultValue="false"/>
         <!-- Whether experts have connections, producing without raw
              materials in factories. -->
         <booleanOption id="model.option.expertsHaveConnections"
