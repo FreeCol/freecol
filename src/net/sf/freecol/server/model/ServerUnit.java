@@ -1062,6 +1062,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             for (Unit u : getUnitList()) {
                 ((ServerUnit)u).csMove(newTile, random, cs);
             }
+            setMovesLeft(0);
         }
                 
         // Check for slowing units.
