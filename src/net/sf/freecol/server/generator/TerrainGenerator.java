@@ -87,9 +87,6 @@ public class TerrainGenerator {
     private ArrayList<TileType> landTileTypes = null;
     private ArrayList<TileType> oceanTileTypes = null;
 
-    /** The cache of geographic regions. */
-    private ServerRegion[] geographicRegions = null;
-
 
     /**
      * Creates a new <code>TerrainGenerator</code>.
@@ -132,9 +129,11 @@ public class TerrainGenerator {
      * know where each region is.
      *
      * @param sr The <code>ServerRegion</code> to find a parent for.
+     * @param geographicRegions A list of all the geographic
+     *     <code>ServerRegion</code>s.
      */
-    private void setGeographicRegion(ServerRegion sr) {
-        if (geographicRegions == null) return;
+    private void setGeographicRegion(ServerRegion sr,
+                                     List<ServerRegion> geographicRegions) {
         for (ServerRegion gr : geographicRegions) {
             if (gr.containsCenter(sr)) {
                 sr.setParent(gr);
@@ -355,9 +354,12 @@ public class TerrainGenerator {
      * landmass is created.
      *
      * @param map The <code>Map</code> to work on.
+     * @param geographicRegions A list of all the geographic
+     *     <code>ServerRegion</code>s.
      * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void createLandRegions(Map map, LogBuilder lb) {
+    private void createLandRegions(Map map,
+        List<ServerRegion> geographicRegions, LogBuilder lb) {
         // Create "explorable" land regions
         int continents = 0;
         boolean[][] landmap = new boolean[map.getWidth()][map.getHeight()];
@@ -483,18 +485,12 @@ public class TerrainGenerator {
                                        * LAND_REGIONS_SCORE_VALUE),
                                  LAND_REGION_MIN_SCORE);
             sr.setScoreValue(score);
-            setGeographicRegion(sr);
+            setGeographicRegion(sr, geographicRegions);
             lb.add("Created land region ", sr.toString(),
                 " (size ", sr.getSize(),
                 ", score ", sr.getScoreValue(),
                 ", parent ", ((sr.getParent() == null) ? "(null)"
                     : sr.getParent().toString()), ")\n");
-        }
-
-        for (ServerRegion gr : geographicRegions) {
-            lb.add("Geographic region ", gr.toString(),
-                " (size ", gr.getSize(),
-                ", children ", gr.getChildren().size(), ")\n");
         }
     }
 
@@ -503,9 +499,12 @@ public class TerrainGenerator {
      * of mountain ranges depends on the map size.
      *
      * @param map The map to use.
+     * @param geographicRegions A list of all the geographic
+     *     <code>ServerRegion</code>s.
      * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void createMountains(Map map, LogBuilder lb) {
+    private void createMountains(Map map, List<ServerRegion> geographicRegions,
+                                 LogBuilder lb) {
         float randomHillsRatio = 0.5f;
         // 50% of user settings will be allocated for random hills
         // here and there the rest will be allocated for large
@@ -582,6 +581,7 @@ public class TerrainGenerator {
                 }
                 int scoreValue = 2 * mountainRegion.getSize();
                 mountainRegion.setScoreValue(scoreValue);
+                setGeographicRegion(mountainRegion, geographicRegions);
                 lb.add("Created mountain region (direction ", direction,
                     ", length ", length,
                     ", size ", mountainRegion.getSize(),
@@ -605,14 +605,14 @@ public class TerrainGenerator {
 
                 // Do not add hills too close to a mountain range
                 // this would defeat the purpose of adding random hills.
-                for (Tile tile: t.getSurroundingTiles(3)) {
+                for (Tile tile : t.getSurroundingTiles(3)) {
                     if (tile.getType() == mountains) continue nextTry;
                 }
 
                 // Do not add hills too close to the ocean/lake this
                 // helps with good locations for building colonies on
                 // shore.
-                for (Tile tile: t.getSurroundingTiles(1)) {
+                for (Tile tile : t.getSurroundingTiles(1)) {
                     if (!tile.isLand()) continue nextTry;
                 }
 
@@ -630,9 +630,12 @@ public class TerrainGenerator {
      * on the map size.
      *
      * @param map The <code>Map</code> to create rivers on.
+     * @param geographicRegions A list of all the geographic
+     *     <code>ServerRegion</code>s.
      * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void createRivers(Map map, LogBuilder lb) {
+    private void createRivers(Map map, List<ServerRegion> geographicRegions,
+                              LogBuilder lb) {
         final TileImprovementType riverType
             = spec.getTileImprovementType("model.improvement.river");
         final int number = getApproximateLandCount()
@@ -684,6 +687,7 @@ public class TerrainGenerator {
             }
             scoreValue *= 2;
             region.setScoreValue(scoreValue);
+            setGeographicRegion(region, geographicRegions);
             lb.add("Created river region (length ", river.getLength(),
                 ", score value ", scoreValue, ").\n");
         }
@@ -693,9 +697,12 @@ public class TerrainGenerator {
      * Finds all the lake regions.
      *
      * @param map The <code>Map</code> to work on.
+     * @param geographicRegions A list of all the geographic
+     *     <code>ServerRegion</code>s.
      * @param lb A <code>LogBuilder</code> to log to.
      */
-    private void createLakeRegions(Map map, LogBuilder lb) {
+    private void createLakeRegions(Map map,
+        List<ServerRegion> geographicRegions, LogBuilder lb) {
         final TileType lakeType = spec.getTileType("model.tile.lake");
 
         // Create the water map, and find any tiles that are water but
@@ -715,7 +722,7 @@ public class TerrainGenerator {
             }
         }
         for (ServerRegion sr : makeLakes(map, lakes)) {
-            setGeographicRegion(sr);
+            setGeographicRegion(sr, geographicRegions);
         }            
         lb.add("\n");
     }
@@ -994,24 +1001,26 @@ public class TerrainGenerator {
             }
         }
         game.setMap(map);
-        geographicRegions = ServerRegion.makeStandardRegions(map);
+        List<ServerRegion> fixed = ServerRegion.requireFixedRegions(map, lb);
+        List<ServerRegion> geographic = new ArrayList<>();
+        for (ServerRegion sr : fixed) {
+            if (sr.isGeographic()) geographic.add(sr);
+        }
 
         if (importTerrain) {
             if (!fixRegions.isEmpty()) { // Fix the tiles missing regions.
-                ServerRegion.makeFixedOceans(map, lb);
-                createLakeRegions(map, lb);
-                createLandRegions(map, lb);
+                createLakeRegions(map, geographic, lb);
+                createLandRegions(map, geographic, lb);
             }
         } else {
-            ServerRegion.makeFixedOceans(map, lb);
             map.resetHighSeas(
                 mapOptions.getInteger(MapGeneratorOptions.DISTANCE_TO_HIGH_SEA),
                 mapOptions.getInteger(MapGeneratorOptions.MAXIMUM_DISTANCE_TO_EDGE));
             if (mapHasLand) {
-                createMountains(map, lb);
-                createRivers(map, lb);
-                createLakeRegions(map, lb);
-                createLandRegions(map, lb);
+                createMountains(map, geographic, lb);
+                createRivers(map, geographic, lb);
+                createLakeRegions(map, geographic, lb);
+                createLandRegions(map, geographic, lb);
             }
         }
         map.fixupRegions();
@@ -1019,7 +1028,7 @@ public class TerrainGenerator {
 
         // Add the bonuses only after the map is completed.
         // Otherwise we risk creating resources on fields where they
-        // don't belong (like sugar in large rivers or tobaco on hills).
+        // do not belong (like sugar in large rivers or tobacco on hills).
         for (Tile tile : map.getAllTiles()) {
             perhapsAddBonus(tile, !importBonuses);
             if (!tile.isLand()) {

@@ -486,6 +486,20 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Get the fixed regions indexed by key.
+     *
+     * @return A map of the fixed regions.
+     */
+    public java.util.Map<String, Region> getFixedRegions() {
+        HashMap<String, Region> result = new HashMap<>();
+        for (Region r : getRegions()) {
+            String n = r.getNameKey();
+            if (r != null) result.put(n, r);
+        }
+        return result;
+    }
+
+    /**
      * Gets a <code>Region</code> by name key.
      *
      * @param key The name key to lookup the region with.
