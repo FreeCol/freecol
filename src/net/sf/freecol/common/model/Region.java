@@ -122,9 +122,6 @@ public class Region extends FreeColGameObject implements Nameable, Named {
      */
     protected String discoverer;
 
-    /** Whether the region is already discovered when the game starts. */
-    protected boolean prediscovered = false;
-
     /**
      * How much discovering this region contributes to your score.
      * This should be zero unless the region is discoverable.
@@ -180,7 +177,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
      * @return The i18n-ready name for the region.
      */
     public StringTemplate getLabel() {
-        if (prediscovered || isPacific()) {
+        if (hasName()) {
             // @compat 0.10.x
             // Older region name keys did not end in .name
             if (!nameKey.endsWith(".name")) return StringTemplate.key(Messages.nameKey(nameKey));
@@ -280,7 +277,6 @@ public class Region extends FreeColGameObject implements Nameable, Named {
 
     public final void setDiscoverable(final boolean newDiscoverable) {
         this.discoverable = newDiscoverable;
-        if (this.discoverable) this.prediscovered = false;
     }
 
     /**
@@ -350,19 +346,6 @@ public class Region extends FreeColGameObject implements Nameable, Named {
      */
     public final void setDiscoveredBy(final Player newDiscoveredBy) {
         this.discoveredBy = newDiscoveredBy;
-    }
-
-    /**
-     * Is the region pre-discovered (e.g. the Atlantic).
-     *
-     * @return True if the region is prediscovered.
-     */
-    public final boolean isPrediscovered() {
-        return this.prediscovered;
-    }
-
-    public final void setPrediscovered(final boolean newPrediscovered) {
-        this.prediscovered = newPrediscovered;
     }
 
     /**
@@ -448,7 +431,6 @@ public class Region extends FreeColGameObject implements Nameable, Named {
     private static final String NAME_TAG = "name";
     private static final String NAME_KEY_TAG = "nameKey";
     private static final String PARENT_TAG = "parent";
-    private static final String PREDISCOVERED_TAG = "prediscovered";
     private static final String SCORE_VALUE_TAG = "scoreValue";
     private static final String TYPE_TAG = "type";
     
@@ -467,8 +449,6 @@ public class Region extends FreeColGameObject implements Nameable, Named {
         xw.writeAttribute(NAME_KEY_TAG, nameKey);
 
         xw.writeAttribute(TYPE_TAG, type);
-
-        xw.writeAttribute(PREDISCOVERED_TAG, prediscovered);
 
         xw.writeAttribute(CLAIMABLE_TAG, claimable);
 
@@ -524,8 +504,6 @@ public class Region extends FreeColGameObject implements Nameable, Named {
         claimable = xr.getAttribute(CLAIMABLE_TAG, false);
 
         discoverable = xr.getAttribute(DISCOVERABLE_TAG, false);
-
-        prediscovered = xr.getAttribute(PREDISCOVERED_TAG, false);
 
         scoreValue = xr.getAttribute(SCORE_VALUE_TAG, 0);
 

@@ -79,7 +79,6 @@ public class ServerRegion extends Region {
         this.discoverable = region.isDiscoverable();
         this.discoveredIn = region.getDiscoveredIn();
         this.discoveredBy = region.getDiscoveredBy();
-        this.prediscovered = region.isPrediscovered();
         this.scoreValue = region.getScoreValue();
         this.type = region.getType();
     }
@@ -223,7 +222,6 @@ public class ServerRegion extends Region {
         if (arctic == null) {
             arctic = new ServerRegion(game, "model.region.arctic",
                                       RegionType.LAND, null);
-            arctic.setPrediscovered(true);
             map.addRegion(arctic);
             for (int x = 0; x < map.getWidth(); x++) {
                 for (int y = 0; y < arcticHeight; y++) {
@@ -241,7 +239,6 @@ public class ServerRegion extends Region {
         if (antarctic == null) {
             antarctic = new ServerRegion(game, "model.region.antarctic",
                                          RegionType.LAND, null);
-            antarctic.setPrediscovered(true);
             map.addRegion(antarctic);
             for (int x = 0; x < map.getWidth(); x++) {
                 for (int y = antarcticHeight; y < map.getHeight(); y++) {
@@ -270,7 +267,6 @@ public class ServerRegion extends Region {
                                          RegionType.LAND, null);
             northWest.bounds.setBounds(new Rectangle(0,0,thirdWidth,thirdHeight));
             map.addRegion(northWest);
-            northWest.setPrediscovered(true);
             lb.add("+NW");
         }
         result.add(northWest);
@@ -281,7 +277,6 @@ public class ServerRegion extends Region {
                                      RegionType.LAND, null);
             north.bounds.setBounds(new Rectangle(thirdWidth,0,thirdWidth,thirdHeight));
             map.addRegion(north);
-            north.setPrediscovered(true);
             lb.add("+N");
         }
         result.add(north);
@@ -292,7 +287,6 @@ public class ServerRegion extends Region {
                                          RegionType.LAND, null);
             northEast.bounds.setBounds(new Rectangle(twoThirdWidth,0,thirdWidth,thirdHeight));
             map.addRegion(northEast);
-            northEast.setPrediscovered(true);
             lb.add("+NE");
         }
         result.add(northEast);
@@ -303,7 +297,6 @@ public class ServerRegion extends Region {
                                     RegionType.LAND, null);
             west.bounds.setBounds(new Rectangle(0,thirdHeight,thirdWidth,thirdHeight));
             map.addRegion(west);
-            west.setPrediscovered(true);
             lb.add("+W");
         }
         result.add(west);
@@ -314,7 +307,6 @@ public class ServerRegion extends Region {
                                       RegionType.LAND, null);
             center.bounds.setBounds(new Rectangle(thirdWidth,thirdHeight,thirdWidth,thirdHeight));
             map.addRegion(center);
-            center.setPrediscovered(true);
             lb.add("+center");
         }
         result.add(center);
@@ -325,7 +317,6 @@ public class ServerRegion extends Region {
                                     RegionType.LAND, null);
             east.bounds.setBounds(new Rectangle(twoThirdWidth,thirdHeight,thirdWidth,thirdHeight));
             map.addRegion(east);
-            east.setPrediscovered(true);
             lb.add("+E");
         }
         result.add(east);
@@ -336,7 +327,6 @@ public class ServerRegion extends Region {
                                          RegionType.LAND, null);
             southWest.bounds.setBounds(new Rectangle(0,twoThirdHeight,thirdWidth,thirdHeight));
             map.addRegion(southWest);
-            southWest.setPrediscovered(true);
             lb.add("+SW");
         }
         result.add(southWest);
@@ -347,7 +337,6 @@ public class ServerRegion extends Region {
                                      RegionType.LAND, null);
             south.bounds.setBounds(new Rectangle(thirdWidth,twoThirdHeight,thirdWidth,thirdHeight));
             map.addRegion(south);
-            south.setPrediscovered(true);
             lb.add("+S");
         }
         result.add(south);
@@ -358,7 +347,6 @@ public class ServerRegion extends Region {
                                          RegionType.LAND, null);
             southEast.bounds.setBounds(new Rectangle(twoThirdWidth,twoThirdHeight,thirdWidth,thirdHeight));
             map.addRegion(southEast);
-            southEast.setPrediscovered(true);
             lb.add("+SE");
         }
         result.add(southEast);
@@ -402,7 +390,6 @@ public class ServerRegion extends Region {
                                         RegionType.OCEAN, null);
             atlantic.setDiscoverable(false);
             map.addRegion(atlantic);
-            atlantic.setPrediscovered(true);
             allOceans = false;
             lb.add("+atlantic");
         }
@@ -413,7 +400,6 @@ public class ServerRegion extends Region {
                                              RegionType.OCEAN, atlantic);
             northAtlantic.setDiscoverable(false);
             map.addRegion(northAtlantic);
-            northAtlantic.setPrediscovered(true);
             allOceans = false;
             lb.add("+northAtlantic");
         }
@@ -424,7 +410,6 @@ public class ServerRegion extends Region {
                                              RegionType.OCEAN, atlantic);
             southAtlantic.setDiscoverable(false);
             map.addRegion(southAtlantic);
-            southAtlantic.setPrediscovered(true);
             allOceans = false;
             lb.add("+southAtlantic");
         }
