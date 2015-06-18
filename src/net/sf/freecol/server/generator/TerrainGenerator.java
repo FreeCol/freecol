@@ -1014,6 +1014,7 @@ public class TerrainGenerator {
                 createLandRegions(map, lb);
             }
         }
+        map.fixupRegions();
         lb.shrink("\n");
 
         // Add the bonuses only after the map is completed.

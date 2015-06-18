@@ -2238,6 +2238,16 @@ public class Map extends FreeColGameObject implements Location {
             : Layer.TERRAIN);
     }
 
+    /**
+     * Fix the region parent/child relationships.
+     */
+    public void fixupRegions() {
+        for (Region r : regions) {
+            Region p = r.getParent();
+            if (p != null && !p.getChildren().contains(r)) p.addChild(r);
+        }
+    }
+
 
     // Interface Location
     // getId() inherited.
@@ -2505,6 +2515,11 @@ public class Map extends FreeColGameObject implements Location {
             Settlement s = t.getOwningSettlement();
             if (s != null) s.addTile(t);
         }
+
+        // @compat 0.11.3
+        // Maps with incorrect parent/child chains were occurring.
+        fixupRegions();
+        // end @compat 0.11.3
     }
 
     /**
