@@ -182,7 +182,9 @@ public class Region extends FreeColGameObject implements Nameable, Named {
 
 
     /**
-     * Only needed by a ServerRegion copying constructor.
+     * Get the key for this region.
+     *
+     * @return The region key, which will be null for non-fixed regions.
      */
     public String getKey() {
         return this.key;
@@ -626,8 +628,9 @@ public class Region extends FreeColGameObject implements Nameable, Named {
         sb.append("[").append(getId())
             .append(" ").append((key != null) ? key : (name != null) ? name
                 : "<unnamed>")
-            .append(" ").append(type)
-            .append("]");
+            .append(" ").append(type);
+        if (getDiscoverable()) sb.append("!");
+        sb.append("]");
         return sb.toString();
     }
 

@@ -508,7 +508,7 @@ public class Map extends FreeColGameObject implements Location {
     public Region getRegionByKey(final String key) {
         if (key == null) return null;
         for (Region r : regions) {
-            if (key.equals(r.getNameKey())) return r;
+            if (key.equals(r.getKey())) return r;
         }
         return null;
     }

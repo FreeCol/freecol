@@ -214,7 +214,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         Game game = new ServerGame(spec());
         MapGenerator gen = new SimpleMapGenerator(game, new Random(1));
         gen.createMap(new LogBuilder(-1));
-
+        
         Map map = game.getMap();
         Region pacific = map.getRegionByKey("model.region.pacific");
         assertNotNull(pacific);

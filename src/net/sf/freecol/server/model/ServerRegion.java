@@ -253,7 +253,7 @@ public class ServerRegion extends Region {
                     }
                 }
             }
-            lb.add("+arctic, ");
+            lb.add("+arctic");
         }
         result.add(arctic);
         final int antarcticHeight = map.getHeight() - Map.POLAR_HEIGHT - 1;
@@ -269,7 +269,7 @@ public class ServerRegion extends Region {
                     }
                 }
             }
-            lb.add("+antarctic, ");
+            lb.add("+antarctic");
         }
         result.add(antarctic);
 
@@ -477,7 +477,7 @@ public class ServerRegion extends Region {
                 nNP, " North Pacific, ",
                 nSP, " South Pacific, ",
                 nNA, " North Atlantic, ",
-                nSP, " South Atlantic.");
+                nSP, " South Atlantic.\n");
         }
         return result;
     }
