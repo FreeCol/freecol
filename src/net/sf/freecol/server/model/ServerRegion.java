@@ -157,8 +157,7 @@ public class ServerRegion extends Region {
      * @return True if this is a geographic region.
      */
     public final boolean isGeographic() {
-        return this.size == 0
-            && this.bounds.width > 0 && this.bounds.height > 0;
+        return this.key != null && this.type == RegionType.LAND;
     }
 
     /**

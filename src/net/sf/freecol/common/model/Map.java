@@ -2257,7 +2257,15 @@ public class Map extends FreeColGameObject implements Location {
      */
     public void fixupRegions() {
         for (Region r : regions) {
+            if (r.isPacific()) continue;
             Region p = r.getParent();
+            // Mountains and Rivers were setting their parent to the
+            // discoverable land region they are created within.  Move them
+            // up to being children of the geographic region.
+            if (r.getDiscoverable() && p != null && p.getDiscoverable()) {
+                p = p.getParent();
+                r.setParent(p);
+            }
             if (p != null && !p.getChildren().contains(r)) p.addChild(r);
         }
     }
