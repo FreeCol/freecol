@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -38,6 +39,15 @@ import static net.sf.freecol.common.util.StringUtils.*;
 public class Region extends FreeColGameObject implements Nameable, Named {
 
     private static final Logger logger = Logger.getLogger(Region.class.getName());
+
+    /** The keys for the valid predefined regions. */
+    public static final List<String> predefinedRegionKeys
+        = makeUnmodifiableList("model.region.arctic", "model.region.antarctic",
+            "model.region.northWest", "model.region.north", "model.region.northEast",
+            "model.region.west", "model.region.center", "model.region.east",
+            "model.region.southWest", "model.region.south", "model.region.southEast",
+            "model.region.atlantic", "model.region.northAtlantic", "model.region.southAtlantic",
+            "model.region.pacific", "model.region.northPacific", "model.region.southPacific");
 
     /** Hardwired name key for the Pacific for the benefit of isPacific(). */
     public static final String PACIFIC_NAME_KEY
@@ -177,15 +187,9 @@ public class Region extends FreeColGameObject implements Nameable, Named {
      * @return The i18n-ready name for the region.
      */
     public StringTemplate getLabel() {
-        if (hasName()) {
-            // @compat 0.10.x
-            // Older region name keys did not end in .name
-            if (!nameKey.endsWith(".name")) return StringTemplate.key(Messages.nameKey(nameKey));
-            // end @compat 0.10.x
-            return StringTemplate.key(nameKey);
-        }
-        return (name == null) ? StringTemplate.key(type.getUnknownKey())
-            : StringTemplate.name(name);
+        return (this.nameKey != null) ? StringTemplate.key(nameKey)
+            : (this.name != null) ? StringTemplate.name(this.name)
+            : StringTemplate.key(type.getUnknownKey());
     }
 
     /**
@@ -380,17 +384,35 @@ public class Region extends FreeColGameObject implements Nameable, Named {
         this.discoverable = false;
         result.add(this);
         for (Region r : getChildren()) {
-            if (r.isDiscoverable()) {
-                r.discoveredBy = player;
-                r.discoveredIn = turn;
-                r.discoverable = false;
-                result.add(r);
-            }
+            if (!r.isDiscoverable()) continue;
+            r.discoveredBy = player;
+            r.discoveredIn = turn;
+            r.discoverable = false;
+            result.add(r);
         }
         return result;
     }
-    
-    
+
+    // @compat 0.11.3
+    /**
+     * Is a key one of the dodgy name keys that were generated around 0.11.3?
+     *
+     * @return A valid name key or null if already null or invalid.
+     */
+    private String fixRegionKey(String key) {
+        if (key == null) return key;
+        for (String r : predefinedRegionKeys) {
+            if (key.equals(r)) {
+                return Messages.nameKey(r);
+            } else if (key.equals(Messages.nameKey(r))) {
+                return key;
+            }            
+        }
+        return null;
+    }
+    // end @compat 0.11.3
+
+
     // Implement Nameable
 
     /**
@@ -498,6 +520,9 @@ public class Region extends FreeColGameObject implements Nameable, Named {
         name = xr.getAttribute(NAME_TAG, (String)null);
 
         nameKey = xr.getAttribute(NAME_KEY_TAG, (String)null);
+        // @compat 0.11.3
+        nameKey = fixRegionKey(nameKey);
+        // end @compat 0.11.3
 
         type = xr.getAttribute(TYPE_TAG, RegionType.class, (RegionType)null);
 
