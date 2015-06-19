@@ -216,39 +216,40 @@ public class MapGeneratorTest extends FreeColTestCase {
         gen.createMap(new LogBuilder(-1));
 
         Map map = game.getMap();
-        Region pacific = map.getRegionByKey("model.region.pacific.name");
+        Region pacific = map.getRegionByKey("model.region.pacific");
         assertNotNull(pacific);
         assertTrue(pacific.isPacific());
         assertEquals(pacific, pacific.getDiscoverableRegion());
 
-        Region southPacific = map.getRegionByKey("model.region.southPacific.name");
+        Region southPacific = map.getRegionByKey("model.region.southPacific");
         assertNotNull(southPacific);
-        assertFalse(southPacific.isDiscoverable());
+        assertFalse(southPacific.getDiscoverable());
         assertTrue(southPacific.isPacific());
         assertEquals(pacific, southPacific.getParent());
         assertEquals(pacific, southPacific.getDiscoverableRegion());
 
         Player player = new Player(game, FreeColObject.ID_ATTRIBUTE_TAG);
-        ServerUnit unit = new ServerUnit(game, null, player, spec().getUnitType("model.unit.caravel"));
+        ServerUnit unit = new ServerUnit(game, null, player,
+            spec().getUnitType("model.unit.caravel"));
         pacific.discover(player, new Turn(1));
 
-        assertFalse(pacific.isDiscoverable());
+        assertFalse(pacific.getDiscoverable());
         assertNull(pacific.getDiscoverableRegion());
-        assertFalse(southPacific.isDiscoverable());
+        assertFalse(southPacific.getDiscoverable());
         assertTrue(southPacific.isPacific());
         assertEquals(pacific, southPacific.getParent());
         assertNull(southPacific.getDiscoverableRegion());
 
-        Region atlantic = map.getRegionByKey("model.region.atlantic.name");
+        Region atlantic = map.getRegionByKey("model.region.atlantic");
         assertNotNull(atlantic);
         assertFalse(atlantic.isPacific());
-        assertFalse(atlantic.isDiscoverable());
+        assertFalse(atlantic.getDiscoverable());
         assertNull(atlantic.getDiscoverableRegion());
 
-        Region northAtlantic = map.getRegionByKey("model.region.northAtlantic.name");
+        Region northAtlantic = map.getRegionByKey("model.region.northAtlantic");
         assertNotNull(northAtlantic);
         assertFalse(northAtlantic.isPacific());
-        assertFalse(northAtlantic.isDiscoverable());
+        assertFalse(northAtlantic.getDiscoverable());
         assertNull(northAtlantic.getDiscoverableRegion());
     }
 }

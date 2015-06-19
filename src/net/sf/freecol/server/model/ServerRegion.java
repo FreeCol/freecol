@@ -73,11 +73,11 @@ public class ServerRegion extends Region {
         super(game);
 
         this.name = region.getName();
+        this.key = region.getKey();
         this.type = region.getType();
-        this.nameKey = region.getNameKey();
         this.parent = null; // Has to be fixed up elsewhere
-        this.claimable = region.isClaimable();
-        this.discoverable = region.isDiscoverable();
+        this.claimable = region.getClaimable();
+        this.discoverable = region.getDiscoverable();
         this.discoveredIn = region.getDiscoveredIn();
         this.discoveredBy = region.getDiscoveredBy();
         this.discoverer = null;
@@ -101,15 +101,15 @@ public class ServerRegion extends Region {
      * Create a new fixed server region.
      *
      * @param game The <code>Game</code> to create in.
-     * @param nameKey A name key for the region.
+     * @param key The key for the region.
      * @param type The <code>RegionType</code> to use.
      * @param parent The <code>Region</code> to be the parent of this one.
      */
-    private ServerRegion(Game game, String nameKey, RegionType type,
+    private ServerRegion(Game game, String key, RegionType type,
                          Region parent) {
         super(game);
 
-        this.nameKey = nameKey;
+        this.key = key;
         this.name = null;
         this.type = type;
         this.parent = parent;
@@ -208,7 +208,7 @@ public class ServerRegion extends Region {
      */
     public void csDiscover(Player player, Turn turn, String newName,
                            ChangeSet cs) {
-        if (!isDiscoverable()) return;
+        if (!getDiscoverable()) return;
         final int score = (getSpecification().getBoolean(GameOptions.EXPLORATION_POINTS)) 
             ? this.scoreValue
             : 0;
@@ -528,10 +528,9 @@ public class ServerRegion extends Region {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
-        sb.append("[").append(getId())
-            .append(" ").append((name == null) ? "(null)" : name)
-            .append(" ").append(nameKey).append(" ").append(type)
-            .append(" ").append(size).append(" ").append(bounds)
+        sb.append(super.toString());
+        sb.setLength(sb.length() - 1);
+        sb.append(" ").append(size).append(" ").append(bounds)
             .append("]");
         return sb.toString();
     }
