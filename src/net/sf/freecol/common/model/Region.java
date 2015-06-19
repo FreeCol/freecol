@@ -53,14 +53,37 @@ public class Region extends FreeColGameObject implements Nameable, Named {
     public static final String PACIFIC_NAME_KEY
         = Messages.nameKey("model.region.pacific");
 
+    /** The type of region. */
     public static enum RegionType implements Named {
-        OCEAN,
-        COAST,
-        LAKE,
-        RIVER,
-        LAND,
-        MOUNTAIN,
-        DESERT;
+        OCEAN(false),
+        COAST(false),
+        LAKE(false),
+        RIVER(true),
+        LAND(true),
+        MOUNTAIN(true),
+        DESERT(true);
+
+        /** Are regions of this type claimable by default? */
+        private final boolean claimable;
+
+
+        /**
+         * Create a region type.
+         *
+         * @param claimable The default claimability of this region type.
+         */
+        RegionType(boolean claimable) {
+            this.claimable = claimable;
+        }
+        
+
+        /** Is this region claimable by default?
+         *
+         * @return True if this region type is normally claimable.
+         */
+        public boolean getClaimable() {
+            return this.claimable;
+        }
 
         /**
          * Get a stem key for this region type.
@@ -395,7 +418,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
 
     // @compat 0.11.3
     /**
-     * Is a key one of the dodgy name keys that were generated around 0.11.3?
+     * Is a key one of the dodgy keys that were generated up to 0.11.3?
      *
      * @return A valid name key or null if already null or invalid.
      */
@@ -468,7 +491,9 @@ public class Region extends FreeColGameObject implements Nameable, Named {
             xw.writeAttribute(NAME_TAG, name);
         }
 
-        xw.writeAttribute(NAME_KEY_TAG, nameKey);
+        if (nameKey != null) {
+            xw.writeAttribute(NAME_KEY_TAG, nameKey);
+        }
 
         xw.writeAttribute(TYPE_TAG, type);
 

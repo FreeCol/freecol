@@ -461,10 +461,7 @@ public class TerrainGenerator {
         int landIndex = 1;
         for (int c = 1; c <= continents; c++) {
             // c starting at 1, c=0 is all water tiles
-            landregions[c] = new ServerRegion(game, null, RegionType.LAND,
-                                              null);
-            landregions[c].setDiscoverable(true);
-            map.addRegion(landregions[c]);
+            landregions[c] = new ServerRegion(game, RegionType.LAND);
         }
 
         // Add tiles to ServerRegions
@@ -550,11 +547,7 @@ public class TerrainGenerator {
                     if (!t.isLand()) continue nextTry;
                 }
 
-                ServerRegion mountainRegion = new ServerRegion(game, null,
-                    RegionType.MOUNTAIN, startTile.getRegion());
-                mountainRegion.setDiscoverable(true);
-                mountainRegion.setClaimable(true);
-                map.addRegion(mountainRegion);
+                ServerRegion mountainRegion = new ServerRegion(game, RegionType.MOUNTAIN);
                 Direction direction = Direction.getRandomDirection("getLand",
                     logger, random);
                 int length = maximumLength
@@ -659,10 +652,7 @@ public class TerrainGenerator {
                 }
                 if (riverMap.get(tile) == null) {
                     // no river here yet
-                    ServerRegion riverRegion = new ServerRegion(game, null,
-                        RegionType.RIVER, tile.getRegion());
-                    riverRegion.setDiscoverable(true);
-                    riverRegion.setClaimable(true);
+                    ServerRegion riverRegion = new ServerRegion(game, RegionType.RIVER);
                     River river = new River(map, riverMap, riverRegion, random);
                     if (river.flowFromSource(tile)) {
                         lb.add("Created new river with length ",
@@ -750,9 +740,7 @@ public class TerrainGenerator {
             Tile tile = lakes.get(0);
             if (tile.getRegion() != null) continue;
 
-            ServerRegion lakeRegion = new ServerRegion(game, null,
-                                                       RegionType.LAKE, null);
-            map.addRegion(lakeRegion);
+            ServerRegion lakeRegion = new ServerRegion(game, RegionType.LAKE);
             // Pretend lakes are discovered with the surrounding terrain?
             todo.clear();
             todo.add(tile);
