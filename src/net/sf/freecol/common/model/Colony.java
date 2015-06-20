@@ -752,6 +752,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         buildingMap.put(buildingType.getId(), building);
         addFeatures(building.getType());
         invalidateCache();
+        checkBuildQueueIntegrity(true);
     }
 
     /**

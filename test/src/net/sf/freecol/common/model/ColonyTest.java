@@ -126,7 +126,6 @@ public class ColonyTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony();
-
         colony.setCurrentlyBuilding(wagonTrainType);
         // default item will be added to new colony's build queue
         assertEquals("Building queue should have 2 entry",

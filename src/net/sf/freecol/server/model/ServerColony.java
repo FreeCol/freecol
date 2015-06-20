@@ -96,7 +96,19 @@ public class ServerColony extends Colony implements ServerModelObject {
         for (Tile t : tile.getSurroundingTiles(getRadius())) {
             colonyTiles.add(new ServerColonyTile(game, this, t));
         }
-        // Set up default production queues.
+
+        Building building;
+        List<BuildingType> buildingTypes = spec.getBuildingTypeList();
+        for (BuildingType buildingType : buildingTypes) {
+            if (buildingType.isAutomaticBuild()
+                || isAutomaticBuild(buildingType)) {
+                building = new ServerBuilding(getGame(), this, buildingType);
+                addBuilding(building);
+            }
+        }
+        // Set up default production queues.  Do this after calling
+        // addBuilding because that will check build queue integrity,
+        // and these might fail the population check.
         // FIXME: express this in the spec somehow.
         if (isLandLocked()) {
             buildQueue.add(spec.getBuildingType("model.building.warehouse"));
@@ -107,16 +119,6 @@ public class ServerColony extends Colony implements ServerModelObject {
         for (UnitType unitType : spec.getUnitTypesWithAbility(Ability.BORN_IN_COLONY)) {
             if (unitType.needsGoodsToBuild()) {
                 populationQueue.add(unitType);
-            }
-        }
-
-        Building building;
-        List<BuildingType> buildingTypes = spec.getBuildingTypeList();
-        for (BuildingType buildingType : buildingTypes) {
-            if (buildingType.isAutomaticBuild()
-                || isAutomaticBuild(buildingType)) {
-                building = new ServerBuilding(getGame(), this, buildingType);
-                addBuilding(building);
             }
         }
     }
