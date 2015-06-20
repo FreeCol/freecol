@@ -298,6 +298,7 @@ public final class UnitLabel extends JLabel
 
             if (unit.isDamaged()) {
                 String underRepair = Messages.message(unit.getRepairLabel());
+System.err.println("UR = " + underRepair + " L=" + unit.getRepairLabel());
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
                 Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,

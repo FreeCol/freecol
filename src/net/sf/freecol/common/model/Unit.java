@@ -441,7 +441,7 @@ public class Unit extends GoodsLocation
      * @return A repair label.
      */
     public StringTemplate getRepairLabel() {
-        return StringTemplate.template("underRepair")
+        return StringTemplate.template("model.unit.underRepair")
             .addAmount("%turns%", getTurnsForRepair());
     }
 
