@@ -50,6 +50,7 @@ import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
@@ -258,9 +259,13 @@ public final class InfoPanel extends FreeColPanel {
             if (this.unit != unit) {
                 if (this.unit != null) {
                     this.unit.removePropertyChangeListener(this);
+                    GoodsContainer gc = this.unit.getGoodsContainer();
+                    if (gc != null) gc.removePropertyChangeListener(this);
                 }
                 if (unit != null) {
                     unit.addPropertyChangeListener(this);
+                    GoodsContainer gc = unit.getGoodsContainer();
+                    if (gc != null) gc.addPropertyChangeListener(this);
                 }
                 this.unit = unit;
                 update();
