@@ -130,7 +130,9 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
 
             this.colony = colony;
             this.goodsType = goodsType;
-
+            final int capacity = colony.getWarehouseCapacity();
+            final int maxCapacity = 300; // TODO: magic number
+            
             setLayout(new MigLayout("wrap 2", "", ""));
             setOpaque(false);
             setBorder(Utility.localizedBorder(goodsType));
@@ -176,7 +178,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
             // export level settings
             SpinnerNumberModel exportLevelModel
                 = new SpinnerNumberModel(exportData.getExportLevel(), 0,
-                                         colony.getWarehouseCapacity(), 1);
+                    (goodsType.limitIgnored()) ? maxCapacity : capacity, 1);
             exportLevel = new JSpinner(exportLevelModel);
             Utility.localizeToolTip(exportLevel,
                 "warehouseDialog.exportLevel.shortDescription");
