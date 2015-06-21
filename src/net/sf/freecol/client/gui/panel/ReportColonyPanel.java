@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
@@ -61,6 +62,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -135,7 +137,7 @@ public final class ReportColonyPanel extends ReportPanel
     public ReportColonyPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportColonyAction");
 
-        colonies = freeColClient.getMySortedColonies();
+        colonies = continentalSorting(freeColClient.getMySortedColonies());
         try {
             useCompact = getClientOptions().getInteger(ClientOptions.COLONY_REPORT)
                 == ClientOptions.COLONY_REPORT_COMPACT;
@@ -152,6 +154,33 @@ public final class ReportColonyPanel extends ReportPanel
 
 
     /**
+     * Split out colonies by continent, retaining overall order within
+     * continents and continental order by first colony order.
+     *
+     * @param colonies The list of <code>Colony</code>s to sort.
+     * @return The sorted list of <code>Colony</code>s.
+     */
+    private List<Colony> continentalSorting(final List<Colony> colonies) {
+        List<Colony> result = new ArrayList<>();
+        final Map<Integer, List<Colony>> continents = new HashMap<>();
+        for (Colony c : colonies) {
+            appendToMapList(continents, c.getTile().getContiguity(), c);
+        }
+        List<Integer> indicies = new ArrayList<>(continents.keySet());
+        Collections.sort(indicies, new Comparator<Integer>() {
+                public int compare(Integer i1, Integer i2) {
+                    Colony c1 = continents.get(i1).get(0);
+                    Colony c2 = continents.get(i2).get(0);
+                    return colonies.indexOf(c1) - colonies.indexOf(c2);
+                }
+            });
+        for (Integer i : indicies) {
+            result.addAll(continents.get(i));
+        }
+        return result;
+    }
+
+    /**
      * Standard version of the Colony Report Panel
      */
     private void classicColonyPanel(List<Colony> colonies) {
@@ -164,8 +193,17 @@ public final class ReportColonyPanel extends ReportPanel
         // Display Panel
         reportPanel.setLayout(new MigLayout("fill"));
 
+        int contig = (colonies.isEmpty()) ? -1
+            : colonies.get(0).getTile().getContiguity();
         for (Colony colony : colonies) {
 
+            // Fence off contiguity change
+            if (contig != colony.getTile().getContiguity()) {
+                contig = colony.getTile().getContiguity();
+                reportPanel.add(new JSeparator(JSeparator.HORIZONTAL),
+                    "newline, span, growx");
+            }
+                
             // Name
             JButton button = Utility.getLinkButton(colony.getName(), null,
                 colony.getId());
@@ -260,7 +298,6 @@ public final class ReportColonyPanel extends ReportPanel
         }
     }
 
-
     /**
      * Compact version of the Colony Report Panel
      */
@@ -337,10 +374,16 @@ public final class ReportColonyPanel extends ReportPanel
         Market market = getMyPlayer().getMarket();
         conciseHeaders(goodsTypes, market);
 
+        int contig = (colonies.isEmpty()) ? -1
+            : colonies.get(0).getTile().getContiguity();
         for (Colony colony : colonies) {
             // Do not include colonies that have been abandoned but are
             // still on the colonies list.
             if (colony.getUnitCount() > 0) {
+                if (contig != colony.getTile().getContiguity()) {
+                    contig = colony.getTile().getContiguity();
+                    conciseHeaders(goodsTypes, market);
+                }                    
                 updateColony(colony);
             }
         }
