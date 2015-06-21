@@ -752,7 +752,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         buildingMap.put(buildingType.getId(), building);
         addFeatures(building.getType());
         invalidateCache();
-        checkBuildQueueIntegrity(true);
     }
 
     /**
@@ -770,7 +769,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         if (result) {
             removeFeatures(building.getType());
             invalidateCache();
-            checkBuildQueueIntegrity(true);
         }
         return result;
     }
@@ -2923,7 +2921,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return Negative if there are problems remaining, zero if
      *     problems were fixed, positive if no problems found at all.
      */
-    private int checkBuildQueueIntegrity(boolean fix) {
+    public int checkBuildQueueIntegrity(boolean fix) {
         int result = 1;
         List<BuildableType> buildables = buildQueue.getValues();
         List<BuildableType> assumeBuilt = new ArrayList<>();

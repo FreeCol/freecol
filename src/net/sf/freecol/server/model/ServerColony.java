@@ -426,6 +426,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         }
 
         // Check for free buildings
+        boolean found = false;
         for (BuildingType buildingType : spec.getBuildingTypeList()) {
             if (isAutomaticBuild(buildingType)) {
                 if (buildingType.isDefenceType()) {
@@ -433,8 +434,10 @@ public class ServerColony extends Colony implements ServerModelObject {
                 }
                 addBuilding(new ServerBuilding(getGame(), this,
                                                buildingType));//-til
+                found = true;
             }
         }
+        if (found) checkBuildQueueIntegrity(true);
 
         // If a build queue is empty, check that we are not producing
         // any goods types useful for BuildableTypes, except if that

@@ -3797,6 +3797,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (type.getUpgradesFrom() == null) {
             changed = colony.ejectUnits(building, building.getUnitList());//-til
             colony.removeBuilding(building);//-til
+            colony.checkBuildQueueIntegrity(true);
             changed |= building.getType().isDefenceType();
             cs.addRemove(See.only((ServerPlayer)colony.getOwner()), colony, 
                          building);//-vis: safe, buildings are ok
