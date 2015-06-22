@@ -152,7 +152,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
      * Identifier for the unit the region was discovered by.   Using
      * an identifier as units may subsequently die.
      */
-    protected String discoverer;
+    private String discoverer = null;
 
     /**
      * How much discovering this region contributes to your score.
@@ -329,7 +329,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
      *
      * @return The unit identifier, or null if none yet.
      */
-    public String getDiscoverer() {
+    public synchronized String getDiscoverer() {
         return this.discoverer;
     }
 
@@ -338,7 +338,7 @@ public class Region extends FreeColGameObject implements Nameable, Named {
      *
      * @param discoverer The unit identifier to set.
      */
-    public void setDiscoverer(String discoverer) {
+    public synchronized void setDiscoverer(String discoverer) {
         this.discoverer = discoverer;
     }
 

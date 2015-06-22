@@ -117,6 +117,7 @@ import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.common.util.Utils;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.FreeColServer;
@@ -1739,6 +1740,12 @@ public final class InGameController extends Controller {
                                     Region region, String name) {
         final Game game = getGame();
         ServerRegion serverRegion = (ServerRegion)region;
+        // Discoverer is set when unit moves in.
+        if (!Utils.equals(region.getDiscoverer(), unit.getId())) {
+            return DOMMessage.clientError("Discoverer mismatch, "
+                + region.getDiscoverer() + " expected, "
+                + unit.getId() + " provided.");
+        }
         ChangeSet cs = new ChangeSet();
         serverRegion.csDiscover(serverPlayer, game.getTurn(), name, cs);
 

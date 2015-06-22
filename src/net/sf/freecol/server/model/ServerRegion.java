@@ -80,7 +80,6 @@ public class ServerRegion extends Region {
         this.discoverable = region.getDiscoverable();
         this.discoveredIn = region.getDiscoveredIn();
         this.discoveredBy = region.getDiscoveredBy();
-        this.discoverer = null;
         this.scoreValue = region.getScoreValue();
     }
 
@@ -118,7 +117,6 @@ public class ServerRegion extends Region {
         this.discoverable = false;
         this.discoveredIn = null;
         this.discoveredBy = null;
-        this.discoverer = null;
         this.scoreValue = 0;
         game.getMap().addRegion(this);
     }
@@ -219,6 +217,7 @@ public class ServerRegion extends Region {
                 .addName("%region%", newName);
         h.setScore(score);
         cs.addGlobalHistory(getGame(), h);
+        setDiscoverer(null);
     }
 
     /**
