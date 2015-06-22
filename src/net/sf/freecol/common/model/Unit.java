@@ -1551,25 +1551,6 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Get the next stop after the current one where the unit has work to
-     * do in its trade route.
-     *
-     * @param checkProduction Account for the time it takes to get to the stop.
-     * @return The next <code>TradeRouteStop</code> to visit.
-     */
-    public TradeRouteStop getNextStop(boolean checkProduction) {
-        List<TradeRouteStop> stops = getCurrentStops();
-        if (stops == null) return null;
-        if (atStop(stops.get(0))) stops.remove(0);
-        for (TradeRouteStop trs : stops) {
-            int turns = (checkProduction) ? getTurnsToReach(trs.getLocation())
-                : 0;
-            if (trs.hasWork(this, turns)) return trs;
-        }
-        return null;
-    }
-        
-    /**
      * Get the stop the unit is heading for or at.
      *
      * @return The target <code>Stop</code>.

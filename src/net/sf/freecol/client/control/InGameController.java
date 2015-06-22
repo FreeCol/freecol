@@ -2233,7 +2233,16 @@ public final class InGameController implements NetworkConstants {
             if (unit.getMovesLeft() <= 0) break;
 
             // Find the next stop with work to do.
-            TradeRouteStop next = unit.getNextStop(checkProduction);
+            TradeRouteStop next = null;
+            List<TradeRouteStop> moreStops = unit.getCurrentStops();
+            if (unit.atStop(moreStops.get(0))) moreStops.remove(0);
+            for (TradeRouteStop trs : moreStops) {
+                if (trs.hasWork(unit, (!checkProduction) ? 0
+                                : unit.getTurnsToReach(trs.getLocation()))) {
+                    next = trs;
+                    break;
+                }
+            }
             if (next == null) {
                 // No work was found anywhere on the trade route,
                 // so we should skip this unit.
