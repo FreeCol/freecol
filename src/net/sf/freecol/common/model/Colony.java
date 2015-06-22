@@ -572,15 +572,29 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @param building The <code>Building</code> to remove.
      * @return True if the building was removed.
      */
-    public boolean removeBuilding(final Building building) {
-        BuildingType buildingType = building.getType().getFirstLevel();
-        boolean result = buildingMap.remove(buildingType.getId()) != null;
-        if (result) {
-            removeFeatures(building.getType());
-            invalidateCache();
-        }
-        return result;
+    protected boolean removeBuilding(final Building building) {
+        final BuildingType buildingType = building.getType().getFirstLevel();
+        if (buildingMap.remove(buildingType.getId()) == null) return false;
+        removeFeatures(building.getType());
+        return true;
     }
+
+    /**
+     * Destroy an existing building in this colony.
+     *
+     * @param building The <code>Building</code> to destroy.
+     * @return True if the building was destroyed.
+     */
+    public boolean destroyBuilding(Building building) {
+        Tile copied = (building.getType().isDefenceType())
+            ? getTile().getTileToCache() : null;
+        if (!removeBuilding(building)) return false;
+        getTile().cacheUnseen(copied);
+        invalidateCache();
+        checkBuildQueueIntegrity(true);
+        return true;
+    }
+
 
     /**
      * Gets a building for producing a given type of goods.
