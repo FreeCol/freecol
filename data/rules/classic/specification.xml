@@ -4234,6 +4234,10 @@
         <!-- New recruits in Europe are equipped. -->
         <booleanOption id="model.option.equipEuropeanRecruits"
                        defaultValue="true"/>
+        <!-- Trade cargoes are sorted for maximum transfer, import
+             amounts are respected. -->
+        <booleanOption id="model.option.enhancedTradeRoutes"
+                       defaultValue="false"/>
       </optionGroup>
       <optionGroup id="gameOptions.colony">
         <!-- Is colony bell accumulation capped when 100% rebels achieved? -->

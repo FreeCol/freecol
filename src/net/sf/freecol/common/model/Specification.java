@@ -2651,6 +2651,8 @@ public final class Specification {
                                   GameOptions.GAMEOPTIONS_YEARS, 2);
         ret |= checkBooleanOption(GameOptions.DISEMBARK_IN_COLONY,
                                   GameOptions.GAMEOPTIONS_COLONY, false);
+        ret |= checkBooleanOption(GameOptions.ENHANCED_TRADE_ROUTES,
+                                  GameOptions.GAMEOPTIONS_MAP, false);
         // end @compat 0.11.3
 
         return ret;

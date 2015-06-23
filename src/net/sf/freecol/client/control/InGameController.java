@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.Europe.MigrationType;
 import net.sf.freecol.common.model.EuropeWas;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoldTradeItem;
@@ -2202,7 +2203,7 @@ public final class InGameController implements NetworkConstants {
                 Location destination = stop.getLocation();
                 PathNode path = unit.findPath(destination);
                 if (path == null) {
-                    lb.add(" ", Messages.message(stop
+                    lb.add("\n", Messages.message(stop
                             .getLabelFor("tradeRoute.pathStop", player)));
                     unit.setState(UnitState.SKIPPED);
                     break;
@@ -2220,9 +2221,9 @@ public final class InGameController implements NetworkConstants {
             // At the stop, do the work available.
             lb.mark();
             unloadUnitAtStop(unit, lb); // Anything to unload?
-            loadUnitAtStop(unit, lb);   // Anything to load?
-            lb.grew(" ", Messages.message(stop.getLabelFor("tradeRoute.atStop",
-                                                           player)));
+            loadUnitAtStop(unit, lb); // Anything to load?
+            lb.grew("\n", Messages.message(stop.getLabelFor("tradeRoute.atStop",
+                                                            player)));
 
             // If the un/load consumed the moves, break now before
             // updating the stop.  This allows next turn to retry
@@ -2245,6 +2246,7 @@ public final class InGameController implements NetworkConstants {
                 // so we should skip this unit.
                 lb.add(" ", Messages.message("tradeRoute.wait"));
                 unit.setState(UnitState.SKIPPED);
+                unit.setMovesLeft(0);
                 break;
             }
             // Add a message for any skipped stops.
@@ -2300,114 +2302,217 @@ public final class InGameController implements NetworkConstants {
      * @return True if goods were loaded.
      */
     private boolean loadUnitAtStop(Unit unit, LogBuilder lb) {
+        final boolean enhancedTradeRoutes = getSpecification()
+            .getBoolean(GameOptions.ENHANCED_TRADE_ROUTES);
+        final TradeRoute tradeRoute = unit.getTradeRoute();
         final TradeLocation trl = unit.getTradeLocation();
         if (trl == null) return false;
 
         final TradeRouteStop stop = unit.getStop();
         boolean ret = false;
 
-        // Get the collapsed list of goods to load at this stop.
+        // A collapsed list of goods to load at this stop.
         List<AbstractGoods> toLoad = stop.getCompactCargo();
-        // If already at capacity for a goods type, drop it from the
-        // toLoad list, otherwise reduce its amount by the amount
-        // already loaded.  Handle excess goods.
+        // Templates to accumulate messages in.
+        StringTemplate unexpected = StringTemplate.label(", ");
+        StringTemplate noLoad = StringTemplate.label(", ");
+        StringTemplate left = StringTemplate.label(", ");
+        StringTemplate loaded = StringTemplate.label(", ");
+        StringTemplate nonePresent = StringTemplate.label(", ");
+        
+        // Check the goods already on board.  If it is not expected to
+        // be loaded at this stop then complain (unload must have
+        // failed somewhere).  If it is expected to load, reduce the
+        // loading amount by what is already on board.
         for (Goods g : unit.getCompactGoods()) {
             AbstractGoods ag = AbstractGoods.findByType(g.getType(), toLoad);
-            if (ag != null) {
-                int goodsAmount = g.getAmount();
-                int amount = ag.getAmount() - goodsAmount;
-                if (amount <= 0) { // At capacity
-                    toLoad.remove(ag);
-                } else { // Modify amount
-                    ag.setAmount(amount);
-                }
+            if (ag == null) { // Excess goods on board, failed unload?
+                unexpected.addStringTemplate("%goods%", ag.getLabel());
             } else {
-                // Excess goods on board.  They must have failed to
-                // unload somewhere.
-                lb.add(" ", Messages.message(StringTemplate
-                        .template("tradeRoute.loadStopBlocked")
-                        .addStringTemplate("%goods%", g.getLabel())));
-            }                
+                int goodsAmount = g.getAmount();
+                if (ag.getAmount() <= goodsAmount) { // At capacity
+                    noLoad.addStringTemplate(StringTemplate
+                        .template("tradeRoute.loadStop.noLoad.carrier")
+                            .addNamed("%goodsType%", ag.getType()));
+                    toLoad.remove(ag);
+                } else {
+                    ag.setAmount(ag.getAmount() - goodsAmount);
+                }
+            }
         }
 
-        // Adjust toLoad with the actual export amount.  Some goods
-        // may not have an export surplus.  Add messages for them and
-        // drop from the toLoad list.
+        // Adjust toLoad with the actual amount to load.
+        // Drop goods that are:
+        // - missing
+        // - do not have an export surplus
+        // - (optionally) are not needed by the destination
+        // and add messages for them.
+        //
+        // Similarly, for each goods type, add an entry to the limit
+        // map, with value:
+        // - the unit, when it lacks capacity for all the goods present
+        // - the stop when there is a non-zero export limit
+        // - (optionally) the destination stop when there is a non-zero
+        //   import limit
+        // - otherwise null
+        java.util.Map<GoodsType, Location> limit = new HashMap<>();
         Iterator<AbstractGoods> iterator = toLoad.iterator();
         while (iterator.hasNext()) {
             AbstractGoods ag = iterator.next();
-            int amount = stop.getExportAmount(ag.getType(), 0);
-            if (amount <= 0) {
-                if (stop.getCargo().contains(ag.getType())) {
-                    // Complain only if this goods type was planned to load
-                    int present = stop.getGoodsCount(ag.getType());
-                    lb.add(" ", getLoadGoodsMessage(ag.getType(), 0, present,
-                                                    0, -1));
+            final GoodsType type = ag.getType();
+            int present = stop.getGoodsCount(type);
+            int exportAmount = stop.getExportAmount(type, 0);
+            int importAmount = FreeColObject.INFINITY;
+            TradeRouteStop unload = null;
+            if (enhancedTradeRoutes) {
+                final List<TradeRouteStop> stops = unit.getCurrentStops();
+                stops.remove(0);
+                Location start = unit.getLocation();
+                int turns = 0;
+                for (TradeRouteStop trs : stops) {
+                    turns += unit.getTurnsToReach(start, trs.getLocation());
+                    int amountIn = trs.getImportAmount(type, turns),
+                        amountOut = trs.getExportAmount(type, turns);
+                    if (AbstractGoods.findByType(type, trs.getCompactCargo()) == null
+                        || amountIn > amountOut) {
+                        importAmount = amountIn;
+                        unload = trs;
+                        break;
+                    }
+                    start = trs.getLocation();
                 }
-                iterator.remove();
-            } else {
-                ag.setAmount(Math.min(amount, ag.getAmount()));
             }
+            if (enhancedTradeRoutes && unload == null) {
+                noLoad.addStringTemplate(StringTemplate
+                    .template("tradeRoute.loadStop.noLoad.noUnload")
+                        .addNamed("%goodsType%", type));
+                ag.setAmount(0);
+            } else if (present <= 0) { // None present
+                nonePresent.addNamed(type);
+                ag.setAmount(0);
+            } else if (exportAmount <= 0) { // Export blocked
+                noLoad.addStringTemplate(StringTemplate
+                    .template("tradeRoute.loadStop.noLoad.export")
+                        .addNamed("%goodsType%", type)
+                        .addAmount("%more%", present));
+                ag.setAmount(0);
+            } else if (importAmount <= 0) { // Import blocked
+                noLoad.addStringTemplate(StringTemplate
+                    .template("tradeRoute.loadStop.noLoad.import")
+                        .addNamed("%goodsType%", type)
+                        .addAmount("%more%", present)
+                        .addStringTemplate("%location%", unload.getLocation()
+                            .getLocationLabelFor(unit.getOwner())));
+                ag.setAmount(0);
+            } else if (exportAmount < ag.getAmount() // Export limited
+                && exportAmount <= importAmount) {
+                ag.setAmount(exportAmount);
+                limit.put(type, stop.getLocation());
+            } else if (importAmount < ag.getAmount() // Import limited
+                && importAmount <= exportAmount) {
+                int already = unit.getGoodsCount(type);
+                if (already >= importAmount) {
+                    if (already > importAmount) {
+                        askUnloadGoods(type, already - importAmount, unit);
+                    }
+                    noLoad.addStringTemplate(StringTemplate
+                        .template("tradeRoute.loadStop.noLoad.already")
+                            .addNamed("%goodsType%", type));
+                    ag.setAmount(0);
+                } else {
+                    ag.setAmount(importAmount - already);
+                }
+                limit.put(type, unload.getLocation());
+            } else if (present > ag.getAmount()) { // Carrier limited (last!)
+                limit.put(type, unit);
+            } else { // Expecting to load everything present
+                limit.put(type, null);
+            }
+
+            // Do not load this goods type
+            if (ag.getAmount() <= 0) iterator.remove();
+
+            logger.log(Level.FINEST, "Load " + tradeRoute.getName()
+                + " with " + unit.getId() + " at " + stop.getLocation()
+                + " of " + type.getSuffix() + " from " + present
+                + " exporting " + exportAmount + " importing " + importAmount
+                + " to " + unload.getLocation()
+                + " limited by " + limit.get(type)
+                + " -> " + ag.getAmount());
         }
+
+        if (enhancedTradeRoutes) { // Prioritize by goods amount
+            Collections.sort(toLoad, AbstractGoods.abstractGoodsComparator);
+        }
+        
         // Load the goods.
+        boolean done = false;
         for (AbstractGoods ag : toLoad) {
-            GoodsType type = ag.getType();
-            int demand = ag.getAmount();
-            ret = askLoadGoods(stop.getLocation(), type, demand, unit);
-            if (!ret) {
-                // Assume any failure is due to goods still on board,
-                // and thus no further loading is likely to succeed.
-                break;
+            final GoodsType type = ag.getType();
+            final int amount = ag.getAmount();
+            if (!done) {
+                done = unit.getLoadableAmount(type) < amount
+                    || !askLoadGoods(stop.getLocation(), type, amount, unit);
+            }
+            if (done) {
+                left.addNamed(ag);
+                continue;
             }
             int present = stop.getGoodsCount(type);
-            int export = stop.getExportAmount(type, 0);
-            lb.add(" ", getLoadGoodsMessage(type, demand, present,
-                                            export, demand));
+            Location why = limit.get(type);
+            if (present == 0) {
+                loaded.addStringTemplate(ag.getLabel());
+            } else if (why == null) {
+                loaded.addStringTemplate(StringTemplate
+                    .template("tradeRoute.loadStop.load.fail")
+                        .addStringTemplate("%goods%", ag.getLabel())
+                        .addAmount("%more%", present));
+            } else if (why == unit) {
+                loaded.addStringTemplate(StringTemplate
+                    .template("tradeRoute.loadStop.load.carrier")
+                        .addStringTemplate("%goods%", ag.getLabel())
+                        .addAmount("%more%", present));
+            } else if (Map.isSameLocation(why, stop.getLocation())) {
+                loaded.addStringTemplate(StringTemplate
+                    .template("tradeRoute.loadStop.load.export")
+                    .addStringTemplate("%goods%", ag.getLabel())
+                    .addAmount("%more%", present));
+            } else {
+                loaded.addStringTemplate(StringTemplate
+                    .template("tradeRoute.loadStop.load.import")
+                    .addStringTemplate("%goods%", ag.getLabel())
+                    .addAmount("%more%", present)
+                    .addStringTemplate("%location%",
+                        why.getLocationLabelFor(unit.getOwner())));
+            }
+            ret = true;
+        }
+        if (!loaded.isEmpty()) {
+            lb.add("\n  ", Messages.message(StringTemplate
+                    .template("tradeRoute.loadStop.load")
+                        .addStringTemplate("%goodsList%", loaded)));
+        }
+        if (!unexpected.isEmpty()) {
+            lb.add("\n  ", Messages.message(StringTemplate
+                    .template("tradeRoute.loadStop.unexpected")
+                        .addStringTemplate("%goodsList%", unexpected)));
+        }
+        if (!left.isEmpty()) {
+            noLoad.addStringTemplate(StringTemplate
+                .template("tradeRoute.loadStop.noLoad.left")
+                    .addStringTemplate("%goodsList%", left));
+        }
+        if (!nonePresent.isEmpty()) {
+            noLoad.addStringTemplate(StringTemplate
+                .template("tradeRoute.loadStop.noLoad.goods")
+                    .addStringTemplate("%goodsList%", nonePresent));
+        }
+        if (!noLoad.isEmpty()) {
+            lb.add("\n  ", Messages.message(StringTemplate
+                    .template("tradeRoute.loadStop.noLoad")
+                        .addStringTemplate("%goodsList%", noLoad)));
         }
         return ret;
-    }
-
-    /**
-     * Gets a message describing a goods loading.
-     *
-     * @param type The <code>GoodsType</code> the type of goods being loaded.
-     * @param amount The amount of goods actually loaded.
-     * @param present The amount of goods already at the location.
-     * @param export The amount of goods available to export.
-     * @param toLoad The amount of goods the unit should load according to
-     *     the trade route orders.
-     * @return A summary of the load.
-     */
-    private String getLoadGoodsMessage(GoodsType type,
-                                       int amount, int present,
-                                       int export, int toLoad) {
-        String key;
-        int more;
-
-        if (amount == 0) {
-            key = (present == 0)
-                // Loaded no %goods% from an empty warehouse.
-                ? "tradeRoute.loadStopNone"
-                // Loaded no %goods% with %more% more retained...
-                : "tradeRoute.loadStopNoExport";
-            more = present;
-        } else if (toLoad < export) {
-            key = "tradeRoute.loadStopImport";
-            // Loaded %amount% %goods% lacking space for %more% more
-            more = export - toLoad;
-        } else if (present > export && toLoad > export) {
-            // Loaded %amount% %goods% with %more% more retained...
-            key = "tradeRoute.loadStopExport";
-            more = present - export;
-        } else {
-            // Loaded %amount% %goods%
-            key = "tradeRoute.loadStop";
-            more = -1; // not displayed
-        }
-        return Messages.message(StringTemplate.template(key)
-            .addAmount("%amount%", amount)
-            .addNamed("%goods%", type)
-            .addAmount("%more%", more));
     }
 
     /**
@@ -2423,6 +2528,8 @@ public final class InGameController implements NetworkConstants {
 
         final TradeRouteStop stop = unit.getStop();
         final List<GoodsType> goodsTypesToLoad = stop.getCargo();
+        final StringTemplate unloaded = StringTemplate.label(", ");
+        final StringTemplate noUnload = StringTemplate.label(", ");
         boolean ret = false;
 
         // Unload everything that is on the carrier but not listed to
@@ -2431,8 +2538,11 @@ public final class InGameController implements NetworkConstants {
         for (Goods goods : unit.getCompactGoodsList()) {
             GoodsType type = goods.getType();
             if (goodsTypesToLoad.contains(type)) continue; // Keep this cargo.
-
             int present = goods.getAmount();
+            if (present <= 0) {
+                logger.warning("Unexpected empty goods unload " + goods);
+                continue;
+            }
             int toUnload = present;
             int atStop = trl.getImportAmount(type, 0);
             int amount = toUnload;
@@ -2450,7 +2560,10 @@ public final class InGameController implements NetworkConstants {
                         .addAmount("%amount%", toUnload - atStop)
                         .addNamed("%goods%", goods);
                     if (!gui.confirm(unit.getTile(), template,
-                                     unit, "yes", "no")) amount = atStop;
+                                     unit, "yes", "no")) {
+                        if (atStop == 0) continue;
+                        amount = atStop;
+                    }
                     break;
                 case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_NEVER:
                     amount = atStop;
@@ -2463,13 +2576,53 @@ public final class InGameController implements NetworkConstants {
                     break;
                 }
             }
-
-            // Try to unload.
-            ret = (amount == 0) ? false : askUnloadGoods(type, amount, unit);
-            if (ret) {
-                lb.add(" ", getUnloadGoodsMessage(unit, type, amount,
-                                                  present, atStop, toUnload));
+            if (amount == 0) {
+                noUnload.addStringTemplate(goods.getLabel());
+                continue;
             }
+            // Try to unload.
+            ret = askUnloadGoods(type, amount, unit);
+            int retained = unit.getGoodsCount(type);
+            if (!ret || present == retained) {
+                noUnload.addStringTemplate(StringTemplate
+                    .template("tradeRoute.unloadStop.noUnload.fail")
+                    .addStringTemplate("%goods%", goods.getLabel()));
+                ret = false;
+                break;
+            }
+            if (present - retained != amount) {
+                unloaded.addStringTemplate(StringTemplate
+                    .template("tradeRoute.unloadStop.unload.fail")
+                    .addNamed("%goodsType%", type)
+                    .addAmount("%amount%", amount)
+                    .addAmount("%more%", retained));
+            } else if (amount > atStop) {
+                if (retained > 0) {
+                    unloaded.addStringTemplate(StringTemplate
+                        .template("tradeRoute.unloadStop.unload.keep")
+                        .addNamed("%goodsType%", type)
+                        .addAmount("%amount%", atStop)
+                        .addAmount("%more%", retained));
+                } else {
+                    unloaded.addStringTemplate(StringTemplate
+                        .template("tradeRoute.unloadStop.unload.overflow")
+                        .addNamed("%goodsType%", type)
+                        .addAmount("%amount%", atStop)
+                        .addAmount("%more%", amount - atStop));
+                }
+            } else {
+                unloaded.addStringTemplate(goods.getLabel());
+            }
+        }
+        if (!unloaded.isEmpty()) {
+            lb.add("\n  ", Messages.message(StringTemplate
+                    .template("tradeRoute.unloadStop.unload")
+                        .addStringTemplate("%goodsList%", unloaded)));
+        }
+        if (!noUnload.isEmpty()) {
+            lb.add("\n  ", Messages.message(StringTemplate
+                    .template("tradeRoute.unloadStop.noUnload")
+                        .addStringTemplate("%goodsList%", noUnload)));
         }
 
         return ret;

@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.w3c.dom.Element;
@@ -290,7 +291,9 @@ public class TradeRoute extends FreeColGameObject
             always.retainAll(stop.getCargo());
         }
         if (empty) return StringTemplate.template("model.tradeRoute.allEmpty");
-        if (!always.isEmpty()) {
+        final boolean enhancedTradeRoutes = getSpecification()
+            .getBoolean(GameOptions.ENHANCED_TRADE_ROUTES);
+        if (!enhancedTradeRoutes && !always.isEmpty()) {
             return StringTemplate.template("model.tradeRoute.alwaysPresent")
                 .addNamed("%goodsType%", always.iterator().next());
         }

@@ -111,6 +111,10 @@ public class GameOptions {
     public static final String EQUIP_EUROPEAN_RECRUITS
         = "model.option.equipEuropeanRecruits";
 
+    /** Enhanced trade routes. */
+    public static final String ENHANCED_TRADE_ROUTES
+        = "model.option.enhancedTradeRoutes";
+
 
     /** Colony game option group. */
     public static final String GAMEOPTIONS_COLONY

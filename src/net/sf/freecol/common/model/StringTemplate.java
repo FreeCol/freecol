@@ -209,6 +209,15 @@ public class StringTemplate extends FreeColObject {
             ? Collections.<StringTemplate>emptyList()
             : this.replacements;
     }
+
+    /**
+     * Has nothing been added to this template?
+     *
+     * @return True if the template is empty.
+     */
+    public boolean isEmpty() {
+        return this.replacements == null || this.replacements.isEmpty();
+    }
     
     /**
      * Add a replacement.
