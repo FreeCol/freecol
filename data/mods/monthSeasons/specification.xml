@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<freecol-specification id="monthSeasons">
+  <options>
+    <optionGroup id="gameOptions">
+      <optionGroup id="gameOptions.years">
+        <!-- The number of seasons in the year. -->
+        <integerOption id="model.option.seasons"
+                       value="12" minimumValue="12" maximumValue="12" />
+      </optionGroup>
+    </optionGroup>
+  </options>
+</freecol-specification>
