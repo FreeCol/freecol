@@ -38,11 +38,13 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.option.AbstractOption;
@@ -400,7 +402,7 @@ public final class Specification {
     /**
      * Load mods into this specification.
      *
-     * @param mods A list of <code>FreeColModFile</code>s to load.
+     * @param mods A list of <code>FreeColModFile</code>s for the active mods.
      * @return True if any mod was loaded.
      */
     public boolean loadMods(List<FreeColModFile> mods) {

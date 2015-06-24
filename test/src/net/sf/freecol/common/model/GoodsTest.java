@@ -108,7 +108,7 @@ public class GoodsTest extends FreeColTestCase {
 
     public void testToString() {
 
-        Messages.setMessageBundle(Locale.ENGLISH);
+        Messages.loadMessageBundle(Locale.ENGLISH);
 
         Map map = getTestMap(plainsType);
 

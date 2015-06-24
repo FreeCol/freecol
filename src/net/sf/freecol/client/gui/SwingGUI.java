@@ -427,8 +427,8 @@ public class SwingGUI extends GUI {
                         showInformationMessage("info.autodetectLanguageSelected");
                     } else {
                         Locale l = language.getLocale();
-                        Messages.setMessageBundle(l);
-                        Messages.setModMessageBundle(l);
+                        Messages.loadMessageBundle(l);
+                        Messages.loadModMessageBundle(l);
                         showInformationMessage(StringTemplate
                             .template("info.newLanguageSelected")
                             .addName("%language%", l.getDisplayName()));

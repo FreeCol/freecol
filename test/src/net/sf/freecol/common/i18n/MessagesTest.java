@@ -99,7 +99,7 @@ public class MessagesTest extends FreeColTestCase {
 
     @Override
     public void tearDown(){
-        Messages.setMessageBundle(Locale.US);
+        Messages.loadMessageBundle(Locale.US);
     }
 
     public void testMessageString() {
@@ -122,12 +122,12 @@ public class MessagesTest extends FreeColTestCase {
 
 
     public void testChangeLocaleSettings() {
-        Messages.setMessageBundle(Locale.US);
+        Messages.loadMessageBundle(Locale.US);
 
         assertTrue("Trade Advisor"
             .equals(Messages.message("reportTradeAction.name")));
 
-        Messages.setMessageBundle(Locale.GERMANY);
+        Messages.loadMessageBundle(Locale.GERMANY);
 
         assertTrue("Handelsberater"
             .equals(Messages.message("reportTradeAction.name")));
@@ -159,7 +159,7 @@ public class MessagesTest extends FreeColTestCase {
 
     public void testStringTemplates() {
         final Game game = getGame();
-        Messages.setMessageBundle(Locale.US);
+        Messages.loadMessageBundle(Locale.US);
 
         // template with key not in message bundle
         StringTemplate s1 = StringTemplate.key("!no.such.string.template");

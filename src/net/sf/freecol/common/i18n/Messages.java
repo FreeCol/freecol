@@ -90,7 +90,7 @@ public class Messages {
     private static final Logger logger = Logger.getLogger(Messages.class.getName());
 
     public static final String MESSAGE_FILE_PREFIX = "FreeColMessages";
-
+    public static final String MOD_MESSAGE_FILE_PREFIX = "ModMessages";
     public static final String MESSAGE_FILE_SUFFIX = ".properties";
 
     public static final String DESCRIPTION_SUFFIX = ".description";
@@ -151,14 +151,25 @@ public class Messages {
     }
 
     /**
-     * Set the message bundle for the given locale
+     * Get a list of candidate mod message file names for a given locale.
+     *
+     * @param locale The <code>Locale</code> to generate file names for.
+     * @return A list of mod message file names.
+     */
+    private static List<String> getModMessageFileNames(Locale locale) {
+        return FreeColDataFile.getFileNames(MOD_MESSAGE_FILE_PREFIX,
+            MESSAGE_FILE_SUFFIX, locale);
+    }
+        
+    /**
+     * Load the message bundle for the given locale
      *
      * Error messages have to go to System.err as this routine is called
      * before logging is enabled.
      *
      * @param locale The <code>Locale</code> to set resources for.
      */
-    public static void setMessageBundle(Locale locale) {
+    public static void loadMessageBundle(Locale locale) {
         messageBundle.clear(); // Reset the message bundle.
 
         if (!Locale.getDefault().equals(locale)) {
@@ -236,7 +247,7 @@ public class Messages {
     }
 
     /**
-     * Load localized messages for mods.
+     * Load localized messages for all mods.
      *
      * We can not initially load resources from mods because not all
      * mods can be loaded until the user mod directory is initialized,
@@ -247,7 +258,7 @@ public class Messages {
      *
      * @param locale The <code>Locale</code> to load resources for.
      */
-    public static void setModMessageBundle(Locale locale) {
+    public static void loadModMessageBundle(Locale locale) {
         List<FreeColModFile> allMods = new ArrayList<>();
         allMods.addAll(Mods.getAllMods());
         allMods.addAll(Mods.getRuleSets());
@@ -262,6 +273,25 @@ public class Messages {
         }
     }
 
+    /**
+     * Load messages specific to active mods.
+     *
+     * Called when the spec is updated with the selected mods.
+     *
+     * @param mods The list of <code>FreeColModFile</code> for the active mods.
+     * @param locale The <code>Locale</code> to load resources for.
+     */
+    public static void loadActiveModMessageBundle(List<FreeColModFile> mods,
+                                                  Locale locale) {
+        for (FreeColModFile fcmf : mods) {
+            for (String name : getModMessageFileNames(locale)) {
+                try {
+                    loadMessages(fcmf.getInputStream(name));
+                } catch (IOException e) {} // Failures expected
+            }
+        }
+    }
+    
     /**
      * Get the <code>Locale</code> corresponding to a given language name.
      *

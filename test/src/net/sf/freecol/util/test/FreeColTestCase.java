@@ -74,7 +74,7 @@ public class FreeColTestCase extends TestCase {
     protected void setUp() throws Exception {
         if (updateLocale) {
             updateLocale = false;
-            Messages.setMessageBundle(Locale.US);
+            Messages.loadMessageBundle(Locale.US);
         }
     }
 

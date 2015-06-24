@@ -40,6 +40,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
@@ -458,8 +459,10 @@ public final class ConnectController {
         //
         // ATM we only allow mods in single player games.
         // FIXME: allow in stand alone server starts?
-        spec.loadMods(freeColClient.getClientOptions().getActiveMods());
-
+        List<FreeColModFile> mods = freeColClient.getClientOptions()
+            .getActiveMods();
+        spec.loadMods(mods);    
+        Messages.loadActiveModMessageBundle(mods, FreeCol.getLocale());
         FreeColServer freeColServer = startServer(false, true, spec, -1);
         if (freeColServer == null) return false;
 
@@ -517,6 +520,7 @@ public final class ConnectController {
             }
         }
 
+        final ClientOptions options = freeColClient.getClientOptions();
         final boolean defaultSinglePlayer;
         final boolean defaultPublicServer;
         FreeColSavegameFile fis = null;
@@ -546,7 +550,6 @@ public final class ConnectController {
             defaultPublicServer
                 = xr.getAttribute(FreeColServer.PUBLIC_SERVER_TAG, false);
 
-            ClientOptions options = freeColClient.getClientOptions();
             options.updateOptions(fis.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS));
             options.fixClientOptions();
 
@@ -571,8 +574,7 @@ public final class ConnectController {
         final boolean singlePlayer;
         final String name;
         final int port;
-        final int sgo = freeColClient.getClientOptions()
-            .getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
+        final int sgo = options.getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
         boolean show = sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
             || (!defaultSinglePlayer
                 && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER);
@@ -589,7 +591,8 @@ public final class ConnectController {
             name = null;
             port = -1;
         }
-
+        Messages.loadActiveModMessageBundle(options.getActiveMods(),
+                                            FreeCol.getLocale());
         if (!unblockServer(port)) return false;
         gui.showStatusPanel(Messages.message("status.loadingGame"));
 
