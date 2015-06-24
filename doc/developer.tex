@@ -1038,8 +1038,12 @@ where the identifier is some unique name (distinct from other existing
 mods).  The \texttt{FreeColMessages.properties} file should contain at
 minimum entries for \texttt{mod.}\emph{identifier}\texttt{.name} 
 and \texttt{mod.}\emph{identifier}\texttt{.shortDescription}, so that
-the mod selection dialog can display the mod correctly.  The messages
-file should also contain other messages needed by the mod.
+the mod selection dialog can display the mod correctly.  Other
+messages needed by the mod belong in \texttt{ModMessages.properties}.
+The difference between these is that
+\texttt{FreeColMessages.properties} is always loaded so that the mod
+name and description can appear in the mod selection dialog, but
+\texttt{ModMessages.properties} is only loaded if the mod is selected.
 
 Many mods define extra resources.  If so, a
 \texttt{resources.properties} file will be needed, and similarly files
