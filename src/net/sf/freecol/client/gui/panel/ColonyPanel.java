@@ -2167,7 +2167,7 @@ public final class ColonyPanel extends PortPanel
                         }
                         break;
                     default: // Otherwise, can not use land
-                        getGUI().showInformationMessage(tile, claim.getNameKey());
+                        getGUI().showInformationMessage(tile, claim.getDescriptionKey());
                         return false;
                     }
                     // Check reason again, claim should be satisfied.
@@ -2179,7 +2179,8 @@ public final class ColonyPanel extends PortPanel
                 // Claim sorted, but complain about other failure.
                 NoAddReason reason = colonyTile.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    getGUI().showInformationMessage(colonyTile, reason.getDescriptionKey());
+                    getGUI().showInformationMessage(colonyTile,
+                        StringTemplate.template(reason.getDescriptionKey()));
                     return false;
                 }
 
