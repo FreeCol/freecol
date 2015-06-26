@@ -78,7 +78,7 @@ public class InformationPanel extends FreeColPanel {
         final GUI gui = getGUI();
         JPanel textPanel = new MigPanel();
         textPanel.setOpaque(false);
-        textPanel.setLayout(new MigLayout("wrap 2", "", ""));
+        textPanel.setLayout(new MigLayout("wrap 2", "", "top"));
         for (int i = 0; i < texts.length; i++) {
             if (images != null && images[i] != null) {
                 textPanel.add(new JLabel(images[i]));
