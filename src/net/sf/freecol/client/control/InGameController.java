@@ -1983,18 +1983,19 @@ public final class InGameController implements NetworkConstants {
             int gold = -1; // Initially ask for a price
             for (;;) {
                 gold = askServer().sellProposition(unit, settlement,
-                    goods, gold);
+                                                   goods, gold);
                 if (gold <= 0) {
                     return tradeFailMessage(gold, settlement, goods);
                 }
 
                 // Show dialog for sale proposal
-                SellAction act = gui.getSellChoice(unit, settlement, goods, gold);
+                SellAction act = gui.getSellChoice(unit, settlement,
+                                                   goods, gold);
                 if (act == null) break; // Cancelled
                 switch (act) {
                 case SELL: // Accepted price, make the sale
-                    if (askServer().sellToSettlement(unit,
-                            settlement, goods, gold)) {
+                    if (askServer().sellToSettlement(unit, settlement,
+                                                     goods, gold)) {
                         updateControls(); // Assume success
                         return null;
                     }

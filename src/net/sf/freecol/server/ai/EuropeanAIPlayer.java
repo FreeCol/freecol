@@ -2728,7 +2728,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         Colony colony = (Colony) settlement;
         Player otherPlayer = unit.getOwner();
         // don't pay for more than fits in the warehouse
-        int amount = colony.getWarehouseCapacity() - colony.getGoodsCount(goods.getType());
+        int amount = colony.getWarehouseCapacity()
+            - colony.getGoodsCount(goods.getType());
         amount = Math.min(amount, goods.getAmount());
         // get a good price
         Tension.Level tensionLevel = getPlayer().getTension(otherPlayer).getLevel();

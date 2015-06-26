@@ -885,7 +885,8 @@ public class NativeAIPlayer extends AIPlayer {
         IndianSettlement is = (IndianSettlement) settlement;
         Player seller = unit.getOwner();
         String goldKey = "tradeGold#" + goods.getType().getId()
-            + "#" + goods.getAmount() + "#" + settlement.getId();
+            + "#" + goods.getAmount() + "#" + unit.getId()
+            + "#" + settlement.getId();
         String hagglingKey = "tradeHaggling#" + unit.getId();
         int price;
         if (sessionRegister.containsKey(goldKey)) {
