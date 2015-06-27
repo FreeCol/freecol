@@ -1303,7 +1303,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             ? "model.indianSettlement.tension.wary"
             : (!hasContacted(player))
             ? "model.indianSettlement.tension.unknown"
-            : "model.indianSettlement. " + getAlarm(player).getKey();
+            : "model.indianSettlement." + getAlarm(player).getKey();
         return StringTemplate.template(key)
             .addStringTemplate("%nation%", getOwner().getNationName());
     }
