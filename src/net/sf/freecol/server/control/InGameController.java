@@ -2838,7 +2838,8 @@ public final class InGameController extends Controller {
                         .addStringTemplate("%nation%", nation)
                         .addStringTemplate("%colony%",
                             settlement.getLocationLabelFor(sp))
-                        .addNamed("%region%", tile.getRegion()));
+                        .addStringTemplate("%region%",
+                            tile.getRegion().getLabel()));
             }
         } else {
             IndianNationType nationType
