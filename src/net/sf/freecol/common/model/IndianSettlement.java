@@ -1291,8 +1291,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * {@inheritDoc}
      */
     public boolean hasContacted(Player player) {
-        return player == null
-            || getContactLevel(player) != ContactLevel.UNCONTACTED;
+        return player != null
+            && (player.isIndian()
+                || getContactLevel(player) != ContactLevel.UNCONTACTED);
     }
 
     /**

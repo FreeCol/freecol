@@ -2860,7 +2860,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public boolean hasContacted(Player player) {
         return player != null
-            && getOwner().getStance(player) != Stance.UNCONTACTED;
+            && (player.isEuropean()
+                || getOwner().getStance(player) != Stance.UNCONTACTED);
     }
 
     /**
