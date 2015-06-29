@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +39,29 @@ public final class GoodsType extends FreeColGameObjectType {
     private static final float DEFAULT_PRODUCTION_WEIGHT = 1.0f;
     private static final float DEFAULT_LOW_PRODUCTION_THRESHOLD = 0.0f;
     private static final float DEFAULT_ZERO_PRODUCTION_FACTOR = 1.0f;
+
+    /** A comparator to impose a useful order on goods types. */
+    public static final Comparator<GoodsType> goodsTypeComparator
+        = new Comparator<GoodsType>() {
+            private int rank(GoodsType g) {
+                return (!g.isStorable() || g.isTradeGoods()) ? -1
+                    : (g.isFoodType()) ? 1
+                    : (g.isNewWorldGoodsType()) ? 2
+                    : (g.isFarmed()) ? 3
+                    : (g.isRawMaterial()) ? 4
+                    : (g.isNewWorldLuxuryType()) ? 5
+                    : (g.isRefined()) ? 6
+                    : -1;
+            }
+
+            @Override
+            public int compare(GoodsType g1, GoodsType g2) {
+                int r1 = rank(g1);
+                int r2 = rank(g2);
+                return (r1 != r2) ? r1 - r2
+                : g1.getId().compareTo(g2.getId());
+            }
+        };
 
     /** Is this a farmed goods type. */
     private boolean isFarmed;

@@ -188,7 +188,7 @@ public final class InfoPanel extends FreeColPanel {
                     List<AbstractGoods> produce = tile.getType()
                         .getPossibleProduction(true);
                     Collections.sort(produce,
-                                     AbstractGoods.goodsAmountComparator);
+                                     AbstractGoods.abstractGoodsComparator);
                     for (AbstractGoods goods : produce) {
                         JLabel goodsLabel = new JLabel(
                             String.valueOf(tile.getPotentialProduction(goods.getType(), null)),

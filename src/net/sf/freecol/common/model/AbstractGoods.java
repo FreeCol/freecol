@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -37,12 +38,18 @@ import net.sf.freecol.common.util.Utils;
  */
 public class AbstractGoods extends FreeColObject implements Named {
 
-    /** A comparator to sort by descending goods amount. */
-    public static final Comparator<AbstractGoods> goodsAmountComparator
+    /**
+     * A comparator to sort by descending goods amount and then by a
+     * predictable goods type order.
+     */
+    public static final Comparator<AbstractGoods> abstractGoodsComparator
         = new Comparator<AbstractGoods>() {
             @Override
-            public int compare(AbstractGoods o, AbstractGoods p) {
-                return p.getAmount() - o.getAmount();
+            public int compare(AbstractGoods a1, AbstractGoods a2) {
+                int cmp = a2.getAmount() - a1.getAmount();
+                return (cmp != 0) ? cmp
+                    : GoodsType.goodsTypeComparator.compare(a1.getType(),
+                                                            a2.getType());
             }
         };
 

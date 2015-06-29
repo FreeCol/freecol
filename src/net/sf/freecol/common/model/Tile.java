@@ -1767,7 +1767,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
             Collections.sort(goodsTypeList,
                 (owner == null || owner.getMarket() == null)
-                ? AbstractGoods.goodsAmountComparator
+                ? AbstractGoods.abstractGoodsComparator
                 : getMarketGoodsComparator(owner.getMarket()));
         }
         return goodsTypeList;

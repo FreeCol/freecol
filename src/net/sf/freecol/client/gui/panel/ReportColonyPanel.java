@@ -71,38 +71,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 public final class ReportColonyPanel extends ReportPanel
     implements ActionListener {
 
-    private static final Comparator<GoodsType> goodsComparator
-        = new Comparator<GoodsType>() {
-            private int rank(GoodsType g) {
-                return (!g.isStorable() || g.isTradeGoods()) ? -1
-                    : (g.isFoodType()) ? 1
-                    : (g.isNewWorldGoodsType()) ? 2
-                    : (g.isFarmed()) ? 3
-                    : (g.isRawMaterial()) ? 4
-                    : (g.isNewWorldLuxuryType()) ? 5
-                    : (g.isRefined()) ? 6
-                    : -1;
-            }
-
-            @Override
-            public int compare(GoodsType g1, GoodsType g2) {
-                int r1 = rank(g1);
-                int r2 = rank(g2);
-                return (r1 != r2) ? r1 - r2
-                : g1.getId().compareTo(g2.getId());
-            }
-        };
-
-    private static final Comparator<AbstractGoods> abstractGoodsComparator
-        = new Comparator<AbstractGoods>() {
-            @Override
-            public int compare(AbstractGoods a1, AbstractGoods a2) {
-                int cmp = a2.getAmount() - a1.getAmount();
-                return (cmp != 0) ? cmp
-                    : goodsComparator.compare(a2.getType(), a1.getType());
-            }
-        };
-
     private static final Comparator<Unit> teacherComparator
         = new Comparator<Unit>() {
         @Override
@@ -304,7 +272,7 @@ public final class ReportColonyPanel extends ReportPanel
     private void initializeCompactColonyPanel() {
         Specification spec = getSpecification();
         goodsTypes = new ArrayList<>(spec.getGoodsTypeList());
-        Collections.sort(goodsTypes, goodsComparator);
+        Collections.sort(goodsTypes, GoodsType.goodsTypeComparator);
         while (!goodsTypes.get(0).isStorable()
             || goodsTypes.get(0).isTradeGoods()) {
             goodsTypes.remove(0);
@@ -967,7 +935,7 @@ public final class ReportColonyPanel extends ReportPanel
                 if (amount > 0) prod.add(new AbstractGoods(g, amount));
             }
             if (prod.isEmpty()) return null;
-            Collections.sort(prod, abstractGoodsComparator);
+            Collections.sort(prod, AbstractGoods.abstractGoodsComparator);
             return prod.get(0).getType();
         }
     }
