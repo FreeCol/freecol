@@ -277,7 +277,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     }
                 } else if (net < 0) {
                     int turns = stored / -net;
-                    if (turns <= 3 && !newUnitBorn) {
+                    if (turns <= Colony.FAMINE_TURNS && !newUnitBorn) {
                         cs.addMessage(See.only(owner),
                             new ModelMessage(ModelMessage.MessageType.WARNING,
                                              "model.colony.famineFeared",

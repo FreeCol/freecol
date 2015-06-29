@@ -51,7 +51,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
     public static final String REARRANGE_WORKERS = "rearrangeWorkers";
     public static final int LIBERTY_PER_REBEL = 200;
-
+    /** The number of turns of advanced warning of starvation. */
+    public static final int FAMINE_TURNS = 3;
+    
     public static enum ColonyChangeEvent {
         POPULATION_CHANGE,
         PRODUCTION_CHANGE,

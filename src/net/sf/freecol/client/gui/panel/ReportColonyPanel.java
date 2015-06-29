@@ -384,7 +384,7 @@ public final class ReportColonyPanel extends ReportPanel
         } else {
             int newFood = colony.getAdjustedNetProductionOf(foodType);
             famine = newFood < 0
-                && (colony.getGoodsCount(foodType) / -newFood) <= 3;
+                && (colony.getGoodsCount(foodType) / -newFood) <= Colony.FAMINE_TURNS;
             newColonist = (newFood == 0) ? 0
                 : (newFood < 0) ? colony.getGoodsCount(foodType) / newFood - 1
                 : (Settlement.FOOD_PER_COLONIST
@@ -644,7 +644,7 @@ public final class ReportColonyPanel extends ReportPanel
             reportPanel.add(b);
         } else if (newColonist < 0) {
             b = colourButton(cac, Integer.toString(-newColonist),
-                null, (newColonist >= -3) ? cAlarm : cWarn,
+                null, (newColonist >= -Colony.FAMINE_TURNS) ? cAlarm : cWarn,
                 stpl("report.colony.starving.description")
                     .addName("%colony%", colony.getName())
                     .addAmount("%turns%", -newColonist));
