@@ -144,6 +144,7 @@ public final class FreeCol {
                            consoleLogging = false,
                            debugStart = false,
                            fastStart = false,
+                           headless = false,
                            introVideo = true,
                            javaCheck = true,
                            memoryCheck = true,
@@ -478,6 +479,9 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.gui-scale"))
                           .hasOptionalArg()
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("headless")
+                          .withDescription(Messages.message("cli.headless"))
+                          .create());
         options.addOption(OptionBuilder.withLongOpt("load-savegame")
                           .withDescription(Messages.message("cli.load-savegame"))
                           .withArgName(Messages.message("cli.arg.file"))
@@ -678,6 +682,10 @@ public final class FreeCol {
                         .addName("%scales%", getValidGUIScales())
                         .addName("%arg%", arg));
                 }
+            }
+
+            if (line.hasOption("headless")) {
+                headless = true;
             }
 
             if (line.hasOption("load-savegame")) {
@@ -1303,10 +1311,10 @@ public final class FreeCol {
             }
             // savegame was specified on command line
         }
-        final FreeColClient freeColClient = new FreeColClient(
-            splashFilename, fontName, guiScale);
-        freeColClient.startClient(
-            windowSize, userMsg, sound, introVideo, savegame, spec);
+        final FreeColClient freeColClient
+            = new FreeColClient(splashFilename, fontName, guiScale, headless);
+        freeColClient.startClient(windowSize, userMsg, sound, introVideo,
+                                  savegame, spec);
     }
 
     /**

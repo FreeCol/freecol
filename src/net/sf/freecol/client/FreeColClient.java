@@ -134,7 +134,7 @@ public final class FreeColClient {
 
     public FreeColClient(final String splashFilename,
                          final String fontName) {
-        this(splashFilename, fontName, FreeCol.GUI_SCALE_DEFAULT);
+        this(splashFilename, fontName, FreeCol.GUI_SCALE_DEFAULT, true);
     }
 
     /**
@@ -144,14 +144,14 @@ public final class FreeColClient {
      * @param splashFilename The name of the splash image.
      * @param fontName An optional override of the main font.
      * @param scale The scale factor for gui elements.
+     * @param headless Run in headless mode.
      */
-    public FreeColClient(final String splashFilename,
-                         final String fontName,
-                         final float scale) {
+    public FreeColClient(final String splashFilename, final String fontName,
+                         final float scale, boolean headless) {
         mapEditor = false;
-        headless = "true".equals(System.getProperty("java.awt.headless",
-                                                    "false"));
-        if (headless) {
+        this.headless = headless
+            || System.getProperty("java.awt.headless", "false").equals("true");
+        if (this.headless) {
             if (!FreeColDebugger.isInDebugMode()
                 || FreeColDebugger.getDebugRunTurns() <= 0) {
                 fatal(Messages.message("client.headlessDebug"));
@@ -159,8 +159,8 @@ public final class FreeColClient {
         }
 
         // Get the splash screen up early on to show activity.
-        gui = headless ? new GUI(this, scale)
-                       : new SwingGUI(this, scale);
+        gui = (this.headless) ? new GUI(this, scale)
+                              : new SwingGUI(this, scale);
         gui.displaySplashScreen(splashFilename);
 
         // Look for base data directory.  Failure is fatal.
@@ -218,7 +218,7 @@ public final class FreeColClient {
         actionManager = new ActionManager(this);
         actionManager.initializeActions(inGameController, connectController);
 
-        if (!headless) {
+        if (!this.headless) {
             // Swing system and look-and-feel initialization.
             try {
                 gui.installLookAndFeel(fontName);
@@ -226,7 +226,6 @@ public final class FreeColClient {
                 fatal(Messages.message("client.laf") + "\n" + e.getMessage());
             }
         }
-
     }
 
     /**
