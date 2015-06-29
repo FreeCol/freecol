@@ -4161,16 +4161,12 @@ public final class InGameController extends Controller {
         java.util.Map<String, String> stats = getGame()
             .getStatistics();
 
-
         stats.putAll(getFreeColServer().getAIMain().getAIStatistics());
 
-
         List<String> all = new ArrayList<>();
-        List<String> keys = new ArrayList<>(stats.keySet());
-        Collections.sort(keys);
-        for (String k : keys) {
-            all.add(k);
-            all.add(stats.get(k));
+        for (Entry<String, String> e : mapEntriesByKey(stats)) {
+            all.add(e.getKey());
+            all.add(e.getValue());
         }
 
         // Return as statistics element.

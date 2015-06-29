@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
@@ -42,6 +43,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.option.OptionGroup;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
@@ -4015,17 +4017,15 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
 
-            List<String> playerIds = new ArrayList<>(stance.keySet());
-            Collections.sort(playerIds);
-            for (String pid : playerIds) {
-                Stance s = stance.get(pid);
+            for (Entry<String, Stance> e : mapEntriesByKey(stance)) {
+                Stance s = e.getValue();
                 if (s == Stance.UNCONTACTED) continue;
 
                 xw.writeStartElement(STANCE_TAG);
 
-                xw.writeAttribute(PLAYER_TAG, pid);
+                xw.writeAttribute(PLAYER_TAG, e.getKey());
 
-                xw.writeAttribute(VALUE_TAG, stance.get(pid));
+                xw.writeAttribute(VALUE_TAG, s);
 
                 xw.writeEndElement();
             }

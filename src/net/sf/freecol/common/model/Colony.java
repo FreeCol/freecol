@@ -36,6 +36,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Stance;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 
@@ -3051,10 +3052,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
         if (xw.validFor(getOwner())) {
 
-            List<String> keys = new ArrayList<>(exportData.keySet());
-            Collections.sort(keys);
-            for (String key : keys) {
-                exportData.get(key).toXML(xw);
+            for (Entry<String, ExportData> e : mapEntriesByKey(exportData)) {
+                e.getValue().toXML(xw);
             }
 
             for (WorkLocation workLocation : getSortedCopy(getAllWorkLocations())) {

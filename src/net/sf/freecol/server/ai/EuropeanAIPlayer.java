@@ -2621,16 +2621,11 @@ public class EuropeanAIPlayer extends AIPlayer {
             // Dump the negative offers until the sum is positive.
             // Return a proposal with items we like/can accept, or reject
             // if none are left.
-            List<TradeItem> items = new ArrayList<>(agreement.getTradeItems());
-            Collections.sort(items, new Comparator<TradeItem>() {
-                    @Override
-                    public int compare(TradeItem t1, TradeItem t2) {
-                        return scores.get(t1) - scores.get(t2);
-                    }
-                });
-            while (!items.isEmpty() && value < 0) {
-                TradeItem item = items.remove(0);
-                value -= scores.get(item);
+            for (Entry<TradeItem, Integer> e
+                     : mapEntriesByValue(scores, ascendingIntegerComparator)) {
+                if (value > 0) break;
+                TradeItem item = e.getKey();
+                value -= e.getValue();
                 if (value >= 50 && item instanceof GoldTradeItem) {
                     // Counter offer smaller amount of gold, FIXME: magic#
                     GoldTradeItem gti = (GoldTradeItem)item;
@@ -2642,7 +2637,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 agreement.remove(item);
                 lb.add("  Dropped ", item, ", value now = ", value, ".");
             }
-            if (value > 0 && !items.isEmpty()) {
+            if (value > 0 && !agreement.isEmpty()) {
                 result = TradeStatus.PROPOSE_TRADE;
                 lb.add("  Pruned until acceptable at ", value, ".");
             } else {

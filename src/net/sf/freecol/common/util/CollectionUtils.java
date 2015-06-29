@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 
@@ -239,5 +240,93 @@ public class CollectionUtils {
             }
         }
         return false;
+    }                
+
+    /**
+     * Get the entries in a map in a sorted order.
+     *
+     * @param map The <code>Map</code> to extract entries from.
+     * @return A list of entries from the map sorted by key.
+     */
+    public static <K extends Comparable<? super K>,V> List<Entry<K,V>>
+        mapEntriesByKey(Map<K, V> map) {
+        List<Entry<K,V>> result = new ArrayList<>();
+        result.addAll(map.entrySet());
+        Collections.sort(result, new Comparator<Entry<K,V>>() {
+                public int compare(Entry<K,V> e1, Entry<K,V> e2) {
+                    return e1.getKey().compareTo(e2.getKey());
+                }
+            });
+        return result;
     }
+
+    /**
+     * Get the entries in a map in a sorted order.
+     *
+     * @param map The <code>Map</code> to extract entries from.
+     * @param comparator A <code>Comparator</code> for the values.
+     * @return A list of entries from the map sorted by key.
+     */
+    public static <K,V> List<Entry<K,V>>
+        mapEntriesByKey(Map<K, V> map, final Comparator<K> c) {
+        List<Entry<K,V>> result = new ArrayList<>();
+        result.addAll(map.entrySet());
+        Collections.sort(result, new Comparator<Entry<K,V>>() {
+                public int compare(Entry<K,V> e1, Entry<K,V> e2) {
+                    return c.compare(e1.getKey(), e2.getKey());
+                }
+            });
+        return result;
+    }
+
+    /**
+     * Get the entries in a map in a sorted order.
+     *
+     * @param map The <code>Map</code> to extract entries from.
+     * @return A list of entries from the map sorted by key.
+     */
+    public static <K,V extends Comparable<? super V>> List<Entry<K,V>>
+        mapEntriesByValue(Map<K, V> map) {
+        List<Entry<K,V>> result = new ArrayList<>();
+        result.addAll(map.entrySet());
+        Collections.sort(result, new Comparator<Entry<K,V>>() {
+                public int compare(Entry<K,V> e1, Entry<K,V> e2) {
+                    return e1.getValue().compareTo(e2.getValue());
+                }
+            });
+        return result;
+    }
+
+    /**
+     * Get the entries in a map in a sorted order.
+     *
+     * @param map The <code>Map</code> to extract entries from.
+     * @param comparator A <code>Comparator</code> for the values.
+     * @return A list of entries from the map sorted by value.
+     */
+    public static <K,V> List<Entry<K,V>>
+        mapEntriesByValue(Map<K, V> map, final Comparator<V> c) {
+        List<Entry<K,V>> result = new ArrayList<>();
+        result.addAll(map.entrySet());
+        Collections.sort(result, new Comparator<Entry<K,V>>() {
+                public int compare(Entry<K,V> e1, Entry<K,V> e2) {
+                    return c.compare(e1.getValue(), e2.getValue());
+                }
+            });
+        return result;
+    }
+
+    /** Useful comparators for mapEntriesBy* */
+    public static final Comparator<Integer> descendingIntegerComparator
+        = new Comparator<Integer>() {
+            public int compare(Integer i1, Integer i2) {
+                return i2 - i1;
+            }
+        };
+    public static final Comparator<Integer> ascendingIntegerComparator
+        = new Comparator<Integer>() {
+            public int compare(Integer i1, Integer i2) {
+                return i1 - i2;
+            }
+        };
 }

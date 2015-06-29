@@ -35,7 +35,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
 
@@ -970,25 +970,17 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public void updateWantedGoods() {
         final Specification spec = getSpecification();
-        List<GoodsType> goodsTypes = new ArrayList<>(spec.getGoodsTypeList());
         final java.util.Map<GoodsType, Integer> prices = new HashMap<>();
-        for (GoodsType gt : goodsTypes) {
+        for (GoodsType gt : spec.getGoodsTypeList()) {
+            // The natives do not trade military or non-storable goods.
+            if (gt.isMilitaryGoods() || !gt.isStorable()) continue;
             prices.put(gt, getNormalGoodsPriceToBuy(gt, GoodsContainer.CARGO_SIZE));
         }
-        Collections.sort(goodsTypes, new Comparator<GoodsType>() {
-                @Override
-                public int compare(GoodsType goodsType1, GoodsType goodsType2) {
-                    return prices.get(goodsType2) - prices.get(goodsType1);
-                }
-            });
-
         int wantedIndex = 0;
-        for (GoodsType goodsType : goodsTypes) {
-            // The natives do not trade military or non-storable goods.
-            if (goodsType.isMilitaryGoods() || !goodsType.isStorable())
-                continue;
-            if (getNormalGoodsPriceToBuy(goodsType, GoodsContainer.CARGO_SIZE)
-                <= GoodsContainer.CARGO_SIZE * TRADE_MINIMUM_PRICE
+        for (Entry<GoodsType, Integer> e
+                 : mapEntriesByValue(prices, descendingIntegerComparator)) {
+            GoodsType goodsType = e.getKey();
+            if (e.getValue() <= GoodsContainer.CARGO_SIZE * TRADE_MINIMUM_PRICE
                 || wantedIndex >= wantedGoods.length) break;
             wantedGoods[wantedIndex] = goodsType;
             wantedIndex++;

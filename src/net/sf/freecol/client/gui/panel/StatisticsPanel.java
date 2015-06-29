@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.swing.Box;
@@ -39,6 +40,7 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -75,11 +77,9 @@ public final class StatisticsPanel extends FreeColPanel {
         public void setData(java.util.Map<String, String> statsData) {
             this.data = new Object[2][statsData.size()];
             int i = 0;
-            List<String> keys = new ArrayList<>(statsData.keySet());
-            Collections.sort(keys);
-            for (String s : keys) {
-                data[NAME_COLUMN][i] = s;
-                data[VALUE_COLUMN][i] = statsData.get(s);
+            for (Entry<String, String> e : mapEntriesByKey(statsData)) {
+                data[NAME_COLUMN][i] = e.getKey();
+                data[VALUE_COLUMN][i] = e.getValue();
                 i++;
             }
         }

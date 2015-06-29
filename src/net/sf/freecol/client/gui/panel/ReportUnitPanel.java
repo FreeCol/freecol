@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -43,6 +44,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -111,8 +113,8 @@ public abstract class ReportUnitPanel extends ReportPanel {
         // Finally all other locations, sorted alphabetically.
         List<String> otherNames = new ArrayList<>(inLocations.keySet());
         Collections.sort(otherNames);
-        for (String locationName : otherNames) {
-            handleLocation(null, locationName, inLocations.get(locationName));
+        for (Entry<String, List<Unit>> e : mapEntriesByKey(inLocations)) {
+            handleLocation(null, e.getKey(), e.getValue());
         }
 
         revalidate();

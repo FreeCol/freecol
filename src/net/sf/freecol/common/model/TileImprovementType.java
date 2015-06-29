@@ -25,12 +25,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -501,9 +503,10 @@ public final class TileImprovementType extends FreeColGameObjectType {
         }
 
         if (tileTypeChanges != null) {
-            List<TileTypeChange> sorted = new ArrayList<>(tileTypeChanges.values());
-            Collections.sort(sorted);
-            for (TileTypeChange change : sorted) change.toXML(xw);
+            for (Entry<TileType, TileTypeChange> e
+                     : mapEntriesByValue(tileTypeChanges)) {
+                e.getValue().toXML(xw);
+            }
         }
 
         for (RandomChoice<Disaster> choice : getDisasters()) {

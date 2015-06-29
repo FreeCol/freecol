@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
@@ -49,6 +50,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -413,16 +415,14 @@ public class DebugMenu extends JMenu {
         showResourceKeys.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    StringBuilder builder = new StringBuilder();
                     Map<String, ImageResource> resources
                         = ResourceManager.getImageResources();
-                    List<String> keys = new ArrayList<>(resources.keySet());
-                    Collections.sort(keys);
-                    StringBuilder builder = new StringBuilder();
-                    for (String key : keys) {
-                        builder.append(key);
-                        ImageResource resource = resources.get(key);
+                    for (Entry<String, ImageResource> en
+                             : mapEntriesByKey(resources)) {
+                        builder.append(en.getKey());
                         builder.append(" (");
-                        builder.append(resource.getCount());
+                        builder.append(en.getValue().getCount());
                         builder.append(")");
                         builder.append("\n");
                     }
