@@ -22,6 +22,7 @@ package net.sf.freecol.common.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +34,15 @@ import java.util.Set;
  * Collection of small static helper methods using Collections.
  */
 public class CollectionUtils {
+
+    /** Comparator to order lists by decreasing length. */
+    public static final Comparator<List<?>> listLengthComparator
+        = new Comparator<List<?>>() {
+            @Override
+            public int compare(List<?> l1, List<?> l2) {
+                return l2.size() - l1.size();
+            }
+        };
 
     /**
      * Make an unmodifiable set with specified members.
@@ -229,5 +239,5 @@ public class CollectionUtils {
             }
         }
         return false;
-    }                
+    }
 }

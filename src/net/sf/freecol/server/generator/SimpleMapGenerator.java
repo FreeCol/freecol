@@ -68,6 +68,7 @@ import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerBuilding;
@@ -95,6 +96,22 @@ public class SimpleMapGenerator implements MapGenerator {
      */
     private static final float MIN_DISTANCE_FROM_POLE = 0.30f;
 
+    /** Comparator to sort tiles by increasing distance from the edge. */
+    private static final Comparator<Tile> tileEdgeComparator
+        = new Comparator<Tile>() {
+            @Override
+            public int compare(Tile tile1, Tile tile2) {
+                final Map map = tile1.getMap();
+                int distance1 = Math.min(Math.min(tile1.getX(),
+                        map.getWidth() - tile1.getX()),
+                    Math.min(tile1.getY(), map.getHeight() - tile1.getY()));
+                int distance2 = Math.min(Math.min(tile2.getX(),
+                        map.getWidth() - tile2.getX()),
+                    Math.min(tile2.getY(), map.getHeight() - tile2.getY()));
+                return distance1 - distance2;
+            }
+        };
+    
     private static class Territory {
         public ServerRegion region;
         public Tile tile;
@@ -474,16 +491,7 @@ public class SimpleMapGenerator implements MapGenerator {
         }
 
         // Sort tiles from the edges of the map inward
-        Collections.sort(settlementTiles, new Comparator<Tile>() {
-                @Override
-                public int compare(Tile tile1, Tile tile2) {
-                    int distance1 = Math.min(Math.min(tile1.getX(), map.getWidth() - tile1.getX()),
-                        Math.min(tile1.getY(), map.getHeight() - tile1.getY()));
-                    int distance2 = Math.min(Math.min(tile2.getX(), map.getWidth() - tile2.getX()),
-                        Math.min(tile2.getY(), map.getHeight() - tile2.getY()));
-                    return distance1 - distance2;
-                }
-            });
+        Collections.sort(settlementTiles, tileEdgeComparator);
 
         // Now place other settlements
         while (!settlementTiles.isEmpty() && !territories.isEmpty()) {
@@ -562,18 +570,10 @@ public class SimpleMapGenerator implements MapGenerator {
         }
         // Extract just the settlement lists.
         List<List<IndianSettlement>> isList = new ArrayList<>(skills.values());
-        Comparator<List<IndianSettlement>> listComparator
-            = new Comparator<List<IndianSettlement>>() {
-                @Override
-                public int compare(List<IndianSettlement> l1,
-                                   List<IndianSettlement> l2) {
-                    return l2.size() - l1.size();
-                }
-            };
         // For each missing skill...
         while (!expertsNeeded.isEmpty()) {
             UnitType neededSkill = expertsNeeded.remove(0);
-            Collections.sort(isList, listComparator);
+            Collections.sort(isList, listLengthComparator);
             List<IndianSettlement> extras = isList.remove(0);
             UnitType extraSkill = extras.get(0).getLearnableSkill();
             List<RandomChoice<IndianSettlement>> choices = new ArrayList<>();
