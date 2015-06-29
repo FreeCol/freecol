@@ -1074,7 +1074,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return (region != null && region.getName() != null)
             ? StringTemplate.template("model.tile.nameLocation")
                 .addNamed("%name%", type)
-                .addNamed("%location%", region)
+                .addStringTemplate("%location%", region.getLabel())
             : getSimpleLabel();
     }
 

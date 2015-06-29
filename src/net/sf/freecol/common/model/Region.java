@@ -36,7 +36,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
 /**
  * A named region on the map.
  */
-public class Region extends FreeColGameObject implements Nameable, Named {
+public class Region extends FreeColGameObject implements Nameable {
 
     private static final Logger logger = Logger.getLogger(Region.class.getName());
 
@@ -218,8 +218,10 @@ public class Region extends FreeColGameObject implements Nameable, Named {
      * @return The i18n-ready name for the region.
      */
     public StringTemplate getLabel() {
-        return (this.key != null) ? StringTemplate.key(getNameKey())
-            : (this.name != null) ? StringTemplate.name(this.name)
+        return (this.key != null)
+            ? StringTemplate.key(Messages.nameKey(this.key))
+            : (this.name != null)
+            ? StringTemplate.name(this.name)
             : StringTemplate.key(type.getUnknownKey());
     }
 
@@ -470,17 +472,6 @@ public class Region extends FreeColGameObject implements Nameable, Named {
     @Override
     public void setName(final String newName) {
         this.name = newName;
-    }
-
-
-    // Implement Named
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final String getNameKey() {
-        return Messages.nameKey(this.key);
     }
 
 
