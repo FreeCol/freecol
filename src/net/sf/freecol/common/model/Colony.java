@@ -35,6 +35,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Occupation;
 import net.sf.freecol.common.model.Stance;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
@@ -75,61 +76,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         WRONG_UPGRADE,
         COASTAL,
         LIMIT_EXCEEDED
-    }
-
-    /** 
-     * Simple container to define where and what a unit is working
-     * on.
-     */
-    private static class Occupation {
-
-        public WorkLocation workLocation;
-        public ProductionType productionType;
-        public GoodsType workType;
-
-        /**
-         * Create an Occupation.
-         *
-         * @param workLocation The <code>WorkLocation</code> to work at.
-         * @param productionType The <code>ProductionType</code> to
-         *     use at the work location.
-         * @param workType The <code>GoodsType</code> to produce at the
-         *     work location with the production type.
-         */
-        public Occupation(WorkLocation workLocation,
-                          ProductionType productionType,
-                          GoodsType workType) {
-            this.workLocation = workLocation;
-            this.productionType = productionType;
-            this.workType = workType;
-        }
-
-        /**
-         * Install a unit into this occupation.
-         *
-         * @param unit The <code>Unit</code> to establish.
-         * @return True if the unit is installed.
-         */
-        public boolean install(Unit unit) {
-            if (!unit.setLocation(workLocation)) return false;
-            if (productionType != workLocation.getProductionType()) {
-                workLocation.setProductionType(productionType);
-            }
-            if (workType != unit.getWorkType()) {
-                unit.changeWorkType(workType);
-            }
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder(32);
-            sb.append("[Occupation ").append(workLocation)
-                //.append(" ").append(productionType)
-                .append(" ").append(workType.getSuffix())
-                .append("]");
-            return sb.toString();
-        }
     }
 
     /** A map of Buildings, indexed by the id of their basic type. */
@@ -371,7 +317,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
 
-    // Private Occupation routines
+    // Occupation routines
 
     /**
      * Gets the occupation tracing status.
@@ -394,34 +340,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         return ret;
     }
 
-    /**
-     * Get the lowest currently available amount of required goods
-     * from a list.
-     *
-     * @param goodsList A list of <code>AbstractGoods</code> to require.
-     * @return The minimum goods count, INFINITY if not constraints.
-     */
-    private int getMinimumGoodsCount(List<AbstractGoods> goodsList) {
-        int result = INFINITY;
-        if (goodsList != null) {
-            for (AbstractGoods ag : goodsList) {
-                result = Math.min(result, 
-                                  Math.max(getGoodsCount(ag.getType()),
-                                           getNetProductionOf(ag.getType())));
-            }
-        }
-        return result;
-    }
-
-    private void logWorkTypes(Collection<GoodsType> workTypes, LogBuilder lb) {
-        lb.add("[");
-        for (GoodsType gt : workTypes) {
-            lb.add(gt.getSuffix(), " ");
-        }
-        lb.shrink(" ");
-        lb.add("]");
-    }
-        
     private void accumulateChoices(Collection<GoodsType> workTypes,
                                    Collection<GoodsType> tried,
                                    List<Collection<GoodsType>> result) {
@@ -486,67 +404,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         accumulateChoices(spec.getGoodsTypeList(), tried, result);
         return result;
     }
-
-    /**
-     * Check a particular work location for the best available production
-     * for the given unit.
-     *
-     * @param unit The <code>Unit</code> to produce the goods.
-     * @param wl The <code>WorkLocation</code> to check.
-     * @param best The best <code>Occupation</code> found so far.
-     * @param bestAmount The amount of goods produced.
-     * @param workTypes A collection of <code>GoodsType</code> to
-     *     consider producing.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return The updated best amount of production found.
-     */
-    private int getOccupationAt(Unit unit, WorkLocation wl,
-                                Occupation best, int bestAmount,
-                                Collection<GoodsType> workTypes,
-                                LogBuilder lb) {
-        final UnitType type = unit.getType();
-
-        // Can the unit work at this wl?
-        boolean present = unit.getLocation() == wl;
-        lb.add("\n    ", wl,
-            ((!present && !wl.canAdd(unit)) ? " no-add" : ""));
-        if (!present && !wl.canAdd(unit)) return bestAmount;
-
-        // Can the unit determine the production type at this WL?
-        // This will be true if the unit is going to be alone or
-        // if the production type is as yet unset.
-        boolean alone = wl.getProductionType() == null
-            || wl.isEmpty()
-            || (present && wl.getUnitCount() == 1);
-        lb.add(" alone=", alone);
-
-        // Try the available production types for the best production.
-        List<ProductionType> productionTypes = new ArrayList<>();
-        if (alone) {
-            productionTypes.addAll(wl.getAvailableProductionTypes(false));
-        } else {
-            productionTypes.add(wl.getProductionType());
-        }
-        for (ProductionType pt : productionTypes) {
-            lb.add("\n      try=", pt);
-            for (GoodsType gt : workTypes) {
-                if (pt.getOutput(gt) == null) continue;
-                int amount = getMinimumGoodsCount(pt.getInputs());
-                amount = Math.min(amount, wl.getPotentialProduction(gt, type));
-                lb.add(" ", gt.getSuffix(), "=", amount,
-                    "/", getMinimumGoodsCount(pt.getInputs()),
-                    "/", wl.getPotentialProduction(gt, type),
-                    ((bestAmount < amount) ? "!" : ""));
-                if (bestAmount < amount) {
-                    bestAmount = amount;
-                    best.workLocation = wl;
-                    best.productionType = pt;
-                    best.workType = gt;
-                }
-            }
-        }
-        return bestAmount;   
-    }
         
     /**
      * Gets the best occupation for a given unit to produce one of
@@ -568,8 +425,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         Occupation best = new Occupation(null, null, null);
         int bestAmount = 0;
         for (WorkLocation wl : getCurrentWorkLocations()) {
-            bestAmount = getOccupationAt(unit, wl, best, bestAmount,
-                                         workTypes, lb);
+            bestAmount = best.improve(unit, wl, bestAmount, workTypes, lb);
         }
 
         if (best.workLocation != null) {
@@ -591,10 +447,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     private Occupation getOccupationFor(Unit unit, boolean userMode,
                                         LogBuilder lb) {
-        for (Collection<GoodsType> types
-                 : getWorkTypeChoices(unit, userMode)) {
+        for (Collection<GoodsType> types : getWorkTypeChoices(unit, userMode)) {
             lb.add("\n  ");
-            logWorkTypes(types, lb);
+            FreeColObject.logFreeColObjects(types, lb);
             Occupation occupation = getOccupationFor(unit, types, lb);
             if (occupation != null) return occupation;
         }
@@ -617,7 +472,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                                         Collection<GoodsType> workTypes) {
         LogBuilder lb = new LogBuilder((getOccupationTrace()) ? 64 : 0);
         lb.add(getName(), ".getOccupationFor(", unit, ", ");
-        logWorkTypes(workTypes, lb);
+        FreeColObject.logFreeColObjects(workTypes, lb);
         lb.add(")");
 
         Occupation occupation = getOccupationFor(unit, workTypes, lb);
@@ -642,56 +497,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         Occupation occupation = getOccupationFor(unit, userMode, lb);
         lb.log(logger, Level.WARNING);
         return occupation;
-    }
-
-    /**
-     * Gets the best occupation for a given unit at a given work location.
-     *
-     * @param unit The <code>Unit</code> to find an
-     *     <code>Occupation</code> for.
-     * @param wl The <code>WorkLocation</code> to work at.
-     * @param userMode If a user requested this, favour the current
-     *     work type, if not favour goods that the unit requires.
-     * @return An <code>Occupation</code> for the given unit, or
-     *     null if none found.
-     */
-    private Occupation getOccupationAt(Unit unit, WorkLocation wl,
-                                       boolean userMode) {
-        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? 64 : 0);
-        lb.add(getName(), ".getOccupationAt(", unit, ", ", wl, ")");
-
-        Occupation best = new Occupation(null, null, null);
-        int bestAmount = 0;
-        for (Collection<GoodsType> types
-                 : getWorkTypeChoices(unit, userMode)) {
-            lb.add("\n  ");
-            logWorkTypes(types, lb);
-            bestAmount = getOccupationAt(unit, wl, best, bestAmount,
-                                         types, lb);
-            if (best.workType != null) {
-                lb.add("\n  => ", best);
-                break;
-            }
-        }
-        if (best.workType == null) lb.add("\n  FAILED");
-        lb.log(logger, Level.WARNING);
-        return (best.workType == null) ? null : best;
-    }
-
-    /**
-     * Install a unit at the best occupation for it at a given work
-     * location.  Public for {@link WorkLocation#add}.
-     *
-     * @param unit The <code>Unit</code> to install.
-     * @param wl The <code>WorkLocation</code> to install the unit.
-     * @param userMode If a user requested this, favour the current
-     *     work type, if not favour goods that the unit requires.
-     * @return True if the installation succeeds.
-     */
-    public boolean setOccupationAt(Unit unit, WorkLocation wl,
-                                   boolean userMode) {
-        Occupation occupation = getOccupationAt(unit, wl, userMode);
-        return occupation != null && occupation.install(unit);
     }
 
 
@@ -879,19 +684,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public WorkLocation getWorkLocationFor(Unit unit) {
         Occupation occupation = getOccupationFor(unit, false);
         return (occupation == null) ? null : occupation.workLocation;
-    }
-
-    /**
-     * Get the best work type for a unit at a work location in this colony.
-     *
-     * @param unit The <code>Unit</code> to find a work type for.
-     * @param wl The <code>WorkLocation</code> to work at.
-     * @return The best work <code>GoodsType</code> for the unit, or null
-     *     if none found.
-     */
-    public GoodsType getWorkTypeFor(Unit unit, WorkLocation wl) {
-        Occupation occupation = getOccupationAt(unit, wl, true);
-        return (occupation == null) ? null : occupation.workType;
     }
 
     /**

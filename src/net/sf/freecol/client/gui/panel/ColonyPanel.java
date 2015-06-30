@@ -554,7 +554,7 @@ public final class ColonyPanel extends PortPanel
             boolean change = false, check = wl.getProductionType() == null;
             for (Unit u : wl.getUnitList()) {
                 if (check || !wl.produces(u.getWorkType())) {
-                    GoodsType workType = colony.getWorkTypeFor(u, wl);
+                    GoodsType workType = wl.getWorkFor(u);
                     if (workType != null && workType != u.getWorkType()) {
                         igc().changeWorkType(u, workType);
                     }
@@ -746,7 +746,7 @@ public final class ColonyPanel extends PortPanel
      */
     private boolean tryWork(Unit unit, WorkLocation wl) {
         // Choose the best work type.
-        GoodsType workType = colony.getWorkTypeFor(unit, wl);
+        GoodsType workType = wl.getWorkFor(unit);
 
         // Set the unit to work.  Note this might upgrade the unit,
         // and possibly even change its work type as the server has

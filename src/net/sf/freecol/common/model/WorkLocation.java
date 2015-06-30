@@ -19,14 +19,18 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -144,6 +148,61 @@ public abstract class WorkLocation extends UnitLocation
             }
         }
         return best;
+    }
+
+    /**
+     * Gets the best occupation for a given unit at this work location.
+     *
+     * @param unit The <code>Unit</code> to find an
+     *     <code>Occupation</code> for.
+     * @param userMode If a user requested this, favour the current
+     *     work type, if not favour goods that the unit requires.
+     * @return An <code>Occupation</code> for the given unit, or
+     *     null if none found.
+     */
+    public Occupation getOccupation(Unit unit, boolean userMode) {
+        LogBuilder lb = new LogBuilder((colony.getOccupationTrace()) ? 64 : 0);
+        lb.add(colony.getName(), "/", this, ".getOccupationAt(", unit, ")");
+
+        Occupation best = new Occupation(null, null, null);
+        int bestAmount = 0;
+        for (Collection<GoodsType> types
+                 : colony.getWorkTypeChoices(unit, userMode)) {
+            lb.add("\n  ");
+            logFreeColObjects(types, lb);
+            bestAmount = best.improve(unit, this, bestAmount, types, lb);
+            if (best.workType != null) {
+                lb.add("\n  => ", best);
+                break;
+            }
+        }
+        if (best.workType == null) lb.add("\n  FAILED");
+        lb.log(logger, Level.WARNING);
+        return (best.workType == null) ? null : best;
+    }
+
+    /**
+     * Get the best work type for a unit at this work location, favouring
+     * the existing work.
+     *
+     * @param unit The <code>Unit</code> to find a work type for.
+     * @return The best work <code>GoodsType</code> for the unit, or null
+     *     if none found.
+     */
+    public GoodsType getWorkFor(Unit unit) {
+        Occupation occupation = getOccupation(unit, true);
+        return (occupation == null) ? null : occupation.workType;
+    }
+    
+    /**
+     * Install a unit at the best occupation for it at this work location.
+     *
+     * @param unit The <code>Unit</code> to install.
+     * @return True if the installation succeeds.
+     */
+    public boolean setWorkFor(Unit unit) {
+        Occupation occupation = getOccupation(unit, false);
+        return occupation != null && occupation.install(unit);
     }
 
     /**
@@ -427,19 +486,23 @@ public abstract class WorkLocation extends UnitLocation
     @Override
     public boolean add(final Locatable locatable) {
         NoAddReason reason = getNoAddReason(locatable);
-        if (reason != NoAddReason.NONE) {
+        switch (reason) {
+        case NONE:
+            break;
+        case ALREADY_PRESENT:
+            return true;
+        default:
             throw new IllegalStateException("Can not add " + locatable
                 + " to " + this + " because " + reason);
         }
         Unit unit = (Unit)locatable;
-        if (contains(unit)) return true;
         if (!super.add(unit)) return false;
 
         unit.setState(Unit.UnitState.IN_COLONY);
         unit.setMovesLeft(0);
 
         // Choose a sensible work type, which should update production type.
-        getColony().setOccupationAt(unit, this, false);
+        setWorkFor(unit);
 
         getColony().invalidateCache();
         return true;

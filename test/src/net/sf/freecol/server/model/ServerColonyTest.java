@@ -320,14 +320,14 @@ public class ServerColonyTest extends FreeColTestCase {
         ServerBuilding townHall
             = (ServerBuilding)colony.getBuilding(townHallType);
         Unit statesman = colony.getUnitList().get(0);
-        colony.setOccupationAt(statesman, townHall, false);
+        townHall.setWorkFor(statesman);
         assertEquals(bellsType, statesman.getWorkType());
 
         ServerBuilding church
             = (ServerBuilding)colony.getBuilding(chapelType);
         church.upgrade();
         Unit preacher = colony.getUnitList().get(1);
-        colony.setOccupationAt(preacher, church, false);
+        church.setWorkFor(preacher);
         assertEquals(crossesType, preacher.getWorkType());
 
         assertEquals(0, colony.getGoodsCount(bellsType));

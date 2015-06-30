@@ -258,7 +258,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Church cross production, no unit", 2,
             church.getTotalProductionOf(crossesType));
 
-        colony.setOccupationAt(unit0, church, false);
+        church.setWorkFor(unit0);
 
         assertEquals("Church base cross production, free colonist", 3,
             church.getBaseProduction(church.getProductionType(), crossesType,
@@ -268,7 +268,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Church total cross production, free colonist", 5,
             church.getTotalProductionOf(crossesType));
 
-        colony.setOccupationAt(unit1, church, false);
+        church.setWorkFor(unit1);
 
         assertEquals("Church base cross production, 2 x free colonist", 3,
             church.getBaseProduction(church.getProductionType(), crossesType,
@@ -278,7 +278,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Church total cross production, 2 x free colonist", 8,
             church.getTotalProductionOf(crossesType));
 
-        colony.setOccupationAt(unit2, church, false);
+        church.setWorkFor(unit2);
 
         assertEquals("Church base cross production, 3 x free colonist", 3,
             church.getBaseProduction(church.getProductionType(), crossesType,
@@ -289,10 +289,12 @@ public class BuildingTest extends FreeColTestCase {
             church.getTotalProductionOf(crossesType));
 
         Building smithy = colony.getBuilding(blacksmithType);
+        assertTrue(unit0.setLocation(smithy));
         assertTrue(unit1.setLocation(smithy));
         assertTrue(unit2.setLocation(smithy));
         unit0.setType(firebrandPreacherType);
-
+        church.setWorkFor(unit0);
+        
         assertEquals("Church base cross production, firebrand preacher", 3,
             church.getBaseProduction(church.getProductionType(), crossesType,
                                      unit0.getType()));
@@ -317,7 +319,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Cathedral cross production, no colonist", 3,
             church.getTotalProductionOf(crossesType));
 
-        colony.setOccupationAt(unit0, church, false);
+        church.setWorkFor(unit0);
 
         assertEquals("Cathedral base cross production, free colonist", 6,
             church.getBaseProduction(church.getProductionType(), crossesType,
@@ -327,7 +329,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Cathedral total cross production, free colonist", 9,
             church.getTotalProductionOf(crossesType));
 
-        colony.setOccupationAt(unit1, church, false);
+        church.setWorkFor(unit1);
 
         assertEquals("Cathedral base cross production, 2 x free colonist", 6,
             church.getBaseProduction(church.getProductionType(), crossesType,
@@ -337,7 +339,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Cathedral total cross production, 2 x free colonist", 15,
             church.getTotalProductionOf(crossesType));
 
-        colony.setOccupationAt(unit2, church, false);
+        church.setWorkFor(unit2);
 
         assertEquals("Cathedral base cross production, 3 x free colonist", 6,
             church.getBaseProduction(church.getProductionType(), crossesType,
@@ -347,9 +349,11 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Cathedral total cross production, 3 x free colonist", 21,
             church.getTotalProductionOf(crossesType));
 
+        unit0.setLocation(smithy);
         unit1.setLocation(smithy);
         unit2.setLocation(smithy);
         unit0.setType(firebrandPreacherType);
+        church.setWorkFor(unit0);
 
         assertEquals("Cathedral base cross production, firebrand preacher", 6,
             church.getBaseProduction(church.getProductionType(), crossesType,
@@ -606,7 +610,7 @@ public class BuildingTest extends FreeColTestCase {
         assertTrue(worker.getLocation() instanceof ColonyTile);
         assertEquals(plainsType, ((ColonyTile)worker.getLocation()).getWorkTile().getType());
 
-        assertTrue(colony.setOccupationAt(worker, weaver, false));
+        assertTrue(weaver.add(worker));
         assertEquals(worker, weaver.getUnitList().get(0));
 
         colony.addGoods(cottonType, 2);
@@ -902,31 +906,27 @@ public class BuildingTest extends FreeColTestCase {
         units.get(1).setLocation(tile);
         units.get(2).setLocation(tile);
         units.get(3).setLocation(tile);
-        assertTrue(colony.setOccupationAt(units.get(4),
-                colony.getColonyTile(tile.getNeighbourOrNull(Direction.N)),
-                false));
-        assertTrue(colony.setOccupationAt(units.get(5),
-                colony.getColonyTile(tile.getNeighbourOrNull(Direction.E)),
-                false));
-        assertTrue(colony.setOccupationAt(units.get(6),
-                colony.getColonyTile(tile.getNeighbourOrNull(Direction.S)),
-                false));
-        assertTrue(colony.setOccupationAt(units.get(7),
-                colony.getBuilding(townHallType),
-                false));
+        assertTrue(colony.getColonyTile(tile.getNeighbourOrNull(Direction.N))
+            .setWorkFor(units.get(4)));
+        assertTrue(colony.getColonyTile(tile.getNeighbourOrNull(Direction.E))
+            .setWorkFor(units.get(5)));
+        assertTrue(colony.getColonyTile(tile.getNeighbourOrNull(Direction.S))
+            .setWorkFor(units.get(6)));
+        assertTrue(colony.getBuilding(townHallType)
+            .setWorkFor(units.get(7)));
 
         Building smithy = colony.getBuilding(blacksmithType);
-        assertFalse(colony.setOccupationAt(units.get(0), smithy, false));
+        assertFalse(smithy.setWorkFor(units.get(0)));
         colony.addGoods(oreType, 50); // Add ore so the smithy becomes viable
-        assertTrue(colony.setOccupationAt(units.get(0), smithy, false));
-        assertTrue(colony.setOccupationAt(units.get(1), smithy, false));
+        assertTrue(smithy.setWorkFor(units.get(0)));
+        assertTrue(smithy.setWorkFor(units.get(1)));
 
         Building armory = new ServerBuilding(game, colony, armoryType);
         colony.addBuilding(armory);
         colony.invalidateCache();
 
-        assertTrue(colony.setOccupationAt(units.get(2), armory, false));
-        assertTrue(colony.setOccupationAt(units.get(3), armory, false));
+        assertTrue(armory.setWorkFor(units.get(2)));
+        assertTrue(armory.setWorkFor(units.get(3)));
 
         assertEquals(toolsType,   units.get(0).getWorkType());
         assertEquals(toolsType,   units.get(1).getWorkType());
