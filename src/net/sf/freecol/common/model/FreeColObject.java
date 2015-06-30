@@ -53,6 +53,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.util.Introspector;
+import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -251,6 +252,18 @@ public abstract class FreeColObject
         return newC;
     }
 
+    /**
+     * Log a collection of <code>FreeColObject</code>s.
+     *
+     * @param c The <code>Collection</code> to log.
+     * @param lb A <code>LogBuilder</code> to log to.
+     */
+    public static <T extends FreeColObject> void logFreeColObjects(Collection<T> c, LogBuilder lb) {
+        lb.add("[");
+        for (T t : c) lb.add(t.getSuffix(), " ");
+        lb.shrink(" ");
+        lb.add("]");
+    }
 
     // Property change support
 

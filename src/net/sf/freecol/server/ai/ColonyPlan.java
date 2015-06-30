@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
@@ -1595,10 +1596,8 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         LogBuilder lb = new LogBuilder(256);
         lb.add("ColonyPlan: ", colony,
             " ", colony.getTile(),
-            "\nProfile: ", profileType, "\nPreferred production:\n");
-        for (GoodsType goodsType : getPreferredProduction()) {
-            lb.add(goodsType.getSuffix(), "\n");
-        }
+            "\nProfile: ", profileType, "\nPreferred production:");
+        FreeColObject.logFreeColObjects(getPreferredProduction(), lb);
         lb.add(getBuildableReport(), "Food Plans:\n");
         for (WorkLocationPlan wlp : getFoodPlans()) {
             WorkLocation wl = wlp.getWorkLocation();
