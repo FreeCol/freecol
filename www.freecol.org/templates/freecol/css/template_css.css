@@ -744,3 +744,7 @@ tr.trLine .leftcell {
     vertical-align: top;
     text-align: right;
 }
+
+div.content table.contentpane {
+    margin-bottom: 2em;
+}
