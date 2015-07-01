@@ -36,6 +36,20 @@ import java.util.Set;
  */
 public class CollectionUtils {
 
+    /** Useful comparators for mapEntriesBy* */
+    public static final Comparator<Integer> descendingIntegerComparator
+        = new Comparator<Integer>() {
+            public int compare(Integer i1, Integer i2) {
+                return i2 - i1;
+            }
+        };
+    public static final Comparator<Integer> ascendingIntegerComparator
+        = new Comparator<Integer>() {
+            public int compare(Integer i1, Integer i2) {
+                return i1 - i2;
+            }
+        };
+
     /** Comparator to order lists by decreasing length. */
     public static final Comparator<List<?>> listLengthComparator
         = new Comparator<List<?>>() {
@@ -315,18 +329,4 @@ public class CollectionUtils {
             });
         return result;
     }
-
-    /** Useful comparators for mapEntriesBy* */
-    public static final Comparator<Integer> descendingIntegerComparator
-        = new Comparator<Integer>() {
-            public int compare(Integer i1, Integer i2) {
-                return i2 - i1;
-            }
-        };
-    public static final Comparator<Integer> ascendingIntegerComparator
-        = new Comparator<Integer>() {
-            public int compare(Integer i1, Integer i2) {
-                return i1 - i2;
-            }
-        };
 }

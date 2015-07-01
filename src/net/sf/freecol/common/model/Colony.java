@@ -404,7 +404,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         accumulateChoices(spec.getGoodsTypeList(), tried, result);
         return result;
     }
-        
+
     /**
      * Gets the best occupation for a given unit to produce one of
      * a given set of goods types.

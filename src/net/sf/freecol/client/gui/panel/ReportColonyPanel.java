@@ -61,6 +61,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.model.WorkLocation.Suggestion;
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -307,34 +308,6 @@ public final class ReportColonyPanel extends ReportPanel
             ? ResourceManager.getColor(key)
             : Color.BLUE;
     }
-
-    private static class Suggestion {
-
-        public final UnitType oldType;
-        public final UnitType newType;
-        public final GoodsType goodsType;
-        public final int amount;
-
-        /**
-         * Suggest that work done by (optional) oldType would be
-         * better done by newType because it could produce amount more
-         * goodsType.
-         *
-         * @param oldType The optional <code>UnitType</code> currently
-         *     doing the work.
-         * @param newType A new <code>UnitType</code> to do the work.
-         * @param goodsType The <code>GoodsType</code> to produce.
-         * @param amount The extra goods that would be produced if the
-         *     suggestion is taken.
-         */
-        public Suggestion(UnitType oldType, UnitType newType,
-                          GoodsType goodsType, int amount) {
-            this.oldType = oldType;
-            this.newType = newType;
-            this.goodsType = goodsType;
-            this.amount = amount;
-        }
-    };
 
     private void updateCompactColonyPanel() {
         reportPanel.removeAll();

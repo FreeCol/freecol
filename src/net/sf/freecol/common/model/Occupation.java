@@ -138,7 +138,7 @@ public class Occupation {
      * @return The best amount of production found.
      */
     public int improve(Unit unit, WorkLocation wl, int bestAmount,
-                      Collection<GoodsType> workTypes, LogBuilder lb) {
+                       Collection<GoodsType> workTypes, LogBuilder lb) {
         // Can the unit work at the wl?
         boolean present = unit.getLocation() == wl;
         lb.add("\n    ", wl,

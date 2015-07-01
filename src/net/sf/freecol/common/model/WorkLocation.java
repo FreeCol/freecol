@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,6 +53,37 @@ public abstract class WorkLocation extends UnitLocation
 
     public static final List<AbstractGoods> EMPTY_LIST
         = Collections.<AbstractGoods>emptyList();
+
+    /** Container class to suggest a better use of a unit. */
+    public static class Suggestion {
+
+        public final UnitType oldType;
+        public final UnitType newType;
+        public final GoodsType goodsType;
+        public final int amount;
+
+
+        /**
+         * Suggest that work done by (optional) <code>oldType</code>
+         * would be better done by <code>newType</code> because it
+         * could produce <code>amount</code> more
+         * <code>goodsType</code>.
+         *
+         * @param oldType The optional <code>UnitType</code> currently
+         *     doing the work.
+         * @param newType A new <code>UnitType</code> to do the work.
+         * @param goodsType The <code>GoodsType</code> to produce.
+         * @param amount The extra goods that would be produced if the
+         *     suggestion is taken.
+         */
+        public Suggestion(UnitType oldType, UnitType newType,
+            GoodsType goodsType, int amount) {
+            this.oldType = oldType;
+            this.newType = newType;
+            this.goodsType = goodsType;
+            this.amount = amount;
+        }
+    };
 
     /** The colony that contains this work location. */
     protected Colony colony;
@@ -162,7 +194,7 @@ public abstract class WorkLocation extends UnitLocation
      */
     public Occupation getOccupation(Unit unit, boolean userMode) {
         LogBuilder lb = new LogBuilder((colony.getOccupationTrace()) ? 64 : 0);
-        lb.add(colony.getName(), "/", this, ".getOccupationAt(", unit, ")");
+        lb.add(colony.getName(), "/", this, ".getOccupation(", unit, ")");
 
         Occupation best = new Occupation(null, null, null);
         int bestAmount = 0;
@@ -182,6 +214,38 @@ public abstract class WorkLocation extends UnitLocation
     }
 
     /**
+     * Gets the best occupation for a given unit type at this work location.
+     *
+     * @param unitType An optional <code>UnitType</code> to find an
+     *     <code>Occupation</code> for.  If null, use the default unit type.
+     * @return An <code>Occupation</code> for the given unit, or
+     *     null if none found.
+     */
+    public Occupation getOccupation(UnitType unitType) {
+        final Specification spec = getSpecification();
+        if (unitType == null) {
+            unitType = spec.getDefaultUnitType(getOwner().getNationType());
+        }
+        
+        LogBuilder lb = new LogBuilder((colony.getOccupationTrace()) ? 64 : 0);
+        lb.add(colony.getName(), "/", this, ".getOccupation(",
+               unitType.getSuffix(), ")");
+
+        Collection<GoodsType> types = spec.getGoodsTypeList();
+        Occupation best = new Occupation(null, null, null);
+        lb.add("\n  ");
+        logFreeColObjects(types, lb);
+        int bestAmount = best.improve(unitType, this, 0, types, lb);
+        if (best.workType != null) {
+            lb.add("\n  => ", best);
+        } else {
+            lb.add("\n  FAILED");
+        }
+        lb.log(logger, Level.WARNING);
+        return (best.workType == null) ? null : best;
+    }
+        
+    /**
      * Get the best work type for a unit at this work location, favouring
      * the existing work.
      *
@@ -193,7 +257,7 @@ public abstract class WorkLocation extends UnitLocation
         Occupation occupation = getOccupation(unit, true);
         return (occupation == null) ? null : occupation.workType;
     }
-    
+
     /**
      * Install a unit at the best occupation for it at this work location.
      *
@@ -206,12 +270,115 @@ public abstract class WorkLocation extends UnitLocation
     }
 
     /**
+     * Is it a good idea to produce a goods type at this work location
+     * using a better unit type?
+     *
+     * @param unit The <code>Unit</code> that is doing the job at
+     *     present, which may be null if none is at work.
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @return A <code>Suggestion</code> for a better worker, or null if
+     *     improvement is not worthwhile.
+     */
+    public Suggestion getSuggestion(Unit unit, GoodsType goodsType) {
+        // Check first if there is space.
+        if ((unit == null || !contains(unit)) && isFull()) return null;
+
+        final Specification spec = getSpecification();
+        final Player owner = getOwner();
+        
+        // Check if there is a better unit to do this work, and by how
+        // much it would actually improve production.
+        final UnitType unitType = (unit != null) ? unit.getType()
+            : spec.getDefaultUnitType(getOwner().getNationType());
+        UnitType expert;
+        int delta;
+        if (goodsType == null
+            || (expert = spec.getExpertForProducing(goodsType)) == null
+            || (unit != null && expert == unit.getType())
+            || (delta = getPotentialProduction(goodsType, expert)
+                - getPotentialProduction(goodsType, unitType)) <= 0)
+            return null;
+
+        // Is the production actually a good idea?  Not if we are independent
+        // and have maximized liberty, or for immigration.
+        if (owner.getPlayerType() == Player.PlayerType.INDEPENDENT
+            && ((goodsType.isLibertyType() && colony.getSoL() >= 100)
+                || goodsType.isImmigrationType())) 
+            return null;
+
+        // FIXME: OO
+        boolean ok = false;
+        if (this instanceof ColonyTile) {
+            // Assume the work is worth doing for owned or trivially
+            // claimable colony tiles.
+            Tile tile = ((ColonyTile)this).getWorkTile();
+            ok = owner.owns(tile) || owner.canClaimForSettlement(tile);
+        } else if (this instanceof Building) {
+            Building bu = (Building)this;
+            // Make sure the type can be added.
+            if (bu.canAddType(expert)) {
+                Colony colony = getColony();
+                BuildableType bt;
+                // Assume work is worth doing if a unit is already
+                // there, or if the building has been upgraded, or if
+                // the goods are required for the current building job.
+                if (bu.getLevel() > 1 || unit != null) {
+                    ok = true;
+                } else if (colony.getTotalProductionOf(goodsType) == 0
+                    && (bt = colony.getCurrentlyBuilding()) != null) {
+                    for (AbstractGoods ag : bt.getRequiredGoods()) {
+                        if (ag.getType() == goodsType) {
+                            ok = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return (!ok) ? null
+            : new Suggestion((unit == null) ? null : unit.getType(),
+                             expert, goodsType, delta);
+    }
+
+    /**
+     * Get a map of suggestions for better or additional units.
+     *
+     * @return A mapping of either existing units or null (denoting
+     *     adding a unit) to a <code>Suggestion</code>.
+     */
+    public java.util.Map<Unit, Suggestion> getSuggestions() {
+        java.util.Map<Unit, Suggestion> result = new HashMap<>();
+        if (!canBeWorked() || canTeach()) return result;
+        
+        Occupation occ = getOccupation(null);
+        GoodsType work;
+        Suggestion sug;
+        // Check if the existing units can be improved.
+        for (Unit u : getUnitList()) {
+            if (u.getTeacher() != null) continue; // Students assumed temporary
+            if ((work = u.getWorkType()) == null) {
+                if (occ != null) work = occ.workType;
+            }
+            if ((sug = getSuggestion(u, work)) != null) {
+                result.put(u, sug);
+            }
+        }
+        // Check for a suggestion for an extra worker if there is space.
+        if (!isFull() && occ != null
+            && (work = occ.workType) != null
+            && (sug = getSuggestion(null, work)) != null) {
+            result.put(null, sug);
+        }
+        return result;
+    }
+            
+    /**
      * Get the <code>AbstractGoods</code> consumed by this work location.
      *
      * @return A list of <code>AbstractGoods</code> consumed.
      */
     public List<AbstractGoods> getInputs() {
-        return (productionType == null) ? Collections.<AbstractGoods>emptyList()
+        return (productionType == null) ? EMPTY_LIST
             : productionType.getInputs();
     }
 
@@ -292,8 +459,7 @@ public abstract class WorkLocation extends UnitLocation
      */
     public List<AbstractGoods> getProduction() {
         ProductionInfo info = getProductionInfo();
-        return (info == null) ? Collections.<AbstractGoods>emptyList()
-            : info.getProduction();
+        return (info == null) ? EMPTY_LIST : info.getProduction();
     }
 
     /**
