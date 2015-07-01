@@ -1520,7 +1520,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
                 entry.setValue(entry.getValue()
                     + t.getPotentialProduction(entry.getKey(),
-                        spec.getDefaultUnitType(owner.getNationType())));
+                        spec.getDefaultUnitType(owner)));
             }
             Player tileOwner = t.getOwner();
             if (owner == tileOwner) {

@@ -128,7 +128,7 @@ public final class TilePanel extends FreeColPanel {
         add(new JLabel(Integer.toString(movementCost)));
         
         if (tileType != null) {
-            UnitType colonist = getSpecification().getDefaultUnitType(null);
+            UnitType colonist = getSpecification().getDefaultUnitType();
             JLabel label = null;
             boolean first = true;
             for (ProductionType productionType

@@ -244,7 +244,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
                 - settlement.getUnitCount();
             if (numberOfUnits > 0) {
                 Player owner = settlement.getOwner();
-                UnitType brave = spec.getDefaultUnitType(owner.getNationType());
+                UnitType brave = spec.getDefaultUnitType(owner);
                 for (int index = 0; index < numberOfUnits; index++) {
                     settlement.add(new ServerUnit(settlement.getGame(),
                                                   settlement, owner, brave));

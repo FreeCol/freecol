@@ -205,8 +205,7 @@ public class ProductionTypeTest extends FreeColTestCase {
     private static final TileType wetlandForest
         = s.getTileType("model.tile.wetlandForest");
 
-    private static final UnitType colonistType
-        = s.getDefaultUnitType(null);
+    private static final UnitType colonistType = s.getDefaultUnitType();
 
     private Map<GoodsType, Integer> inputs = new HashMap<>();
     private Map<GoodsType, Integer> outputs = new HashMap<>();

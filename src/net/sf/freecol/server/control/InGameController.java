@@ -4076,8 +4076,7 @@ public final class InGameController extends Controller {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
         List<AbstractUnit> units = new ArrayList<>();
-        final UnitType defaultType
-            = spec.getDefaultUnitType(serverPlayer.getNationType());
+        final UnitType defaultType = spec.getDefaultUnitType(serverPlayer);
 
         if (serverPlayer.getPlayerType() == PlayerType.COLONIAL) {
             units = serverPlayer.getMonarch().getExpeditionaryForce().getUnits();

@@ -76,7 +76,7 @@ public class TensionTest extends FreeColTestCase {
 
         int unitCount = settlement.getType().getMaximumSize();
         for (int i = 0; i < unitCount; i++) {
-            UnitType unitType = spec().getDefaultUnitType(indian.getNationType());
+            UnitType unitType = spec().getDefaultUnitType(indian);
             Unit unit = new ServerUnit(game, settlement, indian, unitType);
             unit.setHomeIndianSettlement(settlement);
             if (i == 0) {

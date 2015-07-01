@@ -1280,7 +1280,20 @@ public final class Specification {
     }
 
     /**
-     * Gets the most vanilla unit type.
+     * Get the most vanilla unit type for a given player.
+     *
+     * @param player The <code>Player</code> to find the default
+     *     unit type for, or null indicating a normal player nation
+     *     (i.e. non-REF European).
+     * @return The default unit type.
+     */
+    public UnitType getDefaultUnitType(Player player) {
+        return (player == null) ? getDefaultUnitType()
+            : getDefaultUnitType(player.getNationType());
+    }
+    
+    /**
+     * Get the most vanilla unit type for a type of nation.
      *
      * Provides a type to use to make a neutral comparison of the
      * productivity of work locations.
@@ -1306,9 +1319,18 @@ public final class Specification {
                     && !ut.hasAbility(Ability.REF_UNIT)) return ut;
             }
         }
+        return getDefaultUnitType();
+    }
+    
+    /**
+     * Get the most vanilla unit type.
+     *
+     * @return The default unit type.
+     */
+    public UnitType getDefaultUnitType() {
         return getUnitType("model.unit.freeColonist"); // Drop this soon
     }
-
+    
     /**
      * Get the list of buildable unit types.
      *

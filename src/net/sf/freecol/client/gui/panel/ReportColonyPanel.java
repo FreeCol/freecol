@@ -363,8 +363,7 @@ public final class ReportColonyPanel extends ReportPanel
         final Specification spec = getSpecification();
         final GoodsType foodType = spec.getPrimaryFoodType();
         final Player owner = colony.getOwner();
-        final UnitType colonistType
-            = spec.getDefaultUnitType(owner.getNationType());
+        final UnitType colonistType = spec.getDefaultUnitType(owner);
 
         // Assemble the fundamental facts about this colony
         final String cac = colony.getId();
@@ -777,7 +776,7 @@ public final class ReportColonyPanel extends ReportPanel
         }
         final Player owner = getMyPlayer();
         final UnitType colonistType = getSpecification()
-            .getDefaultUnitType(owner.getNationType());
+            .getDefaultUnitType(owner);
         ImageIcon colonistIcon
             = new ImageIcon(lib.getTinyUnitImage(colonistType, true));
         reportPanel.add(newLabel(null, colonistIcon, null,

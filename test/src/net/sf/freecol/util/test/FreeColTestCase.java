@@ -551,8 +551,7 @@ public class FreeColTestCase extends TestCase {
                     throw new IllegalArgumentException("Default Indian player " + defaultIndianPlayer + " not in game");
                 }
             }
-            UnitType indianBraveType
-                = spec().getDefaultUnitType(indianPlayer.getNationType());
+            UnitType indianBraveType = spec().getDefaultUnitType(indianPlayer);
 
             // settlement tile no set, get default
             if(settlementTile == null){
