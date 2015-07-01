@@ -1,6 +1,7 @@
 *.classpath
 *.project
 *.settings
+*.idea
 semantic.cache*
 *~
 nbproject
