@@ -750,3 +750,11 @@ tr.trLine .leftcell {
 div.content table.contentpane {
     margin-bottom: 2em;
 }
+
+div#sflogo {
+    text-align: right;
+    position: relative;
+    right: 1px;
+    top: -27px;
+    height: 10px;
+}
