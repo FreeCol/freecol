@@ -22,9 +22,11 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
@@ -2059,87 +2061,78 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
   
     // Planning support
 
+    /** Container class for tile exploration or improvement suggestions. */
+    public static class TileImprovementSuggestion {
+
+        /**
+         * Comparator to order suggestions by descending improvement
+         * amount.
+         */
+        public static final Comparator<TileImprovementSuggestion> descendingAmountComparator
+            = new Comparator<TileImprovementSuggestion>() {
+                    @Override
+                    public int compare(TileImprovementSuggestion tis1,
+                                       TileImprovementSuggestion tis2) {
+                        int cmp = tis2.amount - tis1.amount;
+                        if (cmp == 0) cmp = tis2.tile.compareTo(tis1.tile);
+                        return cmp;
+                    }
+                };
+        
+        /** The tile to explore or improve. */
+        public Tile tile;
+        /** The tile improvement to make, or if null to explore an LCR. */
+        public TileImprovementType tileImprovementType;
+        /** The expected improvement.  INFINITY for LCRs. */
+        public int amount;
+        
+        public TileImprovementSuggestion(Tile tile, TileImprovementType t,
+                                         int amount) {
+            this.tile = tile;
+            this.tileImprovementType = t;
+            this.amount = amount;
+        }
+
+        public boolean isExploration() {
+            return this.tileImprovementType == null;
+        }
+    };
+    
     /**
-     * Collects tiles that need exploring, plowing or road building
-     * which may depend on current use within the colony.
+     * Collect suggestions for tiles that need exploration or
+     * improvement (which may depend on current use within the colony).
      *
-     * @param exploreTiles A list of <code>Tile</code>s to update with tiles
-     *     to explore.
-     * @param clearTiles A list of <code>Tile</code>s to update with tiles
-     *     to clear.
-     * @param plowTiles A list of <code>Tile</code>s to update with tiles
-     *     to plow.
-     * @param roadTiles A list of <code>Tile</code>s to update with tiles
-     *     to build roads on.
+     * @return A list of <code>TileImprovementSuggestion</code>s.
      */
-    public void getColonyTileTodo(List<Tile> exploreTiles,
-                                  List<Tile> clearTiles, List<Tile> plowTiles,
-                                  List<Tile> roadTiles) {
+    public List<TileImprovementSuggestion> getTileImprovementSuggestions() {
         final Specification spec = getSpecification();
-        final TileImprovementType clearImprovement
-            = spec.getTileImprovementType("model.improvement.clearForest");
-        final TileImprovementType plowImprovement
-            = spec.getTileImprovementType("model.improvement.plow");
-        final TileImprovementType roadImprovement
-            = spec.getTileImprovementType("model.improvement.road");
+        List<TileImprovementSuggestion> result = new ArrayList<>();
 
-        for (Tile t : getTile().getSurroundingTiles(1)) {
-            if (t.hasLostCityRumour()) exploreTiles.add(t);
+        // Encourage exploration of neighbouring rumours.
+        for (Tile tile : getTile().getSurroundingTiles(1)) {
+            if (tile.hasLostCityRumour()) {
+                result.add(new TileImprovementSuggestion(tile, null, INFINITY));
+            }
         }
 
+        // Consider improvements for all colony tiles
         for (ColonyTile ct : getColonyTiles()) {
-            Tile t = ct.getWorkTile();
-            if (t == null) continue; // Colony has not claimed the tile yet.
-
-            if ((t.getTileItemContainer() == null
-                    || t.getTileItemContainer()
-                    .getImprovement(plowImprovement) == null)
-                && plowImprovement.isTileTypeAllowed(t.getType())) {
-                if (ct.isColonyCenterTile()) {
-                    plowTiles.add(t);
-                } else {
-                    for (Unit u : ct.getUnitList()) {
-                        if (u != null && u.getWorkType() != null
-                            && plowImprovement.getBonus(u.getWorkType()) > 0) {
-                            plowTiles.add(t);
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // To assess whether other improvements are beneficial we
-            // really need a unit, doing work, so we can compare the output
-            // with and without the improvement.  This means we can skip
-            // further consideration of the colony center tile.
-            if (ct.isColonyCenterTile() || ct.isEmpty()) continue;
-
-            TileType oldType = t.getType();
-            TileType newType;
-            if ((t.getTileItemContainer() == null
-                    || t.getTileItemContainer()
-                    .getImprovement(clearImprovement) == null)
-                && clearImprovement.isTileTypeAllowed(t.getType())
-                && (newType = clearImprovement.getChange(oldType)) != null) {
-                for (Unit u : ct.getUnitList()) {
-                    if (newType.getPotentialProduction(u.getWorkType(), u.getType())
-                        > oldType.getPotentialProduction(u.getWorkType(), u.getType())) {
-                        clearTiles.add(t);
-                        break;
-                    }
-                }
-            }
-
-            if (t.getRoad() == null
-                && roadImprovement.isTileTypeAllowed(t.getType())) {
-                for (Unit u : ct.getUnitList()) {
-                    if (roadImprovement.getBonus(u.getWorkType()) > 0) {
-                        roadTiles.add(t);
-                        break;
-                    }
+            final Tile tile = ct.getWorkTile();
+            if (tile == null
+                || tile.getOwningSettlement() != this) continue;
+            
+            for (TileImprovementType t : spec.getTileImprovementTypeList()) {
+                if (t.isNatural()) continue; 
+                int improvement = ct.improvedBy(t);
+                if (improvement > 0) {
+                    result.add(new TileImprovementSuggestion(tile, t,
+                                                             improvement));
                 }
             }
         }
+        Collections.sort(result,
+            TileImprovementSuggestion.descendingAmountComparator);
+        return result;
     }
 
     /**

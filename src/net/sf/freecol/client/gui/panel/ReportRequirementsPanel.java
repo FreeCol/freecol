@@ -40,6 +40,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Colony.TileImprovementSuggestion;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Direction;
@@ -186,33 +187,26 @@ public final class ReportRequirementsPanel extends ReportPanel {
             }
         }
 
-        List<Tile> exploreTiles = new ArrayList<>();
-        List<Tile> clearTiles = new ArrayList<>();
-        List<Tile> plowTiles = new ArrayList<>();
-        List<Tile> roadTiles = new ArrayList<>();
-        colony.getColonyTileTodo(exploreTiles, clearTiles, plowTiles,
-            roadTiles);
-        for (Tile t : exploreTiles) {
-            addTileWarning(doc, colony, "report.requirements.exploreTile", t);
-        }
-        for (Tile t : clearTiles) {
-            addTileWarning(doc, colony, "report.requirements.clearTile", t);
-        }
-        for (Tile t : plowTiles) {
-            if (t == colony.getTile()) {
-                addPlowCenterWarning(doc, colony);
-            } else {
-                addTileWarning(doc, colony, "report.requirements.plowTile", t);
-            }
-        }
-        for (Tile t : roadTiles) {
-            addTileWarning(doc, colony, "report.requirements.roadTile", t);
+        List<TileImprovementSuggestion> tileSuggestions
+            = colony.getTileImprovementSuggestions();
+        for (TileImprovementSuggestion tis : tileSuggestions) {
+            // TODO-post-0.11.4-release: temporary hack until 0.11.4-release
+            String key = (tis.isExploration())
+                ? "report.requirements.exploreTile"
+                : ("model.improvement.plow".equals(tis.tileImprovementType.getId()))
+                ? ((tis.tile == colony.getTile())
+                    ? "report.requirements.plowCenter"
+                    : "report.requirements.plowTile")
+                : ("model.improvement.clearForest".equals(tis.tileImprovementType.getId()))
+                ? "report.requirements.clearTile"
+                : ("model.improvement.road".equals(tis.tileImprovementType.getId()))
+                ? "report.requirements.roadTile"
+                : null;
+            // end temporary hack
+            addTileWarning(doc, colony, key, tis.tile);
         }
 
-        if (exploreTiles.isEmpty()
-            && clearTiles.isEmpty()
-            && plowTiles.isEmpty()
-            && roadTiles.isEmpty()
+        if (tileSuggestions.isEmpty()
             && missingExpertWarning.isEmpty()
             && badAssignmentWarning.isEmpty()
             && productionWarning.isEmpty()) {
@@ -228,28 +222,18 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
     private void addTileWarning(StyledDocument doc, Colony colony,
                                 String messageId, Tile tile) {
+        if (messageId == null || !Messages.containsKey(messageId)) return;
+        // TODO-post-0.11.4-release: migrate to using Tile.getColonyTileLocationLabel()
         Direction direction = colony.getTile().getDirection(tile);
-        String message = Messages.message(StringTemplate.template(messageId)
+        StringTemplate t = StringTemplate.template(messageId)
             .addNamed("%type%", tile.getType())
-            .addNamed("%direction%", direction)
-            .addName("%colony%", colony.getName()));
+            .addName("%colony%", colony.getName());
+        if (direction != null) t.addNamed("%direction%", direction);
         try {
-            doc.insertString(doc.getLength(), "\n\n" + message,
-                doc.getStyle("regular"));
+            doc.insertString(doc.getLength(), "\n\n" + Messages.message(t),
+                             doc.getStyle("regular"));
         } catch (Exception e) {
             logger.log(Level.WARNING, "Tile warning fail", e);
-        }
-    }
-
-    private void addPlowCenterWarning(StyledDocument doc, Colony colony) {
-        String message = Messages.message(StringTemplate
-            .template("report.requirements.plowCenter")
-            .addName("%colony%", colony.getName()));
-        try {
-            doc.insertString(doc.getLength(), "\n\n" + message,
-                doc.getStyle("regular"));
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Center warning fail", e);
         }
     }
 

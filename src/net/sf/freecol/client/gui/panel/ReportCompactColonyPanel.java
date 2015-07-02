@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Colony.TileImprovementSuggestion;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FreeColObject;
@@ -67,6 +68,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -137,14 +139,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
         /** The level of teaching-building. */
         public final int schoolLevel;
 
-        /**
-         * Lists of tiles that could be explored or improved in
-         * some way.
-         */
-        public final List<Tile> exploreTiles = new ArrayList<>();
-        public final List<Tile> clearTiles = new ArrayList<>();
-        public final List<Tile> plowTiles = new ArrayList<>();
-        public final List<Tile> roadTiles = new ArrayList<>();
+        /** Possible tile improvements. */
+        public final List<TileImprovementSuggestion> tileSuggestions
+            = new ArrayList<>();
 
         /** Famine warning required? */
         public final boolean famine;
@@ -201,8 +198,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
             final Player owner = colony.getOwner();
             final GoodsType foodType = spec.getPrimaryFoodType();
 
-            colony.getColonyTileTodo(this.exploreTiles, this.clearTiles,
-                this.plowTiles, this.roadTiles);
+            this.tileSuggestions.clear();
+            this.tileSuggestions.addAll(colony.getTileImprovementSuggestions());
+
             int starve = colony.getStarvationTurns();
             if (starve < 0) {
                 this.famine = false;
@@ -457,11 +455,14 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
 
     private static StringTemplate stpl(String messageId) {
-        return StringTemplate.template(messageId);
+        return (Messages.containsKey(messageId))
+            ? StringTemplate.template(messageId)
+            : null;
     }
 
     private static StringTemplate stpld(String messageId) {
-        return stpl(Messages.descriptionKey(messageId));
+        messageId = Messages.descriptionKey(messageId);
+        return stpl(messageId);
     }
 
     private JLabel newLabel(String h, ImageIcon i, Color c) {
@@ -520,7 +521,6 @@ public final class ReportCompactColonyPanel extends ReportPanel
             : (s.bonus == 0) ? cPlain
             : (s.bonus == 1) ? cExport
             : cGood;
-        
         b = newButton(cac, s.colony.getName(), null, c, null);
         if (s.famine) b.setFont(b.getFont().deriveFont(Font.BOLD));
         reportPanel.add(b, "newline");
@@ -550,48 +550,54 @@ public final class ReportCompactColonyPanel extends ReportPanel
         // Field: The number of potential colony tiles that need
         // exploring.
         // Colour: Always cAlarm
-        if (!s.exploreTiles.isEmpty()) {
+        int n = 0;
+        for (TileImprovementSuggestion tis : s.tileSuggestions) {
+            if (tis.isExploration()) n++;
+        }
+        if (n > 0) {
             t = stpld("report.colony.exploring")
                     .addName("%colony%", s.colony.getName())
-                    .addAmount("%amount%", s.exploreTiles.size());
-            b = newButton(cac, Integer.toString(s.exploreTiles.size()),
-                             null, cAlarm, t);
+                    .addAmount("%amount%", n);
+            b = newButton(cac, Integer.toString(n), null, cAlarm, t);
         } else {
             b = null;
         }
         reportPanel.add((b == null) ? new JLabel() : b);
 
-        // Field: The number of existing colony tiles that would
-        // benefit from ploughing.
+        // Fields: The number of existing colony tiles that would
+        // benefit from improvements.
         // Colour: Always cAlarm
         // Font: Bold if one of the tiles is the colony center.
-        if (!s.plowTiles.isEmpty()) {
-            t = stpld("report.colony.plowing")
-                    .addName("%colony%", s.colony.getName())
-                    .addAmount("%amount%", s.plowTiles.size());
-            b = newButton(cac, Integer.toString(s.plowTiles.size()), null,
-                          cAlarm, t);
-            if (s.plowTiles.contains(s.colony.getTile())) {
-                b.setFont(b.getFont().deriveFont(Font.BOLD));
+        for (TileImprovementType ti : spec.getTileImprovementTypeList()) {
+            if (ti.isNatural()) continue;
+            n = 0;
+            boolean center = false; 
+            for (TileImprovementSuggestion tis : s.tileSuggestions) {
+                if (tis.tileImprovementType == ti) {
+                    n++;
+                    if (tis.tile == s.colony.getTile()) center = true;
+                }
             }
-        } else {
-            b = null;
-        }
-        reportPanel.add((b == null) ? new JLabel() : b);
-
-        // Field: The number of existing colony tiles that would
-        // benefit from a road.
-        // Colour: cAlarm
-        if (!s.roadTiles.isEmpty()) {
-            t = stpld("report.colony.roadBuilding")
+            if (n > 0) {
+                c = cAlarm;
+                // TODO-post-0.11.4-release: temporary hack until 0.11.4-release
+                String key = ("model.improvement.plow".equals(ti.getId())
+                    || "model.improvement.clearForest".equals(ti.getId()))
+                    ? "report.colony.plowing"
+                    : ("model.improvement.road".equals(ti.getId()))
+                    ? "report.colony.roadBuilding"
+                    : null;
+                t = (key == null) ? null : stpld(key)
                     .addName("%colony%", s.colony.getName())
-                    .addAmount("%amount%", s.roadTiles.size());
-            b = newButton(cac, Integer.toString(s.roadTiles.size()), null,
-                          cAlarm, t);
-        } else {
-            b = null;
+                    .addAmount("%amount%", n);
+                // end temporary hack
+                b = newButton(cac, Integer.toString(n), null, c, t);
+                if (center) b.setFont(b.getFont().deriveFont(Font.BOLD));
+            } else {
+                b = null;
+            }
+            reportPanel.add((b == null) ? new JLabel() : b);
         }
-        reportPanel.add((b == null) ? new JLabel() : b);
 
         // Fields: The net production of each storable+non-trade-goods
         // goods type.
@@ -695,8 +701,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
             c = (s.famine) ? cAlarm : cWarn;
             t = stpld("report.colony.starving")
                     .addName("%colony%", s.colony.getName())
-                    .addAmount("%turns%", -s.newColonist - 1);
-            b = newButton(cac, Integer.toString(-s.newColonist - 1), null,
+                    .addAmount("%turns%", -s.newColonist);
+            b = newButton(cac, Integer.toString(-s.newColonist), null,
                           c, t);
             if (s.famine) b.setFont(b.getFont().deriveFont(Font.BOLD));
         } else {
@@ -839,10 +845,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
         // Accumulate all the summaries
         Map<Region, Integer> rRegionMap = new HashMap<>();
-        List<Tile> rExploreTiles = new ArrayList<>();
-        List<Tile> rClearTiles = new ArrayList<>();
-        List<Tile> rPlowTiles = new ArrayList<>();
-        List<Tile> rRoadTiles = new ArrayList<>();
+        List<TileImprovementSuggestion> rTileSuggestions = new ArrayList<>();
         int rFamine = 0, rBonus = 0, rSizeChange = 0,
             teacherLen = 0, improveLen = 0;
         double rNewColonist = 0.0;
@@ -856,10 +859,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         for (ColonySummary s : summaries) {
             accumulateToMap(rRegionMap, s.colony.getTile().getRegion(), 1,
                             integerAccumulator);
-            rExploreTiles.addAll(s.exploreTiles);
-            rClearTiles.addAll(s.clearTiles);
-            rPlowTiles.addAll(s.plowTiles);
-            rRoadTiles.addAll(s.roadTiles);
+            rTileSuggestions.addAll(s.tileSuggestions);
             if (s.famine) rFamine++;
             if (s.newColonist > 0) rNewColonist += s.newColonist;
             rBonus += s.bonus;
@@ -904,20 +904,33 @@ public final class ReportCompactColonyPanel extends ReportPanel
         // Field: The number of potential colony tiles that need
         // exploring.
         // Colour: cAlarm
-        reportPanel.add((rExploreTiles.isEmpty()) ? new JLabel()
-            : newLabel(Integer.toString(rExploreTiles.size()), null, cAlarm));
+        List<Tile> tiles = new ArrayList<>();
+        for (TileImprovementSuggestion tis : rTileSuggestions) {
+            if (tis.isExploration() && !tiles.contains(tis.tile)) {
+                tiles.add(tis.tile);
+            }
+        }
+        reportPanel.add((tiles.isEmpty()) ? new JLabel()
+            : newLabel(Integer.toString(tiles.size()), null, cAlarm,
+                       stpld("report.colony.exploring.summary")));
 
-        // Field: The number of existing colony tiles that would
-        // benefit from ploughing.
+        // Fields: The number of existing colony tiles that would
+        // benefit from improvements.
         // Colour: cAlarm
-        reportPanel.add((rPlowTiles.isEmpty()) ? new JLabel()
-            : newLabel(Integer.toString(rPlowTiles.size()), null, cAlarm));
-
-        // Field: The number of existing colony tiles that would
-        // benefit from a road.
-        // Colour: cAlarm
-        reportPanel.add((rRoadTiles.isEmpty()) ? new JLabel()
-            : newLabel(Integer.toString(rRoadTiles.size()), null, cAlarm));
+        for (TileImprovementType ti : spec.getTileImprovementTypeList()) {
+            if (ti.isNatural()) continue;
+            tiles.clear();
+            for (TileImprovementSuggestion tis : rTileSuggestions) {
+                if (tis.tileImprovementType == ti
+                    && !tiles.contains(tis.tile)) {
+                    tiles.add(tis.tile);
+                }
+            }
+            reportPanel.add((tiles.isEmpty()) ? new JLabel()
+                : newLabel(Integer.toString(tiles.size()), null, cAlarm,
+                           stpld("report.colony.tile." + ti.getSuffix()
+                               + ".summary")));
+        }
 
         // Fields: The net production of each storable+non-trade-goods
         // goods type.
@@ -1011,10 +1024,17 @@ public final class ReportCompactColonyPanel extends ReportPanel
                                  stpld("report.colony.grow")));
         reportPanel.add(newLabel("report.colony.explore.header", null, null,
                                  stpld("report.colony.explore")));
-        reportPanel.add(newLabel("report.colony.plow.header", null, null,
-                                 stpld("report.colony.plow")));
-        reportPanel.add(newLabel("report.colony.road.header", null, null,
-                                 stpld("report.colony.road")));
+        for (TileImprovementType ti : this.spec.getTileImprovementTypeList()) {
+            if (ti.isNatural()) continue;
+            // TODO-post-0.11.4-release: temporary hack until 0.11.4-release
+            String key = ("model.improvement.plow".equals(ti.getId()))
+                ? "report.colony.plow"
+                : ("model.improvement.road".equals(ti.getId()))
+                ? "report.colony.plow"
+                : null;
+            // end temporary hack
+            reportPanel.add(newLabel(key + ".header", null, null, stpld(key)));
+        }
         for (GoodsType gt : this.goodsTypes) {
             ImageIcon icon = new ImageIcon(this.lib.getSmallIconImage(gt));
             JLabel l = newLabel(null, icon, null,
