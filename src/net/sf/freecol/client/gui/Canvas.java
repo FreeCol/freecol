@@ -2598,10 +2598,22 @@ public final class Canvas extends JDesktopPane {
     }
 
     void showReportColonyPanel() {
-        ReportColonyPanel r
-            = getExistingFreeColPanel(ReportColonyPanel.class);
+        boolean compact;
+        try {
+            compact = freeColClient.getClientOptions()
+                .getInteger(ClientOptions.COLONY_REPORT)
+                == ClientOptions.COLONY_REPORT_COMPACT;
+        } catch (Exception e) {
+            compact = false;
+        }
+        ReportPanel r
+            = getExistingFreeColPanel((compact) ? ReportCompactColonyPanel.class
+                : ReportClassicColonyPanel.class);
         if (r == null) {
-            showSubPanel(new ReportColonyPanel(freeColClient), true);
+            showSubPanel((compact)
+                ? new ReportCompactColonyPanel(freeColClient)
+                : new ReportClassicColonyPanel(freeColClient),
+                true);
         }
     }
 
