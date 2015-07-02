@@ -731,6 +731,8 @@ form {
     padding: 0;
 }
 
+/* New CSS for site cleanup */
+
 div.warningbox {
     border: #9F6000 1px solid;
     margin: .5em 0;
