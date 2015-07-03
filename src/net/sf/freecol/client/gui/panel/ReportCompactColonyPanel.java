@@ -34,6 +34,7 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -413,52 +414,6 @@ public final class ReportCompactColonyPanel extends ReportPanel
         return b;
     }
 
-    private void addUnits(final Map<UnitType, Suggestion> suggestions,
-        List<UnitType> have, Colony colony) {
-        final String cac = colony.getId();
-
-        String layout = (suggestions.size() <= 1) ? null
-            : "split " + Integer.toString(suggestions.size());
-        List<UnitType> types = new ArrayList<>();
-        types.addAll(suggestions.keySet());
-        Collections.sort(types, new Comparator<UnitType>() {
-                @Override
-                public int compare(UnitType t1, UnitType t2) {
-                    int cmp = suggestions.get(t2).amount
-                        - suggestions.get(t1).amount;
-                    return (cmp != 0) ? cmp
-                        : t1.getId().compareTo(t2.getId());
-                }
-            });
-        for (UnitType type : types) {
-            boolean present = false;
-            if (have.contains(type)) {
-                have.remove(type);
-                present = true;
-            }
-            Suggestion suggestion = suggestions.get(type);
-            String label = Integer.toString(suggestion.amount);
-            ImageIcon icon
-                = new ImageIcon(this.lib.getTinyUnitImage(type, true));
-            StringTemplate tip = (suggestion.oldType == null)
-                ? stpl("report.colony.wanting.description")
-                    .addName("%colony%", colony.getName())
-                    .addNamed("%unit%", type)
-                    .addNamed("%goods%", suggestion.goodsType)
-                    .addAmount("%amount%", suggestion.amount)
-                : stpl("report.colony.improving.description")
-                    .addName("%colony%", colony.getName())
-                    .addNamed("%oldUnit%", suggestion.oldType)
-                    .addNamed("%unit%", type)
-                    .addNamed("%goods%", suggestion.goodsType)
-                    .addAmount("%amount%", suggestion.amount);
-            JButton b = colourButton(cac, label, icon,
-                                     (present) ? cGood : cPlain, tip);
-            reportPanel.add(b, layout);
-            layout = null;
-        }
-    }
-
     /**
      * Update a single colony.
      *
@@ -636,12 +591,13 @@ public final class ReportCompactColonyPanel extends ReportPanel
             b = colourButton(cac, Integer.toString(s.newColonist),
                              null, cGood, t);
         } else if (s.newColonist < 0) {
-            c = (s.newColonist >= -Colony.FAMINE_TURNS) ? cAlarm : cWarn;
+            c = (s.famine) ? cAlarm : cWarn;
             t = stpl("report.colony.starving.description")
                     .addName("%colony%", colony.getName())
                     .addAmount("%turns%", -s.newColonist);
             b = colourButton(cac, Integer.toString(-s.newColonist),
                              null, c, t);
+            if (s.famine) b.setFont(b.getFont().deriveFont(Font.BOLD));
         } else {
             b = null;
         }
@@ -688,6 +644,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
                         .addAmount("%turns%", -turns - 1);
                 b = colourButton(qac, name + " " + Integer.toString(-turns-1),
                                  null, cAlarm, t);
+                if (turns == -1) b.setFont(b.getFont().deriveFont(Font.BOLD));
             }
         }
         reportPanel.add(b, layout);
@@ -718,21 +675,65 @@ public final class ReportCompactColonyPanel extends ReportPanel
             reportPanel.add(b);
         }
 
-        // Field: The units that could be upgraded.
-        if (!s.improve.isEmpty()) {
-            addUnits(s.improve, s.couldWork, colony);
-        } else {
+        // Field: The units that could be upgraded, followed by the units
+        // that could be added.
+        if (s.improve.isEmpty() && s.want.isEmpty()) {
             reportPanel.add(new JLabel());
-        }
-
-        // Field: The units the colony could make good use of.
-        if (!s.want.isEmpty()) { // FIXME: explain food limitations better
-            addUnits(s.want, s.couldWork, colony);
         } else {
-            reportPanel.add(new JLabel());
+            List<JComponent> buttons = new ArrayList<>();
+            buttons.addAll(addUnits(s.improve, s.couldWork, colony));
+            buttons.add(new JLabel("/"));
+            buttons.addAll(addUnits(s.want, s.couldWork, colony));
+            layout = "split " + (s.improve.size() + s.want.size() + 1);
+            for (JComponent jc : buttons) {
+                reportPanel.add(jc, layout);
+                layout = null;
+            }
         }
 
         // TODO: notWorking?
+    }
+
+    private List<JButton> addUnits(final Map<UnitType, Suggestion> suggestions,
+                                   List<UnitType> have, Colony colony) {
+        final String cac = colony.getId();
+
+        List<JButton> result = new ArrayList<>();
+        List<UnitType> types = new ArrayList<>();
+        types.addAll(suggestions.keySet());
+        Collections.sort(types, new Comparator<UnitType>() {
+                @Override
+                public int compare(UnitType t1, UnitType t2) {
+                    int cmp = suggestions.get(t2).amount
+                        - suggestions.get(t1).amount;
+                    return (cmp != 0) ? cmp
+                        : t1.getId().compareTo(t2.getId());
+                }
+            });
+        for (UnitType type : types) {
+            boolean present = have.contains(type);
+            Suggestion suggestion = suggestions.get(type);
+            String label = Integer.toString(suggestion.amount);
+            ImageIcon icon
+                = new ImageIcon(this.lib.getTinyUnitImage(type, false));
+            StringTemplate tip = (suggestion.oldType == null)
+                ? stpl("report.colony.wanting.description")
+                    .addName("%colony%", colony.getName())
+                    .addNamed("%unit%", type)
+                    .addNamed("%goods%", suggestion.goodsType)
+                    .addAmount("%amount%", suggestion.amount)
+                : stpl("report.colony.improving.description")
+                    .addName("%colony%", colony.getName())
+                    .addNamed("%oldUnit%", suggestion.oldType)
+                    .addNamed("%unit%", type)
+                    .addNamed("%goods%", suggestion.goodsType)
+                    .addAmount("%amount%", suggestion.amount);
+            JButton b = colourButton(cac, label, icon,
+                                     (present) ? cGood : cPlain, tip);
+            if (present) b.setFont(b.getFont().deriveFont(Font.BOLD));
+            result.add(b);
+        }
+        return result;
     }
 
     /**
@@ -774,8 +775,6 @@ public final class ReportCompactColonyPanel extends ReportPanel
                                  stpl("report.colony.making.description")));
         reportPanel.add(newLabel("report.colony.improve.header", null, null,
                                  stpl("report.colony.improve.description")));
-        reportPanel.add(newLabel("report.colony.wanted.header", null, null,
-                                 stpl("report.colony.wanted.description")));
 
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL),
                         "newline, span, growx");

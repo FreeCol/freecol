@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -57,6 +58,21 @@ public abstract class WorkLocation extends UnitLocation
     /** Container class to suggest a better use of a unit. */
     public static class Suggestion {
 
+        public static final Comparator<Suggestion> descendingAmountComparator
+            = new Comparator<Suggestion>() {
+                    @Override
+                    public int compare(Suggestion s1, Suggestion s2) {
+                        int cmp = s2.amount - s1.amount;
+                        if (cmp == 0) {
+                            cmp = s2.goodsType.getId().compareTo(s1.goodsType.getId());
+                        }
+                        if (cmp == 0) {
+                            cmp = s2.newType.getId().compareTo(s1.newType.getId());
+                        }
+                        return cmp;
+                    }
+                };
+                    
         public final UnitType oldType;
         public final UnitType newType;
         public final GoodsType goodsType;
