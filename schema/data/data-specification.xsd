@@ -409,6 +409,9 @@
       <xs:attribute name="maximum-experience" type="xs:nonNegativeInteger"/>
       <xs:attribute name="maximum-attrition" type="xs:nonNegativeInteger"/>
       <xs:attribute name="increasing-price" type="xs:nonNegativeInteger"/>
+      <!-- @compat 0.11.3: drop optional in due course -->
+      <xs:attribute name="priority" use="optional" type="xs:nonNegativeInteger"/>
+      <!-- end @compat 0.11.3 -->
       <!-- @compat 0.11.3 -->
       <xs:attribute name="defaultUnit" use="optional" type="xs:boolean"/>
       <xs:attribute name="lineOfSight" use="optional" type="xs:nonNegativeInteger"/>

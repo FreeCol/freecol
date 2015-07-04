@@ -171,17 +171,15 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
                 .getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW);
             List<AbstractGoods> consumption = new ArrayList<>();
             for (AbstractGoods ag : current.getRequiredGoods()) {
-                boolean satisfied = false;
-                AbstractGoods available = AbstractGoods.findByType(ag.getType(), input);
+                AbstractGoods available
+                    = AbstractGoods.findByType(ag.getType(), input);
                 if (available != null
                     && ag.getAmount() <= available.getAmount()) {
                     int amount = (overflow || ag.getType().isStorable())
                         ? ag.getAmount()
                         : available.getAmount();
                     consumption.add(new AbstractGoods(ag.getType(), amount));
-                    satisfied = true;
-                }
-                if (!satisfied) { // don't build anything
+                } else { // don't build anything
                     return result;
                 }
             }

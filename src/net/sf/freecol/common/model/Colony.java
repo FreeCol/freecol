@@ -1909,7 +1909,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * Returns a list of all {@link Consumer}s in the colony sorted by
+     * Get a list of all {@link Consumer}s in the colony sorted by
      * priority. Consumers include all object that consume goods,
      * e.g. Units, Buildings and BuildQueues.
      *

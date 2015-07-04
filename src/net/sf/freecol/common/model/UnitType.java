@@ -97,6 +97,9 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     private int maximumAttrition = INFINITY;
 
+    /** Consumption order. */
+    private int priority = Consumer.UNIT_PRIORITY;
+
     /** The skill this UnitType teaches, mostly its own. */
     private UnitType skillTaught = null;
 
@@ -680,8 +683,7 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     @Override
     public int getPriority() {
-        // FIXME: make this configurable
-        return UNIT_PRIORITY;
+        return priority;
     }
 
     /**
@@ -711,6 +713,7 @@ public final class UnitType extends BuildableType implements Consumer {
     private static final String MAXIMUM_ATTRITION_TAG = "maximum-attrition";
     private static final String OFFENCE_TAG = "offence";
     private static final String PRICE_TAG = "price";
+    private static final String PRIORITY_TAG = "priority";
     private static final String RECRUIT_PROBABILITY_TAG = "recruit-probability";
     private static final String SCORE_VALUE_TAG = "score-value";
     private static final String SKILL_TAG = "skill";
@@ -778,6 +781,8 @@ public final class UnitType extends BuildableType implements Consumer {
         if (expertProduction != null) {
             xw.writeAttribute(EXPERT_PRODUCTION_TAG, expertProduction);
         }
+
+        xw.writeAttribute(PRIORITY_TAG, priority);
     }
 
     /**
@@ -899,6 +904,9 @@ public final class UnitType extends BuildableType implements Consumer {
         // end @compat 0.11.3
             recruitProbability = xr.getAttribute(RECRUIT_PROBABILITY_TAG,
                                                  parent.recruitProbability);
+
+        // New in 0.11.4, but default is backward compatible.
+        priority = xr.getAttribute(PRIORITY_TAG, Consumer.UNIT_PRIORITY);
 
         skill = xr.getAttribute(SKILL_TAG, parent.skill);
 

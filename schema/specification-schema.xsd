@@ -82,6 +82,7 @@
      0.103: incrementType -> increment-type
      0.104: Fix capitalization in Scope.
      0.105: Fix capitalization in Operand.
+     0.106: Add priority to unit-type.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -534,6 +535,10 @@
       <xs:attribute name="skill-taught" type="xs:string"/>
       <xs:attribute name="space" type="xs:nonNegativeInteger"/>
       <xs:attribute name="space-taken" type="xs:nonNegativeInteger"/>
+
+      <!-- @compat 0.11.3: drop optional in due course -->
+      <xs:attribute name="priority" use="optional" type="xs:nonNegativeInteger"/>
+      <!-- end @compat 0.11.3 -->
 
       <!-- @compat 0.11.3 -->
       <xs:attribute name="defaultUnit" use="optional" type="xs:boolean"/>

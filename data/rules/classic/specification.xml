@@ -1408,7 +1408,8 @@
     <!-- ATTENTION: skill-taught can NOT be inherited because it
          defaults to the unit type itself! -->
     <unit-type id="colonist" abstract="true" 
-               offence="0" defence="1" movement="3" line-of-sight="1">
+               offence="0" defence="1" movement="3" line-of-sight="1"
+               priority="1000">
       <ability id="model.ability.person"
                value="true"/>
       <ability id="model.ability.foundColony"
