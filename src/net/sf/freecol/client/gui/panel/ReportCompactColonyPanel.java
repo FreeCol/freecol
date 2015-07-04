@@ -53,12 +53,15 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Occupation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -69,6 +72,7 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.WorkLocation.Suggestion;
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.CollectionUtils.Accumulator;
 
 
 /**
@@ -93,6 +97,22 @@ public final class ReportCompactColonyPanel extends ReportPanel
             PRODUCTION,  // Positive production but could produce more
             CONSUMPTION, // Positive production but could consume more
         };
+
+        public static Accumulator<GoodsProduction> goodsProductionAccumulator
+            = new Accumulator<GoodsProduction>() {
+                    public GoodsProduction accumulate(GoodsProduction g1,
+                                                      GoodsProduction g2) {
+                        g1.amount += g2.amount;
+                        g1.status = (g1.status == ProductionStatus.NONE
+                            && g2.status == ProductionStatus.NONE)
+                            ? ProductionStatus.NONE
+                            : (g1.amount < 0) ? ProductionStatus.BAD
+                            : (g1.amount > 0) ? ProductionStatus.GOOD
+                            : ProductionStatus.ZERO;
+                        g1.extra = 0;
+                        return g1;
+                    }
+                };
 
         /** Container class for goods production. */
         public static class GoodsProduction {
@@ -381,6 +401,17 @@ public final class ReportCompactColonyPanel extends ReportPanel
     public ReportCompactColonyPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportColonyAction");
 
+        final Player player = getMyPlayer();
+        final Comparator<Colony> colonyComparator = freeColClient
+            .getClientOptions().getColonyComparator();
+        final Comparator<List<Colony>> firstColonyComparator
+            = new Comparator<List<Colony>>() {
+                @Override
+                public int compare(List<Colony> l1, List<Colony> l2) {
+                    return colonyComparator.compare(l1.get(0), l2.get(0));
+                }
+            };
+
         this.spec = getSpecification();
         this.lib = getImageLibrary();
         
@@ -393,12 +424,12 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 appendToMapList(continents, c.getTile().getContiguity(), c);
             }
         }
-        for (Entry<Integer, List<Colony>> e
-                 : mapEntriesByKey(continents, descendingIntegerComparator)) {
+        for (Entry<Integer, List<Colony>> e 
+                 : mapEntriesByValue(continents, firstColonyComparator)) {
             this.colonies.add(e.getValue());
         }
 
-        this.market = getMyPlayer().getMarket();
+        this.market = player.getMarket();
 
         this.goodsTypes.addAll(spec.getGoodsTypeList());
         Iterator<GoodsType> gti = goodsTypes.iterator();
@@ -760,7 +791,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
         // TODO: notWorking?
     }
-
+    
     private List<JButton> unitButtons(final Map<UnitType, Suggestion> suggestions,
                                       List<UnitType> have, Colony colony) {
         final String cac = colony.getId();
@@ -802,6 +833,176 @@ public final class ReportCompactColonyPanel extends ReportPanel
         return result;
     }
 
+    /**
+     * Update several colonies.
+     *
+     * @param summaries A list of <code>ColonySummary</code>s to update from.
+     */
+    private void updateCombinedColonies(List<ColonySummary> summaries) {
+        JLabel l;
+        Color c;
+        StringTemplate t;
+
+        reportPanel.add(new JSeparator(JSeparator.HORIZONTAL),
+                        "newline, span, growx");
+
+        // Accumulate all the summaries
+        Map<Region, Integer> rRegionMap = new HashMap<>();
+        List<Tile> rExploreTiles = new ArrayList<>();
+        List<Tile> rClearTiles = new ArrayList<>();
+        List<Tile> rPlowTiles = new ArrayList<>();
+        List<Tile> rRoadTiles = new ArrayList<>();
+        int rFamine = 0, rBonus = 0, rSizeChange = 0,
+            teacherLen = 0, improveLen = 0;
+        double rNewColonist = 0.0;
+        Map<GoodsType, ColonySummary.GoodsProduction> rProduction
+            = new HashMap<>();
+        Map<UnitType, Integer> rTeachers = new HashMap<>();
+        List<Unit> rNotWorking = new ArrayList<>();
+        List<UnitType> rCouldWork = new ArrayList<>();
+        Map<UnitType, Integer> rImprove = new HashMap<>();
+        Map<GoodsType, Double> rNeeded = new HashMap<>();
+        for (ColonySummary s : summaries) {
+            accumulateToMap(rRegionMap, s.colony.getTile().getRegion(), 1,
+                            integerAccumulator);
+            rExploreTiles.addAll(s.exploreTiles);
+            rClearTiles.addAll(s.clearTiles);
+            rPlowTiles.addAll(s.plowTiles);
+            rRoadTiles.addAll(s.roadTiles);
+            if (s.famine) rFamine++;
+            if (s.newColonist > 0) rNewColonist += s.newColonist;
+            rBonus += s.bonus;
+            rSizeChange += s.sizeChange;
+            accumulateMap(rProduction, s.production,
+                          ColonySummary.goodsProductionAccumulator);
+            teacherLen = Math.max(teacherLen, s.teachers.size());
+            for (Unit u : s.teachers.keySet()) {
+                accumulateToMap(rTeachers, u.getType(), 1, integerAccumulator);
+            }
+            rNotWorking.addAll(s.notWorking);
+            rCouldWork.addAll(s.couldWork);
+            improveLen = Math.max(improveLen, s.improve.size() + s.want.size());
+            for (UnitType ut : s.improve.keySet()) {
+                accumulateToMap(rImprove, ut, 1, integerAccumulator);
+            }
+            for (UnitType ut : s.want.keySet()) {
+                accumulateToMap(rImprove, ut, 1, integerAccumulator);
+            }
+            if (s.needed != null && s.needed.getType().isStorable()) {
+                accumulateToMap(rNeeded, s.needed.getType(),
+                    (double)s.needed.getAmount() / s.completeTurns,
+                    doubleAccumulator);
+            }
+        }
+        rNewColonist = Math.round(rNewColonist / summaries.size());
+
+        // Field: A label for the most settled region in the list.
+        // Colour: Plain
+        t = mapEntriesByValue(rRegionMap, descendingIntegerComparator)
+            .get(0).getKey().getLabel();
+        reportPanel.add(newLabel(Messages.message(t), null, cPlain,
+                                 stpld("report.colony.name.summary")),
+                        "newline");
+
+        // Field: The total of the size change field.
+        // Colour: cGood if efficient/cAlarm if inefficient.
+        reportPanel.add(newLabel(Integer.toString(rSizeChange), null,
+                                 (rSizeChange < 0) ? cAlarm : cGood,
+                                 stpld("report.colony.growing.summary")));
+
+        // Field: The number of potential colony tiles that need
+        // exploring.
+        // Colour: cAlarm
+        reportPanel.add((rExploreTiles.isEmpty()) ? new JLabel()
+            : newLabel(Integer.toString(rExploreTiles.size()), null, cAlarm));
+
+        // Field: The number of existing colony tiles that would
+        // benefit from ploughing.
+        // Colour: cAlarm
+        reportPanel.add((rPlowTiles.isEmpty()) ? new JLabel()
+            : newLabel(Integer.toString(rPlowTiles.size()), null, cAlarm));
+
+        // Field: The number of existing colony tiles that would
+        // benefit from a road.
+        // Colour: cAlarm
+        reportPanel.add((rRoadTiles.isEmpty()) ? new JLabel()
+            : newLabel(Integer.toString(rRoadTiles.size()), null, cAlarm));
+
+        // Fields: The net production of each storable+non-trade-goods
+        // goods type.
+        // Colour: cWarn if negative, empty if no production,
+        // cPlain if production balanced at zero, otherwise cGood.
+        for (GoodsType gt : this.goodsTypes) {
+            final ColonySummary.GoodsProduction gp = rProduction.get(gt);
+            switch (gp.status) {
+            case BAD:
+                c = cWarn;
+                break;
+            case NONE:
+                c = null;
+                break;
+            case ZERO:
+                c = cPlain;
+                break;
+            case GOOD:
+                c = cGood;
+                break;
+            default:
+                throw new IllegalStateException("Bogus status: " + gp.status);
+            }
+            reportPanel.add((c == null) ? new JLabel()
+                : newLabel(Integer.toString(gp.amount), null, c,
+                    stpld("report.colony.production.summary")
+                        .addNamed("%goods%", gt)));
+        }
+
+        // Field: New colonist arrival or famine warning.
+        // Colour: cWarn if negative, else cGood
+        reportPanel.add(newLabel(Integer.toString((int)rNewColonist), null,
+                                 (rNewColonist < 0) ? cWarn : cGood,
+                                 stpld("report.colony.arriving.summary")));
+
+        // Field: The required goods rates.
+        // Colour: cPlain
+        List<JLabel> labels = new ArrayList<>();
+        for (Entry<GoodsType, Double> e
+                 : mapEntriesByValue(rNeeded, descendingDoubleComparator)) {
+            labels.add(newLabel(String.format("%4.1f %s", e.getValue(),
+                                              Messages.getName(e.getKey())),
+                                null, cPlain,
+                                stpld("report.colony.making.summary")
+                                    .addNamed("%goods%", e.getKey())));
+        }
+
+        // Field: What is being trained (attached to previous)
+        // Colour: cPlain.
+        teacherLen = Math.max(3, teacherLen); // Always some room here
+        labels.addAll(unitTypeLabels(rTeachers, teacherLen,
+                stpld("report.colony.making.educating.summary")));
+        addTogether(labels);
+
+        // Field: The units that could be upgraded, followed by the units
+        // that could be added.
+        addTogether(unitTypeLabels(rImprove, improveLen,
+                stpld("report.colony.improving.summary")));
+    }
+
+    private List<JLabel> unitTypeLabels(Map<UnitType, Integer> unitTypeMap,
+                                        int maxSize, StringTemplate t) {
+        List<JLabel> result = new ArrayList<>();
+        int n = 0;
+        for (Entry<UnitType, Integer> e
+                 : mapEntriesByValue(unitTypeMap, descendingIntegerComparator)) {
+            ImageIcon icon
+                = new ImageIcon(this.lib.getTinyUnitImage(e.getKey(), false));
+            result.add(newLabel(Integer.toString(e.getValue()), icon,
+                                                 cPlain, t));
+            if (++n >= maxSize) break;
+        }
+        
+        return result;
+    }                
+        
     /**
      * Display the header area for the concise panel.
      *
@@ -860,10 +1061,16 @@ public final class ReportCompactColonyPanel extends ReportPanel
                                             cols, ""));
 
         conciseHeaders(this.market);
+        List<ColonySummary> summaries = new ArrayList<>();
         for (List<Colony> cs : this.colonies) {
+            summaries.clear();
             for (Colony c : cs) {
                 ColonySummary s = new ColonySummary(c, this.goodsTypes);
+                summaries.add(s);
                 updateColony(s);
+            }
+            if (cs.size() > 1) {
+                updateCombinedColonies(summaries);
             }
             conciseHeaders(this.market);
         }

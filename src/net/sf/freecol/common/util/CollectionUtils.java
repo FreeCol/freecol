@@ -49,6 +49,18 @@ public class CollectionUtils {
                 return i1 - i2;
             }
         };
+    public static final Comparator<Double> descendingDoubleComparator
+        = new Comparator<Double>() {
+            public int compare(Double d1, Double d2) {
+                return (d2 > d1) ? 1 : (d2 < d1) ? -1 : 0;
+            }
+        };
+    public static final Comparator<Double> ascendingDoubleComparator
+        = new Comparator<Double>() {
+            public int compare(Double d1, Double d2) {
+                return (d1 > d2) ? 1 : (d1 < d2) ? -1 : 0;
+            }
+        };
 
     /** Comparator to order lists by decreasing length. */
     public static final Comparator<List<?>> listLengthComparator
@@ -101,6 +113,41 @@ public class CollectionUtils {
             map.put(key, l);
         } else if (!l.contains(value)) {
             l.add(value);
+        }
+    }
+
+    public abstract static class Accumulator<T> {
+        public abstract T accumulate(T t1, T t2);
+    };
+
+    /** Trivial integer accumulator. */
+    public static Accumulator<Integer> integerAccumulator
+        = new Accumulator<Integer>() {
+            public Integer accumulate(Integer i1, Integer i2) {
+                return i1 + i2;
+            }
+        };
+    /** Trivial double accumulator. */
+    public static Accumulator<Double> doubleAccumulator
+        = new Accumulator<Double>() {
+            public Double accumulate(Double d1, Double d2) {
+                return d1 + d2;
+            }
+        };
+
+    public static <K,V> void accumulateToMap(Map<K,V> map, K key, V value,
+                                             Accumulator<V> accumulator) {
+        if (map.containsKey(key)) {
+            map.put(key, accumulator.accumulate(map.get(key), value));
+        } else {
+            map.put(key, value);
+        }
+    }
+
+    public static <K,V> void accumulateMap(Map<K,V> map1, Map<K,V> map2,
+                                           Accumulator<V> accumulator) {
+        for (Entry<K,V> e : map2.entrySet()) {
+            accumulateToMap(map1, e.getKey(), e.getValue(), accumulator);
         }
     }
 
