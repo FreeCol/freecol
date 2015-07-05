@@ -2335,13 +2335,14 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
         List<AbstractGoods> input = info.getConsumptionDeficit();
         if (input.isEmpty()) return null;
-
+        StringTemplate label = StringTemplate.label(", ");
+        for (AbstractGoods ag : input) label.addStringTemplate(ag.getLabel());
+        
         return StringTemplate.template("model.colony.insufficientProduction")
             .addName("%colony%", getName())
             .addNamed("%outputType%", deficit.getType())
             .addAmount("%outputAmount%", deficit.getAmount())
-            .addNamed("%inputType%", input.get(0).getType())
-            .addAmount("%inputAmount%", input.get(0).getAmount());
+            .addStringTemplate("%consumptionDeficit%", label);
     }
 
     /**
