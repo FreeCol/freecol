@@ -2250,6 +2250,49 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
+     * Check if a goods type is still useful to this colony.
+     *
+     * In general, all goods are useful.  However post-independence there is
+     * no need for more liberty once Sol% reaches 100, nor immigration.
+     * Note the latter may change when we implement sailing to other European
+     * ports.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     */
+    public boolean goodsUseful(GoodsType goodsType) {
+        if (getOwner().getPlayerType() == Player.PlayerType.INDEPENDENT) {
+            if ((goodsType.isLibertyType() && getSoLPercentage() >= 100)
+                || goodsType.isImmigrationType()) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Special goods need modifiers applied when changed, and immigration
+     * accumulates to the owner.
+     *
+     * @param goodsType The <code>GoodsType</code> to modify.
+     * @param amount The amount of modification.
+     */
+    private void modifySpecialGoods(GoodsType goodsType, int amount) {
+        final Turn turn = getGame().getTurn();
+        Set<Modifier> mods;
+
+        mods = goodsType.getModifiers(Modifier.LIBERTY);
+        if (!mods.isEmpty()) {
+            int liberty = (int)applyModifiers(amount, turn, mods);
+            modifyLiberty(liberty);
+        }
+
+        mods = goodsType.getModifiers(Modifier.IMMIGRATION);
+        if (!mods.isEmpty()) {
+            int migration = (int)applyModifiers(amount, turn, mods);
+            modifyImmigration(migration);
+            getOwner().modifyImmigration(migration);
+        }
+    }
+    
+    /**
      * Creates a temporary copy of this colony for planning purposes.
      *
      * A simple colony.copy() can not work because all the colony
@@ -2482,24 +2525,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         productionCache.invalidate(type);
         if (removed != null) modifySpecialGoods(type, -removed.getAmount());
         return removed;
-    }
-
-    private void modifySpecialGoods(GoodsType goodsType, int amount) {
-        final Turn turn = getGame().getTurn();
-        Set<Modifier> mods;
-
-        mods = goodsType.getModifiers(Modifier.LIBERTY);
-        if (!mods.isEmpty()) {
-            int liberty = (int)applyModifiers(amount, turn, mods);
-            modifyLiberty(liberty);
-        }
-
-        mods = goodsType.getModifiers(Modifier.IMMIGRATION);
-        if (!mods.isEmpty()) {
-            int migration = (int)applyModifiers(amount, turn, mods);
-            modifyImmigration(migration);
-            getOwner().modifyImmigration(migration);
-        }
     }
 
 

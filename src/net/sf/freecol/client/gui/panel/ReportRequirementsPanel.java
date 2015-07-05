@@ -167,6 +167,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
                     && !building.getUnitList().isEmpty()
                     && !missingExpertWarning.contains(expert)
                     && unitCount.get(colony).getCount(expert) == 0) {
+                    // Post-independence, special goods requirements diminish.
+                    if (!colony.goodsUseful(goodsType)) continue;
                     addExpertWarning(doc, colony, goodsType, expert);
                     missingExpertWarning.add(expert);
                 }
