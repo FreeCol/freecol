@@ -176,6 +176,13 @@ public final class ReportTradePanel extends ReportPanel {
                     : Utility.CELLBORDER);
                 goodsLabel.setForeground(GoodsLabel.getColor(goodsType, amount,
                                                              colony));
+                ExportData ed = colony.getExportData(goodsType);
+                if (ed.getExported()) {
+                    goodsLabel.setToolTipText(Messages.message(StringTemplate
+                            .template("report.trade.export")
+                            .addNamed("%goods%", goodsType)
+                            .addAmount("%amount%", ed.getExportLevel())));
+                }
                 reportPanel.add(goodsLabel, "cell " + column + " " + row);
 
                 int production = colony.getNetProductionOf(goodsType);
