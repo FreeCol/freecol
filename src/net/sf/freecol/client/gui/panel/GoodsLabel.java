@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Color;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
@@ -62,6 +63,32 @@ public final class GoodsLabel extends AbstractGoodsLabel
 
 
     /**
+     * Public routine to get a foreground color for a given goods type and
+     * amount in a given location.
+     *
+     * @param goodsType The <code>GoodsType</code> to use.
+     * @param amount The amount of goods.
+     * @param location The <code>Location</code> for the goods.
+     * @return A suitable <code>color</code>.
+     */
+    public static Color getColor(GoodsType goodsType, int amount,
+                                 Location location) {
+        String key = (!goodsType.limitIgnored()
+            && location instanceof Colony
+            && ((Colony)location).getWarehouseCapacity() < amount)
+            ? "color.foreground.GoodsLabel.capacityExceeded"
+            : (location instanceof Colony && goodsType.isStorable()
+                && ((Colony)location).getExportData(goodsType).getExported())
+            ? "color.foreground.GoodsLabel.exported"
+            : (amount == 0)
+            ? "color.foreground.GoodsLabel.zeroAmount"
+            : (amount < 0)
+            ? "color.foreground.GoodsLabel.negativeAmount"
+            : "color.foreground.GoodsLabel.positiveAmount";
+        return ResourceManager.getColor(key);
+    }
+
+    /**
      * Initialize this label.
      */
     private void initialize() {
@@ -87,19 +114,7 @@ public final class GoodsLabel extends AbstractGoodsLabel
             setIcon(getDisabledIcon());
         }
 
-        String key = (!goods.getType().limitIgnored()
-            && location instanceof Colony
-            && ((Colony)location).getWarehouseCapacity() < goods.getAmount())
-            ? "color.foreground.GoodsLabel.capacityExceeded"
-            : (location instanceof Colony && type.isStorable()
-                && ((Colony)location).getExportData(type).getExported())
-            ? "color.foreground.GoodsLabel.exported"
-            : (goods.getAmount() == 0)
-            ? "color.foreground.GoodsLabel.zeroAmount"
-            : (goods.getAmount() < 0)
-            ? "color.foreground.GoodsLabel.negativeAmount"
-            : "color.foreground.GoodsLabel.positiveAmount";
-        setForeground(ResourceManager.getColor(key));
+        setForeground(getColor(type, goods.getAmount(), location));
         super.setText(String.valueOf(goods.getAmount()));
     }
 
