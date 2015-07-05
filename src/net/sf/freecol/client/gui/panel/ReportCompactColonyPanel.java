@@ -667,17 +667,19 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 break;
             case PRODUCTION:
                 c = cWarn;
-                t = stpld("report.colony.production")
+                t = stpld("report.colony.production.maxProduction")
                         .addName("%colony%", s.colony.getName())
                         .addNamed("%goods%", gt)
-                        .addAmount("%amount%", gp.amount);
+                        .addAmount("%amount%", gp.amount)
+                        .addAmount("%more%", gp.extra);
                 break;
             case CONSUMPTION:
                 c = cWarn;
-                t = stpld("report.colony.production")
+                t = stpld("report.colony.production.maxConsumption")
                         .addName("%colony%", s.colony.getName())
                         .addNamed("%goods%", gt)
-                        .addAmount("%amount%", gp.amount);
+                        .addAmount("%amount%", gp.amount)
+                        .addAmount("%more%", gp.extra);
                 break;
             default:
                 throw new IllegalStateException("Bogus status: " + gp.status);
