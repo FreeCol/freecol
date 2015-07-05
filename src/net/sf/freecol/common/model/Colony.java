@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -2153,17 +2152,17 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * Determine if there is a problem with the production of the
-     * specified goods type.
+     * Determine if there is a problem with the production of a given
+     * goods type.
      *
      * @param goodsType The <code>GoodsType</code> to check.
-     * @param amount The amount in the warehouse.
-     * @param production The production per turn.
      * @return A collection of warning messages.
      */
-    public Collection<StringTemplate> getWarnings(GoodsType goodsType, int amount, int production) {
-        List<StringTemplate> result = new LinkedList<>();
-        
+    public Collection<StringTemplate> getProductionWarnings(GoodsType goodsType) {
+        List<StringTemplate> result = new ArrayList<>();
+        final int amount = getGoodsCount(goodsType);
+        final int production = getNetProductionOf(goodsType);
+
         if (goodsType.isFoodType() && goodsType.isStorable()) {
             // Food is never wasted -> new settler is produced
             if (amount + production < 0) {
@@ -2201,17 +2200,23 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         }
 
         for (WorkLocation wl : getWorkLocationsForProducing(goodsType)) {
-            addInsufficientProductionMessage(result,
-                productionCache.getProductionInfo(wl));
+            ProductionInfo info = getProductionInfo(wl);
+            if (info == null) continue;
+            StringTemplate t = getInsufficientProductionMessage(info,
+                AbstractGoods.findByType(goodsType,
+                    info.getProductionDeficit()));
+            if (t != null) result.add(t);
         }
         for (WorkLocation wl : getWorkLocationsForConsuming(goodsType)) {
+            ProductionInfo info = getProductionInfo(wl);
+            if (info == null) continue;
+            List<AbstractGoods> deficit = info.getProductionDeficit();
+            if (deficit.isEmpty()) continue;
             for (AbstractGoods ag : wl.getOutputs()) {
-                if (!ag.getType().isStorable()) {
-                    // the warnings are for a non-storable good, which
-                    // is not displayed in the trade report
-                    addInsufficientProductionMessage(result, 
-                        productionCache.getProductionInfo(wl));
-                }
+                if (ag.getType().isStorable()) continue;
+                StringTemplate t = getInsufficientProductionMessage(info,
+                    AbstractGoods.findByType(ag.getType(), deficit));
+                if (t != null) result.add(t);
             }
         }
 
@@ -2219,34 +2224,25 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * adds a message about insufficient production for a building
+     * Get a message about insufficient production for a building
      *
-     * @param warnings A list of warnings to add to.
      * @param info The <code>ProductionInfo</code> for the work location.
+     * @param deficit The <code>AbstractGoods</code> in deficit.
+     * @return A suitable <code>StringTemplate</code> or null if none required.
      */
-    private void addInsufficientProductionMessage(List<StringTemplate> warnings,
-                                                  ProductionInfo info) {
-        if (info == null
-            || info.getMaximumProduction().isEmpty()) return;
+    private StringTemplate getInsufficientProductionMessage(ProductionInfo info,
+        AbstractGoods deficit) {
+        if (info == null || deficit == null) return null;
 
-        GoodsType outputType = info.getProduction().get(0).getType();
-        int missingOutput = info.getMaximumProduction().get(0).getAmount()
-            - info.getProduction().get(0).getAmount();
-        if (missingOutput <= 0) return;
+        List<AbstractGoods> input = info.getConsumptionDeficit();
+        if (input.isEmpty()) return null;
 
-        GoodsType inputType = info.getConsumption().isEmpty()
-            ? null : info.getConsumption().get(0).getType();
-        int missingInput = info.getMaximumConsumption().get(0).getAmount()
-            - info.getConsumption().get(0).getAmount();
-        if (inputType == null) return;
-
-        warnings.add(StringTemplate
-            .template("model.colony.insufficientProduction")
-            .addAmount("%outputAmount%", missingOutput)
-            .addNamed("%outputType%", outputType)
+        return StringTemplate.template("model.colony.insufficientProduction")
             .addName("%colony%", getName())
-            .addAmount("%inputAmount%", missingInput)
-            .addNamed("%inputType%", inputType));
+            .addNamed("%outputType%", deficit.getType())
+            .addAmount("%outputAmount%", deficit.getAmount())
+            .addNamed("%inputType%", input.get(0).getType())
+            .addAmount("%inputAmount%", input.get(0).getAmount());
     }
 
     /**

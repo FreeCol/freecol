@@ -82,6 +82,52 @@ public class ProductionInfo {
     }
 
     /**
+     * Get a list of the goods that are in production deficit, that is,
+     * those which are produced at less than their maximum possible rate.
+     *
+     * @return A list of <code>AbstractGoods</code>.
+     */
+    public List<AbstractGoods> getProductionDeficit() {
+        if (this.maximumProduction.isEmpty()) {
+            return WorkLocation.EMPTY_LIST;
+        }
+        List<AbstractGoods> result = new ArrayList<>();
+        for (AbstractGoods ag : this.production) {
+            AbstractGoods agMax = AbstractGoods.findByType(ag.getType(),
+                this.maximumProduction);
+            if (agMax == null) continue;
+            int amount = agMax.getAmount() - ag.getAmount();
+            if (amount != 0) {
+                result.add(new AbstractGoods(ag.getType(), amount));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Get a list of the goods that are in consumption deficit, that is,
+     * those which are consumed at less than their maximum possible rate.
+     *
+     * @return A list of <code>AbstractGoods</code>.
+     */
+    public List<AbstractGoods> getConsumptionDeficit() {
+        if (this.maximumConsumption.isEmpty()) {
+            return WorkLocation.EMPTY_LIST;
+        }
+        List<AbstractGoods> result = new ArrayList<>();
+        for (AbstractGoods ag : this.consumption) {
+            AbstractGoods agMax = AbstractGoods.findByType(ag.getType(),
+                this.maximumConsumption);
+            if (agMax == null) continue;
+            int amount = agMax.getAmount() - ag.getAmount();
+            if (amount != 0) {
+                result.add(new AbstractGoods(ag.getType(), amount));
+            }
+        }
+        return result;
+    }
+
+    /**
      * Does production equal maximum production?
      *
      * @return True if at maximum production.

@@ -183,7 +183,7 @@ public final class ReportTradePanel extends ReportPanel {
                 productionLabel.setForeground(GoodsLabel.getColor(goodsType,
                         production, colony));
                 Collection<StringTemplate> warnings
-                    = colony.getWarnings(goodsType, amount, production);
+                    = colony.getProductionWarnings(goodsType);
                 if (!warnings.isEmpty()) {
                     StringBuilder sb = new StringBuilder();
                     for (StringTemplate warning : warnings) {
