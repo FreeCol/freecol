@@ -2255,19 +2255,25 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         List<StringTemplate> result = new ArrayList<>();
         final int amount = getGoodsCount(goodsType);
         final int production = getNetProductionOf(goodsType);
-
-        if (goodsType.isFoodType() && goodsType.isStorable()) {
-            // Food is never wasted -> new settler is produced
-            if (amount + production < 0) {
-                result.add(StringTemplate
-                    .template("model.colony.famineFeared")
-                    .addName("%colony%", getName())
-                    .addAmount("%number%", 0));
-            }
-        } else {
-            int waste = (amount + production - getWarehouseCapacity());
-            if (waste > 0 && !getExportData(goodsType).getExported()
-                && !goodsType.limitIgnored()) {
+        int waste;
+        
+        if (goodsType.isStorable()) {
+            if (goodsType.limitIgnored()) {
+                if (goodsType.isFoodType()) {
+                    int starve = getStarvationTurns();
+                    if (starve == 0) {
+                        result.add(StringTemplate
+                            .template("model.colony.starving")
+                            .addName("%colony%", getName()));
+                    } else if (starve <= Colony.FAMINE_TURNS) {
+                        result.add(StringTemplate
+                            .template("model.colony.famineFeared")
+                            .addName("%colony%", getName())
+                            .addAmount("%number%", starve));
+                    }
+                }
+            } else if (!getExportData(goodsType).getExported()
+                && (waste = amount + production - getWarehouseCapacity()) > 0) {
                 result.add(StringTemplate
                     .template("model.building.warehouseSoonFull")
                     .addNamed("%goods%", goodsType)
