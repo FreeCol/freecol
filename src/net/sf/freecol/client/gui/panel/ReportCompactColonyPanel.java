@@ -156,14 +156,12 @@ public final class ReportCompactColonyPanel extends ReportPanel
         public final BuildableType build;
         public final int completeTurns;
         public final AbstractGoods needed;
-        
-       
+
+
         /**
          * Create the colony summary.
          *
          * @param colony The <code>Colony</code> to summarize.
-         * @param goodsTypes A list of <code>GoodsType</code>s to
-         *     summarize.
          */
         public ColonySummary(Colony colony, List<GoodsType> goodsTypes) {
             this.colony = colony;
@@ -253,10 +251,11 @@ public final class ReportCompactColonyPanel extends ReportPanel
             }
 
             this.build = colony.getCurrentlyBuilding();
-            AbstractGoods needed = new AbstractGoods();
             if (build == null) {
                 this.completeTurns = -1;
+                this.needed = null;
             } else {
+                AbstractGoods needed = new AbstractGoods();
                 int turns = colony.getTurnsToComplete(build, needed);
                 if (turns == FreeColObject.UNDEFINED) {
                     needed.setAmount(needed.getAmount()
@@ -270,8 +269,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
                         - colony.getGoodsCount(needed.getType()));
                     this.completeTurns = turns - 1;
                 }
+                this.needed = needed;
             }
-            this.needed = needed;
         }
 
         /**
