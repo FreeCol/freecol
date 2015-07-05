@@ -20,7 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,6 +38,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
@@ -46,6 +47,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -64,8 +66,10 @@ public final class ReportTradePanel extends ReportPanel {
     public ReportTradePanel(FreeColClient freeColClient) {
         super(freeColClient, "reportTradeAction");
 
-        Player player = getMyPlayer();
-        colonies = freeColClient.getMySortedColonies();
+        final Player player = getMyPlayer();
+        Color warnColor = ResourceManager.getColor("color.report.trade.warn");
+
+        this.colonies = freeColClient.getMySortedColonies();
 
         JPanel goodsHeader = new MigPanel("ReportPanelUI");
         goodsHeader.setBorder(new EmptyBorder(20, 20, 0, 20));
@@ -83,12 +87,15 @@ public final class ReportTradePanel extends ReportPanel {
 
         String layoutConstraints = "insets 0, gap 0 0";
         String columnConstraints = "[25%!, fill]["
-            + Math.round(lib.getScalingFactor() * (ImageLibrary.ICON_SIZE.width * 1.25f))
+            + Math.round(lib.getScalingFactor()
+                * (ImageLibrary.ICON_SIZE.width * 1.25f))
             + "!, fill]";
         String rowConstraints = "[fill]";
 
-        reportPanel.setLayout(new MigLayout(layoutConstraints, columnConstraints, rowConstraints));
-        goodsHeader.setLayout(new MigLayout(layoutConstraints, columnConstraints, rowConstraints));
+        reportPanel.setLayout(new MigLayout(layoutConstraints,
+                                            columnConstraints, rowConstraints));
+        goodsHeader.setLayout(new MigLayout(layoutConstraints,
+                                            columnConstraints, rowConstraints));
         goodsHeader.setOpaque(true);
 
         JLabel emptyLabel = new JLabel();
@@ -98,7 +105,9 @@ public final class ReportTradePanel extends ReportPanel {
         /**
          * Total Units Sold by Player
          */
-        reportPanel.add(createLeftLabel("report.trade.unitsSold"), "cell 0 0");
+        JLabel jl = createLeftLabel("report.trade.unitsSold");
+        jl.setBorder(Utility.TOPLEFTCELLBORDER);
+        reportPanel.add(jl, "cell 0 0");
         reportPanel.add(createLeftLabel("report.trade.beforeTaxes"), "cell 0 1");
         reportPanel.add(createLeftLabel("report.trade.afterTaxes"), "cell 0 2");
         reportPanel.add(createLeftLabel("report.trade.cargoUnits"), "cell 0 3");
@@ -109,7 +118,8 @@ public final class ReportTradePanel extends ReportPanel {
         TypeCountMap<GoodsType> deltaUnits = new TypeCountMap<>();
         TypeCountMap<GoodsType> cargoUnits = new TypeCountMap<>();
 
-        for (Iterator<Unit> iterator = player.getUnitIterator(); iterator.hasNext();) {
+        Iterator<Unit> iterator = player.getUnitIterator();
+        while (iterator.hasNext()) {
             Unit unit = iterator.next();
             if (unit.isCarrier()) {
                 for (Goods goods : unit.getGoodsContainer().getCompactGoods()) {
@@ -125,10 +135,12 @@ public final class ReportTradePanel extends ReportPanel {
             int sales = player.getSales(goodsType);
             int beforeTaxes = player.getIncomeBeforeTaxes(goodsType);
             int afterTaxes = player.getIncomeAfterTaxes(goodsType);
-            goodsHeader.add(new MarketLabel(lib, goodsType, market).addBorder());
+            goodsHeader.add(new MarketLabel(lib, goodsType, market)
+                .addBorder());
 
-            reportPanel.add(createNumberLabel(sales),
-                            "cell " + column + " 0");
+            jl = createNumberLabel(sales);
+            jl.setBorder(Utility.TOPCELLBORDER);
+            reportPanel.add(jl, "cell " + column + " 0");
             reportPanel.add(createNumberLabel(beforeTaxes),
                             "cell " + column + " 1");
             reportPanel.add(createNumberLabel(afterTaxes),
@@ -138,46 +150,55 @@ public final class ReportTradePanel extends ReportPanel {
         }
 
         int row = 6;
-
-        for (int colonyIndex = 0; colonyIndex < colonies.size(); colonyIndex++) {
-            Colony colony = colonies.get(colonyIndex);
+        boolean first = true;
+        for (Colony colony : colonies) {
             for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
                 deltaUnits.incrementCount(goodsType, colony.getNetProductionOf(goodsType));
             }
             for (Goods goods : colony.getCompactGoods()) {
                 totalUnits.incrementCount(goods.getType(), goods.getAmount());
             }
-            JButton colonyButton = createColonyButton(colony, colonyIndex);
+            JButton colonyButton = createColonyButton(colony);
+            if (colony.hasAbility(Ability.EXPORT)) {
+                colonyButton.setText(colonyButton.getText() + "*");
+            }
+            colonyButton.setBorder((first) ? Utility.TOPLEFTCELLBORDER
+                : Utility.LEFTCELLBORDER);
             reportPanel.add(colonyButton, "cell 0 " + row + " 1 2");
+
             column = 0;
             for (GoodsType goodsType : storableGoods) {
                 column++;
                 int amount = colony.getGoodsCount(goodsType);
-                JLabel goodsLabel = new JLabel(String.valueOf(amount), JLabel.TRAILING);
-                goodsLabel.setBorder(colonyIndex == 0 ? Utility.TOPCELLBORDER
+                JLabel goodsLabel = new JLabel(String.valueOf(amount),
+                                               JLabel.TRAILING);
+                goodsLabel.setBorder((first) ? Utility.TOPCELLBORDER
                     : Utility.CELLBORDER);
-                if (colony.getExportData(goodsType).getExported()) {
-                    goodsLabel.setText("*" + String.valueOf(amount));
-                }
+                goodsLabel.setForeground(GoodsLabel.getColor(goodsType, amount,
+                                                             colony));
                 reportPanel.add(goodsLabel, "cell " + column + " " + row);
 
                 int production = colony.getNetProductionOf(goodsType);
-
                 JLabel productionLabel = createNumberLabel(production, true);
-
-                StringBuilder toolTip = new StringBuilder();
-                for (StringTemplate warning : colony.getWarnings(goodsType, amount, production)) {
-                    if (toolTip.length() > 0) {
-                        toolTip.append(" - ");
+                productionLabel.setForeground(GoodsLabel.getColor(goodsType,
+                        production, colony));
+                Collection<StringTemplate> warnings
+                    = colony.getWarnings(goodsType, amount, production);
+                if (!warnings.isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (StringTemplate warning : warnings) {
+                        sb.append(Messages.message(warning))
+                            .append(" ");
                     }
-                    toolTip.append(Messages.message(warning));
-                    productionLabel.setForeground(Color.MAGENTA);
-                    productionLabel.setToolTipText(toolTip.toString());
+                    sb.setLength(sb.length()-1);
+                    productionLabel.setToolTipText(sb.toString());
+                    productionLabel.setForeground(warnColor);
                 }
-
-                reportPanel.add(productionLabel, "cell " + column + " " + (row + 1));
+                reportPanel.add(productionLabel,
+                                "cell " + column + " " + (row + 1));
             }
             row += 2;
+            first = false;
         }
 
         row++;
@@ -213,27 +234,6 @@ public final class ReportTradePanel extends ReportPanel {
             result.setText("+" + value);
         }
         return result;
-    }
-
-
-    private JButton createColonyButton(Colony colony, int index) {
-
-        JButton button = new JButton();
-        String name = colony.getName();
-        if (colonies.get(index).hasAbility(Ability.EXPORT)) {
-            name += "*";
-        }
-        button.setText(name);
-        button.setOpaque(false);
-        button.setForeground(Utility.LINK_COLOR);
-        button.setHorizontalAlignment(SwingConstants.LEADING);
-        button.setAlignmentY(0.8f);
-            button.setBorder((index == 0) ? Utility.TOPLEFTCELLBORDER
-                : Utility.LEFTCELLBORDER);
-
-        button.setActionCommand(colony.getId());
-        button.addActionListener(this);
-        return button;
     }
 
     protected Border createBorder() {
