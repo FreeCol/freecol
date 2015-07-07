@@ -45,6 +45,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
@@ -133,6 +134,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
         /** The colony being summarized. */
         public final Colony colony;
 
+        /** The level of teaching-building. */
+        public final int schoolLevel;
+
         /**
          * Lists of tiles that could be explored or improved in
          * some way.
@@ -187,7 +191,12 @@ public final class ReportCompactColonyPanel extends ReportPanel
          */
         public ColonySummary(Colony colony, List<GoodsType> goodsTypes) {
             this.colony = colony;
-            
+
+            WorkLocation school
+                = colony.getWorkLocationWithAbility(Ability.TEACH);
+            this.schoolLevel = (school instanceof Building)
+                ? ((Building)school).getLevel() : 0;
+                
             final Specification spec = colony.getSpecification();
             final Player owner = colony.getOwner();
             final GoodsType foodType = spec.getPrimaryFoodType();
@@ -380,17 +389,19 @@ public final class ReportCompactColonyPanel extends ReportPanel
     private static final String cPlainKey = "color.report.colony.plain";
     private static final String cExportKey = "color.report.colony.export";
     private static final String cGoodKey = "color.report.colony.good";
+    private static final String superscriptKey = "superscript";
+    private static Color cAlarm = null;
+    private static Color cWarn;
+    private static Color cPlain;
+    private static Color cExport;
+    private static Color cGood;
+    private static final String[] superscripts = { "", "", "", "" };
 
     private final Specification spec;
     private final ImageLibrary lib;
     private final List<List<Colony>> colonies = new ArrayList<>();
     private final Market market;
     private final List<GoodsType> goodsTypes = new ArrayList<>();
-    private final Color cAlarm;
-    private final Color cWarn;
-    private final Color cPlain;
-    private final Color cExport;
-    private final Color cGood;
 
 
     /**
@@ -439,24 +450,33 @@ public final class ReportCompactColonyPanel extends ReportPanel
         }
         Collections.sort(this.goodsTypes, GoodsType.goodsTypeComparator);
 
-        // Load the customized colours, with simple fallbacks.
-        this.cAlarm = (ResourceManager.hasColorResource(cAlarmKey))
+        loadResources();
+
+        update();
+    }
+
+    private synchronized void loadResources() {
+        if (cAlarm != null) return;
+
+        cAlarm = (ResourceManager.hasColorResource(cAlarmKey))
             ? ResourceManager.getColor(cAlarmKey)
             : Color.RED;
-        this.cWarn = (ResourceManager.hasColorResource(cWarnKey))
+        cWarn = (ResourceManager.hasColorResource(cWarnKey))
             ? ResourceManager.getColor(cWarnKey)
             : Color.MAGENTA;
-        this.cPlain = (ResourceManager.hasColorResource(cPlainKey))
+        cPlain = (ResourceManager.hasColorResource(cPlainKey))
             ? ResourceManager.getColor(cPlainKey)
             : Color.DARK_GRAY;
-        this.cExport = (ResourceManager.hasColorResource(cExportKey))
+        cExport = (ResourceManager.hasColorResource(cExportKey))
             ? ResourceManager.getColor(cExportKey)
             : Color.GREEN;
-        this.cGood = (ResourceManager.hasColorResource(cGoodKey))
+        cGood = (ResourceManager.hasColorResource(cGoodKey))
             ? ResourceManager.getColor(cGoodKey)
             : Color.BLUE;
 
-        update();
+        for (int i = 1; i <= 3; i++) {
+            superscripts[i] = ResourceManager.getString(superscriptKey + i);
+        }
     }
 
 
@@ -524,7 +544,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
             : (s.bonus == 0) ? cPlain
             : (s.bonus == 1) ? cExport
             : cGood;
-        b = newButton(cac, s.colony.getName(), null, c, null);
+        
+        b = newButton(cac, s.colony.getName() + superscripts[s.schoolLevel],
+                      null, c, null);
         if (s.famine) b.setFont(b.getFont().deriveFont(Font.BOLD));
         reportPanel.add(b, "newline");
 
