@@ -167,15 +167,9 @@ public class ReportPanel extends FreeColPanel {
         if (OK.equals(command)) {
             getGUI().removeFromCanvas(this);
         } else {
-            FreeColGameObject object = getGame().getFreeColGameObject(command);
-            if (object instanceof Colony) {
-                getGUI().showColonyPanel((Colony)object, null);
-            } else if (object instanceof Europe) {
-                getGUI().showEuropePanel();
-            } else if (object instanceof IndianSettlement) {
-                getGUI().showIndianSettlementPanel((IndianSettlement)object);
-            } else if (object instanceof Tile) {
-                getGUI().setFocus(((Tile)object));
+            FreeColGameObject fco = getGame().getFreeColGameObject(command);
+            if (fco != null) {
+                getGUI().displayObject(fco);
             } else {
                 getGUI().showColopediaPanel(command);
             }

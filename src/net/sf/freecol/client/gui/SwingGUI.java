@@ -894,7 +894,12 @@ public class SwingGUI extends GUI {
         } else if (fco instanceof Tile) {
             setFocus((Tile)fco);
         } else if (fco instanceof Unit) {
-            displayObject((FreeColObject)(((Unit)fco).getLocation()));
+            Location loc = ((Unit)fco).up();
+            if (loc instanceof Colony) {
+                canvas.showColonyPanel((Colony)loc, (Unit)fco);
+            } else {
+                displayObject((FreeColObject)loc);
+            }
         } else if (fco instanceof WorkLocation) {
             displayObject(((WorkLocation)fco).getColony());
         }
