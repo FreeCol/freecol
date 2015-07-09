@@ -400,6 +400,14 @@ public class Building extends WorkLocation
      * {@inheritDoc}
      */
     @Override
+    public Location up() {
+        return getColony();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         return getColony().getName() + "-" + getType().getSuffix();
     }

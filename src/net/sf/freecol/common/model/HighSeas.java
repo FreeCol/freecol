@@ -123,6 +123,14 @@ public class HighSeas extends UnitLocation {
      * {@inheritDoc}
      */
     @Override
+    public Location up() {
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         return "HighSeas";
     }

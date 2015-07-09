@@ -1135,6 +1135,14 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * {@inheritDoc}
      */
     @Override
+    public Location up() {
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         return getName();
     }

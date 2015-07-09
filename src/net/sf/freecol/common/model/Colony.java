@@ -2476,6 +2476,14 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
+    public Location up() {
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         return getName();
     }

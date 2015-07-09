@@ -314,6 +314,14 @@ public class Europe extends UnitLocation
      * {@inheritDoc}
      */
     @Override
+    public Location up() {
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         return "Europe";
     }

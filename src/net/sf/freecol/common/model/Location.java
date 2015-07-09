@@ -154,6 +154,16 @@ public interface Location extends ObjectWithId {
     public IndianSettlement getIndianSettlement();
 
     /**
+     * Promote this location to a more meaningful one if possible.
+     *
+     * For example: a settlement is more meaningful than the tile
+     * it occupies.
+     *
+     * @return A more meaningful <code>Location</code>, or this one.
+     */
+    public Location up();
+
+    /**
      * Get a short description of this location.
      *
      * @return A short description.

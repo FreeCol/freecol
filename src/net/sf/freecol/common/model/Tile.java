@@ -2216,6 +2216,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
+    public Location up() {
+        return (hasSettlement()) ? getSettlement()
+            : this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         StringBuilder sb = new StringBuilder(16);
         TileType type = getType();

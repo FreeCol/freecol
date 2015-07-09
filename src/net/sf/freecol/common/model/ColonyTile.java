@@ -231,6 +231,14 @@ public class ColonyTile extends WorkLocation {
      * {@inheritDoc}
      */
     @Override
+    public Location up() {
+        return getColony();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         return getColony().getName()
             + "-" + getWorkTile().getType().getSuffix()
