@@ -719,7 +719,10 @@ public final class InGameController implements NetworkConstants {
             if (moveToDestination(unit, messages)) stillActive = unit;
         }
         if (!messages.isEmpty()) {
-            for (ModelMessage m : messages) player.addModelMessage(m);
+            for (ModelMessage m : messages) {
+                player.addModelMessage(m);
+                turnReportMessages.add(m);
+            }
             displayModelMessages(false, false);
             gui.setActiveUnit((stillActive != null) ? stillActive : active);
             return false;
@@ -2290,6 +2293,7 @@ public final class InGameController implements NetworkConstants {
                 messages.add(m);
             } else {
                 player.addModelMessage(m);
+                turnReportMessages.add(m);
             }
         }
         return result;
@@ -3942,7 +3946,8 @@ public final class InGameController implements NetworkConstants {
 
         Turn currTurn = game.getTurn();
         if (currTurn.isFirstSeasonTurn()) {
-            player.addModelMessage(new ModelMessage("twoTurnsPerYear", player)
+            player.addModelMessage(new ModelMessage(MessageType.WARNING,
+                                                    "twoTurnsPerYear", player)
                 .addStringTemplate("%year%", currTurn.getLabel())
                 .addAmount("%amount%", currTurn.getSeasonNumber()));
         }
