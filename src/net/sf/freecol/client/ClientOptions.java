@@ -35,6 +35,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.Colony;
@@ -537,35 +538,126 @@ public class ClientOptions extends OptionGroup {
         }
     }
 
-
-    private final Comparator<ModelMessage> messageTypeComparator
+    /** Compare messages by type. */
+    private static final Comparator<ModelMessage> messageTypeComparator
         = new Comparator<ModelMessage>() {
-            // sort according to message type
             @Override
             public int compare(ModelMessage message1, ModelMessage message2) {
-                return message1.getMessageType().ordinal() - message2.getMessageType().ordinal();
+                return message1.getMessageType().ordinal()
+                    - message2.getMessageType().ordinal();
             }
         };
 
 
     /**
      * Creates a new <code>ClientOptions</code>.
+     *
      * Unlike other OptionGroup classes, ClientOptions can not supply a
      * specification as it is needed before the specification is available.
      */
     public ClientOptions() {
         super(getXMLElementTagName());
+    }
 
-        addDefaultOptions();
+
+    /**
+     * Loads the options from the given reader.
+     *
+     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @return True if the options were loaded without error.
+     */
+    private boolean load(FreeColXMLReader xr) {
+        if (xr == null) return false;
+        try {
+            xr.nextTag();
+            readFromXML(xr);
+        } catch (XMLStreamException xse) {
+            logger.log(Level.WARNING, "Failed to read client option", xse);
+        }
+        return true;
+    }
+    
+    /**
+     * Loads the options from the given buffered input stream.
+     *
+     * @param bis The <code>BufferedInputStream</code> to read the
+     *     options from.
+     * @return True if the options were loaded without error.
+     */
+    private boolean load(BufferedInputStream bis) {
+        if (bis == null) return false;
+        try {
+            return load(new FreeColXMLReader(bis));
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Failed to open FreeColXMLReader", ioe);
+        }
+        return false;
     }
 
     /**
-     * Adds the options to this <code>GameOptions</code>.
+     * Loads the options from the given input stream.
+     *
+     * @param is The <code>InputStream</code> to read the options from.
+     * @return True if the options were loaded without error.
      */
-    private void addDefaultOptions() {
-        loadOptions(FreeColDirectories.getBaseClientOptionsFile());
+    private boolean load(InputStream is) {
+        return (is == null) ? false : load(new BufferedInputStream(is));
     }
 
+    /**
+     * Loads the options from the given file.
+     *
+     * @param file The <code>File</code> to read the options from.
+     * @return True if the options were loaded without error.
+     */
+    public boolean load(File file) {
+        if (file == null) return false;
+        try {
+            return load(new FileInputStream(file));
+        } catch (FileNotFoundException fnfe) {
+            logger.log(Level.WARNING, "Could not open file input stream", fnfe);
+        }
+        return false;
+    }
+
+    /**
+     * Merge the options from the given file game.
+     *
+     * @param file The <code>File</code> to merge the options from.
+     * @return True if the options were merge without error.
+     */
+    public boolean merge(File file) {
+        ClientOptions clop = new ClientOptions();
+        return (!clop.load(file)) ? false : this.merge(clop);
+    }
+
+    /**
+     * Loads the options from the given save game.
+     *
+     * @param save The <code>FreeColSaveGame</code> to read the options from.
+     * @return True if the options were loaded without error.
+     */
+    private boolean load(FreeColSavegameFile save) {
+        if (save == null) return false;
+        try {
+            return load(save.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS));
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Could not open options input stream", ioe);
+        }
+        return false;
+    }
+
+    /**
+     * Merge the options from the given save game.
+     *
+     * @param save The <code>FreeColSaveGame</code> to merge from.
+     * @return True if the options were merge without error.
+     */
+    public boolean merge(FreeColSavegameFile save) {
+        ClientOptions clop = new ClientOptions();
+        return (!clop.load(save)) ? false : this.merge(clop);
+    }
+        
     /**
      * Gets a list of active mods in this ClientOptions.
      *
@@ -583,86 +675,6 @@ public class ClientOptions extends OptionGroup {
             }
         }
         return active;
-    }
-
-    /**
-     * Loads the options from the given file.
-     *
-     * @param optionsFile The <code>File</code> to read the options from.
-     * @return True if the options were loaded without error.
-     */
-    public boolean loadOptions(File optionsFile) {
-        boolean ret = false;
-        try (
-            FileInputStream fis = new FileInputStream(optionsFile);
-        ) {
-            try {
-                ret = loadOptions(new BufferedInputStream(fis));
-            } catch (IOException|XMLStreamException ex) {
-                logger.log(Level.WARNING, "Error reading client options file: "
-                    + optionsFile.getPath(), ex);
-            }
-        } catch (FileNotFoundException fnfe) {
-            logger.log(Level.WARNING, "Client options file not found: "
-                + optionsFile.getPath(), fnfe);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error opening client options file: "
-                + optionsFile.getPath(), ioe);
-        }
-        return ret;
-    }
-
-    /**
-     * Loads the options from the given stream.
-     *
-     * @param in The <code>InputStream</code> to read the options from.
-     * @return True if the options were loaded without error.
-     * @exception IOException if there is a problem opening a
-     *     <code>FreeColXMLStreamReader</code>.
-     * @exception XMLStreamException if there is problem reading the stream.
-     */
-    public boolean loadOptions(InputStream in)
-        throws IOException, XMLStreamException {
-        if (in != null) {
-            try (
-                FreeColXMLReader xr = new FreeColXMLReader(in);
-            ) {
-                xr.nextTag();
-                readFromXML(xr);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Updates the options from the given file.
-     *
-     * @param optionsFile The <code>File</code> to read the options from.
-     */
-    public void updateOptions(File optionsFile) {
-        try {
-            updateOptions(new BufferedInputStream(new FileInputStream(optionsFile)));
-        } catch (FileNotFoundException e) {
-            logger.warning("Could not find the client options file: "
-                + optionsFile.getPath());
-        }
-    }
-
-    /**
-     * Updates the options from the given stream.
-     *
-     * @param in The <code>InputStream</code> to read the options from.
-     */
-    public void updateOptions(InputStream in) {
-        try (
-            FreeColXMLReader xr = new FreeColXMLReader(in);
-        ) {
-            xr.nextTag();
-            readFromXML(xr);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception when loading options.", e);
-        }
     }
 
     /**
@@ -817,7 +829,7 @@ public class ClientOptions extends OptionGroup {
         addBooleanOption(AUTOLOAD_SENTRIES,
             "clientOptions.other", false);
         // end @compat 0.11.3
-}
+    }
 
     private void addBooleanOption(String id, String gr, boolean val) {
         if (getOption(id) == null) {

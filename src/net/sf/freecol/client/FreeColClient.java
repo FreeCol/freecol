@@ -245,18 +245,25 @@ public final class FreeColClient {
                             final boolean showOpeningVideo,
                             final File savedGame,
                             final Specification spec) {
-        if (headless) {
-            if (savedGame == null && spec == null) {
-                fatal(Messages.message("client.headlessRequires"));
-            }
+        if (headless && savedGame == null && spec == null) {
+            fatal(Messages.message("client.headlessRequires"));
         }
 
         // Load the client options, which handle reloading the
         // resources specified in the active mods.
-        loadClientOptions(savedGame);
+        this.clientOptions = loadClientOptions(savedGame);
+
+        // Reset the mod resources as a result of the client option update.
+        ResourceMapping modMappings = new ResourceMapping();
+        for (FreeColModFile f : this.clientOptions.getActiveMods()) {
+            modMappings.addAll(f.getResourceMapping());
+        }
+        ResourceManager.setModMapping(modMappings);
+        // Update the actions, resources may have changed.
+        if (this.actionManager != null) updateActions();
 
         // Initialize Sound (depends on client options)
-        soundController = new SoundController(this, sound);
+        this.soundController = new SoundController(this, sound);
 
         // Start the GUI (headless-safe)
         gui.hideSplashScreen();
@@ -322,54 +329,52 @@ public final class FreeColClient {
     /**
      * Loads the client options.
      * There are several sources:
-     *   1) Base options (set in the ClientOptions constructor with
-     *        ClientOptions.addDefaultOptions())
+     *   1) Base options (data/base/client-options.xml)
      *   2) Standard action manager actions
      *   3) Saved game
      *   4) User options
      *
-     * @param savedGame An optional <code>File</code> to load options from.
+     * The base and action manager options are definitive, so they can
+     * just be added/loaded.  The others are from sources that may be
+     * out of date (i.e. options can be in the wrong group, or no longer
+     * exist), so they must be merged cautiously.
+     *
+     * @param savedGameFile An optional saved game <code>File</code>
+     *     to load options from.
+     * @return The loaded <code>ClientOptions</code>.
      */
-    private void loadClientOptions(File savedGame) {
-        clientOptions = new ClientOptions();
-        logger.info("Loaded default client options.");
+    private ClientOptions loadClientOptions(File savedGameFile) {
+        ClientOptions clop = new ClientOptions();
+        logger.info("Load default client options.");
+        clop.load(FreeColDirectories.getBaseClientOptionsFile());
 
         if (actionManager != null) {
-            clientOptions.add(actionManager);
-            logger.info("Loaded client options from the action manager.");
+            logger.info("Load client options from the action manager.");
+            clop.add(actionManager);
         }
 
-        if (savedGame != null) {
+        if (savedGameFile != null) {
             try {
-                FreeColSavegameFile save = new FreeColSavegameFile(savedGame);
-                String fileName = FreeColSavegameFile.CLIENT_OPTIONS;
-                clientOptions.loadOptions(save.getInputStream(fileName));
-                logger.info("Loaded client options from saved game:"
-                    + savedGame.getPath() + "(" + fileName + ")");
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Unable to read client options from: "
-                    + savedGame.getPath(), e);
+                FreeColSavegameFile fcsf
+                    = new FreeColSavegameFile(savedGameFile);
+                logger.info("Merge client options from saved game: "
+                    + savedGameFile.getPath());
+                clop.merge(fcsf);
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Could not open saved game "
+                    + savedGameFile.getPath(), ioe);
             }
         }
 
-        File userOptions = FreeColDirectories.getClientOptionsFile();
+        final File userOptions = FreeColDirectories.getClientOptionsFile();
         if (userOptions != null && userOptions.exists()) {
-            clientOptions.updateOptions(userOptions);
-            logger.info("Updated client options from user options file: "
+            logger.info("Merge client options from user options file: "
                 + userOptions.getPath());
-        } else {
-            logger.warning("User options file not present.");
+            clop.merge(userOptions);
         }
 
-        // Reset the mod resources as a result of the client option update.
-        ResourceMapping modMappings = new ResourceMapping();
-        for (FreeColModFile f : clientOptions.getActiveMods()) {
-            modMappings.addAll(f.getResourceMapping());
-        }
-        ResourceManager.setModMapping(modMappings);
-
-        // Update the actions, resources may have changed.
-        if (actionManager != null) actionManager.update();
+        //logger.info("Final client options: " + clop.toString());
+        return clop;
     }
 
     /**

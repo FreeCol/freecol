@@ -194,9 +194,6 @@ public class ActionManager extends OptionGroup {
      * @see FreeColAction
      */
     public void update() {
-        Iterator<Option> it = iterator();
-        while (it.hasNext()) {
-            ((FreeColAction)it.next()).update();
-        }
+        for (Option o : getOptions()) ((FreeColAction)o).update();
     }
 }

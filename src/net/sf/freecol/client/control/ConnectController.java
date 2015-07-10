@@ -532,6 +532,8 @@ public final class ConnectController {
                 + file.getName());
             return false;
         }
+        options.merge(fis);
+        options.fixClientOptions(); // TODO: drop, should no longer be needed
 
         // Get suggestions for "singlePlayer" and "publicServer"
         // settings from the file, and update the client options if
@@ -549,9 +551,6 @@ public final class ConnectController {
                 = xr.getAttribute(FreeColServer.SINGLE_PLAYER_TAG, false);
             defaultPublicServer
                 = xr.getAttribute(FreeColServer.PUBLIC_SERVER_TAG, false);
-
-            options.updateOptions(fis.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS));
-            options.fixClientOptions();
 
         } catch (FileNotFoundException e) {
             SwingUtilities.invokeLater(new ErrorJob("server.fileNotFound"));

@@ -39,6 +39,7 @@ public class SoundTest extends FreeColTestCase {
     @Override
     public void setUp() {
         ClientOptions clientOptions = new ClientOptions();
+        clientOptions.load(FreeColDirectories.getBaseClientOptionsFile());
         final AudioMixerOption amo = (AudioMixerOption) clientOptions.getOption(ClientOptions.AUDIO_MIXER);
         final PercentageOption po = (PercentageOption) clientOptions.getOption(ClientOptions.AUDIO_VOLUME);
         po.setValue(10); // 10% volume

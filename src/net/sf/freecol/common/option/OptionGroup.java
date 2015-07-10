@@ -167,7 +167,8 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
-     * Adds the given <code>Option</code> to this group.
+     * Adds the given option to this group.  The option is assumed to
+     * be correct.
      *
      * @param option The <code>Option</code> to add.
      */
@@ -192,6 +193,69 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         }
     }
 
+    /**
+     * Merges the given <code>Option</code> into this group.
+     *
+     * - Option groups are *not* merged, but their leaf options are.
+     * - If an option is not already present it is ignored.
+     * - If an option is present, it is merged but in the option group where
+     *   it is already placed.
+     *
+     * The intent is that the option group structure is never subject to
+     * merging.
+     *
+     * @param option The <code>Option</code> to merge.
+     * @return True if the merge was accepted.
+     */
+    public boolean merge(Option option) {
+        final String id = option.getId();
+
+        // Check first, it is valid to merge an option group onto
+        // one at the same level, for which it will not contain a key.
+        if (option instanceof OptionGroup) {
+            OptionGroup optionGroup = (OptionGroup)option;
+            boolean result = true;
+            for (Option o : optionGroup.getOptions()) {
+                // Merge from the top level, so that the new
+                // option will end up in the group inherited
+                // from the standard client-options.xml.
+                result = result && this.merge(o);
+            }
+            if (result) {
+                optionGroup.setEditable(editable && optionGroup.isEditable());
+            }
+            logger.finest("Merged option group " + id
+                + " contents into " + this.getId());
+            return result;
+        }
+                
+        if (!optionMap.containsKey(id)) {
+            logger.warning("Ignoring unknown option " + id);
+            return false;
+        }
+
+        for (int index = 0; index < options.size(); index++) {
+            Option o = options.get(index);
+            if (id.equals(o.getId())) { // Found it, replace and return true
+                options.remove(index);
+                options.add(index, option);
+                optionMap.put(id, option);
+                logger.finest("Merged option " + id + " into " + this.getId()
+                    + ": " + option.toString() + "/");
+                return true;
+            }
+            if (o instanceof OptionGroup) {
+                OptionGroup og = (OptionGroup)o;
+                if (og.optionMap.containsKey(id) && og.merge(option)) {
+                    optionMap.put(id, option);
+                    return true;
+                }
+            }
+        }
+        logger.warning("Option " + id + " registered but not found!");
+        return false;
+    }
+        
     /**
      * Helper function to recursively add option group members to the
      * optionMap.
