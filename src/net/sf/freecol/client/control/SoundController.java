@@ -29,6 +29,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.option.AudioMixerOption;
+import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.sound.SoundPlayer;
@@ -52,23 +53,30 @@ public class SoundController {
      */
     public SoundController(FreeColClient freeColClient, boolean sound) {
         final ClientOptions opts = freeColClient.getClientOptions();
-    
         if (sound) {
-            final AudioMixerOption amo
-                = (AudioMixerOption) opts.getOption(ClientOptions.AUDIO_MIXER);
-            final PercentageOption volume
-                = (PercentageOption) opts.getOption(ClientOptions.AUDIO_VOLUME);
-            try {
-                this.soundPlayer = new SoundPlayer(amo, volume);
-            } catch (Exception e) {
-                // #3168279 reports an undocumented NPE thrown by
-                // AudioSystem.getMixer(null).  Workaround this and other
-                // such failures by just disabling sound.
-                this.soundPlayer = null;
-                logger.log(Level.WARNING, "Sound disabled", e);
-            }
-        } else {
             this.soundPlayer = null;
+            Option amo = opts.getOption(ClientOptions.AUDIO_MIXER);
+            Option vo = opts.getOption(ClientOptions.AUDIO_VOLUME);
+            if (!(amo instanceof AudioMixerOption)) {
+                logger.warning(ClientOptions.AUDIO_MIXER + " is not an AudioMixerOption");
+            } else if (!(vo instanceof PercentageOption)) {
+                logger.warning(ClientOptions.AUDIO_VOLUME + " is not a PercentageOption");
+            } else {
+                try {
+                    logger.log(Level.INFO, "Create sound controller with"
+                        + amo + "/" + vo);
+                        //+ " mixer /" + amo.getValue().toString()
+                        //+ "/, volume " + volume.getValue().toString());
+                    this.soundPlayer = new SoundPlayer((AudioMixerOption)amo,
+                                                       (PercentageOption)vo);
+                } catch (Exception e) {
+                    // #3168279 reports an undocumented NPE thrown by
+                    // AudioSystem.getMixer(null).  Workaround this and other
+                    // such failures by just disabling sound.
+                    this.soundPlayer = null;
+                    logger.log(Level.WARNING, "Sound disabled", e);
+                }
+            }
         }
     }
 
