@@ -74,6 +74,7 @@ public abstract class WorkLocation extends UnitLocation
                     }
                 };
                     
+        public final WorkLocation workLocation;
         public final UnitType oldType;
         public final UnitType newType;
         public final GoodsType goodsType;
@@ -86,6 +87,8 @@ public abstract class WorkLocation extends UnitLocation
          * could produce <code>amount</code> more
          * <code>goodsType</code>.
          *
+         * @param workLocation The <code>WorkLocation</code> to add
+         *     a unit to.
          * @param oldType The optional <code>UnitType</code> currently
          *     doing the work.
          * @param newType A new <code>UnitType</code> to do the work.
@@ -93,8 +96,9 @@ public abstract class WorkLocation extends UnitLocation
          * @param amount The extra goods that would be produced if the
          *     suggestion is taken.
          */
-        public Suggestion(UnitType oldType, UnitType newType,
-            GoodsType goodsType, int amount) {
+        public Suggestion(WorkLocation workLocation, UnitType oldType,
+                          UnitType newType, GoodsType goodsType, int amount) {
+            this.workLocation = workLocation;
             this.oldType = oldType;
             this.newType = newType;
             this.goodsType = goodsType;
@@ -358,7 +362,7 @@ public abstract class WorkLocation extends UnitLocation
             }
         }
         return (!ok) ? null
-            : new Suggestion((unit == null) ? null : unit.getType(),
+            : new Suggestion(this, (unit == null) ? null : unit.getType(),
                              better, goodsType, delta);
     }
 

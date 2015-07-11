@@ -826,12 +826,16 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 ? stpld("report.colony.wanting")
                     .addName("%colony%", colony.getName())
                     .addNamed("%unit%", type)
+                    .addStringTemplate("%location%",
+                        suggestion.workLocation.getLabel())
                     .addNamed("%goods%", suggestion.goodsType)
                     .addAmount("%amount%", suggestion.amount)
                 : stpld("report.colony.improving")
                     .addName("%colony%", colony.getName())
                     .addNamed("%oldUnit%", suggestion.oldType)
                     .addNamed("%unit%", type)
+                    .addStringTemplate("%location%",
+                        suggestion.workLocation.getLabel())
                     .addNamed("%goods%", suggestion.goodsType)
                     .addAmount("%amount%", suggestion.amount);
             JButton b = newButton(cac, label, icon,
