@@ -807,6 +807,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
             buttons.clear();
             buttons.addAll(unitButtons(s.improve, s.couldWork, s.colony));
             buttons.add(new JLabel("/"));
+            // Prefer to suggest an improvement over and addition.
+            for (UnitType ut : s.improve.keySet()) s.want.remove(ut);
             buttons.addAll(unitButtons(s.want, s.couldWork, s.colony));
             addTogether(buttons);
         }
