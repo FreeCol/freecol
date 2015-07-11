@@ -64,7 +64,8 @@ public abstract class WorkLocation extends UnitLocation
                     public int compare(Suggestion s1, Suggestion s2) {
                         int cmp = s2.amount - s1.amount;
                         if (cmp == 0) {
-                            cmp = s2.goodsType.getId().compareTo(s1.goodsType.getId());
+                            cmp = GoodsType.goodsTypeComparator
+                                .compare(s1.goodsType, s2.goodsType);
                         }
                         if (cmp == 0) {
                             cmp = s2.newType.getId().compareTo(s1.newType.getId());

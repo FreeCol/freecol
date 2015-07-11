@@ -825,10 +825,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
         Collections.sort(types, new Comparator<UnitType>() {
                 @Override
                 public int compare(UnitType t1, UnitType t2) {
-                    int cmp = suggestions.get(t2).amount
-                        - suggestions.get(t1).amount;
-                    return (cmp != 0) ? cmp
-                        : t1.getId().compareTo(t2.getId());
+                    Suggestion s1 = suggestions.get(t1);
+                    Suggestion s2 = suggestions.get(t2);
+                    return Suggestion.descendingAmountComparator.compare(s1, s2);
                 }
             });
         for (UnitType type : types) {
