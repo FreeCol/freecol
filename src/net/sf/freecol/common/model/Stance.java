@@ -156,8 +156,18 @@ public enum Stance implements Named {
      *
      * @return A suitable message key.
      */
-    public String getDeclarationKey() {
+    public String getStanceChangeKey() {
         return "model.player." + getKey() + ".declared";
+    }
+    
+    /**
+     * Get the message key to use for player messages when stance
+     * changes between other players.
+     *
+     * @return A suitable message key.
+     */
+    public String getOtherStanceChangeKey() {
+        return "model.player." + getKey() + ".others";
     }
     
     // Implement Named

@@ -1295,7 +1295,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (old != Stance.UNCONTACTED) {
                 cs.addMessage(See.only(other),
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                        stance.getDeclarationKey(), this)
+                        stance.getStanceChangeKey(), this)
                     .addStringTemplate("%nation%", getNationName()));
             }
             cs.addStance(See.only(this), this, stance, otherPlayer);
@@ -1318,7 +1318,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (old != Stance.UNCONTACTED) {
                 cs.addMessage(See.only(this),
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                        stance.getDeclarationKey(), otherPlayer)
+                        stance.getStanceChangeKey(), otherPlayer)
                     .addStringTemplate("%nation%", otherPlayer.getNationName()));
             }
             cs.addStance(See.only(this), otherPlayer, stance, this);
@@ -1511,7 +1511,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     cs.addStance(See.only(sp), this, sta, s);
                     cs.addMessage(See.only(sp),
                         new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                            "model.player." + sta + ".others", this)
+                            sta.getOtherStanceChangeKey(), this)
                         .addStringTemplate("%attacker%", getNationName())
                         .addStringTemplate("%defender%", s.getNationName()));
                 }
