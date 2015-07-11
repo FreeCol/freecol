@@ -297,23 +297,23 @@ public abstract class WorkLocation extends UnitLocation
      */
     public Suggestion getSuggestion(Unit unit, GoodsType goodsType) {
         // Check first if there is space.
-        if ((unit == null || !contains(unit)) && isFull()) return null;
+        if (((unit == null || !contains(unit)) && isFull())
+            || goodsType == null) return null;
 
         final Specification spec = getSpecification();
         final Player owner = getOwner();
+        final UnitType expert = spec.getExpertForProducing(goodsType);
         
-        // Check if there is a better unit to do this work, and by how
-        // much it would actually improve production.
-        final UnitType unitType = (unit != null) ? unit.getType()
-            : spec.getDefaultUnitType(getOwner().getNationType());
-        UnitType expert;
-        int delta;
-        if (goodsType == null
-            || (expert = spec.getExpertForProducing(goodsType)) == null
-            || (unit != null && expert == unit.getType())
-            || (delta = getPotentialProduction(goodsType, expert)
-                - getPotentialProduction(goodsType, unitType)) <= 0)
-            return null;
+        // Require there be a better unit to do this work, and that it
+        // would actually improve production.
+        final UnitType better = (expert != null) ? expert
+            : spec.getDefaultUnitType(owner);
+        if (unit != null && better == unit.getType()) return null;
+        int delta = getPotentialProduction(goodsType, better);
+        if (unit != null) {
+            delta -= getPotentialProduction(goodsType, unit.getType());
+        }
+        if (delta <= 0) return null;
 
         // Is the production actually a good idea?  Not if we are independent
         // and have maximized liberty, or for immigration.
@@ -332,7 +332,7 @@ public abstract class WorkLocation extends UnitLocation
         } else if (this instanceof Building) {
             Building bu = (Building)this;
             // Make sure the type can be added.
-            if (bu.canAddType(expert)) {
+            if (bu.canAddType(better)) {
                 Colony colony = getColony();
                 BuildableType bt;
                 // Assume work is worth doing if a unit is already
@@ -353,7 +353,7 @@ public abstract class WorkLocation extends UnitLocation
         }
         return (!ok) ? null
             : new Suggestion((unit == null) ? null : unit.getType(),
-                             expert, goodsType, delta);
+                             better, goodsType, delta);
     }
 
     /**
