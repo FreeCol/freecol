@@ -292,13 +292,16 @@ public abstract class WorkLocation extends UnitLocation
      *
      * @param unit The <code>Unit</code> that is doing the job at
      *     present, which may be null if none is at work.
+     * @param productionType The <code>ProductionType</code> to use.
      * @param goodsType The <code>GoodsType</code> to produce.
      * @return A <code>Suggestion</code> for a better worker, or null if
      *     improvement is not worthwhile.
      */
-    public Suggestion getSuggestion(Unit unit, GoodsType goodsType) {
+    private Suggestion getSuggestion(Unit unit, ProductionType productionType,
+                                     GoodsType goodsType) {
         // Check first if there is space.
         if (((unit == null || !contains(unit)) && isFull())
+            || productionType == null
             || goodsType == null) return null;
 
         final Specification spec = getSpecification();
@@ -314,6 +317,11 @@ public abstract class WorkLocation extends UnitLocation
         if (unit != null) {
             delta -= getPotentialProduction(goodsType, unit.getType());
         }
+        // Do we have a chance of satisfying the inputs?
+        for (AbstractGoods in : productionType.getInputs()) {
+            // TODO: should really consider in.getAmount
+            delta = Math.min(delta, colony.getNetProductionOf(in.getType()));
+        }
         if (delta <= 0) return null;
 
         // Is the production actually a good idea?  Not if we are independent
@@ -322,7 +330,7 @@ public abstract class WorkLocation extends UnitLocation
             && ((goodsType.isLibertyType() && colony.getSoL() >= 100)
                 || goodsType.isImmigrationType())) 
             return null;
-
+        
         // FIXME: OO
         boolean ok = false;
         if (this instanceof ColonyTile) {
@@ -376,14 +384,14 @@ public abstract class WorkLocation extends UnitLocation
             if ((work = u.getWorkType()) == null) {
                 if (occ != null) work = occ.workType;
             }
-            if ((sug = getSuggestion(u, work)) != null) {
+            if ((sug = getSuggestion(u, getProductionType(), work)) != null) {
                 result.put(u, sug);
             }
         }
         // Check for a suggestion for an extra worker if there is space.
         if (!isFull() && occ != null
             && (work = occ.workType) != null
-            && (sug = getSuggestion(null, work)) != null) {
+            && (sug = getSuggestion(null, occ.productionType, work)) != null) {
             result.put(null, sug);
         }
         return result;
