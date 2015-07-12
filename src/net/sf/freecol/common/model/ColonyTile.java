@@ -221,10 +221,8 @@ public class ColonyTile extends WorkLocation {
      */
     @Override
     public StringTemplate getLocationLabel() {
-        return (isColonyCenterTile())
-            ? getColony().getLocationLabel()
-            : getTile().getNearLocationLabel(getTile().getDirection(workTile),
-                getColony().getLocationLabel());
+        return (workTile == null) ? null
+            : workTile.getColonyTileLocationLabel(getColony());
     }
 
     /**

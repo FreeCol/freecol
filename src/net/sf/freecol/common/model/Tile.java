@@ -1088,6 +1088,34 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             : getSimpleLabel();
     }
 
+    /**
+     * Get a label for this tile assuming it is a colony tile of
+     * a given colony.
+     *
+     * @param colony The <code>Colony</code> assumed to own this tile.
+     * @return A suitable <code>StringTemplate</code>, or null if this
+     *     tile is not close enough to the colony to be a colony tile.
+     */
+    public StringTemplate getColonyTileLocationLabel(Colony colony) {
+        Tile ct = colony.getTile();
+        StringTemplate t = StringTemplate.template("model.tile.nameLocation");
+        if (ct == this) {
+            t.addStringTemplate("%location%",
+                // FIXME: Quick hack, add message post-0.11.4-release
+                StringTemplate.key("colopedia.terrain.colonyCenterTile"));
+        } else {
+            Direction d = getMap().getDirection(ct, this);
+            if (d == null) return null;
+            t.addNamed("%location%", d);
+        }
+        if (type == null) {
+            t.add("%name%", "unexplored");
+        } else {
+            t.addNamed("%name%", type);
+        }
+        return t;
+    }
+
 
     //
     // Map / geographic routines
