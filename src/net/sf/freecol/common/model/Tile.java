@@ -1029,13 +1029,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         Settlement nearSettlement = null;
         for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
             nearSettlement = tile.getSettlement();
-            if (nearSettlement != null
-                && nearSettlement.getName() != null) {
+            if (nearSettlement != null && nearSettlement.getName() != null) {
+                Direction d = Map.getRoughDirection(tile, this);
                 StringTemplate t = StringTemplate
-                    .template("model.tile.nameLocation")
-                    .addStringTemplate("%location%",
-                        getNearLocationLabel(Map.getRoughDirection(tile, this),
-                            nearSettlement.getLocationLabel()));
+                    .template("model.tile.nameLocation");
+                if (d == null) {
+                    t.addName("%location%", nearSettlement.getName());
+                } else {
+                    t.addStringTemplate("%location%",
+                        getNearLocationLabel(d, nearSettlement.getLocationLabel()));
+                }
                 if (type == null) {
                     t.add("%name%", "unexplored");
                 } else {
@@ -1063,11 +1066,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             nearSettlement = tile.getSettlement();
             if (nearSettlement != null
                 && nearSettlement.hasContacted(player)) {
+                Direction d = Map.getRoughDirection(tile, this);
                 StringTemplate t = StringTemplate
                     .template("model.tile.nameLocation")
-                    .addStringTemplate("%location%",
-                        getNearLocationLabel(Map.getRoughDirection(tile, this),
-                            nearSettlement.getLocationLabelFor(player)));
+                        .addStringTemplate("%location%", (d == null)
+                            ? nearSettlement.getLocationLabelFor(player)
+                            : getNearLocationLabel(d,
+                                nearSettlement.getLocationLabelFor(player)));
                 if (type == null) {
                     t.add("%name%", "unexplored");
                 } else {
