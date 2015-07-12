@@ -282,25 +282,13 @@ public final class ReportCompactColonyPanel extends ReportPanel
             }
 
             this.build = colony.getCurrentlyBuilding();
-            if (build == null) {
+            if (this.build == null) {
                 this.completeTurns = -1;
                 this.needed = null;
             } else {
                 AbstractGoods needed = new AbstractGoods();
-                int turns = colony.getTurnsToComplete(build, needed);
-                if (turns == FreeColObject.UNDEFINED) {
-                    needed.setAmount(needed.getAmount()
-                        - colony.getGoodsCount(needed.getType()));
-                    this.completeTurns = -1;
-                } else if (turns >= 0) {
-                    needed = null;
-                    this.completeTurns = turns;
-                } else {
-                    needed.setAmount(needed.getAmount()
-                        - colony.getGoodsCount(needed.getType()));
-                    this.completeTurns = turns - 1;
-                }
-                this.needed = needed;
+                this.completeTurns = colony.getTurnsToComplete(build, needed);
+                this.needed = (this.completeTurns < 0) ? needed : null;
             }
         }
 
@@ -731,47 +719,40 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
         // Field: What is currently being built (clickable if on the
         // buildqueue) and the turns until it completes, including
-        // units being taught.
-        // Colour: cAlarm bold "Nothing" if nothing being built, cAlarm
-        // with no turns if no production, cGood with turns if
-        // completing, cAlarm with turns if will block, turns
+        // units being taught, or blank if nothing queued.
+        // Colour: cWarn if no construction is occurring, cGood with
+        // turns if completing, cAlarm with turns if will block, turns
         // indicates when blocking occurs.
-        BuildableType build = s.build;
+        // Font: Bold if blocked right now.
         final String qac = BUILDQUEUE + cac;
-        if (build == null) {
-            t = stpld("report.colony.making.noconstruction")
-                    .addName("%colony%", s.colony.getName());
-            b = newButton(qac, Messages.message("nothing"), null,
-                          cAlarm, t);
-            b.setFont(b.getFont().deriveFont(Font.BOLD));
-        } else {
-            AbstractGoods needed = s.needed;
+        if (s.build != null) {
             int turns = s.completeTurns;
-            String name = Messages.getName(build);
+            String name = Messages.getName(s.build);
             if (turns == FreeColObject.UNDEFINED) {
                 t = stpld("report.colony.making.noconstruction")
                         .addName("%colony%", s.colony.getName());
-                b = newButton(qac, name, null, cAlarm, t);
+                b = newButton(qac, name, null, cWarn, t);
             } else if (turns >= 0) {
                 t = stpld("report.colony.making.constructing")
                         .addName("%colony%", s.colony.getName())
-                        .addNamed("%buildable%", build)
+                        .addNamed("%buildable%", s.build)
                         .addAmount("%turns%", turns);
                 b = newButton(qac, name + " " + Integer.toString(turns), null,
                               cGood, t);
             } else if (turns < 0) {
+                turns = -(turns + 1);
                 t = stpld("report.colony.making.blocking")
                         .addName("%colony%", s.colony.getName())
-                        .addAmount("%amount%", needed.getAmount())
-                        .addNamed("%goods%", needed.getType())
-                        .addNamed("%buildable%", build)
-                        .addAmount("%turns%", -turns - 1);
-                b = newButton(qac, name + " " + Integer.toString(-turns-1),
+                        .addAmount("%amount%", s.needed.getAmount())
+                        .addNamed("%goods%", s.needed.getType())
+                        .addNamed("%buildable%", s.build)
+                        .addAmount("%turns%", turns);
+                b = newButton(qac, name + " " + Integer.toString(turns),
                               null, cAlarm, t);
-                if (turns == -1) b.setFont(b.getFont().deriveFont(Font.BOLD));
+                if (turns == 0) b.setFont(b.getFont().deriveFont(Font.BOLD));
             }
+            buttons.add(b);
         }
-        buttons.add(b);
 
         // Field: What is being trained.
         // Colour: cAlarm if completion is blocked, otherwise cPlain.

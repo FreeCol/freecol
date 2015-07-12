@@ -812,51 +812,54 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @param buildable The <code>BuildableType</code> to build.
      * @param needed The <code>AbstractGoods</code> needed to continue
      *     the build.
-     * @return The number of turns to build the buildable, negative if
-     *     some goods are not being built, UNDEFINED if none is.
+     * @return The number of turns to build the buildable (which may
+     *     be zero, UNDEFINED if no useful work is being done, negative
+     *     if some requirement is or will block completion (value is
+     *     the negation of (turns-to-blockage + 1), and if the needed
+     *     argument is supplied it is set to the goods deficit).
      */
     public int getTurnsToComplete(BuildableType buildable,
                                   AbstractGoods needed) {
-        int result = 0;
-        boolean goodsMissing = false;
-        boolean goodsBeingProduced = false;
-        boolean productionMissing = false;
-
+        final List<AbstractGoods> required = buildable.getRequiredGoods();
+        int turns = 0, satisfied = 0, failing = 0, underway = 0;
+        
         ProductionInfo info = productionCache.getProductionInfo(buildQueue);
-        for (AbstractGoods ag : buildable.getRequiredGoods()) {
-            int amountNeeded = ag.getAmount();
-            int amountAvailable = getGoodsCount(ag.getType());
-            if (amountAvailable >= amountNeeded) continue;
-            goodsMissing = true;
-            int amountProduced = productionCache.getNetProductionOf(ag.getType());
+        for (AbstractGoods ag : required) {
+            final GoodsType type = ag.getType();
+            final int amountNeeded = ag.getAmount();
+            final int amountAvailable = getGoodsCount(type);
+            if (amountAvailable >= amountNeeded) {
+                satisfied++;
+                continue;
+            }
+            int production = productionCache.getNetProductionOf(type);
             if (info != null) {
-                AbstractGoods consumed = AbstractGoods.findByType(ag.getType(), info.getConsumption());
-                if (consumed != null) {
+                AbstractGoods consumption = AbstractGoods.findByType(type,
+                    info.getConsumption());
+                if (consumption != null) {
                     // add the amount the build queue itself will consume
-                    amountProduced += consumed.getAmount();
+                    production += consumption.getAmount();
                 }
             }
-            if (amountProduced <= 0) {
-                productionMissing = true;
+            if (production <= 0) {
+                failing++;
                 if (needed != null) {
-                    needed.setType(ag.getType());
-                    needed.setAmount(ag.getAmount());
+                    needed.setType(type);
+                    needed.setAmount(amountNeeded - amountAvailable);
                 }
                 continue;
             }
-            goodsBeingProduced = true;
 
+            underway++;
             int amountRemaining = amountNeeded - amountAvailable;
-            int eta = amountRemaining / amountProduced;
-            if (amountRemaining % amountProduced != 0) {
-                eta++;
-            }
-            result = Math.max(result, eta);
+            int eta = amountRemaining / production;
+            if (amountRemaining % production != 0) eta++;
+            turns = Math.max(turns, eta);
         }
-        return (!goodsMissing) ? 0
-            : (!goodsBeingProduced) ? UNDEFINED
-            : (productionMissing) ? -result
-            : result;
+
+        return (satisfied + underway == required.size()) ? turns // Will finish
+            : (failing == required.size()) ? UNDEFINED // Not even trying
+            : -(turns + 1); // Blocked by something
     }
 
     /**

@@ -254,7 +254,7 @@ public class Turn {
         return (turns == FreeColObject.UNDEFINED)
             ? Messages.message("notApplicable")
             : (turns >= 0) ? Integer.toString(turns)
-            : ">" + Integer.toString(-turns);
+            : ">" + Integer.toString(-turns - 1);
     }
 
 
