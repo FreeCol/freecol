@@ -904,8 +904,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         BuildableType bt = (current.getSize() <= 0) ? null
             : current.getElementAt(0);
         this.buyBuildable.setEnabled(bt != null && pay
-            && this.colony.canPayToFinishBuilding(bt)
-            && this.colony.getTurnsToComplete(bt) > 0);
+            && this.colony.canPayToFinishBuilding(bt));
         this.setBuyLabel(bt);
 
         // Update the construction panel
@@ -919,7 +918,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     private void setBuyLabel(BuildableType buildable) {
         this.buyBuildable.setText(Messages.message((buildable == null)
                 ? StringTemplate.template("buildQueuePanel.buyBuilding")
-                    .add("%buildable%", "nothing")
+                    .addStringTemplate("%buildable%",
+                        StringTemplate.key("nothing"))
                 : StringTemplate.template("buildQueuePanel.buyBuilding")
                     .addNamed("%buildable%", buildable)));
     }

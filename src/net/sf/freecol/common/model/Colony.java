@@ -1014,17 +1014,15 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @see net.sf.freecol.client.control.InGameController#payForBuilding
      */
     public int priceGoodsForBuilding(List<AbstractGoods> required) {
+        final Market market = getOwner().getMarket();
         int price = 0;
-        Market market = getOwner().getMarket();
         for (AbstractGoods ag : required) {
-            GoodsType goodsType = ag.getType();
-            int amount = ag.getAmount();
-            if (goodsType.isStorable()) {
-                // FIXME: magic number!
-                price += (market.getBidPrice(goodsType, amount) * 110) / 100;
-            } else {
-                price += goodsType.getPrice() * amount;
-            }
+            final GoodsType goodsType = ag.getType();
+            final int amount = ag.getAmount();
+            // FIXME: magic number!
+            price += (goodsType.isStorable())
+                ? (market.getBidPrice(goodsType, amount) * 110) / 100
+                : goodsType.getPrice() * amount;
         }
         return price;
     }
