@@ -377,13 +377,11 @@ public final class ReportCompactColonyPanel extends ReportPanel
     private static final String cPlainKey = "color.report.colony.plain";
     private static final String cExportKey = "color.report.colony.export";
     private static final String cGoodKey = "color.report.colony.good";
-    private static final String superscriptKey = "superscript";
     private static Color cAlarm = null;
     private static Color cWarn;
     private static Color cPlain;
     private static Color cExport;
     private static Color cGood;
-    private static final String[] superscripts = { "", "", "", "" };
 
     private final Specification spec;
     private final ImageLibrary lib;
@@ -461,10 +459,6 @@ public final class ReportCompactColonyPanel extends ReportPanel
         cGood = (ResourceManager.hasColorResource(cGoodKey))
             ? ResourceManager.getColor(cGoodKey)
             : Color.BLUE;
-
-        for (int i = 1; i <= 3; i++) {
-            superscripts[i] = ResourceManager.getString(superscriptKey + i);
-        }
     }
 
 
@@ -533,8 +527,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             : (s.bonus == 1) ? cExport
             : cGood;
         
-        b = newButton(cac, s.colony.getName() + superscripts[s.schoolLevel],
-                      null, c, null);
+        b = newButton(cac, s.colony.getName(), null, c, null);
         if (s.famine) b.setFont(b.getFont().deriveFont(Font.BOLD));
         reportPanel.add(b, "newline");
 
