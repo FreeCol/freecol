@@ -982,6 +982,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         HashMap<Tile, Settlement> claims = new HashMap<>();
         Settlement claimant;
         for (Tile tile : tiles) {
+            if (tile.isOccupied()) continue;
             votes.clear();
             for (Tile t : tile.getSurroundingTiles(1)) {
                 claimant = t.getOwningSettlement();
