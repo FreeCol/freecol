@@ -334,28 +334,32 @@ public final class TradeRoutePanel extends FreeColPanel {
     @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
+        if (null == command) return;
         final TradeRoute route = getRoute();
-        if (null != command) switch (command) {
-            case DEASSIGN:
-                if (unit != null && route == unit.getTradeRoute()) {
-                    igc().clearOrders(unit);
-                }   getGUI().removeFromCanvas(this);
-                break;
-            case OK:
-                List<TradeRoute> routes = new ArrayList<>();
-                for (int index = 0; index < listModel.getSize(); index++) {
-                    routes.add(listModel.getElementAt(index));
-                }   igc().setTradeRoutes(routes);
-                if (unit != null && route != null) {
-                    igc().assignTradeRoute(unit, route);
-            }   super.actionPerformed(event);
-                break;
-            case CANCEL:
-                getGUI().removeTradeRoutePanel(this);
-                break;
-            default:
-                super.actionPerformed(event);
-                break;
+        switch (command) {
+        case DEASSIGN:
+            if (unit != null && route == unit.getTradeRoute()) {
+                igc().clearOrders(unit);
+            }
+            getGUI().removeFromCanvas(this);
+            break;
+        case OK:
+            List<TradeRoute> routes = new ArrayList<>();
+            for (int index = 0; index < listModel.getSize(); index++) {
+                routes.add(listModel.getElementAt(index));
+            }
+            igc().setTradeRoutes(routes);
+            if (unit != null && route != null) {
+                igc().assignTradeRoute(unit, route);
+            }
+            super.actionPerformed(event);
+            break;
+        case CANCEL:
+            getGUI().removeTradeRoutePanel(this);
+            break;
+        default:
+            super.actionPerformed(event);
+            break;
         }
     }
 

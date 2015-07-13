@@ -2985,8 +2985,7 @@ public final class InGameController implements NetworkConstants {
      * @return boolean <b>true</b> if the orders were cleared
      */
     public boolean clearOrders(Unit unit) {
-        if (!requireOurTurn() || unit == null
-            || !unit.checkSetState(UnitState.ACTIVE)) return false;
+        if (!requireOurTurn() || unit == null) return false;
 
         if (unit.getState() == UnitState.IMPROVING
             && !gui.confirm(true, unit.getTile(), StringTemplate
@@ -2998,7 +2997,8 @@ public final class InGameController implements NetworkConstants {
 
         UnitWas unitWas = new UnitWas(unit);
         boolean ret = askClearGotoOrders(unit)
-            && askServer().changeState(unit, UnitState.ACTIVE);
+            && (unit.getState() == UnitState.ACTIVE
+                || askServer().changeState(unit, UnitState.ACTIVE));
         unitWas.fireChanges();
         updateControls();
         return ret;
