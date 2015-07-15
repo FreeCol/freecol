@@ -580,17 +580,27 @@ public final class ReportCompactColonyPanel extends ReportPanel
             }
             if (n > 0) {
                 c = cAlarm;
-                // TODO-post-0.11.4-release: temporary hack until 0.11.4-release
-                String key = ("model.improvement.plow".equals(ti.getId())
-                    || "model.improvement.clearForest".equals(ti.getId()))
-                    ? "report.colony.plowing"
-                    : ("model.improvement.road".equals(ti.getId()))
-                    ? "report.colony.roadBuilding"
-                    : null;
-                t = (key == null) ? null : stpld(key)
-                    .addName("%colony%", s.colony.getName())
-                    .addAmount("%amount%", n);
-                // end temporary hack
+                if (n == 1) {
+                    TileImprovementSuggestion tis = s.tileSuggestions.get(0);
+                    for (Unit u : tis.tile.getUnitList()) {
+                        if (u.getState() == Unit.UnitState.IMPROVING
+                            && u.getWorkImprovement() != null
+                            && u.getWorkImprovement().getType()
+                                == tis.tileImprovementType) {
+                            c = cWarn; // Work is underway
+                            break;
+                        }
+                    }
+                    t = stpld("report.colony.tile." + ti.getSuffix()
+                              + ".specific")
+                        .addName("%colony%", s.colony.getName())
+                        .addStringTemplate("%location%",
+                            tis.tile.getColonyTileLocationLabel(s.colony));
+                } else {
+                    t = stpld("report.colony.tile." + ti.getSuffix())
+                        .addName("%colony%", s.colony.getName())
+                        .addAmount("%amount%", n);
+                }
                 b = newButton(cac, Integer.toString(n), null, c, t);
                 if (center) b.setFont(b.getFont().deriveFont(Font.BOLD));
             } else {
@@ -1028,13 +1038,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
                                  stpld("report.colony.explore")));
         for (TileImprovementType ti : this.spec.getTileImprovementTypeList()) {
             if (ti.isNatural()) continue;
-            // TODO-post-0.11.4-release: temporary hack until 0.11.4-release
-            String key = (("model.improvement.plow".equals(ti.getId()))
-                ? "report.colony.plow"
-                : ("model.improvement.road".equals(ti.getId()))
-                ? "report.colony.road"
-                : null) + ".header";
-            // end temporary hack
+            String key = "report.colony.tile." + ti.getSuffix() + ".header";
             reportPanel.add(newLabel(key, null, null, stpld(key)));
         }
         for (GoodsType gt : this.goodsTypes) {

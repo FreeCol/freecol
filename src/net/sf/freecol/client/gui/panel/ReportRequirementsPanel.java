@@ -190,20 +190,17 @@ public final class ReportRequirementsPanel extends ReportPanel {
         List<TileImprovementSuggestion> tileSuggestions
             = colony.getTileImprovementSuggestions();
         for (TileImprovementSuggestion tis : tileSuggestions) {
-            // TODO-post-0.11.4-release: temporary hack until 0.11.4-release
-            String key = (tis.isExploration())
-                ? "report.requirements.exploreTile"
-                : ("model.improvement.plow".equals(tis.tileImprovementType.getId()))
-                ? ((tis.tile == colony.getTile())
-                    ? "report.requirements.plowCenter"
-                    : "report.requirements.plowTile")
-                : ("model.improvement.clearForest".equals(tis.tileImprovementType.getId()))
-                ? "report.requirements.clearTile"
-                : ("model.improvement.road".equals(tis.tileImprovementType.getId()))
-                ? "report.requirements.roadTile"
-                : null;
-            // end temporary hack
-            addTileWarning(doc, colony, key, tis.tile);
+            if (tis.tileImprovementType == null) {
+                addTileWarning(doc, colony, "report.requirements.exploreTile",
+                               tis.tile);
+            } else {
+                String key = "report.requirements.tile."
+                    + tis.tileImprovementType.getSuffix();
+                if (tis.tile == colony.getTile()) key += ".center";
+                if (Messages.containsKey(key)) {
+                    addTileWarning(doc, colony, key, tis.tile);
+                }
+            }
         }
 
         if (tileSuggestions.isEmpty()
