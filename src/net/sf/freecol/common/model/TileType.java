@@ -304,7 +304,7 @@ public final class TileType extends FreeColGameObjectType {
         List<ProductionType> good = new ArrayList<>(),
             better = new ArrayList<>();
         for (ProductionType productionType : productionTypes) {
-            if (productionType.isUnattended() != unattended) continue;
+            if (productionType.getUnattended() != unattended) continue;
             if (productionType.appliesExactly(level)) {
                 better.add(productionType);
             } else if (productionType.appliesTo(level)) {

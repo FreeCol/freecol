@@ -225,7 +225,7 @@ public final class BuildingType extends BuildableType {
                                                             String level) {
         List<ProductionType> result = new ArrayList<>();
         for (ProductionType productionType : productionTypes) {
-            if (productionType.isUnattended() == unattended
+            if (productionType.getUnattended() == unattended
                 && productionType.appliesTo(level)) {
                 result.add(productionType);
             }

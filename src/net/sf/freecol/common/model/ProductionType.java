@@ -227,11 +227,11 @@ public class ProductionType extends FreeColObject {
     }
 
     /**
-     * Is this unattended production?
+     * Get the unattended production state.
      *
      * @return True if this is unattended production.
      */
-    public final boolean isUnattended() {
+    public final boolean getUnattended() {
         return unattended;
     }
 
