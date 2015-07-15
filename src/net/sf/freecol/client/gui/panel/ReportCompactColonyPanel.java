@@ -150,8 +150,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
         public final boolean famine;
 
         /**
-         * Turns to new colonist if non-negative, turns to starvation
-         * if negative.
+         * Turns to new colonist if positive, no colonist if zero,
+         * -turns-1 to starvation if negative.
          */
         public final int newColonist;
 
@@ -203,19 +203,13 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
             colony.getColonyTileTodo(this.exploreTiles, this.clearTiles,
                 this.plowTiles, this.roadTiles);
-            if (colony.getGoodsCount(foodType) > Settlement.FOOD_PER_COLONIST) {
+            int starve = colony.getStarvationTurns();
+            if (starve < 0) {
                 this.famine = false;
-                this.newColonist = 1;
+                this.newColonist = colony.getNewColonistTurns();
             } else {
-                int newFood = colony.getAdjustedNetProductionOf(foodType);
-                this.famine = newFood < 0
-                    && (colony.getGoodsCount(foodType) / -newFood)
-                        <= Colony.FAMINE_TURNS;
-                this.newColonist = (newFood == 0) ? 0
-                    : (newFood < 0)
-                    ? colony.getGoodsCount(foodType) / newFood - 1
-                    : (Settlement.FOOD_PER_COLONIST
-                        - colony.getGoodsCount(foodType)) / newFood + 1;
+                this.famine = starve <= Colony.FAMINE_TURNS;
+                this.newColonist = -starve - 1;
             }
 
             this.bonus = colony.getProductionBonus();
@@ -701,8 +695,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
             c = (s.famine) ? cAlarm : cWarn;
             t = stpld("report.colony.starving")
                     .addName("%colony%", s.colony.getName())
-                    .addAmount("%turns%", -s.newColonist);
-            b = newButton(cac, Integer.toString(-s.newColonist), null,
+                    .addAmount("%turns%", -s.newColonist - 1);
+            b = newButton(cac, Integer.toString(-s.newColonist - 1), null,
                           c, t);
             if (s.famine) b.setFont(b.getFont().deriveFont(Font.BOLD));
         } else {

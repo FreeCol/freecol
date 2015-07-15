@@ -1912,6 +1912,36 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
+     * Get the number of turns before starvation occurs at this colony
+     * with current production levels.
+     *
+     * @return The number of turns before starvation occurs, or negative
+     *     if it will not.
+     */
+    public int getStarvationTurns() {
+        final GoodsType foodType = getSpecification().getPrimaryFoodType();
+        final int food = getGoodsCount(foodType);
+        final int newFood = getAdjustedNetProductionOf(foodType);
+        return (newFood >= 0) ? -1 : food / -newFood;
+    }
+
+    /**
+     * Get the number of turns before a new colonist will be born in
+     * this colony with current production levels.
+     *
+     * @return A number of turns, or negative if no colonist will be born.
+     */
+    public int getNewColonistTurns() {
+        final GoodsType foodType = getSpecification().getPrimaryFoodType();
+        final int food = getGoodsCount(foodType);
+        final int newFood = getAdjustedNetProductionOf(foodType);
+        return (food + newFood >= Settlement.FOOD_PER_COLONIST) ? 1
+            : (newFood <= 0) ? -1
+            : (Settlement.FOOD_PER_COLONIST - food) / newFood + 1;
+    }
+        
+        
+    /**
      * Get the current production <code>Modifier</code>, which is
      * generated from the current production bonus.
      *
