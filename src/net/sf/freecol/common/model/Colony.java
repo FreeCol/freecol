@@ -1838,6 +1838,32 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     // Production and consumption
 
     /**
+     * Does this colony produce a goods type?
+     *
+     * This is more reliable than checking net or total production,
+     * either of which might be cancelling to zero.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return True if goods type is produced.
+     */
+    public boolean isProducing(GoodsType goodsType) {
+        return productionCache.isProducing(goodsType);
+    }
+
+    /**
+     * Does this colony consume a goods type?
+     *
+     * This is more reliable than checking net or total consumption,
+     * either of which might be cancelling to zero.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return True if goods type is consumed.
+     */
+    public boolean isConsuming(GoodsType goodsType) {
+        return productionCache.isConsuming(goodsType);
+    }
+
+    /**
      * Returns a list of all {@link Consumer}s in the colony sorted by
      * priority. Consumers include all object that consume goods,
      * e.g. Units, Buildings and BuildQueues.

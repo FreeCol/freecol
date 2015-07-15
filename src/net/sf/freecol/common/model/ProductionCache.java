@@ -185,7 +185,6 @@ public class ProductionCache {
         return colony.getGoodsCount(type);
     }
 
-
     /**
      * Invalidates the production cache. This method needs to be
      * called whenever global production modifiers change. This might
@@ -196,7 +195,6 @@ public class ProductionCache {
     public synchronized void invalidate() {
         upToDate = false;
     }
-
 
     /**
      * Invalidates the production cache if it produces or consumes the
@@ -211,7 +209,36 @@ public class ProductionCache {
         }
     }
 
+    /**
+     * Does this production cache contain production of a goods type?
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return True if there is a production entry for the given type.
+     */
+    public boolean isProducing(GoodsType goodsType) {
+        update();
+        for (ProductionInfo pi : productionAndConsumption.values()) {
+            if (AbstractGoods.findByType(goodsType, pi.getProduction()) != null)
+                return true;
+        }
+        return false;
+    }
 
+    /**
+     * Does this production cache contain consumption of a goods type?
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return True if there is a consumption entry for the given type.
+     */
+    public boolean isConsuming(GoodsType goodsType) {
+        update();
+        for (ProductionInfo pi : productionAndConsumption.values()) {
+            if (AbstractGoods.findByType(goodsType, pi.getConsumption()) != null)
+                return true;
+        }
+        return false;
+    }
+    
     /**
      * Returns the net production, that is the total production minus
      * the total consumption, of the given GoodsType.
@@ -235,7 +262,6 @@ public class ProductionCache {
         update();
         return productionAndConsumption.get(object);
     }
-
 
     /**
      * Gets a copy of the current production state.

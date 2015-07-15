@@ -350,13 +350,10 @@ public abstract class WorkLocation extends UnitLocation
                 if (bu.getLevel() > 1 || unit != null) {
                     ok = true;
                 } else if (colony.getTotalProductionOf(goodsType) == 0
-                    && (bt = colony.getCurrentlyBuilding()) != null) {
-                    for (AbstractGoods ag : bt.getRequiredGoods()) {
-                        if (ag.getType() == goodsType) {
-                            ok = true;
-                            break;
-                        }
-                    }
+                    && (bt = colony.getCurrentlyBuilding()) != null
+                    && AbstractGoods.findByType(goodsType,
+                        bt.getRequiredGoods()) != null) {
+                    ok = true;
                 }
             }
         }
