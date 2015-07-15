@@ -103,8 +103,8 @@ public class Cargo {
             // Do some sanity checking
             if (t.isDisposed()) {
                 return "invalid-disposed";
-            } else if (carrier.isDisposed()) {
-                return "invalid-carrier-disposed";
+            } else if (carrier == null) {
+                return "invalid-null-carrier";
             } else if (destination == null
                 && (destination = t.getTransportDestination()) == null) {
                 return "invalid-null-destination";
