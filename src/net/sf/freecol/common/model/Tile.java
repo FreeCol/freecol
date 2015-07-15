@@ -1101,8 +1101,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         StringTemplate t = StringTemplate.template("model.tile.nameLocation");
         if (ct == this) {
             t.addStringTemplate("%location%",
-                // TODO-post-0.11.4-release: add message
-                StringTemplate.key("colopedia.terrain.colonyCenterTile"));
+                StringTemplate.key("colonyCenter"));
         } else {
             Direction d = getMap().getDirection(ct, this);
             if (d == null) return null;
