@@ -186,6 +186,98 @@ public class ColonyTile extends WorkLocation {
     }
 
     /**
+     * Would a given tile improvement be beneficial to this colony tile?
+     *
+     * @param ti The <code>TileImprovementType</code> to assess.
+     * @return A measure of improvement (negative is a bad idea).
+     */
+    public int improvedBy(TileImprovementType ti) {
+        final Tile tile = getWorkTile();
+        final Colony colony = getColony();
+        if (tile == null  // Colony has not claimed the tile
+            || tile.getOwningSettlement() != colony // Not our tile
+            || tile.hasTileImprovement(ti)) // Pointless work
+            return 0;
+
+        final TileType oldType = tile.getType();
+        if (!ti.isTileTypeAllowed(oldType)) return 0; // Impossible
+        
+        final ProductionType productionType = getProductionType();
+        if (productionType == null) return 0; // Not using the tile
+
+        final Resource resource = tile.getResource();
+        final TileType newType = ti.getChange(oldType);
+
+        // Unattended production is the hard case.
+        if (productionType.getUnattended()) {
+            if (newType != null) { // Tile type change
+                final List<AbstractGoods> newProd
+                    = newType.getPossibleProduction(true);
+                int food = 0;
+                // Get the current food production.  Otherwise for
+                // goods that are being passively produced and
+                // consumed, check if production remains in surplus
+                // following a negative change.
+                for (AbstractGoods ag : getProduction()) {
+                    final GoodsType goodsType = ag.getType();
+                    if (goodsType.isFoodType()) {
+                        food -= ag.getAmount();
+                        continue;
+                    }                        
+                    if (!colony.isConsuming(goodsType)) continue;
+                    int change = -ag.getAmount();
+                    AbstractGoods ng
+                        = AbstractGoods.findByType(goodsType, newProd);
+                    change += (ng == null) ? 0 : ng.getAmount();
+                    if (change < 0
+                        && change + colony.getNetProductionOf(goodsType) < 0) {
+                        // The change drives the net production (more?)
+                        // negative.  Do not do this.
+                        return change;
+                    }
+                }
+                // No production showstoppers found
+                // Would the passive food production be improved?
+                for (AbstractGoods ag : newProd) {
+                    if (ag.getType().isFoodType()) food += ag.getAmount();
+                }
+                return food;
+            }
+
+            // Tile type stays the same, return the sum of any food bonues.
+            int bonus = 0;
+            for (GoodsType gt : getSpecification().getFoodGoodsTypeList()) {
+                bonus += ti.getBonus(gt);
+            }
+            return bonus;
+        }
+
+        // Units are at work here.  Find out what work is being done.
+        GoodsType work = null;
+        UnitType type = null;
+        for (Unit u : getUnitList()) {
+            if (u != null && (type = u.getType()) != null
+                && (work = u.getWorkType()) != null) break;
+        }
+        if (work == null) return 0; // No work, no reason to improve.
+            
+        if (newType != null) { // Tile type change
+            // Return the production impact on the work being done.
+            int diff = newType.getPotentialProduction(work, type);
+            if (resource == null) {
+                diff -= oldType.getPotentialProduction(work, type);
+            } else {
+                diff -= resource.applyBonus(work, type,
+                    oldType.getPotentialProduction(work, type));
+            }
+            return diff;
+        }
+
+        // Otherwise return any new bonus that impacts the current work.
+        return ti.getBonus(work);
+    }
+        
+    /**
      * Evaluate this work location for a given player.
      *
      * @param player The <code>Player</code> to evaluate for.
