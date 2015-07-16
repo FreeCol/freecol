@@ -893,13 +893,15 @@ public final class ReportCompactColonyPanel extends ReportPanel
         // Colour: Plain
         t = mapEntriesByValue(rRegionMap, descendingIntegerComparator)
             .get(0).getKey().getLabel();
-        reportPanel.add(newLabel(Messages.message(t), null, cPlain, null),
+        reportPanel.add(newLabel(Messages.message(t), null, cPlain,
+                                 stpld("report.colony.name.summary")),
                         "newline");
 
         // Field: The total of the size change field.
         // Colour: cGood if efficient/cAlarm if inefficient.
         reportPanel.add(newLabel(Integer.toString(rSizeChange), null,
-                                 (rSizeChange < 0) ? cAlarm : cGood, null));
+                                 (rSizeChange < 0) ? cAlarm : cGood,
+                                 stpld("report.colony.growing.summary")));
 
         // Field: The number of potential colony tiles that need
         // exploring.
@@ -911,7 +913,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
             }
         }
         reportPanel.add((tiles.isEmpty()) ? new JLabel()
-            : newLabel(Integer.toString(tiles.size()), null, cAlarm, null));
+            : newLabel(Integer.toString(tiles.size()), null, cAlarm,
+                       stpld("report.colony.exploring.summary")));
 
         // Fields: The number of existing colony tiles that would
         // benefit from improvements.
@@ -926,7 +929,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 }
             }
             reportPanel.add((tiles.isEmpty()) ? new JLabel()
-                : newLabel(Integer.toString(tiles.size()), null, cAlarm, null));
+                : newLabel(Integer.toString(tiles.size()), null, cAlarm,
+                           stpld("report.colony.tile." + ti.getSuffix()
+                               + ".summary")));
         }
 
         // Fields: The net production of each storable+non-trade-goods
@@ -952,13 +957,16 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 throw new IllegalStateException("Bogus status: " + gp.status);
             }
             reportPanel.add((c == null) ? new JLabel()
-                : newLabel(Integer.toString(gp.amount), null, c, null));
+                : newLabel(Integer.toString(gp.amount), null, c,
+                    stpld("report.colony.production.summary")
+                        .addNamed("%goods%", gt)));
         }
 
         // Field: New colonist arrival or famine warning.
         // Colour: cWarn if negative, else cGood
         reportPanel.add(newLabel(Integer.toString((int)rNewColonist), null,
-                                 (rNewColonist < 0) ? cWarn : cGood, null));
+                                 (rNewColonist < 0) ? cWarn : cGood,
+                                 stpld("report.colony.arriving.summary")));
 
         // Field: The required goods rates.
         // Colour: cPlain
@@ -967,18 +975,22 @@ public final class ReportCompactColonyPanel extends ReportPanel
                  : mapEntriesByValue(rNeeded, descendingDoubleComparator)) {
             labels.add(newLabel(String.format("%4.1f %s", e.getValue(),
                                               Messages.getName(e.getKey())),
-                                null, cPlain, null));
+                                null, cPlain,
+                                stpld("report.colony.making.summary")
+                                    .addNamed("%goods%", e.getKey())));
         }
 
         // Field: What is being trained (attached to previous)
         // Colour: cPlain.
         teacherLen = Math.max(3, teacherLen); // Always some room here
-        labels.addAll(unitTypeLabels(rTeachers, teacherLen, null));
+        labels.addAll(unitTypeLabels(rTeachers, teacherLen,
+                stpld("report.colony.making.educating.summary")));
         addTogether(labels);
 
         // Field: The units that could be upgraded, followed by the units
         // that could be added.
-        addTogether(unitTypeLabels(rImprove, improveLen, null));
+        addTogether(unitTypeLabels(rImprove, improveLen,
+                stpld("report.colony.improving.summary")));
     }
 
     private List<JLabel> unitTypeLabels(Map<UnitType, Integer> unitTypeMap,
