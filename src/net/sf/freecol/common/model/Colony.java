@@ -614,6 +614,60 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
+     * Gets a work location of a specific class with a given ability.
+     *
+     * @param ability An ability key.
+     * @param returnClass The expected subclass.
+     * @return A <code>WorkLocation</code> with the required
+     *     <code>Ability</code>, or null if not found.
+     */
+    public <T extends WorkLocation> T getWorkLocationWithAbility(String ability,
+        Class<T> returnClass) {
+        for (WorkLocation wl : getCurrentWorkLocations()) {
+            if (wl.hasAbility(ability)) {
+                try {
+                    return returnClass.cast(wl);
+                } catch (ClassCastException cce) {}
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets a work location with a given modifier.
+     *
+     * @param modifier A modifier key.
+     * @return A <code>WorkLocation</code> with the required
+     *     <code>Modifier</code>, or null if not found.
+     */
+    public WorkLocation getWorkLocationWithModifier(String modifier) {
+        for (WorkLocation wl : getCurrentWorkLocations()) {
+            if (wl.hasModifier(modifier)) return wl;
+        }
+        return null;
+    }
+
+    /**
+     * Gets a work location of a specific class with a given modifier.
+     *
+     * @param modifier A modifier key.
+     * @param returnClass The expected subclass.
+     * @return A <code>WorkLocation</code> with the required
+     *     <code>Modifier</code>, or null if not found.
+     */
+    public <T extends WorkLocation> T getWorkLocationWithModifier(String modifier,
+        Class<T> returnClass) {
+        for (WorkLocation wl : getCurrentWorkLocations()) {
+            if (wl.hasModifier(modifier)) {
+                try {
+                    return returnClass.cast(wl);
+                } catch (ClassCastException cce) {}
+            }
+        }
+        return null;
+    }
+    
+    /**
      * Collect the work locations for consuming a given type of goods.
      *
      * @param goodsType The <code>GoodsType</code> to consume.
@@ -704,13 +758,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The warehouse <code>Building</code>.
      */
     public Building getWarehouse() {
-        // FIXME: should search for more than one building?
-        for (Building building : buildingMap.values()) {
-            if (building.getType().hasModifier(Modifier.WAREHOUSE_STORAGE)) {
-                return building;
-            }
-        }
-        return null;
+        return getWorkLocationWithModifier(Modifier.WAREHOUSE_STORAGE,
+                                           Building.class);
     }
 
     /**
@@ -728,13 +777,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The stockade <code>Building</code>.
      */
     public Building getStockade() {
-        // FIXME: should search for more than one building?
-        for (Building building : buildingMap.values()) {
-            if (building.getType().hasModifier(Modifier.DEFENCE)) {
-                return building;
-            }
-        }
-        return null;
+        return getWorkLocationWithModifier(Modifier.DEFENCE, Building.class);
     }
 
     /**
