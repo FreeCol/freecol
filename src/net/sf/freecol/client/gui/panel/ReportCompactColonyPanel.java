@@ -37,11 +37,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
@@ -51,15 +53,20 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.TileImprovementSuggestion;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Occupation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Region;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -70,6 +77,7 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.WorkLocation.Suggestion;
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -127,9 +135,6 @@ public final class ReportCompactColonyPanel extends ReportPanel
         /** The colony being summarized. */
         public final Colony colony;
 
-        /** The level of teaching-building. */
-        public final int schoolLevel;
-
         /** Possible tile improvements. */
         public final List<TileImprovementSuggestion> tileSuggestions
             = new ArrayList<>();
@@ -180,11 +185,6 @@ public final class ReportCompactColonyPanel extends ReportPanel
         public ColonySummary(Colony colony, List<GoodsType> goodsTypes) {
             this.colony = colony;
 
-            WorkLocation school
-                = colony.getWorkLocationWithAbility(Ability.TEACH);
-            this.schoolLevel = (school instanceof Building)
-                ? ((Building)school).getLevel() : 0;
-                
             final Specification spec = colony.getSpecification();
             final Player owner = colony.getOwner();
             final GoodsType foodType = spec.getPrimaryFoodType();
@@ -499,6 +499,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         JButton b;
         Color c;
         StringTemplate t;
+        Building building;
 
         // Field: A button for the colony.
         // Colour: bonus in {-2,2} => {alarm, warn, plain, export, good}
@@ -508,7 +509,60 @@ public final class ReportCompactColonyPanel extends ReportPanel
             : (s.bonus == 0) ? cPlain
             : (s.bonus == 1) ? cExport
             : cGood;
-        b = newButton(cac, s.colony.getName(), null, c, null);
+        String annotations = "", key;
+        t = StringTemplate.label(",");
+        if ((building = s.colony.getStockade()) == null) {
+            key = "annotation.unfortified";
+            t.add(Messages.message("report.colony.annotation.unfortified"));
+        } else {
+            key = "annotation." + building.getType().getSuffix();
+            t.add(Messages.message(building.getLabel()));
+        }
+        if (ResourceManager.hasResource(key))
+            annotations += ResourceManager.getString(key);
+        if (!s.colony.getTile().isCoastland()) {
+            key = "annotation.inland";
+            t.add(Messages.message("report.colony.annotation.inland"));
+        } else if ((building = s.colony.getWorkLocationWithAbility(Ability.PRODUCE_IN_WATER, Building.class)) == null) {
+            key = "annotation.coastal";
+            t.add(Messages.message("report.colony.annotation.coastal"));
+        } else {
+            key = "annotation." + building.getType().getSuffix();
+            t.add(Messages.message(building.getLabel()));
+        }
+        if (ResourceManager.hasResource(key))
+            annotations += ResourceManager.getString(key);
+        /* Omit for now, too much detail.
+        for (GoodsType gt : spec.getLibertyGoodsTypeList()) {
+            if ((building = s.colony.getWorkLocationWithModifier(gt.getId(), Building.class)) != null) {
+                key = "annotation." + building.getType().getSuffix();
+                t.add(Messages.message(building.getLabel()));
+                if (ResourceManager.hasResource(key))
+                    annotations += ResourceManager.getString(key);
+            }
+        }*/
+        /* Omit for now, too much detail.
+        for (GoodsType gt : spec.getImmigrationGoodsTypeList()) {
+            if ((building = s.colony.getWorkLocationWithModifier(gt.getId(), Building.class)) != null) {
+                key = "annotation." + building.getType().getSuffix();
+                t.add(Messages.message(building.getLabel()));
+                if (ResourceManager.hasResource(key))
+                    annotations += ResourceManager.getString(key);
+            }
+        }*/
+        /* Font update needed
+        if ((building = s.colony.getWorkLocationWithAbility(Ability.TEACH, Building.class)) != null) {
+            key = "annotation." + building.getType().getSuffix();
+            t.add(Messages.message(building.getLabel()));
+            if (ResourceManager.hasResource(key)) annotations += ResourceManager.getString(key);
+        }*/
+        if ((building = s.colony.getWorkLocationWithAbility(Ability.EXPORT, Building.class)) != null) {
+            annotations += "*";
+            t.add(Messages.message(building.getLabel()));
+        }
+        b = newButton(cac, s.colony.getName() + annotations, null, c,
+            StringTemplate.label(": ").add(s.colony.getName())
+                .add(Messages.message(t)));
         if (s.famine) b.setFont(b.getFont().deriveFont(Font.BOLD));
         reportPanel.add(b, "newline");
 
@@ -718,17 +772,17 @@ public final class ReportCompactColonyPanel extends ReportPanel
         final String qac = BUILDQUEUE + cac;
         if (s.build != null) {
             int turns = s.completeTurns;
-            String name = Messages.getName(s.build);
+            String bname = Messages.getName(s.build);
             if (turns == FreeColObject.UNDEFINED) {
                 t = stpld("report.colony.making.noconstruction")
                         .addName("%colony%", s.colony.getName());
-                b = newButton(qac, name, null, cWarn, t);
+                b = newButton(qac, bname, null, cWarn, t);
             } else if (turns >= 0) {
                 t = stpld("report.colony.making.constructing")
                         .addName("%colony%", s.colony.getName())
                         .addNamed("%buildable%", s.build)
                         .addAmount("%turns%", turns);
-                b = newButton(qac, name + " " + Integer.toString(turns), null,
+                b = newButton(qac, bname + " " + Integer.toString(turns), null,
                               cGood, t);
             } else if (turns < 0) {
                 turns = -(turns + 1);
@@ -738,7 +792,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
                         .addNamed("%goods%", s.needed.getType())
                         .addNamed("%buildable%", s.build)
                         .addAmount("%turns%", turns);
-                b = newButton(qac, name + " " + Integer.toString(turns),
+                b = newButton(qac, bname + " " + Integer.toString(turns),
                               null, cAlarm, t);
                 if (turns == 0) b.setFont(b.getFont().deriveFont(Font.BOLD));
             }
@@ -1035,6 +1089,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         reportPanel.add(newLabel("report.colony.name.header", null, null,
                                  stpld("report.colony.name")),
                         "newline");
+
         reportPanel.add(newLabel("report.colony.grow.header", null, null,
                                  stpld("report.colony.grow")));
         reportPanel.add(newLabel("report.colony.explore.header", null, null,
