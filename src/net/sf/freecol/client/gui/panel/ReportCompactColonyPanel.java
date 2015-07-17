@@ -472,7 +472,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
     }
 
     private JLabel newLabel(String h, ImageIcon i, Color c, StringTemplate t) {
-        if (h != null) h = Messages.message(h);
+        h = (h != null && Messages.containsKey(h)) ? Messages.message(h) : "";
         JLabel l = newLabel(h, i, c);
         if (t != null) Utility.localizeToolTip(l, t);
         return l;
@@ -1015,13 +1015,13 @@ public final class ReportCompactColonyPanel extends ReportPanel
         for (TileImprovementType ti : this.spec.getTileImprovementTypeList()) {
             if (ti.isNatural()) continue;
             // TODO-post-0.11.4-release: temporary hack until 0.11.4-release
-            String key = ("model.improvement.plow".equals(ti.getId()))
+            String key = (("model.improvement.plow".equals(ti.getId()))
                 ? "report.colony.plow"
                 : ("model.improvement.road".equals(ti.getId()))
-                ? "report.colony.plow"
-                : null;
+                ? "report.colony.road"
+                : null) + ".header";
             // end temporary hack
-            reportPanel.add(newLabel(key + ".header", null, null, stpld(key)));
+            reportPanel.add(newLabel(key, null, null, stpld(key)));
         }
         for (GoodsType gt : this.goodsTypes) {
             ImageIcon icon = new ImageIcon(this.lib.getSmallIconImage(gt));
