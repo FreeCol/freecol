@@ -244,17 +244,21 @@ public class Building extends WorkLocation
                 if (output.getAmount() <= 0) continue;
                 final GoodsType goodsType = output.getType();
                 int available = getColony().getGoodsCount(goodsType);
-                int divisor = (int)getType().applyModifiers(0f, turn,
-                    Modifier.BREEDING_DIVISOR);
-                int factor = (int)getType().applyModifiers(0f, turn,
-                    Modifier.BREEDING_FACTOR);
-                int production = (available < goodsType.getBreedingNumber()
-                    || divisor <= 0) ? 0
-                    // Deliberate use of integer division
-                    : ((available - 1) / divisor + 1) * factor;
-                double newRatio = (double)production / output.getAmount();
-                minimumRatio = Math.min(minimumRatio, newRatio);
-                maximumRatio = Math.max(maximumRatio, newRatio);
+                if (available >= capacity) {
+                    minimumRatio = maximumRatio = 0.0;
+                } else {
+                    int divisor = (int)getType().applyModifiers(0f, turn,
+                        Modifier.BREEDING_DIVISOR);
+                    int factor = (int)getType().applyModifiers(0f, turn,
+                        Modifier.BREEDING_FACTOR);
+                    int production = (available < goodsType.getBreedingNumber()
+                        || divisor <= 0) ? 0
+                        // Deliberate use of integer division
+                        : ((available - 1) / divisor + 1) * factor;
+                    double newRatio = (double)production / output.getAmount();
+                    minimumRatio = Math.min(minimumRatio, newRatio);
+                    maximumRatio = Math.max(maximumRatio, newRatio);
+                }
             }
         } else {
             for (AbstractGoods output : getOutputs()) {
