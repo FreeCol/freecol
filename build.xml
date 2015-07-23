@@ -531,6 +531,7 @@
                      excludes="*.tex *.sty images/* specification.*" />
         </delete>
         <delete quiet="true" file="${freecol.jar.file}"/>
+        <delete quiet="true" file="${freecol.metaserver.jar.file}"/>
         <delete quiet="true" file="TESTS-TestSuites.xml"/>
         <delete quiet="true" dir="${freecol.javadoc.dir}"/>
         <delete quiet="true" file="Freecol.log"/>
