@@ -183,7 +183,7 @@
              basedir="${freecol.build.dir}"
              manifest="${basedir}/src/MANIFEST.MF"
              includes="net/**, org/**"
-             excludes="**/.svn/**, **/metaserver/**"/>
+             excludes="**/metaserver/**"/>
     </target>
 
     <!-- Compiles the metaserver and creates a JAR-file. -->
@@ -191,8 +191,7 @@
         <jar jarfile="${freecol.metaserver.jar.file}"
              basedir="${freecol.build.dir}"
              manifest="${basedir}/src/MANIFEST.MF"
-             includes="net/**, org/**"
-             excludes="**/.svn/**"/>
+             includes="net/**, org/**"/>
     </target>
 
     <target name="mydist" depends="mydistWindows,mydistMac,mydistJava"
@@ -268,8 +267,8 @@
                      includes="freecol.cmd"/>
             <fileset dir="${freecol.packaging.dir}/common"
                      includes="freecol.xpm"/>
-            <fileset dir="${basedir}" includes="data/**" excludes="**/.svn/**"/>
-            <fileset dir="${basedir}" includes="jars/**" excludes="**/.svn/**"/>
+            <fileset dir="${basedir}" includes="data/**"/>
+            <fileset dir="${basedir}" includes="jars/**"/>
         </copy>
         <copy file="${freecol.packaging.dir}/common/freecol.sh"
               tofile="${freecol.release.dir}/base/${freecol.name}/freecol"/>
@@ -280,7 +279,7 @@
         <mkdir dir="${freecol.release.dir}/source/${freecol.name}"/>
         <copy todir="${freecol.release.dir}/source/${freecol.name}">
             <fileset dir="${basedir}"
-                     excludes="**/.svn/**,dist/**,data/**,jars/**"/>
+                     excludes="dist/**,data/**,jars/**"/>
         </copy>
     </target>
 
