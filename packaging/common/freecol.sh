@@ -1,7 +1,7 @@
 #! /bin/sh
 # Generic freecol start script.
 # Please customize this for your distribution.
-# Look at the ../debian script for other ideas, they are clueful.
+# Look at the debian scripts for other ideas, they are clueful.
 #
 # Things this script needs to do:
 # - Find the freecol data directory.
