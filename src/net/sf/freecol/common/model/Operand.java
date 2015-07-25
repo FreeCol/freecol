@@ -366,11 +366,23 @@ public class Operand extends Scope {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        operandType = xr.getAttribute(OPERAND_TYPE_TAG,
-                                      OperandType.class, OperandType.NONE);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_OPERAND_TYPE_TAG)) {
+            operandType = xr.getAttribute(OLD_OPERAND_TYPE_TAG,
+                                          OperandType.class, OperandType.NONE);
+        } else            
+        // end @compat 0.11.3
+            operandType = xr.getAttribute(OPERAND_TYPE_TAG,
+                                          OperandType.class, OperandType.NONE);
 
-        scopeLevel = xr.getAttribute(SCOPE_LEVEL_TAG,
-                                     ScopeLevel.class, ScopeLevel.NONE);
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_SCOPE_LEVEL_TAG)) {
+            scopeLevel = xr.getAttribute(OLD_SCOPE_LEVEL_TAG,
+                                         ScopeLevel.class, ScopeLevel.NONE);
+        } else
+        // end @compat 0.11.3
+            scopeLevel = xr.getAttribute(SCOPE_LEVEL_TAG,
+                                         ScopeLevel.class, ScopeLevel.NONE);
 
         int val = xr.getAttribute(VALUE_TAG, INFINITY);
         if (val != INFINITY) value = val;
@@ -381,8 +393,11 @@ public class Operand extends Scope {
      */
     @Override
     public String toString() {
-        return (value != null) ? Integer.toString(value)
-            : scopeLevel + "'s number of " + operandType + "s";
+        if (value != null) return Integer.toString(value);
+        StringBuffer sb = new StringBuffer();
+        sb.append("[Operand type=").append(operandType)
+            .append(" scopeLevel=").append(scopeLevel);
+        return super.toString().replaceFirst("^[^ ]*", sb.toString());
     }
 
     // getXMLElementTagName apparently not needed, uses parents.
