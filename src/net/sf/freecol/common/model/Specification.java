@@ -2241,6 +2241,16 @@ public final class Specification {
                     Modifier.ModifierType.PERCENTAGE, CARGO_PENALTY_SOURCE,
                     Modifier.GENERAL_COMBAT_INDEX));
         }
+
+        // Backwards compatibility for the fixes to BR#2873.
+        Event event = getEvent("model.event.declareIndependence");
+        if (event != null) {
+            Limit limit = event.getLimit("model.limit.independence.coastalColonies");
+            if (limit != null) {
+                limit.setOperator(Limit.Operator.GE);
+                limit.getRightHandSide().setValue(1);
+            }
+        }
         // end @compat 0.11.3
         
     }
