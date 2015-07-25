@@ -1658,7 +1658,7 @@ public class ChangeSet {
     /**
      * Helper function to add a new player to a ChangeSet.
      *
-     * @param player The new <code>ServerPlayer</code> to add.
+     * @param serverPlayer The new <code>ServerPlayer</code> to add.
      * @return The updated <code>ChangeSet</code>.
      */
     public ChangeSet addPlayer(ServerPlayer serverPlayer) {

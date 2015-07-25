@@ -1764,8 +1764,8 @@ public final class Specification {
     /**
      * Gets the age corresponding to a given turn.
      *
-     * @param year The turn integer value.
-     * @return The age of this turn.
+     * @param turn The <code>Turn</code> to check.
+     * @return The age of the given turn.
      */
     public int getAge(Turn turn) {
         int n = turn.getNumber();

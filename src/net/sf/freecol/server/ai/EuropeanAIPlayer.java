@@ -1150,7 +1150,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Suppress European trade in a goods type.  A goods party and
      * boycott is incoming.
      *
-     * @param goodsType The <code>GoodsType</code> to suppress.
+     * @param type The <code>GoodsType</code> to suppress.
      * @param lb A <code>LogBuilder</code> to log to.
      */
     private void suppressEuropeanTrade(GoodsType type, LogBuilder lb) {
@@ -1633,7 +1633,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Get a nation summary for another player.
      *
-     * @param player The <code>Player</code> to get the summary for.
+     * @param other The other <code>Player</code> to get the summary for.
      * @return The current <code>NationSummary</code> for a player.
      */
     protected NationSummary getNationSummary(Player other) {

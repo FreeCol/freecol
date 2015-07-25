@@ -164,7 +164,7 @@ public class NameCache {
      * Initialize the region names for a player.
      *
      * @param player The <code>Player</code> to install region names for.
-     * @param regionType The <code>RegionType</code> to get names of.
+     * @param type The <code>RegionType</code> to get names of.
      */
     private static void requireRegionNames(Player player, RegionType type) {
         synchronized (regionNameLock) {

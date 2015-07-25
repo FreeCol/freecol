@@ -59,7 +59,7 @@ public class Turn {
      *
      * @param newStartingYear The starting year for the game.
      * @param newSeasonYear The year at which the seasons split.
-     * @param newSeasonNumebr The number of seasons in the year.
+     * @param newSeasonNumber The number of seasons in the year.
      */
     public static synchronized void initialize(int newStartingYear,
                                                int newSeasonYear,

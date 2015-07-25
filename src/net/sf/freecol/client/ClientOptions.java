@@ -64,9 +64,7 @@ import javax.xml.stream.events.XMLEvent;
  * in the file <code>base/client-options.xml</code> in the FreeCol
  * data directory. They are overridden by the player's personal
  * settings in the file <code>options.xml</code> in the user
- * directory. Options that can not be defined in this way because they
- * are generated dynamically (such as a list of available mods) must
- * be added to {@link #addDefaultOptions()}.
+ * directory. Note that some options are generated and added dynamically.
  *
  * Each option should be given an unique identifier (defined as a
  * constant in this class). In general, the options are called

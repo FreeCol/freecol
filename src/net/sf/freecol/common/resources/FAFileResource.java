@@ -44,7 +44,6 @@ public class FAFileResource extends Resource {
      *
      * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
-     * @see ResourceFactory#createResource(URI)
      */
     public FAFileResource(URI resourceLocator) throws Exception {
         super(resourceLocator);

@@ -807,7 +807,7 @@ public final class QuickActionMenu extends JPopupMenu {
     /**
      * Creates menu items for some goods in a market.
      *
-     * @param ag The <code>AbstractGoods</code> to create entries for.
+     * @param marketLabel The <code>MarketLabel</code> to create entries for.
      */
     private void createMarketMenu(MarketLabel marketLabel) {
         final AbstractGoods ag = marketLabel.getAbstractGoods();

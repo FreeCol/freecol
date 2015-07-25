@@ -52,7 +52,6 @@ public class ColorResource extends Resource {
      *
      * @param resourceLocator The <code>URI</code> used when loading this
      *     resource.
-     * @see ResourceFactory#createResource(URI)
      */
     public ColorResource(URI resourceLocator) throws Exception {
         super(resourceLocator);

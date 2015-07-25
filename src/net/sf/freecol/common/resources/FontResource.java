@@ -51,7 +51,6 @@ public class FontResource extends Resource {
      *
      * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
-     * @see ResourceFactory#createResource(URI)
      */
     public FontResource(URI resourceLocator) throws Exception {
         super(resourceLocator);

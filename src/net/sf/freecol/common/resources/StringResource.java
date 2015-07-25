@@ -35,7 +35,6 @@ public class StringResource extends Resource {
      *
      * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
-     * @see ResourceFactory#createResource(URI)
      */
     public StringResource(URI resourceLocator) {
         super(resourceLocator);

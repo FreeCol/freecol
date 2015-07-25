@@ -55,7 +55,6 @@ public class ImageResource extends Resource
      *
      * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
-     * @see ResourceFactory#createResource(URI)
      */
     public ImageResource(URI resourceLocator) {
         super(resourceLocator);

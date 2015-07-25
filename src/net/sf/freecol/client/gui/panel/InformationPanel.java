@@ -117,7 +117,6 @@ public class InformationPanel extends FreeColPanel {
 
     /**
      * A label for an FCO that can meaningfully be displayed.
-     * Keep this routine synchronized with {@link #displayFCO}.
      *
      * @param fco The <code>FreeColObject</code> to check.
      * @return A <code>StringTemplate</code> label, or null if nothing found.

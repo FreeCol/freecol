@@ -27,8 +27,6 @@ import java.net.URI;
  * <code>URI</code>.  There can only be one instance of
  * <code>Resource</code> having the same (as in URI's equals, not the
  * identity) <code>URI</code>.
- *
- * Instances are created using {@link ResourceFactory#createResource(URI)}.
  */
 public abstract class Resource {
 
@@ -73,9 +71,9 @@ public abstract class Resource {
 
     /**
      * Do not use directly.
+     *
      * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
-     * @see ResourceFactory#createResource(URI)
      */
     public Resource(URI resourceLocator) {
         this.resourceLocator = resourceLocator;

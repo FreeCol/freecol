@@ -329,12 +329,12 @@ public class CollectionUtils {
      * @return A list of entries from the map sorted by key.
      */
     public static <K,V> List<Entry<K,V>>
-        mapEntriesByKey(Map<K, V> map, final Comparator<K> c) {
+        mapEntriesByKey(Map<K, V> map, final Comparator<K> comparator) {
         List<Entry<K,V>> result = new ArrayList<>();
         result.addAll(map.entrySet());
         Collections.sort(result, new Comparator<Entry<K,V>>() {
                 public int compare(Entry<K,V> e1, Entry<K,V> e2) {
-                    return c.compare(e1.getKey(), e2.getKey());
+                    return comparator.compare(e1.getKey(), e2.getKey());
                 }
             });
         return result;
@@ -366,12 +366,12 @@ public class CollectionUtils {
      * @return A list of entries from the map sorted by value.
      */
     public static <K,V> List<Entry<K,V>>
-        mapEntriesByValue(Map<K, V> map, final Comparator<V> c) {
+        mapEntriesByValue(Map<K, V> map, final Comparator<V> comparator) {
         List<Entry<K,V>> result = new ArrayList<>();
         result.addAll(map.entrySet());
         Collections.sort(result, new Comparator<Entry<K,V>>() {
                 public int compare(Entry<K,V> e1, Entry<K,V> e2) {
-                    return c.compare(e1.getValue(), e2.getValue());
+                    return comparator.compare(e1.getValue(), e2.getValue());
                 }
             });
         return result;

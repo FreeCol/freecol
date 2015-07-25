@@ -48,7 +48,6 @@ public class SZAResource extends Resource implements Resource.Preloadable {
      *
      * @param resourceLocator The <code>URI</code> used when loading this
      *     resource.
-     * @see ResourceFactory#createResource(URI)
      */
     public SZAResource(URI resourceLocator) {
         super(resourceLocator);
