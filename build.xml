@@ -279,7 +279,7 @@
         <mkdir dir="${freecol.release.dir}/source/${freecol.name}"/>
         <copy todir="${freecol.release.dir}/source/${freecol.name}">
             <fileset dir="${basedir}"
-                     excludes="dist/**,data/**,jars/**"/>
+                     excludes="dist/**,data/**,jars/**,www.freecol.org/**,nbproject/**,unused/**"/>
         </copy>
     </target>
 
