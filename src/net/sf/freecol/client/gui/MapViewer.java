@@ -1024,8 +1024,8 @@ public final class MapViewer {
         final int tx = tile.getX(), ty = tile.getY(),
             width = rightColumn - leftColumn;
         int moveX = -1;
-        positionMap(tile);
         setFocus(tile);
+        positionMap(tile);
         if (leftColumn <= 0) { // At left edge already
             if (tx <= width / 4) {
                 where = -1;
@@ -1050,8 +1050,8 @@ public final class MapViewer {
         }
         if (moveX >= 0) {
             Tile other = map.getTile(moveX, ty);
-            positionMap(other);
             setFocus(other);
+            positionMap(other);
         }
         return where;
     }
