@@ -70,10 +70,10 @@
         <left-hand-side scope-level="player" method-name="getSoL" />
         <right-hand-side value="50" />
       </limit>
-      <limit id="model.limit.independence.coastalColonies" operator="gt">
+      <limit id="model.limit.independence.coastalColonies" operator="ge">
         <left-hand-side operand-type="settlements" scope-level="player"
                         method-name="isConnectedPort" method-value="true" />
-        <right-hand-side value="0" />
+        <right-hand-side value="1" />
       </limit>
       <limit id="model.limit.independence.year" operator="le">
         <left-hand-side operand-type="year" scope-level="game"/>
