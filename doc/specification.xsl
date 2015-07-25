@@ -23,7 +23,7 @@
   </xsl:template>
 
   <xsl:template match="resource-types">
-    <h1><xsl:value-of select="freecol:localize('colopediaAction.RESOURCES.name')"/></h1>
+    <h1><xsl:value-of select="freecol:localize('colopediaAction.resources.name')"/></h1>
     <table>
       <tr>
         <th><xsl:value-of select="freecol:localize('name')"/></th>
@@ -51,7 +51,7 @@
   </xsl:template>
 
   <xsl:template match="goods-types">
-    <h1><xsl:value-of select="freecol:localize('colopediaAction.GOODS.name')"/></h1>
+    <h1><xsl:value-of select="freecol:localize('colopediaAction.goods.name')"/></h1>
     <table>
       <tr>
         <th><xsl:value-of select="freecol:localize('name')"/></th>
@@ -96,7 +96,7 @@
   </xsl:template>
 
   <xsl:template match="unit-types">
-    <h1><xsl:value-of select="freecol:localize('colopediaAction.UNITS.name')"/></h1>
+    <h1><xsl:value-of select="freecol:localize('colopediaAction.units.name')"/></h1>
     <table>
       <tr>
         <th><xsl:value-of select="freecol:localize('name')"/></th>
@@ -194,7 +194,7 @@
   </xsl:template>
 
   <xsl:template match="tile-types">
-    <h1><xsl:value-of select="freecol:localize('colopediaAction.TERRAIN.name')"/></h1>
+    <h1><xsl:value-of select="freecol:localize('colopediaAction.terrain.name')"/></h1>
     <table>
       <tr>
         <th><xsl:value-of select="freecol:localize('name')"/></th>
@@ -202,7 +202,7 @@
         <th><xsl:value-of select="freecol:localize('colopedia.terrain.workTurns')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.terrain.colonyCenterTile')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.terrain.production')"/></th>
-        <th><xsl:value-of select="freecol:localize('colopediaAction.RESOURCES.name')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopediaAction.resources.name')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.description')"/></th>
       </tr>
       <xsl:apply-templates />
@@ -242,7 +242,7 @@
   </xsl:template>
 
   <xsl:template match="building-types">
-    <h1><xsl:value-of select="freecol:localize('colopediaAction.BUILDINGS.name')"/></h1>
+    <h1><xsl:value-of select="freecol:localize('colopediaAction.buildings.name')"/></h1>
     <table>
       <tr>
         <th><xsl:value-of select="freecol:localize('name')"/></th>
@@ -289,7 +289,7 @@
 
 
   <xsl:template match="founding-fathers">
-    <h1><xsl:value-of select="freecol:localize('colopediaAction.FATHERS.name')"/></h1>
+    <h1><xsl:value-of select="freecol:localize('colopediaAction.fathers.name')"/></h1>
     <table>
       <caption>
         <xsl:value-of select="freecol:localize('colopedia.foundingFather.description')"/>
@@ -346,7 +346,7 @@
     <table>
       <tr>
         <th><xsl:value-of select="freecol:localize('advantage')"/></th>
-        <th><xsl:value-of select="freecol:localize('colopediaAction.UNITS.name')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopediaAction.units.name')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.nationType.typeOfSettlements')"/></th>
         <th><xsl:value-of select="freecol:localize('abilities')"/></th>
       </tr>
@@ -418,8 +418,8 @@
     <table>
       <tr>
         <th><xsl:value-of select="freecol:localize('name')"/></th>
-        <th><xsl:value-of select="freecol:localize('colopediaAction.SKILLS.name')"/></th>
-        <th><xsl:value-of select="freecol:localize('Settlement')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopediaAction.skills.name')"/></th>
+        <th><xsl:value-of select="freecol:localize('settlement')"/></th>
         <th><xsl:value-of select="freecol:localize('capital')"/></th>
         <th><xsl:value-of select="freecol:localize('abilities')"/></th>
       </tr>
@@ -731,7 +731,6 @@
       <xsl:otherwise><xsl:value-of select="$default"/></xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
   <xsl:template name="name">
     <xsl:param name="id"></xsl:param>
     <xsl:param name="key">.image</xsl:param>
@@ -743,7 +742,6 @@
       </a>
     </td>
   </xsl:template>
-
 
 
 

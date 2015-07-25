@@ -33,6 +33,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 
@@ -49,7 +50,8 @@ public class GenerateDocumentation {
         new File("data/strings");
     private static final File RULE_DIRECTORY =
         new File("data/rules/classic");
-
+    private static final String XSL = "specification.xsl";
+    
     private static final File DESTINATION_DIRECTORY =
         new File("doc");
 
@@ -66,6 +68,7 @@ public class GenerateDocumentation {
 
 
     public static void main(String[] args) throws Exception {
+        System.setProperty("jaxp.debug", "1");
         if (args.length > 0) {
             Arrays.sort(args);
         }
@@ -189,8 +192,16 @@ public class GenerateDocumentation {
                 Messages.loadMessageBundle(Messages.getLocale(languageCode));
                 try {
                     TransformerFactory factory = TransformerFactory.newInstance();
-                    Source xsl = new StreamSource(new File("doc", "specification.xsl"));
-                    Transformer stylesheet = factory.newTransformer(xsl);
+                    Source xsl = new StreamSource(new File("doc", XSL));
+                    Transformer stylesheet;
+                    try {
+                        stylesheet = factory.newTransformer(xsl);
+                    } catch (TransformerException tce) {
+                        System.err.println("Problem with " + XSL + " at: "
+                            + tce.getLocationAsString());
+                        tce.printStackTrace();
+                        continue;
+                    }
 
                     Source request  = new StreamSource(new File(RULE_DIRECTORY, "specification.xml"));
                     Result response = new StreamResult(new File(DESTINATION_DIRECTORY, "specification_"
@@ -218,6 +229,5 @@ public class GenerateDocumentation {
             .addAmount(key, num);
         return Messages.message(stringTemplate);
     }
-
 }
 
