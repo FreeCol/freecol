@@ -83,10 +83,10 @@ public class InformationPanel extends FreeColPanel {
             if (images != null && images[i] != null) {
                 textPanel.add(new JLabel(images[i]));
                 textPanel.add(Utility.getDefaultTextArea(texts[i],
-                    new Dimension(490-images[i].getIconWidth(), 225)));
+                    new Dimension(475-images[i].getIconWidth(), 185)));
             } else {
                 textPanel.add(Utility.getDefaultTextArea(texts[i],
-                    new Dimension(490, 225)), "skip");
+                    new Dimension(475, 185)), "skip");
             }
             StringTemplate disp = displayLabel(fcos[i]);
             if (disp == null) continue;
