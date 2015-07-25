@@ -13,13 +13,13 @@
     <arguments></arguments>
     <embeddedJar>true</embeddedJar>
     <executableName>%ant:freecol.release.name%-installer.exe</executableName>
-    <iconLocation>../packaging/icons/freecol2.ico</iconLocation>
+    <iconLocation>../packaging/icons/freecol.ico</iconLocation>
     <initialMemoryHeap>-1</initialMemoryHeap>
     <jarLocation>%ant:freecol.installerjar%</jarLocation>
     <mainClassName>com.izforge.izpack.installer.Installer</mainClassName>
     <maximumMemoryHeap>268435456</maximumMemoryHeap>
     <maximumVersion></maximumVersion>
-    <minimumVersion>1.2</minimumVersion>
+    <minimumVersion>1.7</minimumVersion>
     <skeletonName>Windowed Wrapper</skeletonName>
     <skeletonProperties>
         <key>Message</key>

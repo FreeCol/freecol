@@ -14,7 +14,7 @@
     <classPath>FreeCol.jar</classPath>
     <embeddedJar>false</embeddedJar>
     <executableName>freecol.exe</executableName>
-    <iconLocation>../packaging/icons/freecol2.ico</iconLocation>
+    <iconLocation>../packaging/icons/freecol.ico</iconLocation>
     <initialMemoryHeap>134217728</initialMemoryHeap>
     <javaProperties>
         <name>sun.java2d.d3d</name>
@@ -23,7 +23,7 @@
     <mainClassName>net.sf.freecol.FreeCol</mainClassName>
     <maximumMemoryHeap>536870912</maximumMemoryHeap>
     <maximumVersion></maximumVersion>
-    <minimumVersion>1.4</minimumVersion>
+    <minimumVersion>1.7</minimumVersion>
     <skeletonName>Windowed Wrapper</skeletonName>
     <skeletonProperties>
         <key>Message</key>
