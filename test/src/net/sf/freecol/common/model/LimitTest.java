@@ -102,11 +102,13 @@ public class LimitTest extends FreeColTestCase {
         assertFalse(rebelLimit.evaluate(dutch));
 
         assertNotNull(colonyLimit);
-        assertEquals(Limit.Operator.GT, colonyLimit.getOperator());
+        assertEquals(Limit.Operator.GE, colonyLimit.getOperator());
         assertEquals(Operand.OperandType.SETTLEMENTS, colonyLimit.getLeftHandSide().getOperandType());
         assertEquals(Operand.ScopeLevel.PLAYER, colonyLimit.getLeftHandSide().getScopeLevel());
+        assertEquals("isConnectedPort", colonyLimit.getLeftHandSide().getMethodName());
+        assertFalse(colony.isConnectedPort());
         assertEquals(Integer.valueOf(0), colonyLimit.getLeftHandSide().getValue(dutch));
-        assertEquals(Integer.valueOf(0), colonyLimit.getRightHandSide().getValue(dutch));
+        assertEquals(Integer.valueOf(1), colonyLimit.getRightHandSide().getValue(dutch));
         assertFalse(colonyLimit.evaluate(dutch));
 
         assertNotNull(yearLimit);

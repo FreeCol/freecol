@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.lang.reflect.Method;
-
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -169,20 +167,10 @@ public class Scope extends FreeColObject {
                 if (!type.equals(object.getId())) {
                     return matchNegated;
                 }
-            } else if (object instanceof FreeColGameObject) {
-                try {
-                    Method method = object.getClass().getMethod("getType");
-                    if (method != null
-                        && FreeColGameObjectType.class.isAssignableFrom(method.getReturnType())) {
-                        FreeColGameObjectType objectType =
-                            (FreeColGameObjectType) method.invoke(object);
-                        if (!type.equals(objectType.getId())) {
-                            return matchNegated;
-                        }
-                    } else {
-                        return matchNegated;
-                    }
-                } catch (Exception e) {
+            } else if (object instanceof FreeColObject) {
+                FreeColGameObjectType fcgot = object.invokeMethod("getType",
+                    FreeColGameObjectType.class, (FreeColGameObjectType)null);
+                if (fcgot == null || !type.equals(fcgot.getId())) {
                     return matchNegated;
                 }
             } else {
@@ -193,15 +181,8 @@ public class Scope extends FreeColObject {
             return matchNegated;
         }
         if (methodName != null) {
-            try {
-                Method method = object.getClass().getMethod(methodName);
-                if (method != null
-                    && !String.valueOf(method.invoke(object)).equals(methodValue)) {
-                    return matchNegated;
-                }
-            } catch (Exception e) {
-                return matchNegated;
-            }
+            Object ret = object.invokeMethod(methodName, Object.class, null);
+            if (!String.valueOf(ret).equals(methodValue)) return matchNegated;
         }
         return !matchNegated;
     }

@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -265,6 +266,31 @@ public abstract class FreeColObject
         lb.add("]");
     }
 
+    /**
+     * Invoke a method for this object.
+     *
+     * @param methodName The name of the method.
+     * @param returnClass The class of the return value.
+     * @param defaultValue The default value.
+     * @return The result of invoking the method, or the default value
+     *     on failure.
+     */
+    protected <T> T invokeMethod(String methodName, Class<T> returnClass,
+                                 T defaultValue) {
+        if (methodName != null && returnClass != null) {
+            try {
+                Method method = getClass().getMethod(methodName);
+                if (method != null) {
+                    return returnClass.cast(method.invoke(this));
+                }
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Invoke failed: " + methodName, e);
+            }
+        }
+        return defaultValue;
+    }
+
+    
     // Property change support
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {

@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.lang.reflect.Method;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -167,15 +165,9 @@ public class Operand extends Scope {
      * @return The operand value or null if inapplicable.
      */
     public Integer getValue(Game game) {
-        if (value == null) {
-            if (scopeLevel == ScopeLevel.GAME){
-                return calculateGameValue(game);
-            } else {
-                return null;
-            }
-        } else {
-            return value;
-        }
+        return (value != null) ? value
+            : (scopeLevel == ScopeLevel.GAME) ? calculateGameValue(game)
+            : null;
     }
 
     /**
@@ -185,21 +177,10 @@ public class Operand extends Scope {
      * @return The operand value.
      */
     private Integer calculateGameValue(Game game) {
+        final String methodName = getMethodName();
         switch (operandType) {
         case NONE:
-            if (getMethodName() != null) {
-                try {
-                    Method method = game.getClass().getMethod(getMethodName());
-                    if (method != null &&
-                        Integer.class.isAssignableFrom(method.getReturnType())) {
-                        return (Integer) method.invoke(game);
-                    }
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "Unable to invoke: "
-                        + getMethodName(), e);
-                }
-            }
-            return null;
+            return game.invokeMethod(methodName, Integer.class, 0);
         case YEAR:
             return game.getTurn().getYear();
         case OPTION:
@@ -237,47 +218,47 @@ public class Operand extends Scope {
      * @return The operand value, or null if inapplicable.
      */
     public Integer getValue(Player player) {
-        if (value == null) {
-            if (scopeLevel == ScopeLevel.PLAYER) {
-                List<FreeColObject> list = new LinkedList<>();
-                switch (operandType) {
-                case UNITS:
-                    return count(player.getUnits());
-                case BUILDINGS:
-                    for (Colony colony : player.getColonies()) {
-                        list.addAll(colony.getBuildings());
-                    }
-                    return count(list);
-                case SETTLEMENTS:
-                    return count(player.getSettlements())
-                        + player.getSpecification()
-                            .getInteger(GameOptions.SETTLEMENT_LIMIT_MODIFIER);
-                case FOUNDING_FATHERS:
-                    list.addAll(player.getFathers());
-                    return count(list);
-                default:
-                    if (getMethodName() != null) {
-                        try {
-                            Method method = player.getClass().getMethod(getMethodName());
-                            if (method != null
-                                && (int.class.equals(method.getReturnType())
-                                    || Integer.class.equals(method.getReturnType()))) {
-                                return (Integer) method.invoke(player);
-                            }
-                        } catch (Exception e) {
-                            logger.log(Level.WARNING, "Unable to invoke: "
-                                + getMethodName(), e);
-                        }
-                    }
-                }
-                return null;
-            } else if (scopeLevel == ScopeLevel.GAME) {
-                return getValue(player.getGame());
-            } else {
-                return null;
+        if (value != null) return value;
+        switch (scopeLevel) {
+        case GAME:
+            return getValue(player.getGame());
+        case PLAYER: // Real case, handled below
+            break;
+        default: // Inapplicable
+            return null;
+        }
+
+        final Specification spec = player.getSpecification();
+        final String methodName = getMethodName();
+        List<FreeColObject> list = new LinkedList<>();
+        switch (operandType) {
+        case UNITS:
+            return count(player.getUnits());
+        case BUILDINGS:
+            for (Colony colony : player.getColonies()) {
+                list.addAll(colony.getBuildings());
             }
-        } else {
-            return value;
+            return count(list);
+        case SETTLEMENTS:
+            if (methodName == null) {
+                return count(player.getSettlements())
+                    + spec.getInteger(GameOptions.SETTLEMENT_LIMIT_MODIFIER);
+            } else {
+                final String methodValue = getMethodValue();
+                int result = 0;
+                for (Settlement settlement : player.getSettlements()) {
+                    Boolean b = settlement.invokeMethod(methodName,
+                        Boolean.class, Boolean.FALSE);
+                    if (String.valueOf(b).equals(methodValue)) result++;
+                }
+                return result;
+            }
+        case FOUNDING_FATHERS:
+            list.addAll(player.getFathers());
+            return count(list);
+        default:
+            return player.invokeMethod(methodName, Integer.class,
+                                       (Integer)null);
         }
     }
 
@@ -301,20 +282,8 @@ public class Operand extends Scope {
                     list.addAll(colony.getBuildings());
                     break;
                 default:
-                    if (getMethodName() != null) {
-                        try {
-                            Method method = colony.getClass().getMethod(getMethodName());
-                            if (method != null &&
-                                Integer.class.isAssignableFrom(method.getReturnType())) {
-                                return (Integer) method.invoke(colony);
-                            }
-                        } catch (Exception e) {
-                            logger.log(Level.WARNING, "Unable to invoke: "
-                                + getMethodName(), e);
-                            return null;
-                        }
-                    }
-                    return null;
+                    return colony.invokeMethod(getMethodName(), Integer.class,
+                                               (Integer)null);
                 }
                 return count(list);
             } else {
