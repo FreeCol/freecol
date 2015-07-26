@@ -308,10 +308,11 @@
     </target>
 
     <target name="zipSourceBundle" unless="skip.dist.source"
-            depends="initDist,prepareSourceFiles">
+            depends="initDist,prepareBaseFiles,prepareSourceFiles">
         <zip destfile="${freecol.release.dir}/${freecol.release.name}-src.zip">
             <fileset dir="${freecol.release.dir}/base"
-                     includes="${freecol.name}/**"/>
+                     includes="${freecol.name}/**"
+                     excludes="${freecol.name}/FreeCol.jar,${freecol.name}/freecol.*,${freecol.name}/freecol"/>
             <fileset dir="${freecol.release.dir}/source"
                      includes="${freecol.name}/**"/>
         </zip>
