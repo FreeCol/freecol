@@ -178,8 +178,8 @@ public abstract class AbstractOption<T> extends FreeColObject
 
     // Serialization
 
-    private static final String ACTION_TAG = "action";
-    private static final String DEFAULT_VALUE_TAG = "defaultValue";
+    protected static final String ACTION_TAG = "action";
+    protected static final String DEFAULT_VALUE_TAG = "defaultValue";
 
 
     /**

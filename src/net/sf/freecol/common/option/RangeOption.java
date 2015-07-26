@@ -55,19 +55,18 @@ public class RangeOption extends SelectOption {
 
 
     /**
-     * Gets the rank of the current selected value in the list of values of this
-     * <code>RangeOption</code>.
+     * Gets the rank of the current selected value in the list of
+     * values of this <code>RangeOption</code>.
      *
      * @return The value.
      */
     public int getValueRank() {
         int rank = 0;
-        Iterator<Integer> iterator = getItemValues().keySet().iterator();
-        while (iterator.hasNext()
-            && iterator.next() != getValue()) {
+        for (Integer i : getItemValues().keySet()) {
+            if (i == getValue()) return rank;
             rank++;
         }
-        return rank;
+        return 0; // Actually invalid
     }
 
     /**
@@ -81,6 +80,7 @@ public class RangeOption extends SelectOption {
         Iterator<Integer> iterator = getItemValues().keySet().iterator();
 
         while (rank >= 0) {
+            if (!iterator.hasNext()) break;
             curValue = iterator.next();
             rank--;
         }

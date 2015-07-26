@@ -21,6 +21,8 @@ package net.sf.freecol.common.option;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -75,6 +77,25 @@ public class SelectOption extends IntegerOption {
     }
 
     /**
+     * Add a new key,value pair to this option.
+     *
+     * @param key The key to add.
+     * @param value The value to add.
+     */
+    public void addItemValue(Integer key, String value) {
+        itemValues.put(key, value);
+    }
+
+    /**
+     * Clear the item values for this option.
+     *
+     * Required by ClientOptions.fixClientOptions.
+     */
+    public void clearItemValues() {
+        itemValues.clear();
+    }
+    
+    /**
      * Whether the labels of this option need to be localized.  This is
      * not the case when the labels are just numeric values.
      *
@@ -93,6 +114,28 @@ public class SelectOption extends IntegerOption {
      */
     public String getXMLItemElementTagName() {
         return "selectValue";
+    }
+
+    // Interface Option
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setValue(Integer value) {
+        Set<Integer> keys = getItemValues().keySet();
+        if (keys.isEmpty()) return; // May not have been read yet
+
+        Integer fallback = null;
+        for (Integer i : keys) {
+            if (i == value) { // Found a valid selection
+                super.setValue(value);
+                return;
+            }
+            if (fallback == null) fallback = i;
+        }
+        logger.warning(getXMLElementTagName() + ".setValue invalid value: "
+            + value + ", using fallback: " + fallback);
+        super.setValue(fallback);
     }
 
 
@@ -145,10 +188,18 @@ public class SelectOption extends IntegerOption {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        itemValues.clear();
+        // We can not set the value until we have read the select options
+        // so as to be able to check its validity.
+        String value = xr.getAttribute(VALUE_TAG, (String)null);
+        String defaultValue = xr.getAttribute(DEFAULT_VALUE_TAG, (String)null);
 
+        // Clear containers.
+        clearItemValues();
+        
         super.readChildren(xr);
+
+        // Now we can correctly set the value.
+        setValue(value, defaultValue);
     }
 
     /**
@@ -159,8 +210,8 @@ public class SelectOption extends IntegerOption {
         final String tag = xr.getLocalName();
 
         if (getXMLItemElementTagName().equals(tag)) {
-            itemValues.put(xr.getAttribute(VALUE_TAG, INFINITY),
-                           xr.getAttribute(LABEL_TAG, (String)null));
+            addItemValue(xr.getAttribute(VALUE_TAG, INFINITY),
+                         xr.getAttribute(LABEL_TAG, (String)null));
             xr.closeTag(tag);
 
         } else {
