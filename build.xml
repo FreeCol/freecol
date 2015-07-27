@@ -261,6 +261,7 @@
         <mkdir dir="${freecol.release.dir}/base/${freecol.name}"/>
         <copy todir="${freecol.release.dir}/base/${freecol.name}">
             <fileset dir="${basedir}" includes="FreeCol.jar"/>
+            <fileset dir="${basedir}" includes="splash.jpg"/>
             <fileset dir="${freecol.packaging.dir}/common" includes="COPYING"/>
             <fileset dir="${freecol.packaging.dir}/common" includes="README"/>
             <fileset dir="${freecol.packaging.dir}/common"
@@ -279,7 +280,7 @@
         <mkdir dir="${freecol.release.dir}/source/${freecol.name}"/>
         <copy todir="${freecol.release.dir}/source/${freecol.name}">
             <fileset dir="${basedir}"
-                     excludes="dist/**,data/**,jars/**,www.freecol.org/**,nbproject/**,unused/**"/>
+                     excludes="splash.jpg,dist/**,data/**,jars/**,www.freecol.org/**,nbproject/**,unused/**"/>
         </copy>
     </target>
 
