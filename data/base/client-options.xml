@@ -140,6 +140,8 @@
         <rangeValue label="2" value="2"/>
         <rangeValue label="3" value="3"/>
         <rangeValue label="4" value="4"/>
+        <rangeValue label="5" value="5"/>
+        <rangeValue label="6" value="6"/>
       </rangeOption>
       <!-- Animation speed for friendly units. -->
       <rangeOption id="model.option.moveAnimationSpeed"

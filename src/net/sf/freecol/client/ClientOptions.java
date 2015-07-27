@@ -49,6 +49,7 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.ModListOption;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.TextOption;
 import net.sf.freecol.common.util.Utils;
 
@@ -826,6 +827,23 @@ public class ClientOptions extends OptionGroup {
         // @compat 0.11.3
         addBooleanOption(AUTOLOAD_SENTRIES,
             "clientOptions.other", false);
+        try { // Zoom range was increased
+            RangeOption ro = (RangeOption)getOption(DEFAULT_MINIMAP_ZOOM);
+            if (ro.getItemValues().size() != 6) {
+                Integer value = ro.getValue();
+                ro.clearItemValues();
+                ro.addItemValue(1, "1");
+                ro.addItemValue(2, "2");
+                ro.addItemValue(3, "3");
+                ro.addItemValue(4, "4");
+                ro.addItemValue(5, "5");
+                ro.addItemValue(6, "6");
+                ro.setValue(value); // Make sure the value is valid
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to fix " + DEFAULT_MINIMAP_ZOOM
+                + " option", e);
+        }
         // end @compat 0.11.3
     }
 

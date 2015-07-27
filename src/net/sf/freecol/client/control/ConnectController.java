@@ -533,7 +533,7 @@ public final class ConnectController {
             return false;
         }
         options.merge(fis);
-        options.fixClientOptions(); // TODO: drop, should no longer be needed
+        options.fixClientOptions();
 
         // Get suggestions for "singlePlayer" and "publicServer"
         // settings from the file, and update the client options if

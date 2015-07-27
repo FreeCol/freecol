@@ -252,6 +252,7 @@ public final class FreeColClient {
         // Load the client options, which handle reloading the
         // resources specified in the active mods.
         this.clientOptions = loadClientOptions(savedGame);
+        this.clientOptions.fixClientOptions();
 
         // Reset the mod resources as a result of the client option update.
         ResourceMapping modMappings = new ResourceMapping();
