@@ -50,7 +50,7 @@ public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {
         JSlider slider = getComponent();
 
         slider.setModel(new DefaultBoundedRangeModel(option.getValueRank(), 0,
-                0, option.getItemValues().size()));
+                0, option.getItemValues().size()-1));
 
         Hashtable<Integer, JComponent> labels
             = new Hashtable<>();
