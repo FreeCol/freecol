@@ -63,7 +63,7 @@ public class SoundController {
                 logger.warning(ClientOptions.AUDIO_VOLUME + " is not a PercentageOption");
             } else {
                 try {
-                    logger.log(Level.INFO, "Create sound controller with"
+                    logger.log(Level.INFO, "Create sound controller with "
                         + amo + "/" + vo);
                         //+ " mixer /" + amo.getValue().toString()
                         //+ "/, volume " + volume.getValue().toString());
