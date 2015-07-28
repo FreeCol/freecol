@@ -545,7 +545,8 @@
 
     <target name="distclean" depends="init,clean"
             description="Cleans the directories and removes the distribution directory.">
-        <delete quiet="true" includeEmptyDirs="true">
+        <delete quiet="true" includeEmptyDirs="true" followsymlinks="false"
+                removeNotFollowedSymlinks="true">
             <fileset dir="${freecol.release.dir}" />
         </delete>
     </target>
