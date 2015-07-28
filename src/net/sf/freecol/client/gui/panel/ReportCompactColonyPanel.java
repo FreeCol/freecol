@@ -504,6 +504,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
      */
     private void updateColony(ColonySummary s) {
         final String cac = s.colony.getId();
+        final UnitType defaultUnitType
+            = spec.getDefaultUnitType(s.colony.getOwner());
         List<JComponent> buttons = new ArrayList<>();
         JButton b;
         Color c;
@@ -700,8 +702,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         if (s.newColonist > 0) {
             t = stpld("report.colony.arriving")
                     .addName("%colony%", s.colony.getName())
-                    .addNamed("%unit%",
-                        spec.getDefaultUnitType(s.colony.getOwner()))
+                    .addNamed("%unit%", defaultUnitType)
                     .addAmount("%turns%", s.newColonist);
             b = newButton(cac, Integer.toString(s.newColonist), null,
                           cGood, t);
@@ -755,8 +756,13 @@ public final class ReportCompactColonyPanel extends ReportPanel
             buttons.add(b);
         }
 
-        // Field: What is being trained.
+        // Field: What is being trained, including shadow units for vacant
+        // places.
         // Colour: cAlarm if completion is blocked, otherwise cPlain.
+        int empty = 0;
+        Building school = s.colony.getWorkLocationWithAbility(Ability.TEACH,
+                                                              Building.class);
+        if (school != null) empty = school.getType().getWorkPlaces();
         for (Entry<Unit, Integer> e
                  : mapEntriesByValue(s.teachers, descendingIntegerComparator)) {
             Unit u = e.getKey();
@@ -778,6 +784,18 @@ public final class ReportCompactColonyPanel extends ReportPanel
                               cPlain, t);
             }
             buttons.add(b);
+            empty--;
+        }
+
+        if (empty > 0) {
+            final ImageIcon emptyIcon
+                = new ImageIcon(this.lib.getTinyUnitImage(defaultUnitType, true));
+            t = stpld("report.colony.making.educationVacancy")
+                    .addName("%colony%", s.colony.getName())
+                    .addAmount("%number%", empty);
+            for (; empty > 0; empty--) {
+                buttons.add(newButton(cac, "", emptyIcon, cPlain, t));
+            }
         }
         addTogether(buttons);
 
