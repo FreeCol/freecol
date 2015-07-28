@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -193,6 +194,11 @@ public final class InGameController implements NetworkConstants {
     /** A template to use as a magic cookie for aborted trades. */
     private static final StringTemplate abortTrade
         = StringTemplate.template("");
+
+    /** A comparator for ordering trade route units. */
+    private static final Comparator<Unit> tradeRouteUnitComparator
+        = Comparator.comparing((Unit u) -> u.getTradeRoute().getName())
+            .thenComparing(u -> (FreeColObject)u);
 
     /** The enclosing <code>FreeColClient</code>. */
     private final FreeColClient freeColClient;
@@ -787,8 +793,10 @@ public final class InGameController implements NetworkConstants {
 
         // Deal with the trade route units first.
         List<ModelMessage> messages = new ArrayList<>();
-        while (player.hasNextTradeRouteUnit()) {
-            Unit unit = player.getNextTradeRouteUnit();
+        for (Unit unit : iterable(player.getUnits().stream()
+                .filter(u -> u.isReadyToMove() && u.getOwner() == player
+                    && u.getTradeRoute() != null)
+                .sorted(tradeRouteUnitComparator))) {
             gui.setActiveUnit(unit);
             if (moveToDestination(unit, messages)) stillActive = unit;
         }
@@ -2436,7 +2444,8 @@ public final class InGameController implements NetworkConstants {
                 + " with " + unit.getId() + " at " + stop.getLocation()
                 + " of " + type.getSuffix() + " from " + present
                 + " exporting " + exportAmount + " importing " + importAmount
-                + " to " + unload.getLocation()
+                + " to " + ((unload == null) ? "?"
+                    : unload.getLocation().toString())
                 + " limited by " + limit.get(type)
                 + " -> " + ag.getAmount());
         }

@@ -582,6 +582,22 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Is this unit ready to move?
+     *
+     * @return True if the unit is ready to move.
+     */
+    public boolean isReadyToMove() {
+        return !isDisposed()
+            && getState() != Unit.UnitState.FORTIFYING
+            && getState() != Unit.UnitState.SKIPPED
+            && getMovesLeft() > 0
+            && !isDamaged()
+            && !isAtSea()
+            && !isOnCarrier()
+            && !isInColony();
+    }
+
+    /**
      * Gets the state of this <code>Unit</code>.
      *
      * @return The state of this <code>Unit</code>.
