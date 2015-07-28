@@ -240,6 +240,9 @@
         <replaceregexp file="${freecol.src.dir}/net/sf/freecol/FreeCol.java"
                        match="FREECOL_VERSION\s*=\s*&quot;(.*?)&quot;\;"
                        replace="FREECOL_VERSION = &quot;${freecol.version}&quot;\;"/>
+        <replaceregexp file="${freecol.doc.dir}/version.sty"
+                       match="fcversion\}\{(.*?)\}"
+                       replace="fcversion\}\{${freecol.version}\}"/>
         <echo message="Game version updated in FreeCol.java" />
     </target>
 
