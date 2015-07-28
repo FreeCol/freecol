@@ -383,9 +383,9 @@ recommended for a release.  Uploads to sourceforge use \texttt{sftp}.
 \begin{itemize}
 
 \item Make sure that all relevant changes have been committed to the
-  branch you are about to release.  If you plan to upload the JavaDoc
-  (see below) make sure that \verb+ant javadoc+ is not finding errors
-  before branching.
+  branch you are about to release.  If you plan to upload the manual
+  and/or JavaDoc, regenerate it (with \verb+ant manual+ and
+  \verb+ant javadoc+), and fix any JavaDoc errors.
 
 \item Merge translations from trunk if the release is not made from
   trunk, with \verb+ant merge-translations+.  Skip this step if the
@@ -395,26 +395,18 @@ recommended for a release.  Uploads to sourceforge use \texttt{sftp}.
 \item Lately we release from the git master and continue to work from
   there, so there is no urgent need to create a special release branch.
 
-\item Change the \verb+FREECOL_VERSION+ constant in FreeCol.java to
-  match the release version.
-
-\item Likewise, change the value of the \verb+fcversion+ macro in
-  \texttt{doc/version.sty} to the release version.
-
 \item Start a clean compile, run all tests and verify the
   specification(s). You can do that by calling \verb+ant prepare-commit+.
  
-\item Commit the changes.
-
 \item Call \verb+ant dist+ in order to build all packages. You will be
   prompted for the version of this release. Alternatively, you can
   specify the version on the command line, by with something like:
-\begin{verbatim}ant -Dfreecol.version=0.9.0-alpha2 dist\end{verbatim}
-  instead (replace 0.9.0-alpha2 with the correct version, of
-  course). It might be necessary to increase the memory available for
-  ant, for example by setting the environment variable
-  \verb|ANT_OPTS="-Xms256m -Xmx256m"|.  Errors in language packs
-  only apply to the installer and need not delay the overall release.
+  \verb+ant -Dfreecol.version=0.9.0-alpha2 dist+ instead (replace
+  0.9.0-alpha2 with the correct version, of course). It might be
+  necessary to increase the memory available for ant, for example by
+  setting the environment variable
+  \verb|ANT_OPTS="-Xms256m -Xmx256m"|.  Errors in language packs only
+  apply to the installer and need not delay the overall release.
 
 \item Install one of the generated packages and verify that you can play
   normally for at least five turns. Other good tests include loading a
@@ -422,30 +414,13 @@ recommended for a release.  Uploads to sourceforge use \texttt{sftp}.
   so. It might also be a good idea to compile the game from one of the
   source packages.
 
-\item Upload the packages to \verb+sftp://frs.sourceforge.net/+ and ensure that
-  all packages get uploaded. You can use a script similar to this:
+\item \verb+ant dist+ will change the \verb+FREECOL_VERSION+ constant
+  in FreeCol.java and the \verb+fcversion+ macro in
+  \texttt{doc/version.sty} to the release version.  Commit these changes.
 
-\begin{verbatim}
-#!/bin/sh
-
-FREECOL_VERSION=0.9.0-alpha2
-PREFIX=freecol-$FREECOL_VERSION
-USERNAME=myUserName
-
-cd dist
-
-sftp $USERNAME,freecol@frs.sourceforge.net <<FILE
-cd /home/frs/project/f/fr/freecol/freecol
-mkdir $PREFIX
-cd $PREFIX
-put $PREFIX-installer.exe
-put $PREFIX-installer.jar
-put $PREFIX-mac.tar.bz2
-put $PREFIX-src.zip
-put $PREFIX.zip
-exit
-FILE
-\end{verbatim}
+\item Upload the packages to \verb+sftp://frs.sourceforge.net/+.  A
+  script \verb|bin/release.sh| is provided that does this job,
+  including rebuilding and uploading the manual and JavaDoc.  
 
 \item Compile the feature list for the news announcement (use the
   tracker and/or run the previous version for comparison).  Include
@@ -454,25 +429,25 @@ FILE
   sourceforge freecol wiki.
 
 \item The \texttt{freecol.org} website is in transition to a new
-  format.  For now, you will need to change the \texttt{index.html},
-  \texttt{news/index.html} and \texttt{download.html} files by hand,
-  and add \texttt{news/freecol-}\emph{version}\texttt{-released.html}.
-  Use \texttt{sftp} to log in at \emph{username}\texttt{,freecol@web.sf.net}
-  to upload changes.  The web site lives in the \texttt{htdocs} directory.
-
-%\item Update the release number in the "Version"-mambot at
-%  \texttt{http://www.freecol.org/administrator} > Mambots > Site Mambots > Version.
-%
-%\item Publish/unpublish "Download Unstable Version" in the main menu
-%  (Front Page Manager).  This page should only be displayed if the
-%  unstable version is the latest release.
-%
-%\item Copy the previous release announcement (Content > All Content
-%  Items), rename and update the copy for the current release, and
-%  publish it to the website.  Retain the download button but fix the
-%  version number on its label.
-%
-%\item Remove the download button from the previous release news item.
+  format, and the master copy lives in the git tree at
+  \texttt{www.freecol.org}.  To update the website, for now, you will
+  need to add a new
+  \texttt{www.freecol.org/news/freecol-}\emph{version}\texttt{-released.html}
+  file and edit the following files:
+  \begin{description}
+  \item[\texttt{www.freecol.org/download.html}] Update the release
+    version number.
+  \item[\texttt{www.freecol.org/index.html}] Add a reference to the
+    new release.
+  \item[\texttt{www.freecol.org/news/index.html}] Add a section for
+    the new release, and move the download button from the previous
+    release to the new one.
+  \end{description}
+  Use \texttt{sftp} to log in at
+  \emph{username}\texttt{,freecol@web.sf.net} to upload changes (the
+  website lives in the \texttt{htdocs} subdirectory), or use the
+  \verb|bin/website.sh| script which uploads everything that has
+  changed in the git website directory.
 
 \item Post release messages on our mailing lists: developers,
   translators and users.  Beware that you may have to be subscribed to
@@ -484,49 +459,23 @@ FILE
 
 \item Post a news item on the FreeCol project \href{https://sourceforge.net/p/freecol/news/}{news} page on sourceforge.
 
-\item Go to the bug tracker and create a new milestone (``Edit
-  Milestones'') called ``Fixed\_\emph{release}''
-  (e.g. ``Fixed\_0.10.2'').  Select the ``Fixed\_trunk'' group and do
-  a mass edit (the pencil icon in the top right of the bug tracker
-  list) and move all bugs to the new milestone.
-
-\item Do the corresponding action in other ticket categories that
-  have distinct release milestones.
-
 \item Consider revising the preamble to the ``Bugs'' page,
   particularly the ``Known Common Problems'' section.  Go to Admin /
   Tools / Bugs / Options to make changes.
 
-\item Regenerate the documentation (with \verb+ant manual+) and
-  JavaDoc (with \verb+ant javadoc+) and update JavaDoc and User
-  Documentation on \href{freecol.org}{freecol.org}. You can do that
-  with a script like this:
+\item Go to the bug tracker and create a new milestone (``Edit
+  Milestones'') called ``Fixed\_\emph{release}''
+  (e.g. ``Fixed\_0.10.2'').  Select the ``Fixed\_trunk'' group and do
+  a mass edit (the pencil icon in the top right of the bug tracker
+  list) and move all bugs to the new milestone.  Repeat for the
+  ``Pending\_Fixed'' group.  Do the corresponding action in other
+  ticket categories that have distinct release milestones.
 
-\begin{verbatim}
-#!/bin/sh
-
-USERNAME=myUserName
-
-cd doc
-
-{
-    echo cd /home/project-web/freecol/htdocs
-    echo put FreeCol.pdf docs/
-    echo put FreeCol.html docs/
-    echo put images/* docs/images
-    find javadoc/ -printf "put %p %p\n"
-} | sftp $USERNAME,freecol@web.sf.net
-
-
-\end{verbatim}
-
-% We are no longer doing this.  Some of these sites are gone anyway.
-%
-%\item Create news items at \href{Linuxgames.com}{Linuxgames.com},
-%  \href{linux-gamers.com}{linux-gamers.com} and
-%  \href{happypenguin.org}{happypenguin.org}.
+\item Start a new wiki page for the release notes for the next
+  release.
 
 \end{itemize}
+
 
 \hypertarget{Missing features}{\chapter{Missing features}}
 
@@ -543,7 +492,7 @@ bug.  Please report such omissions on the
   features} tracker.
 
 Since we do not have access to the source code of the original game,
-we can only guess at the algorithms used.  This is particularly clear
+we can only guess at the algorithms used.  This is particularly true
 in complex, detailed areas such as production and combat.  In some
 cases, players have reverse-engineered the algorithm.  If you know of
 some calcuation in FreeCol that differs from that of the original
@@ -926,10 +875,6 @@ The player may trade goods in foreign colonies.
 
 The unit is an undead unit (used only in revenge mode).
 
-
-
-
-
 \modifier{model.modifier.bombardBonus}
 \affectsPlayer
 
@@ -1076,7 +1021,6 @@ stockade building, which is done as follows:
 
 Note that not all elements take a \texttt{delete} tag yet.  You may
 need to read or modify the source to be certain a mod will work.
-
 
 \hypertarget{Resources}{\chapter{Resources}}
 
