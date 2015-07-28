@@ -8,7 +8,7 @@
     
     <shortcut name="FreeCol"
               target="$INSTALL_PATH\freecol.exe"
-              commandLine="--splash --windowed"
+              commandLine="--windowed"
               workingDirectory="$INSTALL_PATH"
               description="A turn-based strategy game based on 'Sid Meier's Colonization'"
               categories="Application;Game;StrategyGame"
@@ -24,7 +24,7 @@
     
     <shortcut name="FreeCol (full screen)"
               target="$INSTALL_PATH\freecol.exe"
-              commandLine="--splash --full-screen"
+              commandLine="--full-screen"
               workingDirectory="$INSTALL_PATH"
               description="FreeCol - full screen"
               categories="Application;Game;StrategyGame"
