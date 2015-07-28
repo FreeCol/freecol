@@ -102,6 +102,16 @@ public class IntegerOption extends AbstractOption<Integer> {
         this.maximumValue = maximumValue;
     }
 
+    /**
+     * Limit a value with respect to the limits of this option.
+     *
+     * @param value The value to limit.
+     * @return The value limited by the option limits.
+     */
+    public int limitValue(int value) {
+        return Math.min(Math.max(value, this.minimumValue), this.maximumValue);
+    }
+
 
     // Interface Option
 
@@ -131,7 +141,7 @@ public class IntegerOption extends AbstractOption<Integer> {
     @Override
     public void setValue(Integer value) {
         final int oldValue = this.value;
-        this.value = value;
+        this.value = limitValue(value);
 
         if (value != oldValue && isDefined) {
             firePropertyChange(VALUE_TAG, oldValue, (int)value);
@@ -189,6 +199,8 @@ public class IntegerOption extends AbstractOption<Integer> {
         maximumValue = xr.getAttribute(MAXIMUM_VALUE_TAG, Integer.MAX_VALUE);
 
         minimumValue = xr.getAttribute(MINIMUM_VALUE_TAG, Integer.MIN_VALUE);
+
+        this.value = limitValue(this.value);
     }
 
     /**
