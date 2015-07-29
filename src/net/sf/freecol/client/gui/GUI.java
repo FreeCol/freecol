@@ -1632,8 +1632,7 @@ public class GUI {
     public void setFocusImmediately(Tile tileToFocus) {
     }
 
-    public boolean setSelectedTile(Tile newTileToSelect,
-                                   boolean clearGoToOrders) {
+    public boolean setSelectedTile(Tile newTileToSelect) {
         return true; // Pretending again.
     }
 

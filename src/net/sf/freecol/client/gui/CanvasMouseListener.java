@@ -205,7 +205,15 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
     @Override
     public void actionPerformed(ActionEvent e) {
         doubleClickTimer.stop();
-        mapViewer.setSelectedTile(mapViewer.convertToMapTile(centerX, centerY),
-            true);
+        Tile tile=mapViewer.convertToMapTile(centerX, centerY);
+        if(mapViewer.getViewMode() == GUI.MOVE_UNITS_MODE) {
+            // Clear goto order when active unit is on the tile
+            Unit unit=mapViewer.getActiveUnit();
+            if(unit != null && unit.getTile() == tile) {
+                freeColClient.getInGameController().clearGotoOrders(unit);
+                mapViewer.updateCurrentPathForActiveUnit();
+            }
+        }
+        mapViewer.setSelectedTile(tile);
     }
 }

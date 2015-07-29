@@ -139,7 +139,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         try {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
-                if (tile != null) getGUI().setSelectedTile(tile, false);
+                if (tile != null) getGUI().setSelectedTile(tile);
                 startPoint = endPoint = null;
 
             } else if (e.getButton() == MouseEvent.BUTTON2) {
@@ -167,7 +167,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                         canvas.showEditSettlementDialog(tile.getIndianSettlement());
                     }
                 } else {
-                    getGUI().setSelectedTile(null, false);
+                    getGUI().setSelectedTile(null);
                 }
             }
         } catch (Exception ex) {
