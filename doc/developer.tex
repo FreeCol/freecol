@@ -408,11 +408,14 @@ recommended for a release.  Uploads to sourceforge use \texttt{sftp}.
   \verb|ANT_OPTS="-Xms256m -Xmx256m"|.  Errors in language packs only
   apply to the installer and need not delay the overall release.
 
-\item Install one of the generated packages and verify that you can play
-  normally for at least five turns. Other good tests include loading a
-  saved game and running the game in debug mode for a hundred turns or
-  so. It might also be a good idea to compile the game from one of the
-  source packages.
+\item Install one of the generated packages and verify that you can
+  play normally for at least five turns (the java installer can be run
+  from the command line with \texttt{java -cp
+    freecol-\emph{version}-installer.jar
+    com.izforge.izpack.installer.Installer}).  Other good tests
+  include loading a saved game and running the game in debug mode for
+  a hundred turns or so.  It might also be a good idea to compile the
+  game from one of the source packages.
 
 \item \verb+ant dist+ will change the \verb+FREECOL_VERSION+ constant
   in FreeCol.java and the \verb+fcversion+ macro in
@@ -422,16 +425,16 @@ recommended for a release.  Uploads to sourceforge use \texttt{sftp}.
   script \verb|bin/release.sh| is provided that does this job,
   including rebuilding and uploading the manual and JavaDoc.  
 
-\item Compile the feature list for the news announcement (use the
-  tracker and/or run the previous version for comparison).  Include
-  information on savegame compatibility with previous versions on all
-  messages.  Recent practice is to compile a Release Notes page on the
-  sourceforge freecol wiki.
+\item Write a release announcement (see previous versions for
+  comparison).  Include information on savegame compatibility with
+  previous FreeCol versions on all messages.  Recent practice is to
+  keep the announcement brief but refer to a detailed ``Release Notes''
+  page on the sourceforge freecol wiki.
 
 \item The \texttt{freecol.org} website is in transition to a new
-  format, and the master copy lives in the git tree at
-  \texttt{www.freecol.org}.  To update the website, for now, you will
-  need to add a new
+  format, and the master copy lives in the git tree in the
+  \texttt{www.freecol.org} top-level directory.  To update the
+  website, for now, you will need to add a new
   \texttt{www.freecol.org/news/freecol-}\emph{version}\texttt{-released.html}
   file and edit the following files:
   \begin{description}
@@ -440,8 +443,8 @@ recommended for a release.  Uploads to sourceforge use \texttt{sftp}.
   \item[\texttt{www.freecol.org/index.html}] Add a reference to the
     new release.
   \item[\texttt{www.freecol.org/news/index.html}] Add a section for
-    the new release, and move the download button from the previous
-    release to the new one.
+    the new release containing the release announcement, and move the
+    download button from the previous release to the new one.
   \end{description}
   Use \texttt{sftp} to log in at
   \emph{username}\texttt{,freecol@web.sf.net} to upload changes (the
@@ -449,19 +452,21 @@ recommended for a release.  Uploads to sourceforge use \texttt{sftp}.
   \verb|bin/website.sh| script which uploads everything that has
   changed in the git website directory.
 
-\item Post release messages on our mailing lists: developers,
-  translators and users.  Beware that you may have to be subscribed to
-  some lists to be able to post.  The addresses are:
-  \texttt{freecol-\{developers,translators,users\}@lists.sourceforge.net}
-
-\item Post a release message to the FreeCol
-  \href{https://sourceforge.net/p/freecol/discussion/141200/}{forum}.
-
-\item Post a news item on the FreeCol project \href{https://sourceforge.net/p/freecol/news/}{news} page on sourceforge.
+\item Post the release announcement to:
+  \begin{itemize}
+    \item Our mailing lists: developers, translators and users.
+      Beware that you may have to be subscribed to some lists to be
+      able to post.  The addresses are:
+      \texttt{freecol-\{developers,translators,users\}@lists.sourceforge.net}
+    \item The FreeCol
+      \href{https://sourceforge.net/p/freecol/discussion/141200/}{forum}.
+    \item The project
+      \href{https://sourceforge.net/p/freecol/news/}{news} page on sourceforge.
+  \end{itemize}
 
 \item Consider revising the preamble to the ``Bugs'' page,
-  particularly the ``Known Common Problems'' section.  Go to Admin /
-  Tools / Bugs / Options to make changes.
+  particularly the ``Known Common Problems'' section.  Go to ``Admin /
+  Tools / Bugs / Options'' to make changes.
 
 \item Go to the bug tracker and create a new milestone (``Edit
   Milestones'') called ``Fixed\_\emph{release}''
