@@ -317,10 +317,10 @@ public final class ConnectController {
                         activeUnit.getOwner().setNextActiveUnit(activeUnit);
                         gui.setActiveUnit(activeUnit);
                     } else {
-                        gui.setSelectedTile(entryTile, false);
+                        gui.setSelectedTile(entryTile);
                     }
                 } else {
-                    gui.setSelectedTile(entryTile, false);
+                    gui.setSelectedTile(entryTile);
                 }
             }
         }

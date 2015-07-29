@@ -853,7 +853,7 @@ public final class InGameController implements NetworkConstants {
         // just select nothing and wait.
         ClientOptions options = freeColClient.getClientOptions();
         if (tile != null) {
-            gui.setSelectedTile(tile, false);
+            gui.setSelectedTile(tile);
         } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
             doEndTurn(options.getBoolean(ClientOptions.SHOW_END_TURN_DIALOG));
         }
@@ -1631,7 +1631,7 @@ public final class InGameController implements NetworkConstants {
         }
         if (unit.getMovesLeft() <= 0) return false;
         displayModelMessages(false);
-        if (!gui.onScreen(tile)) gui.setSelectedTile(tile, false);
+        if (!gui.onScreen(tile)) gui.setSelectedTile(tile);
         return true;
     }
 
@@ -2563,7 +2563,7 @@ public final class InGameController implements NetworkConstants {
         if (ret) {
             player.invalidateCanSeeTiles();
             gui.setActiveUnit(null);
-            gui.setSelectedTile(tile, false);
+            gui.setSelectedTile(tile);
         }
         return ret;
     }
@@ -2727,7 +2727,7 @@ public final class InGameController implements NetworkConstants {
         if (ret) {
             player.invalidateCanSeeTiles();
             gui.setActiveUnit(null);
-            gui.setSelectedTile(tile, false);
+            gui.setSelectedTile(tile);
             freeColClient.getSoundController()
                 .playSound("sound.event.buildingComplete");
             // Check units present for treasure cash-in as they are now
@@ -3826,7 +3826,7 @@ public final class InGameController implements NetworkConstants {
         Tile newTile = tile.getNeighbourOrNull(direction);
         if (newTile == null) return false;
 
-        gui.setSelectedTile(newTile, false);
+        gui.setSelectedTile(newTile);
         return true;
     } 
 

@@ -204,7 +204,7 @@ public class SwingGUI extends GUI {
         canvas.initializeInGame();
         enableMapControls(freeColClient.getClientOptions()
             .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
-        setSelectedTile(tile, false);
+        setSelectedTile(tile);
     }
 
     /**
@@ -1658,9 +1658,8 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public boolean setSelectedTile(Tile newTileToSelect,
-                                   boolean clearGoToOrders) {
-        return mapViewer.setSelectedTile(newTileToSelect, clearGoToOrders);
+    public boolean setSelectedTile(Tile newTileToSelect) {
+        return mapViewer.setSelectedTile(newTileToSelect);
     }
 
     @Override
