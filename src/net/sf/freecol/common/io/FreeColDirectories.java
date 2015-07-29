@@ -515,6 +515,16 @@ public class FreeColDirectories {
         }
     }
 
+    /**
+     * Derive the directory for the autosave files from the save directory.
+     */
+    private static void deriveAutosaveDirectory() {
+        if (autosaveDirectory == null && saveDirectory != null) {
+            autosaveDirectory = new File(saveDirectory, AUTOSAVE_DIRECTORY);
+            if (!insistDirectory(autosaveDirectory)) autosaveDirectory = null;
+        }
+    }
+        
 
     // Main initialization/bootstrap routines.
     // These need to be called early before the subsidiary directory
@@ -630,9 +640,7 @@ public class FreeColDirectories {
             saveDirectory = new File(getUserDataDirectory(), SAVE_DIRECTORY);
             if (!insistDirectory(saveDirectory)) return "main.userDir.fail";
         }
-
-        autosaveDirectory = new File(getSaveDirectory(), AUTOSAVE_DIRECTORY);
-        if (!insistDirectory(autosaveDirectory)) autosaveDirectory = null;
+        deriveAutosaveDirectory();
 
         userModsDirectory = new File(getUserDataDirectory(), MODS_DIRECTORY);
         if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
@@ -643,7 +651,6 @@ public class FreeColDirectories {
             : (onWindows()) ? "main.userDir.windows"
             : null;
     }
-
 
     // Directory accessors.
     // Where there are supported command line arguments there will also
@@ -843,9 +850,10 @@ public class FreeColDirectories {
             if (!file.exists() || !file.isFile() || !file.canRead()) return false;
         }
         setSavegameFile(file);
-        setSaveDirectory(file.getParentFile());
-        File autoDirectory = new File(getSaveDirectory(), AUTOSAVE_DIRECTORY);
-        if (insistDirectory(autoDirectory)) autosaveDirectory = autoDirectory;
+        File parent = file.getParentFile();
+        if (parent == null) parent = new File(".");
+        setSaveDirectory(parent);
+        deriveAutosaveDirectory();
         return true;
     }
 
