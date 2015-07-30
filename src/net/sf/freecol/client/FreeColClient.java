@@ -21,6 +21,7 @@ package net.sf.freecol.client;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.io.InputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -132,21 +133,21 @@ public final class FreeColClient {
     private final boolean headless;
 
 
-    public FreeColClient(final String splashFilename,
+    public FreeColClient(final InputStream splashStream,
                          final String fontName) {
-        this(splashFilename, fontName, FreeCol.GUI_SCALE_DEFAULT, true);
+        this(splashStream, fontName, FreeCol.GUI_SCALE_DEFAULT, true);
     }
 
     /**
      * Creates a new <code>FreeColClient</code>.  Creates the control
      * objects.
      *
-     * @param splashFilename The name of the splash image.
+     * @param splashStream A stream to read the splash image from.
      * @param fontName An optional override of the main font.
      * @param scale The scale factor for gui elements.
      * @param headless Run in headless mode.
      */
-    public FreeColClient(final String splashFilename, final String fontName,
+    public FreeColClient(final InputStream splashStream, final String fontName,
                          final float scale, boolean headless) {
         mapEditor = false;
         this.headless = headless
@@ -161,7 +162,7 @@ public final class FreeColClient {
         // Get the splash screen up early on to show activity.
         gui = (this.headless) ? new GUI(this, scale)
                               : new SwingGUI(this, scale);
-        gui.displaySplashScreen(splashFilename);
+        gui.displaySplashScreen(splashStream);
 
         // Look for base data directory.  Failure is fatal.
         File baseDirectory = FreeColDirectories.getBaseDirectory();

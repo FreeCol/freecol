@@ -30,21 +30,23 @@ import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JWindow;
@@ -217,15 +219,14 @@ public class SwingGUI extends GUI {
     /**
      * Display the splash screen.
      *
-     * @param splashFilename The name of the file to find the image in.
+     * @param splashStream A stream to read the splash image from.
      */
     @Override
-    public void displaySplashScreen(final String splashFilename) {
+    public void displaySplashScreen(final InputStream splashStream) {
         splash = null;
-        if (splashFilename == null)
-            return;
+        if (splashStream == null) return;
         try {
-            Image im = Toolkit.getDefaultToolkit().getImage(splashFilename);
+            BufferedImage im = ImageIO.read(splashStream);
             splash = new JWindow(graphicsDevice.getDefaultConfiguration());
             splash.getContentPane().add(new JLabel(new ImageIcon(im)));
             splash.pack();

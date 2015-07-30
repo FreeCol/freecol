@@ -22,16 +22,23 @@ package net.sf.freecol;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.InetAddress;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.JarURLConnection;
 import java.util.Locale;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -125,7 +132,7 @@ public final class FreeCol {
     private static final String JAVA_VERSION_MIN = "1.7";
     private static final int    MEMORY_MIN = 128; // Mbytes
     private static final int    PORT_DEFAULT = 3541;
-    private static final String SPLASH_FILE_DEFAULT = "splash.jpg";
+    private static final String SPLASH_DEFAULT = "splash.jpg";
     private static final String TC_DEFAULT = "freecol";
     public static final int     TIMEOUT_DEFAULT = 60; // 1 minute
     public static final int     TIMEOUT_MIN = 10; // 10s
@@ -174,8 +181,8 @@ public final class FreeCol {
     private static int serverPort = -1;
     private static String serverName = null;
 
-    /** Where the splash file lives. */
-    private static String splashFilename = SPLASH_FILE_DEFAULT;
+    /** A stream to get the splash image from. */
+    private static InputStream splashStream;
 
     /** The TotalConversion / ruleset in play, defaults to "freecol". */
     private static String tc = null;
@@ -202,13 +209,30 @@ public final class FreeCol {
      */
     public static void main(String[] args) {
         freeColRevision = FREECOL_VERSION;
+        JarURLConnection juc;
         try {
-            String revision = readVersion(FreeCol.class);
-            if (revision != null) {
-                freeColRevision += " (Revision: " + revision + ")";
+            juc = getJarURLConnection(FreeCol.class);
+        } catch (IOException ioe) {
+            juc = null;
+            System.err.println("Unable to open class jar: "
+                + ioe.getMessage());
+        }
+        if (juc != null) {
+            try {
+                String revision = readVersion(juc);
+                if (revision != null) {
+                    freeColRevision += " (Revision: " + revision + ")";
+                }
+            } catch (Exception e) {
+                System.err.println("Unable to load Manifest: "
+                    + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("Unable to load Manifest: " + e.getMessage());
+            try {
+                splashStream = getDefaultSplashStream(juc);
+            } catch (Exception e) {
+                System.err.println("Unable to open default splash: "
+                    + e.getMessage());
+            }
         }
 
         // Java bug #7075600 causes BR#2554.  The workaround is to set
@@ -316,18 +340,43 @@ public final class FreeCol {
 
 
     /**
-     * Extract the package version from the class.
+     * Get the JarURLConnection from a class.
      *
-     * @param c The <code>Class</code> to extract from.
-     * @return A value of the package version attribute.
+     * @return The <code>JarURLConnection</code>.
      */
-    private static String readVersion(Class c) throws IOException {
+    private static JarURLConnection getJarURLConnection(Class c) throws IOException {
         String resourceName = "/" + c.getName().replace('.', '/') + ".class";
         URL url = c.getResource(resourceName);
-        Manifest mf = ((JarURLConnection)url.openConnection()).getManifest();
-        return mf.getMainAttributes().getValue("Package-Version");
+        return (JarURLConnection)url.openConnection();
+    }
+        
+    /**
+     * Extract the package version from the class.
+     *
+     * @param juc The <code>JarURLConnection</code> to extract from.
+     * @return A value of the package version attribute.
+     */
+    private static String readVersion(JarURLConnection juc) throws IOException {
+        Manifest mf = juc.getManifest();
+        return (mf == null) ? null
+            : mf.getMainAttributes().getValue("Package-Version");
     }
 
+    /**
+     * Get a stream for the default splash file.
+     *
+     * Note: Not bothering to check for nulls as this is called in try
+     * block that ignores all exceptions.
+     *
+     * @param juc The <code>JarURLConnection</code> to extract from.
+     * @return A suitable <code>InputStream</code>, or null on error.
+     */
+    private static InputStream getDefaultSplashStream(JarURLConnection juc) throws IOException {
+        JarFile jf = juc.getJarFile();
+        ZipEntry ze = jf.getEntry(SPLASH_DEFAULT);
+        return jf.getInputStream(ze);
+    }
+            
     /**
      * Exit printing fatal error message.
      *
@@ -516,6 +565,9 @@ public final class FreeCol {
                           .create());
         options.addOption(OptionBuilder.withLongOpt("no-sound")
                           .withDescription(Messages.message("cli.no-sound"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("no-splash")
+                          .withDescription(Messages.message("cli.no-splash"))
                           .create());
         options.addOption(OptionBuilder.withLongOpt("private")
                           .withDescription(Messages.message("cli.private"))
@@ -722,6 +774,9 @@ public final class FreeCol {
             if (line.hasOption("no-sound")) {
                 sound = false;
             }
+            if (line.hasOption("no-splash")) {
+                splashStream = null;
+            }
 
             if (line.hasOption("private")) {
                 publicServer = false;
@@ -744,7 +799,14 @@ public final class FreeCol {
             }
 
             if (line.hasOption("splash")) {
-                splashFilename = line.getOptionValue("splash");
+                String splash = line.getOptionValue("splash");
+                try {
+                    FileInputStream fis = new FileInputStream(splash);
+                    splashStream = fis;
+                } catch (FileNotFoundException fnfe) {
+                    gripe(StringTemplate.template("cli.error.splash")
+                        .addName("%name%", splash));
+                }
             }
 
             if (line.hasOption("tc")) {
@@ -1312,7 +1374,7 @@ public final class FreeCol {
             // savegame was specified on command line
         }
         final FreeColClient freeColClient
-            = new FreeColClient(splashFilename, fontName, guiScale, headless);
+            = new FreeColClient(splashStream, fontName, guiScale, headless);
         freeColClient.startClient(windowSize, userMsg, sound, introVideo,
                                   savegame, spec);
     }

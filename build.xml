@@ -182,7 +182,7 @@
         <jar jarfile="${freecol.jar.file}"
              basedir="${freecol.build.dir}"
              manifest="${basedir}/src/MANIFEST.MF"
-             includes="net/**, org/**"
+             includes="net/**, splash.jpg"
              excludes="**/metaserver/**"/>
     </target>
 

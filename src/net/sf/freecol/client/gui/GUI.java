@@ -27,6 +27,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -177,9 +178,9 @@ public class GUI {
     /**
      * Display the splash screen.
      *
-     * @param splashFilename The name of the file to find the image in.
+     * @param splashStream A stream to find the image in.
      */
-    public void displaySplashScreen(final String splashFilename) {
+    public void displaySplashScreen(final InputStream splashStream) {
     }
 
     /**
