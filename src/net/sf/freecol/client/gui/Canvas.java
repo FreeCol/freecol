@@ -1951,6 +1951,28 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Make image icon from an image.
+     * Use only if you know having null is possible!
+     *
+     * @param image The <code>Image</code> to create an icon for.
+     * @return The <code>ImageIcon</code>.
+     */
+    private static ImageIcon createImageIcon(Image image) {
+        return (image==null) ? null : new ImageIcon(image);
+    }
+
+    /**
+     * Make image icon from an object.
+     *
+     * @param display The FreeColObject to find an icon for.
+     * @return The <code>ImageIcon</code> found.
+     */
+    private ImageIcon createObjectImageIcon(FreeColObject display) {
+        return (display == null) ? null
+            : createImageIcon(gui.getImageLibrary().getObjectImage(display, 2f));
+    }
+
+    /**
      * Shows a message with some information and an "OK"-button.
      *
      * @param displayObject Optional object for displaying an icon.
@@ -1961,7 +1983,7 @@ public final class Canvas extends JDesktopPane {
         ImageIcon icon = null;
         Tile tile = null;
         if(displayObject != null) {
-            icon = gui.createObjectImageIcon(displayObject);
+            icon = createObjectImageIcon(displayObject);
             tile = (displayObject instanceof Location)
                 ? ((Location)displayObject).getTile()
                 : null;
@@ -2110,7 +2132,7 @@ public final class Canvas extends JDesktopPane {
             ModelMessage m = messages.get(i);
             texts[i] = Messages.message(m);
             fcos[i] = game.getMessageSource(m);
-            icons[i] = gui.createObjectImageIcon(game.getMessageDisplay(m));
+            icons[i] = createObjectImageIcon(game.getMessageDisplay(m));
             if (tile == null && fcos[i] instanceof Location) {
                 tile = ((Location)fcos[i]).getTile();
             }
