@@ -212,6 +212,11 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
             if(unit != null && unit.getTile() == tile) {
                 freeColClient.getInGameController().clearGotoOrders(unit);
                 mapViewer.updateCurrentPathForActiveUnit();
+            } else {
+                if (tile != null && tile.hasSettlement()) {
+                    freeColClient.getGUI().showSettlement(tile.getSettlement());
+                    return;
+                }
             }
         }
         mapViewer.setSelectedTile(tile);

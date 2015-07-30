@@ -2727,6 +2727,8 @@ public final class InGameController implements NetworkConstants {
         if (ret) {
             player.invalidateCanSeeTiles();
             gui.setActiveUnit(null);
+            gui.showColonyPanel((Colony)tile.getSettlement(), unit);
+            // FIXME: Check if next line can be removed or replaced
             gui.setSelectedTile(tile);
             freeColClient.getSoundController()
                 .playSound("sound.event.buildingComplete");
@@ -2960,7 +2962,7 @@ public final class InGameController implements NetworkConstants {
      * Clears the goto orders of the given unit by setting its destination
      * to null.
      *
-     * Called from MapViewer.setSelectedTile
+     * Called from CanvasMouseListener
      *
      * @param unit The <code>Unit</code> to clear the destination for.
      * @return True if the unit has no destination.
