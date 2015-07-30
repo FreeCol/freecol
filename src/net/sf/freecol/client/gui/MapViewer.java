@@ -1057,16 +1057,13 @@ public final class MapViewer {
     }
 
     /**
-     * Selects the tile at the specified position.  There are three
+     * Selects the tile at the specified position.  There are two
      * possible cases:
      *
      * <ol>
-     *   <li>If there is a {@link Colony} on the {@link Tile} the
-     *       {@link Canvas#showColonyPanel} will be invoked.
      *   <li>If the tile contains a unit that can become active, then
      *       that unit will be set as the active unit.
-     *   <li>If the two conditions above do not match, then the
-     *       <code>selectedTile</code> will become the map focus.
+     *   <li>If not, the <code>selectedTile</code> will become the map focus.
      * </ol>
      *
      * If a unit is active and is located on the selected tile,
@@ -1085,12 +1082,7 @@ public final class MapViewer {
 
         if (getViewMode() == GUI.MOVE_UNITS_MODE) {
             if (activeUnit == null || activeUnit.getTile() != newTile) {
-                if (newTile != null && newTile.hasSettlement()) {
-                    gui.showSettlement(newTile.getSettlement());
-                    return false;
-                }
-
-                // else, just select a unit on the selected tile
+                // select a unit on the selected tile
                 Unit unitInFront = findUnitInFront(newTile);
                 if (unitInFront != null) {
                     ret = setActiveUnit(unitInFront);
