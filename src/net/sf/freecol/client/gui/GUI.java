@@ -45,7 +45,6 @@ import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.Parameters;
-import net.sf.freecol.client.gui.panel.TradeRoutePanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
@@ -1173,9 +1172,6 @@ public class GUI {
     }
 
     public void removeInGameComponents() {
-    }
-
-    public void removeTradeRoutePanel(TradeRoutePanel panel) {
     }
 
     public void requestFocusForSubPanel() {

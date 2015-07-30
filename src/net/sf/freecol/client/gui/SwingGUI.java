@@ -948,7 +948,6 @@ public class SwingGUI extends GUI {
         canvas.removeInGameComponents();
     }
 
-    @Override
     public void removeTradeRoutePanel(TradeRoutePanel panel) {
         canvas.removeTradeRoutePanel(panel);
     }
