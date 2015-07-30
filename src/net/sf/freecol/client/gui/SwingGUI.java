@@ -1036,7 +1036,11 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public ColonyPanel showColonyPanel(Colony colony, Unit unit) {
+    public void showColonyPanel(Colony colony, Unit unit) {
+        canvas.showColonyPanel(colony, unit);
+    }
+
+    public ColonyPanel showColonyPanel2(Colony colony, Unit unit) {
         return canvas.showColonyPanel(colony, unit);
     }
 

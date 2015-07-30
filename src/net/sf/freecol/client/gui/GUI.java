@@ -41,7 +41,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.InGameController.*;
-import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
@@ -1244,8 +1243,7 @@ public class GUI {
     protected void showForeignColony(Settlement settlement) {
     }
 
-    public ColonyPanel showColonyPanel(Colony colony, Unit unit) {
-        return null;
+    public void showColonyPanel(Colony colony, Unit unit) {
     }
 
     public void showColopediaPanel(String nodeId) {
