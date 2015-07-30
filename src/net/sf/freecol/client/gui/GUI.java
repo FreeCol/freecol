@@ -42,7 +42,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.InGameController.*;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.Parameters;
@@ -1140,9 +1139,6 @@ public class GUI {
 
     public boolean containsInGameComponents() {
         return false;
-    }
-
-    public void dialogRemove(FreeColDialog<?> fcd) {
     }
 
     public void displayObject(FreeColObject fco) {

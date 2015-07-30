@@ -870,7 +870,6 @@ public class SwingGUI extends GUI {
         return canvas.containsInGameComponents();
     }
 
-    @Override
     public void dialogRemove(FreeColDialog<?> fcd) {
         canvas.dialogRemove(fcd);
     }

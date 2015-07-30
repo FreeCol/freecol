@@ -45,8 +45,8 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.ChoiceItem;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.client.gui.plaf.FreeColOptionPaneUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Game;
@@ -272,8 +272,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      *
      * @return The <code>GUI</code>.
      */
-    protected GUI getGUI() {
-        return freeColClient.getGUI();
+    protected SwingGUI getGUI() {
+        return (SwingGUI)freeColClient.getGUI();
     }
 
     /**
@@ -429,7 +429,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     public void removeNotify() {
         super.removeNotify();
 
-        freeColClient.getGUI().dialogRemove(FreeColDialog.this);
+        getGUI().dialogRemove(FreeColDialog.this);
 
         removeAll();
         if (this.pane != null) {
