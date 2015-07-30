@@ -811,30 +811,12 @@ public class FreeColDirectories {
     }
 
     /**
-     * Set the directory where the saved games should be put.
-     *
-     * @param dir The new saved games directory.
-     */
-    public static void setSaveDirectory(File dir) {
-        saveDirectory = dir;
-    }
-
-    /**
      * Gets the save game file.
      *
      * @return The save game file.
      */
     public static File getSavegameFile() {
         return savegameFile;
-    }
-
-    /**
-     * Sets the save game file.
-     *
-     * @param file The new save game file.
-     */
-    public static void setSavegameFile(File file) {
-        savegameFile = file;
     }
 
     /**
@@ -849,10 +831,10 @@ public class FreeColDirectories {
             file = new File(getSaveDirectory(), path);
             if (!file.exists() || !file.isFile() || !file.canRead()) return false;
         }
-        setSavegameFile(file);
+        savegameFile = file;
         File parent = file.getParentFile();
         if (parent == null) parent = new File(".");
-        setSaveDirectory(parent);
+        saveDirectory = parent;
         deriveAutosaveDirectory();
         return true;
     }

@@ -3678,7 +3678,7 @@ public final class InGameController implements NetworkConstants {
         turnReportMessages.clear();
         gui.setActiveUnit(null);
         gui.removeInGameComponents();
-        FreeColDirectories.setSavegameFile(file);
+        FreeColDirectories.setSavegameFile(file.getPath());
         freeColClient.getConnectController().startSavedGame(file, null);
     }
 
@@ -4202,7 +4202,7 @@ public final class InGameController implements NetworkConstants {
             || !file.exists()
             || gui.confirm("saveConfirmationDialog.areYouSure.text",
                            "ok", "cancel")) {
-            FreeColDirectories.setSaveDirectory(file.getParentFile());
+            FreeColDirectories.setSavegameFile(file.getPath());
             return saveGame(file);
         }
         return false;
