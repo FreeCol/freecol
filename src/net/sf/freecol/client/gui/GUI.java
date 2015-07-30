@@ -278,6 +278,10 @@ public class GUI {
     /**
      * Create a thumbnail for the minimap.
      * 
+     * FIXME: Delete all code inside this method and replace it with
+     *        sensible code directly drawing in necessary size,
+     *        without creating a throwaway GUI panel, drawing in wrong
+     *        size and immediately resizing.
      * @return The created image.
      */
     public BufferedImage createMiniMapThumbNail() {
@@ -293,8 +297,6 @@ public class GUI {
         miniMap.paintMap(g1);
         g1.dispose();
 
-        // FIXME: this can probably done more efficiently by applying
-        // a suitable AffineTransform to the Graphics2D
         int scaledWidth = Math.min((int)((64 * width) / (float)height), 128);
         BufferedImage scaledImage = new BufferedImage(scaledWidth, 64,
             BufferedImage.TYPE_INT_ARGB);
