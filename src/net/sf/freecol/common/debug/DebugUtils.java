@@ -121,8 +121,7 @@ public class DebugUtils {
         Collections.sort(buildings);
 
         BuildingType buildingType
-            = gui.getChoice(true, null, buildingTitle, null, "cancel",
-                            buildings);
+            = gui.getChoice(true, null, buildingTitle, "cancel", buildings);
         if (buildingType == null) return;
 
         final Game sGame = server.getGame();
@@ -181,7 +180,7 @@ public class DebugUtils {
         }
         Collections.sort(fathers);
 
-        FoundingFather father = gui.getChoice(true, null, fatherTitle, null,
+        FoundingFather father = gui.getChoice(true, null, fatherTitle,
                                               "cancel", fathers);
         if (father != null) {
             server.getInGameController()
@@ -329,7 +328,7 @@ public class DebugUtils {
         Collections.sort(uts);
         UnitType unitChoice = gui.getChoice(true, null,
             StringTemplate.template("prompt.selectUnitType"),
-            null, "cancel", uts);
+            "cancel", uts);
         if (unitChoice == null) return;
 
         Unit carrier = null, sCarrier = null;
@@ -384,7 +383,7 @@ public class DebugUtils {
         Collections.sort(gtl);
         GoodsType goodsType = gui.getChoice(true, null,
             StringTemplate.template("prompt.selectGoodsType"),
-            null, "cancel", gtl);
+            "cancel", gtl);
         if (goodsType == null) return;
 
         String amount = gui.getInput(true, null,
@@ -433,7 +432,7 @@ public class DebugUtils {
         Collections.sort(choices);
         Disaster disaster = gui.getChoice(true, null,
             StringTemplate.template("prompt.selectDisaster"),
-            null, "cancel", choices);
+            "cancel", choices);
         if (disaster == null) return;
 
         final FreeColServer server = freeColClient.getFreeColServer();
@@ -477,7 +476,7 @@ public class DebugUtils {
         Collections.sort(pcs);
         Player player = gui.getChoice(true, null,
             StringTemplate.template("prompt.selectOwner"),
-            null, "cancel", pcs);
+            "cancel", pcs);
         if (player == null) return;
 
         ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
@@ -517,7 +516,7 @@ public class DebugUtils {
         Collections.sort(pcs);
         Player player = gui.getChoice(true, null,
             StringTemplate.template("prompt.selectOwner"),
-            null, "cancel", pcs);
+            "cancel", pcs);
         if (player == null || unit.getOwner() == player) return;
 
         final Game sGame = server.getGame();
@@ -559,7 +558,7 @@ public class DebugUtils {
         Collections.sort(rcs);
         Role roleChoice = gui.getChoice(true, null,
             StringTemplate.template("prompt.selectRole"),
-            null, "cancel", rcs);
+            "cancel", rcs);
         if (roleChoice == null) return;
 
         sUnit.changeRole(roleChoice, roleChoice.getMaximumCount());
@@ -954,7 +953,7 @@ public class DebugUtils {
         Collections.sort(gtl);
         GoodsType goodsType = freeColClient.getGUI().getChoice(true, null,
             StringTemplate.template("prompt.selectGoodsType"),
-            null, "cancel", gtl);
+            "cancel", gtl);
         if (goodsType == null) return;
 
         String response = freeColClient.getGUI().getInput(true, null,
@@ -1002,7 +1001,7 @@ public class DebugUtils {
             actions.add(new ChoiceItem<>(action));
         }
         Collections.sort(actions);
-        MonarchAction action = gui.getChoice(true, null, monarchTitle, null,
+        MonarchAction action = gui.getChoice(true, null, monarchTitle,
                                              "cancel", actions);
         server.getInGameController().setMonarchAction(sPlayer, action);
     }
@@ -1030,7 +1029,7 @@ public class DebugUtils {
         Collections.sort(rumours);
         RumourType rumourChoice = freeColClient.getGUI().getChoice(true, null,
             StringTemplate.template("prompt.selectLostCityRumour"),
-            null, "cancel", rumours);
+            "cancel", rumours);
         tile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
         sTile.getTileItemContainer().getLostCityRumour()
             .setType(rumourChoice);

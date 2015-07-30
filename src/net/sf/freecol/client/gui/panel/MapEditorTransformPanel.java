@@ -313,7 +313,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     }
                     ResourceType choice = getGUI().getChoice(true, null, 
                         Messages.message("mapEditorTransformPanel.chooseResource"),
-                        null, "cancel", choices);
+                        "cancel", choices);
                     if (choice != null) {
                         t.addResource(new Resource(t.getGame(), t, choice,
                                       choice.getMaxValue()));

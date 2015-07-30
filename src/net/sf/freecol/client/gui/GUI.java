@@ -252,18 +252,6 @@ public class GUI {
         return (image==null) ? null : new ImageIcon(image);
     }
 
-    public ImageIcon createUnitImageIcon(Unit unit) {
-        return new ImageIcon(imageLibrary.getUnitImage(unit));
-    }
-
-    public ImageIcon createSettlementImageIcon(Settlement settlement) {
-        return new ImageIcon(imageLibrary.getSettlementImage(settlement));
-    }
-
-    public ImageIcon createGoodsImageIcon(GoodsType goodsType) {
-        return new ImageIcon(imageLibrary.getIconImage(goodsType));
-    }
-
     /**
      * Make image icon from an object.
      *
@@ -515,6 +503,22 @@ public class GUI {
                            StringTemplate template, ImageIcon icon,
                            String okKey, String cancelKey) {
         return false;
+    }
+
+    final public boolean confirm(boolean modal, Tile tile,
+                                 StringTemplate template, Settlement settlement,
+                                 String okKey, String cancelKey) {
+        return confirm(modal, tile, template,
+            new ImageIcon(imageLibrary.getSettlementImage(settlement)),
+            okKey, cancelKey);
+    }
+
+    final public boolean confirm(boolean modal, Tile tile,
+                                 StringTemplate template, GoodsType goodsType,
+                                 String okKey, String cancelKey) {
+        return confirm(modal, tile, template,
+            new ImageIcon(imageLibrary.getIconImage(goodsType)),
+            okKey, cancelKey);
     }
 
     /**
@@ -1112,6 +1116,27 @@ public class GUI {
                            ImageIcon icon,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return null;
+    }
+
+    final public <T> T getChoice(boolean modal, Tile tile, Object explain,
+                                 String cancelKey, List<ChoiceItem<T>> choices) {
+        return getChoice(modal, tile, explain,
+            (ImageIcon)null, cancelKey, choices);
+    }
+
+    final public <T> T getChoice(boolean modal, Tile tile, Object explain,
+                                 Unit unit,
+                                 String cancelKey, List<ChoiceItem<T>> choices) {
+        return getChoice(modal, tile, explain,
+            new ImageIcon(imageLibrary.getUnitImage(unit)), cancelKey, choices);
+    }
+
+    final public <T> T getChoice(boolean modal, Tile tile, Object explain,
+                                 Settlement settlement,
+                                 String cancelKey, List<ChoiceItem<T>> choices) {
+        return getChoice(modal, tile, explain,
+            new ImageIcon(imageLibrary.getSettlementImage(settlement)),
+            cancelKey, choices);
     }
 
     /**

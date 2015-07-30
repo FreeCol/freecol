@@ -1373,7 +1373,7 @@ public final class InGameController implements NetworkConstants {
             // other special handling.
             Unit u = gui.getChoice(true, unit.getTile(),
                                    Messages.message("disembark.text"),
-                                   gui.createUnitImageIcon(unit),
+                                   unit,
                                    "none", choices);
             if (u == null) {
                 // Cancelled, done.
@@ -1426,7 +1426,7 @@ public final class InGameController implements NetworkConstants {
         } else {
             carrier = gui.getChoice(true, unit.getTile(),
                                     Messages.message("embark.text"),
-                                    gui.createUnitImageIcon(unit),
+                                    unit,
                                     "none", choices);
             if (carrier == null) return true; // User cancelled
         }
@@ -1922,7 +1922,7 @@ public final class InGameController implements NetworkConstants {
             }
             goods = gui.getChoice(true, unit.getTile(),
                                   Messages.message("buyProposition.text"),
-                                  gui.createSettlementImageIcon(settlement),
+                                  settlement,
                                   "nothing", choices);
             if (goods == null) break; // Trade aborted by the player
 
@@ -1979,7 +1979,7 @@ public final class InGameController implements NetworkConstants {
             }
             goods = gui.getChoice(true, unit.getTile(),
                                   Messages.message("sellProposition.text"),
-                                  gui.createSettlementImageIcon(settlement),
+                                  settlement,
                                   "nothing", choices);
             if (goods == null) break; // Trade aborted by the player
 
@@ -2036,7 +2036,7 @@ public final class InGameController implements NetworkConstants {
         }
         Goods goods = gui.getChoice(true, unit.getTile(),
                                     Messages.message("gift.text"),
-                                    gui.createSettlementImageIcon(settlement),
+                                    settlement,
                                     "cancel", choices);
         if (goods != null
             && askServer().deliverGiftToSettlement(unit, settlement, goods)) {
@@ -2117,7 +2117,7 @@ public final class InGameController implements NetworkConstants {
             }
             Player enemy = gui.getChoice(true, unit.getTile(),
                 Messages.message("missionarySettlement.inciteQuestion"),
-                gui.createUnitImageIcon(unit),
+                unit,
                 "missionarySettlement.cancel", choices);
             if (enemy == null) return true;
             int gold = askServer().incite(unit, direction, enemy, -1);
@@ -4008,7 +4008,7 @@ public final class InGameController implements NetworkConstants {
         boolean ret = gui.confirm(true, null, StringTemplate
             .template("payArrears.text")
             .addAmount("%amount%", arrears),
-            gui.createGoodsImageIcon(type),
+            type,
             "ok", "cancel")
             && askServer().payArrears(type)
             && player.canTrade(type);
@@ -4043,7 +4043,7 @@ public final class InGameController implements NetworkConstants {
         if (!gui.confirm(true, null, StringTemplate
                 .template("payForBuilding.text")
                 .addAmount("%amount%", price),
-                gui.createSettlementImageIcon(colony),
+                colony,
                 "yes", "no")) {
             return false;
         }
