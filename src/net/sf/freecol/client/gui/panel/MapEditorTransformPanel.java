@@ -38,6 +38,7 @@ import javax.swing.JToggleButton;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
+import net.sf.freecol.client.control.MapEditorController.IMapTransform;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.MapViewer;
@@ -196,7 +197,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      *
      * @see #transform(Tile)
      */
-    public abstract class MapTransform {
+    public abstract class MapTransform implements IMapTransform {
 
         /**
          * A panel with information about this transformation.
