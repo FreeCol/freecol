@@ -552,16 +552,22 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Add a Building to this Colony.
      *
+     * Lower level routine, do not use directly in-game (use buildBuilding).
+     * Used for serialization and public for the test suite.
+     *
      * -til: Could change the tile appearance if the building is
      * stockade-type
      *
-     * @param building a <code>Building</code> value
+     * @param building The <code>Building</code> to build.
+     * @return True if the building was added.
      */
-    public void addBuilding(final Building building) {
-        BuildingType buildingType = building.getType().getFirstLevel();
+    public boolean addBuilding(final Building building) {
+        if (building == null || building.getType() == null) return false;
+        final BuildingType buildingType = building.getType().getFirstLevel();
+        if (buildingType == null || buildingType.getId() == null) return false;
         buildingMap.put(buildingType.getId(), building);
         addFeatures(building.getType());
-        invalidateCache();
+        return true;
     }
 
     /**

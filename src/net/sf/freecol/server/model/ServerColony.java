@@ -424,18 +424,13 @@ public class ServerColony extends Colony implements ServerModelObject {
         }
 
         // Check for free buildings
-        boolean found = false;
         for (BuildingType buildingType : spec.getBuildingTypeList()) {
             if (isAutomaticBuild(buildingType)) {
-                if (buildingType.isDefenceType()) {
-                    getTile().cacheUnseen();//+til
-                }
-                addBuilding(new ServerBuilding(getGame(), this,
-                                               buildingType));//-til
-                found = true;
+                buildBuilding(new ServerBuilding(getGame(), this,
+                                                 buildingType));//-til
             }
         }
-        if (found) checkBuildQueueIntegrity(true);
+        checkBuildQueueIntegrity(true);
 
         // If a build queue is empty, check that we are not producing
         // any goods types useful for BuildableTypes, except if that
@@ -597,18 +592,14 @@ public class ServerColony extends Colony implements ServerModelObject {
         BuildingType from = type.getUpgradesFrom();
         boolean success;
         if (from == null) {
-            addBuilding(new ServerBuilding(getGame(), this, type));//-til
-            success = true;
-            if (type.isDefenceType()) getTile().cacheUnseen(copied);//+til
+            success = buildBuilding(new ServerBuilding(getGame(), this, type));//-til
         } else {
             Building building = getBuilding(from);
             List<Unit> eject = building.upgrade();//-til
             success = eject != null;
             if (success) {
                 ejectUnits(building, eject);//-til
-                if (!eject.isEmpty() || type.isDefenceType()) {
-                    getTile().cacheUnseen(copied);//+til
-                }
+                if (!eject.isEmpty()) getTile().cacheUnseen(copied);//+til
             } else {
                 cs.addMessage(See.only((ServerPlayer)owner),
                               getUnbuildableMessage(type));
@@ -773,14 +764,29 @@ public class ServerColony extends Colony implements ServerModelObject {
     public void csFreeBuilding(BuildingType type, ChangeSet cs) {
         if (canBuild(type)) {
             final ServerPlayer owner = (ServerPlayer)getOwner();
-            if (type.isDefenceType()) getTile().cacheUnseen();//+til
-            addBuilding(new ServerBuilding(getGame(), this, type));//-til
-            getBuildQueue().remove(type);
+            buildBuilding(new ServerBuilding(getGame(), this, type));//-til
+            checkBuildQueueIntegrity(true);
             cs.add(See.only(owner), this);
             if (owner.isAI()) {
                 firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
             }
         }
+    }
+
+    /**
+     * Build a new building in this colony.
+     *
+     * @param building The <code>Building</code> to build.
+     * @return True if the building was built.
+     */
+    public boolean buildBuilding(Building building) {
+net.sf.freecol.common.debug.FreeColDebugger.debugLog("BUILD " + building + "\n" +net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+        Tile copied = (building.getType().isDefenceType())
+            ? getTile().getTileToCache() : null;
+        if (!addBuilding(building)) return false;
+        getTile().cacheUnseen(copied);
+        invalidateCache();
+        return true;
     }
 
     /**

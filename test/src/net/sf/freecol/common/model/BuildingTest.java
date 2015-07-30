@@ -831,24 +831,28 @@ public class BuildingTest extends FreeColTestCase {
         Colony colony = getStandardColony(6);
         Unit unit = colony.getUnitList().get(0);
         Building building = colony.getBuilding(townHallType);
-        Tile tile = colony.getTile();
-        for (Unit u : building.getUnitList()) u.setLocation(tile);
+        clearWorkLocation(building);
 
         int bellProduction = building.getTotalProductionOf(bellsType);
         int expectBellProd = 1;
-        assertEquals("Wrong initial bell production",expectBellProd,bellProduction);
+        assertEquals("Wrong initial bell production", expectBellProd,
+                     bellProduction);
 
-        Building newspaper = new ServerBuilding(getGame(), colony, newspaperType);
+        Building newspaper = new ServerBuilding(getGame(), colony,
+                                                newspaperType);
         colony.addBuilding(newspaper);
+        colony.invalidateCache();
 
         bellProduction = building.getTotalProductionOf(bellsType);
         expectBellProd = 2;
-        assertEquals("Wrong bell production with newspaper",expectBellProd,bellProduction);
+        assertEquals("Wrong bell production with newspaper", expectBellProd,
+                     bellProduction);
 
         unit.setLocation(building);
         bellProduction = building.getTotalProductionOf(bellsType);
         expectBellProd = 8; // 1 initial plus 3 from the colonist + 4 from newspaper
-        assertEquals("Wrong final bell production",expectBellProd,bellProduction);
+        assertEquals("Wrong final bell production", expectBellProd,
+                     bellProduction);
     }
 
     public void testUnitProduction() {
