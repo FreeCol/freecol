@@ -33,7 +33,7 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.model.Building;
@@ -64,7 +64,9 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
+
 import static net.sf.freecol.common.util.StringUtils.*;
+
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;

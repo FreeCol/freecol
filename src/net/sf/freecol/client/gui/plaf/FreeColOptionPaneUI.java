@@ -40,7 +40,7 @@ import javax.swing.plaf.basic.BasicOptionPaneUI;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 

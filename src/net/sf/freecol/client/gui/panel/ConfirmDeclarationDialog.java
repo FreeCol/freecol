@@ -42,7 +42,7 @@ import javax.swing.JTextField;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.panel.Flag.Background;
 import net.sf.freecol.client.gui.panel.Flag.Decoration;
 import net.sf.freecol.client.gui.panel.Flag.UnionPosition;
