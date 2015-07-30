@@ -35,6 +35,7 @@ import javax.swing.SpinnerNumberModel;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.LoadingSavegameInfo;
 import net.sf.freecol.common.i18n.Messages;
 
 
@@ -144,6 +145,15 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
      */
     public String getServerName() {
         return serverNameField.getName();
+    }
+
+    /**
+     * Get all important information at once.
+     * 
+     * @return A LoadingSavegameInfo.
+     */
+    public LoadingSavegameInfo getInfo() {
+        return new LoadingSavegameInfo(isSinglePlayer(), getPort(), getServerName());
     }
 
     /**

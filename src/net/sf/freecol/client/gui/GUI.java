@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionListener;
@@ -47,7 +46,6 @@ import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
-import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.client.gui.panel.TradeRoutePanel;
@@ -1152,7 +1150,7 @@ public class GUI {
     public void displayObject(FreeColObject fco) {
     }
 
-    public LoadingSavegameDialog getLoadingSavegameDialog() {
+    public LoadingSavegameInfo getLoadingSavegameInfo() {
         return null;
     }
 

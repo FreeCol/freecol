@@ -30,12 +30,15 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.xml.stream.XMLStreamException;
 
-import net.sf.freecol.FreeCol;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import net.sf.freecol.FreeCol; 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient; 
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.LoadingSavegameInfo;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
-import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -56,9 +59,6 @@ import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.GameState;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -581,7 +581,7 @@ public final class ConnectController {
             if (!gui.showLoadingSavegameDialog(defaultPublicServer,
                                                defaultSinglePlayer))
                 return false;
-            LoadingSavegameDialog lsd = gui.getLoadingSavegameDialog();
+            LoadingSavegameInfo lsd = gui.getLoadingSavegameInfo();
             singlePlayer = lsd.isSinglePlayer();
             name = lsd.getServerName();
             port = lsd.getPort();

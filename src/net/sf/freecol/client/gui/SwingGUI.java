@@ -906,8 +906,8 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public LoadingSavegameDialog getLoadingSavegameDialog() {
-        return canvas.getLoadingSavegameDialog();
+    public LoadingSavegameInfo getLoadingSavegameInfo() {
+        return canvas.getLoadingSavegameDialog().getInfo();
     }
 
     @Override
