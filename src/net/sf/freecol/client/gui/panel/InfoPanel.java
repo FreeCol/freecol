@@ -441,6 +441,10 @@ public final class InfoPanel extends FreeColPanel {
             ? InfoPanelMode.TILE
             : (unitInfoPanel.hasUnit())
             ? InfoPanelMode.UNIT
+            : ((player = getFreeColClient().getMyPlayer()) == null)
+            ? InfoPanelMode.NONE
+            : player.hasNextActiveUnit()
+            ? InfoPanelMode.UNIT
             : InfoPanelMode.END;
     }
 
@@ -493,6 +497,10 @@ public final class InfoPanel extends FreeColPanel {
      */
     public void update() {
         InfoPanelMode newMode = getMode();
+        if(newMode == InfoPanelMode.UNIT && !unitInfoPanel.hasUnit()) {
+            unitInfoPanel.update(
+                getFreeColClient().getMyPlayer().getNextActiveUnit());
+        }
         if (this.mode != newMode) {
             switch (this.mode = newMode) {
             case END:
