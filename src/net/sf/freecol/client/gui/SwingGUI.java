@@ -914,7 +914,6 @@ public class SwingGUI extends GUI {
      *
      * @param fco The <code>FreeColObject</code> to display.
      */
-    @Override
     public void displayObject(FreeColObject fco) {
         if (fco instanceof Colony) {
             canvas.showColonyPanel((Colony)fco, null);

@@ -1106,9 +1106,6 @@ public class GUI {
         return false;
     }
 
-    public void displayObject(FreeColObject fco) {
-    }
-
     public LoadingSavegameInfo getLoadingSavegameInfo() {
         return null;
     }

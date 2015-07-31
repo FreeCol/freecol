@@ -33,7 +33,7 @@ import javax.swing.JScrollPane;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.StringTemplate;
@@ -75,7 +75,7 @@ public class InformationPanel extends FreeColPanel {
         super(freeColClient, new MigLayout("wrap 1, insets 200 10 10 10",
                 "[510]", "[242]20[20]"));
 
-        final GUI gui = getGUI();
+        final SwingGUI gui = getGUI();
         JPanel textPanel = new MigPanel();
         textPanel.setOpaque(false);
         textPanel.setLayout(new MigLayout("wrap 2", "", "top"));
