@@ -907,6 +907,9 @@ public final class InGameController implements NetworkConstants {
         // Clear ordinary destinations if arrived.
         if (movePath(unit, path) && unit.isAtLocation(destination)) {
             askClearGotoOrders(unit);
+            Colony colony = (unit.hasTile()) ? unit.getTile().getColony()
+                : null;
+            if (colony != null) gui.showColonyPanel(colony, unit);
             // Check cash-in, and if the unit has moves left and was
             // not set to SKIPPED by moveDirection, then return true
             // to show that this unit could continue.
@@ -2563,8 +2566,7 @@ public final class InGameController implements NetworkConstants {
             && !tile.hasSettlement();
         if (ret) {
             player.invalidateCanSeeTiles();
-            gui.setActiveUnit(null);
-            gui.setSelectedTile(tile);
+            gui.setActiveUnit(tile.getFirstUnit());
         }
         return ret;
     }
@@ -2727,10 +2729,7 @@ public final class InGameController implements NetworkConstants {
             && tile.hasSettlement();
         if (ret) {
             player.invalidateCanSeeTiles();
-            gui.setActiveUnit(null);
             gui.showColonyPanel((Colony)tile.getSettlement(), unit);
-            // FIXME: Check if next line can be removed or replaced
-            gui.setSelectedTile(tile);
             freeColClient.getSoundController()
                 .playSound("sound.event.buildingComplete");
             // Check units present for treasure cash-in as they are now
