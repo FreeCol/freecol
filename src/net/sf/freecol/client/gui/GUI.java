@@ -24,7 +24,6 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
@@ -42,7 +41,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.InGameController.*;
-import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.Parameters;
@@ -1240,10 +1238,6 @@ public class GUI {
     }
 
     public void showColopediaPanel(String nodeId) {
-    }
-
-    public ColorChooserPanel showColorChooserPanel(ActionListener al) {
-        return null;
     }
 
     public void showCompactLabourReport() {

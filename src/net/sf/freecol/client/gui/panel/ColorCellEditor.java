@@ -32,7 +32,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.SwingGUI;
 
 
 /**
@@ -98,7 +98,7 @@ public final class ColorCellEditor extends AbstractCellEditor
     @Override
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
-        GUI gui = freeColClient.getGUI();
+        SwingGUI gui = (SwingGUI)freeColClient.getGUI();
         if (null != command) switch (command) {
             case EDIT:
                 this.colorChooserPanel = gui.showColorChooserPanel(this);

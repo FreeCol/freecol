@@ -1048,7 +1048,6 @@ public class SwingGUI extends GUI {
         canvas.showColopediaPanel(nodeId);
     }
 
-    @Override
     public ColorChooserPanel showColorChooserPanel(ActionListener al) {
         return canvas.showColorChooserPanel(al);
     }
