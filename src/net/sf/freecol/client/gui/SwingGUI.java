@@ -87,6 +87,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
@@ -813,7 +814,6 @@ public class SwingGUI extends GUI {
      * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param explain An object explaining the choice.
-     * @param icon An optional icon for the dialog.
      * @param cancelKey A key for the "cancel" button.
      * @param choices A list a <code>ChoiceItem</code>s to choose from.
      * @return The selected value of the selected <code>ChoiceItem</code>,
@@ -821,10 +821,45 @@ public class SwingGUI extends GUI {
      */
     @Override
     public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                           ImageIcon icon,
                            String cancelKey, List<ChoiceItem<T>> choices) {
-        return canvas.showChoiceDialog(modal, tile, explain, icon,
-                                       cancelKey, choices);
+        return canvas.showChoiceDialog(modal, tile, explain,
+            null, cancelKey, choices);
+    }
+
+    @Override
+    public <T> T getChoice(boolean modal, Tile tile, Object explain,
+                           Unit unit,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return canvas.showChoiceDialog(modal, tile, explain,
+            new ImageIcon(imageLibrary.getUnitImage(unit)),
+            cancelKey, choices);
+    }
+
+    @Override
+    public <T> T getChoice(boolean modal, Tile tile, Object explain,
+                           Settlement settlement,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return canvas.showChoiceDialog(modal, tile, explain,
+            new ImageIcon(imageLibrary.getSettlementImage(settlement)),
+            cancelKey, choices);
+    }
+
+    @Override
+    public <T> T getChoice(boolean modal, Tile tile, Object explain,
+                           GoodsType goodsType,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return canvas.showChoiceDialog(modal, tile, explain,
+            new ImageIcon(imageLibrary.getIconImage(goodsType)),
+            cancelKey, choices);
+    }
+
+    @Override
+    public <T> T getChoice(boolean modal, Tile tile, Object explain,
+                           Nation nation,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return canvas.showChoiceDialog(modal, tile, explain,
+            new ImageIcon(imageLibrary.getMiscIconImage(nation)),
+            cancelKey, choices);
     }
 
     /**

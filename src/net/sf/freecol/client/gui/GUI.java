@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
 
@@ -67,6 +66,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
@@ -721,8 +721,7 @@ public class GUI {
 
         return getChoice(true, settlement.getTile(),
             Utility.localizedTextArea(settlement.getAlarmLevelLabel(player)),
-            new ImageIcon(imageLibrary.getSettlementImage(settlement)),
-            "cancel", choices);
+            settlement, "cancel", choices);
     }
 
     /**
@@ -749,8 +748,7 @@ public class GUI {
                 BoycottAction.DUMP_CARGO));
 
         return getChoice(true, null, Utility.localizedTextArea(template),
-                         new ImageIcon(imageLibrary.getIconImage(goods.getType())),
-                         "cancel", choices);
+                         goods.getType(), "cancel", choices);
     }
 
     /**
@@ -777,8 +775,7 @@ public class GUI {
                                      BuyAction.HAGGLE));
 
         return getChoice(true, unit.getTile(), Utility.localizedTextArea(template),
-                         new ImageIcon(imageLibrary.getIconImage(goods.getType())),
-                         "cancel", choices);
+                         goods.getType(), "cancel", choices);
     }
 
     /**
@@ -810,8 +807,7 @@ public class GUI {
                                      ClaimAction.STEAL));
 
         return getChoice(true, tile, Utility.localizedTextArea(template),
-                         new ImageIcon(imageLibrary.getMiscIconImage(owner.getNation())),
-                         "indianLand.cancel", choices);
+                         owner.getNation(), "indianLand.cancel", choices);
     }
 
     /**
@@ -848,9 +844,7 @@ public class GUI {
 
         return getChoice(true, settlement.getTile(),
                          Utility.localizedTextArea(template),
-                         new ImageIcon(
-                             imageLibrary.getSettlementImage(settlement)),
-                         "cancel", choices);
+                         settlement, "cancel", choices);
     }
 
     /**
@@ -890,9 +884,7 @@ public class GUI {
 
         return getChoice(true, unit.getTile(),
                          Utility.localizedTextArea(template),
-                         new ImageIcon(
-                             imageLibrary.getSettlementImage(settlement)),
-                         "cancel", choices);
+                         settlement, "cancel", choices);
     }
 
     /**
@@ -949,9 +941,7 @@ public class GUI {
 
         return getChoice(true, unit.getTile(),
                          Utility.localizedTextArea(template),
-                         new ImageIcon(
-                             imageLibrary.getSettlementImage(colony)),
-                         "cancel", choices);
+                         colony, "cancel", choices);
     }
 
     /**
@@ -1011,9 +1001,7 @@ public class GUI {
 
         return getChoice(true, settlement.getTile(),
                          Utility.localizedTextArea(template),
-                         new ImageIcon(
-                             imageLibrary.getSettlementImage(settlement)),
-                         "cancel", choices);
+                         settlement, "cancel", choices);
     }
 
     /**
@@ -1045,8 +1033,7 @@ public class GUI {
 
         return getChoice(true, unit.getTile(),
                          Utility.localizedTextArea(template),
-                         new ImageIcon(imageLibrary.getIconImage(goods.getType())),
-                         "cancel", choices);
+                         goods.getType(), "cancel", choices);
     }
 
 
@@ -1056,37 +1043,38 @@ public class GUI {
      * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param explain An object explaining the choice.
-     * @param icon An optional icon for the dialog.
      * @param cancelKey A key for the "cancel" button.
      * @param choices A list a <code>ChoiceItem</code>s to choose from.
      * @return The selected value of the selected <code>ChoiceItem</code>,
      *     or null if cancelled.
      */
     public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                           ImageIcon icon,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return null;
     }
 
-    final public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                                 String cancelKey, List<ChoiceItem<T>> choices) {
-        return getChoice(modal, tile, explain,
-            (ImageIcon)null, cancelKey, choices);
+    public <T> T getChoice(boolean modal, Tile tile, Object explain,
+                           Unit unit,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return null;
     }
 
-    final public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                                 Unit unit,
-                                 String cancelKey, List<ChoiceItem<T>> choices) {
-        return getChoice(modal, tile, explain,
-            new ImageIcon(imageLibrary.getUnitImage(unit)), cancelKey, choices);
+    public <T> T getChoice(boolean modal, Tile tile, Object explain,
+                           Settlement settlement,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return null;
     }
 
-    final public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                                 Settlement settlement,
-                                 String cancelKey, List<ChoiceItem<T>> choices) {
-        return getChoice(modal, tile, explain,
-            new ImageIcon(imageLibrary.getSettlementImage(settlement)),
-            cancelKey, choices);
+    public <T> T getChoice(boolean modal, Tile tile, Object explain,
+                           GoodsType goodsType,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return null;
+    }
+
+    public <T> T getChoice(boolean modal, Tile tile, Object explain,
+                           Nation nation,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return null;
     }
 
     /**
