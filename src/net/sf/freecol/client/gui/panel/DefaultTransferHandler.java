@@ -393,6 +393,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                                            defaultAmount, false);
                     if (amount <= 0) return false;
                     goods.setAmount(amount);
+                } else if (label.isFullChosen()) {
                 } else if (goods.getAmount() > GoodsContainer.CARGO_SIZE) {
                     goods.setAmount(GoodsContainer.CARGO_SIZE);
                 }
