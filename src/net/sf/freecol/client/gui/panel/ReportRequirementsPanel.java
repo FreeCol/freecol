@@ -196,7 +196,6 @@ public final class ReportRequirementsPanel extends ReportPanel {
             } else {
                 String key = "report.requirements.tile."
                     + tis.tileImprovementType.getSuffix();
-                if (tis.tile == colony.getTile()) key += ".center";
                 if (Messages.containsKey(key)) {
                     addTileWarning(doc, colony, key, tis.tile);
                 }
@@ -220,12 +219,9 @@ public final class ReportRequirementsPanel extends ReportPanel {
     private void addTileWarning(StyledDocument doc, Colony colony,
                                 String messageId, Tile tile) {
         if (messageId == null || !Messages.containsKey(messageId)) return;
-        // TODO-post-0.11.4-release: migrate to using Tile.getColonyTileLocationLabel()
-        Direction direction = colony.getTile().getDirection(tile);
         StringTemplate t = StringTemplate.template(messageId)
-            .addNamed("%type%", tile.getType())
-            .addName("%colony%", colony.getName());
-        if (direction != null) t.addNamed("%direction%", direction);
+            .addStringTemplate("%location%",
+                tile.getColonyTileLocationLabel(colony));
         try {
             doc.insertString(doc.getLength(), "\n\n" + Messages.message(t),
                              doc.getStyle("regular"));
@@ -234,7 +230,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
         }
     }
 
-    private void addBadAssignmentWarning(StyledDocument doc, Colony colony, Unit expert, Unit nonExpert) {
+    private void addBadAssignmentWarning(StyledDocument doc, Colony colony,
+                                         Unit expert, Unit nonExpert) {
         GoodsType expertGoods = expert.getWorkType();
         GoodsType nonExpertGoods = nonExpert.getWorkType();
         String colonyName = colony.getName();
@@ -257,7 +254,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
         }
     }
 
-    private void addExpertWarning(StyledDocument doc, Colony c, GoodsType goodsType, UnitType workType) {
+    private void addExpertWarning(StyledDocument doc, Colony c,
+                                  GoodsType goodsType, UnitType workType) {
         String newMessage = Messages.message(StringTemplate
             .template("report.requirements.noExpert")
             .addName("%colony%", c.getName())
