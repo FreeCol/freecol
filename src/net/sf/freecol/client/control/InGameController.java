@@ -4661,7 +4661,7 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean victory(Boolean quit) {
         if (quit) {
-            freeColClient.quit();
+            freeColClient.newGame(false);
         } else {
             askServer().continuePlaying();
         }

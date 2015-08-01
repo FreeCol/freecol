@@ -52,7 +52,7 @@ public class NewAction extends FreeColAction {
         if (freeColClient.isMapEditor()) {
             freeColClient.getMapEditorController().newMap();
         } else {
-            freeColClient.newGame();
+            freeColClient.newGame(true);
         }
     }
 }

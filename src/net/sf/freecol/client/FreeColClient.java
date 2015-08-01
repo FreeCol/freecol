@@ -734,14 +734,17 @@ public final class FreeColClient {
      *
      * When the game is clear, show the new game panel.
      *
-     * Called from the New action, often from the button on the MainPanel.
+     * Called from the New action, often from the button on the MainPanel,
+     * and IGC.victory()
+     *
+     * @param prompt If true, prompt to confirm stopping the game.
      */
-    public void newGame() {
+    public void newGame(boolean prompt) {
         Specification specification = null;
         if (getGame() != null) {
             if (isMapEditor()) {
                 specification = getGame().getSpecification();
-            } else if (gui.confirmStopGame()) {
+            } else if (!prompt || gui.confirmStopGame()) {
                 getConnectController().quitGame(true);
                 FreeColSeed.incrementFreeColSeed();
             } else {
