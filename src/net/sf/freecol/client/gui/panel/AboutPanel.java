@@ -72,13 +72,15 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class AboutPanel extends FreeColPanel {
 
-    private static final Logger logger = Logger
-            .getLogger(AboutPanel.class.getName());
+    private static final Logger logger = Logger.getLogger(AboutPanel.class.getName());
 
     public static final String SITE_URL
         = "http://www.freecol.org";
     public static final String PROJECT_URL
         = "http://sourceforge.net/projects/freecol/";
+    private static final String MANUAL_URL
+        = "http://www.freecol.org/documentation/freecol-user-manual.html";
+
 
     /**
      * The constructor that will add the items to this panel.
@@ -131,6 +133,15 @@ public final class AboutPanel extends FreeColPanel {
         apProjectURL.setFont(fontNormal);
         add(apProjectURL, "newline");
 
+        // Manual
+        JLabel apManual = Utility.localizedLabel("aboutPanel.manual");
+        apManual.setFont(fontBold);
+        add(apManual, "newline 10");
+        JButton apManualURL = Utility.getLinkButton(MANUAL_URL, null,
+                                                    MANUAL_URL);
+        apManualURL.addActionListener(this);
+        add(apManualURL, "newline");
+        
         // License Disclaimer
         JTextArea apLegal
             = Utility.localizedTextArea("aboutPanel.legalDisclaimer");
