@@ -47,6 +47,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -1904,7 +1905,11 @@ public final class MapViewer {
                     && tile.getRegion().getName() == null) {
                     text = tile.getRegion().getSuffix();
                 } else {
-                    text = Messages.message(tile.getRegion().getLabel());
+                    try {
+                        text = Messages.message(tile.getRegion().getLabel());
+                    } catch(NullPointerException e) {
+                        logger.log(Level.WARNING, "Uninitialized Region"/*, e*/);
+                    }
                 }
             }
             displayTerritorialBorders(g, tile, BorderType.REGION, true);
