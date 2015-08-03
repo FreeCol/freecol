@@ -233,7 +233,7 @@ public abstract class Settlement extends GoodsLocation
         for (Tile t : tiles) {
             t.changeOwnership(owner, this);//-vis(owner,this),-til
         }
-        if (this instanceof Colony && !tile.hasRoad()) {
+        if (!tile.hasRoad()) {
             TileImprovement road = tile.addRoad();
             road.setTurnsToComplete(0);
             road.setVirtual(true);
