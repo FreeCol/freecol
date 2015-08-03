@@ -434,17 +434,14 @@ public final class InfoPanel extends FreeColPanel {
      * @return The panel mode.
      */
     private InfoPanelMode getMode() {
-        Player player;
         return (getFreeColClient().isMapEditor())
             ? InfoPanelMode.MAP
             : (getGUI().getViewMode() == GUI.VIEW_TERRAIN_MODE)
             ? InfoPanelMode.TILE
             : (unitInfoPanel.hasUnit())
             ? InfoPanelMode.UNIT
-            : ((player = getFreeColClient().getMyPlayer()) == null)
+            : (getFreeColClient().getMyPlayer() == null)
             ? InfoPanelMode.NONE
-            : player.hasNextActiveUnit()
-            ? InfoPanelMode.UNIT
             : InfoPanelMode.END;
     }
 
@@ -497,9 +494,9 @@ public final class InfoPanel extends FreeColPanel {
      */
     public void update() {
         InfoPanelMode newMode = getMode();
-        if(newMode == InfoPanelMode.UNIT && !unitInfoPanel.hasUnit()) {
-            unitInfoPanel.update(
-                getFreeColClient().getMyPlayer().getNextActiveUnit());
+        if(newMode == InfoPanelMode.END &&
+           getFreeColClient().getMyPlayer().hasNextActiveUnit()) {
+            logger.warning("Inconsistent InfoPanel status");
         }
         if (this.mode != newMode) {
             switch (this.mode = newMode) {
