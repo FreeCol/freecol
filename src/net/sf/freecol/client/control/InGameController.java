@@ -383,6 +383,32 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Embark onto a carrier.
+     *
+     * @param unit The <code>Unit</code> to embark.
+     * @param carrier The carrier <code>Unit</code> to board.
+     * @return True if boarding succeeded.
+     */
+    private boolean askEmbark(Unit unit, Unit carrier) {
+        // Proceed to board
+        ColonyWas colonyWas = (unit.getColony() != null)
+            ? new ColonyWas(unit.getColony()) : null;
+        EuropeWas europeWas = (unit.isInEurope())
+            ? new EuropeWas(unit.getOwner().getEurope()) : null;
+        UnitWas unitWas = new UnitWas(unit);
+        boolean ret = askServer().embark(unit, carrier, null)
+            && unit.getLocation() == carrier;
+        if (ret) {
+            freeColClient.getSoundController()
+                .playSound("sound.event.loadCargo");
+        }
+        unitWas.fireChanges();
+        if (colonyWas != null) colonyWas.fireChanges();
+        if (europeWas != null) europeWas.fireChanges();
+        return ret;
+    }
+    
+    /**
      * A unit in Europe emigrates.
      *
      * This is unusual for an ask* routine in that it uses a *Was
@@ -1145,7 +1171,6 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unit has completed the path and can move further.
      */
     private boolean movePath(Unit unit, PathNode path) {
-        // Traverse the path to the destination.
         for (; path != null; path = path.next) {
             if (unit.isAtLocation(path.getLocation())) continue;
 
@@ -1564,24 +1589,27 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unit can move further.
      */
     private boolean moveMove(Unit unit, Direction direction) {
-        // If we are in a colony, or Europe, load sentries.
+        final ClientOptions options = freeColClient.getClientOptions();
         if (unit.canCarryUnits() && unit.hasSpaceLeft()
-            && (unit.getColony() != null || unit.isInEurope())) {
-            boolean boarded = false;
-            for (Unit sentry : unit.getLocation().getUnitList()) {
-                if (sentry.getState() == UnitState.SENTRY) {
-                    if (unit.canAdd(sentry)) {
-                        boarded |= boardShip(sentry, unit);
-                        logger.finest("Unit " + unit
-                            + " loaded sentry " + sentry);
-                    } else {
-                        logger.finest("Unit " + sentry
-                            + " is too big to board " + unit);
+            && options.getBoolean(ClientOptions.AUTOLOAD_SENTRIES)) {
+            // Autoload sentries if selected
+            List<Unit> waiting = (unit.getColony() != null)
+                ? unit.getTile().getUnitList()
+                : Collections.<Unit>emptyList();
+            for (Unit u : waiting) {
+                if (u.getState() != UnitState.SENTRY
+                    || !unit.couldCarry(u)) continue;
+                try {
+                    askEmbark(u, unit);
+                } finally {
+                    if (u.getLocation() != unit) {
+                        u.setState(UnitState.SKIPPED);
                     }
+                    continue;
                 }
             }
             // Boarding consumed this unit's moves.
-            if (boarded && unit.getMovesLeft() <= 0) return false;
+            if (unit.getMovesLeft() <= 0) return false;
         }
 
         // Ask the server
@@ -1598,7 +1626,6 @@ public final class InGameController implements NetworkConstants {
 
         // Perform a short pause on an active unit's last move if
         // the option is enabled.
-        final ClientOptions options = freeColClient.getClientOptions();
         if (unit.getMovesLeft() <= 0
             && options.getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
             gui.paintImmediatelyCanvasInItsBounds();
@@ -1615,22 +1642,6 @@ public final class InGameController implements NetworkConstants {
                 && (unit.getDestination() == null
                     || unit.getDestination().getTile() == tile.getTile())) {
                 gui.showColonyPanel(colony, unit);
-            }
-            // Autoload sentries if selected
-            if (options.getBoolean(ClientOptions.AUTOLOAD_SENTRIES)) {
-                for (Unit u : tile.getUnitList()) {
-                    if (u.getState() != UnitState.SENTRY) continue;
-                    if (unit.couldCarry(u)) {
-                        try {
-                            askServer().embark(u, unit, null);
-                        } finally {
-                            if (u.getLocation() != unit) {
-                                u.setState(UnitState.SKIPPED);
-                            }
-                            continue;
-                        }
-                    }
-                }
             }
         }
         if (unit.getMovesLeft() <= 0) return false;
@@ -2639,23 +2650,11 @@ public final class InGameController implements NetworkConstants {
             || !Map.isSameLocation(unit.getLocation(), carrier.getLocation())
             ) return false;
 
-        // Proceed to board
-        ColonyWas colonyWas = (unit.getColony() != null)
-            ? new ColonyWas(unit.getColony()) : null;
-        EuropeWas europeWas = (unit.isInEurope())
-            ? new EuropeWas(unit.getOwner().getEurope()) : null;
-        UnitWas unitWas = new UnitWas(unit);
-        boolean ret = askServer().embark(unit, carrier, null)
-            && unit.getLocation() == carrier;
+        boolean ret = askEmbark(unit, carrier);
         if (ret) {
-            freeColClient.getSoundController()
-                .playSound("sound.event.loadCargo");
+            updateControls();
+            updateActiveUnit(null);
         }
-        unitWas.fireChanges();
-        if (colonyWas != null) colonyWas.fireChanges();
-        if (europeWas != null) europeWas.fireChanges();
-        updateControls();
-        updateActiveUnit(null);
         return ret;
     }
 
@@ -3770,7 +3769,7 @@ public final class InGameController implements NetworkConstants {
                 if (!u.isNaval()
                     && u.getState() == UnitState.SENTRY
                     && unit.canAdd(u)) {
-                    boardShip(u, unit);
+                    askEmbark(u, unit);
                 }
             }
         }
