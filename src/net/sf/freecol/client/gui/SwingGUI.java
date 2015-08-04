@@ -586,15 +586,17 @@ public class SwingGUI extends GUI {
      * Set the active unit.
      *
      * @param unit The <code>Unit</code> to activate.
+     * @return true if the focus was set.
      */
     @Override
-    public void setActiveUnit(Unit unit) {
-        mapViewer.setActiveUnit(unit);
+    public boolean setActiveUnit(Unit unit) {
+        boolean result=mapViewer.setActiveUnit(unit);
         updateMapControls();
         if (unit != null && !freeColClient.getMyPlayer().owns(unit)) {
             canvas.refresh();
         }
         canvas.updateMenuBar();
+        return result;
     }
 
     /**
@@ -1691,7 +1693,9 @@ public class SwingGUI extends GUI {
 
     @Override
     public boolean setSelectedTile(Tile newTileToSelect) {
-        return mapViewer.setSelectedTile(newTileToSelect);
+        boolean result=mapViewer.setSelectedTile(newTileToSelect);
+        updateMapControls();
+        return result;
     }
 
     @Override

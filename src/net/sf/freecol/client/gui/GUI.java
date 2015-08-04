@@ -322,8 +322,10 @@ public class GUI {
      * Set the active unit.
      *
      * @param unit The <code>Unit</code> to activate.
+     * @return true if the focus was set.
      */
-    public void setActiveUnit(Unit unit) {
+    public boolean setActiveUnit(Unit unit) {
+        return false;
     }
 
     /**

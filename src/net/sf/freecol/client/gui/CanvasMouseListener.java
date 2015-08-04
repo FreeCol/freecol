@@ -219,6 +219,6 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                 }
             }
         }
-        mapViewer.setSelectedTile(tile);
+        freeColClient.getGUI().setSelectedTile(tile);
     }
 }

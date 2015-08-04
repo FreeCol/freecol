@@ -299,12 +299,12 @@ public final class MapViewer {
 
         switch (viewMode) {
         case GUI.MOVE_UNITS_MODE:
-            if (getActiveUnit() == null) setActiveUnit(savedActiveUnit);
+            if (getActiveUnit() == null) gui.setActiveUnit(savedActiveUnit);
             savedActiveUnit = null;
             break;
         case GUI.VIEW_TERRAIN_MODE:
             savedActiveUnit = activeUnit;
-            setActiveUnit(null);
+            gui.setActiveUnit(null);
             break;
         default:
             break;
@@ -947,7 +947,7 @@ public final class MapViewer {
             freeColClient.updateActions();
         } else {
             updateCurrentPathForActiveUnit();
-            if (!setSelectedTile(tile)
+            if (!gui.setSelectedTile(tile)
                 || freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) {
                 setFocus(tile);
@@ -1085,7 +1085,7 @@ public final class MapViewer {
                 // select a unit on the selected tile
                 Unit unitInFront = findUnitInFront(newTile);
                 if (unitInFront != null) {
-                    ret = setActiveUnit(unitInFront);
+                    ret = gui.setActiveUnit(unitInFront);
                     updateCurrentPathForActiveUnit();
                 } else {
                     setFocus(newTile);
