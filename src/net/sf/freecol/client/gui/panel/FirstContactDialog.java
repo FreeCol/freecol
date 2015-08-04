@@ -65,8 +65,8 @@ public class FirstContactDialog extends FreeColConfirmDialog {
         MigPanel panel
             = new MigPanel(new MigLayout("wrap 1", "[center]", "[]20"));
 
-        String headerKey = BASE_KEY + other.getNationNameKey();
-        String imageKey = IMAGE_BASE_KEY + other.getNationNameKey();
+        String headerKey = BASE_KEY + other.getNation().getSuffix();
+        String imageKey = IMAGE_BASE_KEY + other.getNationResourceKey();
         if (!Messages.containsKey(headerKey)) {
             headerKey = BASE_KEY + NATIVES_KEY;
             imageKey = IMAGE_BASE_KEY + NATIVES_KEY;
