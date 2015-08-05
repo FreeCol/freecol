@@ -310,7 +310,8 @@ public final class InfoPanel extends FreeColPanel {
                     JLabel label;
                     for (Goods goods : unit.getGoodsList()) {
                         icon = new ImageIcon(lib.getSmallIconImage(goods.getType()));
-                        label = new JLabel(icon);
+                        label = new JLabel(String.valueOf(goods.getAmount()),
+                                           icon, JLabel.RIGHT);
                         text = Messages.message(goods.getLabel(true));
                         label.setFont(font);
                         label.setToolTipText(text);
