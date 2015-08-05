@@ -3351,17 +3351,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Retrieves client statistics.
-     *
-     * Called from StatisticsPanel
-     *
-     * @return A <code>Map</code> containing the client statistics.
-     */
-    public java.util.Map<String, String> getClientStatistics() {
-        return freeColClient.getGame().getStatistics();
-    }
-
-    /**
      * Get the nation summary for a player.
      *
      * Called from DiplomaticTradePanel, ReportForeignAffairsPanel,
@@ -4315,6 +4304,8 @@ public final class InGameController implements NetworkConstants {
 
         final Game game = freeColClient.getGame();
         game.setCurrentPlayer(player);
+
+        Tile fallback = null;
         if (freeColClient.getMyPlayer().equals(player)) {
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)
                 && DebugUtils.checkDesyncAction(freeColClient)) {
@@ -4322,15 +4313,15 @@ public final class InGameController implements NetworkConstants {
                 return false;
             }
 
+            // Save the game (if it isn't newly loaded)
+            if (freeColClient.getFreeColServer() != null
+                && game.getTurn().getNumber() > 0) autoSaveGame();
+
             // Get turn report out quickly before more message display occurs.
             player.removeDisplayedModelMessages();
             displayModelMessages(true, true);
 
             player.invalidateCanSeeTiles();
-
-            // Save the game (if it isn't newly loaded)
-            if (freeColClient.getFreeColServer() != null
-                && game.getTurn().getNumber() > 0) autoSaveGame();
 
             // Check for emigration.
             Europe europe = player.getEurope();
@@ -4343,20 +4334,8 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             
-            try {
-                List<Settlement> settlements = player.getSettlements();
-                Tile defTile = ((settlements.isEmpty())
-                    ? player.getEntryLocation().getTile()
-                    : settlements.get(0).getTile()).getSafeTile(null, null);
-                player.resetIterators();
-                updateActiveUnit(defTile);
-            } catch (Exception e) {
-                // We end up here if there is a crash in things like the
-                // turn report.  These were hard to track down because we
-                // used to fail silently.  We now complain louder.
-                logger.log(Level.WARNING, "Client new turn failure for "
-                    + player, e);
-            }
+            player.resetIterators();
+            fallback = player.getFallbackTile();
 
             // GUI management.
             if (!freeColClient.isSinglePlayer()) {

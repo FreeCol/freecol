@@ -158,7 +158,8 @@ public final class StatisticsPanel extends FreeColPanel {
 
         // Retrieve the client and server data
         Map<String, String> serverStatistics = igc().getServerStatistics();
-        Map<String, String> clientStatistics = igc().getClientStatistics();
+        Map<String, String> clientStatistics = freeColClient.getGame()
+            .getStatistics();
 
         // Title
         JPanel header = new JPanel();

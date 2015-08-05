@@ -2636,6 +2636,21 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get a default tile to display at the start of the player turn should
+     * there not be any active units.
+     *
+     * Favour the first settlement, followed by the entry tile.
+     * 
+     * @return A suitable <code>Tile</code>.
+     */
+    public Tile getFallbackTile() {
+        List<Settlement> settlements = getSettlements();
+        return (!settlements.isEmpty())
+            ? settlements.get(0).getTile()
+            : getEntryLocation().getTile();
+    }
+
+    /**
      * Get the players high seas.
      *
      * @return The <code>HighSeas</code> for this player.
