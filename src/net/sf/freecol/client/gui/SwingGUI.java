@@ -26,7 +26,6 @@ import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
-import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -62,7 +61,6 @@ import net.sf.freecol.client.gui.panel.CornerMapControls;
 import net.sf.freecol.client.gui.panel.DialogHandler;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
-import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.client.gui.panel.TradeRoutePanel;
@@ -157,7 +155,6 @@ public class SwingGUI extends GUI {
         return canvas;
     }
 
-    @Override
     public MapViewer getColonyTileMapViewer() {
         return colonyTileMapViewer;
     }

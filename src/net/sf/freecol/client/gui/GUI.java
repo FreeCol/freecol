@@ -130,10 +130,6 @@ public class GUI {
         return imageLibrary;
     }
 
-    public MapViewer getColonyTileMapViewer() {
-        return null;
-    }
-
     public boolean isWindowed() {
         return true;
     }

@@ -36,8 +36,8 @@ import javax.swing.JLabel;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.FontLibrary;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -83,7 +83,7 @@ public final class UnitLabel extends JLabel
 
     private final FreeColClient freeColClient;
 
-    private final GUI gui;
+    private final SwingGUI gui;
 
     private final Unit unit;
 
@@ -147,7 +147,7 @@ public final class UnitLabel extends JLabel
                      boolean isSmall, boolean ignoreLocation,
                      boolean useMapImageLibrary) {
         this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
+        this.gui = (SwingGUI)freeColClient.getGUI();
         this.unit = unit;
 
         selected = false;

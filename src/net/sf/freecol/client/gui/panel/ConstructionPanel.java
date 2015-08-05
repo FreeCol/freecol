@@ -35,12 +35,14 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
+
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -132,7 +134,7 @@ public class ConstructionPanel extends MigPanel
 
     public void update(BuildableType buildable) {
         removeAll();
-        final ImageLibrary lib = freeColClient.getGUI()
+        final ImageLibrary lib = ((SwingGUI)freeColClient.getGUI())
             .getColonyTileMapViewer().getImageLibrary();
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.SMALLER, lib.getScalingFactor());
