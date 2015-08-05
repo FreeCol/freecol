@@ -41,7 +41,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -153,7 +152,7 @@ public final class MapViewer {
 
     private final FreeColClient freeColClient;
 
-    private final GUI gui;
+    private final SwingGUI gui;
 
     private Dimension size;
 
@@ -256,7 +255,7 @@ public final class MapViewer {
      */
     MapViewer(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
+        this.gui = (SwingGUI)freeColClient.getGUI();
         this.size = null;
 
         setImageLibraryAndUpdateData(new ImageLibrary());

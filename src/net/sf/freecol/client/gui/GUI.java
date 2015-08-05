@@ -126,10 +126,6 @@ public class GUI {
         return freeColClient.getInGameController();
     }
 
-    public Canvas getCanvas() {
-        return null;
-    }
-
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
     }

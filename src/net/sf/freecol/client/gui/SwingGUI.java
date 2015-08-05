@@ -153,7 +153,6 @@ public class SwingGUI extends GUI {
 
     // Simple accessors
 
-    @Override
     public Canvas getCanvas() {
         return canvas;
     }
