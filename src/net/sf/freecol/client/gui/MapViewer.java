@@ -168,8 +168,6 @@ public final class MapViewer {
     private Tile focus = null;
     private Unit activeUnit;
 
-    private Unit savedActiveUnit;
-
     /** The view mode in use. */
     private int viewMode = 0;
 
@@ -294,19 +292,7 @@ public final class MapViewer {
             logger.fine("Changed to " + ((newViewMode == GUI.MOVE_UNITS_MODE)
                     ? "Move Units" : "View Terrain") + " mode");
             viewMode = newViewMode;
-        }
-
-        switch (viewMode) {
-        case GUI.MOVE_UNITS_MODE:
-            if (getActiveUnit() == null) gui.setActiveUnit(savedActiveUnit);
-            savedActiveUnit = null;
-            break;
-        case GUI.VIEW_TERRAIN_MODE:
-            savedActiveUnit = activeUnit;
-            gui.setActiveUnit(null);
-            break;
-        default:
-            break;
+            gui.updateMapControls();
         }
     }
 
