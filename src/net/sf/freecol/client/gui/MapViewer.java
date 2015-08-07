@@ -806,6 +806,10 @@ public final class MapViewer {
         return new Point(x, y);
     }
 
+    int getTileWidth() {
+        return tileWidth;
+    }
+
     /**
      * Get the ratio of width/height of tiles on the map.
      *
