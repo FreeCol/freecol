@@ -499,7 +499,6 @@ public class SwingGUI extends GUI {
         // Action should be disabled if there is no active unit, but make sure
         if (unit == null) return;
         canvas.stopGoto();
-        refresh();
     }
 
     /**
