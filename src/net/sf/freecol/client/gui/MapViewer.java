@@ -332,7 +332,7 @@ public final class MapViewer {
      */
     void centerActiveUnit() {
         if (activeUnit != null && activeUnit.getTile() != null) {
-            setFocus(activeUnit.getTile());
+            gui.setFocus(activeUnit.getTile());
         }
     }
 
@@ -902,7 +902,7 @@ public final class MapViewer {
         }
 
         if (x == fx && y == fy) return false;
-        setFocus(freeColClient.getGame().getMap().getTile(x,y));
+        gui.setFocus(freeColClient.getGame().getMap().getTile(x,y));
         return true;
     }
 
@@ -935,7 +935,7 @@ public final class MapViewer {
             if (!gui.setSelectedTile(tile)
                 || freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) {
-                setFocus(tile);
+                gui.setFocus(tile);
                 return true;
             }
         }
@@ -961,20 +961,6 @@ public final class MapViewer {
      */
     void setFocus(Tile focus) {
         this.focus = focus;
-
-        gui.refresh();
-    }
-
-    /**
-     * Sets the focus of the map and repaints the screen immediately.
-     *
-     * @param focus The <code>Position</code> of the center tile of the
-     *     displayed map.
-     * @see #getFocus
-     */
-    void setFocusImmediately(Tile focus) {
-        this.focus = focus;
-
         forceReposition();
     }
 
@@ -1009,7 +995,7 @@ public final class MapViewer {
         final int tx = tile.getX(), ty = tile.getY(),
             width = rightColumn - leftColumn;
         int moveX = -1;
-        setFocus(tile);
+        gui.setFocus(tile);
         positionMap(tile);
         if (leftColumn <= 0) { // At left edge already
             if (tx <= width / 4) {
@@ -1035,7 +1021,7 @@ public final class MapViewer {
         }
         if (moveX >= 0) {
             Tile other = map.getTile(moveX, ty);
-            setFocus(other);
+            gui.setFocus(other);
             positionMap(other);
         }
         return where;
@@ -1073,7 +1059,7 @@ public final class MapViewer {
                     ret = gui.setActiveUnit(unitInFront);
                     updateCurrentPathForActiveUnit();
                 } else {
-                    setFocus(newTile);
+                    gui.setFocus(newTile);
                     ret = true;
                 }
             }
@@ -1087,7 +1073,7 @@ public final class MapViewer {
         // Check for refocus
         if (!onScreen(newTile)
             || freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)) {
-            setFocus(newTile);
+            gui.setFocus(newTile);
             ret = true;
         } else {
             if (oldTile != null) {
