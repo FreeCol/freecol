@@ -34,12 +34,10 @@ public class TerrainCursor implements ActionListener  {
     public static final int OFF = 0;
     public static final int ON = 1;
 
-    private int canvasX;
-    private int canvasY;
     private final Timer blinkTimer;
     private boolean active;
     private final EventListenerList listenerList;
-    
+
 
     /**
      * Creates a new <code>TerrainCursor</code> instance.
@@ -53,7 +51,7 @@ public class TerrainCursor implements ActionListener  {
         
         listenerList = new EventListenerList();
     }
-    
+
     /**
      * Returns whether this TerrainCursor is active.
      *
@@ -62,7 +60,7 @@ public class TerrainCursor implements ActionListener  {
     public boolean isActive() {
         return active;
     }
-    
+
     /**
      * Sets the active state of the TerrainCursor.
      *
@@ -71,43 +69,30 @@ public class TerrainCursor implements ActionListener  {
     public void setActive(boolean newState) {
         active = newState;
     }
-    
+
     public void startBlinking() {
         if (!blinkTimer.isRunning()) blinkTimer.start();
     }
-    
+
     public void stopBlinking() {
         if (blinkTimer.isRunning()) blinkTimer.stop();
     }
 
-    public void setCanvasPos(int x,int y) {
-        canvasX = x;
-        canvasY = y;
-    }
-    
-    public int getCanvasX() {
-        return canvasX;
-    }
-    
-    public int getCanvasY() {
-        return canvasY;
-    }
-    
     public void addActionListener(ActionListener listener) {
         listenerList.add(ActionListener.class, listener);
     }
-    
+
     public void removeActionListener(ActionListener listener) {
         listenerList.remove(ActionListener.class, listener);
     }
-    
+
     public void fireActionEvent(ActionEvent event) {
         for (ActionListener al
                  : listenerList.getListeners(ActionListener.class)) {
             al.actionPerformed(event);
         }
     }
-  
+
 
     // Interface ActionListener
 

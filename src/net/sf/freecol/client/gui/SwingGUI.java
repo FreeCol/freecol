@@ -1544,9 +1544,7 @@ public class SwingGUI extends GUI {
 
     @Override
     public void showTilePopUpAtSelectedTile() {
-        TerrainCursor cursor = mapViewer.getCursor();
-        canvas.showTilePopup(mapViewer.getSelectedTile(),
-            cursor.getCanvasX(), cursor.getCanvasY());
+        canvas.showTilePopup(mapViewer.getSelectedTile(), 0, 0);
     }
 
     @Override
