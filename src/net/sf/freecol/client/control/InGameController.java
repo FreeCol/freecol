@@ -1630,19 +1630,19 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Update the active unit and GUI.
-        if (unit.isDisposed() || checkCashInTreasureTrain(unit)) return false;
-        if (tile.getColony() != null && unit.isCarrier()) {
-            final Colony colony = tile.getColony();
-            if (unit.getTradeRoute() == null
-                && (unit.getDestination() == null
-                    || unit.getDestination().getTile() == tile.getTile())) {
-                gui.showColonyPanel(colony, unit);
+        boolean ret = !unit.isDisposed() && !checkCashInTreasureTrain(unit);
+        if (ret) {
+            if (tile.getColony() != null && unit.isCarrier()) {
+                final Colony colony = tile.getColony();
+                if (unit.getTradeRoute() == null
+                    && Map.isSameLocation(tile, unit.getDestination())) {
+                    gui.showColonyPanel(colony, unit);
+                }
             }
+            ret = unit.getMovesLeft() > 0;
         }
-        if (unit.getMovesLeft() <= 0) return false;
         displayModelMessages(false);
-        if (!gui.onScreen(tile)) gui.setSelectedTile(tile);
-        return true;
+        return ret;
     }
 
     /**
