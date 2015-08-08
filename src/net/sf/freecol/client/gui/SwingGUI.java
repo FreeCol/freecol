@@ -1147,11 +1147,10 @@ public class SwingGUI extends GUI {
         canvas.showEmigrationDialog(player, fountainOfYouth,
             new DialogHandler<Integer>() {
                 @Override
-                public void handle(Integer value) {
-                    // Value should be a valid slot
+                public void handle(Integer value) { // Value is a valid slot
                     igc().emigrate(player,
-                        Europe.MigrationType.convertToMigrantSlot(value));
-                    igc().emigrationLoop(player, n-1, fountainOfYouth);
+                        Europe.MigrationType.convertToMigrantSlot(value),
+                        n-1, fountainOfYouth);
                 }
             });
     }

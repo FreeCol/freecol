@@ -783,8 +783,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element fountainOfYouth(Element element) {
         int n = getIntegerAttribute(element, "migrants");
         if (n > 0) {
-            getGUI().showEmigrationDialog(getFreeColClient().getMyPlayer(),
-                                          n, true);
+            igc().fountainOfYouth(n);
         } else {
             logger.warning("Invalid migrants attribute: "
                 + element.getAttribute("migrants"));

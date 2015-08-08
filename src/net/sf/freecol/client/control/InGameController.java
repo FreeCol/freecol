@@ -440,6 +440,36 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Select all the units to emigrate from Europe.  If they are all
+     * the same they can be picked automatically, but otherwise use
+     * the emigration dialog.  Only to be called if the player is
+     * allowed to select the unit type (i.e. FoY or has Brewster).
+     *
+     * The server contains the count of available FoY-units, and
+     * maintains the immigration/immigrationRequired amounts, so this
+     * routine will fail harmlessly if it asks for too much.
+     *
+     * @param player The <code>Player</code> that owns the unit.
+     * @param n The number of units known to be eligible to emigrate.
+     * @param fountainOfYouth True if this migration if due to a FoY.
+     */
+    private void emigration(Player player, int n, boolean fountainOfYouth) {
+        final Europe europe = player.getEurope();
+        if (europe == null) return;
+
+        for (; n > 0 || player.checkEmigrate() ; n--) {
+            if (!allSame(europe.getRecruitables())) {
+                gui.showEmigrationDialog(player, n, fountainOfYouth);
+                return;
+            }
+            Unit u = askEmigrate(europe,
+                                 Europe.MigrationType.getDefaultSlot());
+            if (u == null) break; // Give up on failure, try again next turn
+            player.addModelMessage(player.getEmigrationMessage(u));
+        }
+    }
+   
+    /**
      * Load some goods onto a carrier.
      *
      * @param loc The <code>Location</code> to load from.
@@ -3196,48 +3226,22 @@ public final class InGameController implements NetworkConstants {
     /**
      * Emigrate a unit from Europe.
      *
-     * Called from GUI.showEmigrationDialog
+     * Called from GUI.showEmigrationDialog.
      *
      * @param player The <code>Player</code> that owns the unit.
      * @param slot The slot to emigrate from, [0..RECRUIT_COUNT].
-     * @return True if a unit emigrated.
+     * @param n The number of remaining units known to be eligible to migrate.
+     * @param foY True if this migration is due to a fountain of youth event.
      */
-    public boolean emigrate(Player player, int slot) {
+    public void emigrate(Player player, int slot, int n, boolean foY) {
         if (player == null || !player.isColonial()
-            || !MigrationType.validMigrantSlot(slot)) return false;
+            || !MigrationType.validMigrantSlot(slot)) return;
 
-        return askEmigrate(player.getEurope(), slot) != null;
-    }
-
-    /**
-     * Loop through selecting (or not when all are the same) a new unit
-     * to emigrate from Europe.  Only to be called if the player is allowed
-     * to select the unit type (i.e. FoY or has Brewster).
-     *
-     * Called from GUI.showEmigrationDialog
-     *
-     * @param player The <code>Player</code> that owns the unit.
-     * @param n The number of units known to be eligible to emigrate.
-     * @param fountainOfYouth True if this migration if due to a FoY.
-     */
-    public void emigrationLoop(Player player, int n, boolean fountainOfYouth) {
-        final Europe europe = player.getEurope();
-        if (europe == null) return;
-
-        for (;;) {
-            if (n == 0 && player.checkEmigrate()) n = 1;
-            if (n <= 0) return;
-            if (!allSame(europe.getRecruitables())) break;
-            Unit u = askEmigrate(europe,
-                                 Europe.MigrationType.getDefaultSlot());
-            if (u != null) {
-                player.addModelMessage(player.getEmigrationMessage(u));
-            }
-            n--;
+        if (askEmigrate(player.getEurope(), slot) != null) {
+            emigration(player, n, foY);
         }
-        gui.showEmigrationDialog(player, n, fountainOfYouth);
     }
-    
+
     /**
      * End the turn command.
      *
@@ -3348,6 +3352,17 @@ public final class InGameController implements NetworkConstants {
             || tile == null) return false;
 
         return askServer().firstContact(player, other, tile, result);
+    }
+
+    /**
+     * Handle a fountain of youth event.
+     *
+     * Called from IGIH.fountainOfYouth.
+     *
+     * @param n The number of migrants available for selection.
+     */
+    public void fountainOfYouth(int n) {
+        gui.showEmigrationDialog(freeColClient.getMyPlayer(), n, true);
     }
 
     /**
@@ -4326,11 +4341,11 @@ public final class InGameController implements NetworkConstants {
             // Check for emigration.
             Europe europe = player.getEurope();
             if (player.hasAbility(Ability.SELECT_RECRUIT)) {
-                emigrationLoop(player, 0, false);
+                emigration(player, 0, false);
             } else {
                 while (player.checkEmigrate()) {
                     askEmigrate(europe,
-                                Europe.MigrationType.getUnspecificSlot());
+                        Europe.MigrationType.getUnspecificSlot());
                 }
             }
             
