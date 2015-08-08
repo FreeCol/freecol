@@ -123,9 +123,6 @@ public final class InGameInputHandler extends InputHandler {
             }
         };
 
-    /** The unit last appearing in an animation. */
-    private Unit lastAnimatedUnit = null;
-
 
     /**
      * The constructor to use.
@@ -470,15 +467,9 @@ public final class InGameInputHandler extends InputHandler {
 
         // All is well, do the animation.
         final Unit attacker = u;
-        final boolean focus = lastAnimatedUnit != attacker;
-        lastAnimatedUnit = attacker;
         invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
-                    if (focus || !getGUI().onScreen(attackerTile)
-                        || !getGUI().onScreen(defenderTile)) {
-                        getGUI().setFocusImmediately(attackerTile);
-                    }
                     getGUI().animateUnitAttack(attacker, defender,
                         attackerTile, defenderTile, success);
                     refreshCanvas(false);
@@ -553,30 +544,11 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         final Unit unit = u;
-        final boolean focus = unit != lastAnimatedUnit;
-        lastAnimatedUnit = unit;
         invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
-                    if (getGUI().getAnimationSpeed(unit) > 0) {
-                        // All is well, queue the animation.  Use
-                        // lastAnimatedUnit as a filter to avoid
-                        // excessive refocussing.
-                        if (focus || !getGUI().onScreen(oldTile)) {
-                            getGUI().setFocusImmediately(oldTile);
-                        }
-                        getGUI().animateUnitMove(unit, oldTile, newTile);
-                        refreshCanvas(false);
-                    } else {
-                        // Not animating, but if the centering
-                        // option is enabled at least refocus so
-                        // we can see the move happen.
-                        if (!getGUI().onScreen(oldTile)
-                            && getFreeColClient().getClientOptions()
-                            .getBoolean(ClientOptions.ALWAYS_CENTER)) {
-                            getGUI().setFocus(oldTile);
-                        }
-                    }
+                    getGUI().animateUnitMove(unit, oldTile, newTile);
+                    refreshCanvas(false);
                 }
             });
         return null;

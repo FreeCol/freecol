@@ -606,6 +606,23 @@ public class SwingGUI extends GUI {
     // Animation handling
 
     /**
+     * Require the given tile to be in the onScreen()-area.
+     * Account for the ALWAYS_CENTER client option.
+     *
+     * @param tile The <code>Tile</code> to check.
+     * @return True if the focus was set.
+     */
+    private boolean requireFocus(Tile tile) {
+        boolean required = freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.ALWAYS_CENTER);
+        if ((required && tile != getFocus()) || !onScreen(tile)) {
+            setFocusImmediately(tile);
+            return true;
+        }
+        return false;
+    }
+        
+    /**
      * Animate a unit attack.
      *
      * @param attacker The attacking <code>Unit</code>.
@@ -618,6 +635,7 @@ public class SwingGUI extends GUI {
     public void animateUnitAttack(Unit attacker, Unit defender,
                                   Tile attackerTile, Tile defenderTile,
                                   boolean success) {
+        requireFocus(attackerTile);
         Animations.unitAttack(this, attacker, defender,
                               attackerTile, defenderTile, success);
     }
@@ -631,6 +649,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
+        requireFocus(srcTile);
         Animations.unitMove(this, unit, srcTile, dstTile);
     }
 
