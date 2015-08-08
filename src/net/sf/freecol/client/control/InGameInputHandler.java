@@ -412,8 +412,7 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element animateAttack(Element element) {
-        FreeColClient freeColClient = getFreeColClient();
-        if (freeColClient.isHeadless()) return null;
+        final FreeColClient freeColClient = getFreeColClient();
         final Game game = getGame();
         final Player player = freeColClient.getMyPlayer();
         String str;
@@ -428,7 +427,12 @@ public final class InGameInputHandler extends InputHandler {
             throw new IllegalStateException("Attack animation for: "
                 + player.getId() + " omitted attacker: " + str);
         }
-        final Unit attacker = u;
+        // Note: we used to focus the map on the unit even when
+        // animation is off as long as the center-active-unit option
+        // was set.  However IR#115 requested that if animation is off
+        // that we display nothing so as to speed up the other player
+        // moves as much as possible.
+        if (getGUI().getAnimationSpeed(u) <= 0) return null;
 
         if ((str = element.getAttribute("defender")).isEmpty()) {
             throw new IllegalStateException("Attack animation for: "
@@ -465,7 +469,7 @@ public final class InGameInputHandler extends InputHandler {
             = Boolean.parseBoolean(element.getAttribute("success"));
 
         // All is well, do the animation.
-        // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
+        final Unit attacker = u;
         final boolean focus = lastAnimatedUnit != attacker;
         lastAnimatedUnit = attacker;
         invokeAndWait(new Runnable() {
@@ -515,7 +519,7 @@ public final class InGameInputHandler extends InputHandler {
                 + " missing unit:" + unitId);
             return null;
         }
-        // Note: we used to focus the map on the attacker even when
+        // Note: we used to focus the map on the unit even when
         // animation is off as long as the center-active-unit option
         // was set.  However IR#115 requested that if animation is off
         // that we display nothing so as to speed up the other player
