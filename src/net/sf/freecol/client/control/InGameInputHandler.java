@@ -495,8 +495,7 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element animateMove(Element element) {
-        FreeColClient freeColClient = getFreeColClient();
-        if (freeColClient.isHeadless()) return null;
+        final FreeColClient freeColClient = getFreeColClient();
         final Game game = getGame();
         final Player player = freeColClient.getMyPlayer();
 
@@ -516,7 +515,12 @@ public final class InGameInputHandler extends InputHandler {
                 + " missing unit:" + unitId);
             return null;
         }
-        final Unit unit = u;
+        // Note: we used to focus the map on the attacker even when
+        // animation is off as long as the center-active-unit option
+        // was set.  However IR#115 requested that if animation is off
+        // that we display nothing so as to speed up the other player
+        // moves as much as possible.
+        if (getGUI().getAnimationSpeed(u) <= 0) return null;
 
         String oldTileId = element.getAttribute("oldTile");
         if (oldTileId.isEmpty()) {
@@ -544,6 +548,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
+        final Unit unit = u;
         final boolean focus = unit != lastAnimatedUnit;
         lastAnimatedUnit = unit;
         invokeAndWait(new Runnable() {
