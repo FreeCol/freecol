@@ -744,15 +744,7 @@ public final class InGameController implements NetworkConstants {
                     };
             }
             updateControls();
-            if (SwingUtilities.isEventDispatchThread()) {
-                uiTask.run();
-            } else {
-                try {
-                    SwingUtilities.invokeAndWait(uiTask);
-                } catch (InterruptedException|InvocationTargetException ex) {
-                    logger.log(Level.WARNING, "Message display", ex);
-                }
-            }
+            freeColClient.invokeAndWait(uiTask);
         }
         return !messages.isEmpty();
     }

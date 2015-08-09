@@ -144,22 +144,6 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Wrapper for SwingUtilities.invokeAndWait.  This has to handle the
-     * case where we are already in the EDT.
-     *
-     * @param runnable A <code>Runnable</code> to run.
-     */
-    private void invokeAndWait(Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(runnable);
-            } catch (Exception e) {}
-        }
-    }
-
-    /**
      * Refresh the canvas.
      *
      * @param focus If true, request the focus.
@@ -467,7 +451,7 @@ public final class InGameInputHandler extends InputHandler {
 
         // All is well, do the animation.
         final Unit attacker = u;
-        invokeAndWait(new Runnable() {
+        freeColClient.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getGUI().animateUnitAttack(attacker, defender,
@@ -544,7 +528,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         final Unit unit = u;
-        invokeAndWait(new Runnable() {
+        freeColClient.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getGUI().animateUnitMove(unit, oldTile, newTile);
@@ -603,7 +587,7 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element closeMenus() {
-        invokeAndWait(closeMenusRunnable);
+        getFreeColClient().invokeAndWait(closeMenusRunnable);
         return null;
     }
 
@@ -635,7 +619,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        invokeAndWait(new Runnable() {
+        getFreeColClient().invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     message.setAgreement(igc().diplomacy(our, other,
@@ -849,7 +833,7 @@ public final class InGameInputHandler extends InputHandler {
             throw new IllegalArgumentException("Demand to anothers colony");
         }
 
-        invokeAndWait(new Runnable() {
+        getFreeColClient().invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     boolean accepted = igc().indianDemand(unit, colony,
@@ -1036,7 +1020,7 @@ public final class InGameInputHandler extends InputHandler {
                 // Deselect the object if it is the current active unit.
                 Unit u = (Unit)fcgo;
                 if (u == getGUI().getActiveUnit()) {
-                    invokeAndWait(deselectActiveUnitRunnable);
+                    getFreeColClient().invokeAndWait(deselectActiveUnitRunnable);
                 }
                 // Temporary hack until we have real containers.
                 if (u != null && u.getOwner() != null) {
