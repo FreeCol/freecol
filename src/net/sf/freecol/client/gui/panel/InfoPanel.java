@@ -150,11 +150,6 @@ public final class InfoPanel extends FreeColPanel {
                 FontLibrary.FontSize.TINY, lib.getScalingFactor());
             if (tile != null && tile.getType() != null) {
                 final int width = getWidth() - SLACK;
-                List<AbstractGoods> production = tile.getType()
-                    .getPossibleProduction(true);
-                if (production.size() > PRODUCTION) {
-                    production = production.subList(0, PRODUCTION);
-                }
                 BufferedImage image = mapViewer.createTileImageWithBeachBorderAndItems(tile);
                 if (tile.isExplored()) {
                     String text = Messages.message(tile.getLabel());
