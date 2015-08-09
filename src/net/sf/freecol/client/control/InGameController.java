@@ -4351,13 +4351,14 @@ public final class InGameController implements NetworkConstants {
             
             player.resetIterators();
             fallback = player.getFallbackTile();
-
+            updateActiveUnit(fallback);
+            updateControls();
+            
             // GUI management.
             if (!freeColClient.isSinglePlayer()) {
                 sound("sound.anthem." + player.getNationId());
             }
         }
-        updateControls();
         return true;
     }
 
