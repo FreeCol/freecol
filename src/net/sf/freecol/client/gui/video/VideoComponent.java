@@ -27,10 +27,10 @@ import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
+import com.fluendo.player.Cortado;
+
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.common.resources.Video;
-
-import com.fluendo.player.Cortado;
 
 
 /**
@@ -55,6 +55,7 @@ public class VideoComponent extends JPanel {
     public VideoComponent(Video video, boolean mute) {
         final String url = video.getURL().toExternalForm();
 
+        setOpaque(false);
         setBorder(createBorder());
         final Insets insets = getInsets();
 
