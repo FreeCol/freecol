@@ -411,7 +411,8 @@ public final class InGameInputHandler extends InputHandler {
         // was set.  However IR#115 requested that if animation is off
         // that we display nothing so as to speed up the other player
         // moves as much as possible.
-        if (getGUI().getAnimationSpeed(u) <= 0) return null;
+        if (getFreeColClient().getAnimationSpeed(u.getOwner()) <= 0)
+            return null;
 
         if ((str = element.getAttribute("defender")).isEmpty()) {
             throw new IllegalStateException("Attack animation for: "
@@ -497,7 +498,8 @@ public final class InGameInputHandler extends InputHandler {
         // was set.  However IR#115 requested that if animation is off
         // that we display nothing so as to speed up the other player
         // moves as much as possible.
-        if (getGUI().getAnimationSpeed(u) <= 0) return null;
+        if (getFreeColClient().getAnimationSpeed(u.getOwner()) <= 0)
+            return null;
 
         String oldTileId = element.getAttribute("oldTile");
         if (oldTileId.isEmpty()) {

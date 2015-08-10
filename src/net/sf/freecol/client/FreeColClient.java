@@ -740,6 +740,19 @@ public final class FreeColClient {
     }
 
     /**
+     * Common utility routine to retrieve animation speed.
+     *
+     * @param player The <code>Player</code> to be animated.
+     * @return The animation speed.
+     */
+    public int getAnimationSpeed(Player player) {
+        String key = (getMyPlayer() == player)
+            ? ClientOptions.MOVE_ANIMATION_SPEED
+            : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
+        return getClientOptions().getInteger(key);
+    }
+
+    /**
      * Get a list of the player colonies.
      *
      * @return The players colonies sorted according to the chosen comparator.

@@ -636,7 +636,7 @@ public class SwingGUI extends GUI {
                                   Tile attackerTile, Tile defenderTile,
                                   boolean success) {
         requireFocus(attackerTile);
-        Animations.unitAttack(this, attacker, defender,
+        Animations.unitAttack(freeColClient, attacker, defender,
                               attackerTile, defenderTile, success);
     }
 
@@ -650,7 +650,7 @@ public class SwingGUI extends GUI {
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
         requireFocus(srcTile);
-        Animations.unitMove(this, unit, srcTile, dstTile);
+        Animations.unitMove(freeColClient, unit, srcTile, dstTile);
     }
 
 

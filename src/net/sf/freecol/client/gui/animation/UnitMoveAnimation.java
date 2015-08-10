@@ -24,6 +24,7 @@ import java.awt.Rectangle;
 
 import javax.swing.JLabel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.model.Tile;
@@ -41,23 +42,22 @@ final class UnitMoveAnimation {
      */
     private static final int ANIMATION_DELAY = 33;
 
+    private final FreeColClient freeColClient;
     private final Unit unit;
     private final Tile sourceTile;
     private final Tile destinationTile;
 
-    private final GUI gui;
-
     /**
      * Constructor
      *
-     * @param gui The <code>GUI</code> to display on.
+     * @param freeColClient The enclosing <code>FreeColClient</code>.
      * @param unit The <code>Unit</code> to be animated.
      * @param sourceTile The <code>Tile</code> the unit is moving from.
      * @param destinationTile The <code>Tile</code> the unit is moving to.
      */
-    public UnitMoveAnimation(GUI gui, Unit unit,
+    public UnitMoveAnimation(FreeColClient freeColClient, Unit unit,
                              Tile sourceTile, Tile destinationTile) {
-        this.gui = gui;
+        this.freeColClient = freeColClient;
         this.unit = unit;
         this.sourceTile = sourceTile;
         this.destinationTile = destinationTile;
@@ -68,7 +68,9 @@ final class UnitMoveAnimation {
      * Do the animation.
      */
     public void animate() {
-        final int movementSpeed = gui.getAnimationSpeed(unit);
+        final int movementSpeed
+            = freeColClient.getAnimationSpeed(unit.getOwner());
+        final GUI gui = freeColClient.getGUI();
         final Point srcP = gui.getTilePosition(sourceTile);
         final Point dstP = gui.getTilePosition(destinationTile);
         

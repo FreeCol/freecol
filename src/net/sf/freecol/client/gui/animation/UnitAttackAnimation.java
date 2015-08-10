@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.animation;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Direction;
@@ -32,7 +33,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 final class UnitAttackAnimation {
 
-    private final GUI gui;
+    private final FreeColClient freeColClient;
     private final Unit attacker;
     private final Unit defender;
     private final Tile attackerTile;
@@ -43,17 +44,18 @@ final class UnitAttackAnimation {
     /**
      * Build a new attack animation.
      *
-     * @param gui The <code>GUI</code> to display on.
+     * @param freeColClient The enclosing <code>FreeColClient</code>.
      * @param attacker The <code>Unit</code> that is attacking.
      * @param defender The <code>Unit</code> that is defending.
      * @param attackerTile The <code>Tile</code> the attack comes from.
      * @param defenderTile The <code>Tile</code> the attack goes to.
      * @param success Does the attack succeed?
      */
-    public UnitAttackAnimation(GUI gui, Unit attacker, Unit defender,
+    public UnitAttackAnimation(FreeColClient freeColClient,
+                               Unit attacker, Unit defender,
                                Tile attackerTile, Tile defenderTile,
                                boolean success) {
-        this.gui = gui;
+        this.freeColClient = freeColClient;
         this.attacker = attacker;
         this.defender = defender;
         this.attackerTile = attackerTile;
@@ -90,7 +92,7 @@ final class UnitAttackAnimation {
      */
     private SimpleZippedAnimation getAnimation(Unit unit,
                                                Direction direction) {
-        float scale = gui.getMapScale();
+        float scale = freeColClient.getGUI().getMapScale();
         String roleStr = (unit.hasDefaultRole()) ? ""
             : "." + unit.getRoleSuffix();
         String startStr = "animation.unit." + unit.getType().getId() + roleStr
@@ -129,10 +131,11 @@ final class UnitAttackAnimation {
      * Do the animation.
      */
     public void animate() {
+        final GUI gui = freeColClient.getGUI();
         Direction direction = attackerTile.getDirection(defenderTile);
         SimpleZippedAnimation sza;
 
-        if (gui.getAnimationSpeed(attacker) > 0) {
+        if (freeColClient.getAnimationSpeed(attacker.getOwner()) > 0) {
             if ((sza = getAnimation(attacker, direction)) != null) {
                 new UnitImageAnimation(gui, attacker, attackerTile, sza, mirror)
                     .animate();
@@ -140,7 +143,7 @@ final class UnitAttackAnimation {
         }
 
         if (!success
-            && gui.getAnimationSpeed(defender) > 0) {
+            && freeColClient.getAnimationSpeed(defender.getOwner()) > 0) {
             direction = direction.getReverseDirection();
             if ((sza = getAnimation(defender, direction)) != null) {
                 new UnitImageAnimation(gui, defender, defenderTile, sza, mirror)
