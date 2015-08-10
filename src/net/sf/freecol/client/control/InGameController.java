@@ -2599,6 +2599,39 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Animate an attack.
+     *
+     * Called from IGIH.animateAttack.
+     *
+     * @param attacker The attacking <code>Unit</code>.
+     * @param defender The defending <code>Unit</code>.
+     * @param attackerTile The <code>Tile</code> the attack originates from.
+     * @param defenderTile The <code>Tile</code> the defence takes place on.
+     * @param success True if the attack succeeds.
+     */
+    public void animateAttack(Unit attacker, Unit defender,
+                              Tile attackerTile, Tile defenderTile,
+                              boolean success) {
+        gui.animateUnitAttack(attacker, defender, attackerTile, defenderTile,
+                              success);
+        gui.refresh();
+    }
+
+    /**
+     * Animate a move.
+     *
+     * Called from IGIH.animateMove.
+     *
+     * @param unit The <code>Unit</code> that moves.
+     * @param oldTile The <code>Tile</code> the move begins at.
+     * @param newTile The <code>Tile</code> the move ends at.
+     */
+    public void animateMove(Unit unit, Tile oldTile, Tile newTile) {
+        gui.animateUnitMove(unit, oldTile, newTile);
+        gui.refresh();
+    }
+
+    /**
      * Assigns a student to a teacher.
      *
      * Called from UnitLabel
@@ -2787,6 +2820,19 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Chat with another player.
+     *
+     * Called from IGIH.chat.
+     *
+     * @param player The <code>Player</code> to chat with.
+     * @param message What to say.
+     * @param pri If true, the message is private.
+     */
+    public void chat(Player player, String message, boolean pri) {
+        gui.displayChatMessage(player, message, pri);
+    }
+
+    /**
      * Changes the state of this <code>Unit</code>.
      *
      * Called from FortifyAction, SentryAction, TilePopup, UnitLabel
@@ -2944,6 +2990,18 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Choose a founding father from an offered list.
+     *
+     * Called from IGIH.chooseFoundingFather.
+     *
+     * @param ffs A list of <code>FoundingFather</code>s to choose from.
+     */
+    public void chooseFoundingFather(List<FoundingFather> ffs) {
+        if (ffs == null) return;
+        gui.showChooseFoundingFatherDialog(ffs);
+    }
+    
+    /**
      * Claim a tile.
      *
      * Called from ColonyPanel.ASingleTilePanel, UnitLabel and work()
@@ -3063,6 +3121,15 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Close any open GUI menus.
+     *
+     * Called from IGIH.closeMenus.
+     */
+    public void closeMenus() {
+        gui.closeMenus();
+    }
+
+    /**
      * Declares independence for the home country.
      *
      * Called from DeclareIndependenceAction
@@ -3157,6 +3224,7 @@ public final class InGameController implements NetworkConstants {
             logger.warning("Bogus trade status: " + agreement.getStatus());
             break;
         }
+        updateControls();
         return null;
     }
 
@@ -3196,10 +3264,9 @@ public final class InGameController implements NetworkConstants {
      * @return True, the high scores were displayed.
      */
     public boolean displayHighScores(Boolean high) {
-        List<HighScore> scores = askServer().getHighScores();
         gui.showHighScoresPanel((high == null) ? null
             : (high) ? "highscores.yes" : "highscores.no",
-            scores);
+            askServer().getHighScores());
         return true;
     }
 
@@ -3313,6 +3380,20 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Display an error.
+     *
+     * Called from IGIH.error.
+     *
+     * @param messageId The i18n-keyname of the error message to display.
+     * @param message An alternative (possibly non-i18n) message to
+     *     display if the resource specified by <code>messageId</code>
+     *     is unavailable.
+     */
+    public void error(String messageId, String message) {
+        gui.showErrorMessage(messageId, message);
+    }
+
+    /**
      * Execute goto orders command.
      *
      * Called from ExecuteGotoOrdersAction.
@@ -3344,6 +3425,21 @@ public final class InGameController implements NetworkConstants {
             || tile == null) return false;
 
         return askServer().firstContact(player, other, tile, result);
+    }
+
+    /**
+     * A player makes first contact with a native player.
+     *
+     * Called from IGIH.firstContact.
+     *
+     * @param player The <code>Player</code> making contact.
+     * @param other The native <code>Player</code> being contacted.
+     * @param tile An optional <code>Tile</code> to offer the player if
+     *     they have made a first landing.
+     * @param n The number of settlements claimed by the native player.
+     */
+    public void firstContact(Player player, Player other, Tile tile, int n) {
+        gui.showFirstContactDialog(player, other, tile, n);
     }
 
     /**
@@ -3689,6 +3785,19 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Loot some cargo.
+     *
+     * Called from IGIH.lootCargo.
+     *
+     * @param unit The <code>Unit</code> that is looting.
+     * @param goods A list of <code>Goods</code> to choose from.
+     * @param defenderId The identifier of the defender unit (may have sunk).
+     */
+    public void loot(Unit unit, List<Goods> goods, String defenderId) {
+        gui.showCaptureGoodsDialog(unit, goods, defenderId);
+    }
+    
+    /**
      * Accept or reject a monarch action.
      *
      * Called from GUI.showMonarchDialog
@@ -3709,6 +3818,18 @@ public final class InGameController implements NetworkConstants {
         }
         updateControls();
         return false;
+    }
+
+    /**
+     * Do a monarch interaction.
+     *
+     * @param action The <code>MonarchAction</code> to perform.
+     * @param template A <code>StringTemplate</code> describing the action.
+     * @param monarchKey A key for the monarch involved.
+     */
+    public void monarch(MonarchAction action, StringTemplate template,
+                        String monarchKey) {
+        gui.showMonarchDialog(action, template, monarchKey);
     }
 
     /**
@@ -3935,6 +4056,12 @@ public final class InGameController implements NetworkConstants {
                 .addStringTemplate("%year%", currTurn.getLabel())
                 .addAmount("%amount%", currTurn.getSeasonNumber()));
         }
+
+        // Get rid of the "Waiting for..."
+        game.setCurrentPlayer(null);
+        gui.refresh();
+        
+        updateControls();
         return true;
     }
 
@@ -4110,6 +4237,50 @@ public final class InGameController implements NetworkConstants {
         return newUnit != null;
     }
 
+    /**
+     * Remove game objects.
+     *
+     * Called from IGIH.remove().
+     *
+     * @param objects A list of <code>FreeColGameObject</code>s to remove.
+     * @param 
+     */
+    public void remove(List<FreeColGameObject> objects,
+                       FreeColGameObject divert) {
+        final Player player = freeColClient.getMyPlayer();
+        boolean visibilityChange = false;
+        for (FreeColGameObject fcgo : objects) {
+            if (divert != null) player.divertModelMessages(fcgo, divert);
+        
+            if (fcgo instanceof Settlement) {
+                Settlement settlement = (Settlement)fcgo;
+                if (settlement != null && settlement.getOwner() != null) {
+                    settlement.getOwner().removeSettlement(settlement);
+                }
+                visibilityChange = true;//-vis(player)
+                
+            } else if (fcgo instanceof Unit) {
+                // Deselect the object if it is the current active unit.
+                Unit u = (Unit)fcgo;
+                if (u == gui.getActiveUnit()) gui.setActiveUnit(null);
+
+                // Temporary hack until we have real containers.
+                if (u != null && u.getOwner() != null) {
+                    u.getOwner().removeUnit(u);
+                }
+                visibilityChange = true;//-vis(player)
+            }
+
+            // Do just the low level dispose that removes
+            // reference to this object in the client.  The other
+            // updates should have done the rest.
+            fcgo.disposeResources();
+        }
+        if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
+
+        gui.refresh();
+    }
+        
     /**
      * Renames a <code>Nameable</code>.
      *
@@ -4352,6 +4523,11 @@ public final class InGameController implements NetworkConstants {
                 sound("sound.anthem." + player.getNationId());
             }
         }
+
+        // Update "Waiting for..."
+        gui.refresh();
+        if (!gui.isShowingSubPanel()) gui.requestFocusInWindow();
+        
         return true;
     }
 
@@ -4494,6 +4670,19 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Spy on a colony.
+     *
+     * Called from IGIH.spyResult.
+     *
+     * @param tile The <code>Tile</code> to find the colony on.
+     * @param recover A <code>Runnable</code> to restore the normal
+     *     player view of the tile when the spying colony panel is closed.
+     */
+    public void spyColony(Tile tile, Runnable recover) {
+        gui.showSpyColonyPanel(tile, recover);
+    }
+    
+    /**
      * Trains a unit of a specified type in Europe.
      *
      * Called from NewUnitPanel
@@ -4626,6 +4815,7 @@ public final class InGameController implements NetworkConstants {
      *
      * Called from GUI.showVictoryDialog
      *
+     * @param quit If true, leave this game and start a new one.
      * @return True.
      */
     public boolean victory(Boolean quit) {
@@ -4636,7 +4826,19 @@ public final class InGameController implements NetworkConstants {
         }
         return true;
     }
-        
+
+    /**
+     * The player has won, show the high scores and victory dialog.
+     *
+     * Called from IGIH.gameEnded.
+     *
+     * @param score If "true", a new high score was reached.
+     */
+    public void victory(String score) {
+        displayHighScores("true".equalsIgnoreCase(score));
+        gui.showVictoryDialog();
+    }
+
     /**
      * Tell a unit to wait.
      *
