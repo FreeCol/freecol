@@ -65,6 +65,5 @@ public class DeclareIndependenceAction extends MapboardAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         igc().declareIndependence();
-        update();
     }
 }
