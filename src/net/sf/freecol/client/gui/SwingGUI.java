@@ -1321,7 +1321,6 @@ public class SwingGUI extends GUI {
                 @Override
                 public void handle(Boolean b) {
                     igc().monarchAction(action, b);
-                    canvas.updateMenuBar();
                 }
             });
     }

@@ -3707,6 +3707,7 @@ public final class InGameController implements NetworkConstants {
         default:
             break;
         }
+        updateControls();
         return false;
     }
 
