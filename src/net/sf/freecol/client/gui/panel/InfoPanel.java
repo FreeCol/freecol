@@ -163,7 +163,9 @@ public final class InfoPanel extends FreeColPanel {
                     add(new JLabel(new ImageIcon(image)), "spany");
 
                     final Player owner = tile.getOwner();
-                    if (owner != null) {
+                    if (owner == null) {
+                        add(new JLabel(), "span " + PRODUCTION);
+                    } else {
                         StringTemplate t = owner.getNationName();
                         add(Utility.localizedLabel(t), "span " + PRODUCTION);
                     }
@@ -182,16 +184,21 @@ public final class InfoPanel extends FreeColPanel {
 
                     List<AbstractGoods> produce = tile.getType()
                         .getPossibleProduction(true);
-                    Collections.sort(produce,
-                                     AbstractGoods.abstractGoodsComparator);
-                    for (AbstractGoods goods : produce) {
-                        JLabel goodsLabel = new JLabel(
-                            String.valueOf(tile.getPotentialProduction(goods.getType(), null)),
-                            new ImageIcon(lib.getSmallIconImage(goods.getType())),
-                            JLabel.RIGHT);
-                        goodsLabel.setToolTipText(Messages.getName(goods.getType()));
-                        goodsLabel.setFont(font);
-                        add(goodsLabel);
+                    if (produce.isEmpty()) {
+                        add(new JLabel(), "span " + PRODUCTION);
+                    } else {
+                        Collections.sort(produce,
+                            AbstractGoods.abstractGoodsComparator);
+                        for (AbstractGoods ag : produce) {
+                            GoodsType type = ag.getType();
+                            int n = tile.getPotentialProduction(type, null);
+                            JLabel label = new JLabel(String.valueOf(n),
+                                new ImageIcon(lib.getSmallIconImage(type)),
+                                JLabel.RIGHT);
+                            label.setToolTipText(Messages.getName(type));
+                            label.setFont(font);
+                            add(label);
+                        }
                     }
                 } else {
                     add(Utility.localizedLabel("unexplored"),
