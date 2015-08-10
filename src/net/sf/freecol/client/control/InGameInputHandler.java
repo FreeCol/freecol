@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.SwingUtilities;
-
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -73,8 +71,8 @@ import org.w3c.dom.NodeList;
  *
  * Usually delegate to the real handlers in InGameController, making
  * sure anything non-trivial that touches the GUI is doing so inside
- * the EDT.  Usually this is done with SwingUtilities.invokeLater, but
- * some messages demand a response which requires invokeAndWait.
+ * the EDT.  Usually this is done with invokeLater, but some messages
+ * demand a response which requires invokeAndWait.
  *
  * Note that the EDT often calls the controller, which queries the
  * server, which results in handling the reply here, still within the
@@ -149,7 +147,7 @@ public final class InGameInputHandler extends InputHandler {
      * @param focus If true, request the focus.
      */
     private void refreshCanvas(final boolean focus) {
-        SwingUtilities.invokeLater(new Runnable() {
+        getFreeColClient().invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getGUI().refresh();
@@ -306,7 +304,7 @@ public final class InGameInputHandler extends InputHandler {
         final FreeColClient fcc = getFreeColClient();
         if (Boolean.TRUE.toString().equals(element.getAttribute("flush"))
             && fcc.currentPlayerIsMyPlayer()) {
-            SwingUtilities.invokeLater(displayModelMessagesRunnable);
+            getFreeColClient().invokeLater(displayModelMessagesRunnable);
         }
         return reply;
     }
@@ -549,7 +547,7 @@ public final class InGameInputHandler extends InputHandler {
         final Game game = getGame();
         final ChatMessage chatMessage = new ChatMessage(game, element);
 
-        SwingUtilities.invokeLater(new Runnable() {
+        getFreeColClient().invokeLater(new Runnable() {
             @Override
             public void run() {
                 getGUI().displayChatMessage(chatMessage.getPlayer(game),
@@ -626,7 +624,7 @@ public final class InGameInputHandler extends InputHandler {
                                                          agreement));
                 }
             });
-        SwingUtilities.invokeLater(updateMenuBarRunnable);
+        getFreeColClient().invokeLater(updateMenuBarRunnable);
         return (message.getAgreement() == null) ? null
             : message.toXMLElement();
     }
@@ -671,7 +669,7 @@ public final class InGameInputHandler extends InputHandler {
         final String messageId = element.getAttribute("messageID");
         final String message = element.getAttribute("message");
 
-        SwingUtilities.invokeLater(new Runnable() {
+        getFreeColClient().invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getGUI().showErrorMessage(messageId, message);
@@ -792,7 +790,7 @@ public final class InGameInputHandler extends InputHandler {
             = "true".equalsIgnoreCase(element.getAttribute("highScore"));
 
         if (winner == freeColClient.getMyPlayer()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            getFreeColClient().invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         igc().displayHighScores(highScore);
@@ -952,7 +950,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element newTurn(Element element) {
         final int n = getIntegerAttribute(element, "turn");
 
-        SwingUtilities.invokeLater(new Runnable() {
+        getFreeColClient().invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().newTurn(n);
@@ -962,7 +960,7 @@ public final class InGameInputHandler extends InputHandler {
         igc().setCurrentPlayer(null);
         refreshCanvas(false);
 
-        SwingUtilities.invokeLater(updateMenuBarRunnable);
+        getFreeColClient().invokeLater(updateMenuBarRunnable);
         return null;
     }
 
@@ -976,7 +974,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element reconnect(@SuppressWarnings("unused") Element element) {
         logger.finest("Entered reconnect.");
 
-        SwingUtilities.invokeLater(reconnectRunnable);
+        getFreeColClient().invokeLater(reconnectRunnable);
         return null;
     }
 
@@ -1085,7 +1083,7 @@ public final class InGameInputHandler extends InputHandler {
         final Player player = getGame()
             .getFreeColGameObject(element.getAttribute("player"),Player.class);
 
-        SwingUtilities.invokeLater(new Runnable() {
+        getFreeColClient().invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().setDead(player);
@@ -1110,7 +1108,7 @@ public final class InGameInputHandler extends InputHandler {
         final Player p2 = game
             .getFreeColGameObject(element.getAttribute("second"),Player.class);
 
-        SwingUtilities.invokeLater(new Runnable() {
+        getFreeColClient().invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().setStance(stance, p1, p2);
@@ -1154,7 +1152,7 @@ public final class InGameInputHandler extends InputHandler {
         // is closed.
         final Element fullElement = (Element)nodeList.item(0);
         final Element normalElement = (Element)nodeList.item(1);
-        SwingUtilities.invokeLater(new Runnable() {
+        getFreeColClient().invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tile.readFromXMLElement(fullElement);

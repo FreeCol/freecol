@@ -249,6 +249,20 @@ public final class FreeColClient {
     }
 
     /**
+     * Wrapper for SwingUtilities.invokeLater that handles the case
+     * where we are already in the EDT.
+     *
+     * @param runnable A <code>Runnable</code> to run.
+     */
+    public void invokeLater(Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
+        }
+    }
+    
+    /**
      * Starts the new <code>FreeColClient</code>, including the GUI.
      *
      * @param size An optional window size.
