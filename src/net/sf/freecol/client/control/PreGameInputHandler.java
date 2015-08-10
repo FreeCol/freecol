@@ -339,7 +339,6 @@ public final class PreGameInputHandler extends InputHandler {
             Game game = fcc.getGame();
             game.readFromXMLElement((Element)children.item(0));
             fcc.addSpecificationActions(game.getSpecification());
-            fcc.updateActions();
         } else {
             logger.warning("Child node expected: " + element.getTagName());
         }

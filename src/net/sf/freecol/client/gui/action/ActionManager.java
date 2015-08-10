@@ -175,6 +175,7 @@ public class ActionManager extends OptionGroup {
                 add(new ImprovementAction(freeColClient, type));
             }
         }
+        update();
     }
 
     /**

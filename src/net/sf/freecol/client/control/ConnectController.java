@@ -296,7 +296,6 @@ public final class ConnectController {
         }
         freeColClient.setMyPlayer(player);
         freeColClient.addSpecificationActions(game.getSpecification());
-        freeColClient.updateActions();
         logger.info("FreeColClient logged in as " + user
             + "/" + player.getId());
 
