@@ -946,7 +946,6 @@ public final class MapViewer {
 
         if (activeUnit == null || tile == null) {
             gui.getCanvas().stopGoto();
-            freeColClient.updateActions();
         } else {
             updateCurrentPathForActiveUnit();
             if (!gui.setSelectedTile(tile)
@@ -1081,11 +1080,6 @@ public final class MapViewer {
                 }
             }
         }
-
-        freeColClient.updateActions();
-        gui.updateMenuBar();
-
-        gui.updateMapControls();
 
         // Check for refocus
         if (!onScreen(newTile)

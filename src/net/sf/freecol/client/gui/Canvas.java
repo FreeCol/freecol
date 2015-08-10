@@ -986,8 +986,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void add(Component comp, Integer i) {
         addToCanvas(comp, i);
-        updateMenuBar();
-        freeColClient.updateActions();
+        gui.updateMenuBar();
     }
 
     /**
@@ -1407,10 +1406,8 @@ public final class Canvas extends JDesktopPane {
     @Override
     public void remove(Component comp) {
         removeFromCanvas(comp);
-        final boolean takeFocus = (comp != statusPanel);
-        updateMenuBar();
-        freeColClient.updateActions();
-        if (takeFocus && !isShowingSubPanel()) {
+        gui.updateMenuBar();
+        if (comp != statusPanel && !isShowingSubPanel()) {
             requestFocus();
         }
     }
@@ -1623,8 +1620,7 @@ public final class Canvas extends JDesktopPane {
         } finally {
             clientOptionsDialogShowing = false;
             if (group != null) {
-                freeColClient.updateActions();
-                resetMenuBar();
+                gui.resetMenuBar();
                 // Immediately redraw the minimap if that was updated.
                 gui.updateMapControls();
             }

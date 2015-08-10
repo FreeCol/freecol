@@ -72,7 +72,7 @@ public class NewEmptyMapAction extends MapboardAction {
         game.setMap(map);
         Tile tile = map.getTile(size.width/2, size.height/2);
         getGUI().setFocus(tile);
-        getFreeColClient().updateActions();
+        getGUI().updateMenuBar();
         getGUI().refresh();
     }
 }

@@ -543,6 +543,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void resetMenuBar() {
+        freeColClient.updateActions();
         canvas.resetMenuBar();
     }
 
@@ -585,20 +586,24 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean setActiveUnit(Unit unit) {
-        boolean result=mapViewer.setActiveUnit(unit);
+        boolean result = mapViewer.setActiveUnit(unit);
         updateMapControls();
+        updateMenuBar();
         if (unit != null && !freeColClient.getMyPlayer().owns(unit)) {
             canvas.refresh();
         }
-        canvas.updateMenuBar();
         return result;
     }
 
     /**
      * Update the menu bar.
+     *
+     * Always update the actions first so that the enabled/disabled
+     * state is correct.
      */
     @Override
     public void updateMenuBar() {
+        freeColClient.updateActions();
         canvas.updateMenuBar();
     }
 
@@ -1706,8 +1711,9 @@ public class SwingGUI extends GUI {
 
     @Override
     public boolean setSelectedTile(Tile newTileToSelect) {
-        boolean result=mapViewer.setSelectedTile(newTileToSelect);
+        boolean result = mapViewer.setSelectedTile(newTileToSelect);
         updateMapControls();
+        updateMenuBar();
         return result;
     }
 

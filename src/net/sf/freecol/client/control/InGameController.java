@@ -310,7 +310,6 @@ public final class InGameController implements NetworkConstants {
         SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    freeColClient.updateActions();
                     gui.updateMenuBar();
                 }
             });

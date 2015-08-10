@@ -186,7 +186,7 @@ public final class MapEditorController {
             .createMap(new LogBuilder(-1));
         requireNativeNations(game);
         gui.setFocus(game.getMap().getTile(1,1));
-        freeColClient.updateActions();
+        gui.updateMenuBar();
         gui.refresh();
     }
 
@@ -308,7 +308,7 @@ public final class MapEditorController {
                                     gui.closeStatusPanel();
                                     gui.setFocus(freeColClient.getGame()
                                         .getMap().getTile(1,1));
-                                    freeColClient.updateActions();
+                                    gui.updateMenuBar();
                                     gui.refresh();
                                 }
                             });
