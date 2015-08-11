@@ -465,12 +465,16 @@ public class TileTest extends FreeColTestCase {
         assertFalse(tile1.canProduce(lumber, null));
         assertFalse(hasBonusFrom(tile1.getProductionModifiers(lumber, null),
                                  river1.getType()));
-        // Hills can not produce sugar, but can produce ore.
+        // Hills can not produce sugar, but can produce ore.  They do not
+        // get a road bonus for unattended ore production, but do get if
+        // if attended.
         assertFalse(tile2.canProduce(sugar, null));
         assertFalse(hasBonusFrom(tile2.getProductionModifiers(sugar, null),
                                  road2.getType()));
         assertTrue(tile2.canProduce(ore, null));
-        assertTrue(hasBonusFrom(tile2.getProductionModifiers(ore, null),
+        assertFalse(hasBonusFrom(tile2.getProductionModifiers(ore, null),
+                                 road2.getType()));
+        assertTrue(hasBonusFrom(tile2.getProductionModifiers(ore, colonistType),
                                 road2.getType()));
 
         // Add a sugar resource, there should now be two sugar bonuses
@@ -510,7 +514,9 @@ public class TileTest extends FreeColTestCase {
             + (int)FeatureContainer.applyModifiers(0f, turn,
                 road2.getProductionModifiers(silver, null)));
         assertTrue(tile2.canProduce(silver, null));
-        assertTrue(hasBonusFrom(tile2.getProductionModifiers(silver, null),
+        assertFalse(hasBonusFrom(tile2.getProductionModifiers(silver, null),
+                                 road2.getType()));
+        assertTrue(hasBonusFrom(tile2.getProductionModifiers(silver, colonistType),
                                 road2.getType()));
         assertTrue(hasBonusFrom(tile2.getProductionModifiers(silver, null),
                                 mineralsResource));
