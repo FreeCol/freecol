@@ -460,7 +460,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         return (contacted)
             ? ((mostHated == null)
                 ? StringTemplate.key("model.indianSettlement.mostHatedNone")
-                : mostHated.getNationName())
+                : mostHated.getNationLabel())
             : StringTemplate.key("model.indianSettlement.mostHatedUnknown");
     }
             
@@ -1306,7 +1306,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             ? "model.indianSettlement.tension.unknown"
             : "model.indianSettlement." + getAlarm(player).getKey();
         return StringTemplate.template(key)
-            .addStringTemplate("%nation%", getOwner().getNationName());
+            .addStringTemplate("%nation%", getOwner().getNationLabel());
     }
 
 

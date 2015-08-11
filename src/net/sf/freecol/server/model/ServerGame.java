@@ -435,8 +435,8 @@ public class ServerGame extends Game implements ServerModelObject {
             }
         }
 
-        StringTemplate loser = weakestAIPlayer.getNationName();
-        StringTemplate winner = strongestAIPlayer.getNationName();
+        StringTemplate loser = weakestAIPlayer.getNationLabel();
+        StringTemplate winner = strongestAIPlayer.getNationLabel();
         cs.addMessage(See.all(),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                 "model.game.spanishSuccession",

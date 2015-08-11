@@ -615,7 +615,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                 RumourType.BURIAL_GROUND.getDescriptionKey(), serverPlayer, this)
-            .addStringTemplate("%nation%", indianPlayer.getNationName()));
+            .addStringTemplate("%nation%", indianPlayer.getNationLabel()));
     }
 
     /**
@@ -772,7 +772,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 cs.addGlobalHistory(game,
                     new HistoryEvent(game.getTurn(),
                         HistoryEvent.HistoryEventType.CITY_OF_GOLD, serverPlayer)
-                    .addStringTemplate("%nation%", serverPlayer.getNationName())
+                    .addStringTemplate("%nation%", serverPlayer.getNationLabel())
                     .addName("%city%", cityName)
                     .addAmount("%treasure%", treasureAmount));
                 break;
@@ -1032,7 +1032,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         is.getTile().cacheUnseen(copied);//+til
                         cs.add(See.only(contactPlayer), is);
                         // First European contact with native settlement.
-                        StringTemplate nation = is.getOwner().getNationName();
+                        StringTemplate nation = is.getOwner().getNationLabel();
                         cs.addMessage(See.only(contactPlayer),
                             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                              "model.unit.nativeSettlementContact",

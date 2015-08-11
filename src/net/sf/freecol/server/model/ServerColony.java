@@ -829,7 +829,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             brave.setState(Unit.UnitState.ACTIVE);
             cs.addDisappear(newOwner, tile, brave);
             cs.add(See.only(newOwner), getTile());
-            StringTemplate nation = oldOwner.getNationName();
+            StringTemplate nation = oldOwner.getNationLabel();
             cs.addMessage(See.only(newOwner),
                 new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                 "model.colony.newConvert", brave)

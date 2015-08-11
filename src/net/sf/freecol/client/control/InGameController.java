@@ -304,7 +304,7 @@ public final class InGameController implements NetworkConstants {
         } else { // should not happen
             player = freeColClient.getGame().getUnknownEnemy();
         }
-        return player.getNationName();
+        return player.getNationLabel();
     }
 
     /**
@@ -558,7 +558,7 @@ public final class InGameController implements NetworkConstants {
         final String gid = Integer.toHexString(game.getUUID().hashCode());
         final Turn turn = game.getTurn();
         return (/* player.getName() + "_" */ gid
-            + "_" + Messages.message(player.getNationName())
+            + "_" + Messages.message(player.getNationLabel())
             + "_" + turn.getSaveGameSuffix())
             .replaceAll(" ", "_");
     }
@@ -1325,7 +1325,7 @@ public final class InGameController implements NetworkConstants {
         final Player other = colony.getOwner();
         if (other == player.getREFPlayer()) return false;
 
-        StringTemplate nation = other.getNationName();
+        StringTemplate nation = other.getNationLabel();
         ModelMessage m = null;
         TradeStatus status;
         while (dt != null) {
@@ -1761,7 +1761,7 @@ public final class InGameController implements NetworkConstants {
             } else if ("nothing".equals(result)) {
                 gui.showInformationMessage(settlement, StringTemplate
                     .template("scoutSettlement.speakNothing")
-                    .addStringTemplate("%nation%", player.getNationName()));
+                    .addStringTemplate("%nation%", player.getNationLabel()));
             } else {
                 logger.warning("Invalid result from askScoutSpeak: " + result);
             }
@@ -1837,7 +1837,7 @@ public final class InGameController implements NetworkConstants {
         StringTemplate baseTemplate = StringTemplate
             .template("tradeProposition.welcome")
             .addStringTemplate("%nation%",
-                settlement.getOwner().getNationName())
+                settlement.getOwner().getNationLabel())
             .addName("%settlement%", settlement.getName());
         StringTemplate template = baseTemplate;
         boolean[] results = askServer()
@@ -2143,7 +2143,7 @@ public final class InGameController implements NetworkConstants {
         case INCITE_INDIANS:
             List<ChoiceItem<Player>> choices = new ArrayList<>();
             for (Player p : freeColClient.getGame().getLiveEuropeanPlayers(player)) {
-                String label = Messages.message(p.getNationName());
+                String label = Messages.message(p.getCountryLabel());
                 choices.add(new ChoiceItem<>(label, p));
             }
             Player enemy = gui.getChoice(true, unit.getTile(),
@@ -3120,7 +3120,7 @@ public final class InGameController implements NetworkConstants {
                                      DiplomaticTrade agreement) {
         final Player player = freeColClient.getMyPlayer();
         final Player otherPlayer = agreement.getOtherPlayer(player);
-        StringTemplate t, nation = otherPlayer.getNationName();
+        StringTemplate t, nation = otherPlayer.getNationLabel();
 
         switch (agreement.getStatus()) {
         case ACCEPT_TRADE:
@@ -3485,7 +3485,7 @@ public final class InGameController implements NetworkConstants {
             .getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE);
         boolean accepted;
         ModelMessage m = null;
-        String nation = Messages.message(unit.getOwner().getNationName());
+        String nation = Messages.message(unit.getOwner().getNationLabel());
         if (type == null) {
             switch (opt) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:

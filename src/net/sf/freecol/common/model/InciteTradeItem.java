@@ -90,7 +90,7 @@ public class InciteTradeItem extends TradeItem {
     @Override
     public StringTemplate getLabel() {
         return StringTemplate.template(Messages.descriptionKey("model.tradeItem.incite"))
-            .addStringTemplate("%nation%", victim.getNationName());
+            .addStringTemplate("%nation%", victim.getNationLabel());
     }
 
     /**

@@ -103,7 +103,7 @@ public final class ReportIndianPanel extends ReportPanel {
             opponent.getNationType().getCapitalType(),
             lib.getScalingFactor())));
         reportPanel.add(villageLabel, "span, split 2");
-        JLabel headline = Utility.localizedLabel(opponent.getNationName());
+        JLabel headline = Utility.localizedLabel(opponent.getNationLabel());
         headline.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScalingFactor()));
         reportPanel.add(headline, "wrap 20, aligny center");

@@ -101,7 +101,7 @@ public final class TilePanel extends FreeColPanel {
         }
 
         if (tile.getOwner() != null) {
-            StringTemplate ownerName = tile.getOwner().getNationName();
+            StringTemplate ownerName = tile.getOwner().getNationLabel();
             if (ownerName != null) {
                 add(Utility.localizedLabel("tilePanel.owner"));
                 add(Utility.localizedLabel(ownerName));

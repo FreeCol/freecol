@@ -975,7 +975,7 @@ public class SimpleMapGenerator implements MapGenerator {
         unitType = spec.getUnitType("model.unit.expertFarmer");
         Unit buildColonyUnit = new ServerUnit(game, colonyTile,
                                               player, unitType);
-        String colonyName = Messages.message(player.getNationName())
+        String colonyName = Messages.message(player.getNationLabel())
             + " " + Messages.message("Colony");
         Colony colony = new ServerColony(game, player, colonyName, colonyTile);
         player.addSettlement(colony);

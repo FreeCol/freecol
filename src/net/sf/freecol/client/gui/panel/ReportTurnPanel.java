@@ -259,7 +259,7 @@ public final class ReportTurnPanel extends ReportPanel {
             headline = Utility.localizedLabel(StringTemplate
                 .template("report.turn.playerNation")
                 .addName("%player%", player.getName())
-                .addStringTemplate("%nation%", player.getNationName()));
+                .addStringTemplate("%nation%", player.getNationLabel()));
         } else if (source instanceof Europe) {
             Europe europe = (Europe) source;
             JButton button = new JButton(Messages.getName(europe));

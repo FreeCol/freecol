@@ -89,7 +89,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
             .getSettlementTypeKey(true);
         JTextArea text = Utility.localizedTextArea(StringTemplate
             .template(messageId)
-            .addStringTemplate("%nation%", other.getNationName())
+            .addStringTemplate("%nation%", other.getNationLabel())
             .addName("%camps%", Integer.toString(settlementCount))
             .add("%settlementType%", type));
 

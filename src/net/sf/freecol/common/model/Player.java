@@ -597,7 +597,7 @@ public class Player extends FreeColGameObject implements Nameable {
         return StringTemplate.label("")
             .add(getRulerNameKey())
             .addName(" (")
-            .addStringTemplate(getNationName())
+            .addStringTemplate(getNationLabel())
             .addName(")");
     }
 
@@ -688,11 +688,24 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return A template for this nation name.
      */
-    public StringTemplate getNationName() {
+    public StringTemplate getNationLabel() {
         return (playerType == PlayerType.REBEL
                 || playerType == PlayerType.INDEPENDENT)
             ? StringTemplate.name(independentNationName)
             : StringTemplate.key(Messages.nameKey(nationId));
+    }
+
+    /**
+     * Get a template for this players country.
+     *
+     * @return A template for this country.
+     */
+    public StringTemplate getCountryLabel() {
+        return (playerType == PlayerType.REBEL
+                || playerType == PlayerType.INDEPENDENT)
+            ? StringTemplate.name(independentNationName)
+            : StringTemplate.template("countryName")
+                .addStringTemplate("%nation%", getNationLabel());
     }
 
     /**
@@ -702,7 +715,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public StringTemplate getForcesLabel() {
         return StringTemplate.template("model.player.forces")
-            .addStringTemplate("%nation%", getNationName());
+            .addStringTemplate("%nation%", getNationLabel());
     }
 
     /**
@@ -712,7 +725,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public StringTemplate getWaitingLabel() {
         return StringTemplate.template("model.player.waitingFor")
-            .addStringTemplate("%nation%", getNationName());
+            .addStringTemplate("%nation%", getNationLabel());
     }
 
     /**

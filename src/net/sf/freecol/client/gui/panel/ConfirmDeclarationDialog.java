@@ -271,7 +271,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
         StringTemplate nation = StringTemplate
             .template("confirmDeclarationDialog.defaultNation")
-            .addStringTemplate("%nation%", player.getNationName());
+            .addStringTemplate("%nation%", player.getNationLabel());
         this.nationField = new JTextField(Messages.message(nation), 20);
 
         this.label = new JLabel();

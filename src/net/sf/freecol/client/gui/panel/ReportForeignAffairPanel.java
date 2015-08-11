@@ -83,13 +83,13 @@ public final class ReportForeignAffairPanel extends ReportPanel {
             if (ns == null) continue;
 
             JPanel enemyPanel = new MigPanel(new MigLayout("gapy 0",
-                                               "[][]20[align right]0[]", ""));
+                                             "[][]20[align right]0[]", ""));
             enemyPanel.setOpaque(false);
             final Image coatOfArms = lib.getMiscIconImage(enemy.getNation());
             JLabel coatLabel = new JLabel(new ImageIcon(coatOfArms));
             enemyPanel.add(coatLabel, "spany, aligny top");
 
-            JLabel label = Utility.localizedLabel(enemy.getNationName());
+            JLabel label = Utility.localizedLabel(enemy.getCountryLabel());
             label.setFont(font);
             enemyPanel.add(label, "wrap 12");
 

@@ -166,7 +166,7 @@ public final class InfoPanel extends FreeColPanel {
                     if (owner == null) {
                         add(new JLabel(), "span " + PRODUCTION);
                     } else {
-                        StringTemplate t = owner.getNationName();
+                        StringTemplate t = owner.getNationLabel();
                         add(Utility.localizedLabel(t), "span " + PRODUCTION);
                     }
 

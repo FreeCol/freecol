@@ -472,7 +472,7 @@ public class DebugUtils {
 
         List<ChoiceItem<Player>> pcs = new ArrayList<>();
         for (Player p : game.getLiveEuropeanPlayers(colony.getOwner())) {
-            String msg = Messages.message(p.getNationName());
+            String msg = Messages.message(p.getNationLabel());
             pcs.add(new ChoiceItem<>(msg, p));
         }
         Collections.sort(pcs);
@@ -511,7 +511,7 @@ public class DebugUtils {
         List<ChoiceItem<Player>> pcs = new ArrayList<>();
         for (Player p : game.getLivePlayers(null)) {
             if (unit.getType().isAvailableTo(p)) {
-                String msg = Messages.message(p.getNationName());
+                String msg = Messages.message(p.getNationLabel());
                 pcs.add(new ChoiceItem<>(msg, p));
             }
         }
@@ -740,7 +740,7 @@ public class DebugUtils {
             units.put(Messages.message("sailingToEurope"), toEurope);
             units.put(Messages.getName(p.getEurope()), inEurope);
             units.put(Messages.message("sailingToAmerica"), toAmerica);
-            lb.add("\n==", Messages.message(p.getNationName()), "==\n");
+            lb.add("\n==", Messages.message(p.getNationLabel()), "==\n");
 
             for (Unit u : p.getEurope().getUnitList()) {
                 if (u.getDestination() instanceof Map) {
@@ -1105,7 +1105,7 @@ public class DebugUtils {
         Player mostHated = sis.getMostHated();
         for (Player p : sGame.getLiveEuropeanPlayers(null)) {
             Tension tension = sis.getAlarm(p);
-            lb.add(Messages.message(p.getNationName()),
+            lb.add(Messages.message(p.getNationLabel()),
                    " ", ((tension == null) ? "(none)"
                        : Integer.toString(tension.getValue())),
                    ((mostHated == p) ? " (most hated)" : ""),

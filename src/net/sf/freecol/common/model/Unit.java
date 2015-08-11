@@ -267,7 +267,7 @@ public class Unit extends GoodsLocation
     public StringTemplate getApparentOwnerName() {
         Player own = (hasAbility(Ability.PIRACY)) ? getGame().getUnknownEnemy()
             : owner;
-        return own.getNationName();
+        return own.getNationLabel();
     }
 
     /** What type of unit label do we want? */

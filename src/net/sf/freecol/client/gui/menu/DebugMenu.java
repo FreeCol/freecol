@@ -176,7 +176,7 @@ public class DebugMenu extends JMenu {
         cvpMenu.addSeparator();
         for (Player p : game.getLiveEuropeanPlayers(null)) {
             final JRadioButtonMenuItem cv2
-                = Utility.localizedRadioButtonMenuItem(p.getNationName(),
+                = Utility.localizedRadioButtonMenuItem(p.getNationLabel(),
                     FreeColDebugger.debugDisplayColonyValuePlayer() == p);
             cv2.setOpaque(false);
             //cv2.setMnemonic(KeyEvent.VK_C);

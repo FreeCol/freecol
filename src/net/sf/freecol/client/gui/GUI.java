@@ -539,14 +539,14 @@ public class GUI {
         int gold = ns.getGold();
         if (gold == 0) {
             t = StringTemplate.template("confirmTribute.broke")
-                .addStringTemplate("%nation%", other.getNationName());
+                .addStringTemplate("%nation%", other.getNationLabel());
             showInformationMessage(t);
             return -1;
         }
 
         int fin = (gold <= 100) ? 0 : (gold <= 1000) ? 1 : 2;
         t = StringTemplate.template("confirmTribute.european")
-            .addStringTemplate("%nation%", other.getNationName())
+            .addStringTemplate("%nation%", other.getNationLabel())
             .addStringTemplate("%danger%",
                 StringTemplate.template("danger." + levels[mil]))
             .addStringTemplate("%finance%",
@@ -605,7 +605,7 @@ public class GUI {
         }
         return confirm(true, attacker.getTile(), StringTemplate
             .template(messageId)
-            .addStringTemplate("%nation%", enemy.getNationName()),
+            .addStringTemplate("%nation%", enemy.getNationLabel()),
             attacker, "confirmHostile.yes", "cancel");
     }
 
@@ -649,7 +649,7 @@ public class GUI {
             : "confirmTribute.normal";
         return (confirm(true, is.getTile(), StringTemplate.template(messageId)
                 .addName("%settlement%", is.getName())
-                .addStringTemplate("%nation%", other.getNationName()),
+                .addStringTemplate("%nation%", other.getNationLabel()),
                 attacker, "confirmTribute.yes", "confirmTribute.no"))
             ? 1 : -1;
     }
@@ -745,7 +745,7 @@ public class GUI {
     public BuyAction getBuyChoice(Unit unit, Settlement settlement,
                                   Goods goods, int gold, boolean canBuy) {
         StringTemplate template = StringTemplate.template("buy.text")
-            .addStringTemplate("%nation%", settlement.getOwner().getNationName())
+            .addStringTemplate("%nation%", settlement.getOwner().getNationLabel())
             .addStringTemplate("%goods%", goods.getLabel(true))
             .addAmount("%gold%", gold);
 
@@ -774,7 +774,7 @@ public class GUI {
         StringTemplate template;
         if (owner.hasContacted(player)) {
             template = StringTemplate.template("indianLand.text")
-                .addStringTemplate("%player%", owner.getNationName());
+                .addStringTemplate("%player%", owner.getNationLabel());
             StringTemplate pay = StringTemplate.template("indianLand.pay")
                 .addAmount("%amount%", price);
             choices.add(new ChoiceItem<>(Messages.message(pay),
@@ -943,7 +943,7 @@ public class GUI {
             .addName("\n\n")
             .addStringTemplate(StringTemplate
                 .template("scoutSettlement.greetings")
-                .addStringTemplate("%nation%", owner.getNationName())
+                .addStringTemplate("%nation%", owner.getNationLabel())
                 .addName("%settlement%", settlement.getName())
                 .addName("%number%", numberString)
                 .add("%settlementType%",
@@ -998,7 +998,7 @@ public class GUI {
                                     Goods goods, int gold) {
         StringTemplate goodsTemplate = goods.getLabel(true);
         StringTemplate template = StringTemplate.template("sell.text")
-            .addStringTemplate("%nation%", settlement.getOwner().getNationName())
+            .addStringTemplate("%nation%", settlement.getOwner().getNationLabel())
             .addStringTemplate("%goods%", goodsTemplate)
             .addAmount("%gold%", gold);
 

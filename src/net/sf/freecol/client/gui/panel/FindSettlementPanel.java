@@ -76,7 +76,7 @@ public final class FindSettlementPanel extends FreeColPanel
                 .addName("%name%", value.getName())
                 .addName("%capital%", ((value.isCapital()) ? "*" : ""))
                 .addStringTemplate("%nation%",
-                    value.getOwner().getNationName());
+                    value.getOwner().getNationLabel());
             label.setText(Messages.message(template));
             label.setIcon(new ImageIcon(ImageLibrary.getSettlementImage(value,
                     new Dimension(64, -1))));

@@ -423,7 +423,7 @@ public class NameCache {
         synchronized (regionNameLock) {
             index = regionIndex.get(prefix);
         }
-        StringTemplate nn = player.getNationName();
+        StringTemplate nn = player.getNationLabel();
         do {
             name = Messages.message(StringTemplate.label(" ")
                 .addStringTemplate(nn)

@@ -432,7 +432,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
                 Player value, int index, boolean isSelected,
                 boolean cellHasFocus) {
                 setText((value == null) ? ""
-                    : Messages.message(value.getNationName()));
+                    : Messages.message(value.getNationLabel()));
                 return this;
             }
         }
@@ -836,8 +836,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         this.agreement = agreement;
         this.comment = comment;
 
-        StringTemplate nation = player.getNationName(),
-            otherNation = otherPlayer.getNationName();
+        StringTemplate nation = player.getNationLabel(),
+            otherNation = otherPlayer.getNationLabel();
         this.demand = StringTemplate.template("negotiationDialog.demand")
             .addStringTemplate("%nation%", nation)
             .addStringTemplate("%otherNation%", otherNation);

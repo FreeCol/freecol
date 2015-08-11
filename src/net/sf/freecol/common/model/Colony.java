@@ -2809,7 +2809,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public StringTemplate getAlarmLevelLabel(Player player) {
         Stance stance = getOwner().getStance(player);
         return StringTemplate.template("model.colony." + stance.getKey())
-            .addStringTemplate("%nation%", getOwner().getNationName());
+            .addStringTemplate("%nation%", getOwner().getNationLabel());
     }
 
 

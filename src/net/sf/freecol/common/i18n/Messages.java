@@ -60,7 +60,7 @@ import net.sf.freecol.common.model.StringTemplate.TemplateType;
  * Properties class is unable to handle UTF-8 directly, this class
  * uses its own implementation.
  *
- * Te individual messages may include variables, which must be
+ * The individual messages may include variables, which must be
  * delimited by percent characters (e.g. "%nation%"), and will be
  * replaced when the message is formatted. Furthermore, the messages
  * may include choice formats consisting of a tag followed by a colon
