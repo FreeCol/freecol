@@ -416,7 +416,10 @@ public final class ConnectController {
 
             List<ChoiceItem<String>> choices = new ArrayList<>();
             for (String n : names) {
-                choices.add(new ChoiceItem<>(Messages.getName(n), n));
+                String nam = Messages.message(StringTemplate
+                    .template("countryName")
+                    .add("%nation%", Messages.nameKey(n)));
+                choices.add(new ChoiceItem<>(nam, n));
             }
             String choice = gui.getChoice(true, null,
                 Messages.message("client.choicePlayer"),

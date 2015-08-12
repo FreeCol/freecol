@@ -106,7 +106,7 @@ public final class ReportExplorationPanel extends ReportPanel {
             reportPanel.add(Utility.localizedLabel(region.getDiscoveredIn()
                     .getLabel()));
             reportPanel.add(Utility.localizedLabel(region.getDiscoveredBy()
-                    .getNationLabel()));
+                    .getCountryLabel()));
             reportPanel.add(new JLabel(String.valueOf(region.getScoreValue())));
         }
     }

@@ -460,7 +460,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         return (contacted)
             ? ((mostHated == null)
                 ? StringTemplate.key("model.indianSettlement.mostHatedNone")
-                : mostHated.getNationLabel())
+                : mostHated.getCountryLabel())
             : StringTemplate.key("model.indianSettlement.mostHatedUnknown");
     }
             

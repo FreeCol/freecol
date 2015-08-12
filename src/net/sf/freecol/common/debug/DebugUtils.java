@@ -472,7 +472,7 @@ public class DebugUtils {
 
         List<ChoiceItem<Player>> pcs = new ArrayList<>();
         for (Player p : game.getLiveEuropeanPlayers(colony.getOwner())) {
-            String msg = Messages.message(p.getNationLabel());
+            String msg = Messages.message(p.getCountryLabel());
             pcs.add(new ChoiceItem<>(msg, p));
         }
         Collections.sort(pcs);
@@ -511,7 +511,7 @@ public class DebugUtils {
         List<ChoiceItem<Player>> pcs = new ArrayList<>();
         for (Player p : game.getLivePlayers(null)) {
             if (unit.getType().isAvailableTo(p)) {
-                String msg = Messages.message(p.getNationLabel());
+                String msg = Messages.message(p.getCountryLabel());
                 pcs.add(new ChoiceItem<>(msg, p));
             }
         }
@@ -740,7 +740,7 @@ public class DebugUtils {
             units.put(Messages.message("sailingToEurope"), toEurope);
             units.put(Messages.getName(p.getEurope()), inEurope);
             units.put(Messages.message("sailingToAmerica"), toAmerica);
-            lb.add("\n==", Messages.message(p.getNationLabel()), "==\n");
+            lb.add("\n==", Messages.message(p.getCountryLabel()), "==\n");
 
             for (Unit u : p.getEurope().getUnitList()) {
                 if (u.getDestination() instanceof Map) {
