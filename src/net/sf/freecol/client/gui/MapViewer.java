@@ -46,6 +46,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -61,6 +62,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -319,12 +321,23 @@ public final class MapViewer {
      * Sets the path of the active unit to display it.
      */
     void updateCurrentPathForActiveUnit() {
-        setCurrentPath((activeUnit == null
-                || activeUnit.getDestination() == null
-                || Map.isSameLocation(activeUnit.getLocation(),
-                                      activeUnit.getDestination()))
-            ? null
-            : activeUnit.findPath(activeUnit.getDestination()));
+        PathNode path;
+        if (activeUnit == null
+            || activeUnit.getDestination() == null
+            || ((FreeColGameObject)activeUnit.getDestination()).isDisposed()
+            || Map.isSameLocation(activeUnit.getLocation(),
+                                  activeUnit.getDestination())) {
+            path = null;
+        } else {
+            try {
+                path = activeUnit.findPath(activeUnit.getDestination());
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Path fail", e);
+                path = null;
+                activeUnit.setDestination(null);
+            }
+        }
+        setCurrentPath(path);
     }
 
     /**
