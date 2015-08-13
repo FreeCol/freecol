@@ -99,26 +99,26 @@ public class Occupation {
         final Colony colony = wl.getColony();
         for (ProductionType pt : productionTypes) {
             lb.add("\n      try=", pt);
-            for (GoodsType gt : workTypes) {
-                if (pt.getOutput(gt) == null) continue;
-                int minInput = FreeColObject.INFINITY;
-                List<AbstractGoods> inputs = pt.getInputs();
-                if (pt != null) {
+            if (pt != null) {
+                for (GoodsType gt : workTypes) {
+                    if (pt.getOutput(gt) == null) continue;
+                    int minInput = FreeColObject.INFINITY;
+                    List<AbstractGoods> inputs = pt.getInputs();
                     for (AbstractGoods ag : inputs) {
                         int input = Math.max(colony.getGoodsCount(ag.getType()),
                             colony.getNetProductionOf(ag.getType()));
                         minInput = Math.min(minInput, input);
                     }
-                }
-                int potential = wl.getPotentialProduction(gt, unitType);
-                int amount = Math.min(minInput, potential);
-                lb.add(" ", gt.getSuffix(), "=", amount, "/", minInput,
-                    "/", potential, ((bestAmount < amount) ? "!" : ""));
-                if (bestAmount < amount) {
-                    bestAmount = amount;
-                    this.workLocation = wl;
-                    this.productionType = pt;
-                    this.workType = gt;
+                    int potential = wl.getPotentialProduction(gt, unitType);
+                    int amount = Math.min(minInput, potential);
+                    lb.add(" ", gt.getSuffix(), "=", amount, "/", minInput,
+                        "/", potential, ((bestAmount < amount) ? "!" : ""));
+                    if (bestAmount < amount) {
+                        bestAmount = amount;
+                        this.workLocation = wl;
+                        this.productionType = pt;
+                        this.workType = gt;
+                    }
                 }
             }
         }
