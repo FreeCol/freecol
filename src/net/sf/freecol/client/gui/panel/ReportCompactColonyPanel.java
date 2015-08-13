@@ -468,7 +468,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
     }
 
     private JLabel newLabel(String h, ImageIcon i, Color c, StringTemplate t) {
-        h = (h != null && Messages.containsKey(h)) ? Messages.message(h) : "";
+        if (h != null && Messages.containsKey(h)) h = Messages.message(h);
         JLabel l = newLabel(h, i, c);
         if (t != null) Utility.localizeToolTip(l, t);
         return l;
@@ -1030,7 +1030,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             ImageIcon icon
                 = new ImageIcon(this.lib.getTinyUnitImage(e.getKey(), false));
             result.add(newLabel(Integer.toString(e.getValue()), icon,
-                                                 cPlain, t));
+                                cPlain, t));
             if (++n >= maxSize) break;
         }
         
