@@ -128,9 +128,7 @@ public class NationTypeDetailPanel
 
         panel.setLayout(new MigLayout("wrap 2, gapx 20"));
 
-        JLabel label = Utility.localizedLabel(nationType);
-        label.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        JLabel label = Utility.localizedHeaderLabel(nationType, FontLibrary.FontSize.SMALL);
         panel.add(label, "span, align center, wrap 40");
 
         label = Utility.localizedLabel("colopedia.nationType.units");
@@ -184,9 +182,7 @@ public class NationTypeDetailPanel
 
         panel.setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
 
-        JLabel name = Utility.localizedLabel(nationType);
-        name.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        JLabel name = Utility.localizedHeaderLabel(nationType, FontLibrary.FontSize.SMALL);
         panel.add(name, "span, align center, wrap 40");
 
         panel.add(Utility.localizedLabel("colopedia.nationType.aggressionLevel"));

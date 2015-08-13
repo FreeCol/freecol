@@ -38,6 +38,7 @@ import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.ClientOptions;
@@ -130,9 +131,8 @@ public final class ReportTurnPanel extends ReportPanel {
             case ClientOptions.MESSAGES_GROUP_BY_TYPE:
                 if (message.getMessageType() != type) {
                     type = message.getMessageType();
-                    JLabel headline = Utility.localizedLabel(message.getMessageType());
-                    headline.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-                        FontLibrary.FontSize.SMALL));
+                    JLabel headline = Utility.localizedHeaderLabel(
+                        message.getMessageType(), FontLibrary.FontSize.SMALL);
                     reportPanel.add(headline, "newline 20, skip, span");
                 }
                 break;
@@ -297,8 +297,19 @@ public final class ReportTurnPanel extends ReportPanel {
             headline = new JLabel(source.toString());
         }
 
-        headline.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        // FIXME: Get text before putting it inside and remove type testing.
+        String text;
+        if(headline instanceof JLabel)
+            text = ((JLabel)headline).getText();
+        else if(headline instanceof JButton)
+            text = ((JButton)headline).getText();
+        else {
+            text = "";
+            logger.warning("Unknown JComponent");
+        }
+
+        headline.setFont(FontLibrary.createCompatibleFont(text,
+            FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL));
         headline.setOpaque(false);
         headline.setForeground(Utility.LINK_COLOR);
         headline.setBorder(Utility.blankBorder(5, 0, 0, 0));

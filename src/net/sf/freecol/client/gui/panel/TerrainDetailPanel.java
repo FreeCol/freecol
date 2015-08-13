@@ -113,9 +113,7 @@ public class TerrainDetailPanel
             defenseBonus = ModifierFormat.getModifierAsString(defenceModifiers.iterator().next());
         }
 
-        JLabel nameLabel = Utility.localizedLabel(tileType);
-        nameLabel.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        JLabel nameLabel = Utility.localizedHeaderLabel(tileType, FontLibrary.FontSize.SMALL);
         panel.add(nameLabel, "span, align center");
 
         panel.add(Utility.localizedLabel("colopedia.terrain.terrainImage"), "spany 3");

@@ -23,6 +23,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -71,9 +72,8 @@ public class FirstContactDialog extends FreeColConfirmDialog {
             headerKey = BASE_KEY + NATIVES_KEY;
             imageKey = IMAGE_BASE_KEY + NATIVES_KEY;
         }
-        JLabel header = Utility.localizedLabel(headerKey);
-        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.MEDIUM));
+        JLabel header = Utility.localizedHeaderLabel(headerKey,
+            SwingConstants.LEADING, FontLibrary.FontSize.MEDIUM);
         JLabel image
             = new JLabel(new ImageIcon(ResourceManager.getImage(imageKey)));
 

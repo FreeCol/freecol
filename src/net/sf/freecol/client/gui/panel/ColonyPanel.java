@@ -274,6 +274,7 @@ public final class ColonyPanel extends PortPanel
         selectedUnitLabel = null;
 
         // Make the colony label
+        // TODO: Check font compatibility for all contained strings
         this.nameBox.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.SMALL, getImageLibrary().getScalingFactor()));
         if (editable) {

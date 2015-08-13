@@ -29,6 +29,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.miginfocom.swing.MigLayout;
@@ -114,9 +115,8 @@ public class FatherDetailPanel
         } catch (IllegalArgumentException e) {
             // this is not a founding father
             panel.setLayout(new MigLayout("wrap 1, align center", "align center"));
-            JLabel header = Utility.localizedLabel(Messages.nameKey(id));
-            header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-                FontLibrary.FontSize.SMALL));
+            JLabel header = Utility.localizedHeaderLabel(Messages.nameKey(id),
+                SwingConstants.LEADING, FontLibrary.FontSize.SMALL);
             panel.add(header, "align center, wrap 20");
             if (getId().equals(id)) {
                 panel.add(Utility.localizedTextArea("colopedia.foundingFather.description", 40));
@@ -139,9 +139,10 @@ public class FatherDetailPanel
 
         String name = Messages.getName(father);
         String type = Messages.message(father.getTypeKey());
-        JLabel header = new JLabel(name + " (" + type + ")");
-        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        String text = name + " (" + type + ")";
+        JLabel header = new JLabel(text);
+        header.setFont(FontLibrary.createCompatibleFont(text,
+            FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL));
 
         Image image = ImageLibrary.getFoundingFatherImage(father, false);
         JLabel label = new JLabel(new ImageIcon(image));

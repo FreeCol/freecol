@@ -371,11 +371,43 @@ public final class Utility {
      * @return A suitable <code>JLabel</code>.
      */
     public static JLabel localizedHeader(String key, boolean small) {
-        JLabel header = new JLabel(Messages.message(key), JLabel.CENTER);
-        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            (small) ? FontLibrary.FontSize.SMALL : FontLibrary.FontSize.BIG));
+        JLabel header = localizedHeaderLabel(key, SwingConstants.CENTER,
+            (small ? FontLibrary.FontSize.SMALL : FontLibrary.FontSize.BIG));
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         return header;
+    }
+
+    /**
+     * Gets a label containing a localized message using the header font.
+     *
+     * @param key The message key to use.
+     * @param alignment The alignment.
+     * @param size The font size.
+     * @return A suitable <code>JLabel</code>.
+     */
+    public static JLabel localizedHeaderLabel(String key, int alignment,
+                                              FontLibrary.FontSize size) {
+        String text = Messages.message(key);
+        JLabel header = new JLabel(text, alignment);
+        header.setFont(FontLibrary.createCompatibleFont(
+            text, FontLibrary.FontType.HEADER, size));
+        return header;
+    }
+
+    public static JLabel localizedHeaderLabel(StringTemplate template,
+                                              int alignment,
+                                              FontLibrary.FontSize size) {
+        String text = Messages.message(template);
+        JLabel header = new JLabel(text, alignment);
+        header.setFont(FontLibrary.createCompatibleFont(
+            text, FontLibrary.FontType.HEADER, size));
+        return header;
+    }
+
+    public static JLabel localizedHeaderLabel(Named named,
+                                              FontLibrary.FontSize size) {
+        return localizedHeaderLabel(named.getNameKey(),
+                                    SwingConstants.LEADING, size);
     }
 
     /**

@@ -139,9 +139,7 @@ public class BuildingDetailPanel
         BuildingType buildingType = getSpecification().getBuildingType(id);
         panel.setLayout(new MigLayout("wrap 7, gapx 20", "", ""));
 
-        JLabel name = Utility.localizedLabel(buildingType);
-        name.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        JLabel name = Utility.localizedHeaderLabel(buildingType, FontLibrary.FontSize.SMALL);
         panel.add(name, "span, align center, wrap 40");
 
         // Requires - prerequisites to build

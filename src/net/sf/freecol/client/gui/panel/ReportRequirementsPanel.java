@@ -386,11 +386,11 @@ public final class ReportRequirementsPanel extends ReportPanel {
     }
 
     private JButton createColonyButton(Colony colony, String info, boolean headline) {
-        JButton button = Utility.getLinkButton(colony.getName() + info, null,
-            colony.getId());
+        String text = colony.getName() + info;
+        JButton button = Utility.getLinkButton(text, null, colony.getId());
         if (headline) {
-            button.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-                FontLibrary.FontSize.SMALL));
+            button.setFont(FontLibrary.createCompatibleFont(text,
+                FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL));
         }
         button.addActionListener(this);
         return button;

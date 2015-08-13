@@ -578,9 +578,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 getImageLibrary().getScalingFactor());
         
         // Create the components
-        JLabel header = Utility.localizedLabel("buildQueuePanel.buildQueue");
-        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.BIG));
+        JLabel header = Utility.localizedHeaderLabel(
+            "buildQueuePanel.buildQueue",
+            SwingConstants.LEADING, FontLibrary.FontSize.BIG);
         
         // JLabel SubHeads
         JLabel bqpUnits = Utility.localizedLabel("buildQueuePanel.units");

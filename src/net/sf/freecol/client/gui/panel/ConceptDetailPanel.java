@@ -30,6 +30,7 @@ import java.util.List;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.miginfocom.swing.MigLayout;
@@ -127,9 +128,8 @@ public class ConceptDetailPanel extends FreeColPanel
 
         panel.setLayout(new MigLayout("wrap 1, center"));
 
-        JLabel header = Utility.localizedLabel(Messages.nameKey(id));
-        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        JLabel header = Utility.localizedHeaderLabel(Messages.nameKey(id),
+            SwingConstants.LEADING, FontLibrary.FontSize.SMALL);
         panel.add(header, "align center, wrap 20");
 
         JEditorPane editorPane = new JEditorPane("text/html", Messages.getDescription(id)) {

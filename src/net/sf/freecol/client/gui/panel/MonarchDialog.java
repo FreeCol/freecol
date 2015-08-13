@@ -78,6 +78,7 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
             hdrKey = "monarchDialog.default";
         }
         JTextArea header = Utility.localizedTextArea(hdrKey);
+        // TODO: Check font compatibility for contained text, when possible.
         header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
             FontLibrary.FontSize.MEDIUM));
 
