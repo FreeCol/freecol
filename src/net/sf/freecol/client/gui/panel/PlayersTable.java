@@ -319,9 +319,10 @@ public final class PlayersTable extends JTable {
             Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
             Nation nation = (Nation) value;
-            setText(Messages.getName(nation));
-            setIcon(new ImageIcon(
-                gui.getImageLibrary().getSmallerMiscIconImage(nation)));
+            setText(Messages.message(StringTemplate.template("countryName")
+                    .add("%nation%", Messages.nameKey(nation.getId()))));
+            setIcon(new ImageIcon(gui.getImageLibrary()
+                    .getSmallerMiscIconImage(nation)));
             return this;
         }
     }
