@@ -4062,6 +4062,20 @@ public class Unit extends GoodsLocation
                 result = -1;
             }
         }
+        if (this.destination != null) {
+            if (((FreeColGameObject)this.destination).isUninitialized()) {
+                if (fix) {
+                    this.destination = null;
+                    logger.warning("Cleared uninitialized destination for: "
+                        + getId());
+                    result = Math.min(result, 0);
+                } else {
+                    logger.warning("Uninitialized destination for: "
+                        + getId());
+                    result = -1;
+                }
+            }
+        }
         return result;
     }
 
