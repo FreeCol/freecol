@@ -233,7 +233,14 @@ public final class Utility {
      * @return The default <code>JTextPane</code> to use.
      */
     public static JTextPane getDefaultTextPane() {
-        return getDefaultTextPane(null);
+        DefaultStyledDocument document
+            = new DefaultStyledDocument(STYLE_CONTEXT);
+
+        JTextPane textPane = new JTextPane(document);
+        textPane.setOpaque(false);
+        textPane.setEditable(false);
+        textPane.setLogicalStyle(STYLE_CONTEXT.getStyle("regular"));
+        return textPane;
     }
 
     /**
@@ -243,14 +250,7 @@ public final class Utility {
      * @return A suitable <code>JTextPane</code>.
      */
     public static JTextPane getDefaultTextPane(String text) {
-        DefaultStyledDocument document
-            = new DefaultStyledDocument(STYLE_CONTEXT);
-
-        JTextPane textPane = new JTextPane(document);
-        textPane.setOpaque(false);
-        textPane.setEditable(false);
-        textPane.setLogicalStyle(STYLE_CONTEXT.getStyle("regular"));
-
+        JTextPane textPane = getDefaultTextPane();
         textPane.setText(text);
         return textPane;
     }
@@ -354,16 +354,6 @@ public final class Utility {
     }
 
     /**
-     * Get a JLabel with a named object.
-     *
-     * @param named The <code>Named</code> to use.
-     * @return The <code>JLabel</code>.
-     */
-    public static JLabel localizedLabel(Named named) {
-        return localizedLabel(named.getNameKey());
-    }
-
-    /**
      * Gets a default header for panels containing a localized message.
      *
      * @param key The message key to use.
@@ -411,36 +401,23 @@ public final class Utility {
     }
 
     /**
+     * Get a JLabel with a named object.
+     *
+     * @param named The <code>Named</code> to use.
+     * @return The <code>JLabel</code>.
+     */
+    public static JLabel localizedLabel(Named named) {
+        return localizedLabel(named.getNameKey());
+    }
+
+    /**
      * Get a JLabel with Messages.message(key) as text.
      *
      * @param key The key to use.
      * @return The <code>JLabel</code>.
      */
     public static JLabel localizedLabel(String key) {
-        return localizedLabel(key, SwingConstants.LEADING);
-    }
-
-    /**
-     * Get a JLabel with Messages.message(key) as text.
-     *
-     * @param key The key to use.
-     * @param alignment The alignment.
-     * @return The <code>JLabel</code>.
-     */
-    public static JLabel localizedLabel(String key, int alignment) {
-        return localizedLabel(key, null, alignment);
-    }
-
-    /**
-     * Get a JLabel with Messages.message(key) as text.
-     *
-     * @param key The key to use.
-     * @param icon The icon to use.
-     * @param alignment The alignment.
-     * @return The <code>JLabel</code>.
-     */
-    public static JLabel localizedLabel(String key, Icon icon, int alignment) {
-        return localizedLabel(StringTemplate.key(key), icon, alignment);
+        return localizedLabel(StringTemplate.key(key));
     }
 
     /**
@@ -450,7 +427,7 @@ public final class Utility {
      * @return The <code>JLabel</code>.
      */
     public static JLabel localizedLabel(StringTemplate template) {
-        return localizedLabel(template, null, SwingConstants.LEADING);
+        return new JLabel(Messages.message(template));
     }
 
     /**

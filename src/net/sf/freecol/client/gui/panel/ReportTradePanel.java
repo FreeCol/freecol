@@ -223,7 +223,7 @@ public final class ReportTradePanel extends ReportPanel {
     }
 
     private JLabel createLeftLabel(String key) {
-        JLabel result = Utility.localizedLabel(key, JLabel.LEADING);
+        JLabel result = Utility.localizedLabel(key);
         result.setBorder(Utility.LEFTCELLBORDER);
         return result;
     }
