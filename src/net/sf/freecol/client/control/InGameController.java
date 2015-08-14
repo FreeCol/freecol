@@ -261,13 +261,11 @@ public final class InGameController implements NetworkConstants {
      * @return True if it is our turn.
      */
     private boolean requireOurTurn() {
-        if (!freeColClient.currentPlayerIsMyPlayer()) {
-            if (freeColClient.isInGame()) {
-                gui.showInformationMessage("info.notYourTurn");
-            }
-            return false;
+        if (freeColClient.currentPlayerIsMyPlayer()) return true;
+        if (freeColClient.isInGame()) {
+            gui.showInformationMessage("info.notYourTurn");
         }
-        return true;
+        return false;
     }
 
     /**
@@ -355,8 +353,7 @@ public final class InGameController implements NetworkConstants {
         if (price < 0) { // not for sale
             return false;
         } else if (price > 0) { // for sale
-            ClaimAction act = gui.getClaimChoice(tile, player, price,
-                                                     owner);
+            ClaimAction act = gui.getClaimChoice(tile, player, price, owner);
             if (act == null) return false; // Cancelled
             switch (act) {
             case ACCEPT: // accepted price
@@ -370,7 +367,6 @@ public final class InGameController implements NetworkConstants {
             }
         } // else price == 0 and we can just proceed to claim
 
-        // Ask the server
         return askServer().claimTile(tile, claimant, price)
             && player.owns(tile);
     }
@@ -380,15 +376,18 @@ public final class InGameController implements NetworkConstants {
      * to null.
      *
      * @param unit The <code>Unit</code> to clear the destination for.
-     * @return True if the unit has no destination.
+     * @return True if the unit now has no destination or trade route.
      */
     private boolean askClearGotoOrders(Unit unit) {
         if (!askAssignTradeRoute(unit, null)) return false;
 
         if (unit.getDestination() == null) return true;
 
-        gui.clearGotoPath();
-        return askSetDestination(unit, null);
+        if (askSetDestination(unit, null)) {
+            gui.clearGotoPath();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -1174,10 +1173,9 @@ public final class InGameController implements NetworkConstants {
             result = false;
             break;
         }
-        if (clearDestination && !unit.isDisposed()) {
-            askClearGotoOrders(unit);
-        }
-        return result;
+        if (unit.isDisposed()) return false;
+        if (clearDestination) askClearGotoOrders(unit);
+        return true;
     }
 
     /**
@@ -2720,7 +2718,7 @@ public final class InGameController implements NetworkConstants {
 
         // Check unit, which must be on the map and able to build.
         if (unit == null) return false;
-        Tile tile = unit.getTile();
+        final Tile tile = unit.getTile();
         if (tile == null) return false;
         if (!unit.canBuildColony()) {
             gui.showInformationMessage(unit, StringTemplate
@@ -3495,8 +3493,9 @@ public final class InGameController implements NetworkConstants {
      * @return a <code>List</code> value
      */
     public List<AbstractUnit> getREFUnits() {
-        return (!requireOurTurn()) ? Collections.<AbstractUnit>emptyList()
-            : askServer().getREFUnits();
+        if (!requireOurTurn()) return Collections.<AbstractUnit>emptyList();
+        
+        return askServer().getREFUnits();
     }
 
     /**
@@ -3671,7 +3670,7 @@ public final class InGameController implements NetworkConstants {
         }
         if (m != null) {
             player.addModelMessage(m);
-            displayModelMessages(false, false);
+            displayModelMessages(false);
         }
         return accepted;
     }
@@ -3959,7 +3958,7 @@ public final class InGameController implements NetworkConstants {
                            null);
 
         // Add tutorial message.
-        String key = FreeColActionUI.getHumanKeyStrokeText(freeColClient
+        final String key = FreeColActionUI.getHumanKeyStrokeText(freeColClient
             .getActionManager().getFreeColAction("buildColonyAction")
             .getAccelerator());
         player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
@@ -3992,6 +3991,8 @@ public final class InGameController implements NetworkConstants {
     /**
      * Ask the player to name the new land.
      *
+     * Called from IGIH.newLandName.
+     *
      * @param defaultName The default name to use.
      * @param unit The <code>Unit</code> that has landed.
      */
@@ -4001,6 +4002,8 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Ask the player to name a new region.
+     *
+     * Called from IGIH.newRegionName.
      *
      * @param region The <code>Region</code> to name.
      * @param defaultName The default name to use.
@@ -4045,11 +4048,9 @@ public final class InGameController implements NetworkConstants {
 
         final boolean alert = freeColClient.getClientOptions()
             .getBoolean(ClientOptions.AUDIO_ALERTS);
-        if (alert) {
-            sound("sound.event.alertSound");
-        }
+        if (alert) sound("sound.event.alertSound");
 
-        Turn currTurn = game.getTurn();
+        final Turn currTurn = game.getTurn();
         if (currTurn.isFirstSeasonTurn()) {
             player.addModelMessage(new ModelMessage(MessageType.WARNING,
                                                     "twoTurnsPerYear", player)
@@ -4727,9 +4728,9 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn() || unit == null
             || !unit.isCarrier()) return false;
 
+        final boolean inEurope = unit.isInEurope();
+        final Colony colony = unit.getColony();
         boolean ret = true;
-        boolean inEurope = unit.isInEurope();
-        Colony colony = unit.getColony();
         if (colony != null) { // In colony, unload units and goods.
             for (Unit u : unit.getUnitList()) {
                 ret = leaveShip(u) && ret;
@@ -4737,7 +4738,7 @@ public final class InGameController implements NetworkConstants {
             for (Goods goods : unit.getGoodsList()) {
                 ret = unloadCargo(goods, false) && ret;
             }
-        } else if (unit.isInEurope()) { // In Europe, unload non-boycotted goods
+        } else if (inEurope) { // In Europe, unload non-boycotted goods
             Player player = freeColClient.getMyPlayer();
             for (Goods goods : unit.getCompactGoodsList()) {
                 if (player.canTrade(goods.getType())) {
@@ -4748,7 +4749,7 @@ public final class InGameController implements NetworkConstants {
                 gui.showDumpCargoDialog(unit);
                 return false;
             }
-        } else { // Dump goods, units dislike jumping overboard
+        } else { // Dump goods, however units dislike jumping overboard
             for (Goods goods : unit.getGoodsList()) {
                 ret = unloadCargo(goods, false) && ret;
             }
