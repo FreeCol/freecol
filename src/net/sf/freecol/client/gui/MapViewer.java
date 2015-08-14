@@ -1884,7 +1884,7 @@ public final class MapViewer {
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_OWNERS:
             if (tile.getOwner() != null) {
-                text = Messages.message(tile.getOwner().getCountryLabel());
+                text = Messages.message(tile.getOwner().getNationLabel());
             }
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_REGIONS:
