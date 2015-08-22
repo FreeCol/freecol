@@ -274,16 +274,28 @@ public final class ColonyPanel extends PortPanel
         selectedUnitLabel = null;
 
         // Make the colony label
-        // TODO: Check font compatibility for all contained strings
-        this.nameBox.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL, getImageLibrary().getScalingFactor()));
+        Font nameBoxFont = FontLibrary.createFont(FontLibrary.FontType.HEADER,
+            FontLibrary.FontSize.SMALL, getImageLibrary().getScalingFactor());
+        boolean incompatibleFont = false;
         if (editable) {
             for (Colony c : freeColClient.getMySortedColonies()) {
                 this.nameBox.addItem(c);
+                if(!incompatibleFont &&
+                    nameBoxFont.canDisplayUpTo(c.getName()) != -1) {
+                    incompatibleFont = true;
+                }
             }
         } else { // When spying, only add the given colony.
             this.nameBox.addItem(colony);
+            if(nameBoxFont.canDisplayUpTo(colony.getName()) != -1)
+                incompatibleFont = true;
         }
+        if(incompatibleFont) {
+            nameBoxFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.SMALL,
+                getImageLibrary().getScalingFactor());
+        }
+        this.nameBox.setFont(nameBoxFont);
         this.nameBox.setSelectedItem(colony);
         this.nameBox.getInputMap().put(KeyStroke.getKeyStroke("LEFT"),
                                        "selectPrevious2");
