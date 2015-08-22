@@ -26,7 +26,9 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -77,10 +79,8 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
         if (!Messages.containsKey(hdrKey)) {
             hdrKey = "monarchDialog.default";
         }
-        JTextArea header = Utility.localizedTextArea(hdrKey);
-        // TODO: Check font compatibility for contained text, when possible.
-        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.MEDIUM));
+        JLabel header = Utility.localizedHeaderLabel(hdrKey,
+            SwingConstants.LEADING, FontLibrary.FontSize.MEDIUM);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 2, insets 10",
                                                     "[]20[]"));
