@@ -234,15 +234,25 @@ public class FontLibrary {
     public static Font createCompatibleFont(String string, FontType fontType,
                                             FontSize fontSize,
                                             int style, float scaleFactor) {
-        // FIXME: Inline createFont calls, add private helper methods
-        //        for common code and simplify everything.
         // TODO: Consider testing the normal font for compatibility and try
         //       some or all other available fonts for complete/longest match:
         //       header/simple->main->normal->simple/header->emergency
-        Font font = createFont(fontType, fontSize, style, scaleFactor);
-        if(font.canDisplayUpTo(string) == -1 || fontType==FontType.NORMAL)
-            return font;
-        return createFont(FontType.NORMAL, fontSize, style, scaleFactor);
+        float scaledSize = calcScaledSize(fontSize, scaleFactor);
+        String fontKey = getFontKey(fontType);
+        Font font = null;
+        if(fontType != FontType.NORMAL) {
+            font = ResourceManager.getFont(fontKey);
+            if(font.canDisplayUpTo(string) != -1)
+                font = null;
+        }
+        if(font == null) {
+            fontKey = getFontKey(FontType.NORMAL);
+            font = (fontKey == null)
+                ? mainFont
+                : ResourceManager.getFont(fontKey);
+        }
+        font = font.deriveFont(style, scaledSize);
+        return font;
     }
 
     private static float calcScaledSize(FontSize fontSize, float scaleFactor) {
