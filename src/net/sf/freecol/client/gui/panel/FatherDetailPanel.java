@@ -115,14 +115,16 @@ public class FatherDetailPanel
         } catch (IllegalArgumentException e) {
             // this is not a founding father
             panel.setLayout(new MigLayout("wrap 1, align center", "align center"));
-            JLabel header = Utility.localizedHeaderLabel(Messages.nameKey(id),
-                SwingConstants.LEADING, FontLibrary.FontSize.SMALL);
-            panel.add(header, "align center, wrap 20");
             if (getId().equals(id)) {
+                JLabel header = Utility.localizedHeaderLabel(Messages.nameKey(id),
+                    SwingConstants.LEADING, FontLibrary.FontSize.SMALL);
+                panel.add(header, "align center, wrap 20");
                 panel.add(Utility.localizedTextArea("colopedia.foundingFather.description", 40));
             } else {
+                JLabel header = Utility.localizedHeaderLabel(Messages.message(id),
+                    SwingConstants.LEADING, FontLibrary.FontSize.SMALL);
+                panel.add(header, "align center, wrap 20");
                 Image image = ResourceManager.getImage("image.flavor." + id);
-                header.setText(Messages.message(id));
                 panel.add(new JLabel(new ImageIcon(image)));
             }
         }
