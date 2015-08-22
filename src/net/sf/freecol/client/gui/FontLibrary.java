@@ -208,42 +208,11 @@ public class FontLibrary {
      */
     public static Font createFont(FontType fontType, FontSize fontSize,
                                   int style, float scaleFactor) {
-        String fontName;
-        switch(fontType) {
-            default:
-                logger.warning("Unknown FontType");
-            case NORMAL:
-                fontName = (mainFont != null) ? null : "normal";
-                break;
-            case SIMPLE:
-                fontName = "simple";
-                break;
-            case HEADER:
-                fontName = "header";
-        }
-        float pixelSize;
-        switch(fontSize) {
-            default:
-                logger.warning("Unknown FontSize");
-            case TINY:
-                pixelSize = 12f;
-                break;
-            case SMALLER:
-                pixelSize = 16f;
-                break;
-            case SMALL:
-                pixelSize = 24f;
-                break;
-            case MEDIUM:
-                pixelSize = 36f;
-                break;
-            case BIG:
-                pixelSize = 48f;
-        }
-        float scaledSize = pixelSize * scaleFactor;
-        Font font = (fontName == null)
+        float scaledSize = calcScaledSize(fontSize, scaleFactor);
+        String fontKey = getFontKey(fontType);
+        Font font = (fontKey == null)
             ? mainFont
-            : ResourceManager.getFont("font." + fontName);
+            : ResourceManager.getFont(fontKey);
         font = font.deriveFont(style, scaledSize);
         return font;
     }
@@ -274,6 +243,46 @@ public class FontLibrary {
         if(font.canDisplayUpTo(string) == -1 || fontType==FontType.NORMAL)
             return font;
         return createFont(FontType.NORMAL, fontSize, style, scaleFactor);
+    }
+
+    private static float calcScaledSize(FontSize fontSize, float scaleFactor) {
+        float pixelSize;
+        switch(fontSize) {
+            default:
+                logger.warning("Unknown FontSize");
+            case TINY:
+                pixelSize = 12f;
+                break;
+            case SMALLER:
+                pixelSize = 16f;
+                break;
+            case SMALL:
+                pixelSize = 24f;
+                break;
+            case MEDIUM:
+                pixelSize = 36f;
+                break;
+            case BIG:
+                pixelSize = 48f;
+        }
+        return pixelSize * scaleFactor;
+    }
+
+    private static String getFontKey(FontType fontType) {
+        String fontName;
+        switch(fontType) {
+            default:
+                logger.warning("Unknown FontType");
+            case NORMAL:
+                fontName = (mainFont != null) ? null : "font.normal";
+                break;
+            case SIMPLE:
+                fontName = "font.simple";
+                break;
+            case HEADER:
+                fontName = "font.header";
+        }
+        return fontName;
     }
 
 }
