@@ -273,9 +273,7 @@ iframe.wrapper {
 
 #rightcol-broad div.module {
     width: 180px;
-    /* background: transparent url(../images/module_middle_wide.jpg) left repeat-y; */
     background: transparent url(../images/vertical-line.jpg) left repeat-y;
-    /*margin-bottom: 10px;*/
     padding-left: 5px;
     padding-bottom: 10px;
 }
@@ -283,28 +281,21 @@ iframe.wrapper {
 #rightcol-broad-top {
     width: 170px;
     padding-left: 5px;
-    /*margin-top: 10px;*/
-    /*background: transparent url(../images/vertical-line.jpg) left repeat-y;
-    padding-bottom: 100%;*/
     background: transparent url(../images/horizontal-line.jpg) bottom repeat-x;
 }
 
 #rightcol-broad-bottom {
     width: 170px;
     padding-left: 5px;
-    /*background: transparent url(../images/vertical-line.jpg) left repeat-y;
-    padding-bottom: 100%;*/
     background: transparent url(../images/horizontal-line.jpg) top repeat-x;
 }
 
 #rightcol-broad div.module div {
     width: 180px;
-    /* background: transparent url(../images/module_top_wide.jpg) top left no-repeat; */
 }
 
 #rightcol-broad div.module div div {
     width: 180px;
-    /* background: transparent url(../images/module_bottom_wide.jpg)  bottom left no-repeat; */
 }
 
 #rightcol-broad div.module div div div {
