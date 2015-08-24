@@ -187,6 +187,15 @@ public final class ImageLibrary {
         return scaleFactor;
     }
 
+    public Dimension scaleDimension(Dimension size) {
+        return scaleDimension(size, scaleFactor);
+    }
+
+    public static Dimension scaleDimension(Dimension size, float scaleFactor) {
+        return new Dimension(Math.round(size.width*scaleFactor),
+                             Math.round(size.height*scaleFactor));
+    }
+
     /**
      * Gets a suitable foreground color given a background color.
      *
@@ -381,21 +390,18 @@ public final class ImageLibrary {
     }
 
     public BufferedImage getSmallerIconImage(FreeColGameObjectType type) {
-        return getMiscImage("image.icon." + type.getId(), new Dimension(
-            Math.round(scaleFactor * (ICON_SIZE.width * 0.5f)),
-            Math.round(scaleFactor * (ICON_SIZE.height * 0.5f))));
+        return getMiscImage("image.icon." + type.getId(),
+            scaleDimension(ICON_SIZE, scaleFactor * 0.5f));
     }
 
     public BufferedImage getSmallIconImage(FreeColGameObjectType type) {
-        return getMiscImage("image.icon." + type.getId(), new Dimension(
-            Math.round(scaleFactor * (ICON_SIZE.width * 0.75f)),
-            Math.round(scaleFactor * (ICON_SIZE.height * 0.75f))));
+        return getMiscImage("image.icon." + type.getId(),
+            scaleDimension(ICON_SIZE, scaleFactor * 0.75f));
     }
 
     public BufferedImage getIconImage(FreeColGameObjectType type) {
-        return getMiscImage("image.icon." + type.getId(), new Dimension(
-            Math.round(scaleFactor * ICON_SIZE.width),
-            Math.round(scaleFactor * ICON_SIZE.height)));
+        return getMiscImage("image.icon." + type.getId(),
+            scaleDimension(ICON_SIZE, scaleFactor));
     }
 
     public BufferedImage getSmallerMiscIconImage(FreeColGameObjectType type) {
@@ -447,9 +453,7 @@ public final class ImageLibrary {
     public BufferedImage getObjectImage(FreeColObject display, float scale) {
         try {
             final float combinedScale = scaleFactor * scale;
-            final Dimension size = new Dimension(
-                Math.round(combinedScale*ICON_SIZE.width),
-                Math.round(combinedScale*ICON_SIZE.height));
+            final Dimension size = scaleDimension(ICON_SIZE, combinedScale);
             BufferedImage image;
             if (display instanceof Goods) {
                 display = ((Goods)display).getType();
