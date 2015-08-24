@@ -100,9 +100,9 @@ public final class AboutPanel extends FreeColPanel {
         // Create available Font choices
         Font fontBold = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.TINY, Font.BOLD,
-            getImageLibrary().getScalingFactor());
+            getImageLibrary().getScaleFactor());
         Font fontNormal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, getImageLibrary().getScalingFactor());
+            FontLibrary.FontSize.TINY, getImageLibrary().getScaleFactor());
         
         // Version
         JLabel apVersion = Utility.localizedLabel("aboutPanel.version");

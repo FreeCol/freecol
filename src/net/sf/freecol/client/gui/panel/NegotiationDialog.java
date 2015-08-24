@@ -929,7 +929,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         JTextArea labelDemandMessage = Utility.localizedTextArea(this.demand);
         Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, 
                 FontLibrary.FontSize.TINY, Font.BOLD,
-                getImageLibrary().getScalingFactor());
+                getImageLibrary().getScaleFactor());
         labelDemandMessage.setFont(font);
         panel.add(labelDemandMessage);
         JTextArea blank = new JTextArea(" ");

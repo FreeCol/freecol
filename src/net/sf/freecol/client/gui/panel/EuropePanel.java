@@ -698,7 +698,7 @@ public final class EuropePanel extends PortPanel {
 
         setSelectedUnitLabel(null);
 
-        float scale = getImageLibrary().getScalingFactor();
+        float scale = getImageLibrary().getScaleFactor();
         getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
     }
 

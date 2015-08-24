@@ -275,7 +275,7 @@ public final class ColonyPanel extends PortPanel
 
         // Make the colony label
         Font nameBoxFont = FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL, getImageLibrary().getScalingFactor());
+            FontLibrary.FontSize.SMALL, getImageLibrary().getScaleFactor());
         boolean incompatibleFont = false;
         if (editable) {
             for (Colony c : freeColClient.getMySortedColonies()) {
@@ -293,7 +293,7 @@ public final class ColonyPanel extends PortPanel
         if(incompatibleFont) {
             nameBoxFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                 FontLibrary.FontSize.SMALL,
-                getImageLibrary().getScalingFactor());
+                getImageLibrary().getScaleFactor());
         }
         this.nameBox.setFont(nameBoxFont);
         this.nameBox.setSelectedItem(colony);
@@ -355,7 +355,7 @@ public final class ColonyPanel extends PortPanel
             JComponent.WHEN_IN_FOCUSED_WINDOW, nameIM);
 
         initialize(colony);
-        float scale = getImageLibrary().getScalingFactor();
+        float scale = getImageLibrary().getScaleFactor();
         getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
     }
 
@@ -435,7 +435,7 @@ public final class ColonyPanel extends PortPanel
 
         add(this.nameBox, "height 42:, grow");
         int tmp = (int)(ImageLibrary.ICON_SIZE.height
-            * gui.getImageLibrary().getScalingFactor());
+            * gui.getImageLibrary().getScaleFactor());
         add(netProductionPanel,
             "grow, height " + (tmp+10) + ":" + (2*tmp+10) + ":" + (2*tmp+10));
         add(tilesScroll, "width 390!, height 200!, top");
@@ -1224,7 +1224,7 @@ public final class ColonyPanel extends PortPanel
             final ImageLibrary lib = getGUI().getColonyTileMapViewer()
                 .getImageLibrary();
             final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.SMALLER, lib.getScalingFactor());
+                FontLibrary.FontSize.SMALLER, lib.getScaleFactor());
             final int uc = colony.getUnitCount();
             final int solPercent = colony.getSoL();
             final int rebels = Colony.calculateRebels(uc, solPercent);

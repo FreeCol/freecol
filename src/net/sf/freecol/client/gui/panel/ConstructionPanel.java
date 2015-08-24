@@ -137,7 +137,7 @@ public class ConstructionPanel extends MigPanel
         final ImageLibrary lib = ((SwingGUI)freeColClient.getGUI())
             .getColonyTileMapViewer().getImageLibrary();
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, lib.getScalingFactor());
+            FontLibrary.FontSize.SMALLER, lib.getScaleFactor());
 
         if (buildable == null) {
             String clickToBuild = Messages.message(getDefaultLabel());

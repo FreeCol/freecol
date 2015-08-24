@@ -91,7 +91,7 @@ public final class InfoPanel extends FreeColPanel {
             final ImageLibrary lib = getGUI().getColonyTileMapViewer()
                 .getImageLibrary();
             Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.TINY, lib.getScalingFactor());
+                FontLibrary.FontSize.TINY, lib.getScaleFactor());
 
             String labelString = Messages.message("infoPanel.endTurn");
             for (String s : splitText(labelString, " /",
@@ -147,7 +147,7 @@ public final class InfoPanel extends FreeColPanel {
             final MapViewer mapViewer = getGUI().getColonyTileMapViewer();
             final ImageLibrary lib = mapViewer.getImageLibrary();
             final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.TINY, lib.getScalingFactor());
+                FontLibrary.FontSize.TINY, lib.getScaleFactor());
             if (tile != null && tile.getType() != null) {
                 final int width = getWidth() - SLACK;
                 BufferedImage image = mapViewer.createTileImageWithBeachBorderAndItems(tile);
@@ -283,7 +283,7 @@ public final class InfoPanel extends FreeColPanel {
             final ImageLibrary lib = getGUI().getColonyTileMapViewer()
                 .getImageLibrary();
             Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.TINY, lib.getScalingFactor());
+                FontLibrary.FontSize.TINY, lib.getScaleFactor());
             String text;
             JLabel textLabel;
             if (unit != null) {

@@ -465,7 +465,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             } else if (location instanceof Colony) {
                 Colony colony = (Colony) location;
                 icon = new JLabel(new ImageIcon(ImageLibrary.getSettlementImage(
-                    colony, lib.getScalingFactor()* 0.5f)));
+                    colony, lib.getScaleFactor()* 0.5f)));
                 name = new JLabel(colony.getName());
             } else {
                 throw new IllegalStateException("Bogus location: " + location);

@@ -72,7 +72,7 @@ public class BuildingToolTip extends JToolTip {
         if (arrow == null) {
             arrow = new JLabel(ResourceManager.getString("arrow.E"));
             arrow.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScalingFactor()));
+                FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScaleFactor()));
         }
 
         String columns = "[align center]";
@@ -86,7 +86,7 @@ public class BuildingToolTip extends JToolTip {
 
         JLabel buildingName = new JLabel(Messages.getName(building));
         buildingName.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.SMALLER, Font.BOLD, lib.getScalingFactor()));
+            FontLibrary.FontSize.SMALLER, Font.BOLD, lib.getScaleFactor()));
         add(buildingName, "span");
 
         ProductionInfo info = building.getProductionInfo();

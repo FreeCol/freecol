@@ -277,7 +277,7 @@ public class InGameMenuBar extends FreeColMenuBar {
                         freeColClient.getGame().getTurn().getLabel()));
             Rectangle2D displayStringBounds
                 = g2d.getFontMetrics().getStringBounds(displayString, g);
-            int y = Math.round(12f*freeColClient.getGUI().getImageLibrary().getScalingFactor())
+            int y = Math.round(12f*freeColClient.getGUI().getImageLibrary().getScaleFactor())
                   + 3 + getInsets().top;
             g2d.drawString(displayString, getWidth() - 10 - (int) displayStringBounds.getWidth(), y);
         }

@@ -143,11 +143,11 @@ public final class ImageLibrary {
 
 
     /**
-     * The scaling factor used when creating this
+     * The scale factor used when creating this
      * <code>ImageLibrary</code>.  The value <code>1</code> is used if
      * this object is not a result of a scaling operation.
      */
-    private final float scalingFactor;
+    private final float scaleFactor;
 
     private final HashMap<String,BufferedImage> stringImageCache;
 
@@ -168,11 +168,11 @@ public final class ImageLibrary {
      * but this gets multiplied for tiny 0.25(rarely, candidate for removal),
      * smaller 0.5, small 0.75 and normal 1.0 image retrieval methods.
      * 
-     * @param scalingFactor The factor used when scaling. 2 is twice
+     * @param scaleFactor The factor used when scaling. 2 is twice
      *      the size of the original images and 0.5 is half.
      */
-    public ImageLibrary(float scalingFactor) {
-        this.scalingFactor = scalingFactor;
+    public ImageLibrary(float scaleFactor) {
+        this.scaleFactor = scaleFactor;
         stringImageCache = new HashMap<>();
     }
 
@@ -183,8 +183,8 @@ public final class ImageLibrary {
      * this object.
      * @return The scaling factor of this ImageLibrary.
      */
-    public float getScalingFactor() {
-        return scalingFactor;
+    public float getScaleFactor() {
+        return scaleFactor;
     }
 
     /**
@@ -246,7 +246,7 @@ public final class ImageLibrary {
     public BufferedImage getBeachCornerImage(int index, int x, int y) {
         return ResourceManager.getImage("image.tile.model.tile.beach.corner" + index
                                         + ".r" + ((isEven(x, y)) ? "0" : "1"),
-                                        scalingFactor);
+                                        scaleFactor);
     }
 
     /**
@@ -260,7 +260,7 @@ public final class ImageLibrary {
     public BufferedImage getBeachEdgeImage(int index, int x, int y) {
         return ResourceManager.getImage("image.tile.model.tile.beach.edge" + index
                                         + ".r"+ ((isEven(x, y)) ? "0" : "1"),
-                                        scalingFactor);
+                                        scaleFactor);
     }
 
     /**
@@ -279,7 +279,7 @@ public final class ImageLibrary {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
         return ResourceManager.getImage("image.tile." + key + ".border." + direction
                                         + ".r" + ((isEven(x, y)) ?  "0" : "1")
-                                        , scalingFactor);
+                                        , scaleFactor);
     }
 
     /**
@@ -289,11 +289,11 @@ public final class ImageLibrary {
      * @return The image at the given index.
      */
     public BufferedImage getForestImage(TileType type) {
-        return getForestImage(type, scalingFactor);
+        return getForestImage(type, scaleFactor);
     }
 
     public BufferedImage getForestImage(TileType type, TileImprovementStyle riverStyle) {
-        return getForestImage(type, riverStyle, scalingFactor);
+        return getForestImage(type, riverStyle, scaleFactor);
     }
 
     public static BufferedImage getForestImage(TileType type, float scale) {
@@ -333,7 +333,7 @@ public final class ImageLibrary {
 
     public BufferedImage getSmallBuildableImage(BuildableType buildable, Player player) {
         // FIXME: distinguish national unit types
-        float scale = scalingFactor * 0.75f;
+        float scale = scaleFactor * 0.75f;
         BufferedImage image = (buildable instanceof BuildingType)
             ? ImageLibrary.getBuildingImage(
                 (BuildingType) buildable, player, scale)
@@ -350,12 +350,12 @@ public final class ImageLibrary {
 
     public BufferedImage getSmallBuildingImage(Building building) {
         return getBuildingImage(building.getType(), building.getOwner(),
-            scalingFactor * 0.75f);
+            scaleFactor * 0.75f);
     }
 
     public BufferedImage getBuildingImage(Building building) {
         return getBuildingImage(building.getType(), building.getOwner(),
-            scalingFactor);
+            scaleFactor);
     }
 
     public static BufferedImage getBuildingImage(BuildingType buildingType,
@@ -382,32 +382,32 @@ public final class ImageLibrary {
 
     public BufferedImage getSmallerIconImage(FreeColGameObjectType type) {
         return getMiscImage("image.icon." + type.getId(), new Dimension(
-            Math.round(scalingFactor * (ICON_SIZE.width * 0.5f)),
-            Math.round(scalingFactor * (ICON_SIZE.height * 0.5f))));
+            Math.round(scaleFactor * (ICON_SIZE.width * 0.5f)),
+            Math.round(scaleFactor * (ICON_SIZE.height * 0.5f))));
     }
 
     public BufferedImage getSmallIconImage(FreeColGameObjectType type) {
         return getMiscImage("image.icon." + type.getId(), new Dimension(
-            Math.round(scalingFactor * (ICON_SIZE.width * 0.75f)),
-            Math.round(scalingFactor * (ICON_SIZE.height * 0.75f))));
+            Math.round(scaleFactor * (ICON_SIZE.width * 0.75f)),
+            Math.round(scaleFactor * (ICON_SIZE.height * 0.75f))));
     }
 
     public BufferedImage getIconImage(FreeColGameObjectType type) {
         return getMiscImage("image.icon." + type.getId(), new Dimension(
-            Math.round(scalingFactor * ICON_SIZE.width),
-            Math.round(scalingFactor * ICON_SIZE.height)));
+            Math.round(scaleFactor * ICON_SIZE.width),
+            Math.round(scaleFactor * ICON_SIZE.height)));
     }
 
     public BufferedImage getSmallerMiscIconImage(FreeColGameObjectType type) {
-        return getMiscIconImage(type, scalingFactor * 0.5f);
+        return getMiscIconImage(type, scaleFactor * 0.5f);
     }
 
     public BufferedImage getSmallMiscIconImage(FreeColGameObjectType type) {
-        return getMiscIconImage(type, scalingFactor * 0.75f);
+        return getMiscIconImage(type, scaleFactor * 0.75f);
     }
 
     public BufferedImage getMiscIconImage(FreeColGameObjectType type) {
-        return getMiscIconImage(type, scalingFactor);
+        return getMiscIconImage(type, scaleFactor);
     }
 
     public static BufferedImage getMiscIconImage(FreeColGameObjectType type, float scale) {
@@ -425,7 +425,7 @@ public final class ImageLibrary {
      * @return The image.
      */
     public BufferedImage getMiscImage(String id) {
-        return getMiscImage(id, scalingFactor);
+        return getMiscImage(id, scaleFactor);
     }
 
     public static BufferedImage getMiscImage(String id, float scale) {
@@ -446,7 +446,7 @@ public final class ImageLibrary {
      */
     public BufferedImage getObjectImage(FreeColObject display, float scale) {
         try {
-            final float combinedScale = scalingFactor * scale;
+            final float combinedScale = scaleFactor * scale;
             final Dimension size = new Dimension(
                 Math.round(combinedScale*ICON_SIZE.width),
                 Math.round(combinedScale*ICON_SIZE.height));
@@ -510,7 +510,7 @@ public final class ImageLibrary {
      * @return A pseudo-random terrain image.
      */
     public BufferedImage getOverlayImage(Tile tile) {
-        return getOverlayImage(tile.getType(), tile.getId(), scalingFactor);
+        return getOverlayImage(tile.getType(), tile.getId(), scaleFactor);
     }
 
     /**
@@ -533,7 +533,7 @@ public final class ImageLibrary {
     }
 
     public BufferedImage getOverlayImage(Tile tile, Set<String> overlayCache) {
-        return getOverlayImage(tile.getType(), tile.getId(), scalingFactor,
+        return getOverlayImage(tile.getType(), tile.getId(), scaleFactor,
                                overlayCache);
     }
 
@@ -614,7 +614,7 @@ public final class ImageLibrary {
      * @return The image with the given style.
      */
     public BufferedImage getRiverImage(TileImprovementStyle style) {
-        return getRiverImage(style, scalingFactor);
+        return getRiverImage(style, scaleFactor);
     }
 
     /**
@@ -654,11 +654,11 @@ public final class ImageLibrary {
                                     int x, int y) {
         String key = "image.tile.model.tile.delta." + direction
             + (magnitude == 1 ? ".small" : ".large");
-        return ResourceManager.getImage(key, scalingFactor);
+        return ResourceManager.getImage(key, scaleFactor);
     }
 
     public BufferedImage getSmallSettlementImage(Settlement settlement) {
-        return getSettlementImage(settlement, scalingFactor * 0.75f);
+        return getSettlementImage(settlement, scaleFactor * 0.75f);
     }
 
     /**
@@ -668,7 +668,7 @@ public final class ImageLibrary {
      * @return The graphics that will represent the given settlement.
      */
     public BufferedImage getSettlementImage(Settlement settlement) {
-        return getSettlementImage(settlement, scalingFactor);
+        return getSettlementImage(settlement, scaleFactor);
     }
 
     /**
@@ -694,7 +694,7 @@ public final class ImageLibrary {
      * @return The graphics that will represent the given settlement.
      */
     public BufferedImage getSettlementImage(SettlementType settlementType) {
-        return getSettlementImage(settlementType, scalingFactor);
+        return getSettlementImage(settlementType, scaleFactor);
     }
 
     public static BufferedImage getSettlementImage(SettlementType settlementType,
@@ -727,7 +727,7 @@ public final class ImageLibrary {
      * @return The terrain-image at the given index.
      */
     public BufferedImage getTerrainImage(TileType type, int x, int y) {
-        return getTerrainImage(type, x, y, scalingFactor);
+        return getTerrainImage(type, x, y, scaleFactor);
     }
 
     public static BufferedImage getTerrainImage(TileType type, int x, int y, float scale) {
@@ -738,27 +738,27 @@ public final class ImageLibrary {
 
     public BufferedImage getSmallerUnitImage(Unit unit) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
-            unit.hasNativeEthnicity(), false, scalingFactor * 0.5f);
+            unit.hasNativeEthnicity(), false, scaleFactor * 0.5f);
     }
 
     public BufferedImage getSmallUnitImage(Unit unit) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
-            unit.hasNativeEthnicity(), false, scalingFactor * 0.75f);
+            unit.hasNativeEthnicity(), false, scaleFactor * 0.75f);
     }
 
     public BufferedImage getSmallUnitImage(Unit unit, boolean grayscale) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
-            unit.hasNativeEthnicity(), grayscale, scalingFactor * 0.75f);
+            unit.hasNativeEthnicity(), grayscale, scaleFactor * 0.75f);
     }
 
     public BufferedImage getUnitImage(Unit unit) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
-            unit.hasNativeEthnicity(), false, scalingFactor);
+            unit.hasNativeEthnicity(), false, scaleFactor);
     }
 
     public BufferedImage getUnitImage(Unit unit, boolean grayscale) {
         return getUnitImage(unit.getType(), unit.getRole().getId(),
-            unit.hasNativeEthnicity(), grayscale, scalingFactor);
+            unit.hasNativeEthnicity(), grayscale, scaleFactor);
     }
 
     public static BufferedImage getUnitImage(Unit unit, float scale) {
@@ -768,38 +768,38 @@ public final class ImageLibrary {
 
     public BufferedImage getTinyUnitImage(UnitType unitType) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
-            false, false, scalingFactor * 0.25f);
+            false, false, scaleFactor * 0.25f);
     }
 
     public BufferedImage getTinyUnitImage(UnitType unitType, boolean grayscale) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
-            false, grayscale, scalingFactor * 0.25f);
+            false, grayscale, scaleFactor * 0.25f);
     }
 
     public BufferedImage getSmallerUnitImage(UnitType unitType) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
-            false, false, scalingFactor * 0.5f);
+            false, false, scaleFactor * 0.5f);
     }
 
     public BufferedImage getSmallUnitImage(UnitType unitType) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
-            false, false, scalingFactor * 0.75f);
+            false, false, scaleFactor * 0.75f);
     }
 
     public BufferedImage getSmallUnitImage(UnitType unitType, boolean grayscale) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
-            false, grayscale, scalingFactor * 0.75f);
+            false, grayscale, scaleFactor * 0.75f);
     }
 
     public BufferedImage getSmallUnitImage(UnitType unitType, String roleId,
                                    boolean grayscale) {
         return getUnitImage(unitType, roleId,
-            false, grayscale, scalingFactor * 0.75f);
+            false, grayscale, scaleFactor * 0.75f);
     }
 
     public BufferedImage getUnitImage(UnitType unitType) {
         return getUnitImage(unitType, unitType.getDisplayRoleId(),
-            false, false, scalingFactor);
+            false, false, scaleFactor);
     }
 
     public static BufferedImage getUnitImage(UnitType unitType, float scale) {
@@ -1020,9 +1020,9 @@ public final class ImageLibrary {
     private BufferedImage createChip(Graphics2D g, String text, Color border,
                                      Color background, Color foreground) {
         Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
+            FontLibrary.FontSize.TINY, Font.BOLD, scaleFactor);
         FontMetrics fm = g.getFontMetrics(font);
-        int padding = (int)(6 * scalingFactor);
+        int padding = (int)(6 * scaleFactor);
         BufferedImage bi = new BufferedImage(fm.stringWidth(text) + padding,
             fm.getMaxAscent() + fm.getMaxDescent() + padding,
             BufferedImage.TYPE_INT_ARGB);
@@ -1057,9 +1057,9 @@ public final class ImageLibrary {
                                            double amount, Color fill,
                                            Color foreground) {
         Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.TINY, Font.BOLD, scalingFactor);
+            FontLibrary.FontSize.TINY, Font.BOLD, scaleFactor);
         FontMetrics fm = g.getFontMetrics(font);
-        int padding = (int)(6 * scalingFactor);
+        int padding = (int)(6 * scaleFactor);
         BufferedImage bi = new BufferedImage(fm.stringWidth(text) + padding,
             fm.getMaxAscent() + fm.getMaxDescent() + padding,
             BufferedImage.TYPE_INT_ARGB);

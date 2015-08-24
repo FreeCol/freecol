@@ -94,7 +94,7 @@ public final class ColopediaPanel extends FreeColPanel
 
         add(okButton, "newline 20, span, tag ok");
 
-        float scale = getImageLibrary().getScalingFactor();
+        float scale = getImageLibrary().getScaleFactor();
         getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
         tree = buildTree();
 
@@ -140,7 +140,7 @@ public final class ColopediaPanel extends FreeColPanel
                 @Override
                 public Dimension getPreferredSize() {
                     return new Dimension(
-                        (int)(200 * getImageLibrary().getScalingFactor()),
+                        (int)(200 * getImageLibrary().getScaleFactor()),
                         super.getPreferredSize().height);
                 }
             };

@@ -262,7 +262,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
                 Integer.toString(number), getForeground(),
                 FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
                     FontLibrary.FontSize.TINY, Font.BOLD,
-                    lib.getScalingFactor()));
+                    lib.getScaleFactor()));
             g.drawImage(image,
                 (getIcon().getIconWidth() - image.getWidth(null))/2,
                 (getIcon().getIconHeight() - image.getHeight(null))/2, null);

@@ -662,7 +662,7 @@ public final class MapViewer {
             Player owner = freeColClient.getMyPlayer();
             String text = Messages.message(unit.getOccupationLabel(owner, false));
             g.drawImage(lib.getOccupationIndicatorChip(g, unit, text),
-                        (int)(STATE_OFFSET_X * lib.getScalingFactor()),
+                        (int)(STATE_OFFSET_X * lib.getScaleFactor()),
                         0, null);
         }
     }
@@ -754,7 +754,7 @@ public final class MapViewer {
      * @return The current map scale.
      */
     public float getMapScale() {
-        return lib.getScalingFactor();
+        return lib.getScaleFactor();
     }
 
     /**
@@ -846,7 +846,7 @@ public final class MapViewer {
                 / 2 - unitLabel.getWidth() / 2;
             int labelY = tileP.y + tileHeight
                 / 2 - unitLabel.getHeight() / 2
-                - (int) (UNIT_OFFSET * lib.getScalingFactor());
+                - (int) (UNIT_OFFSET * lib.getScaleFactor());
             return new Point(labelX, labelY);
         } else {
             return null;
@@ -1168,15 +1168,15 @@ public final class MapViewer {
     }
 
     boolean isAtMaxMapScale() {
-        return lib.getScalingFactor() == MAP_SCALE_MAX;
+        return lib.getScaleFactor() == MAP_SCALE_MAX;
     }
 
     boolean isAtMinMapScale() {
-        return lib.getScalingFactor() == MAP_SCALE_MIN;
+        return lib.getScaleFactor() == MAP_SCALE_MIN;
     }
 
     void increaseMapScale() {
-        float newScale = lib.getScalingFactor() + MAP_SCALE_STEP;
+        float newScale = lib.getScaleFactor() + MAP_SCALE_STEP;
         if (newScale >= MAP_SCALE_MAX)
             newScale = MAP_SCALE_MAX;
         setImageLibraryAndUpdateData(new ImageLibrary(newScale));
@@ -1184,7 +1184,7 @@ public final class MapViewer {
     }
 
     void decreaseMapScale() {
-        float newScale = lib.getScalingFactor() - MAP_SCALE_STEP;
+        float newScale = lib.getScaleFactor() - MAP_SCALE_STEP;
         if (newScale <= MAP_SCALE_MIN)
             newScale = MAP_SCALE_MIN;
         setImageLibraryAndUpdateData(new ImageLibrary(newScale));
@@ -1481,7 +1481,7 @@ public final class MapViewer {
      */
     private void displayPath(Graphics2D g, PathNode path) {
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, lib.getScalingFactor());
+            FontLibrary.FontSize.TINY, lib.getScaleFactor());
         final boolean debug = FreeColDebugger
             .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
 
@@ -1537,7 +1537,7 @@ public final class MapViewer {
         AffineTransform originTransform = g.getTransform();
         Rectangle clipBounds = g.getClipBounds();
         Map map = freeColClient.getGame().getMap();
-        FontLibrary fontLibrary = new FontLibrary(lib.getScalingFactor());
+        FontLibrary fontLibrary = new FontLibrary(lib.getScaleFactor());
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);
@@ -1822,27 +1822,27 @@ public final class MapViewer {
                         }
 
                         int width = (int)((nameImage.getWidth(null)
-                                * lib.getScalingFactor())
+                                * lib.getScaleFactor())
                             + ((leftImage != null)
                                 ? (leftImage.getWidth(null)
-                                    * lib.getScalingFactor()) + spacing
+                                    * lib.getScaleFactor()) + spacing
                                 : 0)
                             + ((rightImage != null)
                                 ? (rightImage.getWidth(null)
-                                    * lib.getScalingFactor()) + spacing
+                                    * lib.getScaleFactor()) + spacing
                                 : 0));
                         int labelOffset = (tileWidth - width)/2;
                         yOffset -= (nameImage.getHeight(null)
-                            * lib.getScalingFactor())/2;
+                            * lib.getScaleFactor())/2;
                         if (leftImage != null) {
                             g.drawImage(leftImage, labelOffset, yOffset, null);
                             labelOffset += (leftImage.getWidth(null)
-                                * lib.getScalingFactor()) + spacing;
+                                * lib.getScaleFactor()) + spacing;
                         }
                         g.drawImage(nameImage, labelOffset, yOffset, null);
                         if (rightImage != null) {
                             labelOffset += (nameImage.getWidth(null)
-                                * lib.getScalingFactor()) + spacing;
+                                * lib.getScaleFactor()) + spacing;
                             g.drawImage(rightImage, labelOffset, yOffset, null);
                         }
                         break;
@@ -1907,7 +1907,7 @@ public final class MapViewer {
 
         g.setColor(Color.BLACK);
         g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, lib.getScalingFactor()));
+            FontLibrary.FontSize.TINY, lib.getScaleFactor()));
         if (text != null) {
             int b = getBreakingPoint(text);
             if (b == -1) {
@@ -1975,10 +1975,10 @@ public final class MapViewer {
                     Font font = (colony.getPreferredSizeChange() > 0)
                         ? FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
                             FontLibrary.FontSize.SMALLER, Font.BOLD | Font.ITALIC,
-                            lib.getScalingFactor())
+                            lib.getScaleFactor())
                         : FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
                             FontLibrary.FontSize.TINY, Font.BOLD,
-                            lib.getScalingFactor());
+                            lib.getScaleFactor());
                     Image stringImage = lib.getStringImage(g,
                         populationString, theColor, font);
                     displayCenteredImage(g, stringImage, tileWidth, tileHeight);
@@ -1992,8 +1992,8 @@ public final class MapViewer {
                 displayCenteredImage(g, settlementImage, tileWidth, tileHeight);
 
                 Image chip;
-                float xOffset = STATE_OFFSET_X * lib.getScalingFactor();
-                float yOffset = STATE_OFFSET_Y * lib.getScalingFactor();
+                float xOffset = STATE_OFFSET_X * lib.getScaleFactor();
+                float yOffset = STATE_OFFSET_Y * lib.getScaleFactor();
                 final int colonyLabels = freeColClient.getClientOptions()
                     .getInteger(ClientOptions.COLONY_LABELS);
                 if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
@@ -2105,7 +2105,7 @@ public final class MapViewer {
         // Draw an occupation and nation indicator.
         String text = Messages.message(unit.getOccupationLabel(player, false));
         g.drawImage(lib.getOccupationIndicatorChip(g, unit, text),
-                    (int)(STATE_OFFSET_X * lib.getScalingFactor()), 0,
+                    (int)(STATE_OFFSET_X * lib.getScaleFactor()), 0,
                     null);
 
         // Draw one small line for each additional unit (like in civ3).
@@ -2121,9 +2121,9 @@ public final class MapViewer {
             g.setColor(Color.WHITE);
             int unitLinesY = OTHER_UNITS_OFFSET_Y;
             int x1 = (int)((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X)
-                * lib.getScalingFactor());
+                * lib.getScaleFactor());
             int x2 = (int)((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X
-                    + OTHER_UNITS_WIDTH) * lib.getScalingFactor());
+                    + OTHER_UNITS_WIDTH) * lib.getScaleFactor());
             for (int i = 0; i < unitsOnTile && i < MAX_OTHER_UNITS; i++) {
                 g.drawLine(x1, unitLinesY, x2, unitLinesY);
                 unitLinesY += 2;
@@ -2201,7 +2201,7 @@ public final class MapViewer {
                 if (ResourceManager.hasImageResource(key)) {
                     // Has its own Overlay Image in Misc, use it
                     Image overlay = ResourceManager.getImage(key,
-                        lib.getScalingFactor());
+                        lib.getScaleFactor());
                     g.drawImage(overlay, 0, 0, null);
                 }
             }
@@ -2305,7 +2305,7 @@ public final class MapViewer {
     private Point calculateUnitImagePositionInTile(Image unitImage) {
         int unitX = (tileWidth - unitImage.getWidth(null)) / 2;
         int unitY = (tileHeight - unitImage.getHeight(null)) / 2 -
-                    (int) (UNIT_OFFSET * lib.getScalingFactor());
+                    (int) (UNIT_OFFSET * lib.getScaleFactor());
 
         return new Point(unitX, unitY);
     }
@@ -2728,7 +2728,7 @@ public final class MapViewer {
         borderPoints.put(Direction.W,  new Point2D.Float(dx + ddx, halfHeight + ddy));
 
         borderStroke = new BasicStroke(dy);
-        gridStroke = new BasicStroke(lib.getScalingFactor());
+        gridStroke = new BasicStroke(lib.getScaleFactor());
 
         fog.reset();
         fog.moveTo(halfWidth, 0);

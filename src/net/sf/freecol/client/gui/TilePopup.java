@@ -482,7 +482,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.TINY, Font.BOLD,
-            gui.getImageLibrary().getScalingFactor()));
+            gui.getImageLibrary().getScaleFactor()));
         menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {
@@ -533,7 +533,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = Utility.localizedMenuItem(name);
         menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.TINY, Font.BOLD,
-            gui.getImageLibrary().getScalingFactor()));
+            gui.getImageLibrary().getScaleFactor()));
         menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {
@@ -568,7 +568,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = Utility.localizedMenuItem(name);
         menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.TINY, Font.BOLD,
-            gui.getImageLibrary().getScalingFactor()));
+            gui.getImageLibrary().getScaleFactor()));
         menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {

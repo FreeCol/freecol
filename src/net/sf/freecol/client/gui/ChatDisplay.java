@@ -93,7 +93,7 @@ public class ChatDisplay {
         if (getMessageCount() > 0) {
             // Don't edit the list of messages while I'm drawing them.
             Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.TINY, lib.getScalingFactor());
+                FontLibrary.FontSize.TINY, lib.getScaleFactor());
             GUIMessage message = getMessage(0);
             Image si = lib.getStringImage(
                 g, message.getMessage(), message.getColor(), font);
