@@ -30,7 +30,6 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;

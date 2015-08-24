@@ -41,7 +41,6 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Stance;
-import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;

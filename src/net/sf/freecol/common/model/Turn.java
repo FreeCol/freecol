@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.i18n.NameCache;
-import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**

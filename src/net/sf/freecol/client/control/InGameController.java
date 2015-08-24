@@ -21,7 +21,6 @@ package net.sf.freecol.client.control;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,7 +62,6 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;

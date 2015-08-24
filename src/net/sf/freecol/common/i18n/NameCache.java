@@ -32,8 +32,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+
 import static net.sf.freecol.common.util.RandomUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 

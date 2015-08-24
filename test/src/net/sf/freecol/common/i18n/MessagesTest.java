@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Role;
-import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitLabelType;
 import net.sf.freecol.common.model.UnitType;

@@ -40,7 +40,6 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceMapper;
 import net.sf.freecol.common.resources.ResourceMapping;

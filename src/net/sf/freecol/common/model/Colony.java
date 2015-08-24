@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
@@ -38,7 +37,9 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Occupation;
 import net.sf.freecol.common.model.Stance;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
+
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 

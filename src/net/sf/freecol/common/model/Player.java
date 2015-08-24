@@ -41,11 +41,11 @@ import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.NationState;
-import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.option.OptionGroup;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.RandomUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
+
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;

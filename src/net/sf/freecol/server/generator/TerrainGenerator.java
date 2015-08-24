@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.generator;
 
-import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -46,7 +45,9 @@ import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
+
 import static net.sf.freecol.common.util.RandomUtils.*;
+
 import net.sf.freecol.server.model.ServerRegion;
 
 

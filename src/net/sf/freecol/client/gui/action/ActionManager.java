@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.util.Iterator;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;

@@ -24,10 +24,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.debug.FreeColDebugger;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -46,7 +44,6 @@ import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;

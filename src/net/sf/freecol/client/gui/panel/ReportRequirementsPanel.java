@@ -32,6 +32,7 @@ import javax.swing.JButton;
 import javax.swing.JTextPane;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -43,7 +44,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.TileImprovementSuggestion;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;

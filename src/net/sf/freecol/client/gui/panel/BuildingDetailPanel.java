@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -53,7 +52,6 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
