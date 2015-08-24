@@ -255,7 +255,7 @@ public final class ImageLibrary {
     public BufferedImage getBeachCornerImage(int index, int x, int y) {
         return ResourceManager.getImage("image.tile.model.tile.beach.corner" + index
                                         + ".r" + ((isEven(x, y)) ? "0" : "1"),
-                                        scaleFactor);
+                                        scaleDimension(TILE_SIZE));
     }
 
     /**
@@ -269,7 +269,7 @@ public final class ImageLibrary {
     public BufferedImage getBeachEdgeImage(int index, int x, int y) {
         return ResourceManager.getImage("image.tile.model.tile.beach.edge" + index
                                         + ".r"+ ((isEven(x, y)) ? "0" : "1"),
-                                        scaleFactor);
+                                        scaleDimension(TILE_SIZE));
     }
 
     /**
@@ -287,8 +287,8 @@ public final class ImageLibrary {
                                 int x, int y) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
         return ResourceManager.getImage("image.tile." + key + ".border." + direction
-                                        + ".r" + ((isEven(x, y)) ?  "0" : "1")
-                                        , scaleFactor);
+                                        + ".r" + ((isEven(x, y)) ?  "0" : "1"),
+                                        scaleDimension(TILE_SIZE));
     }
 
     /**
@@ -306,10 +306,12 @@ public final class ImageLibrary {
     }
 
     public static BufferedImage getForestImage(TileType type, float scale) {
-        return ResourceManager.getImage("image.tileforest." + type.getId(), scale);
+        return ResourceManager.getImage("image.tileforest." + type.getId(),
+                                        scaleDimension(TILE_FOREST_SIZE, scale));
     }
 
     public static BufferedImage getForestImage(TileType type, TileImprovementStyle riverStyle, float scale) {
+        Dimension size = scaleDimension(TILE_FOREST_SIZE, scale);
         if (riverStyle != null) {
             String key = "image.tileforest." + type.getId() + ".s" + riverStyle.getMask();
             // @compat 0.10.6
@@ -321,9 +323,9 @@ public final class ImageLibrary {
             // Consider keeping the fallback, as its safer to have one.
             if (ResourceManager.hasImageResource(key))
             // end @compat
-                return ResourceManager.getImage(key, scale);
+                return ResourceManager.getImage(key, size);
         }
-        return ResourceManager.getImage("image.tileforest." + type.getId(), scale);
+        return ResourceManager.getImage("image.tileforest." + type.getId(), size);
     }
 
     /**
@@ -559,11 +561,13 @@ public final class ImageLibrary {
             case 0:
                 return null;
             case 1:
-                return ResourceManager.getImage(keys.get(0), scale);
+                return ResourceManager.getImage(keys.get(0),
+                    scaleDimension(TILE_OVERLAY_SIZE, scale));
             default:
                 Collections.sort(keys);
                 return ResourceManager.getImage(
-                    keys.get(Math.abs(id.hashCode() % count)), scale);
+                    keys.get(Math.abs(id.hashCode() % count)),
+                    scaleDimension(TILE_OVERLAY_SIZE, scale));
         }
     }
 
@@ -640,7 +644,9 @@ public final class ImageLibrary {
      * @return The image with the given style.
      */
     public static BufferedImage getRiverImage(String style, float scale) {
-        return ResourceManager.getImage("image.tile.model.improvement.river.s" + style, scale);
+        return ResourceManager.getImage(
+            "image.tile.model.improvement.river.s" + style,
+            scaleDimension(TILE_SIZE, scale));
     }
 
     /**
@@ -658,7 +664,7 @@ public final class ImageLibrary {
                                     int x, int y) {
         String key = "image.tile.model.tile.delta." + direction
             + (magnitude == 1 ? ".small" : ".large");
-        return ResourceManager.getImage(key, scaleFactor);
+        return ResourceManager.getImage(key, scaleDimension(TILE_SIZE));
     }
 
     public BufferedImage getSmallSettlementImage(Settlement settlement) {
@@ -708,19 +714,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Get a tile size for displaying the colony tiles.
-     * 
-     * @param tile The <code>Tile</code> to get the size for.
-     * @return The tile size.
-     */
-    public Dimension calculateTileSize(Tile tile) {
-        final TileType tileType = tile.getType();
-        final BufferedImage image = getTerrainImage(tileType,
-            tile.getX(), tile.getY());
-        return new Dimension(image.getWidth(), image.getHeight());
-    }
-
-    /**
      * Returns the terrain-image for the given type.
      *
      * @param type The type of the terrain-image to return.
@@ -737,7 +730,7 @@ public final class ImageLibrary {
     public static BufferedImage getTerrainImage(TileType type, int x, int y, float scale) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
         return ResourceManager.getImage("image.tile." + key + ".center.r"
-            + (isEven(x, y) ? "0" : "1"), scale);
+            + (isEven(x, y) ? "0" : "1"), scaleDimension(TILE_SIZE, scale));
     }
 
     public BufferedImage getSmallerUnitImage(Unit unit) {

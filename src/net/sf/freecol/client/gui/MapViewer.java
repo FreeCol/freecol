@@ -470,7 +470,7 @@ public final class MapViewer {
                     compoundHeight = tmpHeight;
             }
             if (tileType.isForested()) {
-                tmpHeight = lib.getForestImage(tileType).getHeight(null);
+                tmpHeight = lib.scaleDimension(ImageLibrary.TILE_FOREST_SIZE).height;
                 if(tmpHeight > compoundHeight)
                     compoundHeight = tmpHeight;
             }
@@ -587,7 +587,7 @@ public final class MapViewer {
     public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
         final Tile tile = colony.getTile();
-        Dimension tileSize = lib.calculateTileSize(tile);
+        Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 if (tiles[x][y] != null) {
@@ -2201,7 +2201,7 @@ public final class MapViewer {
                 if (ResourceManager.hasImageResource(key)) {
                     // Has its own Overlay Image in Misc, use it
                     Image overlay = ResourceManager.getImage(key,
-                        lib.getScaleFactor());
+                        lib.scaleDimension(ImageLibrary.TILE_SIZE));
                     g.drawImage(overlay, 0, 0, null);
                 }
             }
