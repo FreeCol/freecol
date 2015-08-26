@@ -125,7 +125,8 @@ public class ModifierFormat {
                 } else if (scope.getAbilityId() != null) {
                     key = scope.getAbilityId();
                 } else if (scope.getMethodName() != null) {
-                    key = "model.scope." + scope.getMethodName();
+                    key = "modifierFormat.scopeMethod."
+                        + scope.getMethodName();
                 }
                 if (key != null) {
                     label += (scope.isMatchNegated() ? " !" : " ")
