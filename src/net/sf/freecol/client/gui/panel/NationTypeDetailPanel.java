@@ -185,7 +185,7 @@ public class NationTypeDetailPanel
         JLabel name = Utility.localizedHeaderLabel(nationType, FontLibrary.FontSize.SMALL);
         panel.add(name, "span, align center, wrap 40");
 
-        panel.add(Utility.localizedLabel("colopedia.nationType.aggressionLevel"));
+        panel.add(Utility.localizedLabel("colopedia.nationType.aggression"));
         panel.add(Utility.localizedLabel("colopedia.nationType."
                 + nationType.getAggression().getKey()));
 
