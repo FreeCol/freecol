@@ -657,7 +657,7 @@ public final class ColonyPanel extends PortPanel
                     .template(goodsType)
                     .addAmount("%amount%", producing));
                 sb.append(unit.getDescription())
-                    .append(" ").append(Messages.message("producing.name"))
+                    .append(" ").append(Messages.message("colonyPanel.producing"))
                     .append(" ").append(producing)
                     .append(" ").append(nominative);
             } else if (workingInBuilding != null && goodsType != null) {
