@@ -724,7 +724,7 @@ public final class ColonyPanel extends PortPanel
             } else if (!unit.isOnCarrier()) {
                 unitIcon = new ImageIcon(lib.getSmallerUnitImage(unit));
                 String menuTitle = unit.getDescription()
-                    + " " + Messages.message("colonyPanel.outsideOfColony");
+                    + " " + Messages.message("colonyPanel.outsideColony");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
                     @Override
