@@ -41,6 +41,8 @@ public class AbstractCanvasListener {
     /** The enclosing client. */
     protected final FreeColClient freeColClient;
 
+    protected final Canvas canvas;
+
     /** The map viewer to scroll. */
     protected final MapViewer mapViewer;
 
@@ -53,8 +55,9 @@ public class AbstractCanvasListener {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public AbstractCanvasListener(FreeColClient freeColClient, MapViewer mapViewer) {
+    public AbstractCanvasListener(FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer) {
         this.freeColClient = freeColClient;
+        this.canvas = canvas;
         this.mapViewer = mapViewer;
         this.scrollThread = null;
     }

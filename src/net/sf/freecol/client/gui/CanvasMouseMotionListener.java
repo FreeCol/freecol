@@ -40,8 +40,6 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
     /** Number of pixels that must be moved before a goto is enabled. */
     private static final int DRAG_THRESHOLD = 16;
 
-    private Canvas canvas;
-
     /**
      * Temporary variable for checking if we need to recalculate the
      * path when dragging units.
@@ -55,8 +53,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public CanvasMouseMotionListener(FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer) {
-        super(freeColClient, mapViewer);
-        this.canvas = canvas;
+        super(freeColClient, canvas, mapViewer);
     }
 
 

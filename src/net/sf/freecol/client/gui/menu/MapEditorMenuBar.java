@@ -31,6 +31,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
@@ -63,11 +64,12 @@ public class MapEditorMenuBar extends FreeColMenuBar {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public MapEditorMenuBar(final FreeColClient freeColClient, MapViewer mapViewer) {
+    public MapEditorMenuBar(final FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer) {
         super(freeColClient);
 
         // Add a mouse listener so that autoscrolling can happen in this menubar
-        this.addMouseMotionListener(new MenuMouseMotionListener(freeColClient, mapViewer));
+        this.addMouseMotionListener(
+            new MenuMouseMotionListener(freeColClient, canvas, mapViewer));
         reset();
     }
 

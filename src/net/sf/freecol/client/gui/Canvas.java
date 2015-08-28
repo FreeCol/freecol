@@ -327,7 +327,7 @@ public final class Canvas extends JDesktopPane {
         // We may need to reset the zoom value to the default value
         gui.resetMapZoom();
 
-        frame.setJMenuBar(new MapEditorMenuBar(freeColClient, mapViewer));
+        frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this, mapViewer));
         showMapEditorTransformPanel();
 
         CanvasMapEditorMouseListener listener
@@ -353,7 +353,7 @@ public final class Canvas extends JDesktopPane {
     void initializeInGame() {
         if (frame == null) return;
 
-        frame.setJMenuBar(new InGameMenuBar(freeColClient, mapViewer));
+        frame.setJMenuBar(new InGameMenuBar(freeColClient, this, mapViewer));
         frame.paintAll(getGraphics());
     }
 

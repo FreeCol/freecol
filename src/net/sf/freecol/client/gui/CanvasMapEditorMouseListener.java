@@ -48,8 +48,6 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
 
     private static final Logger logger = Logger.getLogger(CanvasMapEditorMouseListener.class.getName());
 
-    private final Canvas canvas;
-
     private Point endPoint;
     private Point startPoint;
 
@@ -60,9 +58,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      * @param canvas The component this object gets created for.
      */
     public CanvasMapEditorMouseListener(FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer) {
-        super(freeColClient, mapViewer);
-
-        this.canvas = canvas;
+        super(freeColClient, canvas, mapViewer);
     }
 
 

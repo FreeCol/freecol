@@ -30,6 +30,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
@@ -63,7 +64,7 @@ public class InGameMenuBar extends FreeColMenuBar {
      *
      * @param f The main controller.
      */
-    public InGameMenuBar(FreeColClient f, MapViewer mapViewer) {
+    public InGameMenuBar(FreeColClient f, Canvas canvas, MapViewer mapViewer) {
         // FIXME: FreeColClient should not have to be passed in to
         // this class.  This is only a menu bar, it doesn't need a
         // reference to the main controller.  The only reason it has
@@ -83,7 +84,8 @@ public class InGameMenuBar extends FreeColMenuBar {
 
         // Add a mouse listener so that autoscrolling can happen in
         // this menubar
-        this.addMouseMotionListener(new MenuMouseMotionListener(f, mapViewer));
+        this.addMouseMotionListener(
+            new MenuMouseMotionListener(f, canvas, mapViewer));
         
         reset();
     }
