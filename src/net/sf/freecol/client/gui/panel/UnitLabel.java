@@ -93,7 +93,7 @@ public final class UnitLabel extends JLabel
 
     private boolean ignoreLocation;
     
-    private boolean useMapImageLibrary;
+    private boolean useTileImageLibrary;
 
 
     /**
@@ -140,12 +140,12 @@ public final class UnitLabel extends JLabel
      * @param isSmall The image will be smaller if set to <code>true</code>.
      * @param ignoreLocation The image will not include production or state
      *            information if set to <code>true</code>.
-     * @param useMapImageLibrary If false use ImageLibrary in gui.
-     *              If true use ImageLibrary in gui.getColonyTileMapViewer().
+     * @param useTileImageLibrary If false use ImageLibrary in GUI.
+     *              If true use tileImageLibrary in SwingGUI.
      */
     public UnitLabel(FreeColClient freeColClient, Unit unit,
                      boolean isSmall, boolean ignoreLocation,
-                     boolean useMapImageLibrary) {
+                     boolean useTileImageLibrary) {
         this.freeColClient = freeColClient;
         this.gui = (SwingGUI)freeColClient.getGUI();
         this.unit = unit;
@@ -153,7 +153,7 @@ public final class UnitLabel extends JLabel
         selected = false;
         this.isSmall = isSmall;
         this.ignoreLocation = ignoreLocation;
-        this.useMapImageLibrary = useMapImageLibrary;
+        this.useTileImageLibrary = useTileImageLibrary;
 
         updateIcon();
     }
@@ -194,7 +194,7 @@ public final class UnitLabel extends JLabel
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
     public void setSmall(boolean isSmall) {
-        final ImageLibrary lib = useMapImageLibrary
+        final ImageLibrary lib = useTileImageLibrary
             ? gui.getTileImageLibrary()
             : gui.getImageLibrary();
         if (isSmall) {
@@ -261,7 +261,7 @@ public final class UnitLabel extends JLabel
     @Override
     public void paintComponent(Graphics g) {
         final Player player = freeColClient.getMyPlayer();
-        final ImageLibrary lib = useMapImageLibrary
+        final ImageLibrary lib = useTileImageLibrary
             ? gui.getTileImageLibrary()
             : gui.getImageLibrary();
         if (ignoreLocation || selected

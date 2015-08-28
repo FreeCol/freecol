@@ -1923,8 +1923,8 @@ public final class ColonyPanel extends PortPanel
 
     /**
      * A panel that displays the tiles in the immediate area around the colony.
-     * TilesPanel class must use the ImageLibrary inside
-     * getGUI().getColonyTileMapViewer() for everything.
+     * TilesPanel class must use the ImageLibrary inside SwingGUI.tileMapViewer
+     * for everything.
      */
     public final class TilesPanel extends JPanel {
 
