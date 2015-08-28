@@ -457,56 +457,6 @@ public final class MapViewer {
 
     }
 
-
-    private int calculateHeightForTileWithOverlayAndForest(
-            TileType tileType, int height, Image overlayImage) {
-        int compoundHeight = height;
-        if (tileType != null) {
-            int tmpHeight;
-            if (overlayImage != null) {
-                tmpHeight = overlayImage.getHeight(null);
-                if(tmpHeight > compoundHeight)
-                    compoundHeight = tmpHeight;
-            }
-            if (tileType.isForested()) {
-                tmpHeight = lib.scaleDimension(ImageLibrary.TILE_FOREST_SIZE).height;
-                if(tmpHeight > compoundHeight)
-                    compoundHeight = tmpHeight;
-            }
-        }
-        return compoundHeight;
-    }
-
-    /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Draws the terrain and
-     * improvements.  Doesn't draw settlements, lost city rumours, fog
-     * of war, optional values neither units.
-     *
-     * The same as calling <code>displayTile(g, map, tile, x, y, true);</code>.
-     *
-     * @param tile The Tile to draw.
-     * @return The image.
-     */
-    public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
-        final TileType tileType = tile.getType();
-        final Image terrain = lib.getTerrainImage(
-            tileType, tile.getX(), tile.getY());
-        Image overlayImage = lib.getOverlayImage(tile);
-        final int width = terrain.getWidth(null);
-        final int height = terrain.getHeight(null);
-        final int compoundHeight = calculateHeightForTileWithOverlayAndForest(
-            tileType, height, overlayImage);
-        BufferedImage image = new BufferedImage(
-            width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = image.createGraphics();
-        g.translate(0, compoundHeight - height);
-        displayTileWithBeachAndBorder(g, lib, tile, true);
-        displayTileItems(g, tile, overlayImage);
-        g.dispose();
-        return image;
-    }
-
     /**
      * Returns the scaled terrain-image for a terrain type (and position 0, 0).
      *
@@ -514,34 +464,65 @@ public final class MapViewer {
      * @param scale The scale of the terrain image to return.
      * @return The terrain-image
      */
-    public static Image createTileImageWithOverlayAndForest(TileType type, float scale) {
-        Image terrainImage = ImageLibrary.getTerrainImage(type, 0, 0, scale);
-        Image overlayImage = ImageLibrary.getOverlayImage(type, type.getId(), scale);
-        Image forestImage = type.isForested() ? ImageLibrary.getForestImage(type, scale) : null;
+    public static BufferedImage createTileImageWithOverlayAndForest(
+            TileType type, float scale) {
+        BufferedImage terrainImage = ImageLibrary.getTerrainImage(
+            type, 0, 0, scale);
+        BufferedImage overlayImage = ImageLibrary.getOverlayImage(
+            type, type.getId(), scale);
+        BufferedImage forestImage = type.isForested()
+            ? ImageLibrary.getForestImage(type, scale)
+            : null;
         if (overlayImage == null && forestImage == null) {
             return terrainImage;
         } else {
-            int width = terrainImage.getWidth(null);
-            int height = terrainImage.getHeight(null);
+            int width = terrainImage.getWidth();
+            int height = terrainImage.getHeight();
             if (overlayImage != null) {
-                height = Math.max(height, overlayImage.getHeight(null));
+                height = Math.max(height, overlayImage.getHeight());
             }
             if (forestImage != null) {
-                height = Math.max(height, forestImage.getHeight(null));
+                height = Math.max(height, forestImage.getHeight());
             }
             BufferedImage compositeImage = new BufferedImage(width, height,
                 BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = compositeImage.createGraphics();
-            g.drawImage(terrainImage, 0, height - terrainImage.getHeight(null), null);
+            g.drawImage(terrainImage, 0, height - terrainImage.getHeight(), null);
             if (overlayImage != null) {
-                g.drawImage(overlayImage, 0, height - overlayImage.getHeight(null), null);
+                g.drawImage(overlayImage, 0, height - overlayImage.getHeight(), null);
             }
             if (forestImage != null) {
-                g.drawImage(forestImage, 0, height - forestImage.getHeight(null), null);
+                g.drawImage(forestImage, 0, height - forestImage.getHeight(), null);
             }
             g.dispose();
             return compositeImage;
         }
+    }
+
+    /**
+     * Create a <code>BufferedImage</code> and draw a <code>Tile</code> on it.
+     * Draws the terrain and improvements.
+     *
+     * @param tile The Tile to draw.
+     * @return The image.
+     */
+    public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
+        final TileType tileType = tile.getType();
+        Dimension terrainTileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+        BufferedImage overlayImage = lib.getOverlayImage(tile);
+        final int compoundHeight = (overlayImage != null)
+            ? overlayImage.getHeight()
+            : tileType.isForested()
+                ? lib.scaleDimension(ImageLibrary.TILE_FOREST_SIZE).height
+                : terrainTileSize.height;
+        BufferedImage image = new BufferedImage(
+            terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        g.translate(0, compoundHeight - terrainTileSize.height);
+        displayTileWithBeachAndBorder(g, lib, tile, true);
+        displayTileItems(g, tile, overlayImage);
+        g.dispose();
+        return image;
     }
 
     /**
@@ -558,17 +539,17 @@ public final class MapViewer {
      */
     public BufferedImage createColonyTileImage(Tile tile, Colony colony) {
         final TileType tileType = tile.getType();
-        final Image terrain = lib.getTerrainImage(
-            tileType, tile.getX(), tile.getY());
-        final int width = terrain.getWidth(null);
-        final int height = terrain.getHeight(null);
-        Image overlayImage = lib.getOverlayImage(tile);
-        final int compoundHeight = calculateHeightForTileWithOverlayAndForest(
-            tileType, height, overlayImage);
+        Dimension terrainTileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+        BufferedImage overlayImage = lib.getOverlayImage(tile);
+        final int compoundHeight = (overlayImage != null)
+            ? overlayImage.getHeight()
+            : tileType.isForested()
+                ? lib.scaleDimension(ImageLibrary.TILE_FOREST_SIZE).height
+                : terrainTileSize.height;
         BufferedImage image = new BufferedImage(
-            width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
+            terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
-        g.translate(0, compoundHeight - height);
+        g.translate(0, compoundHeight - terrainTileSize.height);
         displayColonyTile(g, tile, colony, overlayImage);
         g.dispose();
         return image;
@@ -585,7 +566,6 @@ public final class MapViewer {
      */
     public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
-        final Tile tile = colony.getTile();
         Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
