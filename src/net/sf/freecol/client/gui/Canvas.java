@@ -73,6 +73,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColFileFilter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
@@ -202,6 +203,8 @@ public final class Canvas extends JDesktopPane {
 
     private final MapViewer mapViewer;
 
+    private Point gotoDragPoint;
+
     private GrayLayer greyLayer;
 
     private final ServerListPanel serverListPanel;
@@ -327,11 +330,11 @@ public final class Canvas extends JDesktopPane {
         // We may need to reset the zoom value to the default value
         gui.resetMapZoom();
 
-        frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this, mapViewer));
+        frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
         showMapEditorTransformPanel();
 
         CanvasMapEditorMouseListener listener
-            = new CanvasMapEditorMouseListener(freeColClient, this, mapViewer);
+            = new CanvasMapEditorMouseListener(freeColClient, this);
         addMouseListener(listener);
         addMouseMotionListener(listener);
     }
@@ -353,7 +356,7 @@ public final class Canvas extends JDesktopPane {
     void initializeInGame() {
         if (frame == null) return;
 
-        frame.setJMenuBar(new InGameMenuBar(freeColClient, this, mapViewer));
+        frame.setJMenuBar(new InGameMenuBar(freeColClient, this));
         frame.paintAll(getGraphics());
     }
 
@@ -375,6 +378,56 @@ public final class Canvas extends JDesktopPane {
         if (frame != null && frame.getJMenuBar() != null) {
             ((FreeColMenuBar)frame.getJMenuBar()).update();
         }
+    }
+
+    /**
+     * Scroll the map in the given direction.
+     *
+     * @param direction The <code>Direction</code> to scroll in.
+     * @return True if scrolling occurred.
+     */
+    boolean scrollMap(Direction direction) {
+        return mapViewer.scrollMap(direction);
+    }
+
+    /**
+     * Converts the given screen coordinates to Map coordinates.
+     * It checks to see to which Tile the given pixel 'belongs'.
+     *
+     * @param x The x-coordinate in pixels.
+     * @param y The y-coordinate in pixels.
+     * @return The Tile that is located at the given position on the screen.
+     */
+    Tile convertToMapTile(int x, int y) {
+        return mapViewer.convertToMapTile(x, y);
+    }
+
+    /**
+     * Gets the active unit.
+     *
+     * @return The <code>Unit</code>.
+     */
+    Unit getActiveUnit() {
+        return mapViewer.getActiveUnit();
+    }
+
+    /**
+     * Gets the point at which the map was clicked for a drag.
+     *
+     * @return The Point where the mouse was initially clicked.
+     */
+    Point getDragPoint() {
+        return gotoDragPoint;
+    }
+
+    /**
+     * Sets the point at which the map was clicked for a drag.
+     *
+     * @param x The mouse's x position.
+     * @param y The mouse's y position.
+     */
+    void setDragPoint(int x, int y) {
+        gotoDragPoint = new Point(x, y);
     }
 
     /**
@@ -1296,7 +1349,7 @@ public final class Canvas extends JDesktopPane {
     void setupMouseListeners() {
         addMouseListener(new CanvasMouseListener(freeColClient, this,
                                                  mapViewer));
-        addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, this, mapViewer));
+        addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, this));
     }
 
     /**

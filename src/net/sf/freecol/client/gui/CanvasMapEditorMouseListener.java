@@ -32,8 +32,8 @@ import javax.swing.JComponent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
-import net.sf.freecol.client.gui.panel.RiverStyleDialog;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.TileTypeTransform;
+import net.sf.freecol.client.gui.panel.RiverStyleDialog;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -57,8 +57,8 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      *
      * @param canvas The component this object gets created for.
      */
-    public CanvasMapEditorMouseListener(FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer) {
-        super(freeColClient, canvas, mapViewer);
+    public CanvasMapEditorMouseListener(FreeColClient freeColClient, Canvas canvas) {
+        super(freeColClient, canvas);
     }
 
 
@@ -89,10 +89,9 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      */
     private void drawBox(JComponent component,
                          Point startPoint, Point endPoint) {
-        final MapEditorController controller;
         if (startPoint == null || endPoint == null
             || startPoint.distance(endPoint) == 0
-            || (controller = freeColClient.getMapEditorController()) == null)
+            || freeColClient.getMapEditorController() == null)
             return;
 
         Graphics2D graphics = (Graphics2D)component.getGraphics();
@@ -116,7 +115,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
 
         try {
             if (e.getClickCount() > 1) {
-                mapViewer.convertToMapTile(e.getX(), e.getY());
+                canvas.convertToMapTile(e.getX(), e.getY());
             } else {
                 canvas.requestFocus();
             }
@@ -134,7 +133,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
 
         try {
             if (e.getButton() == MouseEvent.BUTTON1) {
-                Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
+                Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
                 if (tile != null) getGUI().setSelectedTile(tile);
                 startPoint = endPoint = null;
 
@@ -146,7 +145,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
             } else if (e.getButton() == MouseEvent.BUTTON3
                 || e.isPopupTrigger()) {
                 startPoint = e.getPoint();
-                Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
+                Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
                 if (tile != null) {
                     if (tile.hasRiver()) {
                         TileImprovement river = tile.getRiver();
@@ -187,9 +186,9 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         endPoint = e.getPoint();
         if (startPoint == null) startPoint = endPoint;
         drawBox(component, startPoint, endPoint);
-        Tile start = mapViewer.convertToMapTile(startPoint.x, startPoint.y);
+        Tile start = canvas.convertToMapTile(startPoint.x, startPoint.y);
         Tile end = (startPoint == endPoint) ? start
-            : mapViewer.convertToMapTile(endPoint.x, endPoint.y);
+            : canvas.convertToMapTile(endPoint.x, endPoint.y);
 
         // edit 2 more conditions in if statement.  we need to
         // check for coordinator of X and Y if (x,y) outside of

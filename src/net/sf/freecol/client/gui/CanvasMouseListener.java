@@ -80,7 +80,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
     public void mouseClicked(MouseEvent e) {
         try {
             if (e.getClickCount() > 1) {
-                Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
+                Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
                 Colony colony = tile.getColony();
                 if (colony != null) {
                     if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
@@ -128,19 +128,19 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
 
         int me = e.getButton();
         if (e.isPopupTrigger()) me = MouseEvent.BUTTON3;
-        Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
+        Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
 
         switch (me) {
         case MouseEvent.BUTTON1:
             // Record initial click point for purposes of dragging
-            mapViewer.setDragPoint(e.getX(), e.getY());
+            canvas.setDragPoint(e.getX(), e.getY());
             if (canvas.isGotoStarted()) {
                 PathNode path = canvas.getGotoPath();
                 if (path != null) {
                     canvas.stopGoto();
                     // Move the unit
                     freeColClient.getInGameController()
-                        .goToTile(mapViewer.getActiveUnit(),
+                        .goToTile(canvas.getActiveUnit(),
                             path.getLastNode().getTile());
                 }
             } else if (doubleClickTimer.isRunning()) {
@@ -154,7 +154,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
             break;
         case MouseEvent.BUTTON2:
             if (tile != null) {
-                Unit unit = mapViewer.getActiveUnit();
+                Unit unit = canvas.getActiveUnit();
                 if (unit != null && unit.getTile() != tile) {
                     PathNode dragPath = unit.findPath(tile);
                     canvas.startGoto();
@@ -185,7 +185,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                 canvas.stopGoto();
 
                 freeColClient.getInGameController()
-                    .goToTile(mapViewer.getActiveUnit(),
+                    .goToTile(canvas.getActiveUnit(),
                               temp.getLastNode().getTile());
 
             } else if (canvas.isGotoStarted()) {
@@ -205,10 +205,10 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
     @Override
     public void actionPerformed(ActionEvent e) {
         doubleClickTimer.stop();
-        Tile tile=mapViewer.convertToMapTile(centerX, centerY);
+        Tile tile=canvas.convertToMapTile(centerX, centerY);
         if(mapViewer.getViewMode() == GUI.MOVE_UNITS_MODE) {
             // Clear goto order when active unit is on the tile
-            Unit unit=mapViewer.getActiveUnit();
+            Unit unit=canvas.getActiveUnit();
             if(unit != null && unit.getTile() == tile) {
                 freeColClient.getInGameController().clearGotoOrders(unit);
                 mapViewer.updateCurrentPathForActiveUnit();

@@ -64,12 +64,11 @@ public class MapEditorMenuBar extends FreeColMenuBar {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public MapEditorMenuBar(final FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer) {
+    public MapEditorMenuBar(final FreeColClient freeColClient, Canvas canvas) {
         super(freeColClient);
 
         // Add a mouse listener so that autoscrolling can happen in this menubar
-        this.addMouseMotionListener(
-            new MenuMouseMotionListener(freeColClient, canvas, mapViewer));
+        this.addMouseMotionListener(new MenuMouseMotionListener(freeColClient, canvas));
         reset();
     }
 

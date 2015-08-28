@@ -481,7 +481,7 @@ public class SwingGUI extends GUI {
             // CanvasMouseMotionListener.
             Point pt = canvas.getMousePosition();
             if (pt != null) {
-                Tile tile = mapViewer.convertToMapTile(pt.x, pt.y);
+                Tile tile = canvas.convertToMapTile(pt.x, pt.y);
                 if (tile != null && unit.getTile() != tile) {
                     canvas.setGotoPath(unit.findPath(tile));
                 }

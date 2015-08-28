@@ -179,7 +179,6 @@ public final class MapViewer {
     /** A path for a current goto order. */
     private PathNode gotoPath = null;
     private boolean gotoStarted = false;
-    private Point gotoDragPoint;
 
     // Helper variables for displaying the map.
     private int tileHeight, tileWidth, halfHeight, halfWidth,
@@ -710,15 +709,6 @@ public final class MapViewer {
     }
 
     /**
-     * Gets the point at which the map was clicked for a drag.
-     *
-     * @return The Point where the mouse was initially clicked.
-     */
-    Point getDragPoint() {
-        return gotoDragPoint;
-    }
-
-    /**
      * Gets the focus of the map. That is the center tile of the displayed
      * map.
      *
@@ -956,16 +946,6 @@ public final class MapViewer {
             }
         }
         return false;
-    }
-
-    /**
-     * Sets the point at which the map was clicked for a drag.
-     *
-     * @param x The mouse's x position.
-     * @param y The mouse's y position.
-     */
-    void setDragPoint(int x, int y) {
-        gotoDragPoint = new Point(x, y);
     }
 
     /**

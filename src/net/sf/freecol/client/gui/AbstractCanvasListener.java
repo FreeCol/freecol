@@ -43,9 +43,6 @@ public class AbstractCanvasListener {
 
     protected final Canvas canvas;
 
-    /** The map viewer to scroll. */
-    protected final MapViewer mapViewer;
-
     /** The scroll thread itself. */
     protected ScrollThread scrollThread = null;
 
@@ -55,10 +52,9 @@ public class AbstractCanvasListener {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public AbstractCanvasListener(FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer) {
+    public AbstractCanvasListener(FreeColClient freeColClient, Canvas canvas) {
         this.freeColClient = freeColClient;
         this.canvas = canvas;
-        this.mapViewer = mapViewer;
         this.scrollThread = null;
     }
 
@@ -110,7 +106,7 @@ public class AbstractCanvasListener {
      */
     private void scroll(int x, int y, int scrollSpace) {
         Direction direction;
-        Dimension size = mapViewer.getSize();
+        Dimension size = canvas.getSize();
         if (x < scrollSpace && y < scrollSpace) { // Upper-Left
             direction = Direction.NW;
         } else if (x >= size.width - scrollSpace
@@ -137,7 +133,7 @@ public class AbstractCanvasListener {
         if (direction == null) {
             stopScrollIfScrollIsActive();
         } else if (scrollThread == null || scrollThread.isInterrupted()) {
-            scrollThread = new ScrollThread(mapViewer);
+            scrollThread = new ScrollThread(canvas);
             scrollThread.setDirection(direction);
             scrollThread.start();
         } else {
