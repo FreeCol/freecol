@@ -2607,8 +2607,15 @@ public final class InGameController implements NetworkConstants {
     public void animateAttack(Unit attacker, Unit defender,
                               Tile attackerTile, Tile defenderTile,
                               boolean success) {
-        gui.animateUnitAttack(attacker, defender, attackerTile, defenderTile,
-                              success);
+        // Note: we used to focus the map on the unit even when
+        // animation is off as long as the center-active-unit option
+        // was set.  However IR#115 requested that if animation is off
+        // that we display nothing so as to speed up the other player
+        // moves as much as possible.
+        if (freeColClient.getAnimationSpeed(attacker.getOwner()) > 0) {
+            gui.animateUnitAttack(attacker, defender,
+                                  attackerTile, defenderTile, success);
+        }
         gui.refresh();
     }
 
@@ -2622,7 +2629,14 @@ public final class InGameController implements NetworkConstants {
      * @param newTile The <code>Tile</code> the move ends at.
      */
     public void animateMove(Unit unit, Tile oldTile, Tile newTile) {
-        gui.animateUnitMove(unit, oldTile, newTile);
+        // Note: we used to focus the map on the unit even when
+        // animation is off as long as the center-active-unit option
+        // was set.  However IR#115 requested that if animation is off
+        // that we display nothing so as to speed up the other player
+        // moves as much as possible.
+        if (freeColClient.getAnimationSpeed(unit.getOwner()) > 0) {
+            gui.animateUnitMove(unit, oldTile, newTile);
+        }
         gui.refresh();
     }
 

@@ -374,13 +374,6 @@ public final class InGameInputHandler extends InputHandler {
             throw new IllegalStateException("Attack animation for: "
                 + player.getId() + " omitted attacker: " + str);
         }
-        // Note: we used to focus the map on the unit even when
-        // animation is off as long as the center-active-unit option
-        // was set.  However IR#115 requested that if animation is off
-        // that we display nothing so as to speed up the other player
-        // moves as much as possible.
-        if (getFreeColClient().getAnimationSpeed(u.getOwner()) <= 0)
-            return null;
         final Unit attacker = u;
 
         if ((str = element.getAttribute("defender")).isEmpty()) {
@@ -460,13 +453,6 @@ public final class InGameInputHandler extends InputHandler {
                 + " missing unit:" + unitId);
             return null;
         }
-        // Note: we used to focus the map on the unit even when
-        // animation is off as long as the center-active-unit option
-        // was set.  However IR#115 requested that if animation is off
-        // that we display nothing so as to speed up the other player
-        // moves as much as possible.
-        if (getFreeColClient().getAnimationSpeed(u.getOwner()) <= 0)
-            return null;
         final Unit unit = u;
 
         String oldTileId = element.getAttribute("oldTile");
