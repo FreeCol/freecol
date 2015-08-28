@@ -23,6 +23,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
@@ -92,6 +93,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
@@ -116,14 +118,14 @@ public class SwingGUI extends GUI {
     private final GraphicsDevice graphicsDevice;
 
     /**
-     * This is the MapViewer instance used to paint the colony tiles
+     * This is the MapViewer instance used to paint the map tiles
      * in the ColonyPanel and other panels.  It should not be scaled
      * along with the default MapViewer.
      */
-    private MapViewer colonyTileMapViewer;
+    private MapViewer tileMapViewer;
 
     /**
-     * The MapViewer instance used to paint the main map.
+     * The MapViewer instance used by canvas to paint the main map.
      * This does need to be scaled.
      */
     private MapViewer mapViewer;
@@ -155,8 +157,8 @@ public class SwingGUI extends GUI {
         return canvas;
     }
 
-    public MapViewer getColonyTileMapViewer() {
-        return colonyTileMapViewer;
+    public ImageLibrary getTileImageLibrary() {
+        return tileMapViewer.getImageLibrary();
     }
 
     @Override
@@ -410,7 +412,7 @@ public class SwingGUI extends GUI {
         this.mapViewer = new MapViewer(freeColClient);
         this.canvas = new Canvas(freeColClient, graphicsDevice,
                                  desiredWindowSize, mapViewer);
-        this.colonyTileMapViewer = new MapViewer(freeColClient);
+        this.tileMapViewer = new MapViewer(freeColClient);
 
         // Now that there is a canvas, prepare for language changes.
         LanguageOption o = (LanguageOption)freeColClient.getClientOptions()
@@ -1720,6 +1722,25 @@ public class SwingGUI extends GUI {
     @Override
     public void toggleViewMode() {
         mapViewer.toggleViewMode();
+    }
+
+    // Forwarding to tileMapViewer
+
+    public static BufferedImage createTileImageWithOverlayAndForest(
+            TileType type, float scale) {
+        return MapViewer.createTileImageWithOverlayAndForest(type, scale);
+    }
+
+    public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
+        return tileMapViewer.createTileImageWithBeachBorderAndItems(tile);
+    }
+
+    public BufferedImage createColonyTileImage(Tile tile, Colony colony) {
+        return tileMapViewer.createColonyTileImage(tile, colony);
+    }
+
+    public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
+        tileMapViewer.displayColonyTiles(g, tiles, colony);
     }
 
 }

@@ -1221,8 +1221,7 @@ public final class ColonyPanel extends PortPanel
         public void update() {
             final Colony colony = getColony();
             if (colony == null) return;
-            final ImageLibrary lib = getGUI().getColonyTileMapViewer()
-                .getImageLibrary();
+            final ImageLibrary lib = getGUI().getTileImageLibrary();
             final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                 FontLibrary.FontSize.SMALLER, lib.getScaleFactor());
             final int uc = colony.getUnitCount();
@@ -2014,8 +2013,7 @@ public final class ColonyPanel extends PortPanel
             g.fillRect(0, 0, getWidth(), getHeight());
             if (colony == null) return;
 
-            getGUI().getColonyTileMapViewer().displayColonyTiles(
-                (Graphics2D)g, tiles, colony);
+            getGUI().displayColonyTiles((Graphics2D)g, tiles, colony);
         }
 
         /**
@@ -2043,8 +2041,8 @@ public final class ColonyPanel extends PortPanel
                 setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 setOpaque(false);
                 // Size and position:
-                Dimension size = getGUI().getColonyTileMapViewer()
-                    .getImageLibrary().scaleDimension(ImageLibrary.TILE_SIZE);
+                Dimension size = getGUI().getTileImageLibrary()
+                    .scaleDimension(ImageLibrary.TILE_SIZE);
                 setSize(size);
                 setLocation(((2 - x) + y) * size.width / 2,
                     (x + y) * size.height / 2);
@@ -2112,8 +2110,7 @@ public final class ColonyPanel extends PortPanel
                         for (AbstractGoods ag : info.getProduction()) {
                             ProductionLabel productionLabel
                                 = new ProductionLabel(getFreeColClient(),
-                                    getGUI().getColonyTileMapViewer()
-                                        .getImageLibrary(),
+                                    getGUI().getTileImageLibrary(),
                                     ag);
                             productionLabel.addMouseListener(pressListener);
                             add(productionLabel);

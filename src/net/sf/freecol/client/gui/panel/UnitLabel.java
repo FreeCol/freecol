@@ -52,7 +52,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 
-import static net.sf.freecol.common.util.StringUtils.*;
+import static net.sf.freecol.common.util.StringUtils.lastPart;
 
 
 /**
@@ -195,7 +195,7 @@ public final class UnitLabel extends JLabel
      */
     public void setSmall(boolean isSmall) {
         final ImageLibrary lib = useMapImageLibrary
-            ? gui.getColonyTileMapViewer().getImageLibrary()
+            ? gui.getTileImageLibrary()
             : gui.getImageLibrary();
         if (isSmall) {
             ImageIcon imageIcon = new ImageIcon(lib.getSmallUnitImage(unit));
@@ -262,7 +262,7 @@ public final class UnitLabel extends JLabel
     public void paintComponent(Graphics g) {
         final Player player = freeColClient.getMyPlayer();
         final ImageLibrary lib = useMapImageLibrary
-            ? gui.getColonyTileMapViewer().getImageLibrary()
+            ? gui.getTileImageLibrary()
             : gui.getImageLibrary();
         if (ignoreLocation || selected
             || (!unit.isCarrier() && unit.getState() != Unit.UnitState.SENTRY)) {

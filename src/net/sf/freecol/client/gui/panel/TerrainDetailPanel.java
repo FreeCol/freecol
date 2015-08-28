@@ -36,7 +36,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.MapViewer;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -78,7 +78,7 @@ public class TerrainDetailPanel
             // FIXME: Use different method supporting a direct request of an
             //        image of fixed ICON_SIZE.
             final float maxTileImageHeight = ImageLibrary.TILE_OVERLAY_SIZE.height;
-            Image tile = MapViewer.createTileImageWithOverlayAndForest(t,
+            Image tile = SwingGUI.createTileImageWithOverlayAndForest(t,
                 ImageLibrary.ICON_SIZE.height / maxTileImageHeight);
             BufferedImage image = new BufferedImage(tile.getWidth(null), ImageLibrary.ICON_SIZE.height,
                 BufferedImage.TYPE_INT_ARGB);
@@ -117,7 +117,7 @@ public class TerrainDetailPanel
         panel.add(nameLabel, "span, align center");
 
         panel.add(Utility.localizedLabel("colopedia.terrain.terrainImage"), "spany 3");
-        Image terrainImage = MapViewer.createTileImageWithOverlayAndForest(tileType, 1);
+        Image terrainImage = SwingGUI.createTileImageWithOverlayAndForest(tileType, 1);
         panel.add(new JLabel(new ImageIcon(terrainImage)), "spany 3");
 
         List<ResourceType> resourceList = tileType.getResourceTypes();

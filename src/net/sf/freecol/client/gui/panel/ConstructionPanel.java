@@ -43,7 +43,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
 
-import static net.sf.freecol.common.util.StringUtils.*;
+import static net.sf.freecol.common.util.StringUtils.getBreakingPoint;
 
 
 /**
@@ -135,7 +135,7 @@ public class ConstructionPanel extends MigPanel
     public void update(BuildableType buildable) {
         removeAll();
         final ImageLibrary lib = ((SwingGUI)freeColClient.getGUI())
-            .getColonyTileMapViewer().getImageLibrary();
+            .getTileImageLibrary();
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.SMALLER, lib.getScaleFactor());
 

@@ -33,11 +33,11 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -90,9 +90,8 @@ public final class TilePanel extends FreeColPanel {
             .addAmount("%y%", tile.getY());
         add(Utility.localizedLabel(template), "span, center");
 
-        final MapViewer mapViewer = getGUI().getColonyTileMapViewer();
         final ImageLibrary lib = getImageLibrary();
-        BufferedImage image = mapViewer.createColonyTileImage(tile, null);
+        BufferedImage image = getGUI().createColonyTileImage(tile, null);
         add(new JLabel(new ImageIcon(image)), "span, center");
 
         if (tile.getRegion() != null) {

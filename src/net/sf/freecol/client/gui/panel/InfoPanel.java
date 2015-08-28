@@ -44,7 +44,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.i18n.Messages;
@@ -58,7 +57,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
-import static net.sf.freecol.common.util.StringUtils.*;
+import static net.sf.freecol.common.util.StringUtils.splitText;
 
 
 /**
@@ -88,8 +87,7 @@ public final class InfoPanel extends FreeColPanel {
         public EndTurnPanel() {
             super(new MigLayout("wrap 1, center", "[center]", ""));
 
-            final ImageLibrary lib = getGUI().getColonyTileMapViewer()
-                .getImageLibrary();
+            final ImageLibrary lib = getGUI().getTileImageLibrary();
             Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                 FontLibrary.FontSize.TINY, lib.getScaleFactor());
 
@@ -144,13 +142,12 @@ public final class InfoPanel extends FreeColPanel {
 
             removeAll();
 
-            final MapViewer mapViewer = getGUI().getColonyTileMapViewer();
-            final ImageLibrary lib = mapViewer.getImageLibrary();
+            final ImageLibrary lib = getGUI().getTileImageLibrary();
             final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                 FontLibrary.FontSize.TINY, lib.getScaleFactor());
             if (tile != null && tile.getType() != null) {
                 final int width = getWidth() - SLACK;
-                BufferedImage image = mapViewer.createTileImageWithBeachBorderAndItems(tile);
+                BufferedImage image = getGUI().createTileImageWithBeachBorderAndItems(tile);
                 if (tile.isExplored()) {
                     String text = Messages.message(tile.getLabel());
                     for (String s : splitText(text, " /",
@@ -280,8 +277,7 @@ public final class InfoPanel extends FreeColPanel {
         public void update() {
             removeAll();
 
-            final ImageLibrary lib = getGUI().getColonyTileMapViewer()
-                .getImageLibrary();
+            final ImageLibrary lib = getGUI().getTileImageLibrary();
             Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                 FontLibrary.FontSize.TINY, lib.getScaleFactor());
             String text;

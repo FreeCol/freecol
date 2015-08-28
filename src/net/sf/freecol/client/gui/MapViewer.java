@@ -87,11 +87,13 @@ import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
+ * MapViewer is a private helper class of Canvas and SwingGUI.
+ * 
  * This class is responsible for drawing the map/background on the
  * <code>Canvas</code>.
- *
+ * It is also used to draw map tiles for some GUI-panels.
  * In addition, the graphical state of the map (focus, active unit..)
- * is also a responsibility of this class.
+ * is currently handled by this class.
  */
 public final class MapViewer {
 
@@ -464,7 +466,7 @@ public final class MapViewer {
      * @param scale The scale of the terrain image to return.
      * @return The terrain-image
      */
-    public static BufferedImage createTileImageWithOverlayAndForest(
+    static BufferedImage createTileImageWithOverlayAndForest(
             TileType type, float scale) {
         BufferedImage terrainImage = ImageLibrary.getTerrainImage(
             type, 0, 0, scale);
@@ -506,7 +508,7 @@ public final class MapViewer {
      * @param tile The Tile to draw.
      * @return The image.
      */
-    public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
+    BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
         final TileType tileType = tile.getType();
         Dimension terrainTileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
         BufferedImage overlayImage = lib.getOverlayImage(tile);
@@ -537,7 +539,7 @@ public final class MapViewer {
      *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
      * @return The image.
      */
-    public BufferedImage createColonyTileImage(Tile tile, Colony colony) {
+    BufferedImage createColonyTileImage(Tile tile, Colony colony) {
         final TileType tileType = tile.getType();
         Dimension terrainTileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
         BufferedImage overlayImage = lib.getOverlayImage(tile);
@@ -564,7 +566,7 @@ public final class MapViewer {
      * @param colony The <code>Colony</code> to create the visualization
      *      of the <code>Tile</code> objects for.
      */
-    public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
+    void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
         Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
         for (int x = 0; x < 3; x++) {
@@ -714,7 +716,7 @@ public final class MapViewer {
      * 
      * @return The image library;
      */
-    public ImageLibrary getImageLibrary() {
+    ImageLibrary getImageLibrary() {
         return lib;
     }
 
@@ -723,7 +725,7 @@ public final class MapViewer {
      *
      * @return The current map scale.
      */
-    public float getMapScale() {
+    float getMapScale() {
         return lib.getScaleFactor();
     }
 

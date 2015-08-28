@@ -41,7 +41,7 @@ import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.control.MapEditorController.IMapTransform;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.MapViewer;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.IndianNationType;
@@ -119,7 +119,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         final Specification spec = getSpecification();
         List<TileType> tileList = spec.getTileTypeList();
         for (TileType type : tileList) {
-            listPanel.add(buildButton(MapViewer.createTileImageWithOverlayAndForest(type, 0.5f),
+            listPanel.add(buildButton(SwingGUI.createTileImageWithOverlayAndForest(type, 0.5f),
                                       Messages.getName(type),
                                       new TileTypeTransform(type)));
         }
