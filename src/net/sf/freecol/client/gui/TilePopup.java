@@ -152,9 +152,7 @@ public final class TilePopup extends JPopupMenu {
                     ji.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent event) {
-                                if (activeUnit.checkSetState(UnitState.ACTIVE)) {
-                                    igc.changeState(activeUnit, Unit.UnitState.ACTIVE);
-                                }
+                                igc.changeState(activeUnit, Unit.UnitState.ACTIVE);
                             }
                         });
                     add(ji);
@@ -165,9 +163,7 @@ public final class TilePopup extends JPopupMenu {
                     ji.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent event) {
-                                if (activeUnit.checkSetState(UnitState.FORTIFYING)) {
-                                    igc.changeState(activeUnit, Unit.UnitState.FORTIFYING);
-                                }
+                                igc.changeState(activeUnit, Unit.UnitState.FORTIFYING);
                             }
                         });
                     add(ji);
@@ -178,9 +174,7 @@ public final class TilePopup extends JPopupMenu {
                     ji.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent event) {
-                                if (activeUnit.checkSetState(UnitState.SKIPPED)) {
-                                    igc.changeState(activeUnit, Unit.UnitState.SKIPPED);
-                                }
+                                igc.changeState(activeUnit, Unit.UnitState.SKIPPED);
                             }
                         });
                     add(ji);

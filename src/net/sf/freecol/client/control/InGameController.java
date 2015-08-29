@@ -2862,8 +2862,9 @@ public final class InGameController implements NetworkConstants {
      * @return True if the state was changed.
      */
     public boolean changeState(Unit unit, UnitState state) {
-        if (!requireOurTurn() || unit == null
-            || !unit.checkSetState(state)) return false;
+        if (!requireOurTurn() || unit == null) return false;
+        if (unit.getState() == state) return true;
+        if (!unit.checkSetState(state)) return false;
 
         // Check if this is a hostile fortification, and give the player
         // a chance to confirm.
@@ -2874,10 +2875,9 @@ public final class InGameController implements NetworkConstants {
             if (tile != null && tile.getOwningSettlement() != null) {
                 Player enemy = tile.getOwningSettlement().getOwner();
                 if (player != enemy
-                    && player.getStance(enemy) != Stance.ALLIANCE) {
-                    if (!gui.confirmHostileAction(unit, tile))
-                        return false; // Aborted
-                }
+                    && player.getStance(enemy) != Stance.ALLIANCE
+                    && !gui.confirmHostileAction(unit, tile))
+                    return false; // Aborted
             }
         }
 
@@ -4687,25 +4687,6 @@ public final class InGameController implements NetworkConstants {
         if (routes == null) return false;
 
         return askServer().setTradeRoutes(routes);
-    }
-
-    /**
-     * Skip the active unit, note no server interaction.
-     *
-     * Called from SkipUnitAction
-     *
-     * @param unit The <code>Unit</code> to skip.
-     * @return True if the active unit is not null.
-     */
-    public boolean skipUnit(Unit unit) {
-        if (!requireOurTurn() || unit == null) return false;
-
-        boolean ret = unit.getState() != UnitState.SKIPPED;
-        if (ret) {
-            unit.setState(UnitState.SKIPPED);
-        }
-        updateGUI(null);
-        return true;
     }
 
     /**
