@@ -53,18 +53,15 @@ public final class WorkerCheck {
         textArea = new JTextArea( 10, 40 );
         textArea.setEditable( false );
 
-        final Runnable  workerJob = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    SwingUtilities.invokeLater( new TestJob("starting the job\n", false) );
-                    SwingUtilities.invokeLater( new TestJob("working.  check that the AWT thread can repaint this window\n", false) );
-                    // this example sleeps, but time-consuming work could be done
-                    Thread.sleep( 7000 );
-                    SwingUtilities.invokeLater( new TestJob("the job is done\n", true) );
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        final Runnable workerJob = () -> {
+            try {
+                SwingUtilities.invokeLater( new TestJob("starting the job\n", false) );
+                SwingUtilities.invokeLater( new TestJob("working.  check that the AWT thread can repaint this window\n", false) );
+                // this example sleeps, but time-consuming work could be done
+                Thread.sleep( 7000 );
+                SwingUtilities.invokeLater( new TestJob("the job is done\n", true) );
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         };
 

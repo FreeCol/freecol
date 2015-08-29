@@ -749,19 +749,9 @@ public final class InGameController implements NetworkConstants {
             Runnable uiTask;
             if (endOfTurn) {
                 turnReportMessages.addAll(messages);
-                uiTask = new Runnable() {
-                        @Override
-                        public void run() {
-                            displayTurnReportMessages();
-                        }
-                    };
+                uiTask = () -> { displayTurnReportMessages(); };
             } else {
-                uiTask = new Runnable() {
-                        @Override
-                        public void run() {
-                            gui.showModelMessages(messages);
-                        }
-                    };
+                uiTask = () -> { gui.showModelMessages(messages); };
             }
             gui.invokeNowOrWait(uiTask);
         }

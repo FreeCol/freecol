@@ -282,40 +282,26 @@ public final class FreeColClient {
         //     NewPanel to a call to the connect controller to start a game)
         if (savedGame != null) {
             soundController.playSound("sound.intro.general");
-            SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!connectController.startSavedGame(savedGame,
-                                                              userMsg)) {
-                            gui.showMainPanel(userMsg);
-                        }
+            SwingUtilities.invokeLater(() -> {
+                    if (!connectController.startSavedGame(savedGame, userMsg)) {
+                        gui.showMainPanel(userMsg);
                     }
                 });
         } else if (spec != null) { // Debug or fast start
             soundController.playSound("sound.intro.general");
-            SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!connectController.startSinglePlayerGame(spec,
-                                                                     true)) {
-                            gui.showMainPanel(userMsg);
-                        }
+            SwingUtilities.invokeLater(() -> {
+                    if (!connectController.startSinglePlayerGame(spec, true)) {
+                        gui.showMainPanel(userMsg);
                     }
                 });
         } else if (showOpeningVideo) {
-            SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        gui.showOpeningVideo(userMsg);
-                    }
+            SwingUtilities.invokeLater(() -> {
+                    gui.showOpeningVideo(userMsg);
                 });
         } else {
             soundController.playSound("sound.intro.general");
-            SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        gui.showMainPanel(userMsg);
-                    }
+            SwingUtilities.invokeLater(() -> {
+                    gui.showMainPanel(userMsg);
                 });
         }
 

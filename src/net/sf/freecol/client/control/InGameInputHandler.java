@@ -86,24 +86,15 @@ public final class InGameInputHandler extends InputHandler {
     private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
 
     // A bunch of predefined non-closure runnables.
-    private final Runnable closeMenusRunnable = new Runnable() {
-            @Override
-            public void run() {
-                igc().closeMenus();
-            }
-        };
-    private final Runnable displayModelMessagesRunnable = new Runnable() {
-            @Override
-            public void run() {
-                igc().displayModelMessages(false);
-            }
-        };
-    private final Runnable reconnectRunnable = new Runnable() {
-            @Override
-            public void run() {
-                igc().reconnect();
-            }
-        };
+    private final Runnable closeMenusRunnable = () -> {
+        igc().closeMenus();
+    };
+    private final Runnable displayModelMessagesRunnable = () -> {
+        igc().displayModelMessages(false);
+    };
+    private final Runnable reconnectRunnable = () -> {
+        igc().reconnect();
+    };
 
 
     /**
@@ -125,6 +116,24 @@ public final class InGameInputHandler extends InputHandler {
         return getFreeColClient().getInGameController();
     }
 
+    /**
+     * Shorthand to run in the EDT and wait.
+     *
+     * @return runnable The <code>Runnable</code> to run.
+     */
+    private void invokeAndWait(Runnable runnable) {
+        getFreeColClient().getGUI().invokeNowOrWait(runnable);
+    }
+    
+    /**
+     * Shorthand to run in the EDT eventually.
+     *
+     * @return runnable The <code>Runnable</code> to run.
+     */
+    private void invokeLater(Runnable runnable) {
+        getFreeColClient().getGUI().invokeNowOrLater(runnable);
+    }
+    
     /**
      * Get the integer value of an element attribute.
      *
@@ -272,7 +281,7 @@ public final class InGameInputHandler extends InputHandler {
         final FreeColClient fcc = getFreeColClient();
         if (Boolean.TRUE.toString().equals(element.getAttribute("flush"))
             && fcc.currentPlayerIsMyPlayer()) {
-            fcc.getGUI().invokeNowOrLater(displayModelMessagesRunnable);
+            invokeLater(displayModelMessagesRunnable);
         }
         return reply;
     }
@@ -411,12 +420,9 @@ public final class InGameInputHandler extends InputHandler {
             = Boolean.parseBoolean(element.getAttribute("success"));
 
         // All is well, do the animation.
-        getGUI().invokeNowOrWait(new Runnable() {
-                @Override
-                public void run() {
-                    igc().animateAttack(attacker, defender,
-                        attackerTile, defenderTile, success);
-                }
+        invokeAndWait(() -> {
+                igc().animateAttack(attacker, defender,
+                                    attackerTile, defenderTile, success);
             });
         return null;
     }
@@ -481,12 +487,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getGUI().invokeNowOrWait(new Runnable() {
-                @Override
-                public void run() {
-                    igc().animateMove(unit, oldTile, newTile);
-                }
-            });
+        invokeAndWait(() -> { igc().animateMove(unit, oldTile, newTile); });
         return null;
     }
 
@@ -501,13 +502,9 @@ public final class InGameInputHandler extends InputHandler {
         final Game game = getGame();
         final ChatMessage chatMessage = new ChatMessage(game, element);
 
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().chat(chatMessage.getPlayer(game),
-                               chatMessage.getMessage(),
-                               chatMessage.isPrivate());
-                }
+        invokeLater(() -> {
+                igc().chat(chatMessage.getPlayer(game),
+                           chatMessage.getMessage(), chatMessage.isPrivate());
             });
         return null;
     }
@@ -524,12 +521,7 @@ public final class InGameInputHandler extends InputHandler {
             = new ChooseFoundingFatherMessage(getGame(), element);
         final List<FoundingFather> ffs = message.getFathers();
 
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().chooseFoundingFather(ffs);
-                }
-            });
+        invokeLater(() -> { igc().chooseFoundingFather(ffs); });
         return null;
     }
 
@@ -544,7 +536,7 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element closeMenus() {
-        getGUI().invokeNowOrWait(closeMenusRunnable);
+        invokeAndWait(closeMenusRunnable);
         return null;
     }
 
@@ -576,12 +568,8 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getGUI().invokeNowOrWait(new Runnable() {
-                @Override
-                public void run() {
-                    message.setAgreement(igc().diplomacy(our, other,
-                                                         agreement));
-                }
+        invokeAndWait(() -> {
+                message.setAgreement(igc().diplomacy(our, other, agreement));
             });
         return (message.getAgreement() == null) ? null
             : message.toXMLElement();
@@ -627,12 +615,7 @@ public final class InGameInputHandler extends InputHandler {
         final String messageId = element.getAttribute("messageID");
         final String message = element.getAttribute("message");
 
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().error(messageId, message);
-                }
-            });
+        invokeLater(() -> { igc().error(messageId, message); });
         return null;
     }
 
@@ -709,12 +692,7 @@ public final class InGameInputHandler extends InputHandler {
         }
         final int n = message.getSettlementCount();
 
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().firstContact(player, other, tile, n);
-                }
-            });
+        invokeLater(() -> { igc().firstContact(player, other, tile, n); });
         return null;
     }
 
@@ -733,12 +711,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().fountainOfYouth(n);
-                }
-            });
+        invokeLater(() -> { igc().fountainOfYouth(n); });
         return null;
     }
 
@@ -762,12 +735,7 @@ public final class InGameInputHandler extends InputHandler {
         final String highScore = element.getAttribute("highScore");
 
         if (winner == freeColClient.getMyPlayer()) {
-            getGUI().invokeNowOrLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        igc().victory(highScore);
-                    }
-                });
+            invokeLater(() -> { igc().victory(highScore); });
         }
         return null;
     }
@@ -800,13 +768,9 @@ public final class InGameInputHandler extends InputHandler {
             throw new IllegalArgumentException("Demand to anothers colony");
         }
 
-        getGUI().invokeNowOrWait(new Runnable() {
-                @Override
-                public void run() {
-                    boolean accepted = igc().indianDemand(unit, colony,
-                        message.getType(game), message.getAmount());
-                    message.setResult(accepted);
-                }
+        invokeAndWait(() -> {
+                message.setResult(igc().indianDemand(unit, colony,
+                        message.getType(game), message.getAmount()));
             });
         return message.toXMLElement();
     }
@@ -826,12 +790,7 @@ public final class InGameInputHandler extends InputHandler {
         final List<Goods> goods = message.getGoods();
         if (unit == null || goods == null) return null;
 
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().loot(unit, goods, defenderId);
-                }
-            });
+        invokeLater(() -> { igc().loot(unit, goods, defenderId); });
         return null;
     }
 
@@ -847,12 +806,9 @@ public final class InGameInputHandler extends InputHandler {
         final MonarchActionMessage message
             = new MonarchActionMessage(game, element);
 
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().monarch(message.getAction(), message.getTemplate(),
-                                  message.getMonarchKey());
-                }
+        invokeLater(() -> {
+                igc().monarch(message.getAction(), message.getTemplate(),
+                              message.getMonarchKey());
             });
         return null;
     }
@@ -895,12 +851,7 @@ public final class InGameInputHandler extends InputHandler {
         if (unit == null || defaultName == null 
             || !unit.hasTile()) return null;
 
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().newLandName(defaultName, unit);
-                }
-            });
+        invokeLater(() -> { igc().newLandName(defaultName, unit); });
         return null;
     }
 
@@ -920,11 +871,8 @@ public final class InGameInputHandler extends InputHandler {
         final String defaultName = message.getNewRegionName();
         if (defaultName == null || region == null) return null;
 
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().newRegionName(region, defaultName, tile, unit);
-                }
+        invokeLater(() -> {
+                igc().newRegionName(region, defaultName, tile, unit);
             });
         return null;
     }
@@ -943,12 +891,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().newTurn(n);
-                }
-            });
+        invokeLater(() -> { igc().newTurn(n); });
         return null;
     }
 
@@ -962,7 +905,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element reconnect(@SuppressWarnings("unused") Element element) {
         logger.finest("Entered reconnect.");
 
-        getGUI().invokeNowOrLater(reconnectRunnable);
+        invokeLater(reconnectRunnable);
         return null;
     }
 
@@ -994,12 +937,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         if (!objects.isEmpty()) {
-            getGUI().invokeNowOrLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        igc().remove(objects, divert);
-                    }
-                });
+            invokeLater(() -> { igc().remove(objects, divert); });
         }
         return null;
     }
@@ -1036,12 +974,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().setCurrentPlayer(player);
-                }
-            });
+        invokeLater(() -> { igc().setCurrentPlayer(player); });
         return null;
     }
 
@@ -1060,12 +993,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().setDead(player);
-                }
-            });
+        invokeLater(() -> { igc().setDead(player); });
         return null;
     }
 
@@ -1097,12 +1025,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().setStance(stance, p1, p2);
-                }
-            });
+        invokeLater(() -> { igc().setStance(stance, p1, p2); });
         return null;
     }
 
@@ -1142,16 +1065,10 @@ public final class InGameInputHandler extends InputHandler {
         final Element fullElement = (Element)nodeList.item(0);
         final Element normalElement = (Element)nodeList.item(1);
         tile.readFromXMLElement(fullElement);
-        getGUI().invokeNowOrLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().spyColony(tile, new Runnable() {
-                            @Override
-                            public void run() {
-                                tile.readFromXMLElement(normalElement);
-                            }
-                        });
-                }
+        invokeLater(() -> {
+                igc().spyColony(tile, () -> {
+                        tile.readFromXMLElement(normalElement);
+                    });
             });
         return null;
     }

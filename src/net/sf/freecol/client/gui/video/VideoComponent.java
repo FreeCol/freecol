@@ -78,11 +78,9 @@ public class VideoComponent extends JPanel {
         // Disable the feature that seems to be missing from the stock Cortado
         //applet.setStopListener(new StopListener() {
         //    public void stopped() {
-        //        SwingUtilities.invokeLater(new Runnable() {
-        //            public void run() {
-        //                for (VideoListener sl : videoListeners) {
-        //                    sl.stopped();
-        //                }
+        //        SwingUtilities.invokeLater(() -> {
+        //            for (VideoListener sl : videoListeners) {
+        //                sl.stopped();
         //            }
         //        });
         //    }

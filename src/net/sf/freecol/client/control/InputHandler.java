@@ -101,15 +101,12 @@ public abstract class InputHandler implements MessageHandler {
      */
     protected Element disconnect(Element element) {
         // Updating the GUI should always be done in the EDT:
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (getGUI().containsInGameComponents()) {
-                        if (freeColClient.getFreeColServer() == null) {
-                            getGUI().returnToTitle();
-                        } else {
-                            getGUI().removeInGameComponents();
-                        }
+        javax.swing.SwingUtilities.invokeLater(() -> {
+                if (getGUI().containsInGameComponents()) {
+                    if (freeColClient.getFreeColServer() == null) {
+                        getGUI().returnToTitle();
+                    } else {
+                        getGUI().removeInGameComponents();
                     }
                 }
             });

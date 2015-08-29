@@ -283,12 +283,9 @@ public final class PreGameInputHandler extends InputHandler {
                         } catch (Exception ex) {}
                     }
                     
-                    SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                getFreeColClient().getPreGameController()
-                                    .startGame();
-                            }
+                    SwingUtilities.invokeLater(() -> {
+                            getFreeColClient().getPreGameController()
+                                .startGame();
                         });
                 }
             }.start();

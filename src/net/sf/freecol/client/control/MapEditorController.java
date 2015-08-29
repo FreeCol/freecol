@@ -220,19 +220,13 @@ public final class MapEditorController {
                         BufferedImage thumb = gui.createMiniMapThumbNail();
                         freeColClient.getFreeColServer()
                             .saveMapEditorGame(file, thumb);
-                        SwingUtilities.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    gui.closeStatusPanel();
-                                    gui.requestFocusInWindow();
-                                }
+                        SwingUtilities.invokeLater(() -> {
+                                gui.closeStatusPanel();
+                                gui.requestFocusInWindow();
                             });
                     } catch (IOException e) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    gui.showErrorMessage(FreeCol.badSave(file));
-                                }
+                        SwingUtilities.invokeLater(() -> {
+                                gui.showErrorMessage(FreeCol.badSave(file));
                             });
                     }
                 }
@@ -291,54 +285,43 @@ public final class MapEditorController {
 
         gui.showStatusPanel(Messages.message("status.loadingGame"));
 
-        Runnable loadGameJob = new Runnable() {
-                @Override
-                public void run() {
-                    FreeColServer freeColServer
-                        = freeColClient.getFreeColServer();
-                    try {
-                        Specification spec = getDefaultSpecification();
-                        Game game = FreeColServer.readGame(new FreeColSavegameFile(theFile),
-                            spec, freeColServer);
-                        freeColClient.setGame(game);
-                        requireNativeNations(game);
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                                public void run() {
-                                    gui.closeStatusPanel();
-                                    gui.setFocus(freeColClient.getGame()
-                                        .getMap().getTile(1,1));
-                                    gui.updateMenuBar();
-                                    gui.refresh();
-                                }
-                            });
-                    } catch (FreeColException e) {
-                        reloadMainPanel();
-                        SwingUtilities.invokeLater(new ErrorJob(StringTemplate.name(e.getMessage())));
-                    } catch (FileNotFoundException e) {
-                        reloadMainPanel();
-                        SwingUtilities.invokeLater(new ErrorJob(StringTemplate.key("server.fileNotFound")));
-                    } catch (IOException e) {
-                        reloadMainPanel();
-                        SwingUtilities.invokeLater(new ErrorJob(StringTemplate.key("server.initialize")));
-                    } catch (XMLStreamException e) {
-                        reloadMainPanel();
-                        SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(theFile)));
-                    }
-                }
-            };
+        Runnable loadGameJob = () -> {
+            FreeColServer freeColServer = freeColClient.getFreeColServer();
+            try {
+                Specification spec = getDefaultSpecification();
+                Game game = FreeColServer.readGame(new FreeColSavegameFile(theFile),
+                                                   spec, freeColServer);
+                freeColClient.setGame(game);
+                requireNativeNations(game);
+                SwingUtilities.invokeLater(() -> {
+                        gui.closeStatusPanel();
+                        gui.setFocus(freeColClient.getGame().getMap().getTile(1,1));
+                        gui.updateMenuBar();
+                        gui.refresh();
+                    });
+            } catch (FreeColException e) {
+                reloadMainPanel();
+                SwingUtilities.invokeLater(new ErrorJob(StringTemplate.name(e.getMessage())));
+            } catch (FileNotFoundException e) {
+                reloadMainPanel();
+                SwingUtilities.invokeLater(new ErrorJob(StringTemplate.key("server.fileNotFound")));
+            } catch (IOException e) {
+                reloadMainPanel();
+                SwingUtilities.invokeLater(new ErrorJob(StringTemplate.key("server.initialize")));
+            } catch (XMLStreamException e) {
+                reloadMainPanel();
+                SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(theFile)));
+            }
+        };
         freeColClient.setWork(loadGameJob);
     }
 
     private void reloadMainPanel () {
-        SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    gui.closeMainPanel();
-                    gui.showMainPanel(null);
-                    freeColClient.getSoundController()
-                        .playSound("sound.intro.general");
-                }
+        SwingUtilities.invokeLater(() -> {
+                gui.closeMainPanel();
+                gui.showMainPanel(null);
+                freeColClient.getSoundController()
+                    .playSound("sound.intro.general");
             });
     }
 }

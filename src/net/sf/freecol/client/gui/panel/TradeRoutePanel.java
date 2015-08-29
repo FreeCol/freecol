@@ -154,19 +154,15 @@ public final class TradeRoutePanel extends FreeColPanel {
                     final TradeRoute selected
                         = tradeRoutes.getSelectedValue();
                     final String name = selected.getName();
-                    getGUI().showTradeRouteInputPanel(selected,
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                StringTemplate template = null;
-                                if (selected.getName() == null) { // Cancelled
-                                    selected.setName(name);
-                                } else if ((template = selected.verify()) == null) {
-                                    igc().updateTradeRoute(selected);
-                                    updateList(selected);
-                                } else {
-                                    getGUI().showInformationMessage(template);
-                                }
+                    getGUI().showTradeRouteInputPanel(selected, () -> {
+                            StringTemplate template = null;
+                            if (selected.getName() == null) { // Cancelled
+                                selected.setName(name);
+                            } else if ((template = selected.verify()) == null) {
+                                igc().updateTradeRoute(selected);
+                                updateList(selected);
+                            } else {
+                                getGUI().showInformationMessage(template);
                             }
                         });
                 }
@@ -240,24 +236,18 @@ public final class TradeRoutePanel extends FreeColPanel {
         final Player player = getMyPlayer();
         final Unit u = this.unit;
         final TradeRoute newRoute = igc().getNewTradeRoute(player);
-        getGUI().showTradeRouteInputPanel(newRoute,
-            new Runnable() {
-                @Override
-                public void run() {
-                    StringTemplate template = null;
-                    if (newRoute.getName() == null) { // Cancelled
-                        deleteTradeRoute(newRoute);
-                        updateList(null);
-                    } else {
-                        if ((template = newRoute.verify()) == null) {
-                            igc().updateTradeRoute(newRoute);
-                            if (u != null) igc().assignTradeRoute(u, newRoute);
-                            updateList(newRoute);
-                        } else {
-                            updateList(null);
-                            getGUI().showInformationMessage(template);
-                        }
-                    }
+        getGUI().showTradeRouteInputPanel(newRoute, () -> {
+                StringTemplate template = null;
+                if (newRoute.getName() == null) { // Cancelled
+                    deleteTradeRoute(newRoute);
+                    updateList(null);
+                } else if ((template = newRoute.verify()) == null) {
+                    igc().updateTradeRoute(newRoute);
+                    if (u != null) igc().assignTradeRoute(u, newRoute);
+                    updateList(newRoute);
+                } else {
+                    updateList(null);
+                    getGUI().showInformationMessage(template);
                 }
             });
     }
