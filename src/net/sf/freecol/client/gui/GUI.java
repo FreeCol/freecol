@@ -41,7 +41,6 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.InGameController.*;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.Parameters;
-import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -699,7 +698,7 @@ public class GUI {
                 ArmedUnitSettlementAction.SETTLEMENT_ATTACK));
 
         return getChoice(true, settlement.getTile(),
-            Utility.localizedTextArea(settlement.getAlarmLevelLabel(player)),
+            settlement.getAlarmLevelLabel(player),
             settlement, "cancel", choices);
     }
 
@@ -726,7 +725,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("boycottedGoods.dumpGoods"),
                 BoycottAction.DUMP_CARGO));
 
-        return getChoice(true, null, Utility.localizedTextArea(template),
+        return getChoice(true, null, template,
                          goods.getType(), "cancel", choices);
     }
 
@@ -753,7 +752,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("buy.moreGold"),
                                      BuyAction.HAGGLE));
 
-        return getChoice(true, unit.getTile(), Utility.localizedTextArea(template),
+        return getChoice(true, unit.getTile(), template,
                          goods.getType(), "cancel", choices);
     }
 
@@ -785,7 +784,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("indianLand.take"),
                                      ClaimAction.STEAL));
 
-        return getChoice(true, tile, Utility.localizedTextArea(template),
+        return getChoice(true, tile, template,
                          owner.getNation(), "indianLand.cancel", choices);
     }
 
@@ -821,8 +820,7 @@ public class GUI {
         }
         if (choices.isEmpty()) return null;
 
-        return getChoice(true, settlement.getTile(),
-                         Utility.localizedTextArea(template),
+        return getChoice(true, settlement.getTile(), template,
                          settlement, "cancel", choices);
     }
 
@@ -861,8 +859,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.incite"),
                                      MissionaryAction.INCITE_INDIANS));
 
-        return getChoice(true, unit.getTile(),
-                         Utility.localizedTextArea(template),
+        return getChoice(true, unit.getTile(), template,
                          settlement, "cancel", choices);
     }
 
@@ -918,8 +915,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("scoutColony.attack"),
                                      ScoutColonyAction.FOREIGN_COLONY_ATTACK));
 
-        return getChoice(true, unit.getTile(),
-                         Utility.localizedTextArea(template),
+        return getChoice(true, unit.getTile(), template,
                          colony, "cancel", choices);
     }
 
@@ -978,8 +974,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.attack"),
                                      ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
 
-        return getChoice(true, settlement.getTile(),
-                         Utility.localizedTextArea(template),
+        return getChoice(true, settlement.getTile(), template,
                          settlement, "cancel", choices);
     }
 
@@ -1010,8 +1005,7 @@ public class GUI {
                     .addStringTemplate("%goods%", goodsTemplate)),
                 SellAction.GIFT));
 
-        return getChoice(true, unit.getTile(),
-                         Utility.localizedTextArea(template),
+        return getChoice(true, unit.getTile(), template,
                          goods.getType(), "cancel", choices);
     }
 
