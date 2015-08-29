@@ -9,7 +9,7 @@
         the metaserver, distribution packages, running tests
         and creating documentation.
     </description>
-    <property name="java.target.version" value="1.7"/>
+    <property name="java.target.version" value="1.8"/>
     <property name="freecol.name" value="freecol"/>
     <property environment="env"/>
     <property name="freecol.data.dir" value="${basedir}/data"/>
@@ -338,7 +338,7 @@
                         <authors>
                             <author name="The FreeCol Team" email="developers@freecol.org" />
                         </authors>
-                        <javaversion>1.7</javaversion>
+                        <javaversion>1.8</javaversion>
                     </info>
                     <guiprefs width="640" height="480" resizable="no">
                         <laf name="looks">
@@ -476,7 +476,7 @@
                     mainclass="net.sf.freecol.FreeCol"
                     version="${freecol.version}"
                     vmoptions="-Xmx256M -Dapple.awt.fakefullscreen=true"
-                    jvmversion="1.7+"
+                    jvmversion="1.8+"
                     arguments="--windowed --freecol-data FreeCol.app/Contents/Resources/"
                     stubfile="${freecol.build.dir}/skeletons/FreeCol"
                     icon="${freecol.packaging.dir}/icons/FreeCol.icns">

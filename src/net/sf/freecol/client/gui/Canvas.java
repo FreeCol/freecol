@@ -2703,9 +2703,9 @@ public final class Canvas extends JDesktopPane {
         } catch (Exception e) {
             compact = false;
         }
-        ReportPanel r
-            = getExistingFreeColPanel((compact) ? ReportCompactColonyPanel.class
-                : ReportClassicColonyPanel.class);
+        ReportPanel r = (compact)
+            ? getExistingFreeColPanel(ReportCompactColonyPanel.class)
+            : getExistingFreeColPanel(ReportClassicColonyPanel.class);
         if (r == null) {
             showSubPanel((compact)
                 ? new ReportCompactColonyPanel(freeColClient)
