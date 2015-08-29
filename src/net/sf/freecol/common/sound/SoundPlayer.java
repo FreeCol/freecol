@@ -20,7 +20,6 @@
 package net.sf.freecol.common.sound;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,18 +65,12 @@ public class SoundPlayer {
         if (mixer == null) {
             throw new IllegalStateException("Mixer unavailable.");
         }
-        mixerOption.addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent e) {
-                    setMixer((MixerWrapper)e.getNewValue());
-                }
+        mixerOption.addPropertyChangeListener((PropertyChangeEvent e) -> {
+                setMixer((MixerWrapper)e.getNewValue());
             });
         setVolume(volumeOption.getValue());
-        volumeOption.addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent e) {
-                    setVolume((Integer)e.getNewValue());
-                }
+        volumeOption.addPropertyChangeListener((PropertyChangeEvent e) -> {
+                setVolume((Integer)e.getNewValue());
             });
         soundPlayerThread = new SoundPlayerThread();
         soundPlayerThread.start();

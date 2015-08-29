@@ -38,7 +38,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;
@@ -400,13 +399,10 @@ public class SwingGUI extends GUI {
             logger.info(pmoffscreen + " overrides client option: "
                 + pmoffscreenValue);
         }
-        usePixmaps.addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent e) {
-                    String newValue = e.getNewValue().toString();
-                    System.setProperty(pmoffscreen, newValue);
-                    logger.info("Set " + pmoffscreen + " to: " + newValue);
-                }
+        usePixmaps.addPropertyChangeListener((PropertyChangeEvent e) -> {
+                String newValue = e.getNewValue().toString();
+                System.setProperty(pmoffscreen, newValue);
+                logger.info("Set " + pmoffscreen + " to: " + newValue);
             });
 
         this.mapViewer = new MapViewer(freeColClient);
@@ -417,21 +413,18 @@ public class SwingGUI extends GUI {
         // Now that there is a canvas, prepare for language changes.
         LanguageOption o = (LanguageOption)freeColClient.getClientOptions()
             .getOption(ClientOptions.LANGUAGE);
-        o.addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent e) {
-                    Language language = (Language)e.getNewValue();
-                    logger.info("Set language to: " + language);
-                    if (Messages.AUTOMATIC.equalsIgnoreCase(language.getKey())) {
-                        showInformationMessage("info.autodetectLanguageSelected");
-                    } else {
-                        Locale l = language.getLocale();
-                        Messages.loadMessageBundle(l);
-                        Messages.loadModMessageBundle(l);
-                        showInformationMessage(StringTemplate
-                            .template("info.newLanguageSelected")
-                            .addName("%language%", l.getDisplayName()));
-                    }
+        o.addPropertyChangeListener((PropertyChangeEvent e) -> {
+                Language language = (Language)e.getNewValue();
+                logger.info("Set language to: " + language);
+                if (Messages.AUTOMATIC.equalsIgnoreCase(language.getKey())) {
+                    showInformationMessage("info.autodetectLanguageSelected");
+                } else {
+                    Locale l = language.getLocale();
+                    Messages.loadMessageBundle(l);
+                    Messages.loadModMessageBundle(l);
+                    showInformationMessage(StringTemplate
+                        .template("info.newLanguageSelected")
+                        .addName("%language%", l.getDisplayName()));
                 }
             });
 
