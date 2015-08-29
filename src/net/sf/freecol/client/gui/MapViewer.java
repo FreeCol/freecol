@@ -1028,9 +1028,8 @@ public final class MapViewer {
     void startCursorBlinking() {
         blinkingMarqueeEnabled = true;
 
-        ActionListener taskPerformer = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
+        cursor = new net.sf.freecol.client.gui.TerrainCursor();
+        cursor.addActionListener((ActionEvent event) -> {
                 if (!blinkingMarqueeEnabled) return;
                 Unit unit = activeUnit;
                 if (unit != null) {
@@ -1039,11 +1038,7 @@ public final class MapViewer {
                         gui.refreshTile(tile);
                     }
                 }
-            }
-        };
-
-        cursor = new net.sf.freecol.client.gui.TerrainCursor();
-        cursor.addActionListener(taskPerformer);
+            });
         cursor.startBlinking();
     }
 

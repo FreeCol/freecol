@@ -101,24 +101,21 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(OpenAction.id));
         menu.add(getMenuItem(SaveAction.id));
         JMenuItem playItem = Utility.localizedMenuItem("startGame");
-        playItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    File startFile = FreeColDirectories.getStartMapFile();
-                    freeColClient.getMapEditorController()
-                        .saveGame(startFile);
-                    OptionGroup options = freeColClient.getGame()
-                        .getMapGeneratorOptions();
-                    FileOption fileOption = (FileOption)options
-                        .getOption(MapGeneratorOptions.IMPORT_FILE);
-                    fileOption.setValue(startFile);
-                    File mapOptionsFile = FreeColDirectories
-                        .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
-                    try {
-                        options.save(mapOptionsFile);
-                    } catch (FileNotFoundException fnfe) {}
-                    freeColClient.newGame(true);
-                }
+        playItem.addActionListener((ActionEvent event) -> {
+                File startFile = FreeColDirectories.getStartMapFile();
+                freeColClient.getMapEditorController()
+                    .saveGame(startFile);
+                OptionGroup options = freeColClient.getGame()
+                    .getMapGeneratorOptions();
+                FileOption fileOption = (FileOption)options
+                    .getOption(MapGeneratorOptions.IMPORT_FILE);
+                fileOption.setValue(startFile);
+                File mapOptionsFile = FreeColDirectories
+                    .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
+                try {
+                    options.save(mapOptionsFile);
+                } catch (FileNotFoundException fnfe) {}
+                freeColClient.newGame(true);
             });
         menu.add(playItem);
         menu.addSeparator();
