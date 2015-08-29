@@ -1660,7 +1660,7 @@ public class SwingGUI extends GUI {
 
     @Override
     public float getMapScale() {
-        return mapViewer.getMapScale();
+        return mapViewer.getImageLibrary().getScaleFactor();
     }
 
     @Override

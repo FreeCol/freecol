@@ -296,16 +296,6 @@ public final class MapViewer {
         }
     }
 
-
-    /**
-     * Get the current active unit path.
-     *
-     * @return The current <code>PathNode</code>.
-     */
-    PathNode getCurrentPath() {
-        return this.currentPath;
-    }
-
     /**
      * Set the current active unit path.
      *
@@ -683,10 +673,6 @@ public final class MapViewer {
         return activeUnit;
     }
 
-    TerrainCursor getCursor() {
-        return cursor;
-    }
-
     /**
      * Gets the focus of the map. That is the center tile of the displayed
      * map.
@@ -715,24 +701,6 @@ public final class MapViewer {
      */
     ImageLibrary getImageLibrary() {
         return lib;
-    }
-
-    /**
-     * Get the current scale of the map.
-     *
-     * @return The current map scale.
-     */
-    float getMapScale() {
-        return lib.getScaleFactor();
-    }
-
-    /**
-     * Get the size of this GUI.
-     *
-     * @return The size of this GUI.
-     */
-    Dimension getSize() {
-        return size;
     }
 
     /**
@@ -861,7 +829,7 @@ public final class MapViewer {
      * @return True if scrolling occurred.
      */
     boolean scrollMap(Direction direction) {
-        Tile t = getFocus();
+        Tile t = focus;
         if (t == null) return false;
         int fx = t.getX(), fy = t.getY();
         if ((t = t.getNeighbourOrNull(direction)) == null) return false;
@@ -1072,7 +1040,7 @@ public final class MapViewer {
             @Override
             public void actionPerformed(ActionEvent event) {
                 if (!blinkingMarqueeEnabled) return;
-                Unit unit = getActiveUnit();
+                Unit unit = activeUnit;
                 if (unit != null) {
                     Tile tile = unit.getTile();
                     if (isTileVisible(tile)) {
@@ -1639,7 +1607,8 @@ public final class MapViewer {
                 // paint transparent borders
                 displayTerritorialBorders(g, tile, BorderType.COUNTRY, false);
 
-                if (shouldDisplayTileCursor(tile)) {
+                if (viewMode == GUI.VIEW_TERRAIN_MODE
+                        && tile != null && tile.equals(selectedTile)) {
                     displayCursor(g);
                 }
                 // check for units
@@ -2043,8 +2012,9 @@ public final class MapViewer {
         final Player player = freeColClient.getMyPlayer();
 
         // Draw the 'selected unit' image if needed.
-        //if ((unit == getActiveUnit()) && cursor) {
-        if (shouldDisplayUnitCursor(unit)) displayCursor(g);
+        if (viewMode == GUI.MOVE_UNITS_MODE && unit == activeUnit
+                && (cursor.isActive() || unit.getMovesLeft() <= 0))
+            displayCursor(g);
 
         // Draw the unit.
         // If unit is sentry, draw in grayscale
@@ -2705,14 +2675,4 @@ public final class MapViewer {
         rightSpace = leftSpace;
     }
 
-    private boolean shouldDisplayTileCursor(Tile tile) {
-        return viewMode == GUI.VIEW_TERRAIN_MODE
-            && tile != null && tile.equals(selectedTile);
-    }
-
-    private boolean shouldDisplayUnitCursor(Unit unit) {
-        return viewMode == GUI.MOVE_UNITS_MODE
-            && unit == activeUnit
-            && (cursor.isActive() || unit.getMovesLeft() <= 0);
-    }
 }
