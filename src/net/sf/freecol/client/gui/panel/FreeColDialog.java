@@ -175,6 +175,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         ChoiceItem<T> ci = (def >= 0) ? options.get(def) : null;
         if (obj instanceof StringTemplate) {
             obj = Utility.localizedTextArea((StringTemplate)obj);
+        } else if(obj instanceof String) {
+            obj = Utility.getDefaultTextArea((String)obj);
         }
         this.pane = new JOptionPane(obj, paneType, JOptionPane.DEFAULT_OPTION,
                                     icon, selectOptions(), ci);
