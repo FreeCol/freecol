@@ -1111,7 +1111,6 @@ public class SwingGUI extends GUI {
         canvas.showCompactLabourReport();
     }
 
-    @Override
     public void showCompactLabourReport(UnitData unitData) {
         canvas.showCompactLabourReport(unitData);
     }

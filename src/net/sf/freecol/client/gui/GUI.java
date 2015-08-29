@@ -39,7 +39,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.InGameController.*;
-import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.client.gui.panel.Utility;
@@ -1185,9 +1184,6 @@ public class GUI {
     }
 
     public void showCompactLabourReport() {
-    }
-
-    public void showCompactLabourReport(UnitData unitData) {
     }
 
     public void showDeclarationPanel() {
