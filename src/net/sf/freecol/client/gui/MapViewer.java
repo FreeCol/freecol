@@ -912,7 +912,7 @@ public final class MapViewer {
         this.activeUnit = activeUnit;
 
         // The user activated a unit
-        if (getViewMode() == GUI.VIEW_TERRAIN_MODE && activeUnit != null) {
+        if (viewMode == GUI.VIEW_TERRAIN_MODE && activeUnit != null) {
             changeViewMode(GUI.MOVE_UNITS_MODE);
         }
 
@@ -1029,7 +1029,7 @@ public final class MapViewer {
         boolean ret = false;
         selectedTile = newTile;
 
-        if (getViewMode() == GUI.MOVE_UNITS_MODE) {
+        if (viewMode == GUI.MOVE_UNITS_MODE) {
             if (activeUnit == null || activeUnit.getTile() != newTile) {
                 // select a unit on the selected tile
                 Unit unitInFront = findUnitInFront(newTile);

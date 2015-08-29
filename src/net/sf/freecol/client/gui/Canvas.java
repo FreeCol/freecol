@@ -403,12 +403,37 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Get the view mode.
+     *
+     * @return The view mode.
+     */
+    public int getViewMode() {
+        return mapViewer.getViewMode();
+    }
+
+    /**
      * Gets the active unit.
      *
      * @return The <code>Unit</code>.
      */
     Unit getActiveUnit() {
         return mapViewer.getActiveUnit();
+    }
+
+    /**
+     * Set the current active unit path.
+     *
+     * @param path The current <code>PathNode</code>.
+     */
+    void setCurrentPath(PathNode path) {
+        mapViewer.setCurrentPath(path);
+    }
+
+    /**
+     * Sets the path of the active unit to display it.
+     */
+    void updateCurrentPathForActiveUnit() {
+        mapViewer.updateCurrentPathForActiveUnit();
     }
 
     /**
@@ -1347,8 +1372,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     void setupMouseListeners() {
-        addMouseListener(new CanvasMouseListener(freeColClient, this,
-                                                 mapViewer));
+        addMouseListener(new CanvasMouseListener(freeColClient, this));
         addMouseMotionListener(new CanvasMouseMotionListener(freeColClient, this));
     }
 
@@ -2567,7 +2591,7 @@ public final class Canvas extends JDesktopPane {
     void showTilePopup(Tile tile, int x, int y) {
         if (tile == null)
             return;
-        TilePopup tp = new TilePopup(freeColClient, mapViewer, tile);
+        TilePopup tp = new TilePopup(freeColClient, this, tile);
         if (tp.hasItem()) {
             tp.show(this, x, y);
             tp.repaint();

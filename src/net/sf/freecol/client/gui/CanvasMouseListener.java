@@ -49,8 +49,6 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
 
     private final Canvas canvas;
 
-    private final MapViewer mapViewer;
-
     private final Timer doubleClickTimer = new Timer(doubleClickDelay,this);
 
     private int centerX, centerY;
@@ -61,14 +59,10 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
      *
      * @param freeColClient The enclosing <code>FreeColClient</code>.
      * @param canvas The component this object gets created for.
-     * @param mapViewer The GUI that holds information such as screen
-     *     resolution.
      */
-    public CanvasMouseListener(FreeColClient freeColClient, Canvas canvas,
-                               MapViewer mapViewer) {
+    public CanvasMouseListener(FreeColClient freeColClient, Canvas canvas) {
         this.freeColClient = freeColClient;
         this.canvas = canvas;
-        this.mapViewer = mapViewer;
     }
 
     /**
@@ -206,12 +200,12 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
     public void actionPerformed(ActionEvent e) {
         doubleClickTimer.stop();
         Tile tile=canvas.convertToMapTile(centerX, centerY);
-        if(mapViewer.getViewMode() == GUI.MOVE_UNITS_MODE) {
+        if(canvas.getViewMode() == GUI.MOVE_UNITS_MODE) {
             // Clear goto order when active unit is on the tile
             Unit unit=canvas.getActiveUnit();
             if(unit != null && unit.getTile() == tile) {
                 freeColClient.getInGameController().clearGotoOrders(unit);
-                mapViewer.updateCurrentPathForActiveUnit();
+                canvas.updateCurrentPathForActiveUnit();
             } else {
                 if (tile != null && tile.hasSettlement()) {
                     freeColClient.getGUI().showSettlement(tile.getSettlement());

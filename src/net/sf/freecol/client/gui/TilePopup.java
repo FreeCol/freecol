@@ -70,7 +70,7 @@ public final class TilePopup extends JPopupMenu {
 
     private final FreeColClient freeColClient;
     private final GUI gui;
-    private final MapViewer mapViewer;
+    private final Canvas canvas;
     private boolean hasAnItem = false;
 
 
@@ -78,15 +78,17 @@ public final class TilePopup extends JPopupMenu {
      * The constructor that will insert the MenuItems.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param canvas The Canvas.
      * @param tile The <code>Tile</code> to create a popup for.
      *       The popup menu also appears near this <code>Tile</code>.
      */
-    public TilePopup(final FreeColClient freeColClient, final MapViewer mapViewer, final Tile tile) {
+    public TilePopup(final FreeColClient freeColClient, final Canvas canvas,
+                     final Tile tile) {
         super(Messages.message(tile.getSimpleLabel()));
 
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
-        this.mapViewer = mapViewer;
+        this.canvas = canvas;
 
         final Player player = freeColClient.getMyPlayer();
         final Unit activeUnit = gui.getActiveUnit();
@@ -119,7 +121,7 @@ public final class TilePopup extends JPopupMenu {
                             // if unit did not move, we should show
                             // the goto path
                             if (activeUnit.getTile() == currTile) {
-                                mapViewer.updateCurrentPathForActiveUnit();
+                                canvas.updateCurrentPathForActiveUnit();
                             }
                         }
                     });
@@ -423,7 +425,7 @@ public final class TilePopup extends JPopupMenu {
                             activeUnit.getTile(), tile, activeUnit.getCarrier(),
                             null, lb);
                         gui.showInformationMessage(lb.toString());
-                        mapViewer.setCurrentPath(path);
+                        canvas.setCurrentPath(path);
                         gui.refresh();                        
                     }
                 });
