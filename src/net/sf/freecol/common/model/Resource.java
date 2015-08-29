@@ -193,7 +193,7 @@ public class Resource extends TileItem {
      */
     @Override
     public final int getZIndex() {
-        return RESOURCE_ZINDEX;
+        return Tile.RESOURCE_ZINDEX;
     }
 
     /**

@@ -121,6 +121,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public static final int NEAR_RADIUS = 8;
 
+    public static final int OVERLAY_ZINDEX = 100;
+    public static final int FOREST_ZINDEX = 200;
+    public static final int RESOURCE_ZINDEX = 400;
+    public static final int RUMOUR_ZINDEX = 500;
+
     /**
      * The type of the tile.
      * Beware: this may appear to be null in the client when the tile is

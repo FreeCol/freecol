@@ -228,9 +228,6 @@ public final class MapViewer {
         OTHER_UNITS_WIDTH = 3,
         MAX_OTHER_UNITS = 10;
 
-    public static final int OVERLAY_INDEX = 100;
-    public static final int FOREST_INDEX = 200;
-
     private GeneralPath gridPath = null;
     private final GeneralPath fog = new GeneralPath();
 
@@ -2001,7 +1998,7 @@ public final class MapViewer {
                 : new ArrayList<TileItem>();
             int startIndex = 0;
             for (int index = startIndex; index < tileItems.size(); index++) {
-                if (tileItems.get(index).getZIndex() < OVERLAY_INDEX) {
+                if (tileItems.get(index).getZIndex() < Tile.OVERLAY_ZINDEX) {
                     displayTileItem(g, tile, tileItems.get(index));
                     startIndex = index + 1;
                 } else {
@@ -2014,7 +2011,7 @@ public final class MapViewer {
                 g.drawImage(overlayImage, 0, (tileHeight - overlayImage.getHeight(null)), null);
             }
             for (int index = startIndex; index < tileItems.size(); index++) {
-                if (tileItems.get(index).getZIndex() < FOREST_INDEX) {
+                if (tileItems.get(index).getZIndex() < Tile.FOREST_ZINDEX) {
                     displayTileItem(g, tile, tileItems.get(index));
                     startIndex = index + 1;
                 } else {

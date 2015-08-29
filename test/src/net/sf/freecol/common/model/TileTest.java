@@ -716,13 +716,13 @@ public class TileTest extends FreeColTestCase {
     }
 
     public void testZIndex() {
-        assertTrue(MapViewer.OVERLAY_INDEX < MapViewer.FOREST_INDEX);
-        assertTrue(MapViewer.FOREST_INDEX < TileItem.RESOURCE_ZINDEX);
-        assertTrue(TileItem.RESOURCE_ZINDEX < TileItem.RUMOUR_ZINDEX);
+        assertTrue(Tile.OVERLAY_ZINDEX < Tile.FOREST_ZINDEX);
+        assertTrue(Tile.FOREST_ZINDEX < Tile.RESOURCE_ZINDEX);
+        assertTrue(Tile.RESOURCE_ZINDEX < Tile.RUMOUR_ZINDEX);
         assertTrue(plow.getZIndex() < river.getZIndex());
         assertTrue(river.getZIndex() < road.getZIndex());
-        assertTrue(MapViewer.FOREST_INDEX < road.getZIndex());
-        assertTrue(road.getZIndex() < TileItem.RESOURCE_ZINDEX);
+        assertTrue(Tile.FOREST_ZINDEX < road.getZIndex());
+        assertTrue(road.getZIndex() < Tile.RESOURCE_ZINDEX);
     }
 
     public void testCopy() {
