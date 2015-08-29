@@ -180,7 +180,7 @@ public final class Canvas extends JDesktopPane {
     private final FreeColClient freeColClient;
 
     /** The parent GUI. */
-    private final GUI gui;
+    private final SwingGUI gui;
 
     private final GraphicsDevice graphicsDevice;
 
@@ -228,16 +228,18 @@ public final class Canvas extends JDesktopPane {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param graphicsDevice The used graphics device.
+     * @param gui The gui.
      * @param desiredSize The desired size of the frame.
      * @param mapViewer The object responsible of drawing the map onto
      *     this component.
      */
     Canvas(final FreeColClient freeColClient,
-                  final GraphicsDevice graphicsDevice,
-                  final Dimension desiredSize,
-                  MapViewer mapViewer) {
+           final GraphicsDevice graphicsDevice,
+           final SwingGUI gui,
+           final Dimension desiredSize,
+           MapViewer mapViewer) {
         this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
+        this.gui = gui;
         this.graphicsDevice = graphicsDevice;
         chatDisplay = new ChatDisplay();
         this.mapViewer = mapViewer;

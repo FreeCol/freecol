@@ -19,10 +19,8 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -30,10 +28,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
-
-import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -42,7 +37,6 @@ import net.sf.freecol.client.control.InGameController.*;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -74,9 +68,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -274,14 +266,6 @@ public class GUI {
     }
 
     /**
-     * Refreshes the screen at the specified Tile.
-     *
-     * @param tile The <code>Tile</code> to refresh.
-     */
-    public void refreshTile(Tile tile) {
-    }
-
-    /**
      * Reset the menu bar.
      */
     public void resetMenuBar() {
@@ -364,9 +348,6 @@ public class GUI {
     }
 
     public void updateMapControls() {
-    }
-
-    public void updateMapControlsInCanvas() {
     }
 
     public void zoomInMapControls() {
@@ -1104,9 +1085,6 @@ public class GUI {
     public void refreshPlayersTable() {
     }
 
-    public void removeFromCanvas(Component component) {
-    }
-
     public void removeInGameComponents() {
     }
 
@@ -1117,22 +1095,10 @@ public class GUI {
         return false;
     }
 
-    public void restoreSavedSize(Component comp, int w, int h) {
-    }
-
-    public void restoreSavedSize(Component comp, Dimension size) {
-    }
-
     public void returnToTitle() {
     }
 
     public void showAboutPanel() {
-    }
-
-    public void showBuildQueuePanel(Colony colony) {
-    }
-
-    public void showBuildQueuePanel(Colony colony, Runnable callBack) {
     }
 
     public void showCaptureGoodsDialog(final Unit unit, List<Goods> gl,
@@ -1184,11 +1150,6 @@ public class GUI {
     }
 
     public OptionGroup showDifficultyDialog() {
-        return null;
-    }
-
-    public OptionGroup showDifficultyDialog(Specification spec,
-                                            OptionGroup group) {
         return null;
     }
 
@@ -1281,10 +1242,6 @@ public class GUI {
         return null;
     }
 
-    public File showLoadDialog(File directory, FileFilter[] fileFilters) {
-        return null;
-    }
-
     final public File showLoadSaveFileDialog() {
         File file = showLoadDialog(FreeColDirectories.getSaveDirectory());
         if (file != null && !file.isFile()) {
@@ -1359,12 +1316,6 @@ public class GUI {
         return false;
     }
 
-    public void showPurchasePanel() {
-    }
-
-    public void showRecruitPanel() {
-    }
-
     public void showReportCargoPanel() {
     }
 
@@ -1387,11 +1338,6 @@ public class GUI {
     }
 
     public void showReportIndianPanel() {
-    }
-
-    public void showReportLabourDetailPanel(UnitType unitType,
-            Map<UnitType, Map<Location, Integer>> data,
-            TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
     }
 
     public void showReportLabourPanel() {
@@ -1422,11 +1368,6 @@ public class GUI {
         return null;
     }
 
-    public File showSaveDialog(File directory, FileFilter[] fileFilters,
-                               String defaultName, String extension) {
-        return null;
-    }
-
     public Dimension showScaleMapSizeDialog() {
         return null;
     }
@@ -1445,9 +1386,6 @@ public class GUI {
         return null;
     }
 
-    public void showServerListPanel(List<ServerInfo> serverList) {
-    }
-
     public void showStartGamePanel(Game game, Player player,
                                    boolean singlePlayerMode) {
     }
@@ -1458,33 +1396,13 @@ public class GUI {
     public void showStatusPanel(String message) {
     }
 
-    public void showTilePanel(Tile tile) {
-    }
-
     public void showTilePopUpAtSelectedTile() {
     }
 
     public void showTradeRoutePanel(Unit unit) {
     }
 
-    public void showTradeRouteInputPanel(TradeRoute newRoute,
-                                         Runnable callBack) {
-    }
-
-    public void showTrainPanel() {
-    }
-
     public void showVictoryDialog() {
-    }
-
-    public boolean showWarehouseDialog(Colony colony) {
-        return false;
-    }
-
-    public void showWorkProductionPanel(Unit unit) {
-    }
-
-    public void updateEuropeanSubpanels() {
     }
 
     public void updateGameOptions() {
@@ -1499,16 +1417,6 @@ public class GUI {
     public void changeViewMode(int newViewMode) {
     }
 
-    public Point calculateUnitLabelPositionInTile(int labelWidth,int labelHeight,
-                                                  Point tileP) {
-        return null;
-    }
-
-    public void executeWithUnitOutForAnimation(final Unit unit,
-                                               final Tile sourceTile,
-                                               final OutForAnimationCallback r) {
-    }
-
     public Unit getActiveUnit() {
         return null;
     }
@@ -1517,41 +1425,15 @@ public class GUI {
         return null;
     }
 
-    public float getMapScale() {
-        return 1.0f;
-    }
-
     public Tile getSelectedTile() {
         return null;
-    }
-
-    public Rectangle getTileBounds(Tile tile) {
-        return null;
-    }
-
-    public Point getTilePosition(Tile tile) {
-        return null;
-    }
-
-    public double getTileWidthHeightRatio() {
-        return ImageLibrary.TILE_SIZE.width / (double)ImageLibrary.TILE_SIZE.height;
     }
 
     public int getViewMode() {
         return -1;
     }
 
-    public boolean onScreen(Tile tileToCheck) {
-        return true; // Lets pretend.
-    }
-
-    public void restartBlinking() {
-    }
-
     public void setFocus(Tile tileToFocus) {
-    }
-
-    public void setFocusImmediately(Tile tileToFocus) {
     }
 
     public boolean setSelectedTile(Tile newTileToSelect) {

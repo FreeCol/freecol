@@ -761,15 +761,6 @@ public final class MapViewer {
     }
 
     /**
-     * Get the ratio of width/height of tiles on the map.
-     *
-     * @return The ratio.
-     */
-    double getTileWidthHeightRatio() {
-        return tileWidth / (double)tileHeight;
-    }
-
-    /**
      * Gets the position where a unitLabel located at tile should be drawn.
      *
      * @param labelWidth The width of the unit label.

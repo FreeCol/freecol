@@ -20,7 +20,7 @@
 package net.sf.freecol.client.gui.animation;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
@@ -92,7 +92,7 @@ final class UnitAttackAnimation {
      */
     private SimpleZippedAnimation getAnimation(Unit unit,
                                                Direction direction) {
-        float scale = freeColClient.getGUI().getMapScale();
+        float scale = ((SwingGUI)freeColClient.getGUI()).getMapScale();
         String roleStr = (unit.hasDefaultRole()) ? ""
             : "." + unit.getRoleSuffix();
         String startStr = "animation.unit." + unit.getType().getId() + roleStr
@@ -131,7 +131,7 @@ final class UnitAttackAnimation {
      * Do the animation.
      */
     public void animate() {
-        final GUI gui = freeColClient.getGUI();
+        final SwingGUI gui = (SwingGUI)freeColClient.getGUI();
         Direction direction = attackerTile.getDirection(defenderTile);
         SimpleZippedAnimation sza;
 

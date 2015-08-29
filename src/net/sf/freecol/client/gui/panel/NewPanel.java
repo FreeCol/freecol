@@ -43,7 +43,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.ServerInfo;
@@ -507,10 +507,9 @@ public final class NewPanel extends FreeColPanel
     @Override
     public void actionPerformed(ActionEvent event) {
         final ConnectController cc = getFreeColClient().getConnectController();
-        final GUI gui = getGUI();
+        final SwingGUI gui = getGUI();
         final String command = event.getActionCommand();
 
-        int port;
         switch (Enum.valueOf(NewPanelAction.class, command)) {
         case OK:
             FreeCol.setName(getSelectedName());

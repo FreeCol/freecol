@@ -326,7 +326,7 @@ public class SwingGUI extends GUI {
                 if (t != null) {
                     t.stop();
                 }
-                freeColClient.getSoundController().playSound("sound.intro.general");
+                playSound("sound.intro.general");
                 showMainPanel(userMsg);
             }
         }
@@ -410,7 +410,7 @@ public class SwingGUI extends GUI {
             });
 
         this.mapViewer = new MapViewer(freeColClient);
-        this.canvas = new Canvas(freeColClient, graphicsDevice,
+        this.canvas = new Canvas(freeColClient, graphicsDevice, this,
                                  desiredWindowSize, mapViewer);
         this.tileMapViewer = new MapViewer(freeColClient);
 
@@ -533,7 +533,6 @@ public class SwingGUI extends GUI {
      *
      * @param tile The <code>Tile</code> to refresh.
      */
-    @Override
     public void refreshTile(Tile tile) {
         if (tile.getX() >= 0 && tile.getY() >= 0) {
             canvas.repaint(mapViewer.calculateTileBounds(tile));
@@ -622,7 +621,7 @@ public class SwingGUI extends GUI {
     private boolean requireFocus(Tile tile) {
         boolean required = freeColClient.getClientOptions()
             .getBoolean(ClientOptions.ALWAYS_CENTER);
-        if ((required && tile != getFocus()) || !onScreen(tile)) {
+        if ((required && tile != getFocus()) || !mapViewer.onScreen(tile)) {
             setFocusImmediately(tile);
             return true;
         }
@@ -704,7 +703,6 @@ public class SwingGUI extends GUI {
         if (mapControls != null) mapControls.update();
     }
 
-    @Override
     public void updateMapControlsInCanvas() {
         if (mapControls == null) return;
         mapControls.removeFromComponent(canvas);
@@ -993,7 +991,6 @@ public class SwingGUI extends GUI {
         canvas.refreshPlayersTable();
     }
 
-    @Override
     public void removeFromCanvas(Component component) {
         canvas.remove(component);
     }
@@ -1017,12 +1014,10 @@ public class SwingGUI extends GUI {
         return canvas.requestFocusInWindow();
     }
 
-    @Override
     public void restoreSavedSize(Component comp, int w, int h) {
         canvas.restoreSavedSize(comp, new Dimension(w, h));
     }
 
-    @Override
     public void restoreSavedSize(Component comp, Dimension size) {
         canvas.restoreSavedSize(comp, size);
     }
@@ -1030,7 +1025,7 @@ public class SwingGUI extends GUI {
     @Override
     public void returnToTitle() {
         canvas.returnToTitle();
-        freeColClient.getSoundController().playSound("sound.intro.general");
+        playSound("sound.intro.general");
     }
 
     @Override
@@ -1038,12 +1033,10 @@ public class SwingGUI extends GUI {
         canvas.showAboutPanel();
     }
 
-    @Override
     public void showBuildQueuePanel(Colony colony) {
         canvas.showBuildQueuePanel(colony);
     }
 
-    @Override
     public void showBuildQueuePanel(Colony colony, Runnable callBack) {
         canvas.showBuildQueuePanel(colony, callBack);
     }
@@ -1125,7 +1118,6 @@ public class SwingGUI extends GUI {
         return canvas.showDifficultyDialog();
     }
 
-    @Override
     public OptionGroup showDifficultyDialog(Specification spec,
                                             OptionGroup group) {
         return canvas.showDifficultyDialog(spec, group);
@@ -1283,7 +1275,6 @@ public class SwingGUI extends GUI {
         return canvas.showLoadDialog(directory);
     }
 
-    @Override
     public File showLoadDialog(File directory, FileFilter[] fileFilters) {
         return canvas.showLoadDialog(directory, fileFilters);
     }
@@ -1406,12 +1397,10 @@ public class SwingGUI extends GUI {
         return canvas.showPreCombatDialog(attacker, defender, tile);
     }
 
-    @Override
     public void showPurchasePanel() {
         canvas.showPurchasePanel();
     }
 
-    @Override
     public void showRecruitPanel() {
         canvas.showRecruitPanel();
     }
@@ -1456,7 +1445,6 @@ public class SwingGUI extends GUI {
         canvas.showReportIndianPanel();
     }
 
-    @Override
     public void showReportLabourDetailPanel(UnitType unitType,
             Map<UnitType, Map<Location, Integer>> data,
             TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
@@ -1509,7 +1497,6 @@ public class SwingGUI extends GUI {
         return canvas.showSaveDialog(directory, defaultName);
     }
 
-    @Override
     public File showSaveDialog(File directory, FileFilter[] fileFilters,
                                String defaultName, String extension) {
         return canvas.showSaveDialog(directory, fileFilters, defaultName,
@@ -1539,7 +1526,6 @@ public class SwingGUI extends GUI {
         return canvas.showSelectDestinationDialog(unit);
     }
 
-    @Override
     public void showServerListPanel(List<ServerInfo> serverList) {
         canvas.showServerListPanel(serverList);
     }
@@ -1560,7 +1546,6 @@ public class SwingGUI extends GUI {
         canvas.showStatusPanel(message);
     }
 
-    @Override
     public void showTilePanel(Tile tile) {
         canvas.showTilePanel(tile);
     }
@@ -1577,13 +1562,11 @@ public class SwingGUI extends GUI {
         canvas.showTradeRoutePanel(unit);
     }
 
-    @Override
     public void showTradeRouteInputPanel(TradeRoute newRoute,
                                          Runnable callBack) {
         canvas.showTradeRouteInputPanel(newRoute, callBack);
     }
 
-    @Override
     public void showTrainPanel() {
         canvas.showTrainPanel();
     }
@@ -1598,17 +1581,14 @@ public class SwingGUI extends GUI {
             });
     }
 
-    @Override
     public boolean showWarehouseDialog(Colony colony) {
         return canvas.showWarehouseDialog(colony);
     }
 
-    @Override
     public void showWorkProductionPanel(Unit unit) {
         canvas.showWorkProductionPanel(unit);
     }
 
-    @Override
     public void updateEuropeanSubpanels() {
         canvas.updateEuropeanSubpanels();
     }
@@ -1635,14 +1615,12 @@ public class SwingGUI extends GUI {
         mapViewer.changeViewMode(newViewMode);
     }
 
-    @Override
     public Point calculateUnitLabelPositionInTile(int labelWidth,int labelHeight,
                                                   Point tileP) {
         return mapViewer.calculateUnitLabelPositionInTile(
             labelWidth, labelHeight, tileP);
     }
 
-    @Override
     public void executeWithUnitOutForAnimation(final Unit unit,
                                                final Tile sourceTile,
                                                final OutForAnimationCallback r) {
@@ -1659,7 +1637,6 @@ public class SwingGUI extends GUI {
         return mapViewer.getFocus();
     }
 
-    @Override
     public float getMapScale() {
         return mapViewer.getImageLibrary().getScaleFactor();
     }
@@ -1669,19 +1646,12 @@ public class SwingGUI extends GUI {
         return mapViewer.getSelectedTile();
     }
 
-    @Override
     public Rectangle getTileBounds(Tile tile) {
         return mapViewer.calculateTileBounds(tile);
     }
 
-    @Override
     public Point getTilePosition(Tile tile) {
         return mapViewer.calculateTilePosition(tile);
-    }
-
-    @Override
-    public double getTileWidthHeightRatio() {
-        return mapViewer.getTileWidthHeightRatio();
     }
 
     @Override
@@ -1689,12 +1659,6 @@ public class SwingGUI extends GUI {
         return mapViewer.getViewMode();
     }
 
-    @Override
-    public boolean onScreen(Tile tileToCheck) {
-        return mapViewer.onScreen(tileToCheck);
-    }
-
-    @Override
     public void restartBlinking() {
         mapViewer.restartBlinking();
     }
@@ -1705,7 +1669,6 @@ public class SwingGUI extends GUI {
         canvas.refresh();
     }
 
-    @Override
     public void setFocusImmediately(Tile tileToFocus) {
         mapViewer.setFocus(tileToFocus);
         Dimension size = canvas.getSize();

@@ -38,7 +38,7 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
@@ -206,7 +206,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     @Override
     public IndianSettlement getResponse() {
         final Specification spec = freeColClient.getGame().getSpecification();
-        final GUI gui = freeColClient.getGUI();
+        final SwingGUI gui = getGUI();
         IndianSettlement ret = null;
         Set<Tile> tiles = settlement.getOwnedTiles();
         Object value = getValue();
@@ -264,8 +264,8 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             ret = settlement;
 
         } else if (options.get(1).equals(value)) {
-            if (!getGUI().confirm("editSettlementDialog.removeSettlement.text", 
-                                  "ok", "cancel")) {
+            if (!gui.confirm("editSettlementDialog.removeSettlement.text", 
+                             "ok", "cancel")) {
                 return settlement;
             }
             // Dispose of units and settlement on tile

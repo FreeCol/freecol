@@ -48,8 +48,8 @@ import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
@@ -235,7 +235,7 @@ public final class DefaultTransferHandler extends TransferHandler {
 
     private final FreeColClient freeColClient;
 
-    private final GUI gui;
+    private final SwingGUI gui;
 
     private final FreeColPanel parentPanel;
 
@@ -249,7 +249,7 @@ public final class DefaultTransferHandler extends TransferHandler {
     public DefaultTransferHandler(FreeColClient freeColClient,
                                   FreeColPanel parentPanel) {
         this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
+        this.gui = (SwingGUI)freeColClient.getGUI();
         this.parentPanel = parentPanel;
     }
 

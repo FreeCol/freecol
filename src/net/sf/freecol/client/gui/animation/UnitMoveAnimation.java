@@ -25,8 +25,9 @@ import java.awt.Rectangle;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.OutForAnimationCallback;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
@@ -70,7 +71,7 @@ final class UnitMoveAnimation {
     public void animate() {
         final int movementSpeed
             = freeColClient.getAnimationSpeed(unit.getOwner());
-        final GUI gui = freeColClient.getGUI();
+        final SwingGUI gui = (SwingGUI)freeColClient.getGUI();
         final Point srcP = gui.getTilePosition(sourceTile);
         final Point dstP = gui.getTilePosition(destinationTile);
         
@@ -92,7 +93,8 @@ final class UnitMoveAnimation {
                         labelWidth, labelHeight, srcP);
                     final Point dstPoint = gui.calculateUnitLabelPositionInTile(
                         labelWidth, labelHeight, dstP);
-                    final double xratio = gui.getTileWidthHeightRatio();
+                    final double xratio = ImageLibrary.TILE_SIZE.width
+                                        / (double)ImageLibrary.TILE_SIZE.height;
                     final int stepX = (srcPoint.getX() == dstPoint.getX()) ? 0
                         : (srcPoint.getX() > dstPoint.getX()) ? -1 : 1;
                     final int stepY = (srcPoint.getY() == dstPoint.getY()) ? 0

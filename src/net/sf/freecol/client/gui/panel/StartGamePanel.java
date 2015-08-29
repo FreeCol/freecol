@@ -31,10 +31,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Nation;
@@ -295,7 +296,7 @@ public final class StartGamePanel extends FreeColPanel {
     public void actionPerformed(ActionEvent event) {
         final String command = event.getActionCommand();
         final FreeColClient fcc = getFreeColClient();
-        final GUI gui = getGUI();
+        final SwingGUI gui = getGUI();
         try {
             switch (Integer.parseInt(command)) {
             case START:

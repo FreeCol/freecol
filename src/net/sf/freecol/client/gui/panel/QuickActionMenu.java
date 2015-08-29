@@ -43,8 +43,8 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.client.gui.panel.ColonyPanel.TilesPanel.ASingleTilePanel;
 import net.sf.freecol.client.gui.panel.UnitLabel.UnitAction;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -83,7 +83,7 @@ public final class QuickActionMenu extends JPopupMenu {
 
     private final FreeColClient freeColClient;
 
-    private final GUI gui;
+    private final SwingGUI gui;
 
     private final FreeColPanel parentPanel;
 
@@ -97,7 +97,7 @@ public final class QuickActionMenu extends JPopupMenu {
     public QuickActionMenu(FreeColClient freeColClient,
                            FreeColPanel freeColPanel) {
         this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
+        this.gui = (SwingGUI)freeColClient.getGUI();
         this.parentPanel = freeColPanel;
     }
 
