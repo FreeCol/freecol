@@ -86,10 +86,12 @@ final class UnitMoveAnimation {
             new OutForAnimationCallback() {
                 @Override
                 public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
-                    final Point srcPoint
-                        = gui.calculateUnitLabelPositionInTile(unitLabel, srcP);
-                    final Point dstPoint
-                        = gui.calculateUnitLabelPositionInTile(unitLabel, dstP);
+                    final int labelWidth = unitLabel.getWidth();
+                    final int labelHeight = unitLabel.getHeight();
+                    final Point srcPoint = gui.calculateUnitLabelPositionInTile(
+                        labelWidth, labelHeight, srcP);
+                    final Point dstPoint = gui.calculateUnitLabelPositionInTile(
+                        labelWidth, labelHeight, dstP);
                     final double xratio = gui.getTileWidthHeightRatio();
                     final int stepX = (srcPoint.getX() == dstPoint.getX()) ? 0
                         : (srcPoint.getX() > dstPoint.getX()) ? -1 : 1;

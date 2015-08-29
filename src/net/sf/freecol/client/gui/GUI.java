@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.client.ClientOptions;
@@ -1510,7 +1509,8 @@ public class GUI {
     public void changeViewMode(int newViewMode) {
     }
 
-    public Point calculateUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
+    public Point calculateUnitLabelPositionInTile(int labelWidth,int labelHeight,
+                                                  Point tileP) {
         return null;
     }
 

@@ -772,17 +772,18 @@ public final class MapViewer {
     /**
      * Gets the position where a unitLabel located at tile should be drawn.
      *
-     * @param unitLabel The unit label with the unit's image and
-     *     occupation indicator drawn.
+     * @param labelWidth The width of the unit label.
+     * @param labelHeight The width of the unit label.
      * @param tileP The position of the Tile on the screen.
      * @return The position where to put the label, null if tileP is null.
      */
-    Point calculateUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
+    Point calculateUnitLabelPositionInTile(int labelWidth,int labelHeight,
+                                           Point tileP) {
         if (tileP != null) {
             int labelX = tileP.x + tileWidth
-                / 2 - unitLabel.getWidth() / 2;
+                / 2 - labelWidth / 2;
             int labelY = tileP.y + tileHeight
-                / 2 - unitLabel.getHeight() / 2
+                / 2 - labelHeight / 2
                 - (int) (UNIT_OFFSET * lib.getScaleFactor());
             return new Point(labelX, labelY);
         } else {
@@ -2138,7 +2139,8 @@ public final class MapViewer {
             final JLabel unitLabel = createUnitLabel(unit);
 
             i = 1;
-            unitLabel.setLocation(calculateUnitLabelPositionInTile(unitLabel,
+            unitLabel.setLocation(calculateUnitLabelPositionInTile(
+                    unitLabel.getWidth(), unitLabel.getHeight(),
                     calculateTilePosition(sourceTile)));
             unitsOutForAnimationLabels.put(unit, unitLabel);
             gui.getCanvas().add(unitLabel, JLayeredPane.DEFAULT_LAYER);

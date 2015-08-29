@@ -1637,8 +1637,10 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public Point calculateUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
-        return mapViewer.calculateUnitLabelPositionInTile(unitLabel, tileP);
+    public Point calculateUnitLabelPositionInTile(int labelWidth,int labelHeight,
+                                                  Point tileP) {
+        return mapViewer.calculateUnitLabelPositionInTile(
+            labelWidth, labelHeight, tileP);
     }
 
     @Override
