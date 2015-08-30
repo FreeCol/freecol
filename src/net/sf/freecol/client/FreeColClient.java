@@ -21,9 +21,8 @@ package net.sf.freecol.client;
 
 import java.awt.Dimension;
 import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -227,38 +226,6 @@ public final class FreeColClient {
             } catch (Exception e) {
                 fatal(Messages.message("client.laf") + "\n" + e.getMessage());
             }
-        }
-    }
-
-    /**
-     * Wrapper for SwingUtilities.invokeAndWait that handles the case
-     * where we are already in the EDT.
-     *
-     * @param runnable A <code>Runnable</code> to run.
-     */
-    public void invokeAndWait(Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(runnable);
-            } catch (InterruptedException|InvocationTargetException ex) {
-                logger.log(Level.WARNING, "Client GUI interaction", ex);
-            }
-        }
-    }
-
-    /**
-     * Wrapper for SwingUtilities.invokeLater that handles the case
-     * where we are already in the EDT.
-     *
-     * @param runnable A <code>Runnable</code> to run.
-     */
-    public void invokeLater(Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            SwingUtilities.invokeLater(runnable);
         }
     }
     

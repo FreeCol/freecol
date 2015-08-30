@@ -25,10 +25,14 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -1476,6 +1480,40 @@ public class GUI {
      */
     public String getSoundMixerLabelText() {
         return freeColClient.getSoundController().getSoundMixerLabelText();
+    }
+
+    // invoke method forwarding
+
+    /**
+     * Wrapper for SwingUtilities.invokeLater that handles the case
+     * where we are already in the EDT.
+     *
+     * @param runnable A <code>Runnable</code> to run.
+     */
+    public void invokeNowOrLater(Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
+        }
+    }
+
+    /**
+     * Wrapper for SwingUtilities.invokeAndWait that handles the case
+     * where we are already in the EDT.
+     *
+     * @param runnable A <code>Runnable</code> to run.
+     */
+    public void invokeNowOrWait(Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(runnable);
+            } catch (InterruptedException | InvocationTargetException ex) {
+                logger.log(Level.WARNING, "Client GUI interaction", ex);
+            }
+        }
     }
 
 }

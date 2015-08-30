@@ -763,7 +763,7 @@ public final class InGameController implements NetworkConstants {
                         }
                     };
             }
-            freeColClient.invokeAndWait(uiTask);
+            gui.invokeNowOrWait(uiTask);
         }
         return !messages.isEmpty();
     }

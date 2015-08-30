@@ -79,7 +79,7 @@ import org.w3c.dom.NodeList;
  * ...except for the special case of the animations.  These have to be
  * done in series but are sometimes in the EDT (our unit moves) and
  * sometimes not (other nation unit moves).  Hence the hack
- * FreeColClient.invokeAndWait.
+ * GUI.invokeNowOrWait.
  */
 public final class InGameInputHandler extends InputHandler {
 
@@ -272,7 +272,7 @@ public final class InGameInputHandler extends InputHandler {
         final FreeColClient fcc = getFreeColClient();
         if (Boolean.TRUE.toString().equals(element.getAttribute("flush"))
             && fcc.currentPlayerIsMyPlayer()) {
-            fcc.invokeLater(displayModelMessagesRunnable);
+            fcc.getGUI().invokeNowOrLater(displayModelMessagesRunnable);
         }
         return reply;
     }
@@ -411,7 +411,7 @@ public final class InGameInputHandler extends InputHandler {
             = Boolean.parseBoolean(element.getAttribute("success"));
 
         // All is well, do the animation.
-        getFreeColClient().invokeAndWait(new Runnable() {
+        getGUI().invokeNowOrWait(new Runnable() {
                 @Override
                 public void run() {
                     igc().animateAttack(attacker, defender,
@@ -481,7 +481,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getFreeColClient().invokeAndWait(new Runnable() {
+        getGUI().invokeNowOrWait(new Runnable() {
                 @Override
                 public void run() {
                     igc().animateMove(unit, oldTile, newTile);
@@ -501,7 +501,7 @@ public final class InGameInputHandler extends InputHandler {
         final Game game = getGame();
         final ChatMessage chatMessage = new ChatMessage(game, element);
 
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().chat(chatMessage.getPlayer(game),
@@ -524,7 +524,7 @@ public final class InGameInputHandler extends InputHandler {
             = new ChooseFoundingFatherMessage(getGame(), element);
         final List<FoundingFather> ffs = message.getFathers();
 
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().chooseFoundingFather(ffs);
@@ -544,7 +544,7 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element closeMenus() {
-        getFreeColClient().invokeAndWait(closeMenusRunnable);
+        getGUI().invokeNowOrWait(closeMenusRunnable);
         return null;
     }
 
@@ -576,7 +576,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getFreeColClient().invokeAndWait(new Runnable() {
+        getGUI().invokeNowOrWait(new Runnable() {
                 @Override
                 public void run() {
                     message.setAgreement(igc().diplomacy(our, other,
@@ -627,7 +627,7 @@ public final class InGameInputHandler extends InputHandler {
         final String messageId = element.getAttribute("messageID");
         final String message = element.getAttribute("message");
 
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().error(messageId, message);
@@ -709,7 +709,7 @@ public final class InGameInputHandler extends InputHandler {
         }
         final int n = message.getSettlementCount();
 
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().firstContact(player, other, tile, n);
@@ -733,7 +733,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().fountainOfYouth(n);
@@ -762,7 +762,7 @@ public final class InGameInputHandler extends InputHandler {
         final String highScore = element.getAttribute("highScore");
 
         if (winner == freeColClient.getMyPlayer()) {
-            getFreeColClient().invokeLater(new Runnable() {
+            getGUI().invokeNowOrLater(new Runnable() {
                     @Override
                     public void run() {
                         igc().victory(highScore);
@@ -800,7 +800,7 @@ public final class InGameInputHandler extends InputHandler {
             throw new IllegalArgumentException("Demand to anothers colony");
         }
 
-        getFreeColClient().invokeAndWait(new Runnable() {
+        getGUI().invokeNowOrWait(new Runnable() {
                 @Override
                 public void run() {
                     boolean accepted = igc().indianDemand(unit, colony,
@@ -826,7 +826,7 @@ public final class InGameInputHandler extends InputHandler {
         final List<Goods> goods = message.getGoods();
         if (unit == null || goods == null) return null;
 
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().loot(unit, goods, defenderId);
@@ -847,7 +847,7 @@ public final class InGameInputHandler extends InputHandler {
         final MonarchActionMessage message
             = new MonarchActionMessage(game, element);
 
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().monarch(message.getAction(), message.getTemplate(),
@@ -895,7 +895,7 @@ public final class InGameInputHandler extends InputHandler {
         if (unit == null || defaultName == null 
             || !unit.hasTile()) return null;
 
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().newLandName(defaultName, unit);
@@ -920,7 +920,7 @@ public final class InGameInputHandler extends InputHandler {
         final String defaultName = message.getNewRegionName();
         if (defaultName == null || region == null) return null;
 
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().newRegionName(region, defaultName, tile, unit);
@@ -943,7 +943,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().newTurn(n);
@@ -962,7 +962,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element reconnect(@SuppressWarnings("unused") Element element) {
         logger.finest("Entered reconnect.");
 
-        getFreeColClient().invokeLater(reconnectRunnable);
+        getGUI().invokeNowOrLater(reconnectRunnable);
         return null;
     }
 
@@ -994,7 +994,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         if (!objects.isEmpty()) {
-            getFreeColClient().invokeLater(new Runnable() {
+            getGUI().invokeNowOrLater(new Runnable() {
                     @Override
                     public void run() {
                         igc().remove(objects, divert);
@@ -1036,7 +1036,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().setCurrentPlayer(player);
@@ -1060,7 +1060,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().setDead(player);
@@ -1097,7 +1097,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().setStance(stance, p1, p2);
@@ -1142,7 +1142,7 @@ public final class InGameInputHandler extends InputHandler {
         final Element fullElement = (Element)nodeList.item(0);
         final Element normalElement = (Element)nodeList.item(1);
         tile.readFromXMLElement(fullElement);
-        getFreeColClient().invokeLater(new Runnable() {
+        getGUI().invokeNowOrLater(new Runnable() {
                 @Override
                 public void run() {
                     igc().spyColony(tile, new Runnable() {
