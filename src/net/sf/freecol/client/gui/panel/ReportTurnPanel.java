@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -124,7 +125,7 @@ public final class ReportTurnPanel extends ReportPanel {
                 FreeColGameObject messageSource = game.getMessageSource(message);
                 if (messageSource != source) {
                     source = messageSource;
-                    reportPanel.add(getHeadline(source), "newline 20, skip");
+                    reportPanel.add(getHeadline(messageSource), "newline 20, skip");
                 }
                 break;
             case ClientOptions.MESSAGES_GROUP_BY_TYPE:
@@ -249,68 +250,60 @@ public final class ReportTurnPanel extends ReportPanel {
         }
     }
 
-    private JComponent getHeadline(Object source) {
-        JComponent headline;
+    private JComponent getHeadline(FreeColGameObject source) {
+        String text;
+        String commandId = null;
         if (source == null) {
-            return new JLabel();
+            text = "";
         } else if (source instanceof Player) {
             Player player = (Player) source;
-            headline = Utility.localizedLabel(StringTemplate
+            StringTemplate template = StringTemplate
                 .template("report.turn.playerNation")
                 .addName("%player%", player.getName())
-                .addStringTemplate("%nation%", player.getNationLabel()));
+                .addStringTemplate("%nation%", player.getNationLabel());
+            text = Messages.message(template);
         } else if (source instanceof Europe) {
             Europe europe = (Europe) source;
-            JButton button = new JButton(Messages.getName(europe));
-            button.addActionListener(this);
-            button.setActionCommand(europe.getId());
-            headline = button;
+            text = Messages.getName(europe);
+            commandId = europe.getId();
         } else if (source instanceof Market) {
             Market market = (Market) source;
-            JButton button = Utility.localizedButton(market.getOwner().getMarketName());
-            button.addActionListener(this);
-            button.setActionCommand(getMyPlayer().getEurope().getId());
-            headline = button;
+            StringTemplate template = market.getOwner().getMarketName();
+            text = Messages.message(template);
+            commandId = getMyPlayer().getEurope().getId();
         } else if (source instanceof Colony) {
             final Colony colony = (Colony) source;
-            JButton button = new JButton(colony.getName());
-            button.addActionListener(this);
-            button.setActionCommand(colony.getId());
-            headline = button;
+            text = colony.getName();
+            commandId = colony.getId();
         } else if (source instanceof Unit) {
             final Unit unit = (Unit) source;
-            JButton button
-                = new JButton(unit.getDescription(Unit.UnitLabelType.NATIONAL));
-            button.addActionListener(this);
-            button.setActionCommand(unit.getLocation().getId());
-            headline = button;
+            text = unit.getDescription(Unit.UnitLabelType.NATIONAL);
+            commandId = unit.getLocation().getId();
         } else if (source instanceof Tile) {
             final Tile tile = (Tile) source;
-            JButton button = Utility.localizedButton(tile.getLocationLabelFor(getMyPlayer()));
-            button.addActionListener(this);
-            button.setActionCommand(tile.getId());
-            headline = button;
+            StringTemplate template = tile.getLocationLabelFor(getMyPlayer());
+            text = Messages.message(template);
+            commandId = tile.getId();
         } else if (source instanceof Nameable) {
-            headline = new JLabel(((Nameable) source).getName());
+            text = ((Nameable) source).getName();
         } else {
-            headline = new JLabel(source.toString());
+            text = source.toString();
         }
 
-        // FIXME: Get text before putting it inside and remove type testing.
-        String text;
-        if(headline instanceof JLabel)
-            text = ((JLabel)headline).getText();
-        else if(headline instanceof JButton)
-            text = ((JButton)headline).getText();
-        else {
-            text = "";
-            logger.warning("Unknown JComponent");
+        Font font = FontLibrary.createCompatibleFont(text,
+            FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL);
+        JComponent headline;
+        if(commandId != null) {
+            JButton button = new JButton(text);
+            button.addActionListener(this);
+            button.setActionCommand(commandId);
+            headline = button;
+            headline.setForeground(Utility.LINK_COLOR);
+        } else {
+            headline = new JLabel(text);
         }
-
-        headline.setFont(FontLibrary.createCompatibleFont(text,
-            FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL));
+        headline.setFont(font);
         headline.setOpaque(false);
-        headline.setForeground(Utility.LINK_COLOR);
         headline.setBorder(Utility.blankBorder(5, 0, 0, 0));
         return headline;
     }
