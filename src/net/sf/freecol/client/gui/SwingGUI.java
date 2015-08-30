@@ -952,7 +952,7 @@ public class SwingGUI extends GUI {
                 displayObject((FreeColObject)loc);
             }
         } else if (fco instanceof WorkLocation) {
-            displayObject(((WorkLocation)fco).getColony());
+            canvas.showColonyPanel(((WorkLocation)fco).getColony(), null);
         }
     }
 
