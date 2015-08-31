@@ -104,25 +104,31 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
      * @param id The object identifier of the new branch node.
      * @param types a List of FreeColGameObjectTypes
      */
-    public void addSubTrees(DefaultMutableTreeNode root, String id, List<T> types) {
+    public void addSubTrees(DefaultMutableTreeNode root, String id,
+                            List<T> types) {
         String name = getName();
-        DefaultMutableTreeNode node =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(this, id, name, null));
+        ColopediaTreeItem cti = new ColopediaTreeItem(this, id, name, null);
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(cti);
         int width = ImageLibrary.ICON_SIZE.width;
         int height = ImageLibrary.ICON_SIZE.height;
         for (FreeColGameObjectType type : types) {
             Image image = (type instanceof GoodsType)
-                ? ImageLibrary.getMiscImage("image.icon." + type.getId(), ImageLibrary.ICON_SIZE)
+                ? ImageLibrary.getMiscImage("image.icon." + type.getId(),
+                                            ImageLibrary.ICON_SIZE)
                 : (type instanceof ResourceType)
-                    ? ImageLibrary.getMiscImage("image.tileitem." + type.getId(), ImageLibrary.ICON_SIZE)
-                    : (type instanceof Nation)
-                        ? ImageLibrary.getMiscIconImage(type, ImageLibrary.ICON_SIZE)
-                        : (type instanceof BuildableType)
-                            ? ImageLibrary.getBuildableImage((BuildableType)type, ImageLibrary.ICON_SIZE)
-                            : ImageLibrary.getMiscImage(ResourceManager.REPLACEMENT_IMAGE, ImageLibrary.ICON_SIZE);
+                ? ImageLibrary.getMiscImage("image.tileitem." + type.getId(),
+                                            ImageLibrary.ICON_SIZE)
+                : (type instanceof Nation)
+                ? ImageLibrary.getMiscIconImage(type, ImageLibrary.ICON_SIZE)
+                : (type instanceof BuildableType)
+                ? ImageLibrary.getBuildableImage((BuildableType)type,
+                                                 ImageLibrary.ICON_SIZE)
+                : ImageLibrary.getMiscImage(ResourceManager.REPLACEMENT_IMAGE,
+                                            ImageLibrary.ICON_SIZE);
             int x = (width - image.getWidth(null)) / 2;
             int y = (height - image.getHeight(null)) / 2;
-            BufferedImage centeredImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage centeredImage
+                = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = centeredImage.createGraphics();
             g.drawImage(image, x, y, null);
             g.dispose();
@@ -131,21 +137,23 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
         root.add(node);
     }
 
-    protected DefaultMutableTreeNode buildItem(FreeColGameObjectType type, ImageIcon icon) {
+    protected DefaultMutableTreeNode buildItem(FreeColGameObjectType type,
+                                               ImageIcon icon) {
         String name = Messages.getName(type);
         return new DefaultMutableTreeNode(new ColopediaTreeItem(this, 
                 type.getId(), name, icon));
     }
 
-
-    protected JButton getButton(FreeColGameObjectType type, String text, ImageIcon icon) {
+    protected JButton getButton(FreeColGameObjectType type, String text,
+                                ImageIcon icon) {
         JButton button = Utility.getLinkButton((text != null) ? text
             : Messages.getName(type), icon, type.getId());
         button.addActionListener(colopediaPanel);
         return button;
     }
 
-    protected JButton getButton(PanelType panelType, String text, ImageIcon icon) {
+    protected JButton getButton(PanelType panelType, String text,
+                                ImageIcon icon) {
         JButton button = Utility.getLinkButton(text, icon,
             "colopediaAction." + panelType.getKey());
         button.addActionListener(colopediaPanel);
@@ -205,7 +213,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
         } catch (Exception e) {
             // not a production bonus
             JLabel label = new JLabel(ModifierFormat.getFeatureAsString(modifier) + ": "
-                                      + ModifierFormat.getModifierAsString(modifier));
+                + ModifierFormat.getModifierAsString(modifier));
             label.setToolTipText(Messages.getShortDescription(modifier));
             return label;
         }

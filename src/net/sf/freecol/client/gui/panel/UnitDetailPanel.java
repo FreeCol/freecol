@@ -81,19 +81,8 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
-        List<UnitType> units = new ArrayList<>();
-        List<UnitType> skills = new ArrayList<>();
-        for (UnitType u : getSpecification().getUnitTypeList()) {
-            if (u.getSkill() <= 0 || u.hasAbility(Ability.EXPERT_SOLDIER)) {
-                units.add(u);
-            } else {
-                skills.add(u);
-            }
-        }
         super.addSubTrees(root, "colopediaAction." + PanelType.UNITS.getKey(),
-                          units);
-        super.addSubTrees(root, "colopediaAction." + PanelType.SKILLS.getKey(),
-                          skills);
+            new ArrayList<>(getSpecification().getUnitTypeList()));
     }
 
     /**

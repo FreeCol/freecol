@@ -43,25 +43,25 @@ public class ColopediaTreeCellRenderer extends DefaultTreeCellRenderer {
         setBackgroundNonSelectionColor(new Color(0,0,0,1));
     }
 
+
     /**
-     * Returns the rendered Component
-     *
-     * @return the rendered item's Component
+     * {@inheritDoc}
      */
     @Override
-    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected,
-                                                  boolean expanded, boolean leaf, int row, boolean hasFocus) {
+    public Component getTreeCellRendererComponent(JTree tree, Object value,
+        boolean selected, boolean expanded, boolean leaf, int row,
+        boolean hasFocus) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
 
-        super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
+        super.getTreeCellRendererComponent(tree, value, selected, expanded,
+                                           leaf, row, hasFocus);
         ColopediaTreeItem nodeItem = (ColopediaTreeItem)node.getUserObject();
-
         if (nodeItem.getIcon() != null) {
             setIcon(nodeItem.getIcon());
-        } else if (expanded) {
-            setIcon(new ImageIcon(ResourceManager.getImage("image.icon.Colopedia.openSection")));
         } else {
-            setIcon(new ImageIcon(ResourceManager.getImage("image.icon.Colopedia.closedSection")));
+            String key = "image.icon.Colopedia."
+                + ((expanded) ? "open" : "closed") + "Section";
+            setIcon(new ImageIcon(ResourceManager.getImage(key)));
         }
         return this;
     }
