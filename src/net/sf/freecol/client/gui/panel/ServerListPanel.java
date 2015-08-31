@@ -184,9 +184,8 @@ public final class ServerListPanel extends FreeColPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
-
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         try {
             switch (Integer.parseInt(command)) {
             case CONNECT:
@@ -198,9 +197,9 @@ public final class ServerListPanel extends FreeColPanel {
                 getGUI().showNewPanel();
                 break;
             default:
-                super.actionPerformed(event);
+                super.actionPerformed(ae);
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException nfe) {
             logger.warning("Invalid ActionEvent, not a number: " + command);
         }
     }

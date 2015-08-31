@@ -68,15 +68,12 @@ public final class LoadDialog extends FreeColDialog<File> {
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setFileHidingEnabled(false);
-        fileChooser.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    final String cmd = event.getActionCommand();
-                    File value = (JFileChooser.APPROVE_SELECTION.equals(cmd))
-                        ? ((JFileChooser)event.getSource()).getSelectedFile()
-                        : cancelFile;
-                    setValue(value);
-                }
+        fileChooser.addActionListener((ActionEvent ae) -> {
+                final String cmd = ae.getActionCommand();
+                File value = (JFileChooser.APPROVE_SELECTION.equals(cmd))
+                    ? ((JFileChooser)ae.getSource()).getSelectedFile()
+                    : cancelFile;
+                setValue(value);
             });
 
         List<ChoiceItem<File>> c = choices();

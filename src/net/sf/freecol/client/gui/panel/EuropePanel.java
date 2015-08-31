@@ -838,8 +838,8 @@ public final class EuropePanel extends PortPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         EuropeAction act = EuropeAction.valueOf(command);
         switch (act) {
         case EXIT:
@@ -861,7 +861,7 @@ public final class EuropePanel extends PortPanel {
             unloadAction();
             break;
         default:
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
             break;
         }
     }

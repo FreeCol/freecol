@@ -121,7 +121,7 @@ public class ScaleMapAction extends FreeColAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         Dimension ms = getGUI().showScaleMapSizeDialog();
         if (ms != null) {
             scaleMapTo(ms.width, ms.height);

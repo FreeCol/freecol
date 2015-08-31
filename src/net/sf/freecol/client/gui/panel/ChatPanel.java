@@ -95,8 +95,8 @@ public final class ChatPanel extends FreeColPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         try {
             switch (Integer.parseInt(command)) {
             case CHAT:
@@ -106,7 +106,7 @@ public final class ChatPanel extends FreeColPanel {
                 getGUI().removeFromCanvas(this);
                 break;
             default:
-                super.actionPerformed(event);
+                super.actionPerformed(ae);
             }
         } catch (NumberFormatException e) {
             logger.warning("Invalid ActionEvent, not a number: " + command);

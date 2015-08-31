@@ -210,12 +210,9 @@ public final class PlayersTable extends JTable {
             = new JComboBox<>(NationState.values());
         private JComboBox activeBox;
 
-        private final ActionListener listener = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    stopCellEditing();
-                }
-            };
+        private final ActionListener listener = (ActionEvent ae) -> {
+            stopCellEditing();
+        };
 
 
         public AvailableCellEditor() {
@@ -395,11 +392,8 @@ public final class PlayersTable extends JTable {
 
 
         public PlayerCellEditor() {
-            button.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        fireEditingStopped();
-                    }
+            button.addActionListener((ActionEvent ae) -> {
+                    fireEditingStopped();
                 });
         }
 
@@ -668,20 +662,14 @@ public final class PlayersTable extends JTable {
         setRowHeight(47);
 
         JButton nationButton = Utility.localizedButton("nation");
-        nationButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    gui.showColopediaPanel(PanelType.NATIONS.getKey());
-                }
+        nationButton.addActionListener((ActionEvent ae) -> {
+                gui.showColopediaPanel(PanelType.NATIONS.getKey());
             });
 
         JLabel availabilityLabel = Utility.localizedLabel("playersTable.availability");
         JButton advantageButton = Utility.localizedButton("playersTable.advantage");
-        advantageButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    gui.showColopediaPanel(PanelType.NATION_TYPES.getKey());
-                }
+        advantageButton.addActionListener((ActionEvent ae) -> {
+                gui.showColopediaPanel(PanelType.NATION_TYPES.getKey());
             });
 
         JLabel colorLabel = Utility.localizedLabel("color");

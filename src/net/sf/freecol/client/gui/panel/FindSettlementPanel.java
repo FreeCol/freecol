@@ -111,7 +111,7 @@ public final class FindSettlementPanel extends FreeColPanel
         this.settlementList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         Action selectAction = new AbstractAction() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent ae) {
                     selectSettlement();
                 }
             };
@@ -120,7 +120,7 @@ public final class FindSettlementPanel extends FreeColPanel
         this.settlementList.getActionMap().put("select", selectAction);
         Action quitAction = new AbstractAction() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent ae) {
                     getGUI().removeFromCanvas(FindSettlementPanel.this);
                 }
             };

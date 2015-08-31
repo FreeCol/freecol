@@ -587,27 +587,18 @@ public final class TradeRouteInputPanel extends FreeColPanel
         this.messagesBox
             = new JCheckBox(Messages.message("tradeRouteInputPanel.silence"));
         this.messagesBox.setSelected(tradeRoute.isSilent());
-        this.messagesBox.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    tradeRoute.setSilent(messagesBox.isSelected());
-                }
+        this.messagesBox.addActionListener((ActionEvent ae) -> {
+                tradeRoute.setSilent(messagesBox.isSelected());
             });
 
         this.addStopButton = Utility.localizedButton("tradeRouteInputPanel.addStop");
-        this.addStopButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    addSelectedStops();
-                }
+        this.addStopButton.addActionListener((ActionEvent ae) -> {
+                addSelectedStops();
             });
 
         this.removeStopButton = Utility.localizedButton("tradeRouteInputPanel.removeStop");
-        this.removeStopButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    deleteCurrentlySelectedStops();
-                }
+        this.removeStopButton.addActionListener((ActionEvent ae) -> {
+                deleteCurrentlySelectedStops();
             });
 
         this.goodsPanel = new GoodsPanel();
@@ -764,21 +755,21 @@ public final class TradeRouteInputPanel extends FreeColPanel
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         if (command == null) return;
         switch (command) {
         case OK:
             if (!verifyNewTradeRoute()) return;
             // Return to TradeRoutePanel, which will add the route
             // if needed, and it is valid.
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
             break;
         case CANCEL:
             cancelTradeRoute();
             break;
         default:
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
             break;
         }
     }

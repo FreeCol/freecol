@@ -63,7 +63,7 @@ public class NewEmptyMapAction extends MapboardAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         Dimension size = getGUI().showMapSizeDialog();
         if (size == null) return;
         final Game game = getGame();

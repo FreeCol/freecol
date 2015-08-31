@@ -165,7 +165,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
                                         "select");
         this.unitList.getActionMap().put("select", new AbstractAction() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent ae) {
                     selectUnit();
                 }
             });
@@ -173,7 +173,7 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
                                         "quit");
         this.unitList.getActionMap().put("quit", new AbstractAction() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent ae) {
                     EndTurnDialog.this.setValue(options.get(1));
                 }
             });

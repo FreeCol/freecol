@@ -96,8 +96,8 @@ public final class ColorCellEditor extends AbstractCellEditor
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         SwingGUI gui = (SwingGUI)freeColClient.getGUI();
         if (null != command) switch (command) {
             case EDIT:

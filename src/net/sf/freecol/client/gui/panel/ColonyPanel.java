@@ -414,13 +414,10 @@ public final class ColonyPanel extends PortPanel
 
         final GUI gui = getGUI();
         this.nameBox.setEnabled(isEditable());
-        this.nameBox.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    final Colony newColony = (Colony)nameBox.getSelectedItem();
-                    closeColonyPanel();
-                    gui.showColonyPanel(newColony, null);
-                }
+        this.nameBox.addActionListener((ActionEvent ae) -> {
+                final Colony newColony = (Colony)nameBox.getSelectedItem();
+                closeColonyPanel();
+                gui.showColonyPanel(newColony, null);
             });
         updateNetProductionPanel();
 
@@ -677,12 +674,9 @@ public final class ColonyPanel extends PortPanel
             }
             String menuTitle = sb.toString();
             subMenu = new JMenuItem(menuTitle, unitIcon);
-            subMenu.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
-                        unitMenu.show(getGUI().getCanvas(), 0, 0);
-                    }
+            subMenu.addActionListener((ActionEvent ae) -> {
+                    unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
+                    unitMenu.show(getGUI().getCanvas(), 0, 0);
                 });
             unitNumber++;
             colonyUnitsMenu.add(subMenu);
@@ -694,13 +688,10 @@ public final class ColonyPanel extends PortPanel
                 String menuTitle = unit.getDescription()
                     + " " + Messages.message("colonyPanel.inPort");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
-                subMenu.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
+                subMenu.addActionListener((ActionEvent ae) -> {
                         unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
-                    }
-                });
+                    });
                 unitNumber++;
                 colonyUnitsMenu.add(subMenu);
                 if (unit.getUnitList() != null) {
@@ -710,13 +701,10 @@ public final class ColonyPanel extends PortPanel
                             + " " + Messages.message("cargoOnCarrier")
                             + " " + unit.getDescription();
                         subMenu = new JMenuItem(menuTitle, unitIcon);
-                        subMenu.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
+                        subMenu.addActionListener((ActionEvent ae) -> {
                                 unitMenu.addMenuItems(new UnitLabel(freeColClient, innerUnit));
                                 unitMenu.show(getGUI().getCanvas(), 0, 0);
-                            }
-                        });
+                            });
                         unitNumber++;
                         colonyUnitsMenu.add(subMenu);
                     }
@@ -726,13 +714,10 @@ public final class ColonyPanel extends PortPanel
                 String menuTitle = unit.getDescription()
                     + " " + Messages.message("colonyPanel.outsideColony");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
-                subMenu.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
+                subMenu.addActionListener((ActionEvent ae) -> {
                         unitMenu.addMenuItems(new UnitLabel(freeColClient, unit));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
-                    }
-                });
+                    });
                 unitNumber++;
                 colonyUnitsMenu.add(subMenu);
             }
@@ -966,9 +951,9 @@ public final class ColonyPanel extends PortPanel
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformed(ActionEvent ae) {
         final Colony colony = getColony();
-        final String command = event.getActionCommand();
+        final String command = ae.getActionCommand();
         final Unit unit = getSelectedUnit();
 
         if (OK.equals(command)) {
@@ -1030,7 +1015,7 @@ public final class ColonyPanel extends PortPanel
                 colony.setOccupationTrace(!colony.getOccupationTrace());
                 break;
             default:
-                super.actionPerformed(event);
+                super.actionPerformed(ae);
             }
         }
     }

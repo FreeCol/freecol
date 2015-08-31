@@ -163,19 +163,18 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         button.setToolTipText(text);
         button.setOpaque(false);
         group.add(button);
-        button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    MapEditorController ctlr = getFreeColClient().getMapEditorController();
-                    MapTransform newMapTransform = null;
-                    if(ctlr.getMapTransform() != mt){
-                        newMapTransform = mt;
-                    }
-                    ctlr.setMapTransform(newMapTransform);
-                    if(newMapTransform == null && mt != null){
-                        //select the invisible button, de-selecting all others
-                        group.setSelected(group.getElements().nextElement().getModel(),true);
-                    }
+        button.addActionListener((ActionEvent ae) -> {
+                MapEditorController ctlr
+                    = getFreeColClient().getMapEditorController();
+                MapTransform newMapTransform = null;
+                if (ctlr.getMapTransform() != mt) {
+                    newMapTransform = mt;
+                }
+                ctlr.setMapTransform(newMapTransform);
+                if (newMapTransform == null && mt != null) {
+                    //select the invisible button, de-selecting all others
+                    group.setSelected(group.getElements().nextElement()
+                        .getModel(), true);
                 }
             });
         button.setBorder(null);

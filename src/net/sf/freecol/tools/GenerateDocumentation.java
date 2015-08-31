@@ -56,7 +56,8 @@ public class GenerateDocumentation {
 
     private static final Map<String, String> resources = new HashMap<>();
 
-    private static final String[] sourceFiles = STRING_DIRECTORY.list(new FilenameFilter() {
+    private static final String[] sourceFiles
+        = STRING_DIRECTORY.list(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 return name.matches("FreeColMessages.*\\.properties");

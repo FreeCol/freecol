@@ -94,11 +94,8 @@ public class InformationPanel extends FreeColPanel {
                 .template("informationPanel.display")
                 .addStringTemplate("%object%", disp));
             final FreeColObject fco = fcos[i];
-            button.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        gui.displayObject(fco);
-                    }
+            button.addActionListener((ActionEvent ae) -> {
+                    gui.displayObject(fco);
                 });
             textPanel.add(button, "skip");
         }

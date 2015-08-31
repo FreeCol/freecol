@@ -177,14 +177,11 @@ public final class ReportTurnPanel extends ReportPanel {
                 Utility.localizeToolTip(ignoreButton, 
                     StringTemplate.copy("report.turn.ignore", message));
                 final ModelMessage m = message;
-                ignoreButton.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent event) {
-                            boolean flag = label.isEnabled();
-                            igc().ignoreMessage(m, flag);
-                            textPane.setEnabled(!flag);
-                            label.setEnabled(!flag);
-                        }
+                ignoreButton.addActionListener((ActionEvent ae) -> {
+                        boolean flag = label.isEnabled();
+                        igc().ignoreMessage(m, flag);
+                        textPane.setEnabled(!flag);
+                        label.setEnabled(!flag);
                     });
                 reportPanel.add(ignoreButton);
                 ignore = true;
@@ -214,18 +211,12 @@ public final class ReportTurnPanel extends ReportPanel {
                     .template("report.turn.filter")
                     .addNamed("%type%", message.getMessageType()));
                 final ModelMessage m = message;
-                filterButton.addActionListener(new ActionListener() {
-                        
-                        @Override
-                        public void actionPerformed(ActionEvent event) {
-                            boolean flag = filterOption.getValue();
-                            filterOption.setValue(!flag);
-                            //textPane.setEnabled(!flag);
-                            //label.setEnabled(!flag);
-                            
-                            setEnabledByType(m.getMessageType(), !flag);
-                        }
-                        
+                filterButton.addActionListener((ActionEvent ae) -> {
+                        boolean flag = filterOption.getValue();
+                        filterOption.setValue(!flag);
+                        //textPane.setEnabled(!flag);
+                        //label.setEnabled(!flag);
+                        setEnabledByType(m.getMessageType(), !flag);
                     });
                 if (ignore) {
                     reportPanel.add(filterButton);
@@ -430,7 +421,7 @@ public final class ReportTurnPanel extends ReportPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        super.actionPerformed(event);
+    public void actionPerformed(ActionEvent ae) {
+        super.actionPerformed(ae);
     }
 }

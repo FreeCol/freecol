@@ -64,8 +64,8 @@ public class MapControlsAction extends SelectableAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
-        setSelected(((AbstractButton)e.getSource()).isSelected());
+    public void actionPerformed(ActionEvent ae) {
+        setSelected(((AbstractButton)ae.getSource()).isSelected());
         setOption(isSelected());
         update();
     }

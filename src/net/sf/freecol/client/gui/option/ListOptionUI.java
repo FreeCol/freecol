@@ -110,66 +110,49 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
             this.panel.add(button);
         }
 
-        addButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    AbstractOption<T> oldValue
-                        = list.getSelectedValue();
-                    if (oldValue == null) oldValue = option.getTemplate();
-                    try {
-                        AbstractOption<T> newValue = (oldValue == null) ? null
-                            : oldValue.clone();
-                        if (gui.showEditOptionDialog(newValue)) {
-                            if (option.canAdd(newValue)) {
-                                model.addElement(newValue);
-                                list.setSelectedValue(newValue, true);
-                                list.repaint();
-                            }
-                        }
-                    } catch (CloneNotSupportedException e) {
-                        logger.log(Level.WARNING, "Can not clone: " + oldValue,
-                            e);
-                    }
-                }
-            });
-        editButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    Object object = list.getSelectedValue();
-                    if (object != null) {
-                        if (gui.showEditOptionDialog((Option)object)) {
+        addButton.addActionListener((ActionEvent ae) -> {
+                AbstractOption<T> oldValue = list.getSelectedValue();
+                if (oldValue == null) oldValue = option.getTemplate();
+                try {
+                    AbstractOption<T> newValue = (oldValue == null) ? null
+                        : oldValue.clone();
+                    if (gui.showEditOptionDialog(newValue)) {
+                        if (option.canAdd(newValue)) {
+                            model.addElement(newValue);
+                            list.setSelectedValue(newValue, true);
                             list.repaint();
                         }
                     }
+                } catch (CloneNotSupportedException e) {
+                    logger.log(Level.WARNING, "Can not clone: " + oldValue, e);
                 }
             });
-        removeButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    model.removeElementAt(list.getSelectedIndex());
+        editButton.addActionListener((ActionEvent ae) -> {
+                Object object = list.getSelectedValue();
+                if (object != null) {
+                    if (gui.showEditOptionDialog((Option)object)) {
+                        list.repaint();
+                    }
                 }
             });
-        upButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (list.getSelectedIndex() == 0) return;
-                    final int index = list.getSelectedIndex();
-                    final AbstractOption<T> temp = model.getElementAt(index);
-                    model.setElementAt(model.getElementAt(index-1), index);
-                    model.setElementAt(temp, index-1);
-                    list.setSelectedIndex(index-1);
-                }
+        removeButton.addActionListener((ActionEvent ae) -> {
+                model.removeElementAt(list.getSelectedIndex());
             });
-        downButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (list.getSelectedIndex() == model.getSize() - 1) return;
-                    final int index = list.getSelectedIndex();
-                    final AbstractOption<T> temp = model.getElementAt(index);
-                    model.setElementAt(model.getElementAt(index+1), index);
-                    model.setElementAt(temp, index+1);
-                    list.setSelectedIndex(index+1);
-                }
+        upButton.addActionListener((ActionEvent ae) -> {
+                if (list.getSelectedIndex() == 0) return;
+                final int index = list.getSelectedIndex();
+                final AbstractOption<T> temp = model.getElementAt(index);
+                model.setElementAt(model.getElementAt(index-1), index);
+                model.setElementAt(temp, index-1);
+                list.setSelectedIndex(index-1);
+            });
+        downButton.addActionListener((ActionEvent ae) -> {
+                if (list.getSelectedIndex() == model.getSize() - 1) return;
+                final int index = list.getSelectedIndex();
+                final AbstractOption<T> temp = model.getElementAt(index);
+                model.setElementAt(model.getElementAt(index+1), index);
+                model.setElementAt(temp, index+1);
+                list.setSelectedIndex(index+1);
             });
 
         list.addListSelectionListener(this);

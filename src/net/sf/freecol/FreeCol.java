@@ -26,7 +26,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.IOException;
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.JarURLConnection;
@@ -291,11 +290,8 @@ public final class FreeCol {
                 + e.getMessage());
             e.printStackTrace();
         }
-        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-                @Override
-                public void uncaughtException(Thread thread, Throwable e) {
-                    baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
-                }
+        Thread.setDefaultUncaughtExceptionHandler((Thread thread, Throwable e) -> {
+                baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
             });
 
         // Now we can find the client options, allow the options

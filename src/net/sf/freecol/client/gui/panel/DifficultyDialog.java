@@ -126,11 +126,8 @@ public final class DifficultyDialog extends OptionsDialog
      * @param button The <code>JButton</code> to add the action to.
      */
     private void addResetAction(JButton button) {
-        button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    getOptionUI().reset();
-                }
+        button.addActionListener((ActionEvent ae) -> {
+                getOptionUI().reset();
             });
     }
 
@@ -140,16 +137,13 @@ public final class DifficultyDialog extends OptionsDialog
      * @param button The <code>JButton</code> to add the action to.
      */
     private void addLoadAction(JButton button) {
-        button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    File dir = FreeColDirectories.getOptionsDirectory();
-                    File file = getGUI().showLoadDialog(dir, filters);
-                    if (file != null && load(file)) {
-                        invalidate();
-                        validate();
-                        repaint();
-                    }
+        button.addActionListener((ActionEvent ae) -> {
+                File dir = FreeColDirectories.getOptionsDirectory();
+                File file = getGUI().showLoadDialog(dir, filters);
+                if (file != null && load(file)) {
+                    invalidate();
+                    validate();
+                    repaint();
                 }
             });
     }
@@ -160,16 +154,13 @@ public final class DifficultyDialog extends OptionsDialog
      * @param button The <code>JButton</code> to add the action to.
      */
     private void addSaveAction(JButton button) {
-        button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    File dir = FreeColDirectories.getOptionsDirectory();
-                    File file = getGUI().showSaveDialog(dir, filters,
-                        getDefaultFileName(), ".xml");
-                    if (file != null) {
-                        getOptionUI().updateOption();
-                        save(file);
-                    }
+        button.addActionListener((ActionEvent ae) -> {
+                File dir = FreeColDirectories.getOptionsDirectory();
+                File file = getGUI().showSaveDialog(dir, filters,
+                    getDefaultFileName(), ".xml");
+                if (file != null) {
+                    getOptionUI().updateOption();
+                    save(file);
                 }
             });
     }

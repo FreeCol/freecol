@@ -77,7 +77,7 @@ public class ColopediaAction extends FreeColAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         getGUI().showColopediaPanel(getId());
     }
 }

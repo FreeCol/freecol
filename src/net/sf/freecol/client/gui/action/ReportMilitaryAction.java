@@ -48,7 +48,7 @@ public class ReportMilitaryAction extends FreeColAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         getGUI().showReportMilitaryPanel();
     }
 }

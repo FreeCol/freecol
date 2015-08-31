@@ -370,11 +370,11 @@ public final class UnitLabel extends JLabel
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformed(ActionEvent ae) {
         final Game game = freeColClient.getGame();
         final Specification spec = game.getSpecification();
         final InGameController igc = freeColClient.getInGameController();
-        String[] args = event.getActionCommand().split("/");
+        String[] args = ae.getActionCommand().split("/");
         GoodsType gt;
         switch (Enum.valueOf(UnitAction.class,
                              args[0].toUpperCase(Locale.US))) {

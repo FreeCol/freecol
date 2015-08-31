@@ -142,10 +142,10 @@ public class NewUnitPanel extends FreeColPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        String command = ae.getActionCommand();
         if (OK.equals(command)) {
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
         } else {
             UnitType unitType = getSpecification().getUnitType(command);
             igc().trainUnitInEurope(unitType);

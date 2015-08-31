@@ -387,12 +387,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         String omcb = Messages.message("selectDestinationDialog.onlyMyColonies");
         this.onlyMyColoniesBox = new JCheckBox(omcb, showOnlyMyColonies);
-        this.onlyMyColoniesBox.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent event) {
-                    showOnlyMyColonies = onlyMyColoniesBox.isSelected();
-                    updateDestinationList();
-                }
+        this.onlyMyColoniesBox.addChangeListener((ChangeEvent event) -> {
+                showOnlyMyColonies = onlyMyColoniesBox.isSelected();
+                updateDestinationList();
             });
 
         this.comparatorBox = new JComboBox<>(new String[] {
@@ -400,14 +397,11 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 Messages.message("selectDestinationDialog.sortByName"),
                 Messages.message("selectDestinationDialog.sortByDistance")
             });
-        this.comparatorBox.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent event) {
-                    updateDestinationComparator();
-                    Collections.sort(SelectDestinationDialog.this.destinations,
-                        SelectDestinationDialog.this.destinationComparator);
-                    updateDestinationList();
-                }
+        this.comparatorBox.addItemListener((ItemEvent event) -> {
+                updateDestinationComparator();
+                Collections.sort(SelectDestinationDialog.this.destinations,
+                    SelectDestinationDialog.this.destinationComparator);
+                updateDestinationList();
             });
         this.comparatorBox.setSelectedIndex(
             (this.destinationComparator instanceof NameComparator) ? 1

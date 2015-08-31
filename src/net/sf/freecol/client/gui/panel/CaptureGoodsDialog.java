@@ -127,31 +127,25 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         this.maxCargo = winner.getSpaceLeft();
 
         this.allButton = Utility.localizedButton("all");
-        this.allButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
-                    for (int i = 0; i < gl.getModel().getSize()
-                             && i < CaptureGoodsDialog.this.maxCargo; i++) {
-                        GoodsItem gi = gl.getModel().getElementAt(i);
-                        gi.setSelected(true);
-                        updateComponents();
-                    }
+        this.allButton.addActionListener((ActionEvent ae) -> {
+                JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
+                for (int i = 0; i < gl.getModel().getSize()
+                         && i < CaptureGoodsDialog.this.maxCargo; i++) {
+                    GoodsItem gi = gl.getModel().getElementAt(i);
+                    gi.setSelected(true);
+                    updateComponents();
                 }
             });
         this.allButton.setMnemonic('a');
         this.allButton.setActionCommand(this.allButton.getText());
  
         this.noneButton = Utility.localizedButton("none");
-        this.noneButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
-                    for (int i = 0; i < gl.getModel().getSize(); i++) {
-                        GoodsItem gi = gl.getModel().getElementAt(i);
-                        gi.setSelected(false);
-                        updateComponents();
-                    }
+        this.noneButton.addActionListener((ActionEvent ae) -> {
+                JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
+                for (int i = 0; i < gl.getModel().getSize(); i++) {
+                    GoodsItem gi = gl.getModel().getElementAt(i);
+                    gi.setSelected(false);
+                    updateComponents();
                 }
             });
         this.noneButton.setMnemonic('n');

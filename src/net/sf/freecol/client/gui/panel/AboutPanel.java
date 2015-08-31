@@ -162,8 +162,8 @@ public final class AboutPanel extends FreeColPanel {
      * @param event
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        String url = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String url = ae.getActionCommand();
         if (SITE_URL.equals(url) || PROJECT_URL.equals(url)) {
             String os = System.getProperty("os.name");
             // FIXME: move this to OS utilities
@@ -191,7 +191,7 @@ public final class AboutPanel extends FreeColPanel {
                 // couldn't start browser
             }
         } else {
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
         }
     }
 }

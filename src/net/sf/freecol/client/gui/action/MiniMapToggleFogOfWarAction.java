@@ -62,7 +62,7 @@ public class MiniMapToggleFogOfWarAction extends MapboardAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         getGUI().miniMapToggleFogOfWarControls();
 
         if (freeColClient.getClientOptions().getBoolean(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR)) {

@@ -1117,9 +1117,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformed(ActionEvent ae) {
         final Game game = getGame();
-        String command = event.getActionCommand();
+        String command = ae.getActionCommand();
         if (command.startsWith(BUILDQUEUE)) {
             command = command.substring(BUILDQUEUE.length());
             Colony colony = game.getFreeColGameObject(command, Colony.class);
@@ -1135,6 +1135,6 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 return;
             }
         }
-        super.actionPerformed(event);
+        super.actionPerformed(ae);
     }
 }

@@ -197,7 +197,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         doubleClickTimer.stop();
         Tile tile=canvas.convertToMapTile(centerX, centerY);
         if(canvas.getViewMode() == GUI.MOVE_UNITS_MODE) {

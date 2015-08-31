@@ -86,10 +86,10 @@ public class TerrainCursor implements ActionListener  {
         listenerList.remove(ActionListener.class, listener);
     }
 
-    public void fireActionEvent(ActionEvent event) {
+    public void fireActionEvent(ActionEvent ae) {
         for (ActionListener al
                  : listenerList.getListeners(ActionListener.class)) {
-            al.actionPerformed(event);
+            al.actionPerformed(ae);
         }
     }
 
@@ -100,7 +100,7 @@ public class TerrainCursor implements ActionListener  {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         active = !active;
         int eventId = active? ON : OFF;
         ActionEvent blinkEvent = new ActionEvent(this,eventId,"blink");

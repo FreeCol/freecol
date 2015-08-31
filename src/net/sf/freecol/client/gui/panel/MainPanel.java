@@ -98,7 +98,7 @@ public final class MainPanel extends FreeColPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformed(ActionEvent ae) {
         // The actions are handled implicitly by the JButton/FreeColActions
         getGUI().removeFromCanvas(this);
     }

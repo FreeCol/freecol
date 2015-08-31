@@ -206,11 +206,8 @@ public final class QuickActionMenu extends JPopupMenu {
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL));
                 JMenuItem menuItem = Utility.localizedMenuItem(template);
-                menuItem.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            igc.boardShip(tempUnit, unit);
-                        }
+                menuItem.addActionListener((ActionEvent ae) -> {
+                        igc.boardShip(tempUnit, unit);
                     });
                 this.add(menuItem);
                 added = true;
@@ -230,14 +227,11 @@ public final class QuickActionMenu extends JPopupMenu {
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL));
                 JMenuItem menuItem = Utility.localizedMenuItem(template);
-                menuItem.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                                promptForGoods(goods);
-                            }
-                            igc.loadCargo(goods, unit);
+                menuItem.addActionListener((ActionEvent ae) -> {
+                        if ((ae.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                            promptForGoods(goods);
                         }
+                        igc.loadCargo(goods, unit);
                     });
                 this.add(menuItem);
                 added = true;
@@ -388,11 +382,8 @@ public final class QuickActionMenu extends JPopupMenu {
 
         if (current != null && unit.getWorkType() != null) {
             JMenuItem ji = Utility.localizedMenuItem("showProductionModifiers");
-            ji.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent event) {
-                        gui.showWorkProductionPanel(unit);
-                    }
+            ji.addActionListener((ActionEvent ae) -> {
+                    gui.showWorkProductionPanel(unit);
                 });
             this.add(ji);
         }
@@ -486,15 +477,12 @@ public final class QuickActionMenu extends JPopupMenu {
         final boolean isUnitAtSea = tempUnit.isAtSea();
 
         JMenuItem menuItem = Utility.localizedMenuItem("activateUnit");
-        menuItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (tempUnit.getState() != Unit.UnitState.ACTIVE) {
-                        freeColClient.getInGameController()
-                            .changeState(tempUnit, Unit.UnitState.ACTIVE);
-                    }
-                    gui.setActiveUnit(tempUnit);
+        menuItem.addActionListener((ActionEvent ae) -> {
+                if (tempUnit.getState() != Unit.UnitState.ACTIVE) {
+                    freeColClient.getInGameController()
+                        .changeState(tempUnit, Unit.UnitState.ACTIVE);
                 }
+                gui.setActiveUnit(tempUnit);
             });
         menuItem.setEnabled(!isUnitAtSea);
         this.add(menuItem);
@@ -536,12 +524,9 @@ public final class QuickActionMenu extends JPopupMenu {
 
         if (tempUnit.canCarryTreasure() && tempUnit.canCashInTreasureTrain()) {
             menuItem = Utility.localizedMenuItem("cashInTreasureTrain");
-            menuItem.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        freeColClient.getInGameController()
-                            .checkCashInTreasureTrain(tempUnit);
-                    }
+            menuItem.addActionListener((ActionEvent ae) -> {
+                    freeColClient.getInGameController()
+                        .checkCashInTreasureTrain(tempUnit);
                 });
             menuItem.setEnabled(true);
             this.add(menuItem);
@@ -617,15 +602,12 @@ public final class QuickActionMenu extends JPopupMenu {
 
         JMenuItem item = new JMenuItem(text, icon);
         final InGameController igc = freeColClient.getInGameController();
-        item.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    igc.equipUnitForRole(unitLabel.getUnit(), to, toCount);
-                    unitLabel.updateIcon();
-                    // FIXME: fix the PCL handling so this can go away
-                    if (parentPanel instanceof ColonyPanel) {
-                        ((ColonyPanel)parentPanel).update();
-                    }
+        item.addActionListener((ActionEvent ae) -> {
+                igc.equipUnitForRole(unitLabel.getUnit(), to, toCount);
+                unitLabel.updateIcon();
+                // FIXME: fix the PCL handling so this can go away
+                if (parentPanel instanceof ColonyPanel) {
+                    ((ColonyPanel)parentPanel).update();
                 }
             });
         return item;
@@ -706,11 +688,8 @@ public final class QuickActionMenu extends JPopupMenu {
             Messages.getName(goods) + " (" + Messages.message("colopedia") + ")",
             new ImageIcon(
                 gui.getImageLibrary().getSmallIconImage(goods.getType())));
-        name.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    gui.showColopediaPanel(goods.getType().getId());
-                }
+        name.addActionListener((ActionEvent ae) -> {
+                gui.showColopediaPanel(goods.getType().getId());
             });
         this.add(name);
 
@@ -743,14 +722,11 @@ public final class QuickActionMenu extends JPopupMenu {
                 || (carrier.isInEurope()
                     && player.canTrade(goods.getType()))) {
                 JMenuItem unload = Utility.localizedMenuItem("unload");
-                unload.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                                promptForGoods(goods);
-                            }
-                            igc.unloadCargo(goods, false);
+                unload.addActionListener((ActionEvent ae) -> {
+                        if ((ae.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                            promptForGoods(goods);
                         }
+                        igc.unloadCargo(goods, false);
                     });
                 this.add(unload);
             } else {
@@ -760,19 +736,16 @@ public final class QuickActionMenu extends JPopupMenu {
                 }
 
                 JMenuItem dump = Utility.localizedMenuItem("dumpCargo");
-                dump.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                                promptForGoods(goods);
-                            }
-                            igc.unloadCargo(goods, true);
-                            // FIXME: fix pcls so this hackery can go away
-                            if (parentPanel instanceof CargoPanel) {
-                                ((CargoPanel) parentPanel).initialize();
-                            }
-                            parentPanel.revalidate();
+                dump.addActionListener((ActionEvent ae) -> {
+                        if ((ae.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                            promptForGoods(goods);
                         }
+                        igc.unloadCargo(goods, true);
+                        // FIXME: fix pcls so this hackery can go away
+                        if (parentPanel instanceof CargoPanel) {
+                            ((CargoPanel) parentPanel).initialize();
+                        }
+                        parentPanel.revalidate();
                     });
                 this.add(dump);
             }
@@ -788,17 +761,14 @@ public final class QuickActionMenu extends JPopupMenu {
         final InGameController igc = freeColClient.getInGameController();
 
         JMenuItem menuItem = Utility.localizedMenuItem("payArrears");
-        menuItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    igc.payArrears(goodsType);
-                    // FIXME: fix pcls so this hackery can go away
-                    if (parentPanel instanceof CargoPanel) {
-                        CargoPanel cargoPanel = (CargoPanel) parentPanel;
-                        cargoPanel.initialize();
-                    }
-                    parentPanel.revalidate();
+        menuItem.addActionListener((ActionEvent ae) -> {
+                igc.payArrears(goodsType);
+                // FIXME: fix pcls so this hackery can go away
+                if (parentPanel instanceof CargoPanel) {
+                    CargoPanel cargoPanel = (CargoPanel) parentPanel;
+                    cargoPanel.initialize();
                 }
+                parentPanel.revalidate();
             });
         this.add(menuItem);
     }
@@ -818,11 +788,8 @@ public final class QuickActionMenu extends JPopupMenu {
             Messages.getName(ag) + " (" + Messages.message("colopedia") + ")",
             new ImageIcon(
                 gui.getImageLibrary().getSmallIconImage(ag.getType())));
-        name.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    gui.showColopediaPanel(ag.getType().getId());
-                }
+        name.addActionListener((ActionEvent ae) -> {
+                gui.showColopediaPanel(ag.getType().getId());
             });
         this.add(name);
 
@@ -846,14 +813,11 @@ public final class QuickActionMenu extends JPopupMenu {
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL));
                 JMenuItem menuItem = Utility.localizedMenuItem(template);
-                menuItem.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                                promptForGoods(ag);
-                            }
-                            igc.buyGoods(ag.getType(), ag.getAmount(), unit);
+                menuItem.addActionListener((ActionEvent ae) -> {
+                        if ((ae.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                            promptForGoods(ag);
                         }
+                        igc.buyGoods(ag.getType(), ag.getAmount(), unit);
                     });
                 this.add(menuItem);
                 added = true;
@@ -897,11 +861,8 @@ public final class QuickActionMenu extends JPopupMenu {
     private void addTileItem(final Tile tile) {
         if (tile != null) {
             JMenuItem menuItem = new JMenuItem(Messages.getName(tile));
-            menuItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
+            menuItem.addActionListener((ActionEvent ae) -> {
                     gui.showTilePanel(tile);
-                }
             });
             this.add(menuItem);
         }

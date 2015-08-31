@@ -64,7 +64,7 @@ public class DetermineHighSeasAction extends FreeColAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         final Map map = getGame().getMap();
         
         Parameters p = getGUI().showParametersDialog();

@@ -49,23 +49,6 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
     private final JButton button2;
     private final JLabel currentMixerLabel;
 
-    private final ActionListener aHandler = new ActionListener () {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() == button1) {
-                    gui.playSound("sound.event.buildingComplete");
-                } else if (e.getSource() == button2) {
-                    gui.playSound("sound.intro.general");
-                } else if (e.getSource() == cbox) {
-                    MixerWrapper value = (MixerWrapper) cbox.getSelectedItem();
-                    if (getOption().getValue() != value) {
-                        getOption().setValue(value);
-                        updateMixerLabel();
-                    }
-                }
-            }
-        };
-
 
     /**
      * Creates a new <code>AudioMixerOptionUI</code> for the given
@@ -95,18 +78,31 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
 
         button1 = Utility.localizedButton("test");
         panel.add(button1);
-        button1.addActionListener(aHandler);
 
         button2 = Utility.localizedButton("music");
         panel.add(button2);
-        button2.addActionListener(aHandler);
 
         cbox.add(super.getJLabel());
         cbox.setModel(new DefaultComboBoxModel<>(getOption().getChoices()
                 .toArray(new MixerWrapper[0])));
         reset();
-
         cbox.setEnabled(editable);
+
+        ActionListener aHandler = (ActionEvent ae) -> {
+            if (ae.getSource() == button1) {
+                gui.playSound("sound.event.buildingComplete");
+            } else if (ae.getSource() == button2) {
+                gui.playSound("sound.intro.general");
+            } else if (ae.getSource() == cbox) {
+                MixerWrapper value = (MixerWrapper) cbox.getSelectedItem();
+                if (getOption().getValue() != value) {
+                    getOption().setValue(value);
+                    updateMixerLabel();
+                }
+            }
+        };
+        button1.addActionListener(aHandler);
+        button2.addActionListener(aHandler);
         cbox.addActionListener(aHandler);
 
         initialize();

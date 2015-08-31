@@ -49,7 +49,7 @@ public class ReportLabourAction extends FreeColAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         if (getClientOptions().getInteger(ClientOptions.LABOUR_REPORT)
             == ClientOptions.LABOUR_REPORT_CLASSIC) {
             getGUI().showReportLabourPanel();

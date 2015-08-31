@@ -50,7 +50,7 @@ public class EndTurnAction extends MapboardAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         igc().endTurn(true);
     }
 }

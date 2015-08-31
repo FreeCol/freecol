@@ -120,10 +120,10 @@ public final class RecruitPanel extends FreeColPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         if (OK.equals(command)) {
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
         } else {
             try {
                 int index = Integer.parseInt(command);

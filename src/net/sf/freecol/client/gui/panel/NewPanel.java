@@ -217,11 +217,8 @@ public final class NewPanel extends FreeColPanel
         this.serverPortLabel = Utility.localizedLabel("newPanel.startServerOnPort");
         this.serverPortField
             = new JTextField(Integer.toString(FreeCol.getServerPort()));
-        this.serverPortField.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    getSelectedPort(NewPanel.this.serverPortField);
-                }
+        this.serverPortField.addActionListener((ActionEvent ae) -> {
+                getSelectedPort(NewPanel.this.serverPortField);
             });
 
         this.rulesLabel = Utility.localizedLabel("rules");
@@ -264,11 +261,8 @@ public final class NewPanel extends FreeColPanel
         this.joinPortLabel = Utility.localizedLabel("port");
         this.joinPortField
             = new JTextField(Integer.toString(FreeCol.getServerPort()));
-        this.joinPortField.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    getSelectedPort(NewPanel.this.joinPortField);
-                }
+        this.joinPortField.addActionListener((ActionEvent ae) -> {
+                getSelectedPort(NewPanel.this.joinPortField);
             });
 
         okButton.setActionCommand(String.valueOf(NewPanelAction.OK));
@@ -505,10 +499,10 @@ public final class NewPanel extends FreeColPanel
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformed(ActionEvent ae) {
         final ConnectController cc = getFreeColClient().getConnectController();
         final SwingGUI gui = getGUI();
-        final String command = event.getActionCommand();
+        final String command = ae.getActionCommand();
 
         switch (Enum.valueOf(NewPanelAction.class, command)) {
         case OK:
@@ -559,7 +553,7 @@ public final class NewPanel extends FreeColPanel
             enableComponents();
             break;
         default:
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
             break;
         }
     }

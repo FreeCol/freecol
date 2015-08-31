@@ -69,7 +69,7 @@ public class MoveAction extends MapboardAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) { 
+    public void actionPerformed(ActionEvent ae) { 
         switch (getGUI().getViewMode()) {
         case GUI.MOVE_UNITS_MODE:
             igc().moveUnit(getGUI().getActiveUnit(), direction);

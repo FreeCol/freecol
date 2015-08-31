@@ -79,8 +79,8 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        JMenuItem source = (JMenuItem)(e.getSource());
+    public void actionPerformed(ActionEvent ae) {
+        JMenuItem source = (JMenuItem)ae.getSource();
         String s = "Action event detected."
                    + newline
                    + "    Event source: " + source.getText()

@@ -293,8 +293,8 @@ public final class StartGamePanel extends FreeColPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         final FreeColClient fcc = getFreeColClient();
         final SwingGUI gui = getGUI();
         try {
@@ -348,9 +348,9 @@ public final class StartGamePanel extends FreeColPanel {
                 }
                 break;
             default:
-                super.actionPerformed(event);
+                super.actionPerformed(ae);
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException nfe) {
             logger.warning("Invalid ActionEvent, not a number: " + command);
         }
     }

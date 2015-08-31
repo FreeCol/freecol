@@ -100,7 +100,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent ae) {
             agreement.remove(item);
             updateDialog();
         }
@@ -193,8 +193,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent event) {
-            final String command = event.getActionCommand();
+        public void actionPerformed(ActionEvent ae) {
+            final String command = ae.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
                     NegotiationDialog.this.addColonyTradeItem(source,
@@ -273,8 +273,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent event) {
-            final String command = event.getActionCommand();
+        public void actionPerformed(ActionEvent ae) {
+            final String command = ae.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
                     int amount = ((Integer)spinner.getValue());
@@ -400,8 +400,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent event) {
-            final String command = event.getActionCommand();
+        public void actionPerformed(ActionEvent ae) {
+            final String command = ae.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
                     NegotiationDialog.this.addGoodsTradeItem(source,
@@ -519,8 +519,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent event) {
-            final String command = event.getActionCommand();
+        public void actionPerformed(ActionEvent ae) {
+            final String command = ae.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
                     Player victim = (Player)victimBox.getSelectedItem();
@@ -641,8 +641,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent event) {
-            final String command = event.getActionCommand();
+        public void actionPerformed(ActionEvent ae) {
+            final String command = ae.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
                     Stance stance = (Stance)stanceBox.getSelectedItem();
@@ -761,8 +761,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent event) {
-            final String command = event.getActionCommand();
+        public void actionPerformed(ActionEvent ae) {
+            final String command = ae.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
                     NegotiationDialog.this.addUnitTradeItem(source,

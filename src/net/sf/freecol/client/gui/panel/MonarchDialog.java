@@ -88,11 +88,8 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
         if (action == MonarchAction.RAISE_TAX_ACT
             || action == MonarchAction.RAISE_TAX_WAR) {
             JButton helpButton = Utility.localizedButton("help");
-            helpButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        getGUI().showColopediaPanel("colopedia.concepts.taxes");
-                    }
+            helpButton.addActionListener((ActionEvent ae) -> {
+                    getGUI().showColopediaPanel("colopedia.concepts.taxes");
                 });
             panel.add(helpButton, "tag help");
         }

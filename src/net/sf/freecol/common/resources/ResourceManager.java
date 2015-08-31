@@ -193,8 +193,7 @@ public class ResourceManager {
             return; // Do not preload in headless mode
         }
 
-        preloadThread = new Thread(FreeCol.CLIENT_THREAD
-            + "-Resource loader") {
+        preloadThread = new Thread(FreeCol.CLIENT_THREAD + "-Resource loader") {
                 @Override
                 public void run() {
                     // Make a local list of the resources to load.

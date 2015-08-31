@@ -89,7 +89,7 @@ public class ChangeAction extends UnitAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         final Unit unit = getGUI().getActiveUnit();
         final Tile tile = unit.getTile();
 

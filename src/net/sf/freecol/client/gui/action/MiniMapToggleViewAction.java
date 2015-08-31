@@ -62,7 +62,7 @@ public class MiniMapToggleViewAction extends MapboardAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         getGUI().miniMapToggleViewControls();
 
         if (freeColClient.getClientOptions().getBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS)) {

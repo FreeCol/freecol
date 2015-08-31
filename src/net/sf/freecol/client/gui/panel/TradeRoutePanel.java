@@ -38,7 +38,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -106,11 +105,8 @@ public final class TradeRoutePanel extends FreeColPanel {
 
         this.unit = unit;
         this.tradeRoutes = new JList<>(listModel);
-        this.tradeRoutes.addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent e) {
-                    updateButtons();
-                }
+        this.tradeRoutes.addListSelectionListener((ListSelectionEvent e) -> {
+                updateButtons();
             });
         this.tradeRoutes.setCellRenderer(new DefaultListCellRenderer() {
                 @Override
@@ -139,48 +135,38 @@ public final class TradeRoutePanel extends FreeColPanel {
         // listener below.
         this.newRouteButton = Utility.localizedButton("tradeRoutePanel.newRoute");
         Utility.localizeToolTip(this.newRouteButton, "tradeRoutePanel.new.tooltip");
-        this.newRouteButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    newRoute();
-                }
+        this.newRouteButton.addActionListener((ActionEvent ae) -> {
+                newRoute();
             });
 
         this.editRouteButton = Utility.localizedButton("tradeRoutePanel.editRoute");
         Utility.localizeToolTip(this.editRouteButton, "tradeRoutePanel.edit.tooltip");
-        this.editRouteButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    final TradeRoute selected
-                        = tradeRoutes.getSelectedValue();
-                    final String name = selected.getName();
-                    getGUI().showTradeRouteInputPanel(selected, () -> {
-                            StringTemplate template = null;
-                            if (selected.getName() == null) { // Cancelled
-                                selected.setName(name);
-                            } else if ((template = selected.verify()) == null) {
-                                igc().updateTradeRoute(selected);
-                                updateList(selected);
-                            } else {
-                                getGUI().showInformationMessage(template);
-                            }
-                        });
-                }
+        this.editRouteButton.addActionListener((ActionEvent ae) -> {
+                final TradeRoute selected = tradeRoutes.getSelectedValue();
+                final String name = selected.getName();
+                getGUI().showTradeRouteInputPanel(selected, () -> {
+                        StringTemplate template = null;
+                        if (selected.getName() == null) { // Cancelled
+                            selected.setName(name);
+                        } else if ((template = selected.verify()) == null) {
+                            igc().updateTradeRoute(selected);
+                            updateList(selected);
+                        } else {
+                            getGUI().showInformationMessage(template);
+                        }
+                    });
             });
 
         this.deleteRouteButton = Utility.localizedButton("tradeRoutePanel.deleteRoute");
         Utility.localizeToolTip(this.deleteRouteButton, "tradeRoutePanel.delete.tooltip");
-        this.deleteRouteButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    TradeRoute route = getRoute();
-                    if (route != null) {
-                        for (Unit u : route.getAssignedUnits()) {
-                            igc().assignTradeRoute(u, null);
-                        }
-                        deleteTradeRoute(route);
-                        updateList(null);
+        this.deleteRouteButton.addActionListener((ActionEvent ae) -> {
+                TradeRoute route = getRoute();
+                if (route != null) {
+                    for (Unit u : route.getAssignedUnits()) {
+                        igc().assignTradeRoute(u, null);
                     }
+                    deleteTradeRoute(route);
+                    updateList(null);
                 }
             });
 
@@ -322,8 +308,8 @@ public final class TradeRoutePanel extends FreeColPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         if (null == command) return;
         final TradeRoute route = getRoute();
         switch (command) {
@@ -342,13 +328,13 @@ public final class TradeRoutePanel extends FreeColPanel {
             if (unit != null && route != null) {
                 igc().assignTradeRoute(unit, route);
             }
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
             break;
         case CANCEL:
             getGUI().removeTradeRoutePanel(this);
             break;
         default:
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
             break;
         }
     }

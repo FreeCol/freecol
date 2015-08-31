@@ -97,8 +97,8 @@ public class DebugMenu extends JMenu {
         sc.setOpaque(false);
         sc.setMnemonic(KeyEvent.VK_S);
         this.add(sc);
-        sc.addActionListener((ActionEvent e) -> {
-                boolean val = ((JCheckBoxMenuItem)e.getSource()).isSelected();
+        sc.addActionListener((ActionEvent ae) -> {
+                boolean val = ((JCheckBoxMenuItem)ae.getSource()).isSelected();
                 FreeColDebugger.setDebugDisplayCoordinates(val);
                 gui.refresh();
             });
@@ -110,7 +110,7 @@ public class DebugMenu extends JMenu {
         reveal.setOpaque(false);
         reveal.setMnemonic(KeyEvent.VK_R);
         this.add(reveal);
-        reveal.addActionListener((ActionEvent e) -> {
+        reveal.addActionListener((ActionEvent ae) -> {
                 DebugUtils.revealMap(freeColClient, true);
                 reveal.setEnabled(false);
             });
@@ -122,7 +122,7 @@ public class DebugMenu extends JMenu {
         hide.setOpaque(false);
         //hide.setMnemonic(KeyEvent.VK_R);
         this.add(hide);
-        hide.addActionListener((ActionEvent e) -> {
+        hide.addActionListener((ActionEvent ae) -> {
                 DebugUtils.revealMap(freeColClient, false);
                 hide.setEnabled(false);
             });
@@ -134,8 +134,8 @@ public class DebugMenu extends JMenu {
                 game.getMap().getSearchTrace());
         searchTrace.setOpaque(false);
         this.add(searchTrace);
-        searchTrace.addActionListener((ActionEvent e) -> {
-                boolean val = ((JCheckBoxMenuItem)e.getSource()).isSelected();
+        searchTrace.addActionListener((ActionEvent ae) -> {
+                boolean val = ((JCheckBoxMenuItem)ae.getSource()).isSelected();
                 game.getMap().setSearchTrace(val);
             });
 
@@ -150,7 +150,7 @@ public class DebugMenu extends JMenu {
         cv1.setMnemonic(KeyEvent.VK_C);
         cvpMenu.add(cv1);
         bg.add(cv1);
-        cv1.addActionListener((ActionEvent e) -> {
+        cv1.addActionListener((ActionEvent ae) -> {
                 FreeColDebugger.setDebugDisplayColonyValuePlayer(null);
                 gui.refresh();
             });
@@ -165,7 +165,7 @@ public class DebugMenu extends JMenu {
             cvpMenu.add(cv2);
             bg.add(cv2);
             final Player fp = p;
-            cv2.addActionListener((ActionEvent e) -> {
+            cv2.addActionListener((ActionEvent ae) -> {
                     FreeColDebugger.setDebugDisplayColonyValuePlayer(fp);
                     gui.refresh();
                 });
@@ -177,7 +177,7 @@ public class DebugMenu extends JMenu {
         skipTurns.setOpaque(false);
         skipTurns.setMnemonic(KeyEvent.VK_T);
         this.add(skipTurns);
-        skipTurns.addActionListener((ActionEvent e) -> {
+        skipTurns.addActionListener((ActionEvent ae) -> {
                 DebugUtils.skipTurns(freeColClient);
             });
         DebugUtils.addSkipChangeListener(freeColClient, this, skipTurns);
@@ -187,7 +187,7 @@ public class DebugMenu extends JMenu {
         addBuilding.setOpaque(false);
         addBuilding.setMnemonic(KeyEvent.VK_B);
         this.add(addBuilding);
-        addBuilding.addActionListener((ActionEvent e) -> {
+        addBuilding.addActionListener((ActionEvent ae) -> {
                 DebugUtils.addBuildings(freeColClient, addBuilding.getText());
             });
         addBuilding.setEnabled(hasServer);
@@ -196,7 +196,7 @@ public class DebugMenu extends JMenu {
         addFather.setOpaque(false);
         addFather.setMnemonic(KeyEvent.VK_F);
         this.add(addFather);
-        addFather.addActionListener((ActionEvent e) -> {
+        addFather.addActionListener((ActionEvent ae) -> {
                 DebugUtils.addFathers(freeColClient, addFather.getText());
             });
         addFather.setEnabled(hasServer);
@@ -205,7 +205,7 @@ public class DebugMenu extends JMenu {
         runMonarch.setOpaque(false);
         runMonarch.setMnemonic(KeyEvent.VK_M);
         this.add(runMonarch);
-        runMonarch.addActionListener((ActionEvent e) -> {
+        runMonarch.addActionListener((ActionEvent ae) -> {
                 DebugUtils.setMonarchAction(freeColClient, runMonarch.getText());
             });
         runMonarch.setEnabled(hasServer);
@@ -214,7 +214,7 @@ public class DebugMenu extends JMenu {
         addGold.setOpaque(false);
         addGold.setMnemonic(KeyEvent.VK_G);
         this.add(addGold);
-        addGold.addActionListener((ActionEvent e) -> {
+        addGold.addActionListener((ActionEvent ae) -> {
                 DebugUtils.addGold(freeColClient);
             });
         addGold.setEnabled(hasServer);
@@ -223,7 +223,7 @@ public class DebugMenu extends JMenu {
         addCrosses.setOpaque(false);
         addCrosses.setMnemonic(KeyEvent.VK_I);
         this.add(addCrosses);
-        addCrosses.addActionListener((ActionEvent e) -> {
+        addCrosses.addActionListener((ActionEvent ae) -> {
                 DebugUtils.addImmigration(freeColClient);
             });
         addCrosses.setEnabled(hasServer);
@@ -232,7 +232,7 @@ public class DebugMenu extends JMenu {
         giveBells.setOpaque(false);
         giveBells.setMnemonic(KeyEvent.VK_L);
         this.add(giveBells);
-        giveBells.addActionListener((ActionEvent e) -> {
+        giveBells.addActionListener((ActionEvent ae) -> {
                 DebugUtils.addLiberty(freeColClient);
             });
         giveBells.setEnabled(hasServer);
@@ -242,7 +242,7 @@ public class DebugMenu extends JMenu {
         rng.setOpaque(false);
         rng.setMnemonic(KeyEvent.VK_X);
         this.add(rng);
-        rng.addActionListener((ActionEvent e) -> {
+        rng.addActionListener((ActionEvent ae) -> {
                 DebugUtils.stepRNG(freeColClient);
             });
         rng.setEnabled(hasServer);
@@ -251,7 +251,7 @@ public class DebugMenu extends JMenu {
         final JMenuItem du = Utility.localizedMenuItem("menuBar.debug.displayUnits");
         du.setOpaque(false);
         this.add(du);
-        du.addActionListener((ActionEvent e) -> {
+        du.addActionListener((ActionEvent ae) -> {
                 DebugUtils.displayUnits(freeColClient);
             });
         du.setEnabled(true);
@@ -262,14 +262,14 @@ public class DebugMenu extends JMenu {
         panelMenu.setOpaque(false);
 
         final JMenuItem monarchDialog = Utility.localizedMenuItem("menuBar.debug.displayMonarchPanel");
-        monarchDialog.addActionListener((ActionEvent e) -> {
+        monarchDialog.addActionListener((ActionEvent ae) -> {
                 gui.showMonarchDialog(Monarch.MonarchAction.RAISE_TAX_WAR,
                                       null, player.getMonarchKey());
             });
         panelMenu.add(monarchDialog);
 
         final JMenuItem errorMessage = Utility.localizedMenuItem("menuBar.debug.displayErrorMessage");
-        errorMessage.addActionListener((ActionEvent e) -> {
+        errorMessage.addActionListener((ActionEvent ae) -> {
                 gui.showErrorMessage(ERROR_MESSAGE);
             });
         panelMenu.add(errorMessage);
@@ -280,7 +280,7 @@ public class DebugMenu extends JMenu {
         europeStatus.setOpaque(false);
         europeStatus.setMnemonic(KeyEvent.VK_E);
         this.add(europeStatus);
-        europeStatus.addActionListener((ActionEvent e) -> {
+        europeStatus.addActionListener((ActionEvent ae) -> {
                 DebugUtils.displayEurope(freeColClient);
             });
         europeStatus.setEnabled(hasServer);
@@ -294,8 +294,8 @@ public class DebugMenu extends JMenu {
         dam.setOpaque(false);
         dam.setMnemonic(KeyEvent.VK_A);
         this.add(dam);
-        dam.addActionListener((ActionEvent e) -> {
-                boolean val = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+        dam.addActionListener((ActionEvent ae) -> {
+                boolean val = ((JCheckBoxMenuItem)ae.getSource()).isSelected();
                 FreeColDebugger.setDebugShowMission(val);
                 dami.setEnabled(val);
                 gui.refresh();
@@ -309,7 +309,7 @@ public class DebugMenu extends JMenu {
             Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
                 | InputEvent.ALT_MASK));
         this.add(useAI);
-        useAI.addActionListener((ActionEvent e) -> {
+        useAI.addActionListener((ActionEvent ae) -> {
                 DebugUtils.useAI(freeColClient);
             });
         useAI.setEnabled(hasServer);
@@ -317,8 +317,8 @@ public class DebugMenu extends JMenu {
         dami.setOpaque(false);
         dami.setMnemonic(KeyEvent.VK_I);
         this.add(dami);
-        dami.addActionListener((ActionEvent e) -> {
-                boolean val = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+        dami.addActionListener((ActionEvent ae) -> {
+                boolean val = ((JCheckBoxMenuItem)ae.getSource()).isSelected();
                 FreeColDebugger.setDebugShowMissionInfo(val);
                 dami.setEnabled(val);
                 gui.refresh();
@@ -334,7 +334,7 @@ public class DebugMenu extends JMenu {
             Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
                 | InputEvent.ALT_MASK));
         this.add(compareMaps);
-        compareMaps.addActionListener((ActionEvent e) -> {
+        compareMaps.addActionListener((ActionEvent ae) -> {
                 DebugUtils.checkDesyncAction(freeColClient);
             });
         compareMaps.setEnabled(hasServer);
@@ -343,7 +343,7 @@ public class DebugMenu extends JMenu {
         showResourceKeys.setOpaque(false);
         //showResourceKeys.setMnemonic(KeyEvent.VK_R);
         this.add(showResourceKeys);
-        showResourceKeys.addActionListener((ActionEvent e) -> {
+        showResourceKeys.addActionListener((ActionEvent ae) -> {
                 StringBuilder builder = new StringBuilder();
                 Map<String, ImageResource> resources
                     = ResourceManager.getImageResources();
@@ -364,7 +364,7 @@ public class DebugMenu extends JMenu {
         statistics.setOpaque(false);
         //statistics.setMnemonic(KeyEvent.VK_I);
         this.add(statistics);
-        statistics.addActionListener((ActionEvent e) -> {
+        statistics.addActionListener((ActionEvent ae) -> {
                 gui.showStatisticsPanel();
             });
         statistics.setEnabled(true);
@@ -374,7 +374,7 @@ public class DebugMenu extends JMenu {
         gc.setOpaque(false);
         //gc.setMnemonic(KeyEvent.VK_G);
         this.add(gc);
-        gc.addActionListener((ActionEvent e) -> {
+        gc.addActionListener((ActionEvent ae) -> {
                 System.gc();
             });
         gc.setEnabled(true);

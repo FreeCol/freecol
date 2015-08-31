@@ -92,11 +92,8 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                 for (final File file : files) {
                     JButton mapButton = makeMapButton(file);
                     if (mapButton == null) continue;
-                    mapButton.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                updateFile(file);
-                            }
+                    mapButton.addActionListener((ActionEvent ae) -> {
+                            updateFile(file);
                         });
                     mapPanel.add(mapButton);
                 }

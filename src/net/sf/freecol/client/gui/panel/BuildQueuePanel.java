@@ -552,15 +552,15 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         BuildQueueMouseAdapter adapter = new BuildQueueMouseAdapter(true);
         Action addAction = new AbstractAction() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent ae) {
                     JList<BuildableType> bql
                         = BuildQueuePanel.this.buildQueueList;
                     DefaultListModel<BuildableType> model
                         = (DefaultListModel<BuildableType>)bql.getModel();
                     JList<? extends BuildableType> btl
-                        = (e.getSource() == BuildQueuePanel.this.unitList)
+                        = (ae.getSource() == BuildQueuePanel.this.unitList)
                         ? BuildQueuePanel.this.unitList
-                        : (e.getSource() == BuildQueuePanel.this.buildingList)
+                        : (ae.getSource() == BuildQueuePanel.this.buildingList)
                         ? BuildQueuePanel.this.buildingList
                         : null;
                     if (btl != null) {
@@ -619,7 +619,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         this.buildQueueList.getActionMap().put("delete",
             new AbstractAction() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent ae) {
                     JList<BuildableType> bql = BuildQueuePanel.
                             this.buildQueueList;
                     for (BuildableType bt : bql.getSelectedValuesList()) {
@@ -1073,10 +1073,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformed(ActionEvent ae) {
         final String FAIL = "FAIL";
         if (this.colony.getOwner() == getMyPlayer()) {
-            String command = event.getActionCommand();
+            String command = ae.getActionCommand();
             List<BuildableType> buildables = getBuildableTypes(this
                     .buildQueueList);
             while (!buildables.isEmpty()
@@ -1098,7 +1098,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                     igc().payForBuilding(this.colony);
                     break;
                 default:
-                    super.actionPerformed(event);
+                    super.actionPerformed(ae);
                     break;
             }
         }

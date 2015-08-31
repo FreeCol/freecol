@@ -48,7 +48,7 @@ public class ClearOrdersAction extends UnitAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         igc().clearOrders(getGUI().getActiveUnit());
     }
 }
