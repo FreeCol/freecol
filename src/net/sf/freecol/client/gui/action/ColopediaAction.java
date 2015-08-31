@@ -33,8 +33,9 @@ public class ColopediaAction extends FreeColAction {
 
     public static final String id = "colopediaAction.";
 
+    // Order of elements will influence ingame order of menu items.
     public static enum PanelType {
-        TERRAIN, RESOURCES, UNITS, GOODS,
+        TERRAIN, RESOURCES, GOODS, UNITS,
         SKILLS, BUILDINGS, FATHERS, NATIONS,
         NATION_TYPES, CONCEPTS;
 
@@ -46,8 +47,8 @@ public class ColopediaAction extends FreeColAction {
     private static final int[] mnemonics = {
         KeyEvent.VK_T,
         KeyEvent.VK_R,
-        KeyEvent.VK_U,
         KeyEvent.VK_G,
+        KeyEvent.VK_U,
         KeyEvent.VK_S,
         KeyEvent.VK_B,
         KeyEvent.VK_F,
