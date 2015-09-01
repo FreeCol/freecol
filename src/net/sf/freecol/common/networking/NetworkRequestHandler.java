@@ -35,5 +35,5 @@ public interface NetworkRequestHandler {
      * @param element The root <code>Element</code> of the message.
      * @return The reply <code>Element</code>, which may be null.
      */
-    public Element handle(Connection connection, Element element);
+    Element handle(Connection connection, Element element);
 }

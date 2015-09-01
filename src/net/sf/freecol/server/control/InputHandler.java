@@ -63,20 +63,12 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
     public InputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
         // All sub-classes are forced to implement this one
-        register("logout", new NetworkRequestHandler() {
-                @Override
-                public Element handle(Connection connection, Element element) {
-                    return logout(connection, element);
-                }
-            });
+        register("logout", (Connection connection, Element element) ->
+            logout(connection, element));
         register("disconnect", new DisconnectHandler());
-        register("chat", new NetworkRequestHandler() {
-                @Override
-                public Element handle(Connection connection, Element element) {
-                    return new ChatMessage(getGame(), element)
-                        .handle(freeColServer, connection);
-                }
-            });
+        register("chat", (Connection connection, Element element) ->
+            new ChatMessage(getGame(), element)
+                .handle(freeColServer, connection));
     }
 
     /**
