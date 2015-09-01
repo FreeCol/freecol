@@ -35,6 +35,7 @@ import java.awt.image.RescaleOp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -530,7 +531,7 @@ public final class ImageLibrary {
      */
     public static BufferedImage getOverlayImage(TileType type, String id, float scale) {
         String prefix = "image.tileoverlay." + type.getId();
-        ArrayList<String> keys = ResourceManager.getImageKeys(prefix);
+        List<String> keys = ResourceManager.getImageKeys(prefix);
         return getRandomizedImage(keys, id, scale);
     }
 
@@ -546,7 +547,7 @@ public final class ImageLibrary {
     public static BufferedImage getOverlayImage(TileType type, String id, float scale,
                                         Set<String> overlayCache) {
         String prefix = "image.tileoverlay." + type.getId() + ".r";
-        ArrayList<String> keys = new ArrayList<>();
+        List<String> keys = new ArrayList<>();
         for (String key : overlayCache) {
             if (key.startsWith(prefix)) {
                 keys.add(key);
@@ -555,7 +556,7 @@ public final class ImageLibrary {
         return getRandomizedImage(keys, id, scale);
     }
 
-    private static BufferedImage getRandomizedImage(ArrayList<String> keys, String id, float scale) {
+    private static BufferedImage getRandomizedImage(List<String> keys, String id, float scale) {
         int count = keys.size();
         switch(count) {
             case 0:

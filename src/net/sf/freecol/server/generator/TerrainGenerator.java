@@ -86,8 +86,8 @@ public class TerrainGenerator {
     private final Specification spec;
 
     /** The cached land and ocean tile types. */
-    private ArrayList<TileType> landTileTypes = null;
-    private ArrayList<TileType> oceanTileTypes = null;
+    private List<TileType> landTileTypes = null;
+    private List<TileType> oceanTileTypes = null;
 
 
     /**

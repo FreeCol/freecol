@@ -25,6 +25,7 @@ import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -198,7 +199,7 @@ public class ResourceManager {
                 public void run() {
                     // Make a local list of the resources to load.
                     logger.info("Background thread started");
-                    ArrayList<Resource> resources
+                    List<Resource> resources
                         = new ArrayList<>(getResources().values());
                     int n = 0;
                     for (Resource r : resources) {
@@ -262,7 +263,7 @@ public class ResourceManager {
      * @param prefix the prefix
      * @return a list of all keys starting with the given prefix
      */
-    public static synchronized ArrayList<String> getImageKeys(String prefix) {
+    public static synchronized List<String> getImageKeys(String prefix) {
         //logger.finest("getImageKeys(" + prefix + ")");
         return mergedContainer.getImageKeys(prefix);
     }
@@ -275,7 +276,7 @@ public class ResourceManager {
      * @param suffix the suffix
      * @return a list of all resulting keys
      */
-    public static synchronized ArrayList<String> getImageKeys(String prefix,
+    public static synchronized List<String> getImageKeys(String prefix,
                                                               String suffix) {
         logger.finest("getImageKeys(" + prefix + ", " + suffix + ")");
         return mergedContainer.getImageKeys(prefix, suffix);

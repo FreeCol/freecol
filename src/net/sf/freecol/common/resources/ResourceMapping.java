@@ -22,6 +22,7 @@ package net.sf.freecol.common.resources;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -290,8 +291,8 @@ public final class ResourceMapping {
      * @param prefix The prefix to check for.
      * @return A list of keys.
      */
-    public ArrayList<String> getImageKeys(String prefix) {
-        ArrayList<String> result = new ArrayList<>();
+    public List<String> getImageKeys(String prefix) {
+        List<String> result = new ArrayList<>();
         for (String key : imageResources.keySet()) {
             if (key.startsWith(prefix)) {
                 result.add(key);
@@ -307,8 +308,8 @@ public final class ResourceMapping {
      * @param suffix The suffix to check for.
      * @return A list of keys.
      */
-    public ArrayList<String> getImageKeys(String prefix, String suffix) {
-        ArrayList<String> result = new ArrayList<>();
+    public List<String> getImageKeys(String prefix, String suffix) {
+        List<String> result = new ArrayList<>();
         for (String key : imageResources.keySet()) {
             if (key.startsWith(prefix) && key.endsWith(suffix)) {
                 result.add(key);
