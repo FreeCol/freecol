@@ -1318,7 +1318,12 @@ public class Game extends FreeColGameObject {
         //logger.finest("Found game tag " + tag + " id=" + xr.readId());
 
         if (CIBOLA_TAG.equals(tag)) {
-            NameCache.addCityOfCibola(xr.readId());
+            String cibola = xr.readId();
+            // @compat 0.11.3
+            final String oldPrefix = "lostCityRumour.cityName";
+            if (cibola.startsWith(oldPrefix)) cibola = "nameCache." + cibola;
+            // end @compat 0.11.3
+            NameCache.addCityOfCibola(cibola);
             xr.closeTag(CIBOLA_TAG);
 
         } else if (Map.getXMLElementTagName().equals(tag)) {
