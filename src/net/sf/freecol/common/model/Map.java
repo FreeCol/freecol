@@ -706,7 +706,7 @@ public class Map extends FreeColGameObject implements Location {
      * Simple interface to supply a heuristic to the A* routine.
      */
     private interface SearchHeuristic {
-        public int getValue(Tile tile);
+        int getValue(Tile tile);
     }
 
     /**
@@ -715,14 +715,8 @@ public class Map extends FreeColGameObject implements Location {
      * @param endTile The <code>Tile</code> to aim for.
      * @return A new <code>SearchHeuristic</code> aiming for the end tile.
      */
-    private SearchHeuristic getManhattenHeuristic(final Tile endTile) {
-        return new SearchHeuristic() {
-            // Manhatten distance to the end tile.
-            @Override
-            public int getValue(Tile tile) {
-                return tile.getDistanceTo(endTile);
-            }
-        };
+    private SearchHeuristic getManhattenHeuristic(Tile endTile) {
+        return (Tile tile) -> tile.getDistanceTo(endTile);
     }
 
     /**
