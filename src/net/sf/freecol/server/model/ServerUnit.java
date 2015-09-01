@@ -394,42 +394,18 @@ public class ServerUnit extends Unit implements ServerModelObject {
     private void csImproveTile(Random random, ChangeSet cs) {
         Tile tile = getTile();
         tile.cacheUnseen();//+til
-        AbstractGoods deliver = getWorkImprovement().getType().getProduction(tile.getType());
+        AbstractGoods deliver = getWorkImprovement().getType()
+            .getProduction(tile.getType());
         if (deliver != null) { // Deliver goods if any
             final Turn turn = getGame().getTurn();
             int amount = deliver.getAmount();
-            if (getType().hasAbility(Ability.EXPERT_PIONEER)) {
-                amount *= 2;
-            }
-            Settlement settlement = tile.getSettlement();
+            amount = (int)this.applyModifiers(amount, turn,
+                Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
+            Settlement settlement = tile.getOwningSettlement();
             if (settlement != null && owner.owns(settlement)) {
                 amount = (int)settlement.applyModifiers(amount, turn,
                     Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
                 settlement.addGoods(deliver.getType(), amount);
-            } else {
-                List<Settlement> adjacent = new ArrayList<>();
-                int newAmount = amount;
-                for (Tile t : tile.getSurroundingTiles(2)) {
-                    Settlement ts = t.getSettlement();
-                    if (ts != null && owner.owns(ts)) {
-                        adjacent.add(ts);
-                        int modAmount = (int)ts.applyModifiers((float)amount,
-                            turn, Modifier.TILE_TYPE_CHANGE_PRODUCTION,
-                            deliver.getType());
-                        if (modAmount > newAmount) {
-                            newAmount = modAmount;
-                        }
-                    }
-                }
-                if (!adjacent.isEmpty()) {
-                    int deliverPerCity = newAmount / adjacent.size();
-                    for (Settlement s : adjacent) {
-                        s.addGoods(deliver.getType(), deliverPerCity);
-                    }
-                    // Add residue to first adjacent settlement.
-                    adjacent.get(0).addGoods(deliver.getType(),
-                                             newAmount % adjacent.size());
-                }
             }
         }
 

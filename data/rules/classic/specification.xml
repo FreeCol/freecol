@@ -1594,6 +1594,10 @@
                recruit-probability="1" score-value="4">
       <default-role id="model.role.pioneer"/>
       <ability id="model.ability.expertPioneer" value="true"/>
+      <modifier id="model.modifier.tileTypeChangeProduction"
+                type="multiplicative" value="2">
+        <scope type="model.goods.lumber"/>
+      </modifier>
     </unit-type>
     <unit-type id="model.unit.veteranSoldier" extends="colonist"
                price="2000" skill="2"
@@ -2003,7 +2007,7 @@
       <required-goods id="model.goods.hammers"
                       value="52"/>
       <modifier id="model.modifier.tileTypeChangeProduction"
-                value="3" type="multiplicative">
+                type="multiplicative" value="3">
         <scope type="model.goods.lumber"/>
       </modifier>
     </building-type>

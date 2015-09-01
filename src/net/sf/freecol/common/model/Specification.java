@@ -2249,7 +2249,20 @@ public final class Specification {
             }
         }
         // end @compat 0.11.3
-        
+
+        // @compat 0.11.5
+        // Added a modifier to hardy pioneer
+        UnitType hardyPioneer = getUnitType("model.unit.hardyPioneer");
+        if (hardyPioneer.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION)
+            .isEmpty()) {
+            Modifier m = new Modifier(Modifier.TILE_TYPE_CHANGE_PRODUCTION,
+                2.0f, Modifier.ModifierType.MULTIPLICATIVE);
+            Scope scope = new Scope();
+            scope.setType("model.goods.lumber");
+            m.addScope(scope);
+            hardyPioneer.addModifier(m);
+        }
+        // end @compat 0.11.5
     }
 
     /**
