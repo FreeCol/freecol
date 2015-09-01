@@ -644,7 +644,7 @@ public final class MapViewer {
      * @param sourceTile The source <code>Tile</code>.
      * @param r The code to be executed.
      */
-    void executeWithUnitOutForAnimation(final Unit unit,
+    public void executeWithUnitOutForAnimation(final Unit unit,
                                                final Tile sourceTile,
                                                final OutForAnimationCallback r) {
         final JLabel unitLabel = enterUnitOutForAnimation(unit, sourceTile);

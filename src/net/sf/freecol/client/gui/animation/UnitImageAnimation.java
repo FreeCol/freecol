@@ -26,7 +26,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.io.sza.AnimationEvent;
 import net.sf.freecol.common.io.sza.ImageAnimationEvent;
@@ -71,9 +70,7 @@ public final class UnitImageAnimation {
 
         // Painting the whole screen once to get rid of disposed dialog-boxes.
         gui.paintImmediatelyCanvasInItsBounds();
-        gui.executeWithUnitOutForAnimation(unit, tile, new OutForAnimationCallback() {
-            @Override
-            public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
+        gui.executeWithUnitOutForAnimation(unit, tile, (JLabel unitLabel) -> {
                 for (AnimationEvent event : animation) {
                     long time = System.nanoTime();
                     if (event instanceof ImageAnimationEvent) {
@@ -86,7 +83,7 @@ public final class UnitImageAnimation {
                         }
                         icon.setImage(image);
                         gui.paintImmediatelyCanvasIn(getDirtyAnimationArea());
-
+                        
                         time = ievent.getDurationInMs()
                             - (System.nanoTime() - time) / 1000000;
                         if (time > 0) {
@@ -97,9 +94,8 @@ public final class UnitImageAnimation {
                             }
                         }
                     }
-                }             
-            }
-        });
+                }
+            });
     }
 
     protected Rectangle getDirtyAnimationArea() {

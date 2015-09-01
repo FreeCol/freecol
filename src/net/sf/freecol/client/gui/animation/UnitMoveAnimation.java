@@ -26,7 +26,6 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -84,61 +83,55 @@ final class UnitMoveAnimation {
         final Rectangle bounds = r1.union(r2);
 
         gui.executeWithUnitOutForAnimation(unit, sourceTile,
-            new OutForAnimationCallback() {
-                @Override
-                public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
-                    final int labelWidth = unitLabel.getWidth();
-                    final int labelHeight = unitLabel.getHeight();
-                    final Point srcPoint = gui.calculateUnitLabelPositionInTile(
-                        labelWidth, labelHeight, srcP);
-                    final Point dstPoint = gui.calculateUnitLabelPositionInTile(
-                        labelWidth, labelHeight, dstP);
-                    final double xratio = ImageLibrary.TILE_SIZE.width
-                                        / (double)ImageLibrary.TILE_SIZE.height;
-                    final int stepX = (srcPoint.getX() == dstPoint.getX()) ? 0
-                        : (srcPoint.getX() > dstPoint.getX()) ? -1 : 1;
-                    final int stepY = (srcPoint.getY() == dstPoint.getY()) ? 0
-                        : (srcPoint.getY() > dstPoint.getY()) ? -1 : 1;
-                    
-                    // Painting the whole screen once to get rid of
-                    // disposed dialog-boxes.
-                    gui.paintImmediatelyCanvasInItsBounds();
-                    
-                    int dropFrames = 0;
-                    Point point = srcPoint;
-                    while (!point.equals(dstPoint)) {
-                        long time = System.currentTimeMillis();
-                        
-                        point.x += stepX * xratio * movementRatio;
-                        point.y += stepY * movementRatio;
-                        if ((stepX < 0 && point.x < dstPoint.x)
-                            || (stepX > 0 && point.x > dstPoint.x)) {
-                            point.x = dstPoint.x;
-                        }
-                        if ((stepY < 0 && point.y < dstPoint.y)
-                            || (stepY > 0 && point.y > dstPoint.y)) {
-                            point.y = dstPoint.y;
-                        }
-                        if (dropFrames <= 0) {
-                            unitLabel.setLocation(point);
-                            gui.paintImmediatelyCanvasIn(bounds);
+            (JLabel unitLabel) -> {
+                final int labelWidth = unitLabel.getWidth();
+                final int labelHeight = unitLabel.getHeight();
+                final Point srcPoint = gui.calculateUnitLabelPositionInTile(labelWidth, labelHeight, srcP);
+                final Point dstPoint = gui.calculateUnitLabelPositionInTile(labelWidth, labelHeight, dstP);
+                final double xratio = ImageLibrary.TILE_SIZE.width
+                    / (double)ImageLibrary.TILE_SIZE.height;
+                final int stepX = (srcPoint.getX() == dstPoint.getX()) ? 0
+                    : (srcPoint.getX() > dstPoint.getX()) ? -1 : 1;
+                final int stepY = (srcPoint.getY() == dstPoint.getY()) ? 0
+                    : (srcPoint.getY() > dstPoint.getY()) ? -1 : 1;
+
+                // Painting the whole screen once to get rid of
+                // disposed dialog-boxes.
+                gui.paintImmediatelyCanvasInItsBounds();
+
+                int dropFrames = 0;
+                Point point = srcPoint;
+                while (!point.equals(dstPoint)) {
+                    long time = System.currentTimeMillis();
+
+                    point.x += stepX * xratio * movementRatio;
+                    point.y += stepY * movementRatio;
+                    if ((stepX < 0 && point.x < dstPoint.x)
+                        || (stepX > 0 && point.x > dstPoint.x)) {
+                        point.x = dstPoint.x;
+                    }
+                    if ((stepY < 0 && point.y < dstPoint.y)
+                        || (stepY > 0 && point.y > dstPoint.y)) {
+                        point.y = dstPoint.y;
+                    }
+                    if (dropFrames <= 0) {
+                        unitLabel.setLocation(point);
+                        gui.paintImmediatelyCanvasIn(bounds);
                             
-                            int timeTaken = (int)(System.currentTimeMillis()
-                                - time);
-                            final int waitTime = ANIMATION_DELAY - timeTaken;
-                            if (waitTime > 0) {
-                                try {
-                                    Thread.sleep(waitTime);
-                                } catch (InterruptedException ex) {
-                                    //ignore
-                                }
-                                dropFrames = 0;
-                            } else {
-                                dropFrames = timeTaken / ANIMATION_DELAY - 1;
+                        int timeTaken = (int)(System.currentTimeMillis() - time);
+                        final int waitTime = ANIMATION_DELAY - timeTaken;
+                        if (waitTime > 0) {
+                            try {
+                                Thread.sleep(waitTime);
+                            } catch (InterruptedException ex) {
+                                //ignore
                             }
+                            dropFrames = 0;
                         } else {
-                            dropFrames--;
+                            dropFrames = timeTaken / ANIMATION_DELAY - 1;
                         }
+                    } else {
+                            dropFrames--;
                     }
                 }
             });
