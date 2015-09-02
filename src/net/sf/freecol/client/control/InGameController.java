@@ -3937,13 +3937,15 @@ public final class InGameController implements NetworkConstants {
 
         if (!askClearGotoOrders(unit)) return false;
 
+        final int unitCount = unit.getUnitCount();
         final Tile oldTile = unit.getTile();
         UnitWas unitWas = new UnitWas(unit);
         ColonyWas colonyWas = (unit.getColony() == null) ? null
             : new ColonyWas(unit.getColony());
         unit.setState(UnitState.ACTIVE);
         moveDirection(unit, direction, true);
-        boolean ret = unit.getTile() != oldTile;
+        boolean ret = unit.getTile() != oldTile
+            || unit.getUnitCount() != unitCount; // disembark occurred
         if (ret) {
             unitWas.fireChanges();
             if (colonyWas != null) colonyWas.fireChanges();
