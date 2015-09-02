@@ -93,11 +93,6 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        if (getId().equals(id)
-            || ("colopediaAction." + PanelType.SKILLS.getKey()).equals(id)) {
-            return;
-        }
-
         UnitType type = getSpecification().getUnitType(id);
         panel.setLayout(new MigLayout("wrap 4", "[]20[]40[]20[]"));
 
