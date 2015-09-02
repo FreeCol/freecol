@@ -974,7 +974,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        invokeLater(() -> { igc().setCurrentPlayer(player); });
+        igc().setCurrentPlayer(player); // It is safe to call this one directly
         return null;
     }
 
