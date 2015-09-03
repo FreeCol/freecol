@@ -70,6 +70,7 @@ public final class ReportClassicColonyPanel extends ReportPanel
         super(freeColClient, "reportColonyAction");
         
         this.colonies.addAll(freeColClient.getMySortedColonies());
+        update();
     }
 
     private void update() {
