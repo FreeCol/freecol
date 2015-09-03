@@ -1038,7 +1038,7 @@ public final class FreeColServer {
 
         // AI initialization.
         AIMain aiMain = getAIMain();
-        int aiIntegrity = aiMain.checkIntegrity(true);
+        int aiIntegrity = (aiMain == null) ? -1 : aiMain.checkIntegrity(true);
         if (aiIntegrity < 0) {
             aiMain = new AIMain(this);
             aiMain.findNewObjects(true);
