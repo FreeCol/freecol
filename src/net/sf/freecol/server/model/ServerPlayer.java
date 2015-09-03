@@ -2163,7 +2163,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     Colony colony = t.getColony();
                     Set<Tile> tiles = new HashSet<>();
                     if (colony != null && !this.owns(colony)) {
-                        tiles.addAll(exploreForSettlement(colony));
+                        // FreeCol ruleset adds this ability, allowing
+                        // full visibility of colony and surroundings.
+                        if (hasAbility(Ability.SEE_ALL_COLONIES)) {
+                            tiles.addAll(exploreForSettlement(colony));
+                        } else {
+                            // Col1 showed Coronado-revealed colonies as size 1
+                            if (exploreTile(t)) {
+                                Tile c = t.copy(game, Tile.class);
+                                c.getColony().setDisplayUnitCount(1);
+                                t.setCachedTile(this, c);
+                                tiles.add(t);
+                            }
+                        }
                     }
                     cs.add(See.only(this), tiles);
                 }
