@@ -2854,17 +2854,17 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
         // All other European settlements if can see all colonies.
-        //if (isEuropean() && hasAbility(Ability.SEE_ALL_COLONIES)) {
-        //    for (Player other : getGame().getLiveEuropeanPlayers(this)) {
-        //        for (Colony colony : other.getColonies()) {
-        //            for (Tile t : colony.getTile().getSurroundingTiles(0,
-        //                    colony.getLineOfSight())) {
-        //                cST[t.getX()][t.getY()] = true;
-        //                t.seeTile(this);
-        //            }
-        //        }
-        //    }
-        //}
+        if (isEuropean() && hasAbility(Ability.SEE_ALL_COLONIES)) {
+            for (Player other : getGame().getLiveEuropeanPlayers(this)) {
+                for (Colony colony : other.getColonies()) {
+                    for (Tile t : colony.getTile().getSurroundingTiles(0,
+                            colony.getLineOfSight())) {
+                        cST[t.getX()][t.getY()] = true;
+                        t.seeTile(this);
+                    }
+                }
+            }
+        }
         return cST;
     }
 

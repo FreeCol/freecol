@@ -58,6 +58,14 @@
   </building-types>
 
   <founding-fathers>
+    <founding-father id="model.foundingFather.franciscoDeCoronado"
+                     type="exploration"
+                     weight1="3" weight2="5" weight3="7">
+      <!-- FreeCol extension -->
+      <ability id="model.ability.seeAllColonies"
+               value="true"/>
+      <event id="model.event.seeAllColonies"/>
+    </founding-father>
     <founding-father id="model.foundingFather.pocahontas" type="political"
                      weight1="7" weight2="5" weight3="3">
       <modifier id="model.modifier.nativeAlarmModifier"
