@@ -60,12 +60,10 @@ public class ResourcesDetailPanel
     }
 
 
+    // Implement ColopediaDetailPanel
+
     /**
-     * Adds one or several subtrees for all the objects for which this
-     * ColopediaDetailPanel could build a detail panel to the given
-     * root node.
-     *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * {@inheritDoc}
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
@@ -73,17 +71,11 @@ public class ResourcesDetailPanel
     }
 
     /**
-     * Builds the details panel for the ResourceType with the given
-     * identifier.
-     *
-     * @param id The object identifier.
-     * @param panel the detail panel to build
+     * {@inheritDoc}
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        if (getId().equals(id)) {
-            return;
-        }
+        if (getId().equals(id)) return;
 
         ResourceType type = getSpecification().getResourceType(id);
         panel.setLayout(new MigLayout("wrap 2", "[]20[]"));
@@ -121,5 +113,4 @@ public class ResourcesDetailPanel
         panel.add(Utility.localizedTextArea(Messages.descriptionKey(type), 30),
                   "growx");
     }
-
 }

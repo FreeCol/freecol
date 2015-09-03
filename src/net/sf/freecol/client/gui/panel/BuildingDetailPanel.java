@@ -72,21 +72,22 @@ public class BuildingDetailPanel
     }
 
 
+    // Implement ColopediaDetailPanel
+
     /**
-     * Adds one or several subtrees for all the objects for which this
-     * ColopediaDetailPanel could build a detail panel to the given
-     * root node.
-     *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * {@inheritDoc}
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
-        DefaultMutableTreeNode parent =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
+        DefaultMutableTreeNode parent
+            = new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(),
+                    getName(), null));
 
         List<BuildingType> buildingTypes = new ArrayList<>();
-        Map<BuildingType, DefaultMutableTreeNode> buildingHash = new HashMap<>();
-        for (BuildingType buildingType : getSpecification().getBuildingTypeList()) {
+        Map<BuildingType, DefaultMutableTreeNode> buildingHash
+            = new HashMap<>();
+        for (BuildingType buildingType
+                 : getSpecification().getBuildingTypeList()) {
             if (buildingType.getUpgradesFrom() == null) {
                 String name = Messages.getName(buildingType);
                 DefaultMutableTreeNode item =
@@ -122,17 +123,11 @@ public class BuildingDetailPanel
     }
 
     /**
-     * Builds the details panel for the BuildingType with the given
-     * identifier.
-     *
-     * @param id The object identifier.
-     * @param panel the detail panel to build
+     * {@inheritDoc}
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        if (getId().equals(id)) {
-            return;
-        }
+        if (getId().equals(id)) return;
 
         BuildingType buildingType = getSpecification().getBuildingType(id);
         panel.setLayout(new MigLayout("wrap 7, gapx 20", "", ""));
@@ -276,5 +271,4 @@ public class BuildingDetailPanel
         panel.add(Utility.localizedTextArea(Messages.descriptionKey(buildingType)),
                   "span, growx");
     }
-
 }

@@ -63,12 +63,10 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
     }
 
 
+    // Implement ColopediaDetailPanel
+
     /**
-     * Adds one or several subtrees for all the objects for which this
-     * ColopediaDetailPanel could build a detail panel to the given
-     * root node.
-     *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * {@inheritDoc}
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
@@ -76,16 +74,11 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
     }
 
     /**
-     * Builds the details panel for the GoodsType with the given identifier.
-     *
-     * @param id The object identifier.
-     * @param panel the detail panel to build
+     * {@inheritDoc}
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        if (getId().equals(id)) {
-            return;
-        }
+        if (getId().equals(id)) return;
 
         GoodsType type = getSpecification().getGoodsType(id);
         panel.setLayout(new MigLayout("wrap 4", "[]20[]"));
@@ -215,7 +208,8 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
     }
 
 
-    private <T extends BuildableType> boolean filterBuildables(List<T> input, List<T> output, GoodsType type) {
+    private <T extends BuildableType> boolean filterBuildables(List<T> input,
+        List<T> output, GoodsType type) {
         boolean result = true;
         for (T buildableType : input) {
             if (buildableType.needsGoodsToBuild()) {

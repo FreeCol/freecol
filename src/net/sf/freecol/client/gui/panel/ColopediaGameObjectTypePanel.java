@@ -59,10 +59,20 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     extends FreeColPanel implements ColopediaDetailPanel<T> {
 
 
+    /** The enclosing colopedia panel. */
+    private ColopediaPanel colopediaPanel; 
+
+    /** The specific panel id. */
     private final String id;
-    private ColopediaPanel colopediaPanel;
 
 
+    /**
+     * Create a new Colopedia game object type panel.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param colopediaPanel The parent <code>ColopediaPanel</code>.
+     * @param id The panel type identifier.
+     */
     public ColopediaGameObjectTypePanel(FreeColClient freeColClient,
                                         ColopediaPanel colopediaPanel,
                                         String id) {
@@ -72,19 +82,25 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
         this.id = "colopediaAction." + id;
     }
 
+
     /**
-     * Returns the name of this ColopediaDetailPanel, which is
-     * generally used to label the root node of its sub-tree.
+     * Get the panel id.
      *
-     * @return a String value
+     * @return The panel id, usually "colopediaAction.*".
+     */
+    protected String getId() {
+        return id;
+    }
+
+    /**
+     * Get the name of this ColopediaDetailPanel, which is generally
+     * used to label the root node of its sub-tree.
+     *
+     * @return The panel name.
      */
     @Override
     public String getName() {
         return Messages.getName(id);
-    }
-
-    protected String getId() {
-        return id;
     }
 
     /**

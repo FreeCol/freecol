@@ -63,25 +63,24 @@ public class TerrainDetailPanel
     }
 
 
+    // Implement ColopediaDetailPanel
+
     /**
-     * Adds one or several subtrees for all the objects for which this
-     * ColopediaDetailPanel could build a detail panel to the given
-     * root node.
-     *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * {@inheritDoc}
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
-        DefaultMutableTreeNode node =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
+        DefaultMutableTreeNode node
+            = new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(),
+                                         getName(), null));
         for (TileType t : getSpecification().getTileTypeList()) {
             // FIXME: Use different method supporting a direct request of an
             //        image of fixed ICON_SIZE.
             final float maxTileImageHeight = ImageLibrary.TILE_OVERLAY_SIZE.height;
             Image tile = SwingGUI.createTileImageWithOverlayAndForest(t,
                 ImageLibrary.ICON_SIZE.height / maxTileImageHeight);
-            BufferedImage image = new BufferedImage(tile.getWidth(null), ImageLibrary.ICON_SIZE.height,
-                BufferedImage.TYPE_INT_ARGB);
+            BufferedImage image = new BufferedImage(tile.getWidth(null),
+                ImageLibrary.ICON_SIZE.height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.createGraphics();
             g.drawImage(tile, 0, (ImageLibrary.ICON_SIZE.height - tile.getHeight(null)) / 2, null);
             g.dispose();
@@ -92,16 +91,11 @@ public class TerrainDetailPanel
     }
 
     /**
-     * Builds the details panel for the TileType with the given identifier.
-     *
-     * @param id The object identifier.
-     * @param panel the detail panel to build
+     * {@inheritDoc}
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        if (getId().equals(id)) {
-            return;
-        }
+        if (getId().equals(id)) return;
 
         TileType tileType = getSpecification().getTileType(id);
         panel.setLayout(new MigLayout("wrap 4, gap 20"));
