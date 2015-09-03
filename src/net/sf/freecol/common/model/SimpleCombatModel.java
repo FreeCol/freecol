@@ -541,9 +541,12 @@ public class SimpleCombatModel extends CombatModel {
 
             // Tile defence bonus
             disableFortified |= hasStrongDefenceModifier(tile.getType());
-            result.addAll(tile.getType().getDefenceModifiers());
 
             if (settlement == null) {
+                // PF#73 demonstrated that tile modifiers do not apply
+                // for colonies
+                result.addAll(tile.getType().getDefenceModifiers());
+
                 // Artillery in the Open penalty
                 if (defender.hasAbility(Ability.BOMBARD)
                     && defender.getState() != Unit.UnitState.FORTIFIED) {
