@@ -41,6 +41,7 @@ import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -2778,10 +2779,11 @@ public final class InGameController implements NetworkConstants {
         // Only native owners that we can steal, buy from, or use a
         // bonus center tile exception should be possible by this point.
         UnitWas unitWas = new UnitWas(unit);
-        boolean ret = player.owns(tile)
-            || (player.canClaimToFoundSettlement(tile)
-                && askClaimTile(player, tile, unit,
-                                player.getLandPrice(tile)));
+        boolean ret = player.owns(tile);
+        if (!ret) {
+            ret = askClaimTile(player, tile, unit, player.getLandPrice(tile));
+            if (!ret) NameCache.putSettlementName(player, name);
+        }            
         if (ret) {
             ret = askServer().buildColony(name, unit)
                 && tile.hasSettlement();
