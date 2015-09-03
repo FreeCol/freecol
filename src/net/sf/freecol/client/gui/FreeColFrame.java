@@ -88,9 +88,11 @@ public class FreeColFrame extends JFrame {
             if (windowed) {
                 Insets screenInsets = Toolkit.getDefaultToolkit()
                         .getScreenInsets(gd.getDefaultConfiguration());
-                bounds = new Rectangle(0, 0,
-                    bounds.width - (bounds.x+screenInsets.left+screenInsets.right),
-                    bounds.height - (bounds.y+screenInsets.top+screenInsets.bottom));
+                bounds = new Rectangle(
+                    bounds.x + screenInsets.left,
+                    bounds.y + screenInsets.top,
+                    bounds.width - screenInsets.right,
+                    bounds.height - screenInsets.bottom);
             }
         }
         setBounds(bounds);
