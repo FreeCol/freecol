@@ -323,6 +323,8 @@ public class ChangeSet {
         private final Unit attacker;
         private final Unit defender;
         private final boolean success;
+        private final boolean defenderInSettlement;
+
 
         /**
          * Build a new AttackChange.
@@ -334,6 +336,10 @@ public class ChangeSet {
          * information is serialized when a unit is inside a
          * settlement, but if unscoped too much is disclosed.  So we
          * make a copy and neuter it.
+         *
+         * We have to remember if the defender was in a settlement
+         * because by the time serialization occurs the settlement
+         * might have been destroyed.
          *
          * We just have to accept that combat animation is an
          * exception to the normal visibility rules.
@@ -347,6 +353,7 @@ public class ChangeSet {
                             boolean success) {
             super(see);
             Game game = attacker.getGame();
+            this.defenderInSettlement = defender.getTile().hasSettlement();
             this.attacker = attacker.copy(game, Unit.class);
             this.attacker.setLocationNoUpdate(this.attacker.getTile());
             this.defender = defender.copy(game, Unit.class);
@@ -404,7 +411,8 @@ public class ChangeSet {
                     element.appendChild(loc.toXMLElement(doc, serverPlayer));
                 }
             }
-            if (!canSeeUnit(serverPlayer, defender)) {
+            if (!canSeeUnit(serverPlayer, defender)
+                || this.defenderInSettlement) {
                 defender.setWorkType(null);
                 element.appendChild(defender.toXMLElement(doc));
             }
