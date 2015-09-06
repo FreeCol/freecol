@@ -45,6 +45,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -142,14 +143,14 @@ public final class ReportTurnPanel extends ReportPanel {
             
             JComponent component = new JLabel();
             FreeColObject messageDisplay = game.getMessageDisplay(message);
+            final ImageLibrary lib = getImageLibrary();
             if (messageDisplay != null) {
-                Image image = getImageLibrary().getObjectImage(messageDisplay, 1f);
+                Image image = lib.getObjectImage(messageDisplay, 1f);
                 ImageIcon icon = (image == null) ? null : new ImageIcon(image);
-
                 if (messageDisplay instanceof Colony
                     || messageDisplay instanceof Europe) {
                     JButton button = Utility.getLinkButton(null, icon,
-                                                       messageDisplay.getId());
+                        messageDisplay.getId());
                     button.addActionListener(this);
                     component = button;
                 } else if (messageDisplay instanceof Unit) {
@@ -165,8 +166,12 @@ public final class ReportTurnPanel extends ReportPanel {
             reportPanel.add(component, "newline");
             
             final JTextPane textPane = Utility.getDefaultTextPane();
-            insertMessage(textPane.getStyledDocument(), message,
-                          getMyPlayer());
+            try {
+                insertMessage(textPane.getStyledDocument(), message,
+                              getMyPlayer());
+            } catch (BadLocationException ble) {
+                logger.log(Level.WARNING, "message insert fail", ble);
+            }
             reportPanel.add(textPane);
 
             boolean ignore = false;
@@ -300,96 +305,67 @@ public final class ReportTurnPanel extends ReportPanel {
     }
 
     private void insertMessage(StyledDocument document, ModelMessage message,
-                               Player player) {
-        try {
-            String input = null;
-            String id = message.getId();
-            if (id == null || id.equals(input = Messages.message(id))) {
-                // id not present, fallback to default
-                input = Messages.message(message.getDefaultId());
-            }
-            int start = input.indexOf('%');
-            if (start == -1) {
-                // no variables present
-                insertText(document, input);
-                return;
-            } else if (start > 0) {
-                // output any string before the first occurrence of '%'
-                insertText(document, input.substring(0, start));
-            }
-
-            int end;
-            while ((end = input.indexOf('%', start + 1)) >= 0) {
-                String var = input.substring(start, end + 1);
-                String item = Messages.message(message.getReplacement(var));
-                FreeColGameObject messageSource = getFreeColClient().getGame()
-                    .getMessageSource(message);
-                if (item != null) {
-                    // found variable to replace
-                    if ("%colony%".equals(var) || var.endsWith("Colony%")) {
-                        Colony colony = player.getColonyByName(item);
-                        if (colony != null) {
-                            insertLinkButton(document, colony, item);
-                        } else if (messageSource instanceof Tile) {
-                            insertLinkButton(document, messageSource, item);
-                        } else {
-                            insertText(document, item);
-                        }
-                    } else if ("%europe%".equals(var)
-                        || ("%market%".equals(var) && player.isColonial())) {
-                        insertLinkButton(document, player.getEurope(),
-                            Messages.getName(player.getEurope()));
-                    } else if ("%unit%".equals(var)
-                        || var.endsWith("Unit%")
-                        || "%newName%".equals(var)) {
-                        Tile tile = null;
-                        if (messageSource instanceof Unit) {
-                            tile = ((Unit)messageSource).getTile();
-                        } else if (messageSource instanceof Tile) {
-                            tile = (Tile)messageSource;
-                        }
-                        if (tile != null) {
-                            Settlement settlement = tile.getSettlement();
-                            if (settlement != null) {
-                                insertLinkButton(document, settlement, item);
-                            } else {
-                                insertLinkButton(document, tile, item);
-                            }
-                        } else {
-                            insertText(document, item);
-                        }
-                    } else if ("%location%".equals(var)
-                        || var.endsWith("Location%")) {
-                        if (messageSource instanceof Europe) {
-                            insertLinkButton(document, player.getEurope(),
-                                Messages.getName(player.getEurope()));
-                        } else if (messageSource instanceof Location) {
-                            Location loc = upLoc((Location)messageSource);
-                            insertLinkButton(document, (FreeColGameObject)loc,
-                                             item);
-                        } else {
-                            insertText(document, item);
-                        }
+                               Player player) throws BadLocationException {
+        final String input = Messages.message(message);
+        final Game game = getFreeColClient().getGame();
+        final FreeColGameObject messageSource = game.getMessageSource(message);
+        int start = 0;
+        for (String key : message.getKeys()) {
+            StringTemplate rep = message.getReplacement(key);
+            String val = Messages.message(rep);
+            int index = input.indexOf(val, start);
+            if (index < 0) continue;
+            insertText(document, input.substring(start, index));
+            if ("%colony%".equals(key) || key.endsWith("Colony%")) {
+                Settlement settlement = game.getSettlement(val);
+                if (settlement != null) {
+                    if (player.owns(settlement)) {
+                        insertLinkButton(document, settlement, val);
                     } else {
-                        insertText(document, item);
+                        insertLinkButton(document, settlement.getTile(), val);
                     }
-                    start = end + 1;
+                } else if (messageSource instanceof Tile) {
+                    insertLinkButton(document, messageSource, val);
                 } else {
-                    // found no variable to replace: either a single '%', or
-                    // some unnecessary variable
-                    insertText(document, input.substring(start, end));
-                    start = end;
+                    insertText(document, val);
                 }
+            } else if ("%europe%".equals(key)
+                || ("%market%".equals(key) && player.isColonial())) {
+                insertLinkButton(document, player.getEurope(), val);
+            } else if ("%location%".equals(key)
+                || key.endsWith("Location%")) {
+                if (messageSource instanceof Europe) {
+                    insertLinkButton(document, player.getEurope(), val);
+                } else if (messageSource instanceof Location) {
+                    Location loc = upLoc((Location)messageSource);
+                    insertLinkButton(document, (FreeColGameObject)loc, val);
+                } else {
+                    insertText(document, val);
+                }
+            } else if ("%unit%".equals(key) || key.endsWith("Unit%")
+                || "%newName%".equals(key)) {
+                Tile tile = null;
+                if (messageSource instanceof Unit) {
+                    tile = ((Unit)messageSource).getTile();
+                } else if (messageSource instanceof Tile) {
+                    tile = (Tile)messageSource;
+                }
+                if (tile != null) {
+                    Settlement settlement = tile.getSettlement();
+                    if (settlement != null && player.owns(settlement)) {
+                        insertLinkButton(document, settlement, val);
+                    } else {
+                        insertLinkButton(document, tile, val);
+                    }
+                } else {
+                    insertText(document, val);
+                }
+            } else {
+                insertText(document, val);
             }
-
-            // output any string after the last occurrence of '%'
-            if (start < input.length()) {
-                insertText(document, input.substring(start));
-            }
-
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Insert fail: " + message, e);
+            start = index + val.length();
         }
+        insertText(document, input.substring(start));
     }
 
     private void insertText(StyledDocument document, String text)
@@ -413,15 +389,5 @@ public final class ReportTurnPanel extends ReportPanel {
         return (loc == null) ? null
             : (loc.getSettlement() != null) ? loc.getSettlement()
             : loc;
-    }
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void actionPerformed(ActionEvent ae) {
-        super.actionPerformed(ae);
     }
 }

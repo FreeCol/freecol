@@ -873,10 +873,12 @@ public class Messages {
                 int replacementIndex = input.indexOf('|', start);
                 int nextOpenIndex = input.indexOf("{{", start);
                 if (nextOpenIndex >= 0 && nextOpenIndex < replacementIndex) {
-                    replacementIndex = input.indexOf('|', findMatchingBracket(input, nextOpenIndex + 2) + 2);
+                    replacementIndex = input.indexOf('|',
+                        findMatchingBracket(input, nextOpenIndex + 2) + 2);
                 }
-                int end = (replacementIndex < 0 || replacementIndex > closeChoice)
-                    ? closeChoice : replacementIndex;
+                int end = (replacementIndex < 0
+                    || replacementIndex > closeChoice) ? closeChoice
+                    : replacementIndex;
                 String replacement = input.substring(start, end);
                 if (!replacement.contains("{{")) {
                     result.append(replacement);
