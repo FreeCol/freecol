@@ -352,7 +352,7 @@ public class TransportMission extends Mission {
             }
             if (next == null) next = getAIUnit().getTrivialTarget();
         }
-        setTarget(upLoc(next));
+        setTarget(Location.upLoc(next));
     }
 
     // Medium-level cargo and target manipulation, should be kept
@@ -831,7 +831,8 @@ public class TransportMission extends Mission {
                     try {
                         Cargo cargo = Cargo.newCargo(t, carrier, end, false);
                         boolean result = queueCargo(cargo, false, lb);
-                        lb.add(" to drop at ", upLoc(end), "=", result);
+                        lb.add(" to drop at ", Location.upLoc(end),
+                            "=", result);
                     } catch (FreeColException fce) {
                         lb.add(" ", t, " drop-fail(", fce.getMessage(), ")");
                     }

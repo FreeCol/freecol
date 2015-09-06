@@ -1076,7 +1076,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             TransportableAIObject t = w.getTransportable();
             if (t != null && t.getTransport() == null
                 && t.getTransportDestination() != null) {
-                Location loc = upLoc(t.getTransportDestination());
+                Location loc = Location.upLoc(t.getTransportDestination());
                 appendToMapList(transportDemand, loc, w);
             }
         }
@@ -1197,7 +1197,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A list of <code>WorkerWish</code>es.
      */
     public List<WorkerWish> getWorkerWishesAt(Location loc, UnitType type) {
-        List<Wish> demand = transportDemand.get(upLoc(loc));
+        List<Wish> demand = transportDemand.get(Location.upLoc(loc));
         if (demand == null) return Collections.<WorkerWish>emptyList();
         List<WorkerWish> result = new ArrayList<>();
         for (Wish w : demand) {
@@ -1217,7 +1217,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A list of <code>GoodsWish</code>es.
      */
     public List<GoodsWish> getGoodsWishesAt(Location loc, GoodsType type) {
-        List<Wish> demand = transportDemand.get(upLoc(loc));
+        List<Wish> demand = transportDemand.get(Location.upLoc(loc));
         if (demand == null) return Collections.<GoodsWish>emptyList();
         List<GoodsWish> result = new ArrayList<>();
         for (Wish w : demand) {

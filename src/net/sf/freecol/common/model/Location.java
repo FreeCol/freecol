@@ -169,4 +169,15 @@ public interface Location extends ObjectWithId {
      * @return A short description.
      */
     public String toShortString();
+
+
+    /**
+     * Static frontend to up().
+     *
+     * @param loc The <code>Location</code> to improve.
+     * @return The improved <code>Location</code>.
+     */
+    public static Location upLoc(Location loc) {
+        return (loc == null) ? null : loc.up();
+    }
 }

@@ -394,7 +394,7 @@ public abstract class Mission extends AIObject {
      */
     protected Mission lbAt(LogBuilder lb) {
         final Unit unit = getUnit();
-        lb.add(", at ", upLoc(unit.getLocation()));
+        lb.add(", at ", Location.upLoc(unit.getLocation()));
         return this;
     }
 
@@ -667,7 +667,7 @@ public abstract class Mission extends AIObject {
         final Map map = unit.getGame().getMap();
         PathNode path = null;
         boolean useTransport = false;
-        target = upLoc(target);
+        target = Location.upLoc(target);
 
         // Consider where the unit is starting.
         if (unit.isAtSea()) {
@@ -866,11 +866,11 @@ public abstract class Mission extends AIObject {
         for (; path != null; path = path.next) {
             // Check for immediate failure
             if (unit.isDisposed()) {
-                lb.add(", died going to ", upLoc(path.getLocation()));
+                lb.add(", died going to ", Location.upLoc(path.getLocation()));
                 return MoveType.MOVE_NO_REPAIR;
             } else if (unit.getMovesLeft() <= 0) {
                 lbAt(lb);
-                lb.add(", en route to ", upLoc(target));
+                lb.add(", en route to ", Location.upLoc(target));
                 return MoveType.MOVE_NO_MOVES;
             }
 
@@ -894,7 +894,8 @@ public abstract class Mission extends AIObject {
             }
             if (!aiUnit.move(path.getDirection())) {
                 lbAt(lb);
-                lb.add(", failed to move to ", upLoc(path.getLocation()));
+                lb.add(", failed to move to ",
+                    Location.upLoc(path.getLocation()));
                 return MoveType.MOVE_ILLEGAL;
             }
         }

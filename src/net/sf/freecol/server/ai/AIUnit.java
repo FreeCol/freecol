@@ -271,7 +271,8 @@ public class AIUnit extends TransportableAIObject {
      */
     public Location getTrivialTarget() {
         PathNode path = unit.getTrivialPath();
-        return (path == null) ? null : upLoc(path.getLastNode().getLocation());
+        return (path == null) ? null
+            : Location.upLoc(path.getLastNode().getLocation());
     }
 
     /**
@@ -385,7 +386,7 @@ public class AIUnit extends TransportableAIObject {
     public boolean equipForRole(Role role) {
         final Specification spec = getSpecification();
         final Player player = unit.getOwner();
-        Location loc = upLoc(unit.getLocation());
+        Location loc = Location.upLoc(unit.getLocation());
         if (!(loc instanceof UnitLocation)) return false;
         int count = role.getMaximumCount();
         if (count > 0) {
@@ -448,7 +449,7 @@ public class AIUnit extends TransportableAIObject {
             dst = getTransportDestination();
             if (dst == null) return null;
         }
-        dst = upLoc(dst);
+        dst = Location.upLoc(dst);
 
         PathNode path;
         if (unit.getLocation() == carrier) {

@@ -240,7 +240,7 @@ public class AIGoods extends TransportableAIObject {
      */
     @Override
     public PathNode getDeliveryPath(Unit carrier, Location dst) {
-        if (dst == null) dst = upLoc(getTransportDestination());
+        if (dst == null) dst = Location.upLoc(getTransportDestination());
 
         PathNode path = (goods.getLocation() == carrier) ? carrier.findPath(dst)
             : (goods.getLocation() instanceof Unit) ? null

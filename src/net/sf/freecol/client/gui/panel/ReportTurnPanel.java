@@ -155,7 +155,7 @@ public final class ReportTurnPanel extends ReportPanel {
                     component = button;
                 } else if (messageDisplay instanceof Unit) {
                     JButton button = Utility.getLinkButton(null, icon,
-                        upLoc(((Unit)messageDisplay).getLocation()).getId());
+                        ((Unit)messageDisplay).up().getId());
                     button.addActionListener(this);
                     component = button;
                 } else { // includes Player
@@ -337,7 +337,7 @@ public final class ReportTurnPanel extends ReportPanel {
                 if (messageSource instanceof Europe) {
                     insertLinkButton(document, player.getEurope(), val);
                 } else if (messageSource instanceof Location) {
-                    Location loc = upLoc((Location)messageSource);
+                    Location loc = ((Location)messageSource).up();
                     insertLinkButton(document, (FreeColGameObject)loc, val);
                 } else {
                     insertText(document, val);
@@ -382,12 +382,5 @@ public final class ReportTurnPanel extends ReportPanel {
         StyleConstants.setComponent(document.getStyle("button"), button);
         document.insertString(document.getLength(), " ",
                               document.getStyle("button"));
-    }
-    
-    public static Location upLoc(Location loc) {
-        if (loc instanceof Unit) loc = ((Unit)loc).getLocation();
-        return (loc == null) ? null
-            : (loc.getSettlement() != null) ? loc.getSettlement()
-            : loc;
     }
 }
