@@ -627,7 +627,7 @@ public final class Canvas extends JDesktopPane {
     private Point chooseLocation(Component comp, int width, int height, 
                                  PopupPosition popupPosition) {
         Point p = null;
-        if ((comp instanceof FreeColPanel || comp instanceof FreeColDialog<?>)
+        if ((comp instanceof FreeColPanel)
             && (p = getSavedPosition(comp)) != null) {
             // Sanity check stuff coming out of client options.
             if (p.getX() < 0
