@@ -811,13 +811,13 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Given a tile to be made visible, determine a position to popup
+     * Make a tile visible, then determine corresponding position to popup
      * a panel.
      *
      * @param tile A <code>Tile</code> to be made visible.
      * @return A <code>PopupPosition</code> for a panel to be displayed.
      */
-    private PopupPosition getPopupPosition(Tile tile) {
+    private PopupPosition setOffsetFocus(Tile tile) {
         if (tile == null) return PopupPosition.CENTERED;
         int where = mapViewer.setOffsetFocus(tile);
         return (where > 0) ? PopupPosition.CENTERED_LEFT
@@ -1015,7 +1015,7 @@ public final class Canvas extends JDesktopPane {
      */
     private void showFreeColPanel(FreeColPanel panel, Tile tile,
                                   boolean resizable) {
-        showSubPanel(panel, getPopupPosition(tile), resizable);
+        showSubPanel(panel, setOffsetFocus(tile), resizable);
     }
 
     /**
@@ -1591,7 +1591,7 @@ public final class Canvas extends JDesktopPane {
      */
     private <T> void viewFreeColDialog(final FreeColDialog<T> freeColDialog,
                                       Tile tile) {
-        PopupPosition pp = getPopupPosition(tile);
+        PopupPosition pp = setOffsetFocus(tile);
 
         // TODO: Remove compatibility code when all non-modal dialogs
         //       have been converted into panels.
