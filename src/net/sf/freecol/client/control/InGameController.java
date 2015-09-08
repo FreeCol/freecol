@@ -3220,9 +3220,12 @@ public final class InGameController implements NetworkConstants {
                 visibilityChange = true;
             }
             if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
-            t = StringTemplate.template("diplomacy.offerAccepted")
-                .addStringTemplate("%nation%", nation);
-            gui.showInformationMessage(t);
+            ModelMessage mm
+                = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                   "diplomacy.offerAccepted", otherPlayer)
+                    .addStringTemplate("%nation%", nation);
+            player.addModelMessage(mm);
+            updateGUI(null);
             break;
         case REJECT_TRADE:
             t = StringTemplate.template("diplomacy.offerRejected")

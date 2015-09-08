@@ -3122,9 +3122,22 @@ public final class InGameController extends Controller {
                 }
             }
             ServerPlayer victim = (ServerPlayer)tradeItem.getVictim();
-            if (victim != null
-                && !source.csChangeStance(Stance.WAR, victim, true, cs)) {
-                logger.warning("Incite trade failure: " + victim);
+            if (victim != null) {
+                if (source.csChangeStance(Stance.WAR, victim, true, cs)) {
+                    // Have to add in an explicit stance change and
+                    // message because the player does not normally
+                    // have visibility of stance changes between other nations.
+                    cs.addStance(See.only(dest), source, Stance.WAR, victim);
+                    cs.addMessage(See.only(dest),
+                        new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                            Stance.WAR.getOtherStanceChangeKey(), source)
+                            .addStringTemplate("%attacker%",
+                                source.getNationLabel())
+                            .addStringTemplate("%defender%",
+                                victim.getNationLabel()));
+                } else {
+                    logger.warning("Incite trade failure: " + victim);
+                }
             }                
             ServerUnit newUnit = (ServerUnit)tradeItem.getUnit();
             if (newUnit != null && settlement != null) {

@@ -311,7 +311,8 @@ public final class InGameInputHandler extends InputHandler {
 
             final String tag = e.getTagName();
             if (FoundingFather.getXMLElementTagName().equals(tag)) {
-                FoundingFather father = spec.getFoundingFather(FreeColObject.readId(e));
+                FoundingFather father
+                    = spec.getFoundingFather(FreeColObject.readId(e));
                 if (father != null) player.addFather(father);
                 player.invalidateCanSeeTiles();// Might be coronado?
                 
