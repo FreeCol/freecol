@@ -2048,9 +2048,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void csAddFoundingFather(FoundingFather father, Random random,
                                     ChangeSet cs) {
-        Game game = getGame();
-        Specification spec = game.getSpecification();
-        ServerEurope europe = (ServerEurope)getEurope();
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
+        final ServerEurope europe = (ServerEurope)getEurope();
+        final Turn turn = game.getTurn();
         boolean europeDirty = false, visibilityChange = false;
 
         // FIXME: We do not want to have to update the whole player
@@ -2064,7 +2065,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                       .addNamed("%foundingFather%", father)
                       .add("%description%", father.getDescriptionKey()));
         cs.addHistory(this,
-            new HistoryEvent(getGame().getTurn(),
+            new HistoryEvent(turn,
                 HistoryEvent.HistoryEventType.FOUNDING_FATHER, this)
                     .addNamed("%father%", father));
 
@@ -2161,22 +2162,25 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 visibilityChange = true;//-vis(this), can now see other colonies
                 for (Tile t : game.getMap().getAllTiles()) {
                     Colony colony = t.getColony();
+                    if (colony == null) continue;
                     Set<Tile> tiles = new HashSet<>();
-                    if (colony != null && !this.owns(colony)) {
-                        // FreeCol ruleset adds this ability, allowing
-                        // full visibility of colony and surroundings.
-                        if (hasAbility(Ability.SEE_ALL_COLONIES)) {
-                            tiles.addAll(exploreForSettlement(colony));
-                        } else {
-                            // Col1 showed Coronado-revealed colonies as size 1
-                            if (exploreTile(t)) {
-                                Tile c = t.copy(game, Tile.class);
-                                c.getColony().setDisplayUnitCount(1);
-                                t.setCachedTile(this, c);
-                                tiles.add(t);
-                            }
+                    if (exploreTile(t)) {
+                        if (!hasAbility(Ability.SEE_ALL_COLONIES)) {
+                            // FreeCol ruleset adds this ability
+                            // allowing full visibility of colony,
+                            // whereas Col1 showed colonies as size 1.
+                            Tile c = t.copy(game, Tile.class);
+                            c.getColony().setDisplayUnitCount(1);
+                            t.setCachedTile(this, c);
                         }
+                        tiles.add(t);
                     }
+                    // Revealed tiles in 11x11 block in Col1
+                    final int fullRadius = (int)father
+                        .applyModifiers((float)colony.getLineOfSight(),
+                                        turn, Modifier.EXPOSED_TILES_RADIUS);
+                    tiles.addAll(exploreTiles(t.getSurroundingTiles(1,
+                                fullRadius)));
                     cs.add(See.only(this), tiles);
                 }
 

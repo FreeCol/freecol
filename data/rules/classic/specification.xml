@@ -2517,6 +2517,8 @@
                      type="exploration"
                      weight1="3" weight2="5" weight3="7">
       <event id="model.event.seeAllColonies"/>
+      <modifier id="model.modifier.exposedTilesRadius"
+                type="additive" value="3"/>
     </founding-father>
     <founding-father id="model.foundingFather.hernandoDeSoto"
                      type="exploration"

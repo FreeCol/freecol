@@ -2263,6 +2263,12 @@ public final class Specification {
             m.addScope(scope);
             hardyPioneer.addModifier(m);
         }
+
+        // Added modifier to Coronado
+        if (!coronado.hasModifier(Modifier.EXPOSED_TILES_RADIUS)) {
+            coronado.addModifier(new Modifier(Modifier.EXPOSED_TILES_RADIUS,
+                    3.0f, Modifier.ModifierType.ADDITIVE, coronado, 0));
+        }
         // end @compat 0.11.5
     }
 
