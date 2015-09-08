@@ -65,6 +65,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
 
         MigPanel panel
             = new MigPanel(new MigLayout("wrap 1", "[center]", "[]20"));
+        panel.setOpaque(false);
 
         String headerKey = BASE_KEY + other.getNation().getSuffix();
         String imageKey = IMAGE_BASE_KEY + other.getNationResourceKey();
@@ -76,6 +77,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
             SwingConstants.LEADING, FontLibrary.FontSize.MEDIUM);
         JLabel image
             = new JLabel(new ImageIcon(ResourceManager.getImage(imageKey)));
+        image.setOpaque(false);
 
         JTextArea tutorial = null;
         if (!player.hasContactedIndians() && freeColClient.tutorialMode()) {

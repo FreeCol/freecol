@@ -381,6 +381,7 @@ public final class Utility {
         JLabel header = new JLabel(text, alignment);
         header.setFont(FontLibrary.createCompatibleFont(
             text, FontLibrary.FontType.HEADER, size));
+        header.setOpaque(false);
         return header;
     }
 
@@ -391,6 +392,7 @@ public final class Utility {
         JLabel header = new JLabel(text, alignment);
         header.setFont(FontLibrary.createCompatibleFont(
             text, FontLibrary.FontType.HEADER, size));
+        header.setOpaque(false);
         return header;
     }
 
@@ -427,7 +429,9 @@ public final class Utility {
      * @return The <code>JLabel</code>.
      */
     public static JLabel localizedLabel(StringTemplate template) {
-        return new JLabel(Messages.message(template));
+        JLabel label = new JLabel(Messages.message(template));
+        label.setOpaque(false);
+        return label;
     }
 
     /**
@@ -440,7 +444,9 @@ public final class Utility {
      */
     public static JLabel localizedLabel(StringTemplate template, Icon icon,
                                         int alignment) {
-        return new JLabel(Messages.message(template), icon, alignment);
+        JLabel label = new JLabel(Messages.message(template), icon, alignment);
+        label.setOpaque(false);
+        return label;
     }
 
     /**
