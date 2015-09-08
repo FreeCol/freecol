@@ -457,15 +457,20 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Fire property changes for all goods that have seen level changes
      * since the last saveState().
+     *
+     * @return True if something changed.
      */
-    public void fireChanges() {
+    public boolean fireChanges() {
+        boolean ret = false;
         for (GoodsType type : getSpecification().getGoodsTypeList()) {
             int oldCount = getOldGoodsCount(type);
             int newCount = getGoodsCount(type);
             if (oldCount != newCount) {
                 firePropertyChange(type.getId(), oldCount, newCount);
+                ret = true;
             }
         }
+        return ret;
     }
 
     // Interface Ownable

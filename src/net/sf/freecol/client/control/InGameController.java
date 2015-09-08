@@ -3942,7 +3942,8 @@ public final class InGameController implements NetworkConstants {
 
         if (!askClearGotoOrders(unit)) return false;
 
-        final int unitCount = unit.getUnitCount();
+        final int unitCount = unit.getUnitCount(),
+            goodsCount = unit.getGoodsList().size();
         final Tile oldTile = unit.getTile();
         UnitWas unitWas = new UnitWas(unit);
         ColonyWas colonyWas = (unit.getColony() == null) ? null
@@ -3950,9 +3951,8 @@ public final class InGameController implements NetworkConstants {
         unit.setState(UnitState.ACTIVE);
         moveDirection(unit, direction, true);
         boolean ret = unit.getTile() != oldTile
-            || unit.getUnitCount() != unitCount; // disembark occurred
+            || unitWas.fireChanges();
         if (ret) {
-            unitWas.fireChanges();
             if (colonyWas != null) colonyWas.fireChanges();
             updateGUI(null);
             if (!unit.couldMove()) { // Show colony panel if unit out of moves
@@ -4015,7 +4015,7 @@ public final class InGameController implements NetworkConstants {
             .addName("%colonyKey%", key)
             .add("%colonyMenuItem%", "buildColonyAction.name")
             .add("%ordersMenuItem%", "menuBar.orders"));
-        displayModelMessages(true);
+        displayModelMessages(false);
         return true;
     }
 

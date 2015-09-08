@@ -68,13 +68,17 @@ public class EuropeWas {
 
     /**
      * Fire any property changes resulting from actions in Europe.
+     *
+     * @return True if something changed.
      */
-    public void fireChanges() {
+    public boolean fireChanges() {
         int newUnitCount = europe.getUnitCount();
 
         if (newUnitCount != unitCount) {
             europe.firePropertyChange(Europe.UNIT_CHANGE,
                                       unitCount, newUnitCount);
+            return true;
         }
+        return false;
     }
 }

@@ -83,8 +83,10 @@ public class UnitWas implements Comparable<UnitWas> {
 
     /**
      * Fire any property changes resulting from actions of a unit.
+     *
+     * @return True if something changed.
      */
-    public void fireChanges() {
+    public boolean fireChanges() {
         UnitType newType = null;
         Role newRole = null;
         int newRoleCount = 0;
@@ -92,6 +94,7 @@ public class UnitWas implements Comparable<UnitWas> {
         GoodsType newWork = null;
         int newWorkAmount = 0;
         int newMovesLeft = 0;
+        boolean ret = false;
         if (!unit.isDisposed()) {
             newLoc = unit.getLocation();
             if (colony != null) {
@@ -112,15 +115,18 @@ public class UnitWas implements Comparable<UnitWas> {
             if (newLoc != null) {
                 newFcgo.firePropertyChange(change(newFcgo), null, unit);
             }
+            ret = true;
         }
         if (colony != null) {
             if (type != newType && newType != null) {
                 String pc = ColonyChangeEvent.UNIT_TYPE_CHANGE.toString();
                 colony.firePropertyChange(pc, type, newType);
+                ret = true;
             } else if (role != newRole && newRole != null) {
                 String pc = Tile.UNIT_CHANGE;
                 colony.firePropertyChange(pc, role.toString(),
                                           newRole.toString());
+                ret = true;
             }
             if (work != newWork) {
                 if (work != null && oldFcgo != null && workAmount != 0) {
@@ -130,25 +136,32 @@ public class UnitWas implements Comparable<UnitWas> {
                     newFcgo.firePropertyChange(newWork.getId(),
                                                0, newWorkAmount);
                 }
+                ret = true;
             } else if (workAmount != newWorkAmount) {
                 newFcgo.firePropertyChange(newWork.getId(),
                                            workAmount, newWorkAmount);
+                ret = true;
             }
         }
         if (role != newRole && newRole != null) {
             unit.firePropertyChange(Unit.ROLE_CHANGE, role, newRole);
+            ret = true;
         } else if (roleCount != newRoleCount && newRoleCount >= 0) {
             unit.firePropertyChange(Unit.ROLE_CHANGE, roleCount, newRoleCount);
+            ret = true;
         }
         if (unit.getGoodsContainer() != null) {
-            unit.getGoodsContainer().fireChanges();
+            ret |= unit.getGoodsContainer().fireChanges();
         }
         if (!units.equals(unit.getUnitList())) {
             unit.firePropertyChange(Unit.CARGO_CHANGE, null, unit);
+            ret = true;
         }
         if (movesLeft != newMovesLeft) {
             unit.firePropertyChange(Unit.MOVE_CHANGE, movesLeft, newMovesLeft);
+            ret = true;
         }
+        return ret;
     }
 
     // FIXME: fix this non-OO nastiness
