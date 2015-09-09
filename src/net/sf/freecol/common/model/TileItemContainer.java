@@ -562,6 +562,17 @@ public class TileItemContainer extends FreeColGameObject {
                     ti.setLocation(tile);
                     integ = Math.min(integ, 0);
                 }
+                // There are also still maps floating around with
+                // rivers that go nowhere.
+                if (ti instanceof TileImprovement) {
+                    TileImprovement tim = (TileImprovement)ti;
+                    if (tim.isRiver()
+                        && (tim.getStyle() == null
+                            || "0000".equals(tim.getStyle().toString()))) {
+                        logger.warning("Style 0000 river: " + tim);
+                        integ = -1;
+                    }
+                }
                 // end @compat
                 if (integ < 0) {
                     logger.warning("Removing broken improvement at: " + tile
