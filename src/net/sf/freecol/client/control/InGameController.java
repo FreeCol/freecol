@@ -2635,6 +2635,8 @@ public final class InGameController implements NetworkConstants {
         // moves as much as possible.
         if (freeColClient.getAnimationSpeed(unit.getOwner()) > 0) {
             gui.animateUnitMove(unit, oldTile, newTile);
+        } else if (freeColClient.getMyPlayer().owns(unit)) {
+            gui.requireFocus(newTile);
         }
         gui.refresh();
     }

@@ -576,7 +576,7 @@ public class SwingGUI extends GUI {
      * Set the active unit.
      *
      * @param unit The <code>Unit</code> to activate.
-     * @return true if the focus was set.
+     * @return True if the focus was set.
      */
     @Override
     public boolean setActiveUnit(Unit unit) {
@@ -606,12 +606,12 @@ public class SwingGUI extends GUI {
 
     /**
      * Require the given tile to be in the onScreen()-area.
-     * Account for the ALWAYS_CENTER client option.
      *
      * @param tile The <code>Tile</code> to check.
      * @return True if the focus was set.
      */
-    private boolean requireFocus(Tile tile) {
+    public boolean requireFocus(Tile tile) {
+        // Account for the ALWAYS_CENTER client option.
         boolean required = freeColClient.getClientOptions()
             .getBoolean(ClientOptions.ALWAYS_CENTER);
         if ((required && tile != getFocus()) || !mapViewer.onScreen(tile)) {

@@ -315,6 +315,16 @@ public class GUI {
     // Animation handling
 
     /**
+     * Require the given tile to be in the onScreen()-area.
+     *
+     * @param tile The <code>Tile</code> to check.
+     * @return True if the focus was set.
+     */
+    public boolean requireFocus(Tile tile) {
+        return false;
+    }
+    
+    /**
      * Animate a unit attack.
      *
      * @param attacker The attacking <code>Unit</code>.
