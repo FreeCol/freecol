@@ -1328,41 +1328,12 @@ public final class InGameController implements NetworkConstants {
         if (other == player.getREFPlayer()) return false;
 
         StringTemplate nation = other.getNationLabel();
-        ModelMessage m = null;
-        TradeStatus status;
         while (dt != null) {
-            // Inform server of current agreement, exit if it did not
-            // require a response (i.e. was not a proposal).
-            status = dt.getStatus();
+            // Inform server of current agreement.
             dt = askServer().diplomacy(game, unit, colony, dt);
-            if (status != TradeStatus.PROPOSE_TRADE) break;
-            
-            // Process the result of a proposal.
-            status = (dt == null) ? TradeStatus.REJECT_TRADE : dt.getStatus();
-            m = null;
-            switch (status) {
-            case PROPOSE_TRADE:
-                break;
-            case ACCEPT_TRADE:
-                m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                     "diplomacy.offerAccepted",
-                                     colony)
-                    .addStringTemplate("%nation%", nation);
-                dt = null;
-                break;
-            case REJECT_TRADE:
-                m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                     "diplomacy.offerRejected",
-                                     colony)
-                    .addStringTemplate("%nation%", nation);
-                dt = null;
-                break;
-            default:
-                throw new RuntimeException("Bogus trade status" + status);
-            }
-            if (m != null) player.addModelMessage(m);
-
-            // If it was a counter proposal, consider it.
+            // Returned dt will be null if we sent or the other player
+            // replied with an accept/reject.  Otherwise consider
+            // counter proposal.
             if (dt != null) {
                 dt = gui.showNegotiationDialog(unit, colony, dt,
                     dt.getSendMessage(player, colony));
