@@ -3928,7 +3928,8 @@ public final class InGameController implements NetworkConstants {
         if (ret) {
             if (colonyWas != null) colonyWas.fireChanges();
             updateGUI(null);
-            if (!unit.couldMove()) { // Show colony panel if unit out of moves
+            if (!unit.couldMove() && unit.hasTile()) {
+                // Show colony panel if unit out of moves
                 Colony colony = unit.getTile().getColony();
                 if (colony != null) colonyPanel(colony, unit);
             }
