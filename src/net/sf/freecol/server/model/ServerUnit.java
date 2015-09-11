@@ -324,7 +324,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             unitDirty = true;
         }
 
-        if (getWorkLeft() == 0) {
+        if (getWorkLeft() <= 0) {
             setWorkLeft(-1);
             unitDirty = true;
             if (getLocation() instanceof HighSeas) {
