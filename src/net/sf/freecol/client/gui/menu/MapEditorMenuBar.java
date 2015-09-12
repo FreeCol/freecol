@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.menu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
@@ -62,12 +63,13 @@ public class MapEditorMenuBar extends FreeColMenuBar {
      * all of the submenus and items.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param listener An optional mouse motion listener.
      */
-    public MapEditorMenuBar(final FreeColClient freeColClient, Canvas canvas) {
+    public MapEditorMenuBar(final FreeColClient freeColClient, MouseMotionListener listener) {
         super(freeColClient);
 
         // Add a mouse listener so that autoscrolling can happen in this menubar
-        this.addMouseMotionListener(new MenuMouseMotionListener(freeColClient, canvas));
+        this.addMouseMotionListener(listener);
         reset();
     }
 
