@@ -325,11 +325,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
 
         if (getWorkLeft() <= 0) {
-            setWorkLeft(-1);
-            unitDirty = true;
             if (getLocation() instanceof HighSeas) {
-                Europe europe = owner.getEurope();
-                Location dst = getDestination();
+                final Europe europe = owner.getEurope();
+                final Location dst = getDestination();
                 Location result = resolveDestination();
                 if (result == europe) {
                     lb.add(" arrives in Europe");
@@ -345,29 +343,38 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     setLocation(europe);//-vis: safe/Europe
                     cs.add(See.only(owner), owner.getHighSeas());
                     locDirty = true;
-                } else if (result instanceof Tile) {
-                    Tile tile = ((Tile)result).getSafeTile(owner, random);
+                } else {
+                    if (!(result instanceof Tile)) {
+                        logger.warning("Unit has unsupported destination: "
+                            + dst + " -> " + result);
+                        result = getEntryLocation().getTile();
+                    }
+                    Tile tile = result.getTile().getSafeTile(owner, random);
                     lb.add(" arrives in America at ", tile);
-                    if (dst != null) lb.add(" sailing for ", dst);
-                    if (dst instanceof Map) setDestination(null);
+                    if (dst != null) {
+                        lb.add(" sailing for ", dst);
+                        if (dst instanceof Map) setDestination(null);
+                    }
                     csMove(tile, random, cs);
                     locDirty = unitDirty = false; // loc update present
-                } else {
-                    lb.add(" has unsupported destination ", getDestination());
                 }
             } else {
                 switch (getState()) {
-                case FORTIFYING:
-                    setState(UnitState.FORTIFIED);
-                    break;
+                case ACTIVE: case FORTIFIED: case SENTRY: case IN_COLONY:
+                    break; // These states are stable
                 case IMPROVING:
                     csImproveTile(random, cs);
                     setWorkImprovement(null);
                     locDirty = true;
                     break;
-                default:
-                    lb.add(" unknown work completed, state=", getState());
+                case FORTIFYING:
+                    setState(UnitState.FORTIFIED);
+                    unitDirty = true;
+                    break;
+                case SKIPPED: default:
+                    lb.add(" work completed, bad state: ", getState());
                     setState(UnitState.ACTIVE);
+                    unitDirty = true;
                     break;
                 }
             }
