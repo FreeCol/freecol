@@ -23,6 +23,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
 
@@ -30,7 +31,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.panel.Utility;
@@ -60,9 +60,10 @@ public class InGameMenuBar extends FreeColMenuBar {
      * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
      * all of the submenus and items.
      *
-     * @param f The main controller.
+     * @param freeColClient The main controller.
+     * @param listener An optional mouse motion listener.
      */
-    public InGameMenuBar(FreeColClient f, Canvas canvas) {
+    public InGameMenuBar(FreeColClient freeColClient, MouseMotionListener listener) {
         // FIXME: FreeColClient should not have to be passed in to
         // this class.  This is only a menu bar, it doesn't need a
         // reference to the main controller.  The only reason it has
@@ -78,11 +79,11 @@ public class InGameMenuBar extends FreeColMenuBar {
         // Okay, I lied.. the update() and paintComponent() methods in
         // this MenuBar use freeColClient, too. But so what.  Move
         // those to another class too. :)
-        super(f);
+        super(freeColClient);
 
         // Add a mouse listener so that autoscrolling can happen in
         // this menubar
-        this.addMouseMotionListener(new MenuMouseMotionListener(f, canvas));
+        this.addMouseMotionListener(listener);
         
         reset();
     }

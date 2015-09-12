@@ -66,6 +66,7 @@ import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.menu.FreeColMenuBar;
 import net.sf.freecol.client.gui.menu.InGameMenuBar;
 import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
+import net.sf.freecol.client.gui.menu.MenuMouseMotionListener;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.common.ServerInfo;
@@ -358,7 +359,8 @@ public final class Canvas extends JDesktopPane {
     void initializeInGame() {
         if (frame == null) return;
 
-        frame.setJMenuBar(new InGameMenuBar(freeColClient, this));
+        frame.setJMenuBar(new InGameMenuBar(freeColClient,
+            new MenuMouseMotionListener(freeColClient, this)));
         frame.paintAll(getGraphics());
     }
 
