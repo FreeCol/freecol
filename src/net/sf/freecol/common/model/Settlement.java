@@ -634,7 +634,7 @@ public abstract class Settlement extends GoodsLocation
      *
      * @return A ratio of defence power to settlement size.
      */
-    public abstract float getDefenceRatio();
+    public abstract double getDefenceRatio();
 
     /**
      * Is this settlement insufficiently defended?

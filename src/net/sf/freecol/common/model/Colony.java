@@ -1652,9 +1652,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *
      * @return The total defence power.
      */
-    public float getTotalDefencePower() {
+    public double getTotalDefencePower() {
         CombatModel cm = getGame().getCombatModel();
-        float defence = 0.0f;
+        double defence = 0.0;
         for (Unit unit : getTile().getUnitList()) {
             if (unit.isDefensiveUnit()) {
                 defence += cm.getDefencePower(null, unit);
@@ -2711,7 +2711,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public float getDefenceRatio() {
+    public double getDefenceRatio() {
         return getTotalDefencePower() / (1 + getUnitCount());
     }
 
@@ -2720,7 +2720,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public boolean isBadlyDefended() {
-        return getTotalDefencePower() < 0.95f * getUnitCount() - 2.5f;
+        return getTotalDefencePower() < 0.95 * getUnitCount() - 2.5;
     }
 
     /**

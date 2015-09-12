@@ -1206,8 +1206,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public float getDefenceRatio() {
-        return getUnitCount() * 2.0f / (getType().getMinimumSize()
+    public double getDefenceRatio() {
+        return getUnitCount() * 2.0 / (getType().getMinimumSize()
             + getType().getMaximumSize());
     }
 
