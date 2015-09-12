@@ -173,10 +173,8 @@ public class ColonyTile extends WorkLocation {
         } else {
             for (AbstractGoods output : getOutputs()) {
                 final GoodsType goodsType = output.getType();
-                int amount = 0;
-                for (Unit u : getUnitList()) {
-                    amount += getUnitProduction(u, goodsType);
-                }
+                int amount = getUnitList().stream()
+                    .mapToInt(u -> getUnitProduction(u, goodsType)).sum();
                 if (amount > 0) {
                     pi.addProduction(new AbstractGoods(goodsType, amount));
                 }
@@ -245,11 +243,8 @@ public class ColonyTile extends WorkLocation {
             }
 
             // Tile type stays the same, return the sum of any food bonues.
-            int bonus = 0;
-            for (GoodsType gt : getSpecification().getFoodGoodsTypeList()) {
-                bonus += ti.getBonus(gt);
-            }
-            return bonus;
+            return getSpecification().getFoodGoodsTypeList().stream()
+                .mapToInt(gt -> ti.getBonus(gt)).sum();
         }
 
         // Units are at work here.  Find out what work is being done.
@@ -285,11 +280,9 @@ public class ColonyTile extends WorkLocation {
      */
     @Override
     public int evaluateFor(Player player) {
-        int result = 0;
-        for (AbstractGoods ag :getProductionInfo().getProduction()) {
-            result += ag.evaluateFor(player);
-        }
-        return result + super.evaluateFor(player);
+        return super.evaluateFor(player)
+            + getProductionInfo().getProduction().stream()
+                .mapToInt(ag -> ag.evaluateFor(player)).sum();
     }
 
 

@@ -412,17 +412,14 @@ public final class TilePopup extends JPopupMenu {
         menuItem.addActionListener((ActionEvent ae) -> {
                 gui.setActiveUnit(unit);
             });
-        int lineCount = 1;
         if (indent) {
             menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
         }
         menuItem.setEnabled(enabled);
         menu.add(menuItem);
 
-        for (Unit passenger : unit.getUnitList()) {
-            lineCount += addUnit(menu, passenger, true, true);
-        }
-
+        int lineCount = 1 + unit.getUnitList().stream()
+            .mapToInt(u -> addUnit(menu, u, true, true)).sum();
         boolean hasGoods = false;
         for (Goods goods: unit.getGoodsList()) {
             text = (indent ? "         " : "     ")

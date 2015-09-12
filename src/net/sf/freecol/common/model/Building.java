@@ -263,10 +263,8 @@ public class Building extends WorkLocation
         } else {
             for (AbstractGoods output : getOutputs()) {
                 final GoodsType goodsType = output.getType();
-                float production = 0f;
-                for (Unit u : getUnitList()) {
-                    production += getUnitProduction(u, goodsType);
-                }
+                float production = getUnitList().stream()
+                    .mapToInt(u -> getUnitProduction(u, goodsType)).sum();
                 // Unattended production always applies for buildings!
                 production += getBaseProduction(null, goodsType, null);
                 production = applyModifiers(production, turn,
@@ -368,11 +366,9 @@ public class Building extends WorkLocation
      */
     @Override
     public int evaluateFor(Player player) {
-        int result = 0;
-        for (AbstractGoods ag : getType().getRequiredGoods()) {
-            result += ag.evaluateFor(player);
-        }
-        return result + super.evaluateFor(player);
+        return super.evaluateFor(player)
+            + getType().getRequiredGoods().stream()
+                .mapToInt(ag -> ag.evaluateFor(player)).sum();
     }
         
 

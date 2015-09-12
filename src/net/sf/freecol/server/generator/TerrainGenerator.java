@@ -648,11 +648,8 @@ public class TerrainGenerator {
 
         for (River river : rivers) {
             ServerRegion region = river.getRegion();
-            int scoreValue = 0;
-            for (RiverSection section : river.getSections()) {
-                scoreValue += section.getSize();
-            }
-            scoreValue *= 2;
+            int scoreValue = 2 * river.getSections().stream()
+                .mapToInt(rs -> rs.getSize()).sum();
             region.setScoreValue(scoreValue);
             lb.add("Created river region (length ", river.getLength(),
                 ", score value ", scoreValue, ").\n");

@@ -1058,16 +1058,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public int priceGoodsForBuilding(List<AbstractGoods> required) {
         final Market market = getOwner().getMarket();
-        int price = 0;
-        for (AbstractGoods ag : required) {
-            final GoodsType goodsType = ag.getType();
-            final int amount = ag.getAmount();
-            // FIXME: magic number!
-            price += (goodsType.isStorable())
-                ? (market.getBidPrice(goodsType, amount) * 110) / 100
-                : goodsType.getPrice() * amount;
-        }
-        return price;
+        // FIXME: magic number!
+        return required.stream().mapToInt(ag -> (ag.getType().isStorable())
+            ? (market.getBidPrice(ag.getType(), ag.getAmount()) * 110) / 100
+            : ag.getType().getPrice() * ag.getAmount()).sum();
     }
 
     /**
@@ -1745,20 +1739,17 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             && player.getNumberOfSettlements() < 5) {// FIXME: magic#
             return Integer.MIN_VALUE;
         }
-        int result = 0;
+        int result;
         if (player.owns(this)) {
-            for (WorkLocation wl : getAvailableWorkLocations()) {
-                result += wl.evaluateFor(player);
-            }
-            for (Unit u : getTile().getUnitList()) {
-                result += u.evaluateFor(player);
-            }
-            for (Goods g : getCompactGoods()) {
-                result += g.evaluateFor(player);
-            }
+            result = getAvailableWorkLocations().stream()
+                    .mapToInt(wl -> wl.evaluateFor(player)).sum()
+                + getTile().getUnitList().stream()
+                    .mapToInt(u -> u.evaluateFor(player)).sum()
+                + getCompactGoods().stream()
+                    .mapToInt(g -> g.evaluateFor(player)).sum();
         } else { // Much guesswork
-            result += getDisplayUnitCount() * 1000;
-            result += 500; // Some useful goods?
+            result = getDisplayUnitCount() * 1000
+                + 500; // Some useful goods?
             for (Tile t : getTile().getSurroundingTiles(1)) {
                 if (t.getOwningSettlement() == this) result += 200;
             }
@@ -1947,11 +1938,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return an <code>int</code> value
      */
     public int getFoodProduction() {
-        int result = 0;
-        for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
-            result += getTotalProductionOf(foodType);
-        }
-        return result;
+        return getSpecification().getFoodGoodsTypeList().stream()
+            .mapToInt(ft -> getTotalProductionOf(ft)).sum();
     }
 
     /**
@@ -2551,11 +2539,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public int getUnitCount() {
-        int n = 0;
-        for (WorkLocation wl : getCurrentWorkLocations()) {
-            n += wl.getUnitCount();
-        }
-        return n;
+        return getCurrentWorkLocations().stream()
+            .mapToInt(wl -> wl.getUnitCount()).sum();
     }
 
     /**
@@ -2732,11 +2717,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public int getUpkeep() {
-        int upkeep = 0;
-        for (Building building : buildingMap.values()) {
-            upkeep += building.getType().getUpkeep();
-        }
-        return upkeep;
+        return buildingMap.values().stream()
+            .mapToInt(b -> b.getType().getUpkeep()).sum();
     }
 
     /**
@@ -2744,11 +2726,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public int getTotalProductionOf(GoodsType goodsType) {
-        int amount = 0;
-        for (WorkLocation workLocation : getCurrentWorkLocations()) {
-            amount += workLocation.getTotalProductionOf(goodsType);
-        }
-        return amount;
+        return getCurrentWorkLocations().stream()
+            .mapToInt(wl -> wl.getTotalProductionOf(goodsType)).sum();
     }
 
     /**

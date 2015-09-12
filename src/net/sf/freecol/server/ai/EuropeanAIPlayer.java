@@ -2779,17 +2779,14 @@ public class EuropeanAIPlayer extends AIPlayer {
             lb.add(((ret) ? "accepted" : "rejected"),
                    ": special-goods-in-turn-", turn, ".");
         } else {
-            int averageIncome = 0;
-            int numberOfGoods = 0;
             // FIXME: consider the amount of goods produced. If we
             // depend on shipping huge amounts of cheap goods, we
             // don't want these goods to be boycotted.
-            List<GoodsType> goodsTypes = getSpecification().getStorableGoodsTypeList();
-            for (GoodsType type : goodsTypes) {
-                averageIncome += getPlayer().getIncomeAfterTaxes(type);
-                numberOfGoods++;
-            }
-            averageIncome /= numberOfGoods;
+            final List<GoodsType> goodsTypes = getSpecification()
+                .getStorableGoodsTypeList();
+            int averageIncome = goodsTypes.stream()
+                .mapToInt(gt -> getPlayer().getIncomeAfterTaxes(gt)).sum()
+                / goodsTypes.size();
             int income = getPlayer().getIncomeAfterTaxes(toBeDestroyed.getType());
             ret = income <= 0 || income > averageIncome;
             lb.add(((ret) ? "accepted" : "rejected"),

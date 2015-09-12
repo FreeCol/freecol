@@ -833,9 +833,8 @@ public abstract class WorkLocation extends UnitLocation
      * @return A value for the player.
      */
     public int evaluateFor(Player player) {
-        int result = 0;
-        for (Unit u : getUnitList()) result += u.evaluateFor(player);
-        return result;
+        return getUnitList().stream()
+            .mapToInt(u -> u.evaluateFor(player)).sum();
     }
 
     /**

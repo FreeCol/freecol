@@ -1374,9 +1374,8 @@ public class Player extends FreeColGameObject implements Nameable {
             .getImmigrationGoodsTypeList();
         int production = 0;
         for (Colony colony : getColonies()) {
-            for (GoodsType goodsType : immigrationGoodsTypes) {
-                production += colony.getTotalProductionOf(goodsType);
-            }
+            production += immigrationGoodsTypes.stream()
+                .mapToInt(gt -> colony.getTotalProductionOf(gt)).sum();
         }
         Europe europe = getEurope();
         if (europe != null) production += europe.getImmigration(production);
@@ -1464,10 +1463,8 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getLibertyProductionNextTurn() {
         int nextTurn = 0;
         for (Colony colony : getColonies()) {
-            for (GoodsType libertyGoods : getSpecification()
-                     .getLibertyGoodsTypeList()) {
-                nextTurn += colony.getTotalProductionOf(libertyGoods);
-            }
+            nextTurn += getSpecification().getLibertyGoodsTypeList().stream()
+                .mapToInt(gt -> colony.getTotalProductionOf(gt)).sum();
         }
         return (int)applyModifiers((float)nextTurn, getGame().getTurn(),
                                    Modifier.LIBERTY);
@@ -1479,13 +1476,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The total percentage of rebels in all this player's colonies.
      */
     public int getSoL() {
-        int sum = 0;
-        int number = 0;
-        for (Colony c : getColonies()) {
-            sum += c.getSoL();
-            number++;
-        }
-        return (number > 0) ? sum / number : 0;
+        final List<Colony> colonies = getColonies();
+        return (colonies.isEmpty()) ? 0
+            : colonies.stream().mapToInt(c -> c.getSoL()).sum()
+                / colonies.size();
     }
 
     /**
@@ -2373,9 +2367,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The sum of the units currently working in the colonies.
      */
     public int getColoniesPopulation() {
-        int i = 0;
-        for (Colony c : getColonies()) i += c.getUnitCount();
-        return i;
+        return getColonies().stream()
+            .mapToInt(c -> c.getUnitCount()).sum();
     }
 
     /**
@@ -3808,10 +3801,8 @@ public class Player extends FreeColGameObject implements Nameable {
             Specification spec = getSpecification();
             for (UnitType unitType : spec.getUnitTypeList()) {
                 if (unitType.isAvailableTo(this)) {
-                    int foodConsumption = 0;
-                    for (GoodsType foodType : spec.getFoodGoodsTypeList()) {
-                        foodConsumption += unitType.getConsumptionOf(foodType);
-                    }
+                    int foodConsumption = spec.getFoodGoodsTypeList().stream()
+                        .mapToInt(ft -> unitType.getConsumptionOf(ft)).sum();
                     if (foodConsumption > maximumFoodConsumption) {
                         maximumFoodConsumption = foodConsumption;
                     }

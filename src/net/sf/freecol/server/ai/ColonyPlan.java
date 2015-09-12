@@ -505,11 +505,8 @@ public class ColonyPlan {
         List<GoodsType> rawMaterials = new ArrayList<>(rawLuxuryGoodsTypes);
         rawMaterials.addAll(otherRawGoodsTypes);
         for (GoodsType g : rawMaterials) {
-            int value = 0;
-            for (Entry<WorkLocation, Integer> e
-                     : production.get(g).entrySet()) {
-                value += e.getValue();
-            }
+            int value = production.get(g).entrySet().stream()
+                .mapToInt(e -> e.getValue()).sum();
             if (value <= LOW_PRODUCTION_THRESHOLD) {
                 production.remove(g);
                 continue;
@@ -921,14 +918,10 @@ public class ColonyPlan {
             = new Comparator<GoodsType>() {
                 @Override
                 public int compare(GoodsType g1, GoodsType g2) {
-                    int p1 = 0;
-                    for (Integer i : production.get(g1).values()) {
-                        p1 += i;
-                    }
-                    int p2 = 0;
-                    for (Integer i : production.get(g2).values()) {
-                        p2 += i;
-                    }
+                    int p1 = production.get(g1).values().stream()
+                        .mapToInt(Integer::intValue).sum();
+                    int p2 = production.get(g2).values().stream()
+                        .mapToInt(Integer::intValue).sum();
                     return p2 - p1;
                 }
             };

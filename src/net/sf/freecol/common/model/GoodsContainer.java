@@ -347,17 +347,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @return The amount of space taken by this containers goods.
      */
     public int getSpaceTaken() {
-        int count = 0;
         synchronized (storedGoods) {
-            for (Integer amount : storedGoods.values()) {
-                if (amount % CARGO_SIZE == 0) {
-                    count += amount/CARGO_SIZE;
-                } else {
-                    count += amount/CARGO_SIZE + 1;
-                }
-            }
+            return storedGoods.values().stream()
+                .mapToInt(amount -> (amount % CARGO_SIZE == 0)
+                    ? amount/CARGO_SIZE
+                    : amount/CARGO_SIZE + 1).sum();
         }
-        return count;
     }
 
     /**

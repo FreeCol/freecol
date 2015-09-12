@@ -796,9 +796,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 // Are there more idle units waiting here?
                 if (!e.getValue().isEmpty()) {
                     idlePorts.add(key);
-                    for (AIUnit aiu : e.getValue()) {
-                        space += aiu.getUnit().getSpaceTaken();
-                    }
+                    space += e.getValue().stream()
+                        .mapToInt(aiu -> aiu.getUnit().getSpaceTaken()).sum();
                 }
             }
 

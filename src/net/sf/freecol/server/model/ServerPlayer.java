@@ -828,18 +828,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public boolean updateScore() {
         int oldScore = score;
-        score = 0;
-
-        for (Unit u : getUnits()) {
-            score += u.getType().getScoreValue();
-        }
-        
-        for (Colony c : getColonies()) {
-            score += c.getLiberty();
-        }
-
-        score += SCORE_FOUNDING_FATHER * getFathers().size();
-
+        score = getUnits().stream()
+                .mapToInt(u -> u.getType().getScoreValue()).sum()
+            + getColonies().stream()
+                .mapToInt(c -> c.getLiberty()).sum()
+            + SCORE_FOUNDING_FATHER * getFathers().size();
         int gold = getGold();
         if (gold != GOLD_NOT_ACCOUNTED) {
             score += (int)Math.floor(SCORE_GOLD * gold);
@@ -1155,10 +1148,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return The price.
      */
     public int priceMercenaries(List<AbstractUnit> mercenaries) {
-        int mercPrice = 0;
-        for (AbstractUnit au : mercenaries) {
-            mercPrice += getPrice(au);
-        }
+        int mercPrice = mercenaries.stream()
+            .mapToInt(au -> getPrice(au)).sum();
         if (!checkGold(mercPrice)) mercPrice = getGold();
         return mercPrice;
     }
@@ -1525,10 +1516,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         final Disaster bankruptcy = spec.getDisaster(Disaster.BANKRUPTCY);
 
         boolean changed = false;
-        int upkeep = 0;
-        for (Settlement settlement : getSettlements()) {
-            upkeep += settlement.getUpkeep();
-        }
+        int upkeep = getSettlements().stream()
+            .mapToInt(s -> s.getUpkeep()).sum();
         if (checkGold(upkeep)) {
             modifyGold(-upkeep);
             if (getBankrupt()) {

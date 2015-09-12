@@ -62,11 +62,7 @@ public class RandomChoice<T> {
     }
 
     public static <T> int getTotalProbability(Collection<RandomChoice<T>> input) {
-        int total = 0;
-        for (RandomChoice<T> choice : input) {
-            total += choice.getProbability();
-        }
-        return total;
+        return input.stream().mapToInt(c -> c.getProbability()).sum();
     }
 
     public static <T> T getWeightedRandom(Logger logger, String logMe,

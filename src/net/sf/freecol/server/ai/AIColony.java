@@ -639,7 +639,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // owner or if it is the best one available.
         UnitType unitType = spec.getDefaultUnitType(player);
         Tile steal = null;
-        float score = 1.0f;
+        double score = 1.0;
         for (Tile t : tile.getSurroundingTiles(1)) {
             Player owner = t.getOwner();
             if (owner == null || owner == player
@@ -655,13 +655,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 // Pick the best tile to steal, considering mainly the
                 // building goods needed, but including food at a lower
                 // weight.
-                float s = 0.0f;
-                for (GoodsType g : needed) {
-                    s += t.getPotentialProduction(g, unitType);
-                }
-                for (GoodsType g : spec.getFoodGoodsTypeList()) {
-                    s += 0.1 * t.getPotentialProduction(g, unitType);
-                }
+                double s = needed.stream()
+                        .mapToInt(gt -> t.getPotentialProduction(gt, unitType)).sum()
+                    + spec.getFoodGoodsTypeList().stream()
+                        .mapToDouble(ft -> 0.1 * t.getPotentialProduction(ft, unitType)).sum();
                 if (s > score) {
                     score = s;
                     steal = t;

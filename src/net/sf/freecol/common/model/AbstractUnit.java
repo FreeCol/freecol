@@ -182,9 +182,7 @@ public class AbstractUnit extends FreeColObject {
      */
     public static double calculateStrength(Specification spec,
                                            List<AbstractUnit> units) { 
-        float result = 0;
-        for (AbstractUnit au : units) result += au.getOffence(spec);
-        return result;
+        return units.stream().mapToDouble(au -> au.getOffence(spec)).sum();
     }
 
     /**
