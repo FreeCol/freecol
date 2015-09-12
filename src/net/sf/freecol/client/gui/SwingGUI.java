@@ -1316,9 +1316,9 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public void showNameNewLandDialog(String key, final String defaultName,
+    public void showNameNewLandDialog(StringTemplate template, final String defaultName,
                                       final Unit unit) {
-        canvas.showNameNewLandDialog(key, defaultName, unit,
+        canvas.showNamingDialog(template, defaultName, unit,
             new DialogHandler<String>() {
                 @Override
                 public void handle(String name) {
@@ -1333,7 +1333,7 @@ public class SwingGUI extends GUI {
                                         final String defaultName,
                                         final Unit unit, final Tile tile,
                                         final Region region) {
-        canvas.showNameNewRegionDialog(template, defaultName, unit,
+        canvas.showNamingDialog(template, defaultName, unit,
             new DialogHandler<String>() {
                 @Override
                 public void handle(String name) {

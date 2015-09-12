@@ -4020,7 +4020,8 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> that has landed.
      */
     public void newLandName(String defaultName, Unit unit) {
-        gui.showNameNewLandDialog("newLand.text", defaultName, unit);
+        gui.showNameNewLandDialog(StringTemplate.key("newLand.text"),
+                                  defaultName, unit);
     }
 
     /**

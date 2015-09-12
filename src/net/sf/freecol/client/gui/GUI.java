@@ -1291,7 +1291,8 @@ public class GUI {
                                   StringTemplate template, String monarchKey) {
     }
 
-    public void showNameNewLandDialog(String key, final String defaultName,
+    public void showNameNewLandDialog(StringTemplate template,
+                                      final String defaultName,
                                       final Unit unit) {
     }
 

@@ -2248,36 +2248,16 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Display a dialog to set a new land name.
-     *
-     * @param key A key for the message to explain the dialog.
-     * @param defaultName The default name for the new land.
-     * @param unit The <code>Unit</code> discovering the new land.
-     * @param handler A <code>DialogHandler</code> for the dialog response.
-     */
-    void showNameNewLandDialog(String key, String defaultName,
-                                      Unit unit,
-                                      DialogHandler<String> handler) {
-        SwingUtilities.invokeLater(
-            new DialogCallback<>(
-                new FreeColStringInputDialog(freeColClient, frame, false,
-                                             Messages.message(key),
-                                             defaultName, "ok", null),
-                unit.getTile(), handler));
-    }
-
-    /**
-     * Display a dialog to set a new region name.
+     * Display a dialog to set a new name for something.
      *
      * @param template A <code>StringTemplate</code> for the message
      *     to explain the dialog.
-     * @param defaultName The default name for the new region.
-     * @param unit The <code>Unit</code> discovering the new region.
+     * @param defaultName The default name.
+     * @param unit The <code>Unit</code> discovering it.
      * @param handler A <code>DialogHandler</code> for the dialog response.
      */
-    void showNameNewRegionDialog(StringTemplate template,
-                                        String defaultName, Unit unit,
-                                        DialogHandler<String> handler) {
+    void showNamingDialog(StringTemplate template, String defaultName,
+                          Unit unit, DialogHandler<String> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
                 new FreeColStringInputDialog(freeColClient, frame, false,
