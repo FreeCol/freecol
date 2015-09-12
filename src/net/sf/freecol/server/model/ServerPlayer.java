@@ -783,7 +783,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Select one from each father type
         List<FoundingFather> randomFathers = new ArrayList<>();
         LogBuilder lb = new LogBuilder(64);
-        lb.add("Random fathers");
+        lb.add("Random fathers for ", getDebugName());
         for (FoundingFatherType type : FoundingFatherType.values()) {
             List<RandomChoice<FoundingFather>> rc = choices.get(type);
             if (rc != null) {
