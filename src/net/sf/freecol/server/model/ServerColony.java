@@ -840,6 +840,22 @@ public class ServerColony extends Colony implements ServerModelObject {
         }
     }
 
+    /**
+     * Destroy an existing building in this colony.
+     *
+     * @param building The <code>Building</code> to destroy.
+     * @return True if the building was destroyed.
+     */
+    public boolean destroyBuilding(Building building) {
+        Tile copied = (building.getType().isDefenceType())
+            ? getTile().getTileToCache() : null;
+        if (!removeBuilding(building)) return false;
+        getTile().cacheUnseen(copied);
+        invalidateCache();
+        checkBuildQueueIntegrity(true);
+        return true;
+    }
+
 
     // Serialization
 
