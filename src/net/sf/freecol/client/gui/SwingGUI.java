@@ -1306,31 +1306,11 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public void showNameNewLandDialog(StringTemplate template, final String defaultName,
-                                      final Unit unit) {
-        canvas.showNamingDialog(template, defaultName, unit,
-            new DialogHandler<String>() {
-                @Override
-                public void handle(String name) {
-                    if (name == null || name.isEmpty()) name = defaultName;
-                    igc().nameNewLand(unit, name);
-                }
-            });
-    }
-
-    @Override
-    public void showNameNewRegionDialog(StringTemplate template,
-                                        final String defaultName,
-                                        final Unit unit, final Tile tile,
-                                        final Region region) {
-        canvas.showNamingDialog(template, defaultName, unit,
-            new DialogHandler<String>() {
-                @Override
-                public void handle(String name) {
-                    if (name == null || name.isEmpty()) name = defaultName;
-                    igc().nameNewRegion(tile, unit, region, name);
-                }
-            });
+    public void showNamingDialog(StringTemplate template,
+                                      final String defaultName,
+                                      final Unit unit,
+                                      DialogHandler<String> handler) {
+        canvas.showNamingDialog(template, defaultName, unit, handler);
     }
 
     @Override

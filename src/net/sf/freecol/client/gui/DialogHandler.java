@@ -21,10 +21,10 @@ package net.sf.freecol.client.gui;
 
 
 /**
- * The base class for non-modal dialog handlers.
+ * The interface for non-modal dialog handlers.
  */
-public abstract class DialogHandler<T> {
+public interface DialogHandler<T> {
 
-    public abstract void handle(T response);
+    void handle(T response);
 
 };

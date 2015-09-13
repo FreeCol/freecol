@@ -4017,8 +4017,12 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> that has landed.
      */
     public void newLandName(String defaultName, Unit unit) {
-        gui.showNameNewLandDialog(StringTemplate.key("newLand.text"),
-                                  defaultName, unit);
+        gui.showNamingDialog(
+            StringTemplate.key("newLand.text"), defaultName, unit,
+            (String name) -> {
+                if (name == null || name.isEmpty()) name = defaultName;
+                nameNewLand(unit, name);
+            });
     }
 
     /**
@@ -4040,10 +4044,14 @@ public final class InGameController implements NetworkConstants {
             }
             nameNewRegion(tile, unit, region, defaultName);
         } else {
-            gui.showNameNewRegionDialog(StringTemplate
-                .template("nameRegion.text")
-                .addStringTemplate("%type%", region.getLabel()),
-                defaultName, unit, tile, region);
+            gui.showNamingDialog(
+                StringTemplate.template("nameRegion.text")
+                              .addStringTemplate("%type%", region.getLabel()),
+                defaultName, unit,
+                (String name) -> {
+                    if (name == null || name.isEmpty()) name = defaultName;
+                    nameNewRegion(tile, unit, region, name);
+                });
         }
     }
 

@@ -1282,15 +1282,10 @@ public class GUI {
                                   StringTemplate template, String monarchKey) {
     }
 
-    public void showNameNewLandDialog(StringTemplate template,
-                                      final String defaultName,
-                                      final Unit unit) {
-    }
-
-    public void showNameNewRegionDialog(StringTemplate template,
-                                        final String defaultName,
-                                        final Unit unit, final Tile tile,
-                                        final Region region) {
+    public void showNamingDialog(StringTemplate template,
+                                 final String defaultName,
+                                 final Unit unit,
+                                 DialogHandler<String> handler) {
     }
 
     public void showFirstContactDialog(final Player player, final Player other,
