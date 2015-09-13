@@ -119,7 +119,7 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * Shorthand to run in the EDT and wait.
      *
-     * @return runnable The <code>Runnable</code> to run.
+     * @param runnable The <code>Runnable</code> to run.
      */
     private void invokeAndWait(Runnable runnable) {
         getFreeColClient().getGUI().invokeNowOrWait(runnable);
@@ -128,7 +128,7 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * Shorthand to run in the EDT eventually.
      *
-     * @return runnable The <code>Runnable</code> to run.
+     * @param runnable The <code>Runnable</code> to run.
      */
     private void invokeLater(Runnable runnable) {
         getFreeColClient().getGUI().invokeNowOrLater(runnable);

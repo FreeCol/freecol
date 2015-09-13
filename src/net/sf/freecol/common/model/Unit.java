@@ -1307,14 +1307,12 @@ public class Unit extends GoodsLocation
      * Gets the number of turns this unit has to train to educate a student.
      * This value is only meaningful for units that can be put in a school.
      *
+     * @param typeTeacher The teacher <code>UnitType</code>.
+     * @param typeStudent the student <code>UnitType</code>.
      * @return The turns of training needed to teach its current type
      *     to a free colonist or to promote an indentured servant or a
      *     petty criminal.
      * @see #getTurnsOfTraining
-     *
-     * @param typeTeacher The teacher <code>UnitType</code>.
-     * @param typeStudent the student <code>UnitType</code>.
-     * @return The number of turns.
      */
     public int getNeededTurnsOfTraining(UnitType typeTeacher,
                                         UnitType typeStudent) {

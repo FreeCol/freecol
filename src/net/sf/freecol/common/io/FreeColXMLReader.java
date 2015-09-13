@@ -593,7 +593,6 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * @param required If true a null result should throw an exception.
      * @return The <code>FreeColGameObject</code> found or made, or null
      *     if the attribute was not present.
-     * @exception XMLStreamError if there was a problem reading the stream.
      */
     public <T extends FreeColGameObject> T makeFreeColGameObject(Game game,
         String attributeName, Class<T> returnClass,

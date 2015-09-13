@@ -42,7 +42,6 @@ public interface MapGenerator {
      * Creates the map with the current set options
      *
      * @return The new <code>Map</code>.
-     * @exception FreeColException if an error occurs
      */
     public abstract Map createMap(LogBuilder lb);
 }

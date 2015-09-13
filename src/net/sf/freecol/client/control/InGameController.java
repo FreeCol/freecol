@@ -4262,7 +4262,6 @@ public final class InGameController implements NetworkConstants {
      * Called from IGIH.remove().
      *
      * @param objects A list of <code>FreeColGameObject</code>s to remove.
-     * @param 
      */
     public void remove(List<FreeColGameObject> objects,
                        FreeColGameObject divert) {
@@ -4710,7 +4709,7 @@ public final class InGameController implements NetworkConstants {
      *
      * Called from UnloadAction, UnitLabel
      *
-     * @param unit The <code>Unit<code> that is dumping.
+     * @param unit The <code>Unit</code> that is dumping.
      * @return True if the unit unloaded.
      */
     public boolean unload(Unit unit) {
@@ -4754,7 +4753,7 @@ public final class InGameController implements NetworkConstants {
      * Called from CargoPanel, ColonyPanel, EuropePanel.MarketPanel,
      * GUI.showDumpCargoDialog, QuickActionMenu, unload()
      *
-     * @param goods The <code>Goods<code> to unload.
+     * @param goods The <code>Goods</code> to unload.
      * @param dump If true, dump the goods.
      * @return True if the unload succeeds.
      */

@@ -81,7 +81,7 @@ public class SoundPlayer {
      *
      * @param file The <code>File</code> to test.
      * @return An <code>AudioInputStream</code>, or null on failure.
-     * @throws Assorted exceptions if the file does not contain valid audio.
+     * @throws Exception if the file does not contain valid audio.
      */
     public static AudioInputStream getAudioInputStream(File file)
         throws Exception {

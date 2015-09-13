@@ -159,7 +159,6 @@ public final class AboutPanel extends FreeColPanel {
 
     /**
      * {@inheritDoc}
-     * @param event
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
