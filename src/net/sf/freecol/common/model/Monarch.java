@@ -110,14 +110,13 @@ public final class Monarch extends FreeColGameObject implements Named {
          */
         public final void updateSpaceAndCapacity() {
             final Specification spec = getSpecification();
-            capacity = 0;
-            for (AbstractUnit nu : navalUnits) {
-                if (nu.getType(spec).canCarryUnits()) {
-                    capacity += nu.getType(spec).getSpace() * nu.getNumber();
-                }
-            }
+            capacity = navalUnits.stream()
+                .filter(nu -> nu.getType(spec).canCarryUnits())
+                .mapToInt(nu -> nu.getType(spec).getSpace()
+                    * nu.getNumber()).sum();
             spaceRequired = landUnits.stream()
-                .mapToInt(lu -> lu.getType(spec).getSpaceTaken() * lu.getNumber()).sum();
+                .mapToInt(lu -> lu.getType(spec).getSpaceTaken()
+                    * lu.getNumber()).sum();
         }
 
         /**

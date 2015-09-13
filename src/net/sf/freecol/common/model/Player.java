@@ -1372,12 +1372,11 @@ public class Player extends FreeColGameObject implements Nameable {
         
         final List<GoodsType> immigrationGoodsTypes = getSpecification()
             .getImmigrationGoodsTypeList();
-        int production = 0;
-        for (Colony colony : getColonies()) {
-            production += immigrationGoodsTypes.stream()
-                .mapToInt(gt -> colony.getTotalProductionOf(gt)).sum();
-        }
-        Europe europe = getEurope();
+        int production = getColonies().stream()
+            .mapToInt(c -> immigrationGoodsTypes.stream()
+                .mapToInt(gt -> c.getTotalProductionOf(gt)).sum())
+            .sum();
+        final Europe europe = getEurope();
         if (europe != null) production += europe.getImmigration(production);
         return production;
     }
@@ -1461,11 +1460,11 @@ public class Player extends FreeColGameObject implements Nameable {
      *     <code>Colony</code>s will make next turn.
      */
     public int getLibertyProductionNextTurn() {
-        int nextTurn = 0;
-        for (Colony colony : getColonies()) {
-            nextTurn += getSpecification().getLibertyGoodsTypeList().stream()
-                .mapToInt(gt -> colony.getTotalProductionOf(gt)).sum();
-        }
+        final Specification spec = getSpecification();
+        int nextTurn = getColonies().stream()
+            .mapToInt(c -> spec.getLibertyGoodsTypeList().stream()
+                .mapToInt(gt -> c.getTotalProductionOf(gt)).sum())
+            .sum();
         return (int)applyModifiers((float)nextTurn, getGame().getTurn(),
                                    Modifier.LIBERTY);
     }
@@ -1645,13 +1644,9 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int calculateStrength(boolean naval) {
         final CombatModel cm = getGame().getCombatModel();
-        int s = 0;
-        for (Unit unit : getUnits()) {
-            if (unit.isNaval() == naval) {
-                s += cm.getOffencePower(unit, null);
-            }
-        }
-        return s;
+        return (int)getUnits().stream()
+            .filter(u -> u.isNaval() == naval)
+            .mapToDouble(u -> cm.getOffencePower(u, null)).sum();
     }
 
     /**
@@ -1941,18 +1936,11 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getPrice(AbstractUnit au) {
         final Specification spec = getSpecification();
-        UnitType unitType = au.getType(spec);
-        Role role = au.getRole(spec);
-        if (unitType.hasPrice()) {
-            int price = getEurope().getUnitPrice(unitType);
-            for (AbstractGoods goods : role.getRequiredGoods()) {
-                int amount = goods.getAmount() * role.getMaximumCount();
-                price += getMarket().getBidPrice(goods.getType(), amount);
-            }
-            return price * au.getNumber();
-        } else {
-            return INFINITY;
-        }
+        final UnitType unitType = au.getType(spec);
+        if (!unitType.hasPrice()) return INFINITY;
+
+        return au.getNumber() * (getEurope().getUnitPrice(unitType)
+            + au.getRole(spec).getRequiredGoodsPrice(getMarket()));
     }
 
     /**
@@ -3057,7 +3045,6 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getLandPrice(Tile tile) {
         final Specification spec = getSpecification();
         Player nationOwner = tile.getOwner();
-        int price = 0;
 
         if (nationOwner == null || nationOwner == this) {
             return 0; // Freely available
@@ -3071,15 +3058,12 @@ public class Player extends FreeColGameObject implements Nameable {
                 return 0; // Claim abandoned or only by tile improvement
             }
         } // Else, native ownership
-        for (GoodsType type : spec.getGoodsTypeList()) {
-            if (type == spec.getPrimaryFoodType()) {
+        int price = spec.getInteger(GameOptions.LAND_PRICE_FACTOR)
+            * spec.getGoodsTypeList().stream()
                 // Only consider specific food types, not the aggregation.
-                continue;
-            }
-            price += tile.getPotentialProduction(type, null);
-        }
-        price *= spec.getInteger(GameOptions.LAND_PRICE_FACTOR);
-        price += 100;
+                .filter(gt -> gt != spec.getPrimaryFoodType())
+                .mapToInt(gt -> tile.getPotentialProduction(gt, null)).sum()
+            + 100;
         return (int)applyModifiers(price, getGame().getTurn(),
                                    Modifier.LAND_PAYMENT_MODIFIER);
     }

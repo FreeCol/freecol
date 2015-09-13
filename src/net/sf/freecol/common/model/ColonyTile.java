@@ -236,10 +236,9 @@ public class ColonyTile extends WorkLocation {
                 }
                 // No production showstoppers found
                 // Would the passive food production be improved?
-                for (AbstractGoods ag : newProd) {
-                    if (ag.getType().isFoodType()) food += ag.getAmount();
-                }
-                return food;
+                return newProd.stream()
+                    .filter(ag -> ag.getType().isFoodType())
+                    .mapToInt(AbstractGoods::getAmount).sum();
             }
 
             // Tile type stays the same, return the sum of any food bonues.

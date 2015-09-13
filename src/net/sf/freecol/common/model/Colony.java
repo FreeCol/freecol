@@ -1630,14 +1630,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The total defence power.
      */
     public double getTotalDefencePower() {
-        CombatModel cm = getGame().getCombatModel();
-        double defence = 0.0;
-        for (Unit unit : getTile().getUnitList()) {
-            if (unit.isDefensiveUnit()) {
-                defence += cm.getDefencePower(null, unit);
-            }
-        }
-        return defence;
+        final CombatModel cm = getGame().getCombatModel();
+        return getTile().getUnitList().stream()
+            .filter(Unit::isDefensiveUnit)
+            .mapToDouble(u -> cm.getDefencePower(null, u)).sum();
     }
 
     /**
@@ -1749,10 +1745,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                     .mapToInt(g -> g.evaluateFor(player)).sum();
         } else { // Much guesswork
             result = getDisplayUnitCount() * 1000
-                + 500; // Some useful goods?
-            for (Tile t : getTile().getSurroundingTiles(1)) {
-                if (t.getOwningSettlement() == this) result += 200;
-            }
+                + 500 // Some useful goods?
+                + 200 * (int)getTile().getSurroundingTiles(0, 1).stream()
+                    .filter(t -> t.getOwningSettlement() == this).count();
             Building stockade = getStockade();
             if (stockade != null) result *= stockade.getLevel();
         }

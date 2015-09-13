@@ -259,6 +259,18 @@ public class Role extends BuildableType {
     }
 
     /**
+     * Get the price of the required goods in a given market.
+     *
+     * @param market The <code>Market</code> to evaluate in.
+     * @return The price of the goods for this role.
+     */
+    public int getRequiredGoodsPrice(Market market) {
+        return getRequiredGoods().stream()
+            .mapToInt(ag -> market.getBidPrice(ag.getType(),
+                    ag.getAmount() * getMaximumCount())).sum();
+    }
+        
+    /**
      * Get the role changes that can allow a unit to assume this role.
      *
      * @return A list of <code>RoleChange</code>s.

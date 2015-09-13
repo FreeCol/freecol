@@ -595,9 +595,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // than the rebels.
         int rebelPower = 0;
         for (Player rebel : getRebels()) {
-            for (Unit r : rebel.getUnits()) {
-                if (!r.isNaval()) rebelPower += cm.getOffencePower(r, null);
-            }
+            rebelPower += rebel.getUnits().stream()
+                .filter(u -> !u.isNaval())
+                .mapToDouble(u -> cm.getOffencePower(u, null)).sum();
         }
         if (power > rebelPower) return false;
 
@@ -1908,11 +1908,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         if (enemy.isEuropean()) {
                             Integer alarm = extra.get(enemy);
                             if (alarm == null) continue;
-                            for (Unit unit : tile.getUnitList()) {
-                                if (unit.isOffensiveUnit() && !unit.isNaval()) {
-                                    alarm += (int)unit.getType().getOffence();
-                                }
-                            }
+                            alarm += (int)tile.getUnitList().stream()
+                                .filter(u -> u.isOffensiveUnit() && !u.isNaval())
+                                .mapToDouble(u -> u.getType().getOffence()).sum();
                             extra.put(enemy, alarm);
                         }
                     } else if (colony != null) { // Colonies

@@ -313,10 +313,9 @@ public class NativeAIPlayer extends AIPlayer {
                     bonus = (float)tension.getLevel().ordinal()
                         - Tension.Level.CONTENT.ordinal();
                 }
-                for (Unit u : t.getUnitList()) {
-                    double offence = cm.getOffencePower(u, is);
-                    if (offence > threshold) value += offence + bonus;
-                }
+                value += t.getUnitList().stream()
+                    .filter(u -> cm.getOffencePower(u, is) > threshold)
+                    .mapToDouble(u -> cm.getOffencePower(u, is) + bonus).sum();
                 if (value > 0.0) threats.put(t, value);
             }
         }

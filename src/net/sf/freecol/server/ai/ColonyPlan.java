@@ -825,18 +825,16 @@ public class ColonyPlan {
 
         // Weight by lower required goods.
         for (BuildPlan bp : buildPlans) {
-            double difficulty = 0.0f;
-            for (AbstractGoods ag : bp.type.getRequiredGoods()) {
-                GoodsType g = ag.getType();
-                int need = ag.getAmount() - colony.getGoodsCount(g);
-                if (need > 0) {
-                    // Penalize building with type that can not be
-                    // made locally.
-                    double f = (produce.contains(g.getInputType())) ? 1.0
-                        : 5.0;
-                    difficulty += need * f;
-                }
-            }
+            double difficulty = bp.type.getRequiredGoods().stream()
+                .filter(ag -> ag.getAmount() > colony.getGoodsCount(ag.getType()))
+                .mapToDouble(ag -> {
+                        final GoodsType type = ag.getType();
+                        return (ag.getAmount() - colony.getGoodsCount(type))
+                            // Penalize building with type that can not be
+                            // made locally.
+                            * ((produce.contains(type.getInputType())) ? 1.0
+                                : 5.0);
+                    }).sum();
             bp.difficulty = Math.max(1.0f, Math.sqrt(difficulty));
         }
 
@@ -1391,10 +1389,9 @@ public class ColonyPlan {
                 // what is needed for a building--- e.g. prevent
                 // musket production from hogging the tools.
                 GoodsType raw = goodsType.getInputType();
-                int rawNeeded = 0;
-                for (AbstractGoods ag : buildGoods) {
-                    if (raw == ag.getType()) rawNeeded += ag.getAmount();
-                }
+                int rawNeeded = buildGoods.stream()
+                    .filter(ag -> ag.getType() == raw)
+                    .mapToInt(AbstractGoods::getAmount).sum();
                 if (raw == null
                     || col.getAdjustedNetProductionOf(raw) >= 0
                     || (((col.getGoodsCount(raw) - rawNeeded)

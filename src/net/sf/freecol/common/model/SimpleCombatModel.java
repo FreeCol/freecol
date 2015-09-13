@@ -161,11 +161,9 @@ public class SimpleCombatModel extends CombatModel {
         } else if (combatIsBombard(attacker, defender)) {
             Settlement attackerSettlement = (Settlement) attacker;
             if (attackerSettlement.hasAbility(Ability.BOMBARD_SHIPS)) {
-                for (Unit unit : attackerSettlement.getTile().getUnitList()) {
-                    if (unit.hasAbility(Ability.BOMBARD)) {
-                        result += unit.getType().getOffence();
-                    }
-                }
+                result += attackerSettlement.getTile().getUnitList().stream()
+                    .filter(u -> u.hasAbility(Ability.BOMBARD))
+                    .mapToDouble(u -> u.getType().getOffence()).sum();
             }
             if (result > MAXIMUM_BOMBARD_POWER) result = MAXIMUM_BOMBARD_POWER;
             if (lb != null) lb.add(" bombard=", result);
@@ -185,7 +183,7 @@ public class SimpleCombatModel extends CombatModel {
      */
     @Override
     public double getDefencePower(FreeColGameObject attacker,
-                                 FreeColGameObject defender) {
+                                  FreeColGameObject defender) {
         return getDefencePower(attacker, defender, null);
     }
 
@@ -198,8 +196,8 @@ public class SimpleCombatModel extends CombatModel {
      * @return The defensive power.
      */
     public double getDefencePower(FreeColGameObject attacker,
-                                 FreeColGameObject defender,
-                                 LogBuilder lb) {
+                                  FreeColGameObject defender,
+                                  LogBuilder lb) {
         double result;
         if (combatIsDefenceMeasurement(attacker, defender)
             || combatIsAttack(attacker, defender)

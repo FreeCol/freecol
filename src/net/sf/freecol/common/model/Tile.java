@@ -1580,17 +1580,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         }
 
-        int food = 0;
-        for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
-            if (entry.getKey().isFoodType()) {
-                food += entry.getValue();
-            }
-        }
-
         StringTemplate ret = StringTemplate.label("\n");
         if (landLocked) {
             ret.add("warning.landLocked");
         }
+        int food = goodsMap.entrySet().stream()
+            .filter(e -> e.getKey().isFoodType())
+            .mapToInt(e -> e.getValue()).sum();
         if (food < 8) {
             ret.add("warning.noFood");
         }
