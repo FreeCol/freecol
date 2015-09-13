@@ -1026,14 +1026,8 @@ public class SwingGUI extends GUI {
 
     @Override
     public void showCaptureGoodsDialog(final Unit unit, List<Goods> gl,
-                                       final String defenderId) {
-        canvas.showCaptureGoodsDialog(unit, gl,
-            new DialogHandler<List<Goods>>() {
-                @Override
-                public void handle(List<Goods> gl) {
-                    igc().lootCargo(unit, gl, defenderId);
-                }
-            });
+                                       DialogHandler<List<Goods>> handler) {
+        canvas.showCaptureGoodsDialog(unit, gl, handler);
     }
 
     @Override
@@ -1042,14 +1036,9 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs) {
-        canvas.showChooseFoundingFatherDialog(ffs,
-            new DialogHandler<FoundingFather>() {
-                @Override
-                public void handle(FoundingFather ff) {
-                    igc().chooseFoundingFather(ffs, ff);
-                }
-            });
+    public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs,
+                DialogHandler<FoundingFather> handler) {
+        canvas.showChooseFoundingFatherDialog(ffs, handler);
     }
 
     @Override
@@ -1107,14 +1096,9 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public void showDumpCargoDialog(Unit unit) {
-        canvas.showDumpCargoDialog(unit,
-            new DialogHandler<List<Goods>>() {
-                @Override
-                public void handle(List<Goods> goodsList) {
-                    for (Goods g : goodsList) igc().unloadCargo(g, true);
-                }
-            });
+    public void showDumpCargoDialog(Unit unit,
+                                    DialogHandler<List<Goods>> handler) {
+        canvas.showDumpCargoDialog(unit, handler);
     }
 
     @Override
@@ -1123,30 +1107,16 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public void showEmigrationDialog(final Player player, final int n,
-                                     final boolean fountainOfYouth) {
-        canvas.showEmigrationDialog(player, fountainOfYouth,
-            new DialogHandler<Integer>() {
-                @Override
-                public void handle(Integer value) { // Value is a valid slot
-                    igc().emigrate(player,
-                        Europe.MigrationType.convertToMigrantSlot(value),
-                        n-1, fountainOfYouth);
-                }
-            });
+    public void showEmigrationDialog(final Player player,
+                                     final boolean fountainOfYouth,
+                                     DialogHandler<Integer> handler) {
+        canvas.showEmigrationDialog(player, fountainOfYouth, handler);
     }
 
     @Override
-    public void showEndTurnDialog(final List<Unit> units) {
-        canvas.showEndTurnDialog(units,
-            new DialogHandler<Boolean>() {
-                @Override
-                public void handle(Boolean value) {
-                    if (value != null && value) {
-                        igc().endTurn(false);
-                    }
-                }
-            });
+    public void showEndTurnDialog(final List<Unit> units,
+                                  DialogHandler<Boolean> handler) {
+        canvas.showEndTurnDialog(units, handler);
     }
 
     @Override
@@ -1295,14 +1265,9 @@ public class SwingGUI extends GUI {
 
     @Override
     public void showMonarchDialog(final MonarchAction action,
-                                  StringTemplate template, String monarchKey) {
-        canvas.showMonarchDialog(action, template, monarchKey,
-            new DialogHandler<Boolean>() {
-                @Override
-                public void handle(Boolean b) {
-                    igc().monarchAction(action, b);
-                }
-            });
+                                  StringTemplate template, String monarchKey,
+                                  DialogHandler<Boolean> handler) {
+        canvas.showMonarchDialog(action, template, monarchKey, handler);
     }
 
     @Override
@@ -1315,14 +1280,10 @@ public class SwingGUI extends GUI {
 
     @Override
     public void showFirstContactDialog(final Player player, final Player other,
-                                       final Tile tile, int settlementCount) {
+                                       final Tile tile, int settlementCount,
+                                       DialogHandler<Boolean> handler) {
         canvas.showFirstContactDialog(player, other, tile, settlementCount,
-            new DialogHandler<Boolean>() {
-                @Override
-                public void handle(Boolean b) {
-                    igc().firstContact(player, other, tile, b);
-                }
-            });
+                                      handler);
     }
 
     @Override
@@ -1535,13 +1496,8 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public void showVictoryDialog() {
-        canvas.showVictoryDialog(new DialogHandler<Boolean>() {
-                @Override
-                public void handle(Boolean result) {
-                    igc().victory(result);
-                }
-            });
+    public void showVictoryDialog(DialogHandler<Boolean> handler) {
+        canvas.showVictoryDialog(handler);
     }
 
     public boolean showWarehouseDialog(Colony colony) {

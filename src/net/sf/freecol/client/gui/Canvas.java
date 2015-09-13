@@ -1664,7 +1664,7 @@ public final class Canvas extends JDesktopPane {
      * @param handler A <code>DialogHandler</code> for the dialog response.
      */
     void showCaptureGoodsDialog(Unit unit, List<Goods> gl,
-                                       DialogHandler<List<Goods>> handler) {
+                                DialogHandler<List<Goods>> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
                 new CaptureGoodsDialog(freeColClient, frame, unit, gl),
@@ -1689,7 +1689,7 @@ public final class Canvas extends JDesktopPane {
      * @param handler A <code>DialogHandler</code> for the dialog response.
      */
     void showChooseFoundingFatherDialog(List<FoundingFather> ffs,
-                                               DialogHandler<FoundingFather> handler) {
+                                        DialogHandler<FoundingFather> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
                 new ChooseFoundingFatherDialog(freeColClient, frame, ffs),
@@ -1837,8 +1837,7 @@ public final class Canvas extends JDesktopPane {
      * @param unit The <code>Unit</code> that is dumping.
      * @param handler A <code>DialogHandler</code> for the dialog response.
      */
-    void showDumpCargoDialog(Unit unit,
-                                    DialogHandler<List<Goods>> handler) {
+    void showDumpCargoDialog(Unit unit, DialogHandler<List<Goods>> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
                 new DumpCargoDialog(freeColClient, frame, unit),
@@ -1876,7 +1875,7 @@ public final class Canvas extends JDesktopPane {
      * @param handler A <code>DialogHandler</code> for the dialog response.
      */
     void showEmigrationDialog(Player player, boolean fountainOfYouth,
-                                     DialogHandler<Integer> handler) {
+                              DialogHandler<Integer> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
                 new EmigrationDialog(freeColClient, frame, player.getEurope(),
@@ -1973,8 +1972,8 @@ public final class Canvas extends JDesktopPane {
      * @param handler A <code>DialogHandler</code> for the dialog response.
      */
     void showFirstContactDialog(Player player, Player other,
-                                       Tile tile, int settlementCount,
-                                       DialogHandler<Boolean> handler) {
+                                Tile tile, int settlementCount,
+                                DialogHandler<Boolean> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
                 new FirstContactDialog(freeColClient, frame, player, other, tile,
@@ -2234,8 +2233,8 @@ public final class Canvas extends JDesktopPane {
      * @param handler A <code>DialogHandler</code> for the dialog response.
      */
     void showMonarchDialog(MonarchAction action,
-                                  StringTemplate template, String monarchKey,
-                                  DialogHandler<Boolean> handler) {
+                           StringTemplate template, String monarchKey,
+                           DialogHandler<Boolean> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(
                 new MonarchDialog(freeColClient, frame, action, template, monarchKey),

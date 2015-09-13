@@ -1107,13 +1107,14 @@ public class GUI {
     }
 
     public void showCaptureGoodsDialog(final Unit unit, List<Goods> gl,
-                                       final String defenderId) {
+                                       DialogHandler<List<Goods>> handler) {
     }
 
     public void showChatPanel() {
     }
 
-    public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs) {
+    public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs,
+            DialogHandler<FoundingFather> handler) {
     }
 
     public OptionGroup showClientOptionsDialog() {
@@ -1158,18 +1159,21 @@ public class GUI {
         return null;
     }
 
-    public void showDumpCargoDialog(Unit unit) {
+    public void showDumpCargoDialog(Unit unit,
+                                    DialogHandler<List<Goods>> handler) {
     }
 
     public boolean showEditOptionDialog(Option option) {
         return false;
     }
 
-    public void showEmigrationDialog(final Player player, final int n,
-                                     final boolean fountainOfYouth) {
+    public void showEmigrationDialog(final Player player,
+                                     final boolean fountainOfYouth,
+                                     DialogHandler<Integer> handler) {
     }
 
-    public void showEndTurnDialog(final List<Unit> units) {
+    public void showEndTurnDialog(final List<Unit> units,
+                                  DialogHandler<Boolean> handler) {
     }
 
     public void showErrorMessage(StringTemplate template) {
@@ -1279,7 +1283,8 @@ public class GUI {
     }
 
     public void showMonarchDialog(final MonarchAction action,
-                                  StringTemplate template, String monarchKey) {
+                                  StringTemplate template, String monarchKey,
+                                  DialogHandler<Boolean> handler) {
     }
 
     public void showNamingDialog(StringTemplate template,
@@ -1289,7 +1294,8 @@ public class GUI {
     }
 
     public void showFirstContactDialog(final Player player, final Player other,
-                                       final Tile tile, int settlementCount) {
+                                       final Tile tile, int settlementCount,
+                                       DialogHandler<Boolean> handler) {
     }
 
     public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
@@ -1403,7 +1409,7 @@ public class GUI {
     public void showTradeRoutePanel(Unit unit) {
     }
 
-    public void showVictoryDialog() {
+    public void showVictoryDialog(DialogHandler<Boolean> handler) {
     }
 
     public void updateGameOptions() {

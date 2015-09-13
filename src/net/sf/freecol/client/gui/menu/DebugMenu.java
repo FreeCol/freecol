@@ -263,8 +263,10 @@ public class DebugMenu extends JMenu {
 
         final JMenuItem monarchDialog = Utility.localizedMenuItem("menuBar.debug.displayMonarchPanel");
         monarchDialog.addActionListener((ActionEvent ae) -> {
-                gui.showMonarchDialog(Monarch.MonarchAction.RAISE_TAX_WAR,
-                                      null, player.getMonarchKey());
+                gui.showMonarchDialog(
+                    Monarch.MonarchAction.RAISE_TAX_WAR, null, player.getMonarchKey(),
+                    (Boolean b) ->
+                        freeColClient.getInGameController().monarchAction(Monarch.MonarchAction.RAISE_TAX_WAR, b));
             });
         panelMenu.add(monarchDialog);
 

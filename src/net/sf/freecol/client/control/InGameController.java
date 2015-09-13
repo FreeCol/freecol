@@ -473,7 +473,13 @@ public final class InGameController implements NetworkConstants {
 
         for (; n > 0 || player.checkEmigrate() ; n--) {
             if (!allSame(europe.getRecruitables())) {
-                gui.showEmigrationDialog(player, n, fountainOfYouth);
+                final int nf = n;
+                gui.showEmigrationDialog(player, fountainOfYouth,
+                    (Integer value) -> { // Value is a valid slot
+                        emigrate(player,
+                            Europe.MigrationType.convertToMigrantSlot(value),
+                            nf-1, fountainOfYouth);
+                    });
                 return;
             }
             Unit u = askEmigrate(europe, Europe.MigrationType.getDefaultSlot());
@@ -832,7 +838,13 @@ public final class InGameController implements NetworkConstants {
                 if (unit.couldMove()) units.add(unit);
             }
             if (!units.isEmpty()) {
-                gui.showEndTurnDialog(units); // Modal dialog takes over
+                // Modal dialog takes over
+                gui.showEndTurnDialog(units,
+                    (Boolean value) -> {
+                        if (value != null && value) {
+                            endTurn(false);
+                        }
+                    });
                 return false;
             }
         }
@@ -2981,9 +2993,10 @@ public final class InGameController implements NetworkConstants {
      */
     public void chooseFoundingFather(List<FoundingFather> ffs) {
         if (ffs == null) return;
-        gui.showChooseFoundingFatherDialog(ffs);
+        gui.showChooseFoundingFatherDialog(ffs,
+            (FoundingFather ff) -> chooseFoundingFather(ffs, ff));
     }
-    
+
     /**
      * Claim a tile.
      *
@@ -3437,7 +3450,8 @@ public final class InGameController implements NetworkConstants {
      * @param n The number of settlements claimed by the native player.
      */
     public void firstContact(Player player, Player other, Tile tile, int n) {
-        gui.showFirstContactDialog(player, other, tile, n);
+        gui.showFirstContactDialog(player, other, tile, n,
+            (Boolean b) -> firstContact(player, other, tile, b));
     }
 
     /**
@@ -3448,7 +3462,14 @@ public final class InGameController implements NetworkConstants {
      * @param n The number of migrants available for selection.
      */
     public void fountainOfYouth(int n) {
-        gui.showEmigrationDialog(freeColClient.getMyPlayer(), n, true);
+        Player player = freeColClient.getMyPlayer();
+        final boolean fountainOfYouth = true;
+        gui.showEmigrationDialog(player, fountainOfYouth,
+            (Integer value) -> { // Value is a valid slot
+                emigrate(player,
+                         Europe.MigrationType.convertToMigrantSlot(value),
+                         n-1, fountainOfYouth);
+            });
     }
 
     /**
@@ -3793,9 +3814,10 @@ public final class InGameController implements NetworkConstants {
      * @param defenderId The identifier of the defender unit (may have sunk).
      */
     public void loot(Unit unit, List<Goods> goods, String defenderId) {
-        gui.showCaptureGoodsDialog(unit, goods, defenderId);
+        gui.showCaptureGoodsDialog(unit, goods,
+            (List<Goods> gl) -> lootCargo(unit, gl, defenderId));
     }
-    
+
     /**
      * Accept or reject a monarch action.
      *
@@ -3834,7 +3856,8 @@ public final class InGameController implements NetworkConstants {
      */
     public void monarch(MonarchAction action, StringTemplate template,
                         String monarchKey) {
-        gui.showMonarchDialog(action, template, monarchKey);
+        gui.showMonarchDialog(action, template, monarchKey,
+            (Boolean b) -> monarchAction(action, b));
     }
 
     /**
@@ -4722,7 +4745,6 @@ public final class InGameController implements NetworkConstants {
             || !unit.isCarrier()) return false;
 
         boolean ret = true;
-        boolean inEurope = unit.isInEurope();
         Colony colony = unit.getColony();
         if (colony != null) { // In colony, unload units and goods.
             for (Unit u : unit.getUnitList()) {
@@ -4739,7 +4761,10 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             if (unit.hasGoodsCargo()) { // Goods left here must be dumped.
-                gui.showDumpCargoDialog(unit);
+                gui.showDumpCargoDialog(unit,
+                    (List<Goods> goodsList) -> {
+                        for (Goods g : goodsList) unloadCargo(g, true);
+                    });
                 return false;
             }
         } else { // Dump goods, units dislike jumping overboard
@@ -4812,7 +4837,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void victory(String score) {
         displayHighScores("true".equalsIgnoreCase(score));
-        gui.showVictoryDialog();
+        gui.showVictoryDialog((Boolean result) -> victory(result));
     }
 
     /**
