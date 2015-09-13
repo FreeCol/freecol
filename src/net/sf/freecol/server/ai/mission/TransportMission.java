@@ -166,8 +166,8 @@ public class TransportMission extends Mission {
                                 other.getOwner()) != null) return false;
         final Unit carrier = getUnit();
         final CombatModel cm = getGame().getCombatModel();
-        float offence = cm.getOffencePower(carrier, other)
-            * ((carrier.hasCargo()) ? 0.3f : 0.80f);
+        double offence = cm.getOffencePower(carrier, other)
+            * ((carrier.hasCargo()) ? 0.3 : 0.80);
         return offence > cm.getOffencePower(other, carrier);
     }
 

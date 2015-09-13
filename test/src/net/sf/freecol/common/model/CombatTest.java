@@ -467,21 +467,6 @@ public class CombatTest extends FreeColTestCase {
     }
 
     public void testRegulars() {
-        Random random = new Random(1);
-        // these are the first ten values the RNG will produce
-        float[] values = new float[] {
-            0.7308782f,
-            0.100473166f,
-            0.4100808f,
-            0.40743977f,
-            0.2077148f,
-            0.036235332f,
-            0.332717f,
-            0.6588672f,
-            0.96775585f,
-            0.7107396f
-        };
-
         Game game = ServerTestHelper.startServerGame(getTestMap(plains, true));
         InGameController igc = ServerTestHelper.getInGameController();
 
@@ -500,50 +485,59 @@ public class CombatTest extends FreeColTestCase {
         Unit colonial = new ServerUnit(game, tile1, french, colonialRegularType,
                                        dragoonRole);
 
+        MockPseudoRandom loseRandom = new MockPseudoRandom();
+        List<Integer> i1 = new ArrayList<>();
+        i1.add((int)(Integer.MAX_VALUE * 0.85));
+        loseRandom.setNextNumbers(i1, true);
+        MockPseudoRandom winRandom = new MockPseudoRandom();
+        List<Integer> i2 = new ArrayList<>();
+        i2.add((int)(Integer.MAX_VALUE * 0.20));
+        winRandom.setNextNumbers(i2, true);
+
         // colonist + regular + cavalry * attack bonus
-        float offence = (0 + 4 + 3) * 1.5f;
+        double offence = (0 + 4 + 3) * 1.5;
         assertEquals(offence, combatModel.getOffencePower(regular, colonial));
         // colonist + colonial + dragoon
-        float defence = 0 + 3 + 3;
+        double defence = 0 + 3 + 3;
         assertEquals(defence, combatModel.getDefencePower(regular, colonial));
 
         List<CombatResult> crs
-            = combatModel.generateAttackResult(random, regular, colonial);
+            = combatModel.generateAttackResult(loseRandom, regular, colonial);
         checkCombat("Regular v Colonial", crs,
             CombatResult.LOSE, CombatResult.LOSE_EQUIP);
-        refPlayer.csCombat(regular, colonial, crs, random, new ChangeSet());
+        refPlayer.csCombat(regular, colonial, crs, loseRandom, new ChangeSet());
         assertEquals(infantryRole, regular.getRole());
 
         // (colonist + regular + infantry) * attack bonus
-        offence = (0 + 4 + 2) * 1.5f;
+        offence = (0 + 4 + 2) * 1.5;
         assertEquals(offence, combatModel.getOffencePower(regular, colonial));
 
         // slaughter King's Regular
-        crs = combatModel.generateAttackResult(random, colonial, regular);
+        crs = combatModel.generateAttackResult(winRandom, colonial, regular);
         checkCombat("Regular should be slaughtered upon losing all equipment",
             crs, CombatResult.WIN, CombatResult.SLAUGHTER_UNIT);
 
         regular = new ServerUnit(game, tile2, french, kingsRegularType,
                                  cavalryRole);
 
-        crs = combatModel.generateAttackResult(random, regular, colonial);
+        crs = combatModel.generateAttackResult(winRandom, regular, colonial);
         checkCombat("Regular v Colonial (2)", crs,
             CombatResult.WIN, CombatResult.LOSE_EQUIP);
-        refPlayer.csCombat(regular, colonial, crs, random, new ChangeSet());
+        refPlayer.csCombat(regular, colonial, crs, winRandom, new ChangeSet());
         assertEquals(soldierRole, colonial.getRole());
 
-        crs = combatModel.generateAttackResult(random, regular, colonial);
+        crs = combatModel.generateAttackResult(winRandom, regular, colonial);
         checkCombat("Regular v Colonial (3)", crs,
             CombatResult.WIN, CombatResult.LOSE_EQUIP, CombatResult.DEMOTE_UNIT);
-        refPlayer.csCombat(regular, colonial, crs, random, new ChangeSet());
+        refPlayer.csCombat(regular, colonial, crs, winRandom, new ChangeSet());
         assertFalse(colonial.isArmed());
         assertEquals(veteranType, colonial.getType());
         assertEquals(spec().getDefaultRole(), colonial.getRole());
 
-        crs = combatModel.generateAttackResult(random, regular, colonial);
+        crs = combatModel.generateAttackResult(winRandom, regular, colonial);
         checkCombat("Regular v Colonial (4)", crs,
             CombatResult.WIN, CombatResult.CAPTURE_UNIT);
-        refPlayer.csCombat(regular, colonial, crs, random, new ChangeSet());
+        refPlayer.csCombat(regular, colonial, crs, winRandom, new ChangeSet());
     }
 
     public void testCaptureConvert() {

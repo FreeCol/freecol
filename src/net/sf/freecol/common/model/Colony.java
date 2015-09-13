@@ -2658,9 +2658,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         List<Unit> unitList = getUnitList();
 
         Unit defender = null;
-        float defencePower = -1.0f;
+        double defencePower = -1.0;
         for (Unit nextUnit : unitList) {
-            float unitPower = getGame().getCombatModel()
+            double unitPower = getGame().getCombatModel()
                 .getDefencePower(attacker, nextUnit);
             if (Unit.betterDefender(defender, defencePower,
                     nextUnit, unitPower)) {

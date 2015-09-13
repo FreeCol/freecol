@@ -1841,8 +1841,8 @@ public class Unit extends GoodsLocation
      * @param otherPower Its defence power.
      * @return True if the other unit should be preferred.
      */
-    public static boolean betterDefender(Unit defender, float defenderPower,
-                                         Unit other, float otherPower) {
+    public static boolean betterDefender(Unit defender, double defenderPower,
+                                         Unit other, double otherPower) {
         if (defender == null) {
             return true;
         } else if (defender.isPerson() && other.isPerson()
@@ -1899,9 +1899,9 @@ public class Unit extends GoodsLocation
         return new Comparator<Unit>() {
                 @Override
                 public int compare(Unit u1, Unit u2) {
-                    float cmp = cm.calculateCombatOdds(u1, u2).win
+                    double cmp = cm.calculateCombatOdds(u1, u2).win
                         - cm.calculateCombatOdds(u2, u1).win;
-                    return (cmp < 0.5f) ? -1 : (cmp > 0.5f) ? 1 : 0;
+                    return (cmp < 0.5) ? -1 : (cmp > 0.5) ? 1 : 0;
                 }
             };
     }

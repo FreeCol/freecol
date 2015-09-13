@@ -630,20 +630,20 @@ public class FreeColTestCase extends TestCase {
                                                FreeColGameObject defender)
     {
         List<CombatResult> crs;
-        final float delta = 0.02f;
+        final double delta = 0.02;
         CombatModel combatModel = getGame().getCombatModel();
         CombatOdds combatOdds = combatModel.calculateCombatOdds(attacker, defender);
-        float f = combatOdds.win;
+        double p = combatOdds.win;
         MockPseudoRandom mr = new MockPseudoRandom();
         List<Integer> number = new ArrayList<>();
         number.add(-1);
         do {
-            f += (result == CombatResult.WIN) ? -delta : delta;
-            if (f < 0.0f || f >= 1.0f) {
+            p += (result == CombatResult.WIN) ? -delta : delta;
+            if (p < 0.0 || p >= 1.0) {
                 throw new IllegalStateException("f out of range: "
-                                                + Float.toString(f));
+                                                + Double.toString(p));
             }
-            number.set(0, (int)(Integer.MAX_VALUE * f));
+            number.set(0, (int)(Integer.MAX_VALUE * p));
             mr.setNextNumbers(number, true);
             crs = combatModel.generateAttackResult(mr, attacker, defender);
         } while (crs.get(0) != result);

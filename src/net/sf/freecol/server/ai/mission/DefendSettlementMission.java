@@ -381,7 +381,7 @@ public class DefendSettlementMission extends Mission {
 
         final CombatModel cm = unit.getGame().getCombatModel();
         Unit bestTarget = null;
-        float bestDifference = Float.MIN_VALUE;
+        double bestDifference = Double.MIN_VALUE;
         Direction bestDirection = null;
         for (Direction d : Direction.getRandomDirections("defendSettlements",
                 logger, getAIRandom())) {
@@ -392,11 +392,11 @@ public class DefendSettlementMission extends Mission {
                 && defender.getOwner().atWarWith(unit.getOwner())
                 && unit.getMoveType(d).isAttack()) {
                 Unit enemyUnit = t.getDefendingUnit(unit);
-                float enemyAttack = cm.getOffencePower(enemyUnit, unit);
-                float weAttack = cm.getOffencePower(unit, enemyUnit);
-                float enemyDefend = cm.getDefencePower(unit, enemyUnit);
-                float weDefend = cm.getDefencePower(enemyUnit, unit);
-                float difference = weAttack / (weAttack + enemyDefend)
+                double enemyAttack = cm.getOffencePower(enemyUnit, unit);
+                double weAttack = cm.getOffencePower(unit, enemyUnit);
+                double enemyDefend = cm.getDefencePower(unit, enemyUnit);
+                double weDefend = cm.getDefencePower(enemyUnit, unit);
+                double difference = weAttack / (weAttack + enemyDefend)
                     - enemyAttack / (enemyAttack + weDefend);
                 if (difference > bestDifference) {
                     if (difference > 0 || weAttack > enemyDefend) {

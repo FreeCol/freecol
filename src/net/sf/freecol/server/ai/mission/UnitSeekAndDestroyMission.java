@@ -141,8 +141,8 @@ public class UnitSeekAndDestroyMission extends Mission {
         int value = 1020;
         value -= path.getTotalTurns() * 100;
 
-        final float off = combatModel.getOffencePower(unit, settlement);
-        value += off * 50;
+        final double off = combatModel.getOffencePower(unit, settlement);
+        value += (int)Math.round(off * 50);
 
         if (settlement instanceof Colony) {
             // Favour high population (more loot:-).
@@ -178,8 +178,8 @@ public class UnitSeekAndDestroyMission extends Mission {
         final Tile tile = path.getLastNode().getTile();
         final int turns = path.getTotalTurns();
         final CombatModel combatModel = unit.getGame().getCombatModel();
-        final float off = combatModel.getOffencePower(unit, defender);
-        final float def = combatModel.getDefencePower(unit, defender);
+        final double off = combatModel.getOffencePower(unit, defender);
+        final double def = combatModel.getDefencePower(unit, defender);
         if (tile == null || off <= 0) return Integer.MIN_VALUE;
 
         int value = 1020 - turns * 100;

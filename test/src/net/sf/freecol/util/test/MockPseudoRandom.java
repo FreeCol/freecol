@@ -35,14 +35,14 @@ public class MockPseudoRandom extends Random {
         this(new ArrayList<Integer>(), false);
     }
     
-    public MockPseudoRandom(List<Integer> setNumbers,boolean toCycle){
+    public MockPseudoRandom(List<Integer> setNumbers, boolean toCycle) {
         pos = 0;
         setNumberList = setNumbers;
         cycleNumbers = toCycle;
         random = null;
     }
     
-    public void setNextNumbers(List<Integer> setNumbers,boolean toCycle){
+    public void setNextNumbers(List<Integer> setNumbers, boolean toCycle) {
         pos = 0;
         setNumberList = setNumbers;
         cycleNumbers = toCycle;
@@ -79,5 +79,11 @@ public class MockPseudoRandom extends Random {
     public float nextFloat() {
         int number = getNext();
         return (number < 0) ? random.nextFloat() : number * scale;
+    }
+
+    @Override
+    public double nextDouble() {
+        int number = getNext();
+        return (number < 0) ? random.nextDouble() : number * scale;
     }
 }

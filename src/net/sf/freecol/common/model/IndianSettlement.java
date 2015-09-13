@@ -1189,9 +1189,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     @Override
     public Unit getDefendingUnit(Unit attacker) {
         Unit defender = null;
-        float defencePower = -1.0f;
+        double defencePower = -1.0;
         for (Unit nextUnit : getUnitList()) {
-            float unitPower = attacker.getGame().getCombatModel()
+            double unitPower = attacker.getGame().getCombatModel()
                 .getDefencePower(attacker, nextUnit);
             if (Unit.betterDefender(defender, defencePower,
                     nextUnit, unitPower)) {

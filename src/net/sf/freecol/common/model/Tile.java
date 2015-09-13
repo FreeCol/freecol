@@ -2049,8 +2049,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Unit getDefendingUnit(Unit attacker) {
         CombatModel cm = getGame().getCombatModel();
         Unit defender = null;
-        float defenderPower = -1.0f;
-        float power;
+        double defenderPower = -1.0, power;
 
         // Check the units on the tile...
         for (Unit u : getUnitList()) {

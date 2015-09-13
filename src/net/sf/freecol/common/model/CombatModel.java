@@ -66,11 +66,11 @@ public abstract class CombatModel {
      * Odds a particular outcome will occur in combat.
      */
     public static class CombatOdds {
-        public static final float UNKNOWN_ODDS = -1.0f;
+        public static final double UNKNOWN_ODDS = -1.0;
 
-        public final float win;
+        public final double win;
 
-        public CombatOdds(float win) {
+        public CombatOdds(double win) {
             this.win = win;
         }
     }
@@ -201,8 +201,8 @@ public abstract class CombatModel {
      * @param defender The defender.
      * @return The offensive power.
      */
-    public abstract float getOffencePower(FreeColGameObject attacker,
-                                          FreeColGameObject defender);
+    public abstract double getOffencePower(FreeColGameObject attacker,
+                                           FreeColGameObject defender);
 
     /**
      * Get the defensive power of a defender wrt an attacker.
@@ -211,8 +211,8 @@ public abstract class CombatModel {
      * @param defender The defender.
      * @return The defensive power.
      */
-    public abstract float getDefencePower(FreeColGameObject attacker,
-                                          FreeColGameObject defender);
+    public abstract double getDefencePower(FreeColGameObject attacker,
+                                           FreeColGameObject defender);
 
     /**
      * Collect all the offensive modifiers that apply to an attack.

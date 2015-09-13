@@ -543,7 +543,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         CombatModel combatModel = game.getCombatModel();
         boolean pirate = hasAbility(Ability.PIRACY);
         Unit attacker = null;
-        float attackPower = 0, totalAttackPower = 0;
+        double attackPower = 0, totalAttackPower = 0;
 
         if (!isNaval() || getMovesLeft() <= 0) return null;
         for (Tile tile : newTile.getSurroundingTiles(1)) {
@@ -566,11 +566,13 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
         }
         if (attacker != null) {
-            float defencePower = combatModel.getDefencePower(attacker, this);
-            float totalProbability = totalAttackPower + defencePower;
+            double defencePower = combatModel.getDefencePower(attacker, this);
+            double totalProbability = totalAttackPower + defencePower;
             if (randomInt(logger, "Slowed", random,
-                    Math.round(totalProbability) + 1) < totalAttackPower) {
-                int diff = Math.max(0, Math.round(totalAttackPower - defencePower));
+                    (int)Math.round(totalProbability) + 1)
+                < totalAttackPower) {
+                int diff = (int)Math.max(0,
+                    Math.round(totalAttackPower - defencePower));
                 int moves = Math.min(9, 3 + diff / 3);
                 setMovesLeft(getMovesLeft() - moves);
                 logger.info(getId() + " slowed by " + attacker.getId()
