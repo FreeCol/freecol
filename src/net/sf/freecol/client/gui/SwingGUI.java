@@ -58,7 +58,6 @@ import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColorChooserPanel;
 import net.sf.freecol.client.gui.panel.CornerMapControls;
-import net.sf.freecol.client.gui.panel.DialogHandler;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.MapControls;
