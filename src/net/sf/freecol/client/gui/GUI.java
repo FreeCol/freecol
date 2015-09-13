@@ -388,7 +388,7 @@ public class GUI {
     // Dialogs that return values
 
     /**
-     * Simple confirmation dialog.
+     * Simple modal confirmation dialog.
      *
      * @param textKey A string to use as the message key.
      * @param okKey A key for the "ok" button.
@@ -400,25 +400,22 @@ public class GUI {
     }
 
     /**
-     * General confirmation dialog.
+     * General modal confirmation dialog.
      *
-     * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param template The <code>StringTemplate</code> explaining the choice.
      * @param okKey A key for the "ok" button.
      * @param cancelKey A key for the "cancel" button.
      * @return True if the "ok" button was selected.
      */
-    public boolean confirm(boolean modal, Tile tile,
-                           StringTemplate template,
+    public boolean confirm(Tile tile, StringTemplate template,
                            String okKey, String cancelKey) {
         return false;
     }
 
     /**
-     * General confirmation dialog.
+     * General modal confirmation dialog.
      *
-     * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param template The <code>StringTemplate</code> explaining the choice.
      * @param unit An optional unit to make an icon for the dialog from.
@@ -426,21 +423,20 @@ public class GUI {
      * @param cancelKey A key for the "cancel" button.
      * @return True if the "ok" button was selected.
      */
-    public boolean confirm(boolean modal, Tile tile,
-                           StringTemplate template, Unit unit,
+    public boolean confirm(Tile tile, StringTemplate template, Unit unit,
                            String okKey, String cancelKey) {
         return false;
     }
 
-    public boolean confirm(boolean modal, Tile tile,
-                                 StringTemplate template, Settlement settlement,
-                                 String okKey, String cancelKey) {
+    public boolean confirm(Tile tile, StringTemplate template,
+                           Settlement settlement,
+                           String okKey, String cancelKey) {
         return false;
     }
 
-    public boolean confirm(boolean modal, Tile tile,
-                                 StringTemplate template, GoodsType goodsType,
-                                 String okKey, String cancelKey) {
+    public boolean confirm(Tile tile, StringTemplate template,
+                           GoodsType goodsType,
+                           String okKey, String cancelKey) {
         return false;
     }
 
@@ -477,7 +473,7 @@ public class GUI {
                 .addNamed("%building%", school)
             : null;
         return template == null
-            || confirm(true, unit.getTile(), template, unit,
+            || confirm(unit.getTile(), template, unit,
                        "abandonEducation.yes", "abandonEducation.no");
     }
 
@@ -496,7 +492,7 @@ public class GUI {
             .addStringTemplate("%unit%",
                 unit.getLabel(Unit.UnitLabelType.NATIONAL))
             .addName("%route%", tr.getName());
-        return confirm(true, unit.getTile(), template, unit, "yes", "no");
+        return confirm(unit.getTile(), template, unit, "yes", "no");
     }
 
     /**
@@ -595,7 +591,7 @@ public class GUI {
             messageId = "confirmHostile.peace";
             break;
         }
-        return confirm(true, attacker.getTile(), StringTemplate
+        return confirm(attacker.getTile(), StringTemplate
             .template(messageId)
             .addStringTemplate("%nation%", enemy.getNationLabel()),
             attacker, "confirmHostile.yes", "cancel");
@@ -639,7 +635,7 @@ public class GUI {
             : (is.getAlarm(player).getLevel() == Tension.Level.HAPPY)
             ? "confirmTribute.happy"
             : "confirmTribute.normal";
-        return (confirm(true, is.getTile(), StringTemplate.template(messageId)
+        return (confirm(is.getTile(), StringTemplate.template(messageId)
                 .addName("%settlement%", is.getName())
                 .addStringTemplate("%nation%", other.getNationLabel()),
                 attacker, "confirmTribute.yes", "confirmTribute.no"))
@@ -692,7 +688,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("armedUnitSettlement.attack"),
                 ArmedUnitSettlementAction.SETTLEMENT_ATTACK));
 
-        return getChoice(true, settlement.getTile(),
+        return getChoice(settlement.getTile(),
             settlement.getAlarmLevelLabel(player),
             settlement, "cancel", choices);
     }
@@ -720,7 +716,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("boycottedGoods.dumpGoods"),
                 BoycottAction.DUMP_CARGO));
 
-        return getChoice(true, null, template,
+        return getChoice(null, template,
                          goods.getType(), "cancel", choices);
     }
 
@@ -747,7 +743,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("buy.moreGold"),
                                      BuyAction.HAGGLE));
 
-        return getChoice(true, unit.getTile(), template,
+        return getChoice(unit.getTile(), template,
                          goods.getType(), "cancel", choices);
     }
 
@@ -779,7 +775,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("indianLand.take"),
                                      ClaimAction.STEAL));
 
-        return getChoice(true, tile, template,
+        return getChoice(tile, template,
                          owner.getNation(), "indianLand.cancel", choices);
     }
 
@@ -815,7 +811,7 @@ public class GUI {
         }
         if (choices.isEmpty()) return null;
 
-        return getChoice(true, settlement.getTile(), template,
+        return getChoice(settlement.getTile(), template,
                          settlement, "cancel", choices);
     }
 
@@ -854,7 +850,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.incite"),
                                      MissionaryAction.INCITE_INDIANS));
 
-        return getChoice(true, unit.getTile(), template,
+        return getChoice(unit.getTile(), template,
                          settlement, "cancel", choices);
     }
 
@@ -867,7 +863,7 @@ public class GUI {
      */
     public String getNewColonyName(Player player, Tile tile) {
         String suggested = player.getSettlementName(null);
-        String name = getInput(true, tile, StringTemplate
+        String name = getInput(tile, StringTemplate
             .template("nameColony.text"), suggested,
             "accept", "cancel");
         if (name == null) {
@@ -910,7 +906,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("scoutColony.attack"),
                                      ScoutColonyAction.FOREIGN_COLONY_ATTACK));
 
-        return getChoice(true, unit.getTile(), template,
+        return getChoice(unit.getTile(), template,
                          colony, "cancel", choices);
     }
 
@@ -969,7 +965,7 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.attack"),
                                      ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
 
-        return getChoice(true, settlement.getTile(), template,
+        return getChoice(settlement.getTile(), template,
                          settlement, "cancel", choices);
     }
 
@@ -1000,15 +996,14 @@ public class GUI {
                     .addStringTemplate("%goods%", goodsTemplate)),
                 SellAction.GIFT));
 
-        return getChoice(true, unit.getTile(), template,
+        return getChoice(unit.getTile(), template,
                          goods.getType(), "cancel", choices);
     }
 
 
     /**
-     * General choice dialog.
+     * General modal choice dialog.
      *
-     * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param explain An object explaining the choice.
      * @param cancelKey A key for the "cancel" button.
@@ -1016,39 +1011,34 @@ public class GUI {
      * @return The selected value of the selected <code>ChoiceItem</code>,
      *     or null if cancelled.
      */
-    public <T> T getChoice(boolean modal, Tile tile, Object explain,
+    public <T> T getChoice(Tile tile, Object explain,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return null;
     }
 
-    public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                           Unit unit,
+    public <T> T getChoice(Tile tile, Object explain, Unit unit,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return null;
     }
 
-    public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                           Settlement settlement,
+    public <T> T getChoice(Tile tile, Object explain, Settlement settlement,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return null;
     }
 
-    public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                           GoodsType goodsType,
+    public <T> T getChoice(Tile tile, Object explain, GoodsType goodsType,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return null;
     }
 
-    public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                           Nation nation,
+    public <T> T getChoice(Tile tile, Object explain, Nation nation,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return null;
     }
 
     /**
-     * General input dialog.
+     * General modal string input dialog.
      *
-     * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param template A <code>StringTemplate</code> explaining the choice.
      * @param defaultValue The default value to show initially.
@@ -1056,8 +1046,9 @@ public class GUI {
      * @param cancelKey A key for the "cancel" button.
      * @return The chosen value.
      */
-    public String getInput(boolean modal, Tile tile, StringTemplate template,
-                           String defaultValue, String okKey, String cancelKey) {
+    public String getInput(Tile tile, StringTemplate template,
+                           String defaultValue,
+                           String okKey, String cancelKey) {
         return null;
     }
 

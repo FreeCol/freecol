@@ -1373,7 +1373,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (disembarkable.size() == 1) {
-            if (gui.confirm(true, tile,
+            if (gui.confirm(tile,
                             StringTemplate.key("disembark.text"),
                             disembarkable.get(0), "ok", "cancel")) {
                 moveDirection(disembarkable.get(0), direction, false);
@@ -1390,7 +1390,7 @@ public final class InGameController implements NetworkConstants {
             // destination tile is known to be clear of other player
             // units or settlements, it may have a rumour or need
             // other special handling.
-            Unit u = gui.getChoice(true, unit.getTile(),
+            Unit u = gui.getChoice(unit.getTile(),
                                    Messages.message("disembark.text"),
                                    unit,
                                    "none", choices);
@@ -1443,7 +1443,7 @@ public final class InGameController implements NetworkConstants {
         } else if (choices.size() == 1) {
             // Use the default
         } else {
-            carrier = gui.getChoice(true, unit.getTile(),
+            carrier = gui.getChoice(unit.getTile(),
                                     Messages.message("embark.text"),
                                     unit,
                                     "none", choices);
@@ -1471,13 +1471,13 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean moveExplore(Unit unit, Direction direction) {
         Tile tile = unit.getTile().getNeighbourOrNull(direction);
-        if (!gui.confirm(true, unit.getTile(),
+        if (!gui.confirm(unit.getTile(),
                 StringTemplate.key("exploreLostCityRumour.text"), unit,
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
             return true;
         }
         if (tile.getLostCityRumour().getType()== LostCityRumour.RumourType.MOUNDS
-            && !gui.confirm(true, unit.getTile(),
+            && !gui.confirm(unit.getTile(),
                 StringTemplate.key("exploreMoundsRumour.text"), unit,
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
             askServer().declineMounds(unit, direction);
@@ -1514,7 +1514,7 @@ public final class InGameController implements NetworkConstants {
                 moveTo(unit, unit.getDestination());
                 return false;
             } else {
-                if (gui.confirm(true, oldTile, StringTemplate
+                if (gui.confirm(oldTile, StringTemplate
                         .template("highseas.text")
                         .addAmount("%number%", unit.getSailTurns()),
                         unit, "highseas.yes", "highseas.no")) {
@@ -1553,7 +1553,7 @@ public final class InGameController implements NetworkConstants {
                 .addStringTemplate("%unit%",
                     unit.getLabel(Unit.UnitLabelType.NATIONAL))
                 .addNamed("%skill%", skill));
-        } else if (gui.confirm(true, unit.getTile(), StringTemplate
+        } else if (gui.confirm(unit.getTile(), StringTemplate
                 .template("learnSkill.text")
                 .addNamed("%skill%", skill),
                 unit, "learnSkill.yes", "learnSkill.no")) {
@@ -1924,7 +1924,7 @@ public final class InGameController implements NetworkConstants {
                 String label = Messages.message(g.getLabel(true));
                 choices.add(new ChoiceItem<>(label, g));
             }
-            goods = gui.getChoice(true, unit.getTile(),
+            goods = gui.getChoice(unit.getTile(),
                                   Messages.message("buyProposition.text"),
                                   settlement,
                                   "nothing", choices);
@@ -1978,7 +1978,7 @@ public final class InGameController implements NetworkConstants {
                 String label = Messages.message(g.getLabel(true));
                 choices.add(new ChoiceItem<>(label, g));
             }
-            goods = gui.getChoice(true, unit.getTile(),
+            goods = gui.getChoice(unit.getTile(),
                                   Messages.message("sellProposition.text"),
                                   settlement,
                                   "nothing", choices);
@@ -2032,7 +2032,7 @@ public final class InGameController implements NetworkConstants {
             String label = Messages.message(g.getLabel(true));
             choices.add(new ChoiceItem<>(label, g));
         }
-        Goods goods = gui.getChoice(true, unit.getTile(),
+        Goods goods = gui.getChoice(unit.getTile(),
                                     Messages.message("gift.text"),
                                     settlement,
                                     "cancel", choices);
@@ -2110,7 +2110,7 @@ public final class InGameController implements NetworkConstants {
                 String label = Messages.message(p.getCountryLabel());
                 choices.add(new ChoiceItem<>(label, p));
             }
-            Player enemy = gui.getChoice(true, unit.getTile(),
+            Player enemy = gui.getChoice(unit.getTile(),
                 Messages.message("missionarySettlement.inciteQuestion"),
                 unit,
                 "missionarySettlement.cancel", choices);
@@ -2123,7 +2123,7 @@ public final class InGameController implements NetworkConstants {
                     .template("missionarySettlement.inciteGoldFail")
                     .add("%player%", enemy.getName())
                     .addAmount("%amount%", gold));
-            } else if (gui.confirm(true, unit.getTile(), StringTemplate
+            } else if (gui.confirm(unit.getTile(), StringTemplate
                     .template("missionarySettlement.inciteConfirm")
                     .add("%player%", enemy.getName())
                     .addAmount("%amount%", gold),
@@ -2447,7 +2447,7 @@ public final class InGameController implements NetworkConstants {
                         .addStringTemplate("%colony%", locName)
                         .addAmount("%amount%", toUnload - atStop)
                         .addNamed("%goods%", goods);
-                    if (!gui.confirm(true, unit.getTile(), template,
+                    if (!gui.confirm(unit.getTile(), template,
                                      unit, "yes", "no")) amount = atStop;
                     break;
                 case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_NEVER:
@@ -2738,7 +2738,7 @@ public final class InGameController implements NetworkConstants {
             .getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)) {
             StringTemplate warnings = tile.getBuildColonyWarnings(unit);
             if (!warnings.getReplacements().isEmpty()
-                && !gui.confirm(true, tile, warnings,
+                && !gui.confirm(tile, warnings,
                                 unit, "buildColony.yes", "buildColony.no")) {
                 return false;
             }
@@ -2942,7 +2942,7 @@ public final class InGameController implements NetworkConstants {
                 template = StringTemplate.template("cashInTreasureTrain.pay")
                     .addAmount("%fee%", percent);
             }
-            if (!gui.confirm(true, unit.getTile(), template, unit,
+            if (!gui.confirm(unit.getTile(), template, unit,
                              "accept", "reject")) return false;
         }
 
@@ -3050,7 +3050,7 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn() || unit == null) return false;
 
         if (unit.getState() == UnitState.IMPROVING
-            && !gui.confirm(true, unit.getTile(), StringTemplate
+            && !gui.confirm(unit.getTile(), StringTemplate
                 .template("clearOrders.text")
                 .addAmount("%turns%", unit.getWorkTurnsLeft()),
                 unit, "ok", "cancel")) {
@@ -3091,7 +3091,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         final Tile tile = (gui.isShowingSubPanel()) ? null : unit.getTile();
-        if (!gui.confirm(true, tile, StringTemplate
+        if (!gui.confirm(tile, StringTemplate
                 .template("clearSpeciality.areYouSure")
                 .addStringTemplate("%oldUnit%",
                     unit.getLabel(Unit.UnitLabelType.NATIONAL))
@@ -3236,7 +3236,7 @@ public final class InGameController implements NetworkConstants {
         if (unit.getColony() != null
             && !gui.confirmLeaveColony(unit)) return false;
         final Tile tile = (gui.isShowingSubPanel()) ? null : unit.getTile();
-        if (!gui.confirm(true, tile, StringTemplate.key("disbandUnit.text"),
+        if (!gui.confirm(tile, StringTemplate.key("disbandUnit.text"),
                          unit, "disbandUnit.yes", "cancel"))
             return false;
 
@@ -3585,7 +3585,7 @@ public final class InGameController implements NetworkConstants {
         if (type == null) {
             switch (opt) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
-                accepted = gui.confirm(true, colony.getTile(), StringTemplate
+                accepted = gui.confirm(colony.getTile(), StringTemplate
                     .template("indianDemand.gold.text")
                     .addName("%nation%", nation)
                     .addName("%colony%", colony.getName())
@@ -3615,14 +3615,14 @@ public final class InGameController implements NetworkConstants {
             switch (opt) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
                 if (type.isFoodType()) {
-                    accepted = gui.confirm(true, colony.getTile(),
+                    accepted = gui.confirm(colony.getTile(),
                         StringTemplate.template("indianDemand.food.text")
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
                         .addAmount("%amount%", amount),
                         unit, "indianDemand.food.yes", "indianDemand.food.no");
                 } else {
-                    accepted = gui.confirm(true, colony.getTile(),
+                    accepted = gui.confirm(colony.getTile(),
                         StringTemplate.template("indianDemand.other.text")
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
@@ -4135,7 +4135,7 @@ public final class InGameController implements NetworkConstants {
 
         StringTemplate t = StringTemplate.template("payArrears.text")
             .addAmount("%amount%", arrears);
-        if (!gui.confirm(true, null, t, type, "ok", "cancel")) return false;
+        if (!gui.confirm(null, t, type, "ok", "cancel")) return false;
 
         boolean ret = askServer().payArrears(type) && player.canTrade(type);
         if (ret) {
@@ -4170,7 +4170,7 @@ public final class InGameController implements NetworkConstants {
         final int price = colony.getPriceForBuilding();
         StringTemplate t = StringTemplate.template("payForBuilding.text")
             .addAmount("%amount%", price);
-        if (!gui.confirm(true, null, t, colony, "yes", "no")) return false;
+        if (!gui.confirm(null, t, colony, "yes", "no")) return false;
 
         ColonyWas colonyWas = new ColonyWas(colony);
         boolean ret = askServer().payForBuilding(colony)
@@ -4318,7 +4318,7 @@ public final class InGameController implements NetworkConstants {
         String name = null;
         if (object instanceof Colony) {
             Colony colony = (Colony) object;
-            name = gui.getInput(true, colony.getTile(),
+            name = gui.getInput(colony.getTile(),
                                 StringTemplate.key("renameColony.text"),
                                 colony.getName(), "rename", "cancel");
             if (name == null) { // User cancelled
@@ -4337,7 +4337,7 @@ public final class InGameController implements NetworkConstants {
             }
         } else if (object instanceof Unit) {
             Unit unit = (Unit) object;
-            name = gui.getInput(true, unit.getTile(),
+            name = gui.getInput(unit.getTile(),
                                 StringTemplate.key("renameUnit.text"),
                                 unit.getName(), "rename", "cancel");
             if (name == null) return false; // User cancelled

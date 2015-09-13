@@ -421,7 +421,7 @@ public final class ConnectController {
                     .add("%nation%", Messages.nameKey(n)));
                 choices.add(new ChoiceItem<>(nam, n));
             }
-            String choice = gui.getChoice(true, null,
+            String choice = gui.getChoice(null,
                 Messages.message("client.choicePlayer"),
                 "cancel", choices);
             if (choice == null) return false; // User cancelled

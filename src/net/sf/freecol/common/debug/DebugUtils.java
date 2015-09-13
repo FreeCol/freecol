@@ -117,7 +117,7 @@ public class DebugUtils {
         final GUI gui = freeColClient.getGUI();
         final Player player = freeColClient.getMyPlayer();
 
-        BuildingType buildingType = gui.getChoice(true, null, buildingTitle,
+        BuildingType buildingType = gui.getChoice(null, buildingTitle,
             "cancel",
             game.getSpecification().getBuildingTypeList().stream()
                 .map(bt -> {
@@ -174,7 +174,7 @@ public class DebugUtils {
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
 
-        FoundingFather father = gui.getChoice(true, null, fatherTitle,
+        FoundingFather father = gui.getChoice(null, fatherTitle,
             "cancel",
             sSpec.getFoundingFathers().stream()
                 .filter(f -> !sPlayer.hasFather(f))
@@ -204,7 +204,7 @@ public class DebugUtils {
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
 
-        String response = gui.getInput(true, null,
+        String response = gui.getInput(null,
             StringTemplate.template("prompt.selectGold"),
             Integer.toString(1000), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
@@ -233,7 +233,7 @@ public class DebugUtils {
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
 
-        String response = gui.getInput(true, null,
+        String response = gui.getInput(null,
             StringTemplate.template("prompt.selectImmigration"),
             Integer.toString(100), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
@@ -260,7 +260,7 @@ public class DebugUtils {
         final Player player = freeColClient.getMyPlayer();
         final Game sGame = server.getGame();
 
-        String response = gui.getInput(true, null,
+        String response = gui.getInput(null,
             StringTemplate.template("prompt.selectLiberty"),
             Integer.toString(100), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
@@ -318,7 +318,7 @@ public class DebugUtils {
         final Tile sTile = sGame.getFreeColGameObject(tile.getId(), Tile.class);
         final GUI gui = freeColClient.getGUI();
 
-        UnitType unitChoice = gui.getChoice(true, null,
+        UnitType unitChoice = gui.getChoice(null,
             StringTemplate.template("prompt.selectUnitType"), "cancel",
             sSpec.getUnitTypeList().stream()
                 .map(ut -> {
@@ -375,7 +375,7 @@ public class DebugUtils {
             gtl.add(new ChoiceItem<>(msg, t));
         }
         Collections.sort(gtl);
-        GoodsType goodsType = gui.getChoice(true, null,
+        GoodsType goodsType = gui.getChoice(null,
             StringTemplate.template("prompt.selectGoodsType"),
             "cancel",
             sSpec.getGoodsTypeList().stream()
@@ -387,7 +387,7 @@ public class DebugUtils {
             .sorted().collect(Collectors.toList()));
         if (goodsType == null) return;
 
-        String amount = gui.getInput(true, null,
+        String amount = gui.getInput(null,
             StringTemplate.template("prompt.selectGoodsAmount"),
             "20", "ok", "cancel");
         if (amount == null) return;
@@ -424,7 +424,7 @@ public class DebugUtils {
                 .addName("%colony%", colony.getName()));
             return;
         }
-        Disaster disaster = gui.getChoice(true, null,
+        Disaster disaster = gui.getChoice(null,
             StringTemplate.template("prompt.selectDisaster"), "cancel",
             disasters.stream()
                 .map(rc -> {
@@ -468,7 +468,7 @@ public class DebugUtils {
         final GUI gui = freeColClient.getGUI();
         final Game game = freeColClient.getGame();
 
-        Player player = gui.getChoice(true, null,
+        Player player = gui.getChoice(null,
             StringTemplate.template("prompt.selectOwner"), "cancel",
             game.getLiveEuropeanPlayers(colony.getOwner()).stream()
                 .map(p -> {
@@ -505,7 +505,7 @@ public class DebugUtils {
         final GUI gui = freeColClient.getGUI();
         final Game game = unit.getGame();
 
-        Player player = gui.getChoice(true, null,
+        Player player = gui.getChoice(null,
             StringTemplate.template("prompt.selectOwner"), "cancel",
             game.getLivePlayers(null).stream()
             .filter(p -> unit.getType().isAvailableTo(p))
@@ -548,7 +548,7 @@ public class DebugUtils {
         final Unit sUnit = sGame.getFreeColGameObject(unit.getId(), Unit.class);
         final GUI gui = freeColClient.getGUI();
 
-        Role roleChoice = gui.getChoice(true, null,
+        Role roleChoice = gui.getChoice(null,
             StringTemplate.template("prompt.selectRole"), "cancel",
             sGame.getSpecification().getRoles().stream()
                 .map(r -> new ChoiceItem<Role>(r.getId(), r))
@@ -938,7 +938,7 @@ public class DebugUtils {
     public static void setColonyGoods(final FreeColClient freeColClient,
                                       final Colony colony) {
         final Specification spec = colony.getSpecification();
-        GoodsType goodsType = freeColClient.getGUI().getChoice(true, null,
+        GoodsType goodsType = freeColClient.getGUI().getChoice(null,
             StringTemplate.template("prompt.selectGoodsType"), "cancel",
             spec.getGoodsTypeList().stream()
                 .filter(gt -> !gt.isFoodType() || gt == spec.getPrimaryFoodType())
@@ -949,7 +949,7 @@ public class DebugUtils {
                 .sorted().collect(Collectors.toList()));
         if (goodsType == null) return;
 
-        String response = freeColClient.getGUI().getInput(true, null,
+        String response = freeColClient.getGUI().getInput(null,
                 StringTemplate.template("prompt.selectGoodsAmount"),
                 Integer.toString(colony.getGoodsCount(goodsType)),
                 "ok", "cancel");
@@ -989,7 +989,7 @@ public class DebugUtils {
             ServerPlayer.class);
         final GUI gui = freeColClient.getGUI();
 
-        MonarchAction action = gui.getChoice(true, null, monarchTitle,
+        MonarchAction action = gui.getChoice(null, monarchTitle,
             "cancel",
             Arrays.stream(MonarchAction.values())
                 .map(a -> new ChoiceItem<MonarchAction>(a))
@@ -1014,7 +1014,7 @@ public class DebugUtils {
         final Tile sTile = sGame.getFreeColGameObject(tile.getId(),
                                                       Tile.class);
 
-        RumourType rumourChoice = freeColClient.getGUI().getChoice(true, null,
+        RumourType rumourChoice = freeColClient.getGUI().getChoice(null,
             StringTemplate.template("prompt.selectLostCityRumour"),
             "cancel",
             Arrays.stream(RumourType.values())
@@ -1038,7 +1038,7 @@ public class DebugUtils {
     public static void skipTurns(FreeColClient freeColClient) {
         freeColClient.skipTurns(0); // Clear existing skipping
 
-        String response = freeColClient.getGUI().getInput(true, null,
+        String response = freeColClient.getGUI().getInput(null,
             StringTemplate.key("prompt.selectTurnsToSkip"),
             Integer.toString(10), "ok", "cancel");
         if (response == null || response.isEmpty()) return;
@@ -1065,7 +1065,7 @@ public class DebugUtils {
         boolean more = true;
         while (more) {
             int val = server.getInGameController().stepRandom();
-            more = gui.confirm(true, null, StringTemplate
+            more = gui.confirm(null, StringTemplate
                 .template("prompt.stepRNG")
                 .addAmount("%value%", val),
                 "more", "cancel");

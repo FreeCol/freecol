@@ -740,7 +740,7 @@ public class SwingGUI extends GUI {
     // Dialogs that return values
 
     /**
-     * Simple confirmation dialog.
+     * Simple modal confirmation dialog.
      *
      * @param textKey A string to use as the message key.
      * @param okKey A key for the "ok" button.
@@ -749,14 +749,13 @@ public class SwingGUI extends GUI {
      */
     @Override
     public boolean confirm(String textKey, String okKey, String cancelKey) {
-        return canvas.showConfirmDialog(true, null, Messages.message(textKey),
+        return canvas.showConfirmDialog(null, Messages.message(textKey),
             null, okKey, cancelKey);
     }
 
     /**
-     * General confirmation dialog.
+     * General modal confirmation dialog.
      *
-     * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param template The <code>StringTemplate</code> explaining the choice.
      * @param okKey A key for the "ok" button.
@@ -764,17 +763,15 @@ public class SwingGUI extends GUI {
      * @return True if the "ok" button was selected.
      */
     @Override
-    public boolean confirm(boolean modal, Tile tile,
-                           StringTemplate template,
+    public boolean confirm(Tile tile, StringTemplate template,
                            String okKey, String cancelKey) {
-        return canvas.showConfirmDialog(modal, tile,
+        return canvas.showConfirmDialog(tile,
             Utility.localizedTextArea(template), null, okKey, cancelKey);
     }
 
     /**
-     * General confirmation dialog.
+     * General modal confirmation dialog.
      *
-     * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param template The <code>StringTemplate</code> explaining the choice.
      * @param unit An optional unit to make an icon for the dialog from.
@@ -783,30 +780,29 @@ public class SwingGUI extends GUI {
      * @return True if the "ok" button was selected.
      */
     @Override
-    public boolean confirm(boolean modal, Tile tile,
-                           StringTemplate template, Unit unit,
+    public boolean confirm(Tile tile, StringTemplate template, Unit unit,
                            String okKey, String cancelKey) {
-        return canvas.showConfirmDialog(modal, tile,
+        return canvas.showConfirmDialog(tile,
             Utility.localizedTextArea(template),
             new ImageIcon(imageLibrary.getUnitImage(unit)),
             okKey, cancelKey);
     }
 
     @Override
-    public boolean confirm(boolean modal, Tile tile,
-                                 StringTemplate template, Settlement settlement,
-                                 String okKey, String cancelKey) {
-        return canvas.showConfirmDialog(modal, tile,
+    public boolean confirm(Tile tile, StringTemplate template,
+                           Settlement settlement,
+                           String okKey, String cancelKey) {
+        return canvas.showConfirmDialog(tile,
             Utility.localizedTextArea(template),
             new ImageIcon(imageLibrary.getSettlementImage(settlement)),
             okKey, cancelKey);
     }
 
     @Override
-    public boolean confirm(boolean modal, Tile tile,
-                                 StringTemplate template, GoodsType goodsType,
-                                 String okKey, String cancelKey) {
-        return canvas.showConfirmDialog(modal, tile,
+    public boolean confirm(Tile tile, StringTemplate template,
+                           GoodsType goodsType,
+                           String okKey, String cancelKey) {
+        return canvas.showConfirmDialog(tile,
             Utility.localizedTextArea(template),
             new ImageIcon(imageLibrary.getIconImage(goodsType)),
             okKey, cancelKey);
@@ -823,9 +819,8 @@ public class SwingGUI extends GUI {
     }
 
     /**
-     * General choice dialog.
+     * General modal choice dialog.
      *
-     * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param explain An object explaining the choice.
      * @param cancelKey A key for the "cancel" button.
@@ -834,52 +829,47 @@ public class SwingGUI extends GUI {
      *     or null if cancelled.
      */
     @Override
-    public <T> T getChoice(boolean modal, Tile tile, Object explain,
+    public <T> T getChoice(Tile tile, Object explain,
                            String cancelKey, List<ChoiceItem<T>> choices) {
-        return canvas.showChoiceDialog(modal, tile, explain,
+        return canvas.showChoiceDialog(tile, explain,
             null, cancelKey, choices);
     }
 
     @Override
-    public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                           Unit unit,
+    public <T> T getChoice(Tile tile, Object explain, Unit unit,
                            String cancelKey, List<ChoiceItem<T>> choices) {
-        return canvas.showChoiceDialog(modal, tile, explain,
+        return canvas.showChoiceDialog(tile, explain,
             new ImageIcon(imageLibrary.getUnitImage(unit)),
             cancelKey, choices);
     }
 
     @Override
-    public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                           Settlement settlement,
+    public <T> T getChoice(Tile tile, Object explain, Settlement settlement,
                            String cancelKey, List<ChoiceItem<T>> choices) {
-        return canvas.showChoiceDialog(modal, tile, explain,
+        return canvas.showChoiceDialog(tile, explain,
             new ImageIcon(imageLibrary.getSettlementImage(settlement)),
             cancelKey, choices);
     }
 
     @Override
-    public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                           GoodsType goodsType,
+    public <T> T getChoice(Tile tile, Object explain, GoodsType goodsType,
                            String cancelKey, List<ChoiceItem<T>> choices) {
-        return canvas.showChoiceDialog(modal, tile, explain,
+        return canvas.showChoiceDialog(tile, explain,
             new ImageIcon(imageLibrary.getIconImage(goodsType)),
             cancelKey, choices);
     }
 
     @Override
-    public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                           Nation nation,
+    public <T> T getChoice(Tile tile, Object explain, Nation nation,
                            String cancelKey, List<ChoiceItem<T>> choices) {
-        return canvas.showChoiceDialog(modal, tile, explain,
+        return canvas.showChoiceDialog(tile, explain,
             new ImageIcon(imageLibrary.getMiscIconImage(nation)),
             cancelKey, choices);
     }
 
     /**
-     * General input dialog.
+     * General modal string input dialog.
      *
-     * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param template A <code>StringTemplate</code> explaining the choice.
      * @param defaultValue The default value to show initially.
@@ -888,9 +878,10 @@ public class SwingGUI extends GUI {
      * @return The chosen value.
      */
     @Override
-    public String getInput(boolean modal, Tile tile, StringTemplate template,
-                           String defaultValue, String okKey, String cancelKey) {
-        return canvas.showInputDialog(modal, tile, template, defaultValue,
+    public String getInput(Tile tile, StringTemplate template,
+                           String defaultValue,
+                           String okKey, String cancelKey) {
+        return canvas.showInputDialog(tile, template, defaultValue,
                                       okKey, cancelKey);
     }
 
