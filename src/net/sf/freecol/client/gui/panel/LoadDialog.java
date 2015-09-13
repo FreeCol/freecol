@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 

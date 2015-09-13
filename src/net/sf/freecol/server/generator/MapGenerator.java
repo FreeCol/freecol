@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.generator;
 
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.util.LogBuilder;
 

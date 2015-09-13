@@ -36,7 +36,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.GoodsType;

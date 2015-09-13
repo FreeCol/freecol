@@ -21,7 +21,6 @@ package net.sf.freecol.client.control;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,8 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;

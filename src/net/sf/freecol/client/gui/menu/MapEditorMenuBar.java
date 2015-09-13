@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.menu;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
@@ -32,7 +31,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.panel.Utility;

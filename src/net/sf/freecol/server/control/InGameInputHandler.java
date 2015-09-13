@@ -69,7 +69,6 @@ import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
-import net.sf.freecol.common.networking.NetworkRequestHandler;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;

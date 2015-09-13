@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;

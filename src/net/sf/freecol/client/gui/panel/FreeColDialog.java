@@ -48,7 +48,6 @@ import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.client.gui.plaf.FreeColOptionPaneUI;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
