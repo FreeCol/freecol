@@ -20,27 +20,17 @@
 package net.sf.freecol.common.io;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.BufferedInputStream;
 
-import java.util.Set;
-import java.util.logging.Logger;
-
 import net.sf.freecol.FreeCol;
-
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
  * Represents a FreeCol savegame.
  */
 public class FreeColSavegameFile extends FreeColDataFile {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(FreeColSavegameFile.class.getName());
-
-    private static final Set<String> FILE_ENDINGS
-        = makeUnmodifiableSet(FreeCol.FREECOL_SAVE_EXTENSION, ".zip");
 
     /** The tag for the version string in the saved game. */
     public static final String VERSION_TAG = "version";
@@ -72,8 +62,16 @@ public class FreeColSavegameFile extends FreeColDataFile {
      */
     public static final String THUMBNAIL_FILE = "thumbnail.png";
 
+    /** A file filter to select the saved game files. */
+    private static final FileFilter fileFilter = makeFileFilter(SAVEGAME_FILE,
+        FreeCol.FREECOL_SAVE_EXTENSION, ZIP_FILE_EXTENSION);
 
 
+    /**
+     * Create a new save game file from a given file.
+     *
+     * @param file The base <code>File</code>.
+     */
     public FreeColSavegameFile(File file) throws IOException {
         super(file);
     }
@@ -119,10 +117,11 @@ public class FreeColSavegameFile extends FreeColDataFile {
     }
 
     /**
-     * File endings that are supported for this type of data file.
-     * @return An array of: ".fsg" and ".zip".
+     * Get the file filter to select saved game files.
+     *
+     * @return The saved game file filter.
      */
-    protected static Set<String> getFileEndings() {
-        return FILE_ENDINGS;
+    public static FileFilter getFileFilter() {
+        return fileFilter;
     }
 }

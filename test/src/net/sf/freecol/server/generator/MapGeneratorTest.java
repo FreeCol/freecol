@@ -24,6 +24,7 @@ import java.util.Random;
 import java.util.Vector;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -200,7 +201,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         Game game = new ServerGame(spec());
         MapGenerator gen = new SimpleMapGenerator(game, new Random(1));
         File mapDir = new File("data/maps/");
-        for (File importFile : mapDir.listFiles(FreeCol.freeColSaveFileFilter)) {
+        for (File importFile : mapDir.listFiles(FreeColSavegameFile.getFileFilter())) {
             ((FileOption)spec().getOption(MapGeneratorOptions.IMPORT_FILE))
                 .setValue(importFile);
             assertNotNull(gen.createMap(new LogBuilder(-1)));

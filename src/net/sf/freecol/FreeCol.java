@@ -84,7 +84,7 @@ public final class FreeCol {
     };
 
     /** The extension for FreeCol saved games. */
-    public static final String  FREECOL_SAVE_EXTENSION = ".fsg";
+    public static final String  FREECOL_SAVE_EXTENSION = "fsg";
 
     /** The Java version. */
     private static final String JAVA_VERSION
@@ -92,17 +92,6 @@ public final class FreeCol {
 
     /** The maximum available memory. */
     private static final long MEMORY_MAX = Runtime.getRuntime().maxMemory();
-
-    /** A file filter to select the saved game files. */
-    public static final FileFilter freeColSaveFileFilter
-        = new FileFilter() {
-                @Override
-                public boolean accept(File f) {
-                    return f.isFile()
-                        && f.getName().endsWith(FREECOL_SAVE_EXTENSION)
-                        && f.getName().length() > FREECOL_SAVE_EXTENSION.length();
-                }
-            };
 
     public static final String  CLIENT_THREAD = "FreeColClient:";
     public static final String  SERVER_THREAD = "FreeColServer:";

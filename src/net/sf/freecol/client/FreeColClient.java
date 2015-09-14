@@ -810,7 +810,7 @@ public final class FreeColClient {
             if (validPeriod != 0L && autoSave != null
                 && (flist = autoSave.list()) != null) {
                 for (String f : flist) {
-                    if (!f.endsWith(FreeCol.FREECOL_SAVE_EXTENSION)) continue;
+                    if (!f.endsWith("." + FreeCol.FREECOL_SAVE_EXTENSION)) continue;
                     // delete files which are older than user option allows
                     File saveGameFile = new File(autoSave, f);
                     if (saveGameFile.lastModified() + validPeriod < timeNow) {

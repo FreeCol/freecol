@@ -20,6 +20,7 @@
 package net.sf.freecol.common.io;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,8 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import java.util.Set;
 
 import net.sf.freecol.common.ObjectWithId;
-
-import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.model.Specification;
 
 
 /**
@@ -38,12 +38,17 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
 
-    private static final Set<String> FILE_ENDINGS
-        = makeUnmodifiableSet(".fmd", ".zip");
-    public static final String SPECIFICATION_FILE = "specification.xml";
-    public static final String MOD_DESCRIPTOR_FILE = "mod.xml";
+    protected static final String SPECIFICATION_FILE = "specification.xml";
+    protected static final String MOD_DESCRIPTOR_FILE = "mod.xml";
 
+    /** A file filter to select mods. */
+    private static final FileFilter fileFilter
+        = makeFileFilter(MOD_DESCRIPTOR_FILE, "fmd", ZIP_FILE_EXTENSION);
+
+    /** The identifier for this mod. */
     private String id;
+
+    /** The identifier for the parent of this mod, if any. */
     private String parent;
 
 
@@ -55,8 +60,10 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
      */
     public FreeColModFile(final File file) throws IOException {
         super(file);
+
         readModDescriptor();
     }
+
 
     /**
      * Gets the input stream to the specification.
@@ -72,6 +79,29 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
             ; // Normal for graphic-only mods.
         }
         return null;
+    }
+
+    /**
+     * Gets the Specification.
+     *
+     * @return The <code>Specification</code>, or null if none present.
+     * @exception IOException if an error occurs reading the specification.
+     */
+    public Specification getSpecification() throws IOException {
+        try (InputStream si = getSpecificationInputStream()) {
+            return (si == null) ? null : new Specification(si);
+        }
+    }
+
+    /**
+     * Gets the input stream to the mod meta file.
+     *
+     * @return An <code>InputStream</code> to the file "mod.xml"
+     *     within this data file.
+     * @exception IOException if thrown while opening the input stream.
+     */
+    private InputStream getModDescriptorInputStream() throws IOException {
+        return getInputStream(MOD_DESCRIPTOR_FILE);
     }
 
     /**
@@ -93,26 +123,6 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
     }
 
     /**
-     * Gets the input stream to the mod meta file.
-     *
-     * @return An <code>InputStream</code> to the file "mod.xml"
-     *     within this data file.
-     * @exception IOException if thrown while opening the input stream.
-     */
-    private InputStream getModDescriptorInputStream() throws IOException {
-        return getInputStream(MOD_DESCRIPTOR_FILE);
-    }
-
-    /**
-     * File endings that are supported for this type of data file.
-     *
-     * @return A set of: ".fmd" and ".zip".
-     */
-    protected static Set<String> getFileEndings() {
-        return FILE_ENDINGS;
-    }
-
-    /**
      * Gets the object identifier of this mod.
      *
      * @return The object identifier of the mod.
@@ -129,5 +139,14 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
      */
     public String getParent() {
         return parent;
+    }
+
+    /**
+     * Get the file filter to select mod files.
+     *
+     * @return The mod file filter.
+     */
+    public static FileFilter getFileFilter() {
+        return fileFilter;
     }
 }

@@ -851,7 +851,7 @@ public class FreeColDirectories {
         for (File directory : new File[] {
                 FreeColDirectories.getSaveDirectory(),
                 FreeColDirectories.getAutosaveDirectory() }) {
-            for (File savegame : directory.listFiles(FreeCol.freeColSaveFileFilter)) {
+            for (File savegame : directory.listFiles(FreeColSavegameFile.getFileFilter())) {
                 if (lastSave == null
                     || savegame.lastModified() > lastSave.lastModified()) {
                     lastSave = savegame;

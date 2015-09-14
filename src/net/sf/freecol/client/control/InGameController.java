@@ -600,10 +600,10 @@ public final class InGameController implements NetworkConstants {
         final String prefix = options.getText(ClientOptions.AUTO_SAVE_PREFIX);
         final String lastTurnName = prefix + "-"
             + options.getText(ClientOptions.LAST_TURN_NAME)
-            + FreeCol.FREECOL_SAVE_EXTENSION;
+            + "." + FreeCol.FREECOL_SAVE_EXTENSION;
         final String beforeLastTurnName = prefix + "-"
             + options.getText(ClientOptions.BEFORE_LAST_TURN_NAME)
-            + FreeCol.FREECOL_SAVE_EXTENSION;
+            + "." + FreeCol.FREECOL_SAVE_EXTENSION;
         File autoSaveDir = FreeColDirectories.getAutosaveDirectory();
         File lastTurnFile = new File(autoSaveDir, lastTurnName);
         File beforeLastTurnFile = new File(autoSaveDir, beforeLastTurnName);
@@ -619,7 +619,7 @@ public final class InGameController implements NetworkConstants {
         int turnNumber = game.getTurn().getNumber();
         if (saveGamePeriod >= 1 && turnNumber % saveGamePeriod == 0) {
             String fileName = prefix + "-" + getSaveGameString(game)
-                + FreeCol.FREECOL_SAVE_EXTENSION;
+                + "." + FreeCol.FREECOL_SAVE_EXTENSION;
             saveGame(new File(autoSaveDir, fileName));
         }
     }

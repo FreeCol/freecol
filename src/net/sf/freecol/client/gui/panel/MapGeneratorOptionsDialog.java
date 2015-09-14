@@ -80,7 +80,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             // FIXME: The update should be solved by PropertyEvent.
             File mapDirectory = FreeColDirectories.getMapsDirectory();
             if (mapDirectory.isDirectory()) {
-                File[] files = mapDirectory.listFiles(FreeCol.freeColSaveFileFilter);
+                File[] files = mapDirectory.listFiles(FreeColSavegameFile.getFileFilter());
                 Arrays.sort(files, new Comparator<File>() {
                         @Override
                         public int compare(File f1, File f2) {

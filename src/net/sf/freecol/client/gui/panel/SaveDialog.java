@@ -51,11 +51,9 @@ public final class SaveDialog extends FreeColDialog<File> {
      * @param directory The directory to display when choosing the file.
      * @param fileFilters The available file filters in the dialog.
      * @param defaultName Name of the default save game file.
-     * @param ext The default extension to add to user specified file names.
      */
     public SaveDialog(FreeColClient freeColClient, JFrame frame,
-            File directory, FileFilter[] fileFilters,
-            String defaultName, final String ext) {
+            File directory, FileFilter[] fileFilters, String defaultName) {
         super(freeColClient, frame);
 
         final JFileChooser fileChooser = new JFileChooser(directory);
@@ -70,19 +68,11 @@ public final class SaveDialog extends FreeColDialog<File> {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setFileHidingEnabled(false);
         fileChooser.setSelectedFile(new File(defaultName));
-        fileChooser.addActionListener((ActionEvent ae) -> {
-                final String cmd = ae.getActionCommand();
-                if (JFileChooser.APPROVE_SELECTION.equals(cmd)) {
-                    File file = fileChooser.getSelectedFile();
-                    if (!file.getName().endsWith(ext)) {
-                        file = new File(file.getAbsolutePath() + ext);
-                    }
-                    setValue(file);
-                } else {
-                    setValue(cancelFile);
-                }
-            });
-
+        fileChooser.addActionListener((ActionEvent ae) ->
+                setValue((JFileChooser.APPROVE_SELECTION
+                        .equals(ae.getActionCommand()))
+                    ? fileChooser.getSelectedFile() : cancelFile));
+        
         List<ChoiceItem<File>> c = choices();
         initializeDialog(frame, DialogType.QUESTION, true, fileChooser, null, c);
     }

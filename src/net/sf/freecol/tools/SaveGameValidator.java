@@ -49,7 +49,7 @@ public class SaveGameValidator {
         Validator saveGameValidator = schema.newValidator();
 
         List<File> allFiles = new ArrayList<>();
-        FileFilter ff = FreeCol.freeColSaveFileFilter;
+        FileFilter ff = FreeColSavegameFile.getFileFilter();
         for (String name : args) {
             File file = new File(name);
             if (file.exists()) {

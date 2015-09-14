@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -39,26 +40,6 @@ import net.sf.freecol.common.util.LogBuilder;
 public class Mods {
 
     private static final Logger logger = Logger.getLogger(Mods.class.getName());
-
-    private static final FileFilter MOD_FILTER = new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                final String name = f.getName();
-                if (name.startsWith(".")) {
-                    // Ignore `hidden' files.
-                    return false;
-                } else if (f.isDirectory()) {
-                    return true;
-                } else {
-                    for (String ending : FreeColModFile.getFileEndings()) {
-                        if (name.endsWith(ending)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            }
-        };
 
     /** A cache of all the mods. */
     private static final Map<String, FreeColModFile> allMods = new HashMap<>();
@@ -74,7 +55,7 @@ public class Mods {
             LogBuilder lb = new LogBuilder(64);
             lb.add("In ", directory.getPath(), " found mod:");
             lb.mark();
-            for (File f : directory.listFiles(MOD_FILTER)) {
+            for (File f : directory.listFiles(FreeColModFile.getFileFilter())) {
                 try {
                     FreeColModFile fcmf = new FreeColModFile(f);
                     allMods.put(fcmf.getId(), fcmf);
@@ -137,18 +118,11 @@ public class Mods {
     public static List<FreeColTcFile> getRuleSets() {
         List<FreeColTcFile> result = new ArrayList<>();
         File directory = FreeColDirectories.getRulesDirectory();
-        for (File dir : directory.listFiles()) {
-            if (dir.isDirectory()) {
-                File modDescription
-                    = new File(dir, FreeColModFile.MOD_DESCRIPTOR_FILE);
-                if (modDescription.exists()) {
-                    try {
-                        result.add(new FreeColTcFile(dir));
-                    } catch (IOException e) {
-                        logger.log(Level.WARNING, "Failed to create rule set "
-                            + dir, e);
-                    }
-                }
+        for (File f : directory.listFiles(FreeColTcFile.getFileFilter())) {
+            try {
+                result.add(new FreeColTcFile(f));
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Failed to load rule set " + f, ioe);
             }
         }
         return result;

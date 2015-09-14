@@ -29,6 +29,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -59,8 +60,7 @@ public class FreeColDataFile {
 
     private static final Logger logger = Logger.getLogger(FreeColDataFile.class.getName());
 
-    private static final Set<String> FILE_ENDINGS
-        = makeUnmodifiableSet(".zip");
+    protected static final String ZIP_FILE_EXTENSION = "zip";
     private static final String RESOURCE_FILE_PREFIX = "resources";
     private static final String RESOURCE_FILE_SUFFIX = ".properties";
 
@@ -85,37 +85,22 @@ public class FreeColDataFile {
      */
     public FreeColDataFile(File file) throws IOException {
         if (!file.exists()) {
-            for (String ending : getFileEndings()) {
-                final File tempFile = new File(file.getAbsolutePath() + ending);
-                if (tempFile.exists()) {
-                    file = tempFile;
-                    break;
-                }
-            }
-        }
-        if (!file.exists()) {
             throw new IOException("File " + file.getName() + " does not exist");
         }
         this.file = file;
-
-        if (file.isDirectory()) {
-            this.jarDirectory = null;
-        } else {
-            String jarName = file.getName().substring(0,
-                file.getName().lastIndexOf('.'));
-            this.jarDirectory = findJarDirectory(jarName, file);
-        }
+        this.jarDirectory = (file.isDirectory()) ? null
+            : findJarDirectory(file);
     }
 
     /**
      * Finds the directory within the zip-file in case the data file
      * has been renamed.
      *
-     * @param expectedName The name the directory should have.
      * @param file The zip-file.
      * @return The name of the base directory in the zip-file.
      */
-    private static String findJarDirectory(final String expectedName, File file) {
+    private static String findJarDirectory(File file) {
+        String expected = file.getName().substring(0, file.getName().lastIndexOf('.'));
         try (
             JarFile jf = new JarFile(file);
         ) {
@@ -129,7 +114,7 @@ public class FreeColDataFile {
             return name;
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception while reading data file.", e);
-            return expectedName;
+            return expected;
         }
     }
 
@@ -290,32 +275,23 @@ public class FreeColDataFile {
     }
 
     /**
-     * Gets a <code>FileFilter</code> for the accepted file endings.
+     * Make a <code>FileFilter</code> for a set of file endings.
      *
-     * @return The <code>FileFilter</code>.
+     * @param requiredFile If non-null, the filter will accept a directory
+     *     containing this file.
+     * @param endings Acceptable file suffixes.
+     * @return A suitable <code>FileFilter</code>.
      */
-    public FileFilter getFileFilter() {
-        return new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                final String name = f.getName();
-                for (String ending : getFileEndings()) {
-                    if (name.endsWith(ending)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
+    public static FileFilter makeFileFilter(final String requiredFile,
+                                            final String... endings) {
+        return f -> {
+            final String name = f.getName();
+            return (name.startsWith("."))
+                ? false
+                : (requiredFile != null && f.isDirectory())
+                ? new File(f, requiredFile).exists()
+                : Arrays.stream(endings).anyMatch(e -> name.endsWith("." + e)
+                    && name.length() > e.length());
         };
-    }
-
-    /**
-     * File endings that are supported for this type of data file.
-     * Override in classes that accept other endings.
-     *
-     * @return An array with a single element: ".zip".
-     */
-    protected static Set<String> getFileEndings() {
-        return FILE_ENDINGS;
     }
 }

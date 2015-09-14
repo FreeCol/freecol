@@ -57,6 +57,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import net.sf.freecol.FreeCol;
@@ -71,7 +72,6 @@ import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.io.FreeColFileFilter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Direction;
@@ -876,6 +876,21 @@ public final class Canvas extends JDesktopPane {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * Initialize the file filters to filter for saved games.
+     *
+     * @return File filters for the FreeCol save game extension.
+     */
+    private FileFilter[] getFileFilters() {
+        if (fileFilters == null) {
+            String s = Messages.message("filter.savedGames");
+            fileFilters = new FileFilter[] {
+                new FileNameExtensionFilter(s, FreeCol.FREECOL_SAVE_EXTENSION)
+            };
+        }
+        return fileFilters;
     }
 
     /**
@@ -2095,13 +2110,8 @@ public final class Canvas extends JDesktopPane {
      * @return The selected <code>File</code>.
      */
     File showLoadDialog(File directory) {
-        if (fileFilters == null) {
-            fileFilters = new FileFilter[] {
-                FreeColFileFilter.freeColSaveDirectoryFilter,
-            };
-        }
         return showFreeColDialog(new LoadDialog(freeColClient, frame, directory,
-                                                fileFilters),
+                                                getFileFilters()),
                                  null);
     }
 
@@ -2109,15 +2119,15 @@ public final class Canvas extends JDesktopPane {
      * Displays a dialog where the user may choose a file.
      *
      * @param directory The directory containing the files.
-     * @param fileFilters The file filters which the user can select in the
-     *     dialog.
+     * @param filters The file filters which the user can select in the dialog.
      * @return The selected <code>File</code>.
      */
-    File showLoadDialog(File directory, FileFilter[] fileFilters) {
+    File showLoadDialog(File directory, FileFilter[] filters) {
+        if (filters == null) filters = getFileFilters();
         File response = null;
         for (;;) {
             response = showFreeColDialog(new LoadDialog(freeColClient, frame,
-                                                        directory, fileFilters),
+                                                        directory, filters),
                                          null);
             if (response == null || response.isFile()) break;
             showErrorMessage("error.noSuchFile");
@@ -2397,14 +2407,8 @@ public final class Canvas extends JDesktopPane {
      * @param defaultName Default filename for the savegame.
      * @return The selected <code>File</code>.
      */
-    File showSaveDialog(File directory, String defaultName) {
-        if (fileFilters == null) {
-            fileFilters = new FileFilter[] {
-                FreeColFileFilter.freeColSaveDirectoryFilter,
-            };
-        }
-        return showSaveDialog(directory, fileFilters, defaultName,
-                              FreeCol.FREECOL_SAVE_EXTENSION);
+    public File showSaveDialog(File directory, String defaultName) {
+        return showSaveDialog(directory, getFileFilters(), defaultName);
     }
 
     /**
@@ -2412,17 +2416,15 @@ public final class Canvas extends JDesktopPane {
      *
      * @param directory The directory containing the files in which
      *     the user may overwrite.
-     * @param fileFilters The available file filters in the dialog.
+     * @param filters The available file filters in the dialog.
      * @param defaultName Default filename for the savegame.
-     * @param extension This extension will be added to the specified
-     *     filename (if not added by the user).
      * @return The selected <code>File</code>.
      */
-    File showSaveDialog(File directory, FileFilter[] fileFilters,
-                               String defaultName, String extension) {
+    public File showSaveDialog(File directory, FileFilter[] filters,
+                               String defaultName) {
+        if (filters == null) filters = getFileFilters();
         return showFreeColDialog(new SaveDialog(freeColClient, frame, directory,
-                                                fileFilters, defaultName,
-                                                extension),
+                                                filters, defaultName),
                                  null);
     }
 

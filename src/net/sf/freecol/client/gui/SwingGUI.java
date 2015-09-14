@@ -1418,13 +1418,12 @@ public class SwingGUI extends GUI {
 
     @Override
     public File showSaveDialog(File directory, String defaultName) {
-        return canvas.showSaveDialog(directory, defaultName);
+        return showSaveDialog(directory, null, defaultName);
     }
 
     public File showSaveDialog(File directory, FileFilter[] fileFilters,
-                               String defaultName, String extension) {
-        return canvas.showSaveDialog(directory, fileFilters, defaultName,
-                                     extension);
+                               String defaultName) {
+        return canvas.showSaveDialog(directory, fileFilters, defaultName);
     }
 
     @Override
