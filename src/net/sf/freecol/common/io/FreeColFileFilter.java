@@ -20,11 +20,13 @@
 package net.sf.freecol.common.io;
 
 import java.io.File;
+import java.util.List;
 
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.i18n.Messages;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -32,7 +34,7 @@ import net.sf.freecol.common.i18n.Messages;
  */
 public class FreeColFileFilter extends FileFilter {
 
-    private final String[] extensions;
+    private final List<String> extensions;
     private final boolean allowSubdirs;
     private final String description;
 
@@ -57,7 +59,7 @@ public class FreeColFileFilter extends FileFilter {
      */
     public FreeColFileFilter(String extension, boolean allowSubdirs,
                              String description) {
-        this.extensions = new String[] { extension };
+        this.extensions = makeUnmodifiableList(extension);
         this.allowSubdirs = allowSubdirs;
         this.description = Messages.message(description);
     }
