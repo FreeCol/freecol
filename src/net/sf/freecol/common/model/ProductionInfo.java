@@ -21,6 +21,10 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -88,20 +92,17 @@ public class ProductionInfo {
      * @return A list of <code>AbstractGoods</code>.
      */
     public List<AbstractGoods> getProductionDeficit() {
-        if (this.maximumProduction.isEmpty()) {
-            return WorkLocation.EMPTY_LIST;
-        }
-        List<AbstractGoods> result = new ArrayList<>();
-        for (AbstractGoods ag : this.production) {
+        final Function<AbstractGoods, AbstractGoods> mapper = ag -> {
             AbstractGoods agMax = AbstractGoods.findByType(ag.getType(),
                 this.maximumProduction);
-            if (agMax == null) continue;
-            int amount = agMax.getAmount() - ag.getAmount();
-            if (amount != 0) {
-                result.add(new AbstractGoods(ag.getType(), amount));
-            }
-        }
-        return result;
+            int amount = (agMax == null) ? 0
+                : agMax.getAmount() - ag.getAmount();
+            return (amount <= 0) ? null
+                : new AbstractGoods(ag.getType(), amount);
+        };            
+        return (this.maximumProduction.isEmpty()) ? WorkLocation.EMPTY_LIST
+            : transform(this.production, alwaysTrue(), mapper,
+                        toListNoNulls());
     }
 
     /**
@@ -111,20 +112,17 @@ public class ProductionInfo {
      * @return A list of <code>AbstractGoods</code>.
      */
     public List<AbstractGoods> getConsumptionDeficit() {
-        if (this.maximumConsumption.isEmpty()) {
-            return WorkLocation.EMPTY_LIST;
-        }
-        List<AbstractGoods> result = new ArrayList<>();
-        for (AbstractGoods ag : this.consumption) {
+        final Function<AbstractGoods, AbstractGoods> mapper = ag -> {
             AbstractGoods agMax = AbstractGoods.findByType(ag.getType(),
                 this.maximumConsumption);
-            if (agMax == null) continue;
-            int amount = agMax.getAmount() - ag.getAmount();
-            if (amount != 0) {
-                result.add(new AbstractGoods(ag.getType(), amount));
-            }
-        }
-        return result;
+            int amount = (agMax == null) ? 0
+                : agMax.getAmount() - ag.getAmount();
+            return (amount == 0) ? null
+                : new AbstractGoods(ag.getType(), amount);
+        };
+        return (this.maximumConsumption.isEmpty()) ? WorkLocation.EMPTY_LIST
+            : transform(this.consumption, alwaysTrue(), mapper,
+                        toListNoNulls());
     }
 
     /**
