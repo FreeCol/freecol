@@ -1042,10 +1042,18 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public OptionGroup showClientOptionsDialog() {
-        OptionGroup group = canvas.showClientOptionsDialog();
+    public void showClientOptionsDialog() {
+        OptionGroup group = null;
+        try {
+            group = canvas.showClientOptionsDialog();
+        } finally {
+            if (group != null) {
+                resetMenuBar();
+                // Immediately redraw the minimap if that was updated.
+                updateMapControls();
+            }
+        }
         if (!freeColClient.isInGame()) showMainPanel(null);
-        return group;
     }
 
     @Override

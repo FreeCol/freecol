@@ -1117,8 +1117,7 @@ public class GUI {
             DialogHandler<FoundingFather> handler) {
     }
 
-    public OptionGroup showClientOptionsDialog() {
-        return null;
+    public void showClientOptionsDialog() {
     }
 
     /**

@@ -1001,7 +1001,7 @@ public final class Canvas extends JDesktopPane {
      * Stop blinking on the map.
      */
     private void stopBlinking() {
-        if (gui.getViewMode() != GUI.MOVE_UNITS_MODE) return;
+        if (mapViewer.getViewMode() != GUI.MOVE_UNITS_MODE) return;
         mapViewer.stopBlinking();
     }
 
@@ -1724,11 +1724,6 @@ public final class Canvas extends JDesktopPane {
             group = showFreeColDialog(dialog, null);
         } finally {
             clientOptionsDialogShowing = false;
-            if (group != null) {
-                gui.resetMenuBar();
-                // Immediately redraw the minimap if that was updated.
-                gui.updateMapControls();
-            }
         }
         return group;
     }
