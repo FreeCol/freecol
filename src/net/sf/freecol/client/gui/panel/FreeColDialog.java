@@ -37,6 +37,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -197,8 +198,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         setResizable(false);
         setUndecorated(true);
         setModal(modal);
-        
-        iterateOverOpaqueLayersComponents(this.pane);
+
+        setSubcomponentsNotOpaque(this.pane);
         try { // Layout failures might not get logged.
             pack();
         } catch (Exception e) {
@@ -265,50 +266,37 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
                 }
             });
     }
-    
-  public void iterateOverOpaqueLayersComponents(Object j){   
-        if (j instanceof JPanel) {            
-            
-           JPanel d =  ((JPanel) j);
-           Component[] componentes =d.getComponents();            
+
+    public static void setSubcomponentsNotOpaque(JComponent j) {
+        synchronized(j.getTreeLock()) {
+            iterateOverOpaqueLayersComponents(j);
+        }
+    }
+
+    private static void iterateOverOpaqueLayersComponents(JComponent j){   
+        if (j instanceof JPanel || j instanceof JOptionPane) {            
+           Component[] componentes = j.getComponents();            
            for (Component componente : componentes) {
                setOpaqueLayerRecursive(componente);
            }
-
         }    
-        
-        if (j instanceof JOptionPane) {            
-            
-           JOptionPane d =  ((JOptionPane) j);
-           Component[] componentes =d.getComponents();            
-           for (Component componente : componentes) {
-               setOpaqueLayerRecursive(componente);
-           }
+    }
 
-        }        
+    private static void setOpaqueLayerRecursive(Component opaqueComponent) {
+        if (opaqueComponent instanceof JTextArea ||
+            opaqueComponent instanceof JLabel) {
+            if (opaqueComponent.isOpaque()) {
+                ((JComponent) opaqueComponent).setOpaque(false);
+            }
+        } else if (opaqueComponent instanceof JPanel) {
+            JComponent panel = (JComponent)opaqueComponent;
+            if (panel.isOpaque()) {
+                panel.setOpaque(false);
+            }
+            iterateOverOpaqueLayersComponents(panel);
+        }
     }
-    
-    public void setOpaqueLayerRecursive(Component opaqueComponent){
-        
-                if (opaqueComponent instanceof JTextArea) {
-                    if (opaqueComponent.isOpaque()) {      
-                        ((JTextArea) opaqueComponent).setOpaque(false);
-                    }    
-                }
-                if (opaqueComponent instanceof JLabel) {
-                    if (opaqueComponent.isOpaque()) {                          
-                        ((JLabel) opaqueComponent).setOpaque(false);
-                    }
-                }            
-                if (opaqueComponent instanceof JPanel) {            
-                    if (opaqueComponent.isOpaque()) {      
-                        ((JPanel) opaqueComponent).setOpaque(false);
-                    }    
-                        JPanel mipanel = ((JPanel) opaqueComponent);
-                        iterateOverOpaqueLayersComponents(mipanel);         
-                }  
-    }
-    
+
     /**
      * Get the FreeColClient.
      *
