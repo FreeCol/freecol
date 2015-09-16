@@ -30,6 +30,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -505,14 +507,23 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     // WorkLocations, Buildings, ColonyTiles
 
     /**
+     * Get a stream of all the possible work locations for this colony.
+     *
+     * @return A suitable <code>Stream</code>.
+     */
+    private Stream<WorkLocation> getAllWorkLocationsStream() {
+        return Stream.concat(colonyTiles.stream(),
+                             buildingMap.values().stream());
+    }
+    
+    /**
      * Gets a list of every work location in this colony.
      *
      * @return The list of work locations.
      */
     public List<WorkLocation> getAllWorkLocations() {
-        List<WorkLocation> result = new ArrayList<WorkLocation>(colonyTiles);
-        result.addAll(buildingMap.values());
-        return result;
+        return getAllWorkLocationsStream()
+            .collect(Collectors.toList());
     }
 
     /**
@@ -522,16 +533,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The list of available <code>WorkLocation</code>s.
      */
     public List<WorkLocation> getAvailableWorkLocations() {
-        List<WorkLocation> result
-            = new ArrayList<WorkLocation>(buildingMap.values());
-        for (ColonyTile ct : colonyTiles) {
-            Tile tile = ct.getWorkTile();
-            if (tile.getOwningSettlement() == this
-                || getOwner().canClaimForSettlement(tile)) {
-                result.add(ct);
-            }
-        }
-        return result;
+        return getAllWorkLocationsStream()
+            .filter(WorkLocation::isAvailable)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -540,13 +544,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The list of current <code>WorkLocation</code>s.
      */
     public List<WorkLocation> getCurrentWorkLocations() {
-        List<WorkLocation> result
-            = new ArrayList<WorkLocation>(buildingMap.values());
-        for (ColonyTile ct : colonyTiles) {
-            Tile tile = ct.getWorkTile();
-            if (tile.getOwningSettlement() == this) result.add(ct);
-        }
-        return result;
+        return getAllWorkLocationsStream()
+            .filter(WorkLocation::isCurrent)
+            .collect(Collectors.toList());
     }
 
     /**

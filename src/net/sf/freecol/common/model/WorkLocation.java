@@ -761,6 +761,20 @@ public abstract class WorkLocation extends UnitLocation
     public abstract StringTemplate getLabel();
 
     /**
+     * Is this work location available?
+     *
+     * @return True if the work location is either current or can be claimed.
+     */
+    public abstract boolean isAvailable();
+
+    /**
+     * Is this a current work location of this colony?
+     *
+     * @return True if the work location is current.
+     */
+    public abstract boolean isCurrent();
+
+    /**
      * Checks if this work location is available to the colony to be
      * worked.
      *

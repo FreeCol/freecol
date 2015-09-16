@@ -364,6 +364,22 @@ public class ColonyTile extends WorkLocation {
      * {@inheritDoc}
      */
     @Override
+    public boolean isAvailable() {
+        return isCurrent() || getOwner().canClaimForSettlement(getWorkTile());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isCurrent() {
+        return getWorkTile().getOwningSettlement() == getColony();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public NoAddReason getNoWorkReason() {
         Tile tile = getWorkTile();
         NoClaimReason claim;

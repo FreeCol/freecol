@@ -456,6 +456,22 @@ public class Building extends WorkLocation
      * {@inheritDoc}
      */
     @Override
+    public boolean isAvailable() {
+        return true;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isCurrent() {
+        return true;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public NoAddReason getNoWorkReason() {
         return NoAddReason.NONE;
     }
