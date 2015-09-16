@@ -413,7 +413,9 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
-        colonist.setLocation(colony.getBuilding(townHallType));
+        Building townHall = colony.getBuilding(townHallType);
+        clearWorkLocation(townHall);
+        colonist.setLocation(townHall);
 
         Unit lumberJack = units.next();
         lumberJack.setType(expertLumberJackType);
@@ -456,7 +458,9 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
-        colonist.setLocation(colony.getBuilding(townHallType));
+        Building townHall = colony.getBuilding(townHallType);
+        clearWorkLocation(townHall);
+        colonist.setLocation(townHall);
 
         Unit lumberjack1 = units.next();
         lumberjack1.setType(expertLumberJackType);
@@ -494,7 +498,9 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
-        colonist.setLocation(colony.getBuilding(townHallType));
+        Building townHall = colony.getBuilding(townHallType);
+        clearWorkLocation(townHall);
+        colonist.setLocation(townHall);
 
         Unit lumber = units.next();
         lumber.setType(expertLumberJackType);

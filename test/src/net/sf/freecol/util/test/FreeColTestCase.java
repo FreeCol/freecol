@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -324,6 +325,27 @@ public class FreeColTestCase extends TestCase {
         Colony ret = builder.build();
         ((ServerPlayer)ret.getOwner()).exploreForSettlement(ret);
         return ret;
+    }
+
+    /**
+     * Useful utility to make sure a work location is empty before doing
+     * some test that implicates it.
+     *
+     * @param wl The <code>WorkLocation</code> to clear.
+     * @return True if the work location is clear, false if there was a problem
+     *     removing a unit.
+     */
+    public boolean clearWorkLocation(WorkLocation wl) {
+        for (Unit u : wl.getUnitList()) {
+            for (WorkLocation w : wl.getColony().getCurrentWorkLocations()) {
+                if (w == wl) continue;
+                if (w.canAdd(u)) {
+                    u.setLocation(w);
+                    if (u.getLocation() == w) break;
+                }
+            }
+        }
+        return wl.isEmpty();
     }
 
     public static class MapBuilder{

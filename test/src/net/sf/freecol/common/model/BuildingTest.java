@@ -857,8 +857,9 @@ public class BuildingTest extends FreeColTestCase {
 
         Colony colony = getStandardColony(4);
         Unit unit = colony.getUnitList().get(0);
-
         for (Building building : colony.getBuildings()) {
+            clearWorkLocation(building);
+            unit.setLocation(building);
             for (AbstractGoods output : building.getOutputs()) {
                 GoodsType outputType = output.getType();
                 for (UnitType type : spec().getUnitTypeList()) {
@@ -881,8 +882,8 @@ public class BuildingTest extends FreeColTestCase {
                             assertFalse("ModifierSet should not be empty!",
                                         type.getModifiers(outputType.getId()).isEmpty());
                         }
-                        assertEquals("Wrong productivity for " + type, expected,
-                                     productivity);
+                        assertEquals("Wrong productivity for " + type
+                            + " in " + building, expected, productivity);
                     }
                 }
             }

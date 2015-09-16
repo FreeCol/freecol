@@ -260,6 +260,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
         Building townHall = colony.getBuilding(townHallType);
+        clearWorkLocation(townHall);
         Unit unit = colony.getFirstUnit();
         townHall.add(unit);
 
@@ -317,11 +318,11 @@ public class IndividualFatherTest extends FreeColTestCase {
     public void testPaine() {
         Game game = getGame();
         game.setMap(getTestMap(true));
-
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
         List<AbstractGoods> empty = new ArrayList<>();
         Building townHall = colony.getBuilding(townHallType);
+        clearWorkLocation(townHall);
 
         Unit statesman1 = colony.getUnitList().get(0);
         Unit statesman2 = colony.getUnitList().get(1);
