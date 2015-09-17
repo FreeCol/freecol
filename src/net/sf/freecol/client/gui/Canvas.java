@@ -362,7 +362,7 @@ public final class Canvas extends JDesktopPane {
 
         frame.setJMenuBar(new InGameMenuBar(freeColClient,
             new MenuMouseMotionListener(freeColClient, this)));
-        frame.paintAll(getGraphics());
+        frame.validate();
     }
 
     /**
@@ -2163,6 +2163,7 @@ public final class Canvas extends JDesktopPane {
     void showMainPanel(String userMsg) {
         closeMenus();
         frame.setJMenuBar(null);
+        frame.validate();
         mainPanel = new MainPanel(freeColClient);
         addCentered(mainPanel, JLayeredPane.DEFAULT_LAYER);
         if (userMsg != null) gui.showInformationMessage(userMsg);
