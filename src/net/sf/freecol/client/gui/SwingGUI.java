@@ -437,7 +437,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void changeWindowedMode() {
-        canvas.changeWindowedMode(!canvas.isWindowed());
+        canvas.changeWindowedMode();
     }
 
     /**

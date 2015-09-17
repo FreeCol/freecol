@@ -277,7 +277,7 @@ public final class Canvas extends JDesktopPane {
         setFocusTraversalKeysEnabled(false);
 
         createKeyBindings();
-        changeWindowedMode(windowed);
+        createFrame(null);
         logger.info("Canvas created.");
     }
 
@@ -287,28 +287,29 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Change the windowed mode.
-     *
-     * @param windowed Use <code>true</code> for windowed mode
-     *     and <code>false</code> for fullscreen mode.
      */
-    void changeWindowedMode(boolean windowed) {
+    void changeWindowedMode() {
         // Clean up the old frame
         JMenuBar menuBar = null;
         if (frame != null) {
             menuBar = frame.getJMenuBar();
-            if (this.windowed) {
+            if (windowed) {
                 windowBounds = frame.getBounds();
             }
             frame.setVisible(false);
             frame.dispose();
         }
-        this.windowed = windowed;
+        windowed = !windowed;
 
+        createFrame(menuBar);
+    }
+
+    private void createFrame(JMenuBar menuBar) {
+        // FIXME: Check this:
         // User might have moved window to new screen in a
         // multi-screen setup, so make this.gd point to the current screen.
         frame = new FreeColFrame(freeColClient, graphicsDevice,
             menuBar, this, windowed, windowBounds);
-
         updateSizes();
         frame.setVisible(true);
     }
