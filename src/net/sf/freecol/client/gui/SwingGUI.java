@@ -1590,10 +1590,6 @@ public class SwingGUI extends GUI {
         return mapViewer.getViewMode();
     }
 
-    public void restartBlinking() {
-        mapViewer.restartBlinking();
-    }
-
     @Override
     public void setFocus(Tile tileToFocus) {
         mapViewer.setFocus(tileToFocus);
