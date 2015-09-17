@@ -183,8 +183,6 @@ public final class Canvas extends JDesktopPane {
 
     private boolean windowed;
 
-    private Rectangle windowBounds;
-
     private MainPanel mainPanel;
 
     private final StartGamePanel startGamePanel;
@@ -239,7 +237,7 @@ public final class Canvas extends JDesktopPane {
         this.mapViewer = mapViewer;
 
         // Determine if windowed mode should be used and set the window size.
-        windowBounds = null;
+        Rectangle windowBounds = null;
         if (desiredSize == null) {
             if(graphicsDevice.isFullScreenSupported()) {
                 windowed = false;
@@ -273,7 +271,7 @@ public final class Canvas extends JDesktopPane {
         setFocusTraversalKeysEnabled(false);
 
         createKeyBindings();
-        createFrame(null);
+        createFrame(null, windowBounds);
         logger.info("Canvas created.");
     }
 
@@ -287,6 +285,7 @@ public final class Canvas extends JDesktopPane {
     void changeWindowedMode() {
         // Clean up the old frame
         JMenuBar menuBar = null;
+        Rectangle windowBounds = null;
         if (frame != null) {
             menuBar = frame.getJMenuBar();
             if (windowed) {
@@ -297,10 +296,10 @@ public final class Canvas extends JDesktopPane {
         }
         windowed = !windowed;
 
-        createFrame(menuBar);
+        createFrame(menuBar, windowBounds);
     }
 
-    private void createFrame(JMenuBar menuBar) {
+    private void createFrame(JMenuBar menuBar, Rectangle windowBounds) {
         // FIXME: Check this:
         // User might have moved window to new screen in a
         // multi-screen setup, so make this.gd point to the current screen.
