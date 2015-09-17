@@ -216,8 +216,6 @@ public final class FreeColClient {
         } catch (IOException e) {
             fatal(Messages.message("client.classic") + "\n" + e.getMessage());
         }
-        actionManager = new ActionManager(this);
-        actionManager.initializeActions(inGameController, connectController);
 
         if (!this.headless) {
             // Swing system and look-and-feel initialization.
@@ -227,8 +225,10 @@ public final class FreeColClient {
                 fatal(Messages.message("client.laf") + "\n" + e.getMessage());
             }
         }
+        actionManager = new ActionManager(this);
+        actionManager.initializeActions(inGameController, connectController);
     }
-    
+
     /**
      * Starts the new <code>FreeColClient</code>, including the GUI.
      *
