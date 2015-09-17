@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -99,6 +100,11 @@ public class FreeColFrame extends JFrame {
         logger.info("Frame created in size " + bounds.width + "x" + bounds.height);
     }
 
+    public void exitFullScreen() {
+        GraphicsConfiguration GraphicsConf = getGraphicsConfiguration();
+        GraphicsDevice gd = GraphicsConf.getDevice();
+        gd.setFullScreenWindow(null);
+    }
 
     /**
      * Get the standard name for the main frame.

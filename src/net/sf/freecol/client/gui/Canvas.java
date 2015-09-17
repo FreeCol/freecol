@@ -347,10 +347,8 @@ public final class Canvas extends JDesktopPane {
      * Quit the GUI.  All that is required is to exit the full screen.
      */
     void quit() throws Exception {
-        if (frame != null) {
-            GraphicsConfiguration GraphicsConf = frame.getGraphicsConfiguration();
-            GraphicsDevice gd = GraphicsConf.getDevice();
-            if (!windowed) gd.setFullScreenWindow(null);
+        if (frame != null && !windowed) {
+            frame.exitFullScreen();
         }
     }
 
