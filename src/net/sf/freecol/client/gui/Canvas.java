@@ -1789,29 +1789,17 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Display the difficulty dialog.
-     *
-     * @return The resulting <code>OptionGroup</code>.
-     */
-    OptionGroup showDifficultyDialog() {
-        Game game = freeColClient.getGame();
-        Specification spec = game.getSpecification();
-        return showFreeColDialog(new DifficultyDialog(freeColClient, frame, spec,
-                spec.getDifficultyOptionGroup(), false),
-            null);
-    }
-
-    /**
      * Display the difficulty dialog for a given group.
      *
      * @param spec The enclosing <code>Specification</code>.
      * @param group The <code>OptionGroup</code> containing the difficulty.
+     * @param editable If the options should be editable.
      * @return The resulting <code>OptionGroup</code>.
      */
     OptionGroup showDifficultyDialog(Specification spec,
-                                            OptionGroup group) {
-        return showFreeColDialog(new DifficultyDialog(freeColClient, frame, spec, 
-                group, group.isEditable()),
+                                     OptionGroup group, boolean editable) {
+        return showFreeColDialog(new DifficultyDialog(freeColClient, frame,
+                spec, group, editable),
             null);
     }
 
@@ -2076,18 +2064,6 @@ public final class Canvas extends JDesktopPane {
      * Displays a dialog where the user may choose a file.
      *
      * @param directory The directory containing the files.
-     * @return The selected <code>File</code>.
-     */
-    File showLoadDialog(File directory) {
-        return showFreeColDialog(new LoadDialog(freeColClient, frame, directory,
-                                                getFileFilters()),
-                                 null);
-    }
-
-    /**
-     * Displays a dialog where the user may choose a file.
-     *
-     * @param directory The directory containing the files.
      * @param filters The file filters which the user can select in the dialog.
      * @return The selected <code>File</code>.
      */
@@ -2264,14 +2240,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Display the NewPanel.
-     */
-    void showNewPanel() {
-        showSubPanel(new NewPanel(freeColClient), false);
-    }
-
-    /**
-     * Display the NewPanel for a given specification.
+     * Display the NewPanel for a given optional specification.
      *
      * @param specification The <code>Specification</code> to use.
      */
@@ -2366,18 +2335,6 @@ public final class Canvas extends JDesktopPane {
      */
     String showRiverStyleDialog(Tile tile) {
         return showFreeColDialog(new RiverStyleDialog(freeColClient, frame), tile);
-    }
-
-    /**
-     * Displays a dialog where the user may choose a filename.
-     *
-     * @param directory The directory containing the files in which
-     *     the user may overwrite.
-     * @param defaultName Default filename for the savegame.
-     * @return The selected <code>File</code>.
-     */
-    public File showSaveDialog(File directory, String defaultName) {
-        return showSaveDialog(directory, getFileFilters(), defaultName);
     }
 
     /**

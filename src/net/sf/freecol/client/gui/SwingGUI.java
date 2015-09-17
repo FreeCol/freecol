@@ -1090,14 +1090,22 @@ public class SwingGUI extends GUI {
         canvas.showDeclarationPanel();
     }
 
+    /**
+     * Display a difficulty dialog allowing only viewing of game options.
+     *
+     * @return The resulting <code>OptionGroup</code>.
+     */
     @Override
     public OptionGroup showDifficultyDialog() {
-        return canvas.showDifficultyDialog();
+        Game game = freeColClient.getGame();
+        Specification spec = game.getSpecification();
+        return canvas.showDifficultyDialog(spec,
+            spec.getDifficultyOptionGroup(), false);
     }
 
     public OptionGroup showDifficultyDialog(Specification spec,
                                             OptionGroup group) {
-        return canvas.showDifficultyDialog(spec, group);
+        return canvas.showDifficultyDialog(spec, group, group.isEditable());
     }
 
     @Override
@@ -1230,7 +1238,7 @@ public class SwingGUI extends GUI {
 
     @Override
     public File showLoadDialog(File directory) {
-        return canvas.showLoadDialog(directory);
+        return canvas.showLoadDialog(directory, null);
     }
 
     public File showLoadDialog(File directory, FileFilter[] fileFilters) {
@@ -1301,7 +1309,7 @@ public class SwingGUI extends GUI {
 
     @Override
     public void showNewPanel() {
-        canvas.showNewPanel();
+        canvas.showNewPanel(null);
     }
 
     @Override
@@ -1423,7 +1431,7 @@ public class SwingGUI extends GUI {
 
     @Override
     public File showSaveDialog(File directory, String defaultName) {
-        return showSaveDialog(directory, null, defaultName);
+        return canvas.showSaveDialog(directory, null, defaultName);
     }
 
     public File showSaveDialog(File directory, FileFilter[] fileFilters,
