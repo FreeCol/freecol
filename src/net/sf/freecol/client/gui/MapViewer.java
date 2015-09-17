@@ -1027,7 +1027,7 @@ public final class MapViewer {
     void startCursorBlinking() {
         blinkingMarqueeEnabled = true;
 
-        cursor = new net.sf.freecol.client.gui.TerrainCursor();
+        cursor = new TerrainCursor();
         cursor.addActionListener((ActionEvent ae) -> {
                 if (!blinkingMarqueeEnabled) return;
                 Unit unit = activeUnit;

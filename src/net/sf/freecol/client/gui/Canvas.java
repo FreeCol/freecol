@@ -272,6 +272,7 @@ public final class Canvas extends JDesktopPane {
 
         createKeyBindings();
         createFrame(null, windowBounds);
+        mapViewer.startCursorBlinking();
         logger.info("Canvas created.");
     }
 
