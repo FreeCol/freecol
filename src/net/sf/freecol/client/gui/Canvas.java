@@ -25,15 +25,12 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -311,14 +308,6 @@ public final class Canvas extends JDesktopPane {
         // multi-screen setup, so make this.gd point to the current screen.
         frame = new FreeColFrame(freeColClient, graphicsDevice,
             menuBar, this, windowed, windowBounds);
-        if (windowed) {
-            frame.addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    logger.info("Window size changes to " + getSize());
-                }
-            });
-        }
 
         updateSizes();
         frame.setVisible(true);

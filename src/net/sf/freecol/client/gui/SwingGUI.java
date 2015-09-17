@@ -434,13 +434,10 @@ public class SwingGUI extends GUI {
 
     /**
      * Change the windowed mode.
-     *
-     * @param windowed Use <code>true</code> for windowed mode
-     *     and <code>false</code> for fullscreen mode.
      */
     @Override
-    public void changeWindowedMode(boolean windowed) {
-        canvas.changeWindowedMode(windowed);
+    public void changeWindowedMode() {
+        canvas.changeWindowedMode(!canvas.isWindowed());
     }
 
     /**

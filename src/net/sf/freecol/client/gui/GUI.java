@@ -191,11 +191,8 @@ public class GUI {
 
     /**
      * Change the windowed mode.
-     *
-     * @param windowed Use <code>true</code> for windowed mode
-     *     and <code>false</code> for fullscreen mode.
      */
-    public void changeWindowedMode(boolean windowed) {
+    public void changeWindowedMode() {
     }
 
     /**

@@ -25,6 +25,8 @@ import java.awt.GraphicsDevice;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -98,6 +100,14 @@ public class FreeColFrame extends JFrame {
         }
         setBounds(bounds);
         logger.info("Frame created in size " + bounds.width + "x" + bounds.height);
+        if (windowed) {
+            addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    logger.info("Window size changes to " + getSize());
+                }
+            });
+        }
     }
 
     public void exitFullScreen() {

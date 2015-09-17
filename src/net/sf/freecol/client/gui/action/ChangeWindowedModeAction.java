@@ -78,6 +78,6 @@ public class ChangeWindowedModeAction extends SelectableAction {
     public void actionPerformed(ActionEvent ae) {
         GUI gui = getGUI();
         if (gui == null) return;
-        gui.changeWindowedMode(!gui.isWindowed());
+        gui.changeWindowedMode();
     }
 }
