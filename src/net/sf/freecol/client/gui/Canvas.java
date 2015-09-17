@@ -61,10 +61,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.FreeColAction;
-import net.sf.freecol.client.gui.menu.FreeColMenuBar;
-import net.sf.freecol.client.gui.menu.InGameMenuBar;
-import net.sf.freecol.client.gui.menu.MapEditorMenuBar;
-import net.sf.freecol.client.gui.menu.MenuMouseMotionListener;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.common.ServerInfo;
@@ -323,8 +319,7 @@ public final class Canvas extends JDesktopPane {
         // We may need to reset the zoom value to the default value
         gui.resetMapZoom();
 
-        frame.setJMenuBar(new MapEditorMenuBar(freeColClient,
-            new MenuMouseMotionListener(freeColClient, this)));
+        frame.setMapEditorMenuBar();
         showMapEditorTransformPanel();
 
         CanvasMapEditorMouseListener listener
@@ -347,10 +342,7 @@ public final class Canvas extends JDesktopPane {
      */
     void initializeInGame() {
         if (frame == null) return;
-
-        frame.setJMenuBar(new InGameMenuBar(freeColClient,
-            new MenuMouseMotionListener(freeColClient, this)));
-        frame.validate();
+        frame.setInGameMenuBar();
     }
 
     /**
@@ -358,19 +350,15 @@ public final class Canvas extends JDesktopPane {
      */
     void resetMenuBar() {
         if (frame == null) return;
-        JMenuBar menuBar = frame.getJMenuBar();
-        if (menuBar != null) {
-            ((FreeColMenuBar)menuBar).reset();
-        }
+        frame.resetMenuBar();
     }
 
     /**
      * Update the menu bar.
      */
     void updateMenuBar() {
-        if (frame != null && frame.getJMenuBar() != null) {
-            ((FreeColMenuBar)frame.getJMenuBar()).update();
-        }
+        if (frame == null) return;
+        frame.updateMenuBar();
     }
 
     /**
@@ -1370,7 +1358,6 @@ public final class Canvas extends JDesktopPane {
         // inGame. (Retrieve value of GUI::inGame.)  If GUI thinks
         // we're still in the game then log an error because at this
         // point the GUI should have been informed.
-        closeMenus();
         removeInGameComponents();
         showMainPanel(null);
         repaint();
@@ -2150,8 +2137,7 @@ public final class Canvas extends JDesktopPane {
      */
     void showMainPanel(String userMsg) {
         closeMenus();
-        frame.setJMenuBar(null);
-        frame.validate();
+        frame.removeMenuBar();
         mainPanel = new MainPanel(freeColClient);
         addCentered(mainPanel, JLayeredPane.DEFAULT_LAYER);
         if (userMsg != null) gui.showInformationMessage(userMsg);
