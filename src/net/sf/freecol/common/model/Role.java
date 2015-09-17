@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -414,11 +415,9 @@ public class Role extends BuildableType {
      */
     public static List<Role> getAvailableRoles(Player player, UnitType type,
                                                List<Role> roles) {
-        List<Role> result = new ArrayList<>();
-        for (Role r : roles) {
-            if (r.isAvailableTo(player, type)) result.add(r);
-        }
-        return result;
+        return roles.stream()
+            .filter(r -> r.isAvailableTo(player, type))
+            .collect(Collectors.toList());
     }
 
     /**

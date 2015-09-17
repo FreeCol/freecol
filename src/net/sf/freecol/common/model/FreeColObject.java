@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -248,9 +249,7 @@ public abstract class FreeColObject
      * @return A sorted copy of the collection.
      */
     public static <T extends FreeColObject> List<T> getSortedCopy(Collection<T> c) {
-        List<T> newC = new ArrayList<>(c);
-        Collections.sort(newC); // Use natural order if implemented.
-        return newC;
+        return c.stream().sorted().collect(Collectors.toList());
     }
 
     /**

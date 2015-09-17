@@ -31,6 +31,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -454,9 +455,9 @@ public class EuropeanAIPlayer extends AIPlayer {
         final Random air = getAIRandom();
         final List<GoodsType> arrears = new ArrayList<>();
         if (market != null) {
-            for (GoodsType gt : spec.getGoodsTypeList()) {
-                if (market.getArrears(gt) > 0) arrears.add(gt);
-            }
+            arrears.addAll(spec.getGoodsTypeList().stream()
+                .filter(gt -> market.getArrears(gt) > 0)
+                .collect(Collectors.toList()));
         }
         final int nCheats = arrears.size() + 6; // 6 cheats + arrears
         int[] randoms = randomInts(logger, "cheats", air, 100, nCheats);

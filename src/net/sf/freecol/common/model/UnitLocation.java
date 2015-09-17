@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -242,11 +243,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @return A list of naval <code>Unit</code>s present.
      */
     public List<Unit> getNavalUnits() {
-        List<Unit> shipList = new ArrayList<>();
-        for (Unit u : getUnitList()) {
-            if (u.isNaval()) shipList.add(u);
-        }
-        return shipList;
+        return getUnitList().stream()
+            .filter(Unit::isNaval).collect(Collectors.toList());
     }
 
     /**

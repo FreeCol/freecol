@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -833,10 +834,8 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean doEndTurn(boolean showDialog) {
         if (showDialog) {
-            List<Unit> units = new ArrayList<>();
-            for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
-                if (unit.couldMove()) units.add(unit);
-            }
+            List<Unit> units = freeColClient.getMyPlayer().getUnits().stream()
+                .filter(Unit::couldMove).collect(Collectors.toList());
             if (!units.isEmpty()) {
                 // Modal dialog takes over
                 gui.showEndTurnDialog(units,
@@ -1369,18 +1368,11 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Disembark selected units able to move.
-        final List<Unit> disembarkable = new ArrayList<>();
         unit.setStateToAllChildren(UnitState.ACTIVE);
-        for (Unit u : unit.getUnitList()) {
-            if (u.getMoveType(tile).isProgress()) {
-                disembarkable.add(u);
-            }
-        }
-        if (disembarkable.isEmpty()) {
-            // Did not find any unit that could disembark, fail.
-            return false;
-        }
-
+        final List<Unit> disembarkable = unit.getUnitList().stream()
+            .filter(u -> u.getMoveType(tile).isProgress())
+            .collect(Collectors.toList());
+        if (disembarkable.isEmpty()) return false; // Fail, did not find one
         if (disembarkable.size() == 1) {
             if (gui.confirm(tile,
                             StringTemplate.key("disembark.text"),

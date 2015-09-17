@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -224,11 +225,9 @@ public class TradeRoute extends FreeColGameObject
      * @return A list of assigned <code>Unit</code>s.
      */
     public List<Unit> getAssignedUnits() {
-        List<Unit> list = new ArrayList<>();
-        for (Unit unit : owner.getUnits()) {
-            if (unit.getTradeRoute() == this) list.add(unit);
-        }
-        return list;
+        return owner.getUnits().stream()
+            .filter(u -> u.getTradeRoute() == this)
+            .collect(Collectors.toList());
     }
 
     /**

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.LandMap;
@@ -152,15 +153,11 @@ public class TerrainGenerator {
      */
     private TileType getRandomLandTileType(int latitude) {
         if (landTileTypes == null) {
-            landTileTypes = new ArrayList<>();
-            for (TileType type : spec.getTileTypeList()) {
-                if (type.isElevation() || type.isWater()) {
-                    // do not generate elevated and water tiles at this time
-                    // they are created separately
-                    continue;
-                }
-                landTileTypes.add(type);
-            }
+            // Do not generate elevated and water tiles at this time
+            // they are created elsewhere.
+            landTileTypes = spec.getTileTypeList().stream()
+                .filter(t -> !t.isElevation() && !t.isWater())
+                .collect(Collectors.toList());
         }
         return getRandomTileType(landTileTypes, latitude);
     }
@@ -173,14 +170,11 @@ public class TerrainGenerator {
      */
     private TileType getRandomOceanTileType(int latitude) {
         if (oceanTileTypes == null) {
-            oceanTileTypes = new ArrayList<>();
-            for (TileType type : spec.getTileTypeList()) {
-                if (type.isWater()
-                    && type.isHighSeasConnected()
-                    && !type.isDirectlyHighSeasConnected()) {
-                    oceanTileTypes.add(type);
-                }
-            }
+            oceanTileTypes = spec.getTileTypeList().stream()
+                .filter(t -> t.isWater()
+                    && t.isHighSeasConnected()
+                    && !t.isDirectlyHighSeasConnected())
+                .collect(Collectors.toList());
         }
         return getRandomTileType(oceanTileTypes, latitude);
     }

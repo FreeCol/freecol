@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
@@ -451,14 +452,9 @@ public class LabourData {
     }
 
     public static List<UnitType> getLabourTypes(Player player) {
-        List<UnitType> unitTypes = player.getSpecification().getUnitTypeList();
-        ArrayList<UnitType> labourTypes = new ArrayList<>();
-        for (UnitType unitType : unitTypes) {
-            if (unitType.hasSkill() && unitType.isAvailableTo(player)) {
-                labourTypes.add(unitType);
-            }
-        }
-        return labourTypes;
+        return player.getSpecification().getUnitTypeList().stream()
+            .filter(ut -> ut.hasSkill() && ut.isAvailableTo(player))
+            .collect(Collectors.toList());
     }
 
     private void summarize() {

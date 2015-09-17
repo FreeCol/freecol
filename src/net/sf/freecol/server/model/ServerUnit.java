@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.i18n.NameCache;
@@ -843,12 +844,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @return A list of new tiles to see.
      */
     public List<Tile> collectNewTiles(Tile tile) {
-        List<Tile> newTiles = new ArrayList<>();
-        int los = getLineOfSight();
-        for (Tile t : tile.getSurroundingTiles(0, los)) {
-            if (!getOwner().canSee(t)) newTiles.add(t);
-        }
-        return newTiles;
+        final int los = getLineOfSight();
+        return tile.getSurroundingTiles(0, los).stream()
+            .filter(t -> !getOwner().canSee(t)).collect(Collectors.toList());
     }
 
     /**

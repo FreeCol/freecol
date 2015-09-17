@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.JComponent;
 
@@ -546,13 +547,10 @@ public final class ImageLibrary {
 
     public static BufferedImage getOverlayImage(TileType type, String id, float scale,
                                         Set<String> overlayCache) {
-        String prefix = "image.tileoverlay." + type.getId() + ".r";
-        List<String> keys = new ArrayList<>();
-        for (String key : overlayCache) {
-            if (key.startsWith(prefix)) {
-                keys.add(key);
-            }
-        }
+        final String prefix = "image.tileoverlay." + type.getId() + ".r";
+        final List<String> keys = overlayCache.stream()
+            .filter(k -> k.startsWith(prefix))
+            .collect(Collectors.toList());
         return getRandomizedImage(keys, id, scale);
     }
 

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -270,12 +271,10 @@ public class ColonyPlan {
      * @return A list of food producing plans.
      */
     public List<WorkLocationPlan> getFoodPlans() {
-        List<WorkLocationPlan> plans = new ArrayList<>();
-        for (WorkLocationPlan wlp : workPlans) {
-            if (wlp.isFoodPlan()
-                && !wlp.getWorkLocation().canAutoProduce()) plans.add(wlp);
-        }
-        return plans;
+        return workPlans.stream()
+            .filter(wp -> wp.isFoodPlan()
+                && !wp.getWorkLocation().canAutoProduce())
+            .collect(Collectors.toList());
     }
 
     /**
@@ -285,12 +284,10 @@ public class ColonyPlan {
      * @return A list of non-food producing plans.
      */
     public List<WorkLocationPlan> getWorkPlans() {
-        List<WorkLocationPlan> plans = new ArrayList<>();
-        for (WorkLocationPlan wlp : workPlans) {
-            if (!wlp.isFoodPlan()
-                && !wlp.getWorkLocation().canAutoProduce()) plans.add(wlp);
-        }
-        return plans;
+        return workPlans.stream()
+            .filter(wp -> !wp.isFoodPlan()
+                && !wp.getWorkLocation().canAutoProduce())
+            .collect(Collectors.toList());
     }
 
     /**

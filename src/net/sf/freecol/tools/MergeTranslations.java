@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 
 /**
@@ -68,16 +69,12 @@ public class MergeTranslations {
             File targetFile = new File(targetDirectory, name);
 
             if (targetFile.exists()) {
-
                 Map<String, String> targetProperties = readFile(targetFile);
 
-                List<Entry<?,?>> missingProperties = new ArrayList<>();
-                for (Entry<?,?> entry : sourceProperties.entrySet()) {
-                    if (!targetProperties.containsKey(entry.getKey())) {
-                        missingProperties.add(entry);
-                    }
-                }
-
+                List<Entry<?,?>> missingProperties
+                    = sourceProperties.entrySet().stream()
+                    .filter(e -> !targetProperties.containsKey(e.getKey()))
+                    .collect(Collectors.toList());
                 if (!missingProperties.isEmpty()) {
                     try (FileWriter out = new FileWriter(targetFile, true)) {
                         out.write("### Merged from trunk on "

@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -311,11 +312,9 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A list of <code>TradeItem</code>s offered by the player.
      */
     public List<TradeItem> getItemsGivenBy(Player player) {
-        List<TradeItem> goodsList = new ArrayList<>();
-        for (TradeItem ti : items) {
-            if (player == ti.getSource()) goodsList.add(ti);
-        }
-        return goodsList;
+        return items.stream()
+            .filter(ti -> ti.getSource() == player)
+            .collect(Collectors.toList());
     }
 
     /**

@@ -38,10 +38,12 @@ import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -680,15 +682,9 @@ public final class Canvas extends JDesktopPane {
         Point p = new Point(x, y);
         todo.add(p);
 
-        List<Component> allComponents = new ArrayList<>();
-        for (Component c : this.getComponents()) {
-            if (c instanceof GrayLayer || !c.isValid()) {
-                // GrayLayer always intersects and blocks early
-                // dialogs like FF-selection
-                continue;
-            }
-            allComponents.add(c);
-        }
+        List<Component> allComponents = Arrays.stream(this.getComponents())
+            .filter(c -> !(c instanceof GrayLayer) && c.isValid())
+            .collect(Collectors.toList());
         for (FreeColDialog<?> fcd : dialogs) allComponents.add(fcd);
 
         // Find the position with the least overlap

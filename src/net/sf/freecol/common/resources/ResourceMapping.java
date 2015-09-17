@@ -19,13 +19,12 @@
 
 package net.sf.freecol.common.resources;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 
 /**
@@ -286,51 +285,38 @@ public final class ResourceMapping {
     }
 
     /**
-     * Get the image keys in this mapping with a given prefix.
+     * Get the image keys in this mapping with a given prefix as a list.
      *
      * @param prefix The prefix to check for.
      * @return A list of keys.
      */
     public List<String> getImageKeys(String prefix) {
-        List<String> result = new ArrayList<>();
-        for (String key : imageResources.keySet()) {
-            if (key.startsWith(prefix)) {
-                result.add(key);
-            }
-        }
-        return result;
+        return imageResources.keySet().stream()
+            .filter(k -> k.startsWith(prefix)).collect(Collectors.toList());
     }
 
     /**
-     * Get the image keys in this mapping with a given prefix and suffix.
+     * Get the image keys in this mapping with a given prefix as a set.
+     *
+     * @param prefix The prefix to check for.
+     * @return The set of keys.
+     */
+    public Set<String> getImageKeySet(String prefix) {
+        return imageResources.keySet().stream()
+            .filter(k -> k.startsWith(prefix)).collect(Collectors.toSet());
+    }
+
+    /**
+     * Get the image keys in this mapping with a given prefix and
+     * suffix as a list.
      *
      * @param prefix The prefix to check for.
      * @param suffix The suffix to check for.
      * @return A list of keys.
      */
     public List<String> getImageKeys(String prefix, String suffix) {
-        List<String> result = new ArrayList<>();
-        for (String key : imageResources.keySet()) {
-            if (key.startsWith(prefix) && key.endsWith(suffix)) {
-                result.add(key);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Get the image keys in this mapping with a given prefix.
-     *
-     * @param prefix The prefix to check for.
-     * @return The set of keys.
-     */
-    public Set<String> getImageKeySet(String prefix) {
-        HashSet<String> result = new HashSet<>();
-        for (String key : imageResources.keySet()) {
-            if (key.startsWith(prefix)) {
-                result.add(key);
-            }
-        }
-        return result;
+        return imageResources.keySet().stream()
+            .filter(k -> k.startsWith(prefix) && k.endsWith(suffix))
+            .collect(Collectors.toList());
     }
 }

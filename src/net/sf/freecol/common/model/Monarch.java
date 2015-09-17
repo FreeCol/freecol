@@ -20,9 +20,11 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -571,22 +573,12 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return A list of potential enemy <code>Player</code>s.
      */
     public List<Player> collectPotentialEnemies() {
-        List<Player> enemies = new ArrayList<>();
         // Benjamin Franklin puts an end to the monarch's interference
-        if (!player.hasAbility(Ability.IGNORE_EUROPEAN_WARS)) {
-            for (Player enemy : getGame().getLiveEuropeanPlayers(player)) {
-                if (enemy.hasAbility(Ability.IGNORE_EUROPEAN_WARS)
-                    || enemy.isREF()) continue;
-                switch (player.getStance(enemy)) {
-                case PEACE: case CEASE_FIRE:
-                    enemies.add(enemy);
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-        return enemies;
+        return (player.hasAbility(Ability.IGNORE_EUROPEAN_WARS))
+            ? Collections.<Player>emptyList()
+            : getGame().getLiveEuropeanPlayers(player).stream()
+                .filter(p -> p.isPotentialEnemy(player))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -597,18 +589,9 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return A list of potential friendly <code>Player</code>s.
      */
     public List<Player> collectPotentialFriends() {
-        List<Player> friends = new ArrayList<>();
-        for (Player enemy : getGame().getLiveEuropeanPlayers(player)) {
-            if (enemy.isREF()) continue;
-            switch (player.getStance(enemy)) {
-            case WAR: case CEASE_FIRE:
-                friends.add(enemy);
-                break;
-            default:
-                break;
-            }
-        }
-        return friends;
+        return getGame().getLiveEuropeanPlayers(player).stream()
+            .filter(p -> p.isPotentialFriend(player))
+            .collect(Collectors.toList());
     }
 
     /**

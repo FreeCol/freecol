@@ -146,11 +146,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @return An array of enabled options.
      */
     private Object[] selectOptions() {
-        List<ChoiceItem<T>> actual = new ArrayList<>();
-        for (ChoiceItem<T> c : this.options) {
-            if (c.isEnabled()) actual.add(c);
-        }
-        return actual.toArray();
+        return this.options.stream().filter(ChoiceItem::isEnabled).toArray();
     }
 
     /**

@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,6 +33,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -142,6 +145,22 @@ public final class Specification {
         = new Source("model.source.shipTradePenalty");
     public static final Source SOL_MODIFIER_SOURCE
         = new Source("model.source.solModifier");
+    /** All the special static sources. */
+    private static final Source[] sources = new Source[] {
+        MOVEMENT_PENALTY_SOURCE,
+        ARTILLERY_PENALTY_SOURCE,
+        ATTACK_BONUS_SOURCE,
+        FORTIFICATION_BONUS_SOURCE,
+        INDIAN_RAID_BONUS_SOURCE,
+        AMPHIBIOUS_ATTACK_PENALTY_SOURCE,
+        BASE_OFFENCE_SOURCE,
+        BASE_DEFENCE_SOURCE,
+        CARGO_PENALTY_SOURCE,
+        AMBUSH_BONUS_SOURCE,
+        COLONY_GOODS_PARTY_SOURCE,
+        SHIP_TRADE_PENALTY_SOURCE,
+        SOL_MODIFIER_SOURCE
+    };
 
 
     /** A map from specification element to a reader for that element. */
@@ -250,23 +269,7 @@ public final class Specification {
      */
     public Specification() {
         logger.fine("Initializing Specification");
-        for (Source source : new Source[] {
-                MOVEMENT_PENALTY_SOURCE,
-                ARTILLERY_PENALTY_SOURCE,
-                ATTACK_BONUS_SOURCE,
-                FORTIFICATION_BONUS_SOURCE,
-                INDIAN_RAID_BONUS_SOURCE,
-                AMPHIBIOUS_ATTACK_PENALTY_SOURCE,
-                BASE_OFFENCE_SOURCE,
-                BASE_DEFENCE_SOURCE,
-                CARGO_PENALTY_SOURCE,
-                AMBUSH_BONUS_SOURCE,
-                COLONY_GOODS_PARTY_SOURCE,
-                SHIP_TRADE_PENALTY_SOURCE,
-                SOL_MODIFIER_SOURCE
-            }) {
-            allTypes.put(source.getId(), source);
-        }
+        for (Source source : sources) allTypes.put(source.getId(), source);
 
         readerMap.put(BUILDING_TYPES_TAG,
                       new TypeReader<>(BuildingType.class, buildingTypeList));
@@ -1409,11 +1412,9 @@ public final class Specification {
      * @param naval If true, choose naval units, if not, land units.
      */
     public List<UnitType> getREFUnitTypes(boolean naval) {
-        List<UnitType> types = new ArrayList<>();
-        for (UnitType ut : getUnitTypesWithAbility(Ability.REF_UNIT)) {
-            if (naval == ut.isNaval()) types.add(ut);
-        }
-        return types;
+        return getUnitTypesWithAbility(Ability.REF_UNIT).stream()
+            .filter(ut -> ut.isNaval() == naval)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -1545,12 +1546,11 @@ public final class Specification {
      */
     public List<Role> getMilitaryRoles() {
         if (militaryRoles == null) {
-            List<Role> mr = new ArrayList<>();
-            for (Role role : roles) {
-                if (role.isOffensive()) mr.add(role);
-            }
-            Collections.sort(mr, Role.militaryComparator);
-            this.militaryRoles = Collections.<Role>unmodifiableList(mr);
+            this.militaryRoles
+                = Collections.<Role>unmodifiableList(roles.stream()
+                    .filter(Role::isOffensive)
+                    .sorted(Role.militaryComparator)
+                    .collect(Collectors.toList()));
         }
         return militaryRoles;
     }
@@ -1605,15 +1605,11 @@ public final class Specification {
      * @param naval If true, choose roles for naval units, if not, land units.
      */
     public List<Role> getREFRoles(boolean naval) {
-        List<Role> roles = new ArrayList<>();
-        if (naval) {
-            roles.add(getDefaultRole());
-        } else {
-            for (Role r : getMilitaryRoles()) {
-                if (r.requiresAbility(Ability.REF_UNIT)) roles.add(r);
-            }
-        }
-        return roles;
+        return ((naval)
+            ? Stream.of(getDefaultRole())
+            : getMilitaryRoles().stream()
+                .filter(r -> r.requiresAbility(Ability.REF_UNIT)))
+            .collect(Collectors.toList());
     }
 
 

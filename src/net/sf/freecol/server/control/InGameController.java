@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -1285,17 +1286,16 @@ public final class InGameController extends Controller {
         // declare peace on you and war on the REF.  If they are the
         // same nation, go to the next most hostile nation that may
         // already be at war.
-        List<Player> natives = new ArrayList<>();
-        for (Player p : game.getLiveNativePlayers(null)) {
-            if (p.hasContacted(serverPlayer)) natives.add(p);
-        }
-        if (!natives.isEmpty()) {
-            Collections.sort(natives, new Comparator<Player>() {
+        List<Player> natives = game.getLiveNativePlayers(null).stream()
+            .filter(p -> p.hasContacted(serverPlayer))
+            .sorted(new Comparator<Player>() {
                     public int compare(Player p1, Player p2) {
                         return p1.getTension(serverPlayer).getValue()
                             - p2.getTension(serverPlayer).getValue();
                     }
-                });
+                })
+            .collect(Collectors.toList());
+        if (!natives.isEmpty()) {
             ServerPlayer good = (ServerPlayer)natives.get(0);
             logger.info("Native ally following independence: " + good);
             cs.addMessage(See.only(serverPlayer),

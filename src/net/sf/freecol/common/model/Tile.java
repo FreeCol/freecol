@@ -30,6 +30,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -196,6 +197,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * null in clients.
      */
     private final java.util.Map<Player, IndianSettlementInternals> playerIndianSettlements;
+
+    /** A comparator to sort for best defence value. */
+    private final Comparator<Tile> defenceValueComparator
+        = new Comparator<Tile>() {
+                public int compare(Tile t1, Tile t2) {
+                    float f = t2.getDefenceValue() - t1.getDefenceValue();
+                    return (f < 0.0f) ? -1 : (f > 0.0f) ? 1 : 0;
+                }
+            };
 
 
     /**
@@ -500,10 +510,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if this is a river corner.
      */
     public boolean isRiverCorner() {
-        List<Tile> tiles = new ArrayList<>();
-        for (Tile t : getSurroundingTiles(1)) {
-            if (t.isOnRiver()) tiles.add(t);
-        }
+        List<Tile> tiles = getSurroundingTiles(0, 1).stream()
+            .filter(Tile::isOnRiver).collect(Collectors.toList());
         switch (tiles.size()) {
         case 0: case 1:
             return false;
@@ -1001,11 +1009,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public StringTemplate getLabel() {
         StringTemplate label = StringTemplate.key(type);
         if (tileItemContainer != null) {
-            List<Named> keys = new ArrayList<>();
-            for (TileItem item : tileItemContainer.getTileItems()) {
-                if (!item.isComplete()) continue;
-                keys.add(item);
-            }
+            List<Named> keys = tileItemContainer.getTileItems().stream()
+                .filter(TileItem::isComplete).collect(Collectors.toList());
             if (!keys.isEmpty()) {
                 label = StringTemplate.label("/").addNamed(type);
                 for (Named key : keys) label.addNamed(key);
@@ -1377,21 +1382,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of land <code>Tile</code>s.
      */
     public List<Tile> getSafestSurroundingLandTiles(Player player) {
-        List<Tile> tiles = new ArrayList<>();
-        for (Tile t : getSurroundingTiles(1)) {
-            if (t.isLand()
-                && (!t.hasSettlement() || player.owns(t.getSettlement()))) {
-                tiles.add(t);
-            }
-        }
-        Collections.sort(tiles, new Comparator<Tile>() {
-                @Override
-                public int compare(Tile t1, Tile t2) {
-                    float f = t2.getDefenceValue() - t1.getDefenceValue();
-                    return (f < 0.0f) ? -1 : (f > 0.0f) ? 1 : 0;
-                }
-            });
-        return tiles;
+        return getSurroundingTiles(0, 1).stream()
+            .filter(t -> t.isLand()
+                && (!t.hasSettlement() || player.owns(t.getSettlement())))
+            .sorted(defenceValueComparator).collect(Collectors.toList());
     }
                     
     /**
@@ -1438,12 +1432,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of suitable <code>Tile</code>s.
      */
     public List<Tile> getSafeAnchoringTiles(Unit unit) {
-        List<Tile> result = new ArrayList<>();
-        for (Tile t : getSurroundingTiles(1)) {
-            if (!t.isLand() && t.isHighSeasConnected()
-                && !t.isDangerousToShip(unit)) result.add(t);
-        }
-        return result;
+        return getSurroundingTiles(0, 1).stream()
+            .filter(t -> !t.isLand() && t.isHighSeasConnected()
+                && !t.isDangerousToShip(unit))
+            .collect(Collectors.toList());
     }
                 
 

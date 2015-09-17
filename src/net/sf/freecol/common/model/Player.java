@@ -33,6 +33,7 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -926,6 +927,41 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Is this player currently on good terms with a given player, and thus
+     * a suitable candidate for a random monarch war declaration?
+     *
+     * @param player The <code>Player</code> to possibly declare war on.
+     * @return True if this player is a potential enemy.
+     */
+    public boolean isPotentialEnemy(Player player) {
+        if (!hasAbility(Ability.IGNORE_EUROPEAN_WARS)
+            && player.getREFPlayer() != this) {
+            switch (getStance(player)) {
+            case PEACE: case CEASE_FIRE: return true;
+            default: break;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Is this player currently on bad terms with a given player, and thus
+     * a suitable candidate for a random monarch peace declaration?
+     *
+     * @param player The <code>Player</code> to possibly declare peace with.
+     * @return True if this player is a potential friend.
+     */
+    public boolean isPotentialFriend(Player player) {
+        if (player.getREFPlayer() != this) {
+            switch (getStance(player)) {
+            case WAR: case CEASE_FIRE: return true;
+            default: break;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get the nation type of this player.
      *
      * @return The <code>NationType</code> of this player.
@@ -1117,12 +1153,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of nations in rebellion against us.
      */
     public List<Player> getRebels() {
-        List<Player> rebels = new ArrayList<>();
-        for (Player p : getGame().getLiveEuropeanPlayers(this)) {
-            if (p.getREFPlayer() == this
-                && (p.isRebel() || p.isUndead())) rebels.add(p);
-        }
-        return rebels;
+        return getGame().getLiveEuropeanPlayers(this).stream()
+            .filter(p -> p.getREFPlayer() == this
+                && (p.isRebel() || p.isUndead()))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -2062,11 +2096,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of suitable carriers.
      */
     public List<Unit> getCarriersForUnit(Unit unit) {
-        List<Unit> ul = new ArrayList<>();
-        for (Unit u : getUnits()) {
-            if (u.couldCarry(unit)) ul.add(u);
-        }
-        return ul;
+        return getUnits().stream()
+            .filter(u -> u.couldCarry(unit))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -2076,11 +2108,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The number of units.
      */
     public int getUnitCount(boolean naval) {
-        int ret = 0;
-        for (Unit u : getUnits()) {
-            if (u.isNaval() == naval) ret++;
-        }
-        return ret;
+        return (int)getUnits().stream()
+            .filter(u -> u.isNaval() == naval)
+            .count();
     }
         
     /**
@@ -2089,16 +2119,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The number of units
      */
     public int getNumberOfKingLandUnits() {
-        int n = 0;
-        for (Unit unit : getUnits()) {
-            if (unit.hasAbility(Ability.REF_UNIT) && !unit.isNaval()) {
-                n++;
-            }
-        }
-        return n;
+        return (int)getUnits().stream()
+            .filter(u -> u.hasAbility(Ability.REF_UNIT) && !u.isNaval())
+            .count();
     }
-
- 
 
     /**
      * Checks if this player has at least one of a given unit type.
@@ -2303,12 +2327,11 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of port <code>Colony</code>s.
      */
     public List<Colony> getPorts() {
-        if (!isEuropean()) return Collections.<Colony>emptyList();
-        List<Colony> result = new ArrayList<>();
-        for (Colony colony : getColonies()) {
-            if (colony.isConnectedPort()) result.add(colony);
-        }
-        return result;
+        return (!isEuropean())
+            ? Collections.<Colony>emptyList()
+            : getColonies().stream()
+                .filter(Colony::isConnectedPort)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -2488,11 +2511,11 @@ public class Player extends FreeColGameObject implements Nameable {
      *     <code>Player</code>.
      */
     public List<ModelMessage> getNewModelMessages() {
-        List<ModelMessage> out = new ArrayList<>();
-        for (ModelMessage m : getModelMessages()) {
-            if (!m.hasBeenDisplayed()) out.add(m); // preserve message order
+        synchronized (modelMessages) {
+            return modelMessages.stream()
+                .filter(m -> !m.hasBeenDisplayed())
+                .collect(Collectors.toList());
         }
-        return out;
     }
 
     /**

@@ -826,14 +826,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of buildable <code>UnitType</code>s.
      */
     public List<UnitType> getBuildableUnits() {
-        ArrayList<UnitType> buildableUnits = new ArrayList<>();
-        List<UnitType> unitTypes = getSpecification().getUnitTypeList();
-        for (UnitType unitType : unitTypes) {
-            if (unitType.needsGoodsToBuild() && canBuild(unitType)) {
-                buildableUnits.add(unitType);
-            }
-        }
-        return buildableUnits;
+        return getSpecification().getUnitTypeList().stream()
+            .filter(ut -> ut.needsGoodsToBuild() && canBuild(ut))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -1672,11 +1667,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of burnable buildings.
      */
     public List<Building> getBurnableBuildings() {
-        List<Building> buildingList = new ArrayList<>();
-        for (Building building : getBuildings()) {
-            if (building.canBeDamaged()) buildingList.add(building);
-        }
-        return buildingList;
+        return getBuildings().stream()
+            .filter(Building::canBeDamaged).collect(Collectors.toList());
     }
 
     /**
@@ -1686,11 +1678,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of lootable goods in this colony.
      */
     public List<Goods> getLootableGoodsList() {
-        List<Goods> goodsList = new ArrayList<>();
-        for (Goods goods : getGoodsContainer().getGoods()) {
-            if (goods.getType().isStorable()) goodsList.add(goods);
-        }
-        return goodsList;
+        return getGoodsContainer().getGoods().stream()
+            .filter(g -> g.getType().isStorable())
+            .collect(Collectors.toList());
     }
 
     /**

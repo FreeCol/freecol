@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**
@@ -311,14 +312,9 @@ public class CollectionUtils {
      */
     public static <K extends Comparable<? super K>,V> List<Entry<K,V>>
         mapEntriesByKey(Map<K, V> map) {
-        List<Entry<K,V>> result = new ArrayList<>();
-        result.addAll(map.entrySet());
-        Collections.sort(result, new Comparator<Entry<K,V>>() {
-                public int compare(Entry<K,V> e1, Entry<K,V> e2) {
-                    return e1.getKey().compareTo(e2.getKey());
-                }
-            });
-        return result;
+        return map.entrySet().stream()
+            .sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -330,14 +326,9 @@ public class CollectionUtils {
      */
     public static <K,V> List<Entry<K,V>>
         mapEntriesByKey(Map<K, V> map, final Comparator<K> comparator) {
-        List<Entry<K,V>> result = new ArrayList<>();
-        result.addAll(map.entrySet());
-        Collections.sort(result, new Comparator<Entry<K,V>>() {
-                public int compare(Entry<K,V> e1, Entry<K,V> e2) {
-                    return comparator.compare(e1.getKey(), e2.getKey());
-                }
-            });
-        return result;
+        return map.entrySet().stream()
+            .sorted((e1, e2) -> comparator.compare(e1.getKey(), e2.getKey()))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -348,14 +339,9 @@ public class CollectionUtils {
      */
     public static <K,V extends Comparable<? super V>> List<Entry<K,V>>
         mapEntriesByValue(Map<K, V> map) {
-        List<Entry<K,V>> result = new ArrayList<>();
-        result.addAll(map.entrySet());
-        Collections.sort(result, new Comparator<Entry<K,V>>() {
-                public int compare(Entry<K,V> e1, Entry<K,V> e2) {
-                    return e1.getValue().compareTo(e2.getValue());
-                }
-            });
-        return result;
+        return map.entrySet().stream()
+            .sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -367,13 +353,8 @@ public class CollectionUtils {
      */
     public static <K,V> List<Entry<K,V>>
         mapEntriesByValue(Map<K, V> map, final Comparator<V> comparator) {
-        List<Entry<K,V>> result = new ArrayList<>();
-        result.addAll(map.entrySet());
-        Collections.sort(result, new Comparator<Entry<K,V>>() {
-                public int compare(Entry<K,V> e1, Entry<K,V> e2) {
-                    return comparator.compare(e1.getValue(), e2.getValue());
-                }
-            });
-        return result;
+        return map.entrySet().stream()
+            .sorted((e1, e2) -> comparator.compare(e1.getValue(), e2.getValue()))
+            .collect(Collectors.toList());
     }
 }

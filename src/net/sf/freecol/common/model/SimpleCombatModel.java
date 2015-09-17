@@ -27,6 +27,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -126,10 +127,8 @@ public class SimpleCombatModel extends CombatModel {
      * @param modSet A set of <code>Modifiers</code> to log.
      */   
     private void logModifiers(LogBuilder lb, Set<Modifier> modSet) {
-        List<Modifier> modList = new ArrayList<>();
-        modList.addAll(modSet);
-        Collections.sort(modList);
-        lb.addCollection(" ", modList);
+        lb.addCollection(" ", modSet.stream()
+            .sorted().collect(Collectors.toList()));
     }
 
     /**

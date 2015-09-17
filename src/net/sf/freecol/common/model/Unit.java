@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -855,11 +856,8 @@ public class Unit extends GoodsLocation
      */
     public List<Role> getAvailableRoles(List<Role> roles) {
         if (roles == null) roles = getSpecification().getRoles();
-        List<Role> result = new ArrayList<>();
-        for (Role role : roles) {
-            if (roleIsAvailable(role)) result.add(role);
-        }
-        return result;
+        return roles.stream()
+            .filter(r -> roleIsAvailable(r)).collect(Collectors.toList());
     }
 
     /**

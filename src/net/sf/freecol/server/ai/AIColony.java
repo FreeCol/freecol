@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -580,15 +581,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     private void exploreLCRs() {
         final Tile tile = colony.getTile();
-        List<Unit> explorers = new ArrayList<>();
-        for (Unit u : tile.getUnitList()) {
-            if (u.isPerson()
-                && (u.getType().getSkill() <= 0
-                    || u.hasAbility(Ability.EXPERT_SCOUT))) {
-                explorers.add(u);
-            }
-        }
-        Collections.sort(explorers, scoutComparator);
+        List<Unit> explorers = tile.getUnitList().stream()
+            .filter(u -> u.isPerson() && (u.getType().getSkill() <= 0
+                        || u.hasAbility(Ability.EXPERT_SCOUT)))
+            .sorted(scoutComparator).collect(Collectors.toList());
         for (Tile t : tile.getSurroundingTiles(1)) {
             if (t.hasLostCityRumour()) {
                 Direction direction = tile.getDirection(t);
@@ -630,10 +626,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (!hasDefender) return;
 
         // What goods are really needed?
-        List<GoodsType> needed = new ArrayList<>();
-        for (GoodsType g : spec.getRawBuildingGoodsTypeList()) {
-            if (colony.getTotalProductionOf(g) <= 0) needed.add(g);
-        }
+        List<GoodsType> needed = spec.getRawBuildingGoodsTypeList().stream()
+            .filter(gt -> colony.getTotalProductionOf(gt) <= 0)
+            .collect(Collectors.toList());
 
         // If a tile can be stolen, do so if already at war with the
         // owner or if it is the best one available.
@@ -1524,11 +1519,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     @Override
     public void dispose() {
-        List<AIObject> objects = new ArrayList<>();
-        for (AIGoods ag : getExportGoods()) {
-            if (ag.isDisposed() || ag.getGoods() == null) continue;
-            if (ag.getGoods().getLocation() == colony) objects.add(ag);
-        }
+        List<AIObject> objects = getExportGoods().stream()
+            .filter(ag -> !ag.isDisposed() && ag.getGoods() != null
+                && ag.getGoods().getLocation() == colony)
+            .collect(Collectors.toList());
         objects.addAll(wishes);
         wishes.clear();
         objects.addAll(tileImprovementPlans);

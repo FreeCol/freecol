@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -223,14 +224,10 @@ public final class BuildingType extends BuildableType {
      */
     public List<ProductionType> getAvailableProductionTypes(boolean unattended,
                                                             String level) {
-        List<ProductionType> result = new ArrayList<>();
-        for (ProductionType productionType : productionTypes) {
-            if (productionType.getUnattended() == unattended
-                && productionType.appliesTo(level)) {
-                result.add(productionType);
-            }
-        }
-        return result;
+        return productionTypes.stream()
+            .filter(pt -> pt.getUnattended() == unattended
+                && pt.appliesTo(level))
+            .collect(Collectors.toList());
     }
 
     // @compat 0.10.6

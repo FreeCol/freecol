@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -395,13 +396,9 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return a list of expert roles
      */
     public List<Role> getExpertRoles() {
-        List<Role> result = new ArrayList<>();
-        for (Role role : getSpecification().getRoles()) {
-            if (role.getExpertUnit() == this) {
-                result.add(role);
-            }
-        }
-        return result;
+        return getSpecification().getRoles().stream()
+            .filter(r -> r.getExpertUnit() == this)
+            .collect(Collectors.toList());
     }
 
     /**

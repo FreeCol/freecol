@@ -32,6 +32,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -496,13 +497,9 @@ public class Game extends FreeColGameObject {
      * @return The list of live <code>Player</code>s.
      */
     public List<Player> getLivePlayers(Player other) {
-        List<Player> result = new ArrayList<>();
-        for (Player player : players) {
-            if (player.isUnknownEnemy() || player.isDead()
-                || player == other) continue;
-            result.add(player);
-        }
-        return result;
+        return players.stream()
+            .filter(p -> !p.isUnknownEnemy() && !p.isDead() && p != other)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -524,13 +521,10 @@ public class Game extends FreeColGameObject {
      * @return A list of live European <code>Player</code>s in this game.
      */
     public List<Player> getLiveEuropeanPlayers(Player other) {
-        List<Player> result = new ArrayList<>();
-        for (Player player : players) {
-            if (player.isUnknownEnemy() || player.isDead()
-                || !player.isEuropean() || player == other) continue;
-            result.add(player);
-        }
-        return result;
+        return players.stream()
+            .filter(p -> !p.isUnknownEnemy() && !p.isDead() && p != other
+                && p.isEuropean())
+            .collect(Collectors.toList());
     }
 
     /**
@@ -540,13 +534,10 @@ public class Game extends FreeColGameObject {
      * @return A list of live native <code>Player</code>s in this game.
      */
     public List<Player> getLiveNativePlayers(Player other) {
-        List<Player> result = new ArrayList<>();
-        for (Player player : players) {
-            if (player.isUnknownEnemy() || player.isDead()
-                || !player.isIndian() || player == other) continue;
-            result.add(player);
-        }
-        return result;
+        return players.stream()
+            .filter(p -> !p.isUnknownEnemy() && !p.isDead() && p != other
+                && p.isIndian())
+            .collect(Collectors.toList());
     }
 
     /**
