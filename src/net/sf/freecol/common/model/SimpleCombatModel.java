@@ -509,13 +509,9 @@ public class SimpleCombatModel extends CombatModel {
      * @return True if a strong defence bonus is present.
      */
     private boolean hasStrongDefenceModifier(FreeColObject fco) {
-        for (Modifier m : fco.getDefenceModifiers()) {
-            if (m.getType() == ModifierType.PERCENTAGE
-                && m.getValue() >= STRONG_DEFENCE_THRESHOLD) {
-                return true;
-            }
-        }
-        return false;
+        return fco.getDefenceModifiers().stream()
+            .anyMatch(m -> m.getType() == ModifierType.PERCENTAGE
+                && m.getValue() >= STRONG_DEFENCE_THRESHOLD);
     }
 
     /**

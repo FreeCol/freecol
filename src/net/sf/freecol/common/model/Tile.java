@@ -1188,11 +1188,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if land locked.
      */
     public boolean isLandLocked() {
-        if (!isLand()) return false;
-        for (Tile t : getSurroundingTiles(1)) {
-            if (!t.isLand()) return false;
-        }
-        return true;
+        return (!isLand()) ? false
+            : getSurroundingTiles(0, 1).stream().allMatch(Tile::isLand);
     }
 
     /**
@@ -1205,10 +1202,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if this <code>Tile</code> is on the shore.
      */
     public boolean isShore() {
-        for (Tile t : getSurroundingTiles(1)) {
-            if (t.isLand() != this.isLand()) return true;
-        }
-        return false;
+        return getSurroundingTiles(0, 1).stream()
+            .anyMatch(t -> t.isLand() != this.isLand());
     }
 
 
@@ -1264,10 +1259,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     unexplored.
      */
     public boolean hasUnexploredAdjacent() {
-        for (Tile t : getSurroundingTiles(1)) {
-            if (!t.isExplored()) return true;
-        }
-        return false;
+        return getSurroundingTiles(0, 1).stream()
+            .anyMatch(t -> !t.isExplored());
     }
 
     /**
@@ -1412,15 +1405,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean isDangerousToShip(Unit ship) {
         final Player player = ship.getOwner();
-        for (Tile t : getSurroundingTiles(1)) {
-            if (!t.hasSettlement()) continue;
-            Settlement settlement = t.getSettlement();
-            if (!player.owns(settlement)
-                && settlement.canBombardEnemyShip()
-                && (player.atWarWith(settlement.getOwner())
-                    || ship.hasAbility(Ability.PIRACY))) return true;
-        }
-        return false;
+        return getSurroundingTiles(0, 1).stream()
+            .filter(Tile::hasSettlement)
+            .anyMatch(t -> {
+                    Settlement settlement = t.getSettlement();
+                    return !player.owns(settlement)
+                        && settlement.canBombardEnemyShip()
+                        && (player.atWarWith(settlement.getOwner())
+                            || ship.hasAbility(Ability.PIRACY));
+                });
     }
 
     /**

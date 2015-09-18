@@ -146,10 +146,8 @@ public abstract class GoodsLocation extends UnitLocation {
      * @return True if the goods are all present.
      */
     public final boolean containsGoods(List<AbstractGoods> goods) {
-        for (AbstractGoods ag : goods) {
-            if (getGoodsCount(ag.getType()) < ag.getAmount()) return false;
-        }
-        return true;
+        return goods.stream()
+            .allMatch(ag -> ag.getAmount() <= getGoodsCount(ag.getType()));
     }
 
     /**

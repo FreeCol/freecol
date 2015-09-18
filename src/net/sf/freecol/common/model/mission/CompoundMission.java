@@ -133,13 +133,9 @@ public class CompoundMission extends AbstractMission {
      */
     @Override
     public boolean isValid() {
-        if (super.isValid() && !missions.isEmpty()) {
-            for (Mission mission : missions) {
-                if (!mission.isValid()) return false;
-            }
-            return true;
-        }
-        return false;
+        return (super.isValid() && !missions.isEmpty())
+            ? missions.stream().allMatch(Mission::isValid)
+            : false;
     }
 
     /**

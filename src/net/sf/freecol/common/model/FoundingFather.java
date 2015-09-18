@@ -276,12 +276,9 @@ public class FoundingFather extends FreeColGameObjectType {
      * @return True if the father is available.
      */
     public boolean isAvailableTo(Player player) {
-        if (!player.isEuropean()) return false;
-        if (scopes == null) return true;
-        for (Scope scope : scopes) {
-            if (scope.appliesTo(player)) return true;
-        }
-        return false;
+        return (!player.isEuropean()) ? false
+            : (scopes == null) ? true
+            : scopes.stream().anyMatch(s -> s.appliesTo(player));
     }
 
 

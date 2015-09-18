@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -133,14 +134,9 @@ public abstract class BuildableType extends FreeColGameObjectType {
      */
     public boolean isAvailableTo(FreeColObject... fco) {
         if (requiredAbilities != null) {
-            FreeColObject[] objects = fco;
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
-                boolean found = false;
-                for (FreeColObject object : objects) {
-                    found = object.hasAbility(entry.getKey());
-                    if (found) break;
-                }
-                if (found != entry.getValue()) return false;
+                if (entry.getValue() != Arrays.stream(fco)
+                    .anyMatch(o -> o.hasAbility(entry.getKey()))) return false;
             }
         }
         return true;

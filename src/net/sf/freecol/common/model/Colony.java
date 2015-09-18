@@ -589,10 +589,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public Building getBuildingForProducing(final GoodsType goodsType) {
         for (Building b : buildingMap.values()) {
-            for (AbstractGoods ag : b.getOutputs()) {
-                if (ag.getType() == goodsType)
-                    return b;
-            }
+            if (AbstractGoods.findByType(goodsType, b.getOutputs()) != null)
+                return b;
         }
         return null;
     }
@@ -960,18 +958,13 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             && !getTile().isCoastland()) {
             return NoBuildReason.COASTAL;
         } else {
-            for (Entry<String, Boolean> entry
-                     : buildableType.getRequiredAbilities().entrySet()) {
-                if (hasAbility(entry.getKey()) != entry.getValue()) {
-                    return NoBuildReason.MISSING_ABILITY;
-                }
+            if (!buildableType.getRequiredAbilities().entrySet().stream()
+                .allMatch(e -> e.getValue() == hasAbility(e.getKey()))) {
+                return NoBuildReason.MISSING_ABILITY;
             }
-            if (buildableType.getLimits() != null) {
-                for (Limit limit : buildableType.getLimits()) {
-                    if (!limit.evaluate(this)) {
-                        return NoBuildReason.LIMIT_EXCEEDED;
-                    }
-                }
+            if (!buildableType.getLimits().stream()
+                .allMatch(l -> l.evaluate(this))) {
+                return NoBuildReason.LIMIT_EXCEEDED;
             }
         }
         if (assumeBuilt == null) {
@@ -998,15 +991,13 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 }
             }
         } else if (buildableType instanceof UnitType) {
-            if (!buildableType.hasAbility(Ability.PERSON)) {
-                boolean ok = hasAbility(Ability.BUILD, buildableType);
-                if (!ok) {
-                    for (BuildableType bt : assumeBuilt) {
-                        ok = bt.hasAbility(Ability.BUILD, buildableType);
-                        if (ok) break;
-                    }
-                }
-                if (!ok) return NoBuildReason.MISSING_BUILD_ABILITY;
+            // Non-person units need a BUILD ability, present or assumed.
+            if (!buildableType.hasAbility(Ability.PERSON)
+                && !hasAbility(Ability.BUILD, buildableType)
+                && assumeBuilt.stream()
+                    .noneMatch(bt -> bt.hasAbility(Ability.BUILD,
+                                                   buildableType))) {
+                return NoBuildReason.MISSING_BUILD_ABILITY;
             }
         }
         return NoBuildReason.NONE;
@@ -1760,16 +1751,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return <code>true</code> if this unit type could be added.
      */
     public boolean canTrain(UnitType unitType) {
-        if (!hasAbility(Ability.TEACH)) {
-            return false;
-        }
-
-        for (Building building : buildingMap.values()) {
-            if (building.canTeach() && building.canAddType(unitType)) {
-                return true;
-            }
-        }
-        return false;
+        return hasAbility(Ability.TEACH)
+            && buildingMap.values().stream()
+                .anyMatch(b -> b.canTeach() && b.canAddType(unitType));
     }
 
     /**
@@ -2053,10 +2037,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
         // Is there a work location that can produce the goods, with
         // satisfied inputs and positive generic production potential?
-        outer: for (WorkLocation wl : getWorkLocationsForProducing(goodsType)) {
-            for (AbstractGoods ag : wl.getInputs()) {
-                if (!canProduce(ag.getType())) continue outer;
-            }
+        for (WorkLocation wl : getWorkLocationsForProducing(goodsType)) {
+            if (!wl.getInputs().stream()
+                .allMatch(ag -> canProduce(ag.getType()))) continue;
             if (wl.getGenericPotential(goodsType) > 0) return true;
         }
         return false;
@@ -2501,10 +2484,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     @Override
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
-            for (WorkLocation wl : getAvailableWorkLocations()) {
-                if (wl.contains(locatable)) return true;
-            }
-            return false;
+            return getAvailableWorkLocations().stream()
+                .anyMatch(wl -> wl.contains(locatable));
         }
         return super.contains(locatable);
     }

@@ -230,9 +230,8 @@ public class UnitTypeChange extends FreeColObject {
      */
     public boolean appliesTo(Player player) {
         List<Scope> scopeList = getScopes();
-        if (scopeList.isEmpty()) return true;
-        for (Scope scope : scopeList) if (scope.appliesTo(player)) return true;
-        return false;
+        return (scopeList.isEmpty()) ? true
+            : scopeList.stream().anyMatch(s -> s.appliesTo(player));
     }
 
 

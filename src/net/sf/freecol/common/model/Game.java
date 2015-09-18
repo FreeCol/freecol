@@ -948,10 +948,7 @@ public class Game extends FreeColGameObject {
      * @return True if all players are ready to launch.
      */
     public boolean allPlayersReadyToLaunch() {
-        for (Player player : getLivePlayers(null)) {
-            if (!player.isReady()) return false;
-        }
-        return true;
+        return getLivePlayers(null).stream().allMatch(Player::isReady);
     }
 
     /**

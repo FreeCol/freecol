@@ -224,11 +224,8 @@ public abstract class Feature extends FreeColObject implements Named {
      *     applicable to the object.
      */
     public boolean appliesTo(final FreeColGameObjectType objectType) {
-        if (!hasScope()) return true;
-        for (Scope scope : scopes) {
-            if (scope.appliesTo(objectType)) return true;
-        }
-        return false;
+        return (!hasScope()) ? true
+            : scopes.stream().anyMatch(s -> s.appliesTo(objectType));
     }
 
     /**
@@ -332,18 +329,11 @@ public abstract class Feature extends FreeColObject implements Named {
             } else if (feature.scopes == null) {
                 return false;
             } else {
-                // not very efficient, but we do not expect many
-                // scopes
-                for (Scope scope : scopes) {
-                    if (!feature.scopes.contains(scope)) {
-                        return false;
-                    }
-                }
-                for (Scope scope : feature.scopes) {
-                    if (!scopes.contains(scope)) {
-                        return false;
-                    }
-                }
+                // Not very efficient, but we do not expect many scopes
+                if (!scopes.stream()
+                    .allMatch(s -> feature.scopes.contains(s))
+                    || !feature.scopes.stream()
+                    .allMatch(s -> scopes.contains(s))) return false;
             }
             return true;
         }

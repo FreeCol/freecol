@@ -106,11 +106,9 @@ public final class FeatureContainer {
      * @return True if the ability set is `satisfied'.
      */
     public static boolean hasAbility(Set<Ability> abilitySet) {
-        if (abilitySet == null || abilitySet.isEmpty()) return false;
-        for (Ability ability : abilitySet) {
-            if (!ability.getValue()) return false;
-        }
-        return true;
+        return (abilitySet == null || abilitySet.isEmpty())
+            ? false
+            : abilitySet.stream().allMatch(Ability::getValue);
     }
 
     /**

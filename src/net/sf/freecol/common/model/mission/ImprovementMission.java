@@ -140,13 +140,8 @@ public class ImprovementMission extends AbstractMission {
      * @return false
      */
     public static boolean isValidFor(Unit unit) {
-        for (TileImprovementType type : unit.getGame().getSpecification()
-                 .getTileImprovementTypeList()) {
-            if (type.isWorkerAllowed(unit)) {
-                return true;
-            }
-        }
-        return false;
+        return unit.getGame().getSpecification().getTileImprovementTypeList().stream()
+            .anyMatch(ti -> ti.isWorkerAllowed(unit));
     }
 
 

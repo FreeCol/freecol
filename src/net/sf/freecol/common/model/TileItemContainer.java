@@ -435,10 +435,8 @@ public class TileItemContainer extends FreeColGameObject {
      * @return True if this container allows the goods type to be produced.
      */
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
-        for (TileItem ti : tileItems) {
-            if (ti.canProduce(goodsType, unitType)) return true;
-        }
-        return false;
+        return tileItems.stream()
+            .anyMatch(ti -> ti.canProduce(goodsType, unitType));
     }
 
     /**

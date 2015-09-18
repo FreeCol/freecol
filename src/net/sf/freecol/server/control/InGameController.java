@@ -614,14 +614,9 @@ public final class InGameController extends Controller {
             // Are there humans left?
             // FIXME: see if this can be relaxed so we can run large
             // AI-only simulations.
-            boolean human = false;
-            for (ServerPlayer sp : game.getConnectedPlayers()) {
-                if (!sp.isAI()) {
-                    human = true;
-                    break;
-                }
-            }
-            if (!human) {
+            boolean onlyAI = game.getConnectedPlayers().stream()
+                .allMatch(Player::isAI);
+            if (onlyAI) {
                 logger.info("No human player left.");
                 if (debugOnlyAITurns > 0) { // Complete debug runs
                     FreeColDebugger.signalEndDebugRun();

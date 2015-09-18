@@ -364,16 +364,14 @@ public abstract class Settlement extends GoodsLocation
      * @return True if the settlement can provide the equipment.
      */
     public boolean canProvideGoods(List<AbstractGoods> goods) {
-        for (AbstractGoods ag : goods) {
-            int available = getGoodsCount(ag.getType());
-
-            int breedingNumber = ag.getType().getBreedingNumber();
-            if (breedingNumber != GoodsType.INFINITY) {
-                available -= breedingNumber;
-            }
-            if (available < ag.getAmount()) return false;
-        }
-        return true;
+        return goods.stream().allMatch(ag -> {
+                int available = getGoodsCount(ag.getType());
+                int breedingNumber = ag.getType().getBreedingNumber();
+                if (breedingNumber != GoodsType.INFINITY) {
+                    available -= breedingNumber;
+                }
+                return available >= ag.getAmount();
+            });
     }
 
     /**

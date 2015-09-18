@@ -160,10 +160,8 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @return True if there are any child <code>OptionGroup</code>s present.
      */
     public boolean hasOptionGroup() {
-        for (Option o : options) {
-            if (o instanceof OptionGroup) return true;
-        }
-        return false;
+        return options.stream()
+            .anyMatch(o -> o instanceof OptionGroup);
     }
 
     /**

@@ -2247,13 +2247,12 @@ public class Unit extends GoodsLocation
                 return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
             }
         } else { // moving to sea, check for embarkation
-            if (defender == null || !getOwner().owns(defender)) {
-                return MoveType.MOVE_NO_ACCESS_EMBARK;
-            }
-            for (Unit u : target.getUnitList()) {
-                if (u.canAdd(this)) return MoveType.EMBARK;
-            }
-            return MoveType.MOVE_NO_ACCESS_FULL;
+            return (defender == null || !getOwner().owns(defender))
+                ? MoveType.MOVE_NO_ACCESS_EMBARK
+                : (target.getUnitList().stream()
+                    .anyMatch(u -> u.canAdd(this)))
+                ? MoveType.EMBARK
+                : MoveType.MOVE_NO_ACCESS_FULL;
         }
     }
 
@@ -2431,14 +2430,12 @@ public class Unit extends GoodsLocation
      *      seas or can make a move to a neighbouring high seas tile.
      */
     public boolean hasHighSeasMove() {
-        if (canMoveToHighSeas()) return true;
-        if (hasTile() && getMovesLeft() > 0) {
-            for (Tile t : getTile().getSurroundingTiles(1)) {
-                if (t.isDirectlyHighSeasConnected()
-                    && getMoveType(t).isLegal()) return true;
-            }
-        }
-        return false;
+        return (canMoveToHighSeas())
+            ? true
+            : (hasTile() && getMovesLeft() > 0)
+            ? getTile().getSurroundingTiles(1, 1).stream()
+                .anyMatch(Tile::isDirectlyHighSeasConnected)
+            : false;
     }
 
     /**

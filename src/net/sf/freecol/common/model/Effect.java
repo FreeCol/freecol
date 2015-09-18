@@ -131,11 +131,8 @@ public class Effect extends FreeColGameObjectType {
      * @return True if this effect applies.
      */
     public boolean appliesTo(final FreeColGameObjectType objectType) {
-        if (scopes == null || scopes.isEmpty()) return true;
-        for (Scope scope : scopes) {
-            if (scope.appliesTo(objectType)) return true;
-        }
-        return false;
+        return (scopes == null || scopes.isEmpty()) ? true
+            : scopes.stream().anyMatch(s -> s.appliesTo(objectType));
     }
 
 
