@@ -163,7 +163,8 @@ public final class AboutPanel extends FreeColPanel {
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String url = ae.getActionCommand();
-        if (SITE_URL.equals(url) || PROJECT_URL.equals(url)) {
+        if (SITE_URL.equals(url) || PROJECT_URL.equals(url)
+            || MANUAL_URL.equals(url)) {
             String os = System.getProperty("os.name");
             // FIXME: move this to OS utilities
             String[] cmd = null;
