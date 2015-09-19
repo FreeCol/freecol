@@ -19,13 +19,11 @@
 
 package net.sf.freecol.client.gui.action;
 
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
@@ -241,14 +239,10 @@ public abstract class FreeColAction extends AbstractAction
             + (ResourceManager.hasImageResource(pressedKey) ? 1 : 0)
             + (ResourceManager.hasImageResource(disabledKey) ? 1 : 0);
         if (hasOrderButtons()) {
-            Image normal = ResourceManager.getImage(normalKey);
-            Image highlighted = ResourceManager.getImage(highlightedKey);
-            Image pressed = ResourceManager.getImage(pressedKey);
-            Image disabled = ResourceManager.getImage(disabledKey);
-            putValue(BUTTON_IMAGE, new ImageIcon(normal));
-            putValue(BUTTON_ROLLOVER_IMAGE, new ImageIcon(highlighted));
-            putValue(BUTTON_PRESSED_IMAGE, new ImageIcon(pressed));
-            putValue(BUTTON_DISABLED_IMAGE, new ImageIcon(disabled));
+            putValue(BUTTON_IMAGE, normalKey);
+            putValue(BUTTON_ROLLOVER_IMAGE, highlightedKey);
+            putValue(BUTTON_PRESSED_IMAGE, pressedKey);
+            putValue(BUTTON_DISABLED_IMAGE, disabledKey);
         } else {
             logger.warning("Missing " + (4-orderButtonImageCount)
                 + " order button images for " + getId());

@@ -25,10 +25,12 @@ import java.beans.PropertyChangeListener;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.FreeColAction;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -72,20 +74,21 @@ public final class UnitButton extends JButton {
 
         if (a != null) {
             setRolloverEnabled(true);
-            Icon bi = (Icon) a.getValue(FreeColAction.BUTTON_IMAGE);
+            String key = (String) a.getValue(FreeColAction.BUTTON_IMAGE);
+            ImageIcon bi = new ImageIcon(ResourceManager.getImage(key));
             setIcon(bi);
-            setRolloverIcon((Icon) a.getValue(FreeColAction.BUTTON_ROLLOVER_IMAGE));
-            setPressedIcon((Icon) a.getValue(FreeColAction.BUTTON_PRESSED_IMAGE));
-            setDisabledIcon((Icon) a.getValue(FreeColAction.BUTTON_DISABLED_IMAGE));
+            key = (String) a.getValue(FreeColAction.BUTTON_ROLLOVER_IMAGE);
+            setRolloverIcon(new ImageIcon(ResourceManager.getImage(key)));
+            key = (String) a.getValue(FreeColAction.BUTTON_PRESSED_IMAGE);
+            setPressedIcon(new ImageIcon(ResourceManager.getImage(key)));
+            key = (String) a.getValue(FreeColAction.BUTTON_DISABLED_IMAGE);
+            setDisabledIcon(new ImageIcon(ResourceManager.getImage(key)));
             setToolTipText((String) a.getValue(FreeColAction.NAME));
             setText(null);
             setFocusPainted(false);
             setContentAreaFilled(false);
             setBorderPainted(false);
 
-            if (bi == null) {
-                throw new IllegalArgumentException("The given action is missing \"BUTTON_IMAGE\".");
-            }
             setSize(bi.getIconWidth(), bi.getIconHeight());
         }
     }
@@ -118,20 +121,20 @@ public final class UnitButton extends JButton {
                 button.setIcon(icon);
                 button.repaint();
             } else if (FreeColAction.BUTTON_IMAGE.equals(e.getPropertyName())) {
-                Icon icon = (Icon) e.getNewValue();
-                button.setIcon(icon);
+                String key = (String) e.getNewValue();
+                button.setIcon(new ImageIcon(ResourceManager.getImage(key)));
                 button.repaint();
             } else if (FreeColAction.BUTTON_ROLLOVER_IMAGE.equals(e.getPropertyName())) {
-                Icon icon = (Icon) e.getNewValue();
-                button.setRolloverIcon(icon);
+                String key = (String) e.getNewValue();
+                button.setRolloverIcon(new ImageIcon(ResourceManager.getImage(key)));
                 button.repaint();
             } else if (FreeColAction.BUTTON_PRESSED_IMAGE.equals(e.getPropertyName())) {
-                Icon icon = (Icon) e.getNewValue();
-                button.setPressedIcon(icon);
+                String key = (String) e.getNewValue();
+                button.setPressedIcon(new ImageIcon(ResourceManager.getImage(key)));
                 button.repaint();
             } else if (FreeColAction.BUTTON_DISABLED_IMAGE.equals(e.getPropertyName())) {
-                Icon icon = (Icon) e.getNewValue();
-                button.setDisabledIcon(icon);
+                String key = (String) e.getNewValue();
+                button.setDisabledIcon(new ImageIcon(ResourceManager.getImage(key)));
                 button.repaint();
             } else if (Action.MNEMONIC_KEY.equals(e.getPropertyName())) {
                 Integer mn = (Integer) e.getNewValue();
