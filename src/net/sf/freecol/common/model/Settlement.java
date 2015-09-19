@@ -423,6 +423,16 @@ public abstract class Settlement extends GoodsLocation
     }
 
 
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColGameObject getLinkTarget(Player player) {
+        return (player == getOwner()) ? this : getTile();
+    }
+
     // Override FreeColObject
 
     /**

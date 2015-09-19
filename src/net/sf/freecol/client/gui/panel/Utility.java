@@ -48,8 +48,13 @@ import javax.swing.text.StyleContext;
 
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Named;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -169,6 +174,43 @@ public final class Utility {
         button.setActionCommand(action);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return button;
+    }
+
+    /**
+     * Make a suitable link button for a given key.
+     *
+     * Colonies and Europe-like objects are obvious, locations and units
+     * are dependent on the message source.
+     * TODO: Are there more useful possibilities?
+     *
+     * @param key The message key to make a link for.
+     * @param val The text for the link.
+     * @param player The <code>Player</code> to make a link for.
+     * @param source The message source <code>FreeColGameObject</code>.
+     * @return A <code>JButton</code> for the link, or null if no good
+     *     choice found.
+     */
+    public static JButton getMessageButton(String key, String val,
+        Player player, FreeColGameObject source) {
+        FreeColGameObject link = null;
+        if ("%colony%".equals(key) || key.endsWith("Colony%")) {
+            Settlement settlement = player.getGame().getSettlement(val);
+            link = (settlement == null) ? null
+                : (player.owns(settlement)) ? settlement
+                : settlement.getTile();
+        } else if ("%europe%".equals(key) || "%market%".equals(key)) {
+            link = player.getEurope();
+        } else if ("%location%".equals(key) || key.endsWith("Location%")) {
+            if (source instanceof Location) {
+                link = source.getLinkTarget(player);
+            }
+        } else if ("%unit%".equals(key) || key.endsWith("Unit%")) {
+            if (source instanceof Unit) {
+                link = source.getLinkTarget(player);
+            }
+        }
+        return (link == null) ? null
+            : getLinkButton(val, null, link.getId());
     }
 
     /**

@@ -97,6 +97,16 @@ public class HighSeas extends UnitLocation {
     }
 
 
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColGameObject getLinkTarget(Player player) {
+        return player.getEurope();
+    }
+
     // Interface Location (from UnitLocation)
     // Inherits
     //   FreeColObject.getId

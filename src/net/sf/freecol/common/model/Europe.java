@@ -257,15 +257,22 @@ public class Europe extends UnitLocation
     // Override FreeColObject
 
     /**
-     * Gets the feature container for this Europe object.
-     *
-     * @return The <code>FeatureContainer</code>.
+     * {@inheritDoc}
      */
     @Override
     public FeatureContainer getFeatureContainer() {
         return featureContainer;
     }
 
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColGameObject getLinkTarget(Player player) {
+        return (getOwner() == player) ? this : null;
+    }
 
     // Interface Location (from UnitLocation)
     // Inheriting:

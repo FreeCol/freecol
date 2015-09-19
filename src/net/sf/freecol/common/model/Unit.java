@@ -4047,6 +4047,15 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
+    public FreeColGameObject getLinkTarget(Player player) {
+        return (hasTile()) ? (FreeColGameObject)getTile().up()
+            : player.getEurope();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
         if (this.role == null) {

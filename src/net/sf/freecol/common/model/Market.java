@@ -466,6 +466,16 @@ public final class Market extends FreeColGameObject implements Ownable {
         this.owner = owner;
     }
 
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColGameObject getLinkTarget(Player player) {
+        return (player == getOwner()) ? getOwner().getEurope() : null;
+    }
+
 
     // Serialization
 

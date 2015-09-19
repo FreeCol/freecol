@@ -305,81 +305,17 @@ public final class ReportTurnPanel extends ReportPanel {
 
     private void insertMessage(StyledDocument document, ModelMessage message,
                                Player player) throws BadLocationException {
-        final String input = Messages.message(message);
-        final Game game = getFreeColClient().getGame();
-        final FreeColGameObject messageSource = game.getMessageSource(message);
-        int start = 0;
-        for (String key : message.getKeys()) {
-            StringTemplate rep = message.getReplacement(key);
-            String val = Messages.message(rep);
-            int index = input.indexOf(val, start);
-            if (index < 0) continue;
-            insertText(document, input.substring(start, index));
-            if ("%colony%".equals(key) || key.endsWith("Colony%")) {
-                Settlement settlement = game.getSettlement(val);
-                if (settlement != null) {
-                    if (player.owns(settlement)) {
-                        insertLinkButton(document, settlement, val);
-                    } else {
-                        insertLinkButton(document, settlement.getTile(), val);
-                    }
-                } else if (messageSource instanceof Tile) {
-                    insertLinkButton(document, messageSource, val);
-                } else {
-                    insertText(document, val);
-                }
-            } else if ("%europe%".equals(key)
-                || ("%market%".equals(key) && player.isColonial())) {
-                insertLinkButton(document, player.getEurope(), val);
-            } else if ("%location%".equals(key)
-                || key.endsWith("Location%")) {
-                if (messageSource instanceof Europe) {
-                    insertLinkButton(document, player.getEurope(), val);
-                } else if (messageSource instanceof Location) {
-                    Location loc = ((Location)messageSource).up();
-                    insertLinkButton(document, (FreeColGameObject)loc, val);
-                } else {
-                    insertText(document, val);
-                }
-            } else if ("%unit%".equals(key) || key.endsWith("Unit%")
-                || "%newName%".equals(key)) {
-                Tile tile = null;
-                if (messageSource instanceof Unit) {
-                    tile = ((Unit)messageSource).getTile();
-                } else if (messageSource instanceof Tile) {
-                    tile = (Tile)messageSource;
-                }
-                if (tile != null) {
-                    Settlement settlement = tile.getSettlement();
-                    if (settlement != null && player.owns(settlement)) {
-                        insertLinkButton(document, settlement, val);
-                    } else {
-                        insertLinkButton(document, tile, val);
-                    }
-                } else {
-                    insertText(document, val);
-                }
-            } else {
-                insertText(document, val);
+        for (Object o : message.splitLinks(player)) {
+            if (o instanceof String) {
+                document.insertString(document.getLength(), (String)o,
+                                      document.getStyle("regular"));
+            } else if (o instanceof JButton) {
+                JButton b = (JButton)o;
+                b.addActionListener(this);
+                StyleConstants.setComponent(document.getStyle("button"), b);
+                document.insertString(document.getLength(), " ",
+                                      document.getStyle("button"));
             }
-            start = index + val.length();
         }
-        insertText(document, input.substring(start));
-    }
-
-    private void insertText(StyledDocument document, String text)
-        throws BadLocationException {
-        document.insertString(document.getLength(), text,
-                              document.getStyle("regular"));
-    }
-
-    private void insertLinkButton(StyledDocument document,
-                                  FreeColGameObject object, String name)
-        throws BadLocationException {
-        JButton button = Utility.getLinkButton(name, null, object.getId());
-        button.addActionListener(this);
-        StyleConstants.setComponent(document.getStyle("button"), button);
-        document.insertString(document.getLength(), " ",
-                              document.getStyle("button"));
     }
 }
