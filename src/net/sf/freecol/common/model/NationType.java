@@ -100,9 +100,7 @@ public abstract class NationType extends FreeColGameObjectType {
      * @param settlementType The <code>SettlementType</code> to add.
      */
     private void addSettlementType(SettlementType settlementType) {
-        if (settlementTypes == null) {
-            settlementTypes = new ArrayList<>();
-        }
+        if (settlementTypes == null) settlementTypes = new ArrayList<>();
         settlementTypes.add(settlementType);
     }
 
@@ -112,9 +110,7 @@ public abstract class NationType extends FreeColGameObjectType {
      * @param types A list of <code>SettlementType</code>s to add.
      */
     private void addSettlementTypes(List<SettlementType> types) {
-        if (settlementTypes == null) {
-            settlementTypes = new ArrayList<>();
-        }
+        if (settlementTypes == null) settlementTypes = new ArrayList<>();
         settlementTypes.addAll(types);
     }
 

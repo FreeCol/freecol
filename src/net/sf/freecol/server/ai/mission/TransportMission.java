@@ -183,11 +183,9 @@ public class TransportMission extends Mission {
      * @return A copy of the list of cargoes.
      */
     private List<Cargo> tCopy() {
-        List<Cargo> nxt;
         synchronized (cargoes) {
-            nxt = new ArrayList<>(cargoes);
+            return new ArrayList<>(cargoes);
         }
-        return nxt;
     }
 
     /**

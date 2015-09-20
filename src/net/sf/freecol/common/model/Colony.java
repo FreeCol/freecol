@@ -1073,8 +1073,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of required abstract goods.
      */
     public List<AbstractGoods> getFullRequiredGoods(BuildableType buildable) {
+        if (buildable == null) return Collections.<AbstractGoods>emptyList();
+
         List<AbstractGoods> required = new ArrayList<>();
-        if (buildable == null) return required;
         for (AbstractGoods ag : buildable.getRequiredGoods()) {
             int amount = ag.getAmount();
             GoodsType type = ag.getType();

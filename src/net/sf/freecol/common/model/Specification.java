@@ -2013,8 +2013,7 @@ public final class Specification {
         }
 
         // Fix all other UnitListOptions
-        List<Option> todo = new ArrayList<>();
-        for (OptionGroup og : getDifficultyLevels()) todo.add(og);
+        List<Option> todo = new ArrayList<>(getDifficultyLevels());
         while (!todo.isEmpty()) {
             Option o = todo.remove(0);
             if (o instanceof OptionGroup) {

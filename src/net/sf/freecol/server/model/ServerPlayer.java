@@ -1047,8 +1047,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public List<Unit> createUnits(List<AbstractUnit> abstractUnits,
                                   Location location) {
+        if (location == null) return Collections.<Unit>emptyList();
         List<Unit> units = new ArrayList<>();
-        if (location == null) return units;
 
         final Game game = getGame();
         final Specification spec = game.getSpecification();
@@ -1439,10 +1439,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 interventionBells = Integer.MIN_VALUE;
                 
                 // Enter near a port.
-                List<Colony> ports = new ArrayList<>();
-                for (Colony c : getColonies()) {
-                    if (c.isConnectedPort()) ports.add(c);
-                }
+                List<Colony> ports = getPorts();
                 Colony port = getRandomMember(logger, "Intervention port",
                                               ports, random);
                 Tile portTile = port.getTile();
@@ -1638,7 +1635,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 for (Modifier modifier : effect.getModifiers()) {
                     if (modifier.getDuration() > 0) {
                         Modifier timedModifier = Modifier
-                                .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
+                            .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
                         modifier.setModifierIndex(Modifier.DISASTER_PRODUCTION_INDEX);
                         cs.addFeatureChange(this, this, timedModifier, true);
                     } else {
@@ -1648,59 +1645,61 @@ public class ServerPlayer extends Player implements ServerModelObject {
             } else {
                 if (null != effect.getId()) {
                     switch (effect.getId()) {
-                        case Effect.LOSS_OF_MONEY:
-                            int plunder = Math.max(1, colony.getPlunder(null, random) / 5);
-                            modifyGold(-plunder);
-                            cs.addPartial(See.only(this), this, "gold");
+                    case Effect.LOSS_OF_MONEY:
+                        int plunder = Math.max(1, colony.getPlunder(null, random) / 5);
+                        modifyGold(-plunder);
+                        cs.addPartial(See.only(this), this, "gold");
+                        messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                effect.getId(), this)
+                            .addAmount("%amount%", plunder));
+                        break;
+                    case Effect.LOSS_OF_BUILDING:
+                        Building building = getBuildingForEffect(colony, effect, random);
+                        if (building != null) {
+                            // Add message before damaging building
                             messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                    effect.getId(), this)
-                                    .addAmount("%amount%", plunder));
-                            break;
-                        case Effect.LOSS_OF_BUILDING:
-                            Building building = getBuildingForEffect(colony, effect, random);
-                            if (building != null) {
-                                // Add message before damaging building
-                                messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                        effect.getId(), colony)
-                                        .addNamed("%building%", building.getType()));
-                                csDamageBuilding(building, cs);
-                                colonyDirty = true;
-                    }       break;
-                        case Effect.LOSS_OF_GOODS:
-                            Goods goods = getRandomMember(logger, "select goods",
-                                    colony.getLootableGoodsList(),
-                                    random);
-                            if (goods != null) {
-                                goods.setAmount(Math.min(goods.getAmount() / 2, 50));
-                                colony.removeGoods(goods);
-                                messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                        effect.getId(), colony)
-                                        .addStringTemplate("%goods%", goods.getLabel(true)));
-                                colonyDirty = true;
-                    }       break;
-                        case Effect.LOSS_OF_UNIT:
-                        {
-                                Unit unit = getUnitForEffect(colony, effect, random);
-                                if (unit != null) {
-                                    if (colony.getUnitCount() == 1) {
-                                        messages.clear();
-                                        messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                                "model.player.disaster.effect.colonyDestroyed", this)
-                                                .addName("%colony%", colony.getName()));
-                                        csDisposeSettlement(colony, cs);
-                                        colonyDirty = false;
-                                        break OUTER; // No point proceeding
-                                    }
-                                    messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                            effect.getId(), colony)
-                                            .addStringTemplate("%unit%", unit.getLabel()));
-                                    cs.addRemove(See.only(this), null, unit);
-                                    unit.dispose();//-vis: Safe, entirely within colony
-                                    colonyDirty = true;
-                                }
-                                break;
+                                    effect.getId(), colony)
+                                .addNamed("%building%", building.getType()));
+                            csDamageBuilding(building, cs);
+                            colonyDirty = true;
                         }
-                        case Effect.DAMAGED_UNIT:
+                        break;
+                    case Effect.LOSS_OF_GOODS:
+                        Goods goods = getRandomMember(logger, "select goods",
+                            colony.getLootableGoodsList(),
+                            random);
+                        if (goods != null) {
+                            goods.setAmount(Math.min(goods.getAmount() / 2, 50));
+                            colony.removeGoods(goods);
+                            messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                    effect.getId(), colony)
+                                .addStringTemplate("%goods%", goods.getLabel(true)));
+                            colonyDirty = true;
+                        }
+                        break;
+                    case Effect.LOSS_OF_UNIT:
+                        {
+                            Unit unit = getUnitForEffect(colony, effect, random);
+                            if (unit != null) {
+                                if (colony.getUnitCount() == 1) {
+                                    messages.clear();
+                                    messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                            "model.player.disaster.effect.colonyDestroyed", this)
+                                        .addName("%colony%", colony.getName()));
+                                    csDisposeSettlement(colony, cs);
+                                    colonyDirty = false;
+                                    break OUTER; // No point proceeding
+                                }
+                                messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                        effect.getId(), colony)
+                                    .addStringTemplate("%unit%", unit.getLabel()));
+                                cs.addRemove(See.only(this), null, unit);
+                                unit.dispose();//-vis: Safe, entirely within colony
+                                colonyDirty = true;
+                            }
+                            break;
+                        }
+                    case Effect.DAMAGED_UNIT:
                         {
                             Unit unit = getUnitForEffect(colony, effect, random);
                             if (unit != null && unit.isNaval()) {
@@ -1708,31 +1707,33 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                 if (repairLocation == null) {
                                     messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                             effect.getId(), colony)
-                                            .addStringTemplate("%unit%", unit.getLabel()));
+                                        .addStringTemplate("%unit%", unit.getLabel()));
                                     csSinkShip(unit, null, cs);
                                 } else {
                                     messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                             effect.getId(), colony)
-                                            .addStringTemplate("%unit%", unit.getLabel()));
+                                        .addStringTemplate("%unit%", unit.getLabel()));
                                     csDamageShip(unit, repairLocation, cs);
                                 }
                                 colonyDirty = true;
-                            }           break;
+                            }
+                            break;
                         }
-                        default:
-                            messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                    effect.getId(), colony));
-                            for (Modifier modifier : effect.getModifiers()) {
-                                if (modifier.getDuration() > 0) {
-                                    Modifier timedModifier = Modifier
-                                            .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
-                                    timedModifier.setModifierIndex(Modifier.DISASTER_PRODUCTION_INDEX);
-                                    cs.addFeatureChange(this, colony, timedModifier, true);
-                        } else {
-                            cs.addFeatureChange(this, colony, modifier, true);
+                    default:
+                        messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                effect.getId(), colony));
+                        for (Modifier modifier : effect.getModifiers()) {
+                            if (modifier.getDuration() > 0) {
+                                Modifier timedModifier = Modifier
+                                    .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
+                                timedModifier.setModifierIndex(Modifier.DISASTER_PRODUCTION_INDEX);
+                                cs.addFeatureChange(this, colony, timedModifier, true);
+                            } else {
+                                cs.addFeatureChange(this, colony, modifier, true);
+                            }
+                            colonyDirty = true;
                         }
-                        colonyDirty = true;
-                    }       break;
+                        break;
                     }
                 }
             }

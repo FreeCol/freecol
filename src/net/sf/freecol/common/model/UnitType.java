@@ -437,9 +437,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @param change The <code>UnitTypeChange</code> to add.
      */
     private void addTypeChange(UnitTypeChange change) {
-        if (typeChanges == null) {
-            typeChanges = new ArrayList<>();
-        }
+        if (typeChanges == null) typeChanges = new ArrayList<>();
         typeChanges.add(change);
     }
 
@@ -938,16 +936,12 @@ public final class UnitType extends BuildableType implements Consumer {
             defaultRole = parent.defaultRole;
 
             if (parent.typeChanges != null) {
-                if (typeChanges == null) {
-                    typeChanges = new ArrayList<>();
-                }
+                if (typeChanges == null) typeChanges = new ArrayList<>();
                 typeChanges.addAll(parent.typeChanges);
             }
 
             if (parent.consumption != null) {
-                if (consumption == null) {
-                    consumption = new TypeCountMap<>();
-                }
+                if (consumption == null) consumption = new TypeCountMap<>();
                 consumption.putAll(parent.consumption);
             }
 

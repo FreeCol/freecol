@@ -369,8 +369,7 @@ public class ColonyPlan {
      */
     public void update() {
         // Update the profile type.
-        profileType = ProfileType
-            .getProfileTypeFromSize(colony.getUnitCount());
+        profileType = ProfileType.getProfileTypeFromSize(colony.getUnitCount());
 
         // Build the total map of all possible production with standard units.
         Map<GoodsType, Map<WorkLocation, Integer>> production

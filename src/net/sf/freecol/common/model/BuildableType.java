@@ -176,9 +176,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * @param ag The required <code>AbstractGoods</code> to add.
      */
     private void addRequiredGoods(AbstractGoods ag) {
-        if (requiredGoods == null) {
-            requiredGoods = new ArrayList<>();
-        }
+        if (requiredGoods == null) requiredGoods = new ArrayList<>();
         requiredGoods.add(ag);
     }
 

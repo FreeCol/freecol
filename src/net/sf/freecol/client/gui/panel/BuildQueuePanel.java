@@ -946,18 +946,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         return result;
     }
 
-    private List<BuildableType> getBuildableTypes(Object[] objects) {
-        List<BuildableType> result = new ArrayList<>();
-        if (objects != null) {
-            for (Object object : objects) {
-                if (object instanceof BuildableType) {
-                    result.add((BuildableType) object);
-                }
-            }
-        }
-        return result;
-    }
-
     private int getMinimumIndex(BuildableType buildableType) {
         ListModel<BuildableType> buildQueue = this.buildQueueList.getModel();
         if (buildableType instanceof UnitType) {
