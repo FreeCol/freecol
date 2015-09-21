@@ -210,12 +210,10 @@ public final class UnitLabel extends JLabel
             ImageIcon imageIcon = new ImageIcon(lib.getUnitImage(unit));
             ImageIcon disabledImageIcon = new ImageIcon(lib.getUnitImage(unit, true));
             if (unit.getLocation() instanceof ColonyTile) {
-                final Tile tile = unit.getLocation().getTile();
-                final TileType tileType = tile.getType();
-                final Image image = lib.getTerrainImage(tileType, tile.getX(),
-                                                        tile.getY());
-                setSize(new Dimension(image.getWidth(null) / 2,
-                                      imageIcon.getIconHeight()));
+                Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+                tileSize.width /= 2;
+                tileSize.height = imageIcon.getIconHeight();
+                setSize(tileSize);
             } else {
                 setPreferredSize(null);
             }

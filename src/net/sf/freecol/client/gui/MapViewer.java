@@ -2602,12 +2602,12 @@ public final class MapViewer {
      */
     private void setImageLibraryAndUpdateData(ImageLibrary lib) {
         this.lib = lib;
-        rp = new RoadPainter(lib);
         // ATTENTION: we assume that all base tiles have the same size
-        Image unexplored = lib.getTerrainImage(null, 0, 0);
-        tileHeight = unexplored.getHeight(null);
+        Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+        rp = new RoadPainter(tileSize);
+        tileHeight = tileSize.height;
+        tileWidth = tileSize.width;
         halfHeight = tileHeight/2;
-        tileWidth = unexplored.getWidth(null);
         halfWidth = tileWidth/2;
 
         int dx = tileWidth/16;

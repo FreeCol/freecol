@@ -21,8 +21,8 @@ package net.sf.freecol.client.gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.geom.GeneralPath;
@@ -52,12 +52,10 @@ public final class RoadPainter {
         new EnumMap<>(Direction.class);
     private Stroke roadStroke = new BasicStroke(2);
 
-    public RoadPainter(ImageLibrary lib) {
-        // ATTENTION: we assume that all base tiles have the same size
-        Image unexplored = lib.getTerrainImage(null, 0, 0);
-        tileHeight = unexplored.getHeight(null);
+    public RoadPainter(Dimension tileSize) {
+        tileHeight = tileSize.height;
+        tileWidth = tileSize.width;
         halfHeight = tileHeight/2;
-        tileWidth = unexplored.getWidth(null);
         halfWidth = tileWidth/2;
 
         int dy = tileHeight/16;
