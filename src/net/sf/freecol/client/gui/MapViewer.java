@@ -266,6 +266,15 @@ public final class MapViewer {
 
 
     /**
+     * Gets the contained <code>ImageLibrary</code>.
+     * 
+     * @return The image library;
+     */
+    ImageLibrary getImageLibrary() {
+        return lib;
+    }
+
+    /**
      * Get the view mode.
      *
      * @return The view mode.
@@ -293,38 +302,6 @@ public final class MapViewer {
             viewMode = newViewMode;
             gui.updateMapControls();
         }
-    }
-
-    /**
-     * Set the current active unit path.
-     *
-     * @param path The current <code>PathNode</code>.
-     */
-    void setCurrentPath(PathNode path) {
-        this.currentPath = path;
-    }
-
-    /**
-     * Sets the path of the active unit to display it.
-     */
-    void updateCurrentPathForActiveUnit() {
-        PathNode path;
-        if (activeUnit == null
-            || activeUnit.getDestination() == null
-            || ((FreeColGameObject)activeUnit.getDestination()).isDisposed()
-            || Map.isSameLocation(activeUnit.getLocation(),
-                                  activeUnit.getDestination())) {
-            path = null;
-        } else {
-            try {
-                path = activeUnit.findPath(activeUnit.getDestination());
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Path fail", e);
-                path = null;
-                activeUnit.setDestination(null);
-            }
-        }
-        setCurrentPath(path);
     }
 
     /**
@@ -655,61 +632,76 @@ public final class MapViewer {
         }
     }
 
-    /**
-     * Force the next screen repaint to reposition the tiles on the window.
-     */
-    void forceReposition() {
-        bottomRow = -1;
+    private JLabel enterUnitOutForAnimation(final Unit unit,
+                                            final Tile sourceTile) {
+        Integer i = unitsOutForAnimation.get(unit);
+        if (i == null) {
+            final JLabel unitLabel = createUnitLabel(unit);
+
+            i = 1;
+            unitLabel.setLocation(calculateUnitLabelPositionInTile(
+                    unitLabel.getWidth(), unitLabel.getHeight(),
+                    calculateTilePosition(sourceTile)));
+            unitsOutForAnimationLabels.put(unit, unitLabel);
+            gui.getCanvas().add(unitLabel, JLayeredPane.DEFAULT_LAYER);
+        } else {
+            i++;
+        }
+        unitsOutForAnimation.put(unit, i);
+        return unitsOutForAnimationLabels.get(unit);
+    }
+
+    private void releaseUnitOutForAnimation(final Unit unit) {
+        Integer i = unitsOutForAnimation.get(unit);
+        if (i == null) {
+            throw new IllegalStateException("Tried to release unit that was not out for animation");
+        }
+        if (i == 1) {
+            unitsOutForAnimation.remove(unit);
+            gui.getCanvas().removeFromCanvas(unitsOutForAnimationLabels.remove(unit));
+        } else {
+            i--;
+            unitsOutForAnimation.put(unit, i);
+        }
     }
 
     /**
-     * Gets the active unit.
+     * Returns true if the given Unit is being animated.
      *
-     * @return The <code>Unit</code>.
-     * @see #setActiveUnit
+     * @param unit an <code>Unit</code>
+     * @return a <code>boolean</code>
      */
-    Unit getActiveUnit() {
-        return activeUnit;
+    private boolean isOutForAnimation(final Unit unit) {
+        return unitsOutForAnimation.containsKey(unit);
     }
 
     /**
-     * Gets the focus of the map. That is the center tile of the displayed
-     * map.
+     * Draw the unit's image and occupation indicator in one JLabel object.
      *
-     * @return The center tile of the displayed map
-     * @see #setFocus(Tile)
+     * @param unit The unit to be drawn
+     * @return A JLabel object with the unit's image.
      */
-    Tile getFocus() {
-        return focus;
-    }
+    private JLabel createUnitLabel(Unit unit) {
+        final Image unitImg = lib.getUnitImage(unit);
+        final int width = halfWidth + unitImg.getWidth(null)/2;
+        final int height = unitImg.getHeight(null);
 
-    /**
-     * Gets the path to be drawn on the map.
-     *
-     * @return The path that should be drawn on the map or
-     *     <code>null</code> if no path should be drawn.
-     */
-    PathNode getGotoPath() {
-        return gotoPath;
-    }
+        BufferedImage img = new BufferedImage(width, height,
+                                              BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = img.createGraphics();
 
-    /**
-     * Gets the contained <code>ImageLibrary</code>.
-     * 
-     * @return The image library;
-     */
-    ImageLibrary getImageLibrary() {
-        return lib;
-    }
+        final int unitX = (width - unitImg.getWidth(null)) / 2;
+        g.drawImage(unitImg, unitX, 0, null);
 
-    /**
-     * Gets the selected tile.
-     *
-     * @return The <code>Tile</code> selected.
-     * @see #setSelectedTile(Tile, boolean)
-     */
-    Tile getSelectedTile() {
-        return selectedTile;
+        Player player = freeColClient.getMyPlayer();
+        String text = Messages.message(unit.getOccupationLabel(player, false));
+        g.drawImage(lib.getOccupationIndicatorChip(g, unit, text), 0, 0, null);
+
+        final JLabel label = new JLabel(new ImageIcon(img));
+        label.setSize(width, height);
+
+        g.dispose();
+        return label;
     }
 
     /**
@@ -782,15 +774,6 @@ public final class MapViewer {
     }
 
     /**
-     * Checks if there is currently a goto operation on the mapboard.
-     *
-     * @return True if a goto operation is in progress.
-     */
-    boolean isGotoStarted() {
-        return gotoStarted;
-    }
-
-    /**
      * Checks if the Tile/Units at the given coordinates are displayed
      * on the screen (or, if the map is already displayed and the focus
      * has been changed, whether they will be displayed on the screen
@@ -809,81 +792,41 @@ public final class MapViewer {
             && (tileToCheck.getX() + 2 < rightColumn || alignedRight);
     }
 
+    /**
+     * Starts the unit-selection-cursor blinking animation.
+     */
+    void startCursorBlinking() {
+        blinkingMarqueeEnabled = true;
+
+        cursor = new TerrainCursor();
+        cursor.addActionListener((ActionEvent ae) -> {
+                if (!blinkingMarqueeEnabled) return;
+                Unit unit = activeUnit;
+                if (unit != null) {
+                    Tile tile = unit.getTile();
+                    if (isTileVisible(tile)) gui.refreshTile(tile);
+                }
+            });
+        cursor.startBlinking();
+    }
+
+    void stopBlinking() {
+        blinkingMarqueeEnabled = false;
+    }
+
     void restartBlinking() {
         blinkingMarqueeEnabled = true;
     }
 
     /**
-     * Scroll the map in the given direction.
+     * Gets the focus of the map. That is the center tile of the displayed
+     * map.
      *
-     * @param direction The <code>Direction</code> to scroll in.
-     * @return True if scrolling occurred.
+     * @return The center tile of the displayed map
+     * @see #setFocus(Tile)
      */
-    boolean scrollMap(Direction direction) {
-        Tile t = focus;
-        if (t == null) return false;
-        int fx = t.getX(), fy = t.getY();
-        if ((t = t.getNeighbourOrNull(direction)) == null) return false;
-        int tx = t.getX(), ty = t.getY();
-        int x, y;
-
-        // When already close to an edge, resist moving the focus closer,
-        // but if moving away immediately jump out of the `nearTo' area.
-        if (isMapNearTop(ty) && isMapNearTop(fy)) {
-            y = (ty <= fy) ? fy : topRows;
-        } else if (isMapNearBottom(ty) && isMapNearBottom(fy)) {
-            y = (ty >= fy) ? fy : freeColClient.getGame().getMap().getWidth()
-                - bottomRows;
-        } else {
-            y = ty;
-        }
-        if (isMapNearLeft(tx, ty) && isMapNearLeft(fx, fy)) {
-            x = (tx <= fx) ? fx : getLeftColumns(ty);
-        } else if (isMapNearRight(tx, ty) && isMapNearRight(fx, fy)) {
-            x = (tx >= fx) ? fx : freeColClient.getGame().getMap().getWidth()
-                - getRightColumns(ty);
-        } else {
-            x = tx;
-        }
-
-        if (x == fx && y == fy) return false;
-        gui.setFocus(freeColClient.getGame().getMap().getTile(x,y));
-        return true;
-    }
-
-    /**
-     * Sets the active unit.
-     *
-     * Invokes {@link #setSelectedTile(Tile, boolean)} if the selected
-     * tile is another tile than where the <code>activeUnit</code> is located.
-     *
-     * @param activeUnit The new active <code>Unit</code>.
-     * @return True if the focus was set.
-     * @see #setSelectedTile(Tile, boolean)
-     */
-    boolean setActiveUnit(Unit activeUnit) {
-        // Don't select a unit with zero moves left. -sjm
-        // The user might what to check the status of a unit - SG
-        Tile tile = (activeUnit == null) ? null : activeUnit.getTile();
-        this.activeUnit = activeUnit;
-
-        // The user activated a unit
-        if (viewMode == GUI.VIEW_TERRAIN_MODE && activeUnit != null) {
-            changeViewMode(GUI.MOVE_UNITS_MODE);
-        }
-
-        if (activeUnit == null || tile == null) {
-            gui.getCanvas().stopGoto();
-        } else {
-            updateCurrentPathForActiveUnit();
-            if (!gui.setSelectedTile(tile)
-                || freeColClient.getClientOptions()
-                .getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) {
-                gui.setFocus(tile);
-                return true;
-            }
-        }
-        return false;
+    Tile getFocus() {
+        return focus;
     }
 
     /**
@@ -895,19 +838,6 @@ public final class MapViewer {
      */
     void setFocus(Tile focus) {
         this.focus = focus;
-        forceReposition();
-    }
-
-    /**
-     * Sets the path to be drawn on the map.
-     * 
-     * Dont use this directly, call the method in canvas!
-     *
-     * @param gotoPath The path that should be drawn on the map
-     *     or <code>null</code> if no path should be drawn.
-     */
-    void setGotoPath(PathNode gotoPath) {
-        this.gotoPath = gotoPath;
         forceReposition();
     }
 
@@ -959,6 +889,282 @@ public final class MapViewer {
             positionMap(other);
         }
         return where;
+    }
+
+    /**
+     * Force the next screen repaint to reposition the tiles on the window.
+     */
+    void forceReposition() {
+        bottomRow = -1;
+    }
+
+    private void repositionMapIfNeeded() {
+        if (bottomRow < 0 && focus != null) positionMap(focus);
+    }
+
+    /**
+     * Position the map so that the supplied tile is displayed at the center.
+     *
+     * @param pos The <code>Tile</code> to center at.
+     */
+    private void positionMap(Tile pos) {
+        final Game game = freeColClient.getGame();
+        int x = pos.getX(), y = pos.getY();
+        int leftColumns = getLeftColumns(), rightColumns = getRightColumns();
+
+        /*
+          PART 1
+          ======
+          Calculate: bottomRow, topRow, bottomRowY, topRowY
+          This will tell us which rows need to be drawn on the screen (from
+          bottomRow until and including topRow).
+          bottomRowY will tell us at which height the bottom row needs to be
+          drawn.
+        */
+        alignedTop = false;
+        alignedBottom = false;
+        if (y < topRows) {
+            alignedTop = true;
+            // We are at the top of the map
+            bottomRow = (size.height / (halfHeight)) - 1;
+            if ((size.height % (halfHeight)) != 0) {
+                bottomRow++;
+            }
+            topRow = 0;
+            bottomRowY = bottomRow * (halfHeight);
+            topRowY = 0;
+        } else if (y >= (game.getMap().getHeight() - bottomRows)) {
+            alignedBottom = true;
+            // We are at the bottom of the map
+            bottomRow = game.getMap().getHeight() - 1;
+
+            topRow = size.height / (halfHeight);
+            if ((size.height % (halfHeight)) > 0) {
+                topRow++;
+            }
+            topRow = game.getMap().getHeight() - topRow;
+
+            bottomRowY = size.height - tileHeight;
+            topRowY = bottomRowY - (bottomRow - topRow) * (halfHeight);
+        } else {
+            // We are not at the top of the map and not at the bottom
+            bottomRow = y + bottomRows - 1;
+            topRow = y - topRows;
+            bottomRowY = topSpace + (halfHeight) * bottomRows;
+            topRowY = topSpace - topRows * (halfHeight);
+        }
+
+        /*
+          PART 2
+          ======
+          Calculate: leftColumn, rightColumn, leftColumnX
+          This will tell us which columns need to be drawn on the screen (from
+          leftColumn until and including rightColumn).
+          leftColumnX will tell us at which x-coordinate the left
+          column needs to be drawn (this is for the Tiles where y&1 == 0;
+          the others should be halfWidth more to the right).
+        */
+
+        alignedLeft = false;
+        alignedRight = false;
+        if (x < leftColumns) {
+            // We are at the left side of the map
+            leftColumn = 0;
+
+            rightColumn = size.width / tileWidth - 1;
+            if ((size.width % tileWidth) > 0) {
+                rightColumn++;
+            }
+
+            leftColumnX = 0;
+            alignedLeft = true;
+        } else if (x >= (game.getMap().getWidth() - rightColumns)) {
+            // We are at the right side of the map
+            rightColumn = game.getMap().getWidth() - 1;
+
+            leftColumn = size.width / tileWidth;
+            if ((size.width % tileWidth) > 0) {
+                leftColumn++;
+            }
+
+            leftColumnX = size.width - tileWidth - halfWidth -
+                leftColumn * tileWidth;
+            leftColumn = rightColumn - leftColumn;
+            alignedRight = true;
+        } else {
+            // We are not at the left side of the map and not at the right side
+            leftColumn = x - leftColumns;
+            rightColumn = x + rightColumns;
+            leftColumnX = (size.width - tileWidth) / 2
+                - leftColumns * tileWidth;
+        }
+    }
+
+    /**
+     * Scroll the map in the given direction.
+     *
+     * @param direction The <code>Direction</code> to scroll in.
+     * @return True if scrolling occurred.
+     */
+    boolean scrollMap(Direction direction) {
+        Tile t = focus;
+        if (t == null) return false;
+        int fx = t.getX(), fy = t.getY();
+        if ((t = t.getNeighbourOrNull(direction)) == null) return false;
+        int tx = t.getX(), ty = t.getY();
+        int x, y;
+
+        // When already close to an edge, resist moving the focus closer,
+        // but if moving away immediately jump out of the `nearTo' area.
+        if (isMapNearTop(ty) && isMapNearTop(fy)) {
+            y = (ty <= fy) ? fy : topRows;
+        } else if (isMapNearBottom(ty) && isMapNearBottom(fy)) {
+            y = (ty >= fy) ? fy : freeColClient.getGame().getMap().getWidth()
+                - bottomRows;
+        } else {
+            y = ty;
+        }
+        if (isMapNearLeft(tx, ty) && isMapNearLeft(fx, fy)) {
+            x = (tx <= fx) ? fx : getLeftColumns(ty);
+        } else if (isMapNearRight(tx, ty) && isMapNearRight(fx, fy)) {
+            x = (tx >= fx) ? fx : freeColClient.getGame().getMap().getWidth()
+                - getRightColumns(ty);
+        } else {
+            x = tx;
+        }
+
+        if (x == fx && y == fy) return false;
+        gui.setFocus(freeColClient.getGame().getMap().getTile(x,y));
+        return true;
+    }
+
+    /**
+     * Is a y-coordinate near the bottom?
+     *
+     * @param y The y-coordinate.
+     * @return True if near the bottom.
+     */
+    private boolean isMapNearBottom(int y) {
+        return y >= freeColClient.getGame().getMap().getHeight() - bottomRows;
+    }
+
+    /**
+     * Is an x,y coordinate near the left?
+     *
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     * @return True if near the left.
+     */
+    private boolean isMapNearLeft(int x, int y) {
+        return x < getLeftColumns(y);
+    }
+
+    /**
+     * Is an x,y coordinate near the right?
+     *
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     * @return True if near the right.
+     */
+    private boolean isMapNearRight(int x, int y) {
+        return x >= freeColClient.getGame().getMap().getWidth()
+            - getRightColumns(y);
+    }
+
+    /**
+     * Returns the amount of columns that are to the left of the Tile
+     * that is displayed in the center of the Map.
+     *
+     * @return The amount of columns that are to the left of the Tile
+     *     that is displayed in the center of the Map.
+     */
+    private int getLeftColumns() {
+        return getLeftColumns(focus.getY());
+    }
+
+    /**
+     * Returns the amount of columns that are to the left of the Tile
+     * with the given y-coordinate.
+     *
+     * @param y The y-coordinate of the Tile in question.
+     * @return The amount of columns that are to the left of the Tile
+     *     with the given y-coordinate.
+     */
+    private int getLeftColumns(int y) {
+        int leftColumns = leftSpace / tileWidth + 1;
+
+        if ((y & 1) == 0) {
+            if ((leftSpace % tileWidth) > 32) {
+                leftColumns++;
+            }
+        } else {
+            if ((leftSpace % tileWidth) == 0) {
+                leftColumns--;
+            }
+        }
+
+        return leftColumns;
+    }
+
+    /**
+     * Returns the amount of columns that are to the right of the Tile
+     * that is displayed in the center of the Map.
+     *
+     * @return The amount of columns that are to the right of the Tile
+     *     that is displayed in the center of the Map.
+     */
+    private int getRightColumns() {
+        return getRightColumns(focus.getY());
+    }
+
+    /**
+     * Returns the amount of columns that are to the right of the Tile
+     * with the given y-coordinate.
+     *
+     * @param y The y-coordinate of the Tile in question.
+     * @return The amount of columns that are to the right of the Tile
+     *     with the given y-coordinate.
+     */
+    private int getRightColumns(int y) {
+        int rightColumns = rightSpace / tileWidth + 1;
+
+        if ((y & 1) == 0) {
+            if ((rightSpace % tileWidth) == 0) {
+                rightColumns--;
+            }
+        } else {
+            if ((rightSpace % tileWidth) > 32) {
+                rightColumns++;
+            }
+        }
+
+        return rightColumns;
+    }
+
+    /**
+     * Is a y-coordinate near the top?
+     *
+     * @param y The y-coordinate.
+     * @return True if near the top.
+     */
+    private boolean isMapNearTop(int y) {
+        return y < topRows;
+    }
+
+    private boolean isTileVisible(Tile tile) {
+        if (tile == null) return false;
+        return tile.getY() >= topRow && tile.getY() <= bottomRow
+            && tile.getX() >= leftColumn && tile.getX() <= rightColumn;
+    }
+
+    /**
+     * Gets the selected tile.
+     *
+     * @return The <code>Tile</code> selected.
+     * @see #setSelectedTile(Tile, boolean)
+     */
+    Tile getSelectedTile() {
+        return selectedTile;
     }
 
     /**
@@ -1016,27 +1222,130 @@ public final class MapViewer {
         return ret;
     }
 
-    void setSize(Dimension size) {
-        this.size = size;
-        updateMapDisplayVariables();
+    /**
+     * Gets the unit that should be displayed on the given tile.
+     *
+     * @param unitTile The <code>Tile</code> to check.
+     * @return The <code>Unit</code> to display or null if none found.
+     */
+    private Unit findUnitInFront(Tile unitTile) {
+        Unit result;
+
+        if (unitTile == null || unitTile.isEmpty()) {
+            result = null;
+
+        } else if (activeUnit != null && activeUnit.getTile() == unitTile) {
+            result = activeUnit;
+
+        } else if (unitTile.hasSettlement()) {
+            result = null;
+
+        } else if (activeUnit != null && activeUnit.isOffensiveUnit()) {
+            result = unitTile.getDefendingUnit(activeUnit);
+
+        } else {
+            // Find the unit with the most moves left, preferring
+            // active units.
+            List<Unit> units = unitTile.getUnitList();
+            result = units.remove(0);
+            int best = result.getMovesLeft();
+            boolean carrier,
+                active = result.getState() == Unit.UnitState.ACTIVE;
+            for (Unit u : units) {
+                carrier = false;
+                if (active) {
+                    if (u.getState() == Unit.UnitState.ACTIVE) {
+                        if (best < u.getMovesLeft()) {
+                            best = u.getMovesLeft();
+                            result = u;
+                        }
+                    } else {
+                        carrier = !u.isEmpty();
+                    }
+                } else if (u.getState() == Unit.UnitState.ACTIVE) {
+                    active = true;
+                    best = u.getMovesLeft();
+                    result = u;
+                } else {
+                    if (best < u.getMovesLeft()) {
+                        best = u.getMovesLeft();
+                        result = u;
+                    }
+                    carrier = !u.isEmpty();
+                }
+                if (carrier) {
+                    // Check for active units on carriers.  Usually the
+                    // carrier takes precedence.
+                    for (Unit c : u.getUnitList()) {
+                        if (active) {
+                            if (best < c.getMovesLeft()) {
+                                best = c.getMovesLeft();
+                                result = c;
+                            }
+                        } else if (c.getState() == Unit.UnitState.ACTIVE) {
+                            active = true;
+                            best = c.getMovesLeft();
+                            result = c;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     /**
-     * Starts the unit-selection-cursor blinking animation.
+     * Gets the active unit.
+     *
+     * @return The <code>Unit</code>.
+     * @see #setActiveUnit
      */
-    void startCursorBlinking() {
-        blinkingMarqueeEnabled = true;
+    Unit getActiveUnit() {
+        return activeUnit;
+    }
 
-        cursor = new TerrainCursor();
-        cursor.addActionListener((ActionEvent ae) -> {
-                if (!blinkingMarqueeEnabled) return;
-                Unit unit = activeUnit;
-                if (unit != null) {
-                    Tile tile = unit.getTile();
-                    if (isTileVisible(tile)) gui.refreshTile(tile);
-                }
-            });
-        cursor.startBlinking();
+    /**
+     * Sets the active unit.
+     *
+     * Invokes {@link #setSelectedTile(Tile, boolean)} if the selected
+     * tile is another tile than where the <code>activeUnit</code> is located.
+     *
+     * @param activeUnit The new active <code>Unit</code>.
+     * @return True if the focus was set.
+     * @see #setSelectedTile(Tile, boolean)
+     */
+    boolean setActiveUnit(Unit activeUnit) {
+        // Don't select a unit with zero moves left. -sjm
+        // The user might what to check the status of a unit - SG
+        Tile tile = (activeUnit == null) ? null : activeUnit.getTile();
+        this.activeUnit = activeUnit;
+
+        // The user activated a unit
+        if (viewMode == GUI.VIEW_TERRAIN_MODE && activeUnit != null) {
+            changeViewMode(GUI.MOVE_UNITS_MODE);
+        }
+
+        if (activeUnit == null || tile == null) {
+            gui.getCanvas().stopGoto();
+        } else {
+            updateCurrentPathForActiveUnit();
+            if (!gui.setSelectedTile(tile)
+                || freeColClient.getClientOptions()
+                .getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) {
+                gui.setFocus(tile);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if there is currently a goto operation on the mapboard.
+     *
+     * @return True if a goto operation is in progress.
+     */
+    boolean isGotoStarted() {
+        return gotoStarted;
     }
 
     /**
@@ -1049,10 +1358,6 @@ public final class MapViewer {
         setGotoPath(null);
     }
 
-    void stopBlinking() {
-        blinkingMarqueeEnabled = false;
-    }
-
     /**
      * Stops any ongoing goto operation on the mapboard.
      * 
@@ -1062,6 +1367,66 @@ public final class MapViewer {
         setGotoPath(null);
         updateCurrentPathForActiveUnit();
         gotoStarted = false;
+    }
+
+    /**
+     * Gets the path to be drawn on the map.
+     *
+     * @return The path that should be drawn on the map or
+     *     <code>null</code> if no path should be drawn.
+     */
+    PathNode getGotoPath() {
+        return gotoPath;
+    }
+
+    /**
+     * Sets the path to be drawn on the map.
+     * 
+     * Dont use this directly, call the method in canvas!
+     *
+     * @param gotoPath The path that should be drawn on the map
+     *     or <code>null</code> if no path should be drawn.
+     */
+    void setGotoPath(PathNode gotoPath) {
+        this.gotoPath = gotoPath;
+        forceReposition();
+    }
+
+    /**
+     * Sets the path of the active unit to display it.
+     */
+    void updateCurrentPathForActiveUnit() {
+        PathNode path;
+        if (activeUnit == null
+            || activeUnit.getDestination() == null
+            || ((FreeColGameObject)activeUnit.getDestination()).isDisposed()
+            || Map.isSameLocation(activeUnit.getLocation(),
+                                  activeUnit.getDestination())) {
+            path = null;
+        } else {
+            try {
+                path = activeUnit.findPath(activeUnit.getDestination());
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Path fail", e);
+                path = null;
+                activeUnit.setDestination(null);
+            }
+        }
+        setCurrentPath(path);
+    }
+
+    /**
+     * Set the current active unit path.
+     *
+     * @param path The current <code>PathNode</code>.
+     */
+    void setCurrentPath(PathNode path) {
+        this.currentPath = path;
+    }
+
+    void setSize(Dimension size) {
+        this.size = size;
+        updateMapDisplayVariables();
     }
 
     /**
@@ -1096,338 +1461,70 @@ public final class MapViewer {
         updateMapDisplayVariables();
     }
 
-    /**
-     * Centers the given Image on the tile.
-     *
-     * @param g a <code>Graphics2D</code>
-     * @param image an <code>Image</code>
-     */
-    private static void displayCenteredImage(Graphics2D g, Image image,
-                                    int tileWidth, int tileHeight) {
-        g.drawImage(image,
-                    (tileWidth - image.getWidth(null))/2,
-                    (tileHeight - image.getHeight(null))/2,
-                    null);
-    }
-
-    /**
-     * Draws the pentagram indicating a native capital.
-     */
-    private static BufferedImage createCapitalLabel(int extent, int padding,
-                                     Color backgroundColor) {
-        // create path
-        double deg2rad = Math.PI/180.0;
-        double angle = -90.0 * deg2rad;
-        double offset = extent * 0.5;
-        double size1 = (extent - padding - padding) * 0.5;
-
-        GeneralPath path = new GeneralPath();
-        path.moveTo(Math.cos(angle) * size1 + offset, Math.sin(angle) * size1 + offset);
-        for (int i = 0; i < 4; i++) {
-            angle += 144 * deg2rad;
-            path.lineTo(Math.cos(angle) * size1 + offset, Math.sin(angle) * size1 + offset);
-        }
-        path.closePath();
-
-        // draw everything
-        BufferedImage bi = new BufferedImage(extent, extent, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = bi.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setColor(backgroundColor);
-        g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
-        g.setColor(Color.BLACK);
-        g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g.draw(path);
-        g.setColor(Color.WHITE);
-        g.fill(path);
-        g.dispose();
-        return bi;
-    }
-
-
-    /**
-     * Creates an BufferedImage that shows the given text centred on a
-     * translucent rounded rectangle with the given color.
-     *
-     * @param g a <code>Graphics2D</code>
-     * @param text a <code>String</code>
-     * @param font a <code>Font</code>
-     * @param backgroundColor a <code>Color</code>
-     * @return an <code>BufferedImage</code>
-     */
-    private static BufferedImage createLabel(Graphics2D g, String text,
-                                             Font font, Color backgroundColor) {
-        TextSpecification[] specs = new TextSpecification[1];
-        specs[0] = new TextSpecification(text, font);
-        return createLabel(g, specs, backgroundColor);
-    }
-
-    /**
-     * Creates an BufferedImage that shows the given text centred on a
-     * translucent rounded rectangle with the given color.
-     *
-     * @param g a <code>Graphics2D</code>
-     * @param textSpecs a <code>TextSpecification</code> array
-     * @param backgroundColor a <code>Color</code>
-     * @return a <code>BufferedImage</code>
-     */
-    private static BufferedImage createLabel(Graphics2D g,
-                                             TextSpecification[] textSpecs,
-                                             Color backgroundColor) {
-        int hPadding = 15;
-        int vPadding = 10;
-        int linePadding = 5;
-        int width = 0;
-        int height = vPadding;
-        int i;
-
-        TextSpecification spec;
-        TextLayout[] labels = new TextLayout[textSpecs.length];
-        TextLayout label;
-
-        for (i = 0; i < textSpecs.length; i++) {
-            spec = textSpecs[i];
-            label = new TextLayout(spec.text, spec.font, g.getFontRenderContext());
-            labels[i] = label;
-            Rectangle textRectangle = label.getPixelBounds(null, 0, 0);
-            width = Math.max(width, textRectangle.width + hPadding);
-            if (i > 0) height += linePadding;
-            height += (int) (label.getAscent() + label.getDescent());
-        }
-
-        int radius = Math.min(hPadding, vPadding);
-
-        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = bi.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-
-        g2.setColor(backgroundColor);
-        g2.fill(new RoundRectangle2D.Float(0, 0, width, height, radius, radius));
-        g2.setColor(ImageLibrary.getForegroundColor(backgroundColor));
-        float y = vPadding / 2;
-        for (i = 0; i < labels.length; i++) {
-            Rectangle textRectangle = labels[i].getPixelBounds(null, 0, 0);
-            float x = (width - textRectangle.width) / 2;
-            y += labels[i].getAscent();
-            labels[i].draw(g2, x, y);
-            y += labels[i].getDescent() + linePadding;
-        }
-        g2.dispose();
-        return bi;
-    }
-
-    /**
-     * Draws a cross indicating a religious mission is present in the
-     * native village.
-     */
-    private static BufferedImage createReligiousMissionLabel(int extent,
-            int padding, Color backgroundColor, boolean expertMissionary) {
-        // create path
-        double offset = extent * 0.5;
-        double size1 = extent - padding - padding;
-        double bar = size1 / 3.0;
-        double inset = 0.0;
-        double kludge = 0.0;
-
-        GeneralPath circle = new GeneralPath();
-        GeneralPath cross = new GeneralPath();
-        if (expertMissionary) {
-            // this is meant to represent the eucharist (the -1, +1 thing is a nasty kludge)
-            circle.append(new Ellipse2D.Double(padding-1, padding-1, size1+1, size1+1), false);
-            inset = 4.0;
-            bar = (size1 - inset - inset) / 3.0;
-            // more nasty -1, +1 kludges
-            kludge = 1.0;
-        }
-        offset -= 1.0;
-        cross.moveTo(offset, padding + inset - kludge);
-        cross.lineTo(offset, extent - padding - inset);
-        cross.moveTo(offset - bar, padding + bar + inset);
-        cross.lineTo(offset + bar + 1, padding + bar + inset);
-
-        // draw everything
-        BufferedImage bi = new BufferedImage(extent, extent, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = bi.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setColor(backgroundColor);
-        g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
-        g.setColor(ImageLibrary.getForegroundColor(backgroundColor));
-        if (expertMissionary) {
-            g.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-            g.draw(circle);
-            g.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    private void updateMapDisplayVariables() {
+        // Calculate the amount of rows that will be drawn above the
+        // central Tile
+        topSpace = (size.height - tileHeight) / 2;
+        if ((topSpace % (halfHeight)) != 0) {
+            topRows = topSpace / (halfHeight) + 2;
         } else {
-            g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            topRows = topSpace / (halfHeight) + 1;
         }
-        g.draw(cross);
-        g.dispose();
-        return bi;
+        bottomRows = topRows;
+        leftSpace = (size.width - tileWidth) / 2;
+        rightSpace = leftSpace;
     }
 
     /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Only base terrain will be drawn.
+     * Sets the ImageLibrary and calculates various items that depend
+     * on tile size.
      *
-     * @param g The Graphics2D object on which to draw the Tile.
-     * @param library The <code>ImageLibrary</code> to use.
-     * @param tile The Tile to draw.
-     * @param drawUnexploredBorders If true; draws border between explored and
-     *        unexplored terrain.
+     * @param lib an <code>ImageLibrary</code> value
      */
-    private static void displayTileWithBeachAndBorder(Graphics2D g,
-                                                      ImageLibrary library,
-                                                      Tile tile,
-                                                      boolean drawUnexploredBorders) {
-        if (tile != null) {
-            int x = tile.getX();
-            int y = tile.getY();
-            // ATTENTION: we assume that all base tiles have the same size
-            g.drawImage(library.getTerrainImage(tile.getType(), x, y),
-                        0, 0, null);
-            if (tile.isExplored()) {
-                if (!tile.isLand() && tile.getStyle() > 0) {
-                    int edgeStyle = tile.getStyle() >> 4;
-                    if (edgeStyle > 0) {
-                        g.drawImage(library.getBeachEdgeImage(edgeStyle, x, y),
-                                    0, 0, null);
-                    }
-                    int cornerStyle = tile.getStyle() & 15;
-                    if (cornerStyle > 0) {
-                        g.drawImage(library.getBeachCornerImage(cornerStyle, x, y),
-                                    0, 0, null);
-                    }
-                }
+    private void setImageLibraryAndUpdateData(ImageLibrary lib) {
+        this.lib = lib;
+        // ATTENTION: we assume that all base tiles have the same size
+        Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+        rp = new RoadPainter(tileSize);
+        tileHeight = tileSize.height;
+        tileWidth = tileSize.width;
+        halfHeight = tileHeight/2;
+        halfWidth = tileWidth/2;
 
-                List<SortableImage> imageBorders = new ArrayList<>(8);
-                SortableImage si;
-                for (Direction direction : Direction.values()) {
-                    Tile borderingTile = tile.getNeighbourOrNull(direction);
-                    if (borderingTile != null) {
+        int dx = tileWidth/16;
+        int dy = tileHeight/16;
+        int ddx = dx + dx/2;
+        int ddy = dy + dy/2;
 
-                        if (!drawUnexploredBorders && !borderingTile.isExplored() &&
-                            (direction == Direction.SE || direction == Direction.S ||
-                             direction == Direction.SW)) {
-                            continue;
-                        }
+        // small corners
+        controlPoints.put(Direction.N, new Point2D.Float(halfWidth, dy));
+        controlPoints.put(Direction.E, new Point2D.Float(tileWidth - dx, halfHeight));
+        controlPoints.put(Direction.S, new Point2D.Float(halfWidth, tileHeight - dy));
+        controlPoints.put(Direction.W, new Point2D.Float(dx, halfHeight));
+        // big corners
+        controlPoints.put(Direction.SE, new Point2D.Float(halfWidth, tileHeight));
+        controlPoints.put(Direction.NE, new Point2D.Float(tileWidth, halfHeight));
+        controlPoints.put(Direction.SW, new Point2D.Float(0, halfHeight));
+        controlPoints.put(Direction.NW, new Point2D.Float(halfWidth, 0));
+        // small corners
+        borderPoints.put(Direction.NW, new Point2D.Float(dx + ddx, halfHeight - ddy));
+        borderPoints.put(Direction.N,  new Point2D.Float(halfWidth - ddx, dy + ddy));
+        borderPoints.put(Direction.NE, new Point2D.Float(halfWidth + ddx, dy + ddy));
+        borderPoints.put(Direction.E,  new Point2D.Float(tileWidth - dx - ddx, halfHeight - ddy));
+        borderPoints.put(Direction.SE, new Point2D.Float(tileWidth - dx - ddx, halfHeight + ddy));
+        borderPoints.put(Direction.S,  new Point2D.Float(halfWidth + ddx, tileHeight - dy - ddy));
+        borderPoints.put(Direction.SW, new Point2D.Float(halfWidth - ddx, tileHeight - dy - ddy));
+        borderPoints.put(Direction.W,  new Point2D.Float(dx + ddx, halfHeight + ddy));
 
-                        if (tile.getType() == borderingTile.getType()) {
-                            // Equal tiles, no need to draw border
-                        } else if (tile.isLand() && !borderingTile.isLand()) {
-                            // The beach borders are drawn on the side of water tiles only
-                        } else if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
-                            // If there is a Coast image (eg. beach) defined, use it, otherwise skip
-                            // Draw the grass from the neighboring tile, spilling over on the side of this tile
-                            si = new SortableImage(library.getBorderImage(borderingTile.getType(), direction, x, y),
-                                                   borderingTile.getType().getIndex());
-                            imageBorders.add(si);
-                            TileImprovement river = borderingTile.getRiver();
-                            if (river != null && river.isConnectedTo(direction.getReverseDirection())) {
-                                si = new SortableImage(library.getRiverMouthImage(direction, borderingTile
-                                                                                  .getRiver().getMagnitude(), x, y),
-                                                       -1);
-                                imageBorders.add(si);
-                            }
-                        } else if (borderingTile.isExplored()) {
-                            if (library.getTerrainImage(tile.getType(), 0, 0)
-                                .equals(library.getTerrainImage(borderingTile.getType(), 0, 0))) {
-                                // Do not draw limit between tile that share same graphics (ocean & great river)
-                            } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
-                                // Draw land terrain with bordering land type, or ocean/high seas limit
-                                si = new SortableImage(library.getBorderImage(borderingTile.getType(), direction,
-                                                                              x, y), borderingTile.getType().getIndex());
-                                imageBorders.add(si);
-                            }
-                        }
-                    }
-                }
-                Collections.sort(imageBorders);
-                for (SortableImage sorted : imageBorders) {
-                    g.drawImage(sorted.image, 0, 0, null);
-                }
-            }
-        }
-    }
+        borderStroke = new BasicStroke(dy);
+        gridStroke = new BasicStroke(lib.getScaleFactor());
 
-    /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates.  Fog of war will be
-     * drawn.
-     *
-     * @param g The <code>Graphics2D</code> object on which to draw
-     *     the <code>Tile</code>.
-     * @param tile The <code>Tile</code> to draw.
-     */
-    private static void displayFogOfWar(FreeColClient freeColClient,
-            GeneralPath fog, Graphics2D g, Tile tile) {
-        if (freeColClient.getGame() != null
-            && freeColClient.getGame().getSpecification()
-                .getBoolean(GameOptions.FOG_OF_WAR)
-            && freeColClient.getMyPlayer() != null
-            && !freeColClient.getMyPlayer().canSee(tile)) {
-            g.setColor(Color.BLACK);
-            Composite oldComposite = g.getComposite();
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-                                                      0.2f));
-            g.fill(fog);
-            g.setComposite(oldComposite);
-        }
-    }
-
-
-    /**
-     * Display a path.
-     *
-     * @param g The <code>Graphics2D</code> to display on.
-     * @param path The <code>PathNode</code> to display.
-     */
-    private void displayPath(Graphics2D g, PathNode path) {
-        final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, lib.getScaleFactor());
-        final boolean debug = FreeColDebugger
-            .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
-
-        for (PathNode p = path; p != null; p = p.next) {
-            Tile tile = p.getTile();
-            if (tile == null) continue;
-            Point point = calculateTilePosition(tile);
-            if (point == null) continue;
-
-            Image image = (p.isOnCarrier())
-                ? ImageLibrary.getPathImage(ImageLibrary.PathType.NAVAL)
-                : (activeUnit != null)
-                ? ImageLibrary.getPathImage(activeUnit)
-                : null;
-
-            Image turns = (p.getTurns() <= 0) ? null
-                : lib.getStringImage(g, Integer.toString(p.getTurns()),
-                                      Color.WHITE, font);
-            g.setColor((turns == null) ? Color.GREEN : Color.RED);
-
-            if (debug) { // More detailed display
-                if (activeUnit != null) {
-                    image = ImageLibrary.getPathNextTurnImage(activeUnit);
-                }
-                turns = lib.getStringImage(g, Integer.toString(p.getTurns())
-                    + "/" + Integer.toString(p.getMovesLeft()),
-                    Color.WHITE, font);
-            }
-
-            g.translate(point.x, point.y);
-            if (image == null) {
-                g.fillOval(halfWidth, halfHeight, 10, 10);
-                g.setColor(Color.BLACK);
-                g.drawOval(halfWidth, halfHeight, 10, 10);
-            } else {
-                displayCenteredImage(g, image, tileWidth, tileHeight);
-                if (turns != null)
-                    displayCenteredImage(g, turns, tileWidth, tileHeight);
-            }
-            g.translate(-point.x, -point.y);
-        }
+        fog.reset();
+        fog.moveTo(halfWidth, 0);
+        fog.lineTo(tileWidth, halfHeight);
+        fog.lineTo(halfWidth, tileHeight);
+        fog.lineTo(0, halfHeight);
+        fog.closePath();
     }
 
     /**
@@ -1773,6 +1870,340 @@ public final class MapViewer {
     }
 
     /**
+     * Centers the given Image on the tile.
+     *
+     * @param g a <code>Graphics2D</code>
+     * @param image an <code>Image</code>
+     */
+    private static void displayCenteredImage(Graphics2D g, Image image,
+                                    int tileWidth, int tileHeight) {
+        g.drawImage(image,
+                    (tileWidth - image.getWidth(null))/2,
+                    (tileHeight - image.getHeight(null))/2,
+                    null);
+    }
+
+    /**
+     * Draws the pentagram indicating a native capital.
+     */
+    private static BufferedImage createCapitalLabel(int extent, int padding,
+                                     Color backgroundColor) {
+        // create path
+        double deg2rad = Math.PI/180.0;
+        double angle = -90.0 * deg2rad;
+        double offset = extent * 0.5;
+        double size1 = (extent - padding - padding) * 0.5;
+
+        GeneralPath path = new GeneralPath();
+        path.moveTo(Math.cos(angle) * size1 + offset, Math.sin(angle) * size1 + offset);
+        for (int i = 0; i < 4; i++) {
+            angle += 144 * deg2rad;
+            path.lineTo(Math.cos(angle) * size1 + offset, Math.sin(angle) * size1 + offset);
+        }
+        path.closePath();
+
+        // draw everything
+        BufferedImage bi = new BufferedImage(extent, extent, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = bi.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(backgroundColor);
+        g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
+        g.setColor(Color.BLACK);
+        g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.draw(path);
+        g.setColor(Color.WHITE);
+        g.fill(path);
+        g.dispose();
+        return bi;
+    }
+
+
+    /**
+     * Creates an BufferedImage that shows the given text centred on a
+     * translucent rounded rectangle with the given color.
+     *
+     * @param g a <code>Graphics2D</code>
+     * @param text a <code>String</code>
+     * @param font a <code>Font</code>
+     * @param backgroundColor a <code>Color</code>
+     * @return an <code>BufferedImage</code>
+     */
+    private static BufferedImage createLabel(Graphics2D g, String text,
+                                             Font font, Color backgroundColor) {
+        TextSpecification[] specs = new TextSpecification[1];
+        specs[0] = new TextSpecification(text, font);
+        return createLabel(g, specs, backgroundColor);
+    }
+
+    /**
+     * Creates an BufferedImage that shows the given text centred on a
+     * translucent rounded rectangle with the given color.
+     *
+     * @param g a <code>Graphics2D</code>
+     * @param textSpecs a <code>TextSpecification</code> array
+     * @param backgroundColor a <code>Color</code>
+     * @return a <code>BufferedImage</code>
+     */
+    private static BufferedImage createLabel(Graphics2D g,
+                                             TextSpecification[] textSpecs,
+                                             Color backgroundColor) {
+        int hPadding = 15;
+        int vPadding = 10;
+        int linePadding = 5;
+        int width = 0;
+        int height = vPadding;
+        int i;
+
+        TextSpecification spec;
+        TextLayout[] labels = new TextLayout[textSpecs.length];
+        TextLayout label;
+
+        for (i = 0; i < textSpecs.length; i++) {
+            spec = textSpecs[i];
+            label = new TextLayout(spec.text, spec.font, g.getFontRenderContext());
+            labels[i] = label;
+            Rectangle textRectangle = label.getPixelBounds(null, 0, 0);
+            width = Math.max(width, textRectangle.width + hPadding);
+            if (i > 0) height += linePadding;
+            height += (int) (label.getAscent() + label.getDescent());
+        }
+
+        int radius = Math.min(hPadding, vPadding);
+
+        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = bi.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+
+        g2.setColor(backgroundColor);
+        g2.fill(new RoundRectangle2D.Float(0, 0, width, height, radius, radius));
+        g2.setColor(ImageLibrary.getForegroundColor(backgroundColor));
+        float y = vPadding / 2;
+        for (i = 0; i < labels.length; i++) {
+            Rectangle textRectangle = labels[i].getPixelBounds(null, 0, 0);
+            float x = (width - textRectangle.width) / 2;
+            y += labels[i].getAscent();
+            labels[i].draw(g2, x, y);
+            y += labels[i].getDescent() + linePadding;
+        }
+        g2.dispose();
+        return bi;
+    }
+
+    /**
+     * Draws a cross indicating a religious mission is present in the
+     * native village.
+     */
+    private static BufferedImage createReligiousMissionLabel(int extent,
+            int padding, Color backgroundColor, boolean expertMissionary) {
+        // create path
+        double offset = extent * 0.5;
+        double size1 = extent - padding - padding;
+        double bar = size1 / 3.0;
+        double inset = 0.0;
+        double kludge = 0.0;
+
+        GeneralPath circle = new GeneralPath();
+        GeneralPath cross = new GeneralPath();
+        if (expertMissionary) {
+            // this is meant to represent the eucharist (the -1, +1 thing is a nasty kludge)
+            circle.append(new Ellipse2D.Double(padding-1, padding-1, size1+1, size1+1), false);
+            inset = 4.0;
+            bar = (size1 - inset - inset) / 3.0;
+            // more nasty -1, +1 kludges
+            kludge = 1.0;
+        }
+        offset -= 1.0;
+        cross.moveTo(offset, padding + inset - kludge);
+        cross.lineTo(offset, extent - padding - inset);
+        cross.moveTo(offset - bar, padding + bar + inset);
+        cross.lineTo(offset + bar + 1, padding + bar + inset);
+
+        // draw everything
+        BufferedImage bi = new BufferedImage(extent, extent, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = bi.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(backgroundColor);
+        g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
+        g.setColor(ImageLibrary.getForegroundColor(backgroundColor));
+        if (expertMissionary) {
+            g.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g.draw(circle);
+            g.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        } else {
+            g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        }
+        g.draw(cross);
+        g.dispose();
+        return bi;
+    }
+
+    /**
+     * Displays the given Tile onto the given Graphics2D object at the
+     * location specified by the coordinates. Only base terrain will be drawn.
+     *
+     * @param g The Graphics2D object on which to draw the Tile.
+     * @param library The <code>ImageLibrary</code> to use.
+     * @param tile The Tile to draw.
+     * @param drawUnexploredBorders If true; draws border between explored and
+     *        unexplored terrain.
+     */
+    private static void displayTileWithBeachAndBorder(Graphics2D g,
+                                                      ImageLibrary library,
+                                                      Tile tile,
+                                                      boolean drawUnexploredBorders) {
+        if (tile != null) {
+            int x = tile.getX();
+            int y = tile.getY();
+            // ATTENTION: we assume that all base tiles have the same size
+            g.drawImage(library.getTerrainImage(tile.getType(), x, y),
+                        0, 0, null);
+            if (tile.isExplored()) {
+                if (!tile.isLand() && tile.getStyle() > 0) {
+                    int edgeStyle = tile.getStyle() >> 4;
+                    if (edgeStyle > 0) {
+                        g.drawImage(library.getBeachEdgeImage(edgeStyle, x, y),
+                                    0, 0, null);
+                    }
+                    int cornerStyle = tile.getStyle() & 15;
+                    if (cornerStyle > 0) {
+                        g.drawImage(library.getBeachCornerImage(cornerStyle, x, y),
+                                    0, 0, null);
+                    }
+                }
+
+                List<SortableImage> imageBorders = new ArrayList<>(8);
+                SortableImage si;
+                for (Direction direction : Direction.values()) {
+                    Tile borderingTile = tile.getNeighbourOrNull(direction);
+                    if (borderingTile != null) {
+
+                        if (!drawUnexploredBorders && !borderingTile.isExplored() &&
+                            (direction == Direction.SE || direction == Direction.S ||
+                             direction == Direction.SW)) {
+                            continue;
+                        }
+
+                        if (tile.getType() == borderingTile.getType()) {
+                            // Equal tiles, no need to draw border
+                        } else if (tile.isLand() && !borderingTile.isLand()) {
+                            // The beach borders are drawn on the side of water tiles only
+                        } else if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
+                            // If there is a Coast image (eg. beach) defined, use it, otherwise skip
+                            // Draw the grass from the neighboring tile, spilling over on the side of this tile
+                            si = new SortableImage(library.getBorderImage(borderingTile.getType(), direction, x, y),
+                                                   borderingTile.getType().getIndex());
+                            imageBorders.add(si);
+                            TileImprovement river = borderingTile.getRiver();
+                            if (river != null && river.isConnectedTo(direction.getReverseDirection())) {
+                                si = new SortableImage(library.getRiverMouthImage(direction, borderingTile
+                                                                                  .getRiver().getMagnitude(), x, y),
+                                                       -1);
+                                imageBorders.add(si);
+                            }
+                        } else if (borderingTile.isExplored()) {
+                            if (library.getTerrainImage(tile.getType(), 0, 0)
+                                .equals(library.getTerrainImage(borderingTile.getType(), 0, 0))) {
+                                // Do not draw limit between tile that share same graphics (ocean & great river)
+                            } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
+                                // Draw land terrain with bordering land type, or ocean/high seas limit
+                                si = new SortableImage(library.getBorderImage(borderingTile.getType(), direction,
+                                                                              x, y), borderingTile.getType().getIndex());
+                                imageBorders.add(si);
+                            }
+                        }
+                    }
+                }
+                Collections.sort(imageBorders);
+                for (SortableImage sorted : imageBorders) {
+                    g.drawImage(sorted.image, 0, 0, null);
+                }
+            }
+        }
+    }
+
+    /**
+     * Displays the given Tile onto the given Graphics2D object at the
+     * location specified by the coordinates.  Fog of war will be
+     * drawn.
+     *
+     * @param g The <code>Graphics2D</code> object on which to draw
+     *     the <code>Tile</code>.
+     * @param tile The <code>Tile</code> to draw.
+     */
+    private static void displayFogOfWar(FreeColClient freeColClient,
+            GeneralPath fog, Graphics2D g, Tile tile) {
+        if (freeColClient.getGame() != null
+            && freeColClient.getGame().getSpecification()
+                .getBoolean(GameOptions.FOG_OF_WAR)
+            && freeColClient.getMyPlayer() != null
+            && !freeColClient.getMyPlayer().canSee(tile)) {
+            g.setColor(Color.BLACK);
+            Composite oldComposite = g.getComposite();
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                                                      0.2f));
+            g.fill(fog);
+            g.setComposite(oldComposite);
+        }
+    }
+
+
+    /**
+     * Display a path.
+     *
+     * @param g The <code>Graphics2D</code> to display on.
+     * @param path The <code>PathNode</code> to display.
+     */
+    private void displayPath(Graphics2D g, PathNode path) {
+        final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+            FontLibrary.FontSize.TINY, lib.getScaleFactor());
+        final boolean debug = FreeColDebugger
+            .isInDebugMode(FreeColDebugger.DebugMode.PATHS);
+
+        for (PathNode p = path; p != null; p = p.next) {
+            Tile tile = p.getTile();
+            if (tile == null) continue;
+            Point point = calculateTilePosition(tile);
+            if (point == null) continue;
+
+            Image image = (p.isOnCarrier())
+                ? ImageLibrary.getPathImage(ImageLibrary.PathType.NAVAL)
+                : (activeUnit != null)
+                ? ImageLibrary.getPathImage(activeUnit)
+                : null;
+
+            Image turns = (p.getTurns() <= 0) ? null
+                : lib.getStringImage(g, Integer.toString(p.getTurns()),
+                                      Color.WHITE, font);
+            g.setColor((turns == null) ? Color.GREEN : Color.RED);
+
+            if (debug) { // More detailed display
+                if (activeUnit != null) {
+                    image = ImageLibrary.getPathNextTurnImage(activeUnit);
+                }
+                turns = lib.getStringImage(g, Integer.toString(p.getTurns())
+                    + "/" + Integer.toString(p.getMovesLeft()),
+                    Color.WHITE, font);
+            }
+
+            g.translate(point.x, point.y);
+            if (image == null) {
+                g.fillOval(halfWidth, halfHeight, 10, 10);
+                g.setColor(Color.BLACK);
+                g.drawOval(halfWidth, halfHeight, 10, 10);
+            } else {
+                displayCenteredImage(g, image, tileWidth, tileHeight);
+                if (turns != null)
+                    displayCenteredImage(g, turns, tileWidth, tileHeight);
+            }
+            g.translate(-point.x, -point.y);
+        }
+    }
+
+    /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Show tile names,
      * coordinates and colony values.
@@ -2059,6 +2490,20 @@ public final class MapViewer {
         }
     }
 
+    /**
+     * Gets the coordinates to draw a unit in a given tile.
+     *
+     * @param unitImage The unit's image
+     * @return The coordinates where the unit should be drawn onscreen
+     */
+    private Point calculateUnitImagePositionInTile(Image unitImage) {
+        int unitX = (tileWidth - unitImage.getWidth(null)) / 2;
+        int unitY = (tileHeight - unitImage.getHeight(null)) / 2 -
+                    (int) (UNIT_OFFSET * lib.getScaleFactor());
+
+        return new Point(unitX, unitY);
+    }
+
     private void displayCursor(Graphics2D g) {
         Image cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
         g.drawImage(cursorImage, 0, 0, null);
@@ -2113,269 +2558,6 @@ public final class MapViewer {
                 }
             }
         }
-    }
-
-    private JLabel enterUnitOutForAnimation(final Unit unit,
-                                            final Tile sourceTile) {
-        Integer i = unitsOutForAnimation.get(unit);
-        if (i == null) {
-            final JLabel unitLabel = createUnitLabel(unit);
-
-            i = 1;
-            unitLabel.setLocation(calculateUnitLabelPositionInTile(
-                    unitLabel.getWidth(), unitLabel.getHeight(),
-                    calculateTilePosition(sourceTile)));
-            unitsOutForAnimationLabels.put(unit, unitLabel);
-            gui.getCanvas().add(unitLabel, JLayeredPane.DEFAULT_LAYER);
-        } else {
-            i++;
-        }
-        unitsOutForAnimation.put(unit, i);
-        return unitsOutForAnimationLabels.get(unit);
-    }
-
-    /**
-     * Returns the amount of columns that are to the left of the Tile
-     * that is displayed in the center of the Map.
-     *
-     * @return The amount of columns that are to the left of the Tile
-     *     that is displayed in the center of the Map.
-     */
-    private int getLeftColumns() {
-        return getLeftColumns(focus.getY());
-    }
-
-    /**
-     * Returns the amount of columns that are to the left of the Tile
-     * with the given y-coordinate.
-     *
-     * @param y The y-coordinate of the Tile in question.
-     * @return The amount of columns that are to the left of the Tile
-     *     with the given y-coordinate.
-     */
-    private int getLeftColumns(int y) {
-        int leftColumns = leftSpace / tileWidth + 1;
-
-        if ((y & 1) == 0) {
-            if ((leftSpace % tileWidth) > 32) {
-                leftColumns++;
-            }
-        } else {
-            if ((leftSpace % tileWidth) == 0) {
-                leftColumns--;
-            }
-        }
-
-        return leftColumns;
-    }
-
-    /**
-     * Returns the amount of columns that are to the right of the Tile
-     * that is displayed in the center of the Map.
-     *
-     * @return The amount of columns that are to the right of the Tile
-     *     that is displayed in the center of the Map.
-     */
-    private int getRightColumns() {
-        return getRightColumns(focus.getY());
-    }
-
-    /**
-     * Returns the amount of columns that are to the right of the Tile
-     * with the given y-coordinate.
-     *
-     * @param y The y-coordinate of the Tile in question.
-     * @return The amount of columns that are to the right of the Tile
-     *     with the given y-coordinate.
-     */
-    private int getRightColumns(int y) {
-        int rightColumns = rightSpace / tileWidth + 1;
-
-        if ((y & 1) == 0) {
-            if ((rightSpace % tileWidth) == 0) {
-                rightColumns--;
-            }
-        } else {
-            if ((rightSpace % tileWidth) > 32) {
-                rightColumns++;
-            }
-        }
-
-        return rightColumns;
-    }
-
-    /**
-     * Gets the coordinates to draw a unit in a given tile.
-     *
-     * @param unitImage The unit's image
-     * @return The coordinates where the unit should be drawn onscreen
-     */
-    private Point calculateUnitImagePositionInTile(Image unitImage) {
-        int unitX = (tileWidth - unitImage.getWidth(null)) / 2;
-        int unitY = (tileHeight - unitImage.getHeight(null)) / 2 -
-                    (int) (UNIT_OFFSET * lib.getScaleFactor());
-
-        return new Point(unitX, unitY);
-    }
-
-    /**
-     * Gets the unit that should be displayed on the given tile.
-     *
-     * @param unitTile The <code>Tile</code> to check.
-     * @return The <code>Unit</code> to display or null if none found.
-     */
-    private Unit findUnitInFront(Tile unitTile) {
-        Unit result;
-
-        if (unitTile == null || unitTile.isEmpty()) {
-            result = null;
-
-        } else if (activeUnit != null && activeUnit.getTile() == unitTile) {
-            result = activeUnit;
-
-        } else if (unitTile.hasSettlement()) {
-            result = null;
-
-        } else if (activeUnit != null && activeUnit.isOffensiveUnit()) {
-            result = unitTile.getDefendingUnit(activeUnit);
-
-        } else {
-            // Find the unit with the most moves left, preferring
-            // active units.
-            List<Unit> units = unitTile.getUnitList();
-            result = units.remove(0);
-            int best = result.getMovesLeft();
-            boolean carrier,
-                active = result.getState() == Unit.UnitState.ACTIVE;
-            for (Unit u : units) {
-                carrier = false;
-                if (active) {
-                    if (u.getState() == Unit.UnitState.ACTIVE) {
-                        if (best < u.getMovesLeft()) {
-                            best = u.getMovesLeft();
-                            result = u;
-                        }
-                    } else {
-                        carrier = !u.isEmpty();
-                    }
-                } else if (u.getState() == Unit.UnitState.ACTIVE) {
-                    active = true;
-                    best = u.getMovesLeft();
-                    result = u;
-                } else {
-                    if (best < u.getMovesLeft()) {
-                        best = u.getMovesLeft();
-                        result = u;
-                    }
-                    carrier = !u.isEmpty();
-                }
-                if (carrier) {
-                    // Check for active units on carriers.  Usually the
-                    // carrier takes precedence.
-                    for (Unit c : u.getUnitList()) {
-                        if (active) {
-                            if (best < c.getMovesLeft()) {
-                                best = c.getMovesLeft();
-                                result = c;
-                            }
-                        } else if (c.getState() == Unit.UnitState.ACTIVE) {
-                            active = true;
-                            best = c.getMovesLeft();
-                            result = c;
-                        }
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Draw the unit's image and occupation indicator in one JLabel object.
-     *
-     * @param unit The unit to be drawn
-     * @return A JLabel object with the unit's image.
-     */
-    private JLabel createUnitLabel(Unit unit) {
-        final Image unitImg = lib.getUnitImage(unit);
-        final int width = halfWidth + unitImg.getWidth(null)/2;
-        final int height = unitImg.getHeight(null);
-
-        BufferedImage img = new BufferedImage(width, height,
-                                              BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = img.createGraphics();
-
-        final int unitX = (width - unitImg.getWidth(null)) / 2;
-        g.drawImage(unitImg, unitX, 0, null);
-
-        Player player = freeColClient.getMyPlayer();
-        String text = Messages.message(unit.getOccupationLabel(player, false));
-        g.drawImage(lib.getOccupationIndicatorChip(g, unit, text), 0, 0, null);
-
-        final JLabel label = new JLabel(new ImageIcon(img));
-        label.setSize(width, height);
-
-        g.dispose();
-        return label;
-    }
-
-    /**
-     * Is a y-coordinate near the bottom?
-     *
-     * @param y The y-coordinate.
-     * @return True if near the bottom.
-     */
-    private boolean isMapNearBottom(int y) {
-        return y >= freeColClient.getGame().getMap().getHeight() - bottomRows;
-    }
-
-    /**
-     * Is an x,y coordinate near the left?
-     *
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
-     * @return True if near the left.
-     */
-    private boolean isMapNearLeft(int x, int y) {
-        return x < getLeftColumns(y);
-    }
-
-    /**
-     * Is an x,y coordinate near the right?
-     *
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
-     * @return True if near the right.
-     */
-    private boolean isMapNearRight(int x, int y) {
-        return x >= freeColClient.getGame().getMap().getWidth()
-            - getRightColumns(y);
-    }
-
-    /**
-     * Is a y-coordinate near the top?
-     *
-     * @param y The y-coordinate.
-     * @return True if near the top.
-     */
-    private boolean isMapNearTop(int y) {
-        return y < topRows;
-    }
-
-    /**
-     * Returns true if the given Unit is being animated.
-     *
-     * @param unit an <code>Unit</code>
-     * @return a <code>boolean</code>
-     */
-    private boolean isOutForAnimation(final Unit unit) {
-        return unitsOutForAnimation.containsKey(unit);
-    }
-
-    private boolean isTileVisible(Tile tile) {
-        if (tile == null) return false;
-        return tile.getY() >= topRow && tile.getY() <= bottomRow
-            && tile.getX() >= leftColumn && tile.getX() <= rightColumn;
     }
 
     /**
@@ -2476,188 +2658,6 @@ public final class MapViewer {
             g.setColor(oldColor);
             g.setStroke(oldStroke);
         }
-    }
-
-    /**
-     * Position the map so that the supplied tile is displayed at the center.
-     *
-     * @param pos The <code>Tile</code> to center at.
-     */
-    private void positionMap(Tile pos) {
-        final Game game = freeColClient.getGame();
-        int x = pos.getX(), y = pos.getY();
-        int leftColumns = getLeftColumns(), rightColumns = getRightColumns();
-
-        /*
-          PART 1
-          ======
-          Calculate: bottomRow, topRow, bottomRowY, topRowY
-          This will tell us which rows need to be drawn on the screen (from
-          bottomRow until and including topRow).
-          bottomRowY will tell us at which height the bottom row needs to be
-          drawn.
-        */
-        alignedTop = false;
-        alignedBottom = false;
-        if (y < topRows) {
-            alignedTop = true;
-            // We are at the top of the map
-            bottomRow = (size.height / (halfHeight)) - 1;
-            if ((size.height % (halfHeight)) != 0) {
-                bottomRow++;
-            }
-            topRow = 0;
-            bottomRowY = bottomRow * (halfHeight);
-            topRowY = 0;
-        } else if (y >= (game.getMap().getHeight() - bottomRows)) {
-            alignedBottom = true;
-            // We are at the bottom of the map
-            bottomRow = game.getMap().getHeight() - 1;
-
-            topRow = size.height / (halfHeight);
-            if ((size.height % (halfHeight)) > 0) {
-                topRow++;
-            }
-            topRow = game.getMap().getHeight() - topRow;
-
-            bottomRowY = size.height - tileHeight;
-            topRowY = bottomRowY - (bottomRow - topRow) * (halfHeight);
-        } else {
-            // We are not at the top of the map and not at the bottom
-            bottomRow = y + bottomRows - 1;
-            topRow = y - topRows;
-            bottomRowY = topSpace + (halfHeight) * bottomRows;
-            topRowY = topSpace - topRows * (halfHeight);
-        }
-
-        /*
-          PART 2
-          ======
-          Calculate: leftColumn, rightColumn, leftColumnX
-          This will tell us which columns need to be drawn on the screen (from
-          leftColumn until and including rightColumn).
-          leftColumnX will tell us at which x-coordinate the left
-          column needs to be drawn (this is for the Tiles where y&1 == 0;
-          the others should be halfWidth more to the right).
-        */
-
-        alignedLeft = false;
-        alignedRight = false;
-        if (x < leftColumns) {
-            // We are at the left side of the map
-            leftColumn = 0;
-
-            rightColumn = size.width / tileWidth - 1;
-            if ((size.width % tileWidth) > 0) {
-                rightColumn++;
-            }
-
-            leftColumnX = 0;
-            alignedLeft = true;
-        } else if (x >= (game.getMap().getWidth() - rightColumns)) {
-            // We are at the right side of the map
-            rightColumn = game.getMap().getWidth() - 1;
-
-            leftColumn = size.width / tileWidth;
-            if ((size.width % tileWidth) > 0) {
-                leftColumn++;
-            }
-
-            leftColumnX = size.width - tileWidth - halfWidth -
-                leftColumn * tileWidth;
-            leftColumn = rightColumn - leftColumn;
-            alignedRight = true;
-        } else {
-            // We are not at the left side of the map and not at the right side
-            leftColumn = x - leftColumns;
-            rightColumn = x + rightColumns;
-            leftColumnX = (size.width - tileWidth) / 2
-                - leftColumns * tileWidth;
-        }
-    }
-
-    private void releaseUnitOutForAnimation(final Unit unit) {
-        Integer i = unitsOutForAnimation.get(unit);
-        if (i == null) {
-            throw new IllegalStateException("Tried to release unit that was not out for animation");
-        }
-        if (i == 1) {
-            unitsOutForAnimation.remove(unit);
-            gui.getCanvas().removeFromCanvas(unitsOutForAnimationLabels.remove(unit));
-        } else {
-            i--;
-            unitsOutForAnimation.put(unit, i);
-        }
-    }
-
-    private void repositionMapIfNeeded() {
-        if (bottomRow < 0 && focus != null) positionMap(focus);
-    }
-
-    /**
-     * Sets the ImageLibrary and calculates various items that depend
-     * on tile size.
-     *
-     * @param lib an <code>ImageLibrary</code> value
-     */
-    private void setImageLibraryAndUpdateData(ImageLibrary lib) {
-        this.lib = lib;
-        // ATTENTION: we assume that all base tiles have the same size
-        Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
-        rp = new RoadPainter(tileSize);
-        tileHeight = tileSize.height;
-        tileWidth = tileSize.width;
-        halfHeight = tileHeight/2;
-        halfWidth = tileWidth/2;
-
-        int dx = tileWidth/16;
-        int dy = tileHeight/16;
-        int ddx = dx + dx/2;
-        int ddy = dy + dy/2;
-
-        // small corners
-        controlPoints.put(Direction.N, new Point2D.Float(halfWidth, dy));
-        controlPoints.put(Direction.E, new Point2D.Float(tileWidth - dx, halfHeight));
-        controlPoints.put(Direction.S, new Point2D.Float(halfWidth, tileHeight - dy));
-        controlPoints.put(Direction.W, new Point2D.Float(dx, halfHeight));
-        // big corners
-        controlPoints.put(Direction.SE, new Point2D.Float(halfWidth, tileHeight));
-        controlPoints.put(Direction.NE, new Point2D.Float(tileWidth, halfHeight));
-        controlPoints.put(Direction.SW, new Point2D.Float(0, halfHeight));
-        controlPoints.put(Direction.NW, new Point2D.Float(halfWidth, 0));
-        // small corners
-        borderPoints.put(Direction.NW, new Point2D.Float(dx + ddx, halfHeight - ddy));
-        borderPoints.put(Direction.N,  new Point2D.Float(halfWidth - ddx, dy + ddy));
-        borderPoints.put(Direction.NE, new Point2D.Float(halfWidth + ddx, dy + ddy));
-        borderPoints.put(Direction.E,  new Point2D.Float(tileWidth - dx - ddx, halfHeight - ddy));
-        borderPoints.put(Direction.SE, new Point2D.Float(tileWidth - dx - ddx, halfHeight + ddy));
-        borderPoints.put(Direction.S,  new Point2D.Float(halfWidth + ddx, tileHeight - dy - ddy));
-        borderPoints.put(Direction.SW, new Point2D.Float(halfWidth - ddx, tileHeight - dy - ddy));
-        borderPoints.put(Direction.W,  new Point2D.Float(dx + ddx, halfHeight + ddy));
-
-        borderStroke = new BasicStroke(dy);
-        gridStroke = new BasicStroke(lib.getScaleFactor());
-
-        fog.reset();
-        fog.moveTo(halfWidth, 0);
-        fog.lineTo(tileWidth, halfHeight);
-        fog.lineTo(halfWidth, tileHeight);
-        fog.lineTo(0, halfHeight);
-        fog.closePath();
-    }
-
-    private void updateMapDisplayVariables() {
-        // Calculate the amount of rows that will be drawn above the
-        // central Tile
-        topSpace = (size.height - tileHeight) / 2;
-        if ((topSpace % (halfHeight)) != 0) {
-            topRows = topSpace / (halfHeight) + 2;
-        } else {
-            topRows = topSpace / (halfHeight) + 1;
-        }
-        bottomRows = topRows;
-        leftSpace = (size.width - tileWidth) / 2;
-        rightSpace = leftSpace;
     }
 
 }
