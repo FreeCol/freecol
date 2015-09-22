@@ -227,7 +227,6 @@ public final class MapViewer {
         OTHER_UNITS_WIDTH = 3,
         MAX_OTHER_UNITS = 10;
 
-    private GeneralPath gridPath = null;
     private final GeneralPath fog = new GeneralPath();
 
     private final java.util.Map<Unit, Integer> unitsOutForAnimation;
@@ -1578,6 +1577,7 @@ public final class MapViewer {
         =======
         Create a GeneralPath to draw the grid with, if needed.
         */
+        GeneralPath gridPath = null;
         if (options.getBoolean(ClientOptions.DISPLAY_GRID)) {
             gridPath = new GeneralPath();
             gridPath.moveTo(0, 0);
