@@ -166,7 +166,7 @@ public class AbstractUnit extends FreeColObject {
      * @param spec A <code>Specification</code> to look up.
      * @return The approximate offence power.
      */
-    public float getOffence(Specification spec) {
+    public double getOffence(Specification spec) {
         int n = getNumber();
         Role role = getRole(spec);
         UnitType type = spec.getUnitType(getId());

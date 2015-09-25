@@ -177,7 +177,7 @@ public final class UnitType extends BuildableType implements Consumer {
      *
      * @return The offence value.
      */
-    public float getOffence() {
+    public double getOffence() {
         return applyModifiers(offence, null, Modifier.OFFENCE);
     }
 
@@ -204,7 +204,7 @@ public final class UnitType extends BuildableType implements Consumer {
      *
      * @return The defence value.
      */
-    public float getDefence() {
+    public double getDefence() {
         return applyModifiers(defence, null, Modifier.DEFENCE);
     }
 

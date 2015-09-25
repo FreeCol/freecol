@@ -68,8 +68,8 @@ public class Role extends BuildableType {
         = new Comparator<Role>() {
             @Override
             public int compare(Role role1, Role role2) {
-                float amount1 = role1.getOffence() + role1.getDefence();
-                float amount2 = role2.getOffence() + role2.getDefence();
+                double amount1 = role1.getOffence() + role1.getDefence();
+                double amount2 = role2.getOffence() + role2.getDefence();
                 return (amount1 < amount2) ? 1
                     : (amount1 > amount2) ? -1
                     : 0;
@@ -81,8 +81,8 @@ public class Role extends BuildableType {
         = new Comparator<Role>() {
             @Override
             public int compare(Role role1, Role role2) {
-                float defence1 = role1.getDefence();
-                float defence2 = role2.getDefence();
+                double defence1 = role1.getDefence();
+                double defence2 = role2.getDefence();
                 return (defence1 > defence2) ? 1
                     : (defence1 < defence2) ? -1
                     : 0;
@@ -94,8 +94,8 @@ public class Role extends BuildableType {
         = new Comparator<Role>() {
             @Override
             public int compare(Role role1, Role role2) {
-                float offence1 = role1.getOffence();
-                float offence2 = role2.getOffence();
+                double offence1 = role1.getOffence();
+                double offence2 = role2.getOffence();
                 return (offence1 > offence2) ? 1
                     : (offence1 < offence2) ? -1
                     : 0;
@@ -297,8 +297,8 @@ public class Role extends BuildableType {
      *
      * @return The offense value.
      */
-    public float getOffence() {
-        return applyModifiers(0f, null, Modifier.OFFENCE);
+    public double getOffence() {
+        return applyModifiers(0.0f, null, Modifier.OFFENCE);
     }
 
     /**
@@ -315,8 +315,8 @@ public class Role extends BuildableType {
      *
      * @return The defence value.
      */
-    private float getDefence() {
-        return applyModifiers(0f, null, Modifier.DEFENCE);
+    private double getDefence() {
+        return applyModifiers(0.0f, null, Modifier.DEFENCE);
     }
 
     /**

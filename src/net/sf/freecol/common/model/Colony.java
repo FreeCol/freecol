@@ -1325,22 +1325,21 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public StringTemplate getReducePopulationMessage() {
         if (canReducePopulation()) return null;
         Set<Modifier> modifierSet = getModifiers(Modifier.MINIMUM_COLONY_SIZE);
-        for (Modifier modifier : modifierSet) {
-            FreeColObject source = modifier.getSource();
-            if (source instanceof BuildingType) {
-                // If the modifier source is a building type, use the
-                // building in the colony, which may be of a different
-                // level to the modifier source.
-                // This prevents the stockade modifier from matching a
-                // colony-fort, and thus the message attributing the
-                // failure to reduce population to a non-existing
-                // stockade, BR#3522055.
-                source = getBuilding((BuildingType)source).getType();
-            }
-            return StringTemplate.template("model.colony.minimumColonySize")
-                .addName("%object%", source);
+        if (modifierSet.isEmpty()) return null;
+        Modifier modifier = modifierSet.iterator().next();
+        FreeColObject source = modifier.getSource();
+        if (source instanceof BuildingType) {
+            // If the modifier source is a building type, use the
+            // building in the colony, which may be of a different
+            // level to the modifier source.
+            // This prevents the stockade modifier from matching a
+            // colony-fort, and thus the message attributing the
+            // failure to reduce population to a non-existing
+            // stockade, BR#3522055.
+            source = getBuilding((BuildingType)source).getType();
         }
-        return null;
+        return StringTemplate.template("model.colony.minimumColonySize")
+            .addName("%object%", source);
     }
 
     /**

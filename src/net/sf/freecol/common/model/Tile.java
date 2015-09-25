@@ -202,8 +202,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private final Comparator<Tile> defenceValueComparator
         = new Comparator<Tile>() {
                 public int compare(Tile t1, Tile t2) {
-                    float f = t2.getDefenceValue() - t1.getDefenceValue();
-                    return (f < 0.0f) ? -1 : (f > 0.0f) ? 1 : 0;
+                    double f = t2.getDefenceValue() - t1.getDefenceValue();
+                    return (f < 0.0) ? -1 : (f > 0.0) ? 1 : 0;
                 }
             };
 
@@ -1349,9 +1349,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * @return The defence value.
      */
-    public float getDefenceValue() {
+    public double getDefenceValue() {
         final TileType type = getType();
-        return (type == null) ? 0.0f
+        return (type == null) ? 0.0
             : applyModifiers(1.0f, null, type.getDefenceModifiers());
     }
 
