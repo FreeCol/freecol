@@ -471,6 +471,8 @@ public final class MapViewer {
      * @return The image.
      */
     BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
+        if (!tile.isExplored())
+            return lib.getTerrainImage(null, tile.getX(), tile.getY());
         final TileType tileType = tile.getType();
         Dimension terrainTileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
         BufferedImage overlayImage = lib.getOverlayImage(tile);
@@ -2362,9 +2364,9 @@ public final class MapViewer {
     }
 
     /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates.  Addtions and
-     * improvements to Tile will be drawn.
+     * Displays the given tile's items onto the given Graphics2D object.
+     * Additions and improvements to Tile will be drawn.
+     * Only works for explored tiles.
      *
      * @param g The Graphics2D object on which to draw the Tile.
      * @param tile The Tile to draw.
@@ -2373,46 +2375,43 @@ public final class MapViewer {
     private void displayTileItems(Graphics2D g, Tile tile, Image overlayImage) {
         // ATTENTION: we assume that only overlays and forests
         // might be taller than a tile.
-        if (!tile.isExplored()) {
-            g.drawImage(lib.getTerrainImage(null, tile.getX(), tile.getY()), 0, 0, null);
-        } else {
-            // layer additions and improvements according to zIndex
-            List<TileItem> tileItems = (tile.getTileItemContainer() != null)
-                ? tile.getTileItemContainer().getTileItems()
-                : new ArrayList<TileItem>();
-            int startIndex = 0;
-            for (int index = startIndex; index < tileItems.size(); index++) {
-                if (tileItems.get(index).getZIndex() < Tile.OVERLAY_ZINDEX) {
-                    displayTileItem(g, tile, tileItems.get(index));
-                    startIndex = index + 1;
-                } else {
-                    startIndex = index;
-                    break;
-                }
-            }
-            // Tile Overlays (eg. hills and mountains)
-            if (overlayImage != null) {
-                g.drawImage(overlayImage, 0, (tileHeight - overlayImage.getHeight(null)), null);
-            }
-            for (int index = startIndex; index < tileItems.size(); index++) {
-                if (tileItems.get(index).getZIndex() < Tile.FOREST_ZINDEX) {
-                    displayTileItem(g, tile, tileItems.get(index));
-                    startIndex = index + 1;
-                } else {
-                    startIndex = index;
-                    break;
-                }
-            }
-            // Forest
-            if (tile.isForested()) {
-                Image forestImage = lib.getForestImage(tile.getType(), tile.getRiverStyle());
-                g.drawImage(forestImage, 0, (tileHeight - forestImage.getHeight(null)), null);
-            }
 
-            // draw all remaining items
-            for (TileItem ti : tileItems.subList(startIndex, tileItems.size())) {
-                displayTileItem(g, tile, ti);
+        // layer additions and improvements according to zIndex
+        List<TileItem> tileItems = (tile.getTileItemContainer() != null)
+            ? tile.getTileItemContainer().getTileItems()
+            : new ArrayList<TileItem>();
+        int startIndex = 0;
+        for (int index = startIndex; index < tileItems.size(); index++) {
+            if (tileItems.get(index).getZIndex() < Tile.OVERLAY_ZINDEX) {
+                displayTileItem(g, tile, tileItems.get(index));
+                startIndex = index + 1;
+            } else {
+                startIndex = index;
+                break;
             }
+        }
+        // Tile Overlays (eg. hills and mountains)
+        if (overlayImage != null) {
+            g.drawImage(overlayImage, 0, (tileHeight - overlayImage.getHeight(null)), null);
+        }
+        for (int index = startIndex; index < tileItems.size(); index++) {
+            if (tileItems.get(index).getZIndex() < Tile.FOREST_ZINDEX) {
+                displayTileItem(g, tile, tileItems.get(index));
+                startIndex = index + 1;
+            } else {
+                startIndex = index;
+                break;
+            }
+        }
+        // Forest
+        if (tile.isForested()) {
+            Image forestImage = lib.getForestImage(tile.getType(), tile.getRiverStyle());
+            g.drawImage(forestImage, 0, (tileHeight - forestImage.getHeight(null)), null);
+        }
+
+        // draw all remaining items
+        for (TileItem ti : tileItems.subList(startIndex, tileItems.size())) {
+            displayTileItem(g, tile, ti);
         }
     }
 

@@ -145,7 +145,7 @@ public final class InfoPanel extends FreeColPanel {
             final ImageLibrary lib = getGUI().getTileImageLibrary();
             final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                 FontLibrary.FontSize.TINY, lib.getScaleFactor());
-            if (tile != null && tile.getType() != null) {
+            if (tile != null) {
                 final int width = getWidth() - SLACK;
                 BufferedImage image = getGUI().createTileImageWithBeachBorderAndItems(tile);
                 if (tile.isExplored()) {
