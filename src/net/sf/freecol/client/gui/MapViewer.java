@@ -485,7 +485,7 @@ public final class MapViewer {
             terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
         g.translate(0, compoundHeight - terrainTileSize.height);
-        displayTileWithBeachAndBorder(g, lib, tile, true);
+        displayTileWithBeachAndBorder(g, lib, tile);
         displayTileItems(g, tile, overlayImage);
         g.dispose();
         return image;
@@ -579,7 +579,7 @@ public final class MapViewer {
             }
         }
 
-        displayTileWithBeachAndBorder(g, lib, tile, false);
+        displayTileWithBeachAndBorder(g, lib, tile);
         if (tile != null && tile.isExplored()) {
             displayTileItems(g, tile, overlayImage);
             displaySettlementWithChipsOrPopulationNumber(freeColClient, lib,
@@ -1622,7 +1622,7 @@ public final class MapViewer {
             // Column per column; start at the left side to display the tiles.
             for (int column = firstColumn; column <= lastColumn; column++) {
                 Tile tile = map.getTile(column, row);
-                displayTileWithBeachAndBorder(g, lib, tile, true);
+                displayTileWithBeachAndBorder(g, lib, tile);
                 g.translate(tileWidth, 0);
             }
             g.setTransform(rowTransform);
@@ -2050,13 +2050,10 @@ public final class MapViewer {
      * @param g The Graphics2D object on which to draw the Tile.
      * @param library The <code>ImageLibrary</code> to use.
      * @param tile The Tile to draw.
-     * @param drawUnexploredBorders If true; draws border between explored and
-     *        unexplored terrain.
      */
     private static void displayTileWithBeachAndBorder(Graphics2D g,
                                                       ImageLibrary library,
-                                                      Tile tile,
-                                                      boolean drawUnexploredBorders) {
+                                                      Tile tile) {
         if (tile != null) {
             int x = tile.getX();
             int y = tile.getY();
@@ -2081,19 +2078,12 @@ public final class MapViewer {
                 SortableImage si;
                 for (Direction direction : Direction.values()) {
                     Tile borderingTile = tile.getNeighbourOrNull(direction);
-                    if (borderingTile != null) {
-
-                        if (!drawUnexploredBorders && !borderingTile.isExplored() &&
-                            (direction == Direction.SE || direction == Direction.S ||
-                             direction == Direction.SW)) {
-                            continue;
-                        }
-
+                    if (borderingTile != null && borderingTile.isExplored()) {
                         if (tile.getType() == borderingTile.getType()) {
                             // Equal tiles, no need to draw border
                         } else if (tile.isLand() && !borderingTile.isLand()) {
                             // The beach borders are drawn on the side of water tiles only
-                        } else if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
+                        } else if (!tile.isLand() && borderingTile.isLand()) {
                             // If there is a Coast image (eg. beach) defined, use it, otherwise skip
                             // Draw the grass from the neighboring tile, spilling over on the side of this tile
                             si = new SortableImage(library.getBorderImage(borderingTile.getType(), direction, x, y),
@@ -2106,7 +2096,7 @@ public final class MapViewer {
                                                        -1);
                                 imageBorders.add(si);
                             }
-                        } else if (borderingTile.isExplored()) {
+                        } else {
                             if (library.getTerrainImage(tile.getType(), 0, 0)
                                 .equals(library.getTerrainImage(borderingTile.getType(), 0, 0))) {
                                 // Do not draw limit between tile that share same graphics (ocean & great river)
