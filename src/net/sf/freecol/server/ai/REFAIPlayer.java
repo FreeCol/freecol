@@ -660,16 +660,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             }
 
             // Go defend the nearest colony needing defence
-            int bestValue = Integer.MAX_VALUE;
-            Colony best = null;
-            for (AIColony aic : getBadlyDefended()) {
-                Colony c = aic.getColony();
-                int value = u.getTurnsToReach(c);
-                if (value >= 0 && value < bestValue) {
-                    bestValue = value;
-                    best = c;
-                }
-            }
+            Colony best = u.getClosestColony(getBadlyDefended().stream()
+                .map(AIColony::getColony));
             if (best != null
                 && (m = getDefendSettlementMission(aiu, best)) != null) {
                 lb.add(" GO-DEFEND-", best.getName(), " " , m);
@@ -825,11 +817,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 boolean bad = false;
                 while (!bad && !todo.isEmpty()) {
                     for (Location l : idlePorts) {
-                        int bestValue = INFINITY;
+                        int bestValue = Unit.MANY_TURNS;
                         AIUnit best = null;
                         for (AIUnit aiu : todo) {
                             int value = aiu.getUnit().getTurnsToReach(l);
-                            if (value >= 0 && value < bestValue) {
+                            if (bestValue > value) {
                                 bestValue = value;
                                 best = aiu;
                             }

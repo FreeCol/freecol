@@ -1242,35 +1242,24 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (wishes == null) return null;
 
         final Unit carrier = aiUnit.getUnit();
-        WorkerWish nonTransported = null;
-        WorkerWish transported = null;
-        float bestNonTransportedValue = -1.0f;
-        float bestTransportedValue = -1.0f;
+        WorkerWish carried = null;
+        WorkerWish other = null;
+        double bestCarriedValue = -1.0, bestOtherValue = -1.0;
         for (WorkerWish w : wishes) {
-            int turns;
-            try {
-                turns = carrier.getTurnsToReach(w.getDestination());
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Bogus wish destination for "
-                    + aiUnit + ": " + w.getDestination()
-                    + " for wish: " + w, e);
-                continue;
-            }
-            if (turns == INFINITY) {
-                if (bestTransportedValue < w.getValue()) {
-                    bestTransportedValue = w.getValue();
-                    transported = w;
+            int turns = carrier.getTurnsToReach(w.getDestination());
+            if (turns < Unit.MANY_TURNS) {
+                if (bestCarriedValue < (double)w.getValue() / turns) {
+                    bestCarriedValue = (double)w.getValue() / turns;
+                    carried = w;
                 }
             } else {
-                if (bestNonTransportedValue < (float)w.getValue() / turns) {
-                    bestNonTransportedValue = (float)w.getValue() / turns;
-                    nonTransported = w;
+                if (bestOtherValue < w.getValue()) {
+                    bestOtherValue = w.getValue();
+                    other = w;
                 }
             }
         }
-        return (nonTransported != null) ? nonTransported
-            : (transported != null) ? transported
-            : null;
+        return (carried != null) ? carried : (other != null) ? other : null;
     }
 
     /**
@@ -1285,14 +1274,14 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (wishes == null) return null;
 
         final Unit carrier = aiUnit.getUnit();
-        float bestValue = 0.0f;
+        double bestValue = 0.0f;
         GoodsWish best = null;
         for (GoodsWish w : wishes) {
             int turns = carrier.getTurnsToReach(carrier.getLocation(),
                                                 w.getDestination());
-            if (turns == INFINITY) continue;
-            float value = (float)w.getValue() / turns;
-            if (bestValue > value) {
+            if (turns >= Unit.MANY_TURNS) continue;
+            double value = (double)w.getValue() / turns;
+            if (bestValue < value) {
                 bestValue = value;
                 best = w;
             }
@@ -2138,7 +2127,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 int ttr = 1 + unit.getTurnsToReach(loc, colony.getTile(),
                     unit.getCarrier(),
                     ((relaxed) ? CostDeciders.numberOfTiles() : null));
-                if (ttr < 0) continue;
+                if (ttr >= Unit.MANY_TURNS) continue;
                 double value = colony.getDefenceRatio() * 100.0 / ttr;
                 if (worstValue > value) {
                     worstValue = value;

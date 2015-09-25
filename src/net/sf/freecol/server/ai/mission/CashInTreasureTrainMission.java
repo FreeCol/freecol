@@ -109,7 +109,7 @@ public class CashInTreasureTrainMission extends Mission {
 
         // Pick the closest carrier and queue this unit.
         final Location here = unit.getLocation();
-        int turns = INFINITY;
+        int turns = Unit.MANY_TURNS;
         Unit closest = null;
         for (Unit c : carriers) {
             int t = c.getTurnsToReach(here);

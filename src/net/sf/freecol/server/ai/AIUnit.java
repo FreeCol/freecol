@@ -563,7 +563,7 @@ public class AIUnit extends TransportableAIObject {
         final Player player = unit.getOwner();
         Tile safe = tiles.get(0);
         Tile best = null;
-        int bestTurns = Integer.MAX_VALUE;
+        int bestTurns = Unit.MANY_TURNS;
         Settlement settlement = null;
         for (Tile t : tiles) {
             if (settlement == null || t.isConnectedTo(settlement.getTile())) {

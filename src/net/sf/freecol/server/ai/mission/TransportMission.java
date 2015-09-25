@@ -1113,7 +1113,7 @@ public class TransportMission extends Mission {
 
         for (Cargo cargo : order) {
             int turns = carrier.getTurnsToReach(now, cargo.getCarrierTarget());
-            totalTurns += turns; // Might be INFINITY!
+            totalTurns += turns; // Might be MANY_TURNS!
             totalHoldTurns += holds * turns * favourEarly;
             holds += cargo.getNewSpace();
             if (holds < 0 || holds > maxHolds) return -1.0f;

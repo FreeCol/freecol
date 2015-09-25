@@ -25,7 +25,9 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -1860,31 +1862,17 @@ public class Unit extends GoodsLocation
 
     /**
      * Finds the closest <code>Location</code> to this tile where
-     * this ship can be repaired.
+     * this ship can be repaired, excluding the current colony.
      *
      * @return The closest <code>Location</code> where a ship can be
      *     repaired.
      */
     public Location getRepairLocation() {
         final Player player = getOwner();
-        final Tile tile = getTile();
-        Location bestLocation = null;
-        int bestTurns = INFINITY;
-        for (Colony colony : player.getColonies()) {
-            int turns;
-            if (colony != null && colony != tile.getColony()
-                && colony.hasAbility(Ability.REPAIR_UNITS)
-                && (turns = getTurnsToReach(colony)) >= 0
-                && turns < bestTurns) {
-                // Tile.getDistanceTo(Tile) doesn't care about
-                // connectivity, so we need to check for an available
-                // path to target colony instead
-                bestTurns = turns;
-                bestLocation = colony;
-            }
-        }
-        if (bestLocation == null) bestLocation = player.getEurope();
-        return bestLocation;
+        final Colony notHere = getTile().getColony();
+        Location best = getClosestColony(player.getColonies().stream()
+            .filter(c -> c != notHere && c.hasAbility(Ability.REPAIR_UNITS)));
+        return (best != null) ? best : player.getEurope();
     }
 
     /**
@@ -2738,7 +2726,7 @@ public class Unit extends GoodsLocation
      *
      * @param end The destination <code>Location</code>.
      * @return The number of turns it will take to reach the destination,
-     *         or <code>INFINITY</code> if no path can be found.
+     *         or <code>MANY_TURNS</code> if no path can be found.
      */
     public int getTurnsToReach(Location end) {
         return getTurnsToReach(getLocation(), end);
@@ -2752,7 +2740,7 @@ public class Unit extends GoodsLocation
      * @param start The <code>Location</code> to start the search from.
      * @param end The destination <code>Location</code>.
      * @return The number of turns it will take to reach the <code>end</code>,
-     *         or <code>INFINITY</code> if no path can be found.
+     *         or <code>MANY_TURNS</code> if no path can be found.
      */
     public int getTurnsToReach(Location start, Location end) {
         return getTurnsToReach(start, end, getCarrier(),
@@ -2778,6 +2766,32 @@ public class Unit extends GoodsLocation
         return (path == null) ? MANY_TURNS : path.getTotalTurns();
     }
 
+    /**
+     * Get the colony that can be reached by this unit in the least number
+     * of turns.
+     *
+     * @param colonies A list of <code>Colony</code>s.
+     * @return The nearest <code>Colony</code>, or null if none found.
+     */
+    public Colony getClosestColony(List<Colony> colonies) {
+        return getClosestColony(colonies.stream());
+    }
+    
+    /**
+     * Get the colony that can be reached by this unit in the least number
+     * of turns.
+     *
+     * @param colonies A stream of <code>Colony</code>s.
+     * @return The nearest <code>Colony</code>, or null if none found.
+     */
+    public Colony getClosestColony(Stream<Colony> colonies) {
+        ToIntFunction<Colony> closeness = c -> (c == null) ? MANY_TURNS-1
+            : this.getTurnsToReach(c);
+        return Stream.concat(Stream.of((Colony)null), colonies)
+            .collect(Collectors.minBy(Comparator.comparingInt(closeness)))
+            .orElse(null);
+    }
+    
     /**
      * Find a path for this unit to the nearest settlement with the
      * same owner that is reachable without a carrier.

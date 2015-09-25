@@ -189,8 +189,8 @@ public class TransportMissionTest extends FreeColTestCase {
         // Test
         assertNotNull("Unit should have a destination", dest);
         assertEquals("Destination should be Europe", europe, dest);
-        assertFalse("Unit should have a path", 
-                    galleon.getTurnsToReach(dest) == FreeColObject.INFINITY);
+        assertTrue("Unit should have a path", 
+            galleon.getTurnsToReach(dest) < Unit.MANY_TURNS);
     }
 
     public void testGetNextStopIsColony() {
