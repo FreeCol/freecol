@@ -352,29 +352,32 @@ public class ServerBuildingTest extends FreeColTestCase {
         colony.addGoods(foodType, 100);
 
         Building university = colony.getBuilding(universityType);
+        Building townHall = colony.getBuilding(townHallType);
+        clearWorkLocation(townHall);
         Iterator<Unit> units = colony.getUnitIterator();
 
         Unit colonist1 = units.next();
         colonist1.setType(freeColonistType);
-        colonist1.setLocation(colony.getBuilding(townHallType));
+        colonist1.setLocation(townHall);
 
         Unit colonist2 = units.next();
         colonist2.setType(freeColonistType);
-        colonist2.setLocation(colony.getBuilding(townHallType));
+        colonist2.setLocation(townHall);
 
         Unit colonist3 = units.next();
         colonist3.setType(freeColonistType);
-        colonist3.setLocation(colony.getBuilding(townHallType));
+        colonist3.setLocation(townHall);
 
         Unit black = units.next();
         black.setType(masterBlacksmithType);
+        black.setLocation(university);
 
         Unit ore = units.next();
         ore.setType(expertOreMinerType);
-
-        black.setLocation(university);
         ore.setLocation(university);
 
+        assertTrue("Should be longer to train blacksmith then ore miner",
+            black.getNeededTurnsOfTraining() > ore.getNeededTurnsOfTraining());
         assertEquals(3, getUnitList(colony, freeColonistType).size());
         assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
         assertEquals(1, getUnitList(colony, expertOreMinerType).size());
