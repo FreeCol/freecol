@@ -81,12 +81,12 @@ public final class ImageLibrary {
 
     /**
      * Canonical sizes of images GUI elements and map are expecting
-     * in some cases already and current image files have.
-     * ATM this is just for documentation.
-     * Currently, most images result in a size of image size times scaling
-     * factor times requested size. If these canonical sizes would get used
-     * in the equation, the game could tolerate changing sizes in the files,
-     * without GUI elements sized wrongly, parts cut off or moved unexpectedly.
+     * and current image files have.
+     * ICON_SIZE, TILE_SIZE, TILE_OVERLAY_SIZE and TILE_FOREST_SIZE constants
+     * are used in this way already, allowing them to tolerate changing sizes
+     * in the files.
+     * Most other images are currently still shown in a size of image size
+     * times scaling factor times requested size.
      */
     public static final Dimension ICON_SIZE = new Dimension(32, 32),
                                   BUILDING_SIZE = new Dimension(128, 96),
