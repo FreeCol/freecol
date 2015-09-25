@@ -436,18 +436,18 @@ public class SimpleMapGenerator implements MapGenerator {
         // order picking out as many as possible suitable tiles for
         // native settlements such that can be guaranteed at least one
         // layer of surrounding tiles to own.
-        int minSettlementDistance
+        List<Tile> allTiles = new ArrayList<>();
+        for (Tile t : map.getAllTiles()) allTiles.add(t);
+        randomShuffle(logger, "All tile shuffle", allTiles, random);
+        final int minDistance
             = spec.getRangeOption(GameOptions.SETTLEMENT_NUMBER).getValue();
         List<Tile> settlementTiles = new ArrayList<>();
-        tiles: for (Tile tile : map.getAllTiles()) {
-            if (!tile.isPolar() && suitableForNativeSettlement(tile)) {
-                for (Tile t : settlementTiles) {
-                    if (tile.getDistanceTo(t) < minSettlementDistance) {
-                        continue tiles;
-                    }
-                }
+        for (Tile tile : allTiles) {
+            if (!tile.isPolar()
+                && suitableForNativeSettlement(tile)
+                && settlementTiles.stream()
+                    .noneMatch(t -> t.getDistanceTo(tile) < minDistance))
                 settlementTiles.add(tile);
-            }
         }
         randomShuffle(logger, "Settlement tiles", settlementTiles, random);
 

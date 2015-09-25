@@ -37,6 +37,7 @@ import java.awt.dnd.DragSourceListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -277,14 +278,9 @@ public final class DefaultTransferHandler extends TransferHandler {
      */
     @Override
     public boolean canImport(JComponent comp, DataFlavor[] flavor) {
-        if (comp instanceof JPanel || comp instanceof JLabel) {
-            for (DataFlavor aFlavor : flavor) {
-                if (aFlavor.equals(DefaultTransferHandler.flavor)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return (comp instanceof JPanel || comp instanceof JLabel)
+            && Arrays.stream(flavor)
+                .anyMatch(f -> f.equals(DefaultTransferHandler.flavor));
     }
 
     /**

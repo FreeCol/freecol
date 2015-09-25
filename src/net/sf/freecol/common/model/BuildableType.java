@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -133,13 +134,10 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * @return True if the buildable is available.
      */
     public boolean isAvailableTo(FreeColObject... fco) {
-        if (requiredAbilities != null) {
-            for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
-                if (entry.getValue() != Arrays.stream(fco)
-                    .anyMatch(o -> o.hasAbility(entry.getKey()))) return false;
-            }
-        }
-        return true;
+        return (requiredAbilities == null) ? true
+            : requiredAbilities.entrySet().stream()
+                .allMatch(e -> e.getValue() == Arrays.stream(fco)
+                    .anyMatch(o -> o.hasAbility(e.getKey())));
     }
 
     /**

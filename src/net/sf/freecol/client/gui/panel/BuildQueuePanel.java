@@ -32,6 +32,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -164,10 +165,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
              */
             @Override
             public boolean isDataFlavorSupported(DataFlavor flavor) {
-                for (DataFlavor myFlavor : supportedFlavors) {
-                    if (myFlavor.equals(flavor)) return true;
-                }
-                return false;
+                return Arrays.stream(supportedFlavors)
+                    .anyMatch(f -> f.equals(flavor));
             }
         }
 
@@ -338,11 +337,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
          */
         @Override
         public boolean canImport(JComponent comp, DataFlavor[] flavors) {
-            if (flavors == null) return false;
-            for (DataFlavor flavor : flavors) {
-                if (flavor.equals(BUILD_LIST_FLAVOR)) return true;
-            }
-            return false;
+            return flavors != null && Arrays.stream(flavors)
+                .anyMatch(f -> f.equals(BUILD_LIST_FLAVOR));
         }
 
         /**

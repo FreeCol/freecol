@@ -147,7 +147,17 @@ public class RandomRange {
         scopes.add(scope);
     }
 
-
+    /**
+     * Does an object satisfy the scopes?
+     *
+     * @param fco The <code>FreeColObject</code> to test.
+     * @return True if the scopes are satisfied.
+     */
+    public boolean appliesTo(FreeColObject fco) {
+        List<Scope> scs = getScopes();
+        return scs.isEmpty() || scs.stream().anyMatch(s -> s.appliesTo(fco));
+    }
+    
     /**
      * Gets a random value from this range.
      *

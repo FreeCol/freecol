@@ -31,6 +31,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -223,12 +224,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
         @Override
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
-            for (DataFlavor flavor : flavors) {
-                if (flavor.equals(DefaultTransferHandler.flavor)) {
-                    return true;
-                }
-            }
-            return false;
+            return Arrays.stream(flavors)
+                .anyMatch(f -> f.equals(DefaultTransferHandler.flavor));
         }
     }
 
@@ -345,12 +342,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
          */
         @Override
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
-            for (DataFlavor flavor : flavors) {
-                if (flavor.equals(STOP_FLAVOR)) {
-                    return true;
-                }
-            }
-            return false;
+            return Arrays.stream(flavors).anyMatch(f -> f.equals(STOP_FLAVOR));
         }
 
         /**

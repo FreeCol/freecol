@@ -23,6 +23,7 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -154,14 +155,10 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
                 }
             }
 
-            List<IndianNationType> nations = new ArrayList<>();
-            for (IndianNationType nation : spec.getIndianNationTypes()) {
-                for (RandomChoice<UnitType> choice : nation.getSkills()) {
-                    if (choice.getObject() == type) {
-                        nations.add(nation);
-                    }
-                }
-            }
+            List<IndianNationType> nations = spec.getIndianNationTypes().stream()
+                .filter(nt -> nt.getSkills().stream()
+                    .anyMatch(ut -> ut.getObject() == type))
+                .collect(Collectors.toList());
             if (!nations.isEmpty()) {
                 panel.add(Utility.localizedLabel("colopedia.unit.natives"), "newline");
                 int count = 0;

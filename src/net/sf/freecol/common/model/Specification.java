@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,10 +33,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -57,7 +58,6 @@ import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.TextOption;
 import net.sf.freecol.common.option.UnitListOption;
-
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -1847,18 +1847,12 @@ public final class Specification {
     public <T extends FreeColGameObjectType> List<T>
                       getTypesWithAbility(Class<T> resultType,
                                           String... abilities) {
-        List<T> result = new ArrayList<>();
-        for (FreeColGameObjectType type : allTypes.values()) {
-            if (resultType.isInstance(type)) {
-                for (String ability : abilities) {
-                    if (type.hasAbility(ability)) {
-                        result.add(resultType.cast(type));
-                        break;
-                    }
-                }
-            }
-        }
-        return result;
+        return allTypes.values().stream()
+            .filter(type -> resultType.isInstance(type)
+                    && Arrays.stream(abilities)
+                        .anyMatch(a -> type.hasAbility(a)))
+            .map(type -> resultType.cast(type))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -1871,16 +1865,12 @@ public final class Specification {
     public <T extends FreeColGameObjectType> List<T>
                       getTypesWithoutAbility(Class<T> resultType,
                                              String... abilities) {
-        List<T> result = new ArrayList<>();
-        type: for (FreeColGameObjectType type : allTypes.values()) {
-            if (resultType.isInstance(type)) {
-                for (String ability : abilities) {
-                    if (type.hasAbility(ability)) continue type;
-                }
-                result.add(resultType.cast(type));
-            }
-        }
-        return result;
+        return allTypes.values().stream()
+            .filter(type -> resultType.isInstance(type)
+                    && Arrays.stream(abilities)
+                        .noneMatch(a -> type.hasAbility(a)))
+            .map(type -> resultType.cast(type))
+            .collect(Collectors.toList());
     }
 
 

@@ -264,12 +264,10 @@ public class TradeRoute extends FreeColGameObject
         }
 
         // Check that the name is unique
-        for (TradeRoute route : owner.getTradeRoutes()) {
-            if (route == this) continue;
-            if (route.getName().equals(name)) {
-                return StringTemplate.template("model.tradeRoute.duplicateName")
-                    .addName("%name%", name);
-            }
+        if (owner.getTradeRoutes().stream()
+            .anyMatch(tr -> tr != this && tr.getName().equals(name))) {
+            return StringTemplate.template("model.tradeRoute.duplicateName")
+                .addName("%name%", name);
         }
 
         // Verify that it has at least two stops

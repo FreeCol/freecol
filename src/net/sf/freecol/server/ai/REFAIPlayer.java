@@ -912,14 +912,13 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                         return Integer.MIN_VALUE;
                     }
                     // Do not chase the same unit!
-                    for (AIUnit au : getAIUnits()) {
-                        Mission m = au.getMission(UnitSeekAndDestroyMission.class);
-                        Location loc;
-                        if (m != null
-                            && (loc = m.getTarget()) != null
-                            && loc instanceof Unit
-                            && loc == target) return Integer.MIN_VALUE;
-                    }
+                    if (getAIUnits().stream()
+                        .filter(aiu -> aiu != aiUnit)
+                        .map(aiu -> aiu.getMission(UnitSeekAndDestroyMission.class))
+                        .anyMatch(m -> m != null
+                            && m.getTarget() instanceof Unit
+                            && (Unit)m.getTarget() == target))
+                        return Integer.MIN_VALUE;
                     // The REF is more interested in colonies.
                     value /= 2;
                 }

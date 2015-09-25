@@ -499,13 +499,9 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return True if this unit type can learn.
      */
     public boolean canBeUpgraded(UnitType newType, ChangeType changeType) {
-        for (UnitTypeChange change : getTypeChanges()) {
-            if ((newType == null || newType == change.getNewUnitType())
-                && change.getProbability(changeType) > 0) {
-                return true;
-            }
-        }
-        return false;
+        return getTypeChanges().stream()
+            .anyMatch(c -> (newType == null || newType == c.getNewUnitType())
+                && c.getProbability(changeType) > 0);
     }
 
     /**

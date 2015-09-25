@@ -474,30 +474,25 @@ public class TerrainGenerator {
     private Tile getGoodMountainTile(Map map) {
         final TileType hills = spec.getTileType("model.tile.hills");
         final TileType mountains = spec.getTileType("model.tile.mountains");
-        Tile t = null;
-        nextTry: for (;;) {
-            if ((t = map.getRandomLandTile(random)) == null) break;
-            
-            if (t.getType() == hills || t.getType() == mountains) {
-                continue; // Already on high ground
-            }
+        Tile tile = null;
+        while ((tile = map.getRandomLandTile(random)) != null) {
+            // Can not be high ground already
+            if (tile.getType() != hills && tile.getType() != mountains
+                
+                // Not too close to a mountain range as this would
+                // defeat the purpose of adding random hills
+                && tile.getSurroundingTiles(1, 3).stream()
+                    .noneMatch(t -> t.getType() == mountains)
 
-            // Do not add hills too close to a mountain range
-            // this would defeat the purpose of adding random hills.
-            for (Tile tile : t.getSurroundingTiles(3)) {
-                if (tile.getType() == mountains) continue nextTry;
+                // Do not add hills too close to the ocean/lake, as
+                // this helps with good locations for building
+                // colonies on shore.
+                && tile.getSurroundingTiles(1, 1).stream()
+                    .noneMatch(t -> !t.isLand())) {
+                return tile;
             }
-
-            // Do not add hills too close to the ocean/lake this
-            // helps with good locations for building colonies on
-            // shore.
-            for (Tile tile : t.getSurroundingTiles(1)) {
-                if (!tile.isLand()) continue nextTry;
-            }
-
-            break; // OK, good tile found.
         }
-        return t;
+        return null;
     }
 
     /**

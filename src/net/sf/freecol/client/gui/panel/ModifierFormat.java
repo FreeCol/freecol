@@ -99,12 +99,8 @@ public class ModifierFormat {
                                              FreeColGameObjectType fcgot,
                                              Turn turn) {
         String sourceName = getSourceName(modifier.getSource());
-        if (fcgot != null) {
-            for (Scope scope : modifier.getScopes()) {
-                if (scope.appliesTo(fcgot)) {
-                    sourceName += " (" + Messages.getName(fcgot) + ")";
-                }
-            }
+        if (fcgot != null && modifier.appliesTo(fcgot)) {
+            sourceName += " (" + Messages.getName(fcgot) + ")";
         }
         float value = modifier.getValue(turn);
         String[] bonus = getModifierStrings(value, modifier.getType());

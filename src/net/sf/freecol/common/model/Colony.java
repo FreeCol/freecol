@@ -661,13 +661,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForConsuming(GoodsType goodsType) {
-        List<WorkLocation> result = new ArrayList<>();
-        for (WorkLocation wl : getCurrentWorkLocations()) {
-            for (AbstractGoods input : wl.getInputs()) {
-                if (input.getType() == goodsType) result.add(wl);
-            }
-        }
-        return result;
+        return getCurrentWorkLocations().stream()
+            .filter(wl -> wl.getInputs().stream()
+                .anyMatch(ag -> ag.getType() == goodsType))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -678,13 +675,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForProducing(GoodsType goodsType) {
-        List<WorkLocation> result = new ArrayList<>();
-        for (WorkLocation wl : getCurrentWorkLocations()) {
-            for (AbstractGoods ag : wl.getOutputs()) {
-                if (ag.getType() == goodsType) result.add(wl);
-            }
-        }
-        return result;
+        return getCurrentWorkLocations().stream()
+            .filter(wl -> wl.getOutputs().stream()
+                .anyMatch(ag -> ag.getType() == goodsType))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -2029,20 +2023,19 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return True if the goods can be produced.
      */
     public boolean canProduce(GoodsType goodsType) {
-        if (getNetProductionOf(goodsType) > 0) return true; // Obviously:-)
+        return (getNetProductionOf(goodsType) > 0)
+            ? true // Obviously:-)
 
-        if (goodsType.isBreedable()) {
-            return getGoodsCount(goodsType) >= goodsType.getBreedingNumber();
-        }
+            // Breeding requires the breedable number to be present
+            : (goodsType.isBreedable())
+            ? getGoodsCount(goodsType) >= goodsType.getBreedingNumber()
 
-        // Is there a work location that can produce the goods, with
-        // satisfied inputs and positive generic production potential?
-        for (WorkLocation wl : getWorkLocationsForProducing(goodsType)) {
-            if (!wl.getInputs().stream()
-                .allMatch(ag -> canProduce(ag.getType()))) continue;
-            if (wl.getGenericPotential(goodsType) > 0) return true;
-        }
-        return false;
+            // Is there a work location that can produce the goods, with
+            // positive generic production potential and all inputs satisfied?
+            : getWorkLocationsForProducing(goodsType).stream()
+                .anyMatch(wl -> wl.getGenericPotential(goodsType) > 0
+                    && wl.getInputs().stream()
+                        .allMatch(ag -> canProduce(ag.getType())));
     }
 
   

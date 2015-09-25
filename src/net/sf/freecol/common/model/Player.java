@@ -3191,13 +3191,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The reason why/not the tile can be owned by this player.
      */
     private NoClaimReason canOwnTileReason(Tile tile) {
-        for (Unit u : tile.getUnitList()) {
-            Player owner = u.getOwner();
-            if (owner == this) break; // Not hostile
-            // If the unit is military, the tile is held against us.
-            if (u.isOffensiveUnit()) return NoClaimReason.OCCUPIED;
-        }
-        return (isEuropean())
+        return (tile.getUnitList().stream()
+            .anyMatch(u -> u.getOwner() != this && u.isOffensiveUnit()))
+            ? NoClaimReason.OCCUPIED // The tile is held against us
+            : (isEuropean())
             ? ((tile.hasLostCityRumour())
                 ? NoClaimReason.RUMOUR
                 : NoClaimReason.NONE)

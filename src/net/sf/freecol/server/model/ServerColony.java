@@ -517,14 +517,9 @@ public class ServerColony extends Colony implements ServerModelObject {
         List<BuildableType> buildables = new ArrayList<>();
         buildables.addAll(spec.getBuildingTypeList());
         buildables.addAll(spec.getUnitTypesWithoutAbility(Ability.PERSON));
-        for (BuildableType bt : buildables) {
-            if (canBuild(bt)) {
-                AbstractGoods ag = AbstractGoods.findByType(goodsType,
-                    bt.getRequiredGoods());
-                if (ag != null) return true;
-            }
-        }
-        return false;
+        return buildables.stream()
+            .anyMatch(bt -> canBuild(bt)
+                && AbstractGoods.findByType(goodsType, bt.getRequiredGoods()) != null);
     }
 
     /**

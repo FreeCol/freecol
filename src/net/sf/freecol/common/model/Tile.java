@@ -1259,7 +1259,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     unexplored.
      */
     public boolean hasUnexploredAdjacent() {
-        return getSurroundingTiles(0, 1).stream()
+        return getSurroundingTiles(1, 1).stream()
             .anyMatch(t -> !t.isExplored());
     }
 

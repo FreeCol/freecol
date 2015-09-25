@@ -21,6 +21,7 @@ package net.sf.freecol.server.model;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -113,16 +115,11 @@ public class ServerGame extends Game implements ServerModelObject {
      * @return A list of all connected server players, with exclusions.
      */
     public List<ServerPlayer> getConnectedPlayers(ServerPlayer... serverPlayers) {
-        List<ServerPlayer> result = new ArrayList<>();
-        outer: for (Player otherPlayer : getLivePlayers(null)) {
-            ServerPlayer enemyPlayer = (ServerPlayer)otherPlayer;
-            if (!enemyPlayer.isConnected()) continue;
-            for (ServerPlayer exclude : serverPlayers) {
-                if (enemyPlayer == exclude) continue outer;
-            }
-            result.add(enemyPlayer);
-        }
-        return result;
+        return getLivePlayers(null).stream()
+            .map(p -> (ServerPlayer)p)
+            .filter(sp -> sp.isConnected()
+                && Arrays.stream(serverPlayers).noneMatch(s -> s == sp))
+            .collect(Collectors.toList());
     }
 
     /**

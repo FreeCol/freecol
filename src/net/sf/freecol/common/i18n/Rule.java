@@ -52,19 +52,16 @@ public class Rule {
     /**
      * Returns true if this rule matches the given number.
      *
-     * @param number a <code>double</code> value
-     * @return a <code>boolean</code> value
+     * The outer conditions are or-combined (using anyMatch), the
+     * inner conditions are and-combined (using allMatch).
+     *
+     * @param number The number to test.
+     * @return True if the number matches this rule.
      */
     public boolean matches(double number) {
-        outer: for (List<Relation> andCondition : conditions) {
-            for (Relation relation : andCondition) {
-                if (!relation.matches(number)) {
-                    continue outer;
-                }
-            }
-            return true;
-        }
-        return false;
+        return conditions.stream()
+            .anyMatch(andConditions ->
+                andConditions.stream().allMatch(r -> r.matches(number)));
     }
 
     /**
