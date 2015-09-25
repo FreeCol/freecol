@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.Random;
 import java.util.Vector;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;

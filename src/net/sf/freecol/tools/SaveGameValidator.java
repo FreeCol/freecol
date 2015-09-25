@@ -30,8 +30,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 

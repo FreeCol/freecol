@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.List;
 
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 

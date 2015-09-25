@@ -21,10 +21,8 @@ package net.sf.freecol.common.io;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.InputStream;
 import java.io.IOException;
 
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.resources.ResourceMapping;
 
 

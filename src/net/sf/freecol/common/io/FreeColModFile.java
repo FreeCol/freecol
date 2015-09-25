@@ -27,8 +27,6 @@ import java.io.InputStream;
 
 import javax.xml.stream.XMLStreamException;
 
-import java.util.Set;
-
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.model.Specification;
 
