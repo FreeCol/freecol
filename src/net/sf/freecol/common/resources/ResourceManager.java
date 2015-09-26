@@ -154,6 +154,7 @@ public class ResourceManager {
                 resource.clean();
             }
         }
+        System.gc();
     }
 
     /**
