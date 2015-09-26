@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -110,10 +109,7 @@ public final class PreGameInputHandler extends InputHandler {
                     "reason", "User has logged out.",
                     "player", player.getId()),
                 connection);
-
-        try {
-            getFreeColServer().updateMetaServer();
-        } catch (NoRouteToServerException e) {}
+        getFreeColServer().updateMetaServer();
         return null;
     }
 

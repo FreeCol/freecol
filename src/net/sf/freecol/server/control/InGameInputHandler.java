@@ -71,7 +71,6 @@ import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
-import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.PayArrearsMessage;
 import net.sf.freecol.common.networking.PayForBuildingMessage;
 import net.sf.freecol.common.networking.PutOutsideColonyMessage;
@@ -678,13 +677,10 @@ public final class InGameInputHandler extends InputHandler
         Element reply = null;
         player.setConnected(false);
         if (getFreeColServer().getGame().getCurrentPlayer() == player
-                && !getFreeColServer().isSinglePlayer()) {
+                && !getFreeColServer().getSinglePlayer()) {
             reply = getFreeColServer().getInGameController().endTurn(player);
         }
-        try {
-            getFreeColServer().updateMetaServer();
-        } catch (NoRouteToServerException e) {}
-        
+        getFreeColServer().updateMetaServer();
         return reply;
     }
 }

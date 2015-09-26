@@ -50,7 +50,6 @@ import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 
@@ -1390,13 +1389,14 @@ public final class FreeCol {
             try {
                 freeColServer = new FreeColServer(publicServer, false, spec,
                                                   serverPort, serverName);
-            } catch (NoRouteToServerException nrtse) {
-                fatal(Messages.message("server.noRouteToServer"));
-                return;
             } catch (Exception e) {
                 fatal(Messages.message("server.initialize")
                     + ": " + e.getMessage());
                 return;
+            }
+            if (publicServer && freeColServer != null
+                && !freeColServer.getPublicServer()) {
+                gripe(Messages.message("server.noRouteToServer"));
             }
         }
 

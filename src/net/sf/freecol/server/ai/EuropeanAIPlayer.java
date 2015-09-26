@@ -442,7 +442,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void cheat(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
-        if (!aiMain.getFreeColServer().isSinglePlayer()) return;
+        if (!aiMain.getFreeColServer().getSinglePlayer()) return;
 
         final Player player = getPlayer();
         if (player.getPlayerType() != PlayerType.COLONIAL) return;

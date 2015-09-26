@@ -55,7 +55,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.LoginMessage;
-import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.GameState;
@@ -132,17 +131,20 @@ public final class ConnectController {
      */
     private FreeColServer startServer(boolean publicServer,
         boolean singlePlayer, Specification spec, int port) {
+        FreeColServer freeColServer;
         try {
-            return new FreeColServer(publicServer, singlePlayer, spec, port,
-                                     null);
-        } catch (NoRouteToServerException e) {
-            gui.showErrorMessage("server.noRouteToServer");
-            logger.log(Level.WARNING, "No route to server.", e);
+            freeColServer = new FreeColServer(publicServer, singlePlayer,
+                                              spec, port, null);
         } catch (IOException e) {
+            freeColServer = null;
             gui.showErrorMessage("server.initialize");
             logger.log(Level.WARNING, "Could not start server.", e);
         }
-        return null;
+        if (publicServer && freeColServer != null
+            && !freeColServer.getPublicServer()) {
+            gui.showErrorMessage("server.noRouteToServer");
+        }
+        return freeColServer;
     }
 
     /**
@@ -632,9 +634,6 @@ public final class ConnectController {
             } catch (IOException e) {
                 err = StringTemplate.key("server.initialize");
                 logger.log(Level.WARNING, "Error starting game.", e);
-            } catch (NoRouteToServerException e) {
-                err = StringTemplate.key("server.noRouteToServer");
-                logger.log(Level.WARNING, "No route to server.", e);
             } catch (XMLStreamException e) {
                 err = FreeCol.badLoad(theFile);
                 logger.log(Level.WARNING, "Stream error.", e);

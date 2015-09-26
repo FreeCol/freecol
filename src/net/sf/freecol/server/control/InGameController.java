@@ -488,7 +488,7 @@ public final class InGameController extends Controller {
             });
         DOMMessage reply;
         try {
-            boolean single = getFreeColServer().isSinglePlayer();
+            boolean single = getFreeColServer().getSinglePlayer();
             reply = future.get(FreeCol.getTimeout(single), TimeUnit.SECONDS);
         } catch (TimeoutException te) {
             serverPlayer.send(new ChangeSet()
@@ -633,7 +633,7 @@ public final class InGameController extends Controller {
             // Do not end single player games where an AI has won,
             // that would stop revenge mode.
             if (winner == player
-                && !(freeColServer.isSinglePlayer() && winner.isAI())) {
+                && !(freeColServer.getSinglePlayer() && winner.isAI())) {
                 boolean highScore = !winner.isAI()
                     && HighScore.newHighScore(winner);
                 cs.addTrivial(See.all(), "gameEnded",
@@ -695,7 +695,7 @@ public final class InGameController extends Controller {
             // current player which requested the end-of-turn, unless
             // it is doing a debug run.
             boolean debugSkip = !player.isAI()
-                && freeColServer.isSinglePlayer()
+                && freeColServer.getSinglePlayer()
                 && debugOnlyAITurns > 0;
             if (debugSkip) {
                 game.sendToOthers(player, cs);
@@ -1074,7 +1074,7 @@ public final class InGameController extends Controller {
     public Element continuePlaying(ServerPlayer serverPlayer) {
         final ServerGame game = getGame();
         Element reply = null;
-        if (!getFreeColServer().isSinglePlayer()) {
+        if (!getFreeColServer().getSinglePlayer()) {
             logger.warning("Can not continue playing in multiplayer!");
         } else if (serverPlayer != game.checkForWinner()) {
             logger.warning("Can not continue playing, as "
@@ -4199,7 +4199,7 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element enterRevengeMode(ServerPlayer serverPlayer) {
-        if (!getFreeColServer().isSinglePlayer()) {
+        if (!getFreeColServer().getSinglePlayer()) {
             return DOMMessage.clientError("Can not enter revenge mode,"
                 + " as this is not a single player game.");
         }

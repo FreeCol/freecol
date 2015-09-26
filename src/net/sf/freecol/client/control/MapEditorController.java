@@ -42,7 +42,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
@@ -116,9 +115,6 @@ public final class MapEditorController {
             freeColClient.setInGame(true);
             gui.changeViewMode(GUI.VIEW_TERRAIN_MODE);
             gui.startMapEditorGUI();
-        } catch (NoRouteToServerException e) {
-            gui.showErrorMessage("server.noRouteToServer");
-            return;
         } catch (IOException e) {
             gui.showErrorMessage("server.initialize");
             return;

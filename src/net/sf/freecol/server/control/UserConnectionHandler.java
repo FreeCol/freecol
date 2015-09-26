@@ -30,7 +30,6 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.MessageHandler;
-import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.Server;
@@ -259,13 +258,9 @@ public final class UserConnectionHandler extends FreeColServerHolder
 
         connection.setMessageHandler(mh);
         server.addConnection(connection);
-        try {
-            freeColServer.updateMetaServer();
-        } catch (NoRouteToServerException e) {
-            logger.log(Level.WARNING, "Unable to update meta-server.", e);
-        }
+        freeColServer.updateMetaServer();
         return new LoginMessage(player, userName, version, !starting,
-                                freeColServer.isSinglePlayer(),
+                                freeColServer.getSinglePlayer(),
                                 isCurrentPlayer, active,
                                 game).toXMLElement();
     }
