@@ -585,7 +585,7 @@ public final class MapViewer {
             displaySettlementWithChipsOrPopulationNumber(freeColClient, lib,
                 g, tile, tileWidth, tileHeight, false);
             displayFogOfWar(freeColClient, fog, g, tile);
-            displayOptionalTileTextAndRegionBorder(g, tile);
+            displayOptionalTileText(g, tile);
         }
 
         if (tileCannotBeWorked) {
@@ -1529,35 +1529,22 @@ public final class MapViewer {
     }
 
     /**
-     * Displays the Map onto the given Graphics2D object.  The Tile at
-     * location (x, y) is displayed in the center.
+     * Displays the Map.
      *
      * @param g The Graphics2D object on which to draw the Map.
      */
     void displayMap(Graphics2D g) {
         final ClientOptions options = freeColClient.getClientOptions();
-        final Player player = freeColClient.getMyPlayer();
+        Map map = freeColClient.getGame().getMap();
+
+        // Remember transform
         AffineTransform originTransform = g.getTransform();
         Rectangle clipBounds = g.getClipBounds();
-        Map map = freeColClient.getGame().getMap();
-        FontLibrary fontLibrary = new FontLibrary(lib.getScaleFactor());
 
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                           RenderingHints.VALUE_ANTIALIAS_ON);
-
-        /*
-        PART 1
-        ======
-        Position the map if it is not positioned yet.
-        */
-
+        // Position the map if it is not positioned yet
         repositionMapIfNeeded();
 
-        /*
-        PART 1a
-        =======
-        Determine which tiles need to be redrawn.
-        */
+        // Determine which tiles need to be redrawn
         int firstRow = (clipBounds.y - topRowY) / (halfHeight) - 1;
         int clipTopY = topRowY + firstRow * (halfHeight);
         firstRow = topRow + firstRow;
@@ -1574,301 +1561,353 @@ public final class MapViewer {
             / tileWidth;
         lastColumn = leftColumn + lastColumn;
 
-        /*
-        PART 1b
-        =======
-        Create a GeneralPath to draw the grid with, if needed.
-        */
-        GeneralPath gridPath = null;
+        // Clear background
+        g.setColor(Color.black);
+        g.fillRect(clipBounds.x, clipBounds.y,
+                   clipBounds.width, clipBounds.height);
+
+        // Set and remember transform for upper left corner
+        g.translate(clipLeftX, clipTopY);
+        AffineTransform baseTransform = g.getTransform();
+
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                           RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Display the base Tiles
+        final int x0 = firstColumn;
+        final int y0 = firstRow;
+        map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+            (Tile tile) -> {
+                final int x = tile.getX();
+                final int y = tile.getY();
+                g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
+                            (y-y0) * halfHeight);
+
+                displayTileWithBeachAndBorder(g, lib, tile);
+                for (Direction direction : Direction.values()) {
+                    Tile borderingTile = tile.getNeighbourOrNull(direction);
+                    if (borderingTile != null && !borderingTile.isExplored()) {
+                        g.drawImage(lib.getBorderImage(
+                                null, direction, tile.getX(), tile.getY()),
+                            0, 0, null);
+                    }
+                }
+
+                g.setTransform(baseTransform);
+            });
+
+        // Draw the grid, if needed
         if (options.getBoolean(ClientOptions.DISPLAY_GRID)) {
-            gridPath = new GeneralPath();
+            // Generate a zigzag GeneralPath
+            GeneralPath gridPath = new GeneralPath();
             gridPath.moveTo(0, 0);
             int nextX = halfWidth;
             int nextY = -halfHeight;
-
             for (int i = 0; i <= ((lastColumn - firstColumn) * 2 + 1); i++) {
                 gridPath.lineTo(nextX, nextY);
                 nextX += halfWidth;
                 nextY = (nextY == 0 ? -halfHeight : 0);
             }
-        }
 
-        /*
-        PART 2
-        ======
-        Display the Tiles and the Units.
-        */
-
-        g.setColor(Color.black);
-        g.fillRect(clipBounds.x, clipBounds.y,
-                   clipBounds.width, clipBounds.height);
-
-        /*
-        PART 2a
-        =======
-        Display the base Tiles
-        */
-        g.translate(clipLeftX, clipTopY);
-        AffineTransform baseTransform = g.getTransform();
-        AffineTransform rowTransform = null;
-
-        // Row per row; start with the top modified row
-        for (int row = firstRow; row <= lastRow; row++) {
-            rowTransform = g.getTransform();
-            if ((row & 1) == 1) {
-                g.translate(halfWidth, 0);
-            }
-
-            // Column per column; start at the left side to display the tiles.
-            for (int column = firstColumn; column <= lastColumn; column++) {
-                Tile tile = map.getTile(column, row);
-                displayTileWithBeachAndBorder(g, lib, tile);
-                g.translate(tileWidth, 0);
-            }
-            g.setTransform(rowTransform);
-            g.translate(0, halfHeight);
-        }
-        g.setTransform(baseTransform);
-
-        /*
-        PART 2b
-        =======
-        Display the Tile overlays and Units
-        */
-
-        List<Unit> units = new ArrayList<>();
-        List<AffineTransform> unitTransforms = new ArrayList<>();
-        List<Settlement> settlements = new ArrayList<>();
-        List<AffineTransform> settlementTransforms = new ArrayList<>();
-        Set<String> overlayCache = ImageLibrary.createOverlayCache();
-
-        int colonyLabels = options.getInteger(ClientOptions.COLONY_LABELS);
-        boolean withNumbers = colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC;
-        // Row per row; start with the top modified row
-        for (int row = firstRow; row <= lastRow; row++) {
-            rowTransform = g.getTransform();
-            if ((row & 1) == 1) {
-                g.translate(halfWidth, 0);
-            }
-
-            if (options.getBoolean(ClientOptions.DISPLAY_GRID)) {
-                // Display the grid.
-                g.translate(0, halfHeight);
-                g.setStroke(gridStroke);
-                g.setColor(Color.BLACK);
-                g.draw(gridPath);
-                g.translate(0, -halfHeight);
-            }
-
-            // Column per column; start at the left side to display the tiles.
-            for (int column = firstColumn; column <= lastColumn; column++) {
-                Tile tile = map.getTile(column, row);
-
-                // paint full borders
-                displayTerritorialBorders(g, tile, BorderType.COUNTRY, true);
-                // Display the Tile overlays:
-                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                                   RenderingHints.VALUE_ANTIALIAS_OFF);
-                if (tile != null && tile.isExplored()) {
-                    for (Direction direction : Direction.values()) {
-                        Tile borderingTile = tile.getNeighbourOrNull(direction);
-                        if (borderingTile != null && !borderingTile.isExplored()) {
-                            g.drawImage(lib.getBorderImage(
-                                    null, direction, tile.getX(), tile.getY()),
-                                0, 0, null);
-                        }
-                    }
-                    Image overlayImage = lib.getOverlayImage(tile, overlayCache);
-                    displayTileItems(g, tile, overlayImage);
-                    displaySettlementWithChipsOrPopulationNumber(freeColClient,
-                        lib, g, tile, tileWidth, tileHeight, withNumbers);
-                    displayFogOfWar(freeColClient, fog, g, tile);
-                    displayOptionalTileTextAndRegionBorder(g, tile);
-                }
-                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                                   RenderingHints.VALUE_ANTIALIAS_ON);
-                // paint transparent borders
-                displayTerritorialBorders(g, tile, BorderType.COUNTRY, false);
-
-                if (viewMode == GUI.VIEW_TERRAIN_MODE
-                        && tile != null && tile.equals(selectedTile)) {
-                    displayCursor(g);
-                }
-                // check for units
-                if (tile != null) {
-                    Unit unitInFront = findUnitInFront(tile);
-                    if (unitInFront != null && !isOutForAnimation(unitInFront)) {
-                        units.add(unitInFront);
-                        unitTransforms.add(g.getTransform());
-                    }
-                    // check for settlements
-                    Settlement settlement = tile.getSettlement();
-                    if (settlement != null) {
-                        settlements.add(settlement);
-                        settlementTransforms.add(g.getTransform());
-                    }
-                }
-                g.translate(tileWidth, 0);
-            }
-
-            g.setTransform(rowTransform);
-            g.translate(0, halfHeight);
-        }
-        g.setTransform(baseTransform);
-
-        /*
-        PART 2c
-        =======
-        Display units
-        */
-        if (!units.isEmpty()) {
+            // Display the grid
+            g.setStroke(gridStroke);
             g.setColor(Color.BLACK);
-            Image darkness = null;
-            for (int index = 0; index < units.size(); index++) {
-                final Unit unit = units.get(index);
-                g.setTransform(unitTransforms.get(index));
-                if (unit.isUndead()) {
-                    if(darkness == null) {
-                        // Rescale dark halo only in rare case its needed!
-                        darkness = lib.getMiscImage(ImageLibrary.DARKNESS);
-                    }
-                    // display darkness
-                    displayCenteredImage(g, darkness, tileWidth, tileHeight);
+            for (int row = firstRow; row <= lastRow; row++) {
+                g.translate(0, halfHeight);
+                AffineTransform rowTransform = g.getTransform();
+                if ((row & 1) == 1) {
+                    g.translate(halfWidth, 0);
                 }
-                displayUnit(g, unit);
+                g.draw(gridPath);
+                g.setTransform(rowTransform);
             }
             g.setTransform(baseTransform);
         }
 
-        /*
-        PART 3
-        ======
-        Display the colony names.
-        */
-        if (!settlements.isEmpty()
-            && colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
-            for (int index = 0; index < settlements.size(); index++) {
-                final Settlement settlement = settlements.get(index);
-                if (settlement.isDisposed()) {
-                    logger.warning("Settlement display race detected: "
-                                   + settlement.getName());
-                    continue;
-                }
-                String name
-                    = Messages.message(settlement.getLocationLabelFor(player));
-                if (name == null) continue;
-                Color backgroundColor = settlement.getOwner().getNationColor();
-                if (backgroundColor == null) backgroundColor = Color.WHITE;
-                Font font = fontLibrary.createScaledFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER, Font.BOLD);
-                Font italicFont = fontLibrary.createScaledFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER, Font.BOLD | Font.ITALIC);
-                Font productionFont = fontLibrary.createScaledFont(FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY, Font.BOLD);
-                // int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
-                int yOffset = tileHeight;
-                g.setTransform(settlementTransforms.get(index));
-                switch (colonyLabels) {
-                case ClientOptions.COLONY_LABELS_CLASSIC:
-                    Image img = lib.getStringImage(g, name, backgroundColor, font);
-                    g.drawImage(img, (tileWidth - img.getWidth(null))/2 + 1,
-                                yOffset, null);
-                    break;
-                case ClientOptions.COLONY_LABELS_MODERN:
-                default:
-                    backgroundColor = new Color(backgroundColor.getRed(),
-                                                backgroundColor.getGreen(),
-                                                backgroundColor.getBlue(), 128);
-                    TextSpecification[] specs = new TextSpecification[1];
-                    if (settlement instanceof Colony
-                        && settlement.getOwner() == player) {
-                        Colony colony = (Colony) settlement;
-                        BuildableType buildable = colony.getCurrentlyBuilding();
-                        if (buildable != null) {
-                            specs = new TextSpecification[2];
-                            String t = Messages.getName(buildable)
-                                + " " + Turn.getTurnsText(colony.getTurnsToComplete(buildable));
-                            specs[1] = new TextSpecification(t, productionFont);
-                        }
-                    }
-                    specs[0] = new TextSpecification(name, font);
+        // Paint full region borders
+        if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) ==
+                ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
+            map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+                (Tile tile) -> {
+                    final int x = tile.getX();
+                    final int y = tile.getY();
+                    g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
+                                (y-y0) * halfHeight);
+                    displayTerritorialBorders(g, tile, BorderType.REGION, true);
+                    g.setTransform(baseTransform);
+                });
+        }
 
-                    Image nameImage = createLabel(g, specs, backgroundColor);
-                    if (nameImage != null) {
-                        int spacing = 3;
-                        Image leftImage = null;
-                        Image rightImage = null;
-                        if (settlement instanceof Colony) {
-                            Colony colony = (Colony)settlement;
-                            String string = Integer.toString(colony.getDisplayUnitCount());
-                            leftImage = createLabel(g, string,
-                                ((colony.getPreferredSizeChange() > 0) ? italicFont : font),
-                                backgroundColor);
-                            if (player.owns(settlement)) {
-                                int bonusProduction = colony.getProductionBonus();
-                                if (bonusProduction != 0) {
-                                    String bonus = (bonusProduction > 0)
-                                        ? "+" + bonusProduction
-                                        : Integer.toString(bonusProduction);
-                                    rightImage = createLabel(g, bonus, font,
-                                                             backgroundColor);
-                                }
-                            }
-                        } else if (settlement instanceof IndianSettlement) {
-                            IndianSettlement is = (IndianSettlement) settlement;
-                            if (is.getType().isCapital()) {
-                                leftImage = createCapitalLabel(nameImage.getHeight(null), 5, backgroundColor);
-                            }
+        // Paint full country borders
+        map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+            (Tile tile) -> {
+                final int x = tile.getX();
+                final int y = tile.getY();
+                g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
+                            (y-y0) * halfHeight);
+                displayTerritorialBorders(g, tile, BorderType.COUNTRY, true);
+                g.setTransform(baseTransform);
+            });
 
-                            Unit missionary = is.getMissionary();
-                            if (missionary != null) {
-                                boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
-                                backgroundColor = missionary.getOwner().getNationColor();
-                                backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
-                                rightImage = createReligiousMissionLabel(nameImage.getHeight(null), 5, backgroundColor, expert);
-                            }
-                        }
+        // Display the Tile overlays
+        Set<String> overlayCache = ImageLibrary.createOverlayCache();
+        int colonyLabels = options.getInteger(ClientOptions.COLONY_LABELS);
+        boolean withNumbers = colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC;
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                           RenderingHints.VALUE_ANTIALIAS_OFF);
+        map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+            (Tile tile) -> {
+                if (!tile.isExplored())
+                    return;
 
-                        int width = (int)((nameImage.getWidth(null)
-                                * lib.getScaleFactor())
-                            + ((leftImage != null)
-                                ? (leftImage.getWidth(null)
-                                    * lib.getScaleFactor()) + spacing
-                                : 0)
-                            + ((rightImage != null)
-                                ? (rightImage.getWidth(null)
-                                    * lib.getScaleFactor()) + spacing
-                                : 0));
-                        int labelOffset = (tileWidth - width)/2;
-                        yOffset -= (nameImage.getHeight(null)
-                            * lib.getScaleFactor())/2;
-                        if (leftImage != null) {
-                            g.drawImage(leftImage, labelOffset, yOffset, null);
-                            labelOffset += (leftImage.getWidth(null)
-                                * lib.getScaleFactor()) + spacing;
-                        }
-                        g.drawImage(nameImage, labelOffset, yOffset, null);
-                        if (rightImage != null) {
-                            labelOffset += (nameImage.getWidth(null)
-                                * lib.getScaleFactor()) + spacing;
-                            g.drawImage(rightImage, labelOffset, yOffset, null);
-                        }
-                        break;
-                    }
-                }
+                final int x = tile.getX();
+                final int y = tile.getY();
+                g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
+                            (y-y0) * halfHeight);
+
+                Image overlayImage = lib.getOverlayImage(tile, overlayCache);
+                displayTileItems(g, tile, overlayImage);
+                displaySettlementWithChipsOrPopulationNumber(freeColClient,
+                    lib, g, tile, tileWidth, tileHeight, withNumbers);
+                displayFogOfWar(freeColClient, fog, g, tile);
+                displayOptionalTileText(g, tile);
+
+                g.setTransform(baseTransform);
+            });
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                           RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Paint transparent region borders
+        if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) ==
+                ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
+            map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+                (Tile tile) -> {
+                    final int x = tile.getX();
+                    final int y = tile.getY();
+                    g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
+                                (y-y0) * halfHeight);
+                    displayTerritorialBorders(g, tile, BorderType.REGION, false);
+                    g.setTransform(baseTransform);
+                });
+        }
+
+        // Paint transparent country borders
+        map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+            (Tile tile) -> {
+                final int x = tile.getX();
+                final int y = tile.getY();
+                g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
+                            (y-y0) * halfHeight);
+                displayTerritorialBorders(g, tile, BorderType.COUNTRY, false);
+                g.setTransform(baseTransform);
+            });
+
+        // Display cursor for selected tile or active unit
+        Tile cursorTile = null;
+        switch (viewMode) {
+            case GUI.MOVE_UNITS_MODE:
+                if (activeUnit != null &&
+                        (cursor.isActive() || activeUnit.getMovesLeft() <= 0))
+                    cursorTile = activeUnit.getTile();
+                break;
+            case GUI.VIEW_TERRAIN_MODE:
+                if (selectedTile != null)
+                    cursorTile = selectedTile;
+        }
+        if (cursorTile != null) {
+            final int x = cursorTile.getX();
+            final int y = cursorTile.getY();
+            if(x >= x0 && y >= y0 && x <= lastColumn && y <= lastRow) {
+                g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
+                            (y-y0) * halfHeight);
+                displayCursor(g);
+                g.setTransform(baseTransform);
             }
         }
+
+        // Display units
+        g.setColor(Color.BLACK);
+        map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+            (Tile tile) -> {
+                // check for units
+                Unit unit = findUnitInFront(tile);
+                if (unit == null || isOutForAnimation(unit))
+                    return;
+
+                final int x = tile.getX();
+                final int y = tile.getY();
+                g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
+                            (y-y0) * halfHeight);
+
+                if (unit.isUndead()) {
+                    // Rescale dark halo only in rare case its needed!
+                    Image darkness = lib.getMiscImage(ImageLibrary.DARKNESS);
+                    displayCenteredImage(g, darkness, tileWidth, tileHeight);
+                }
+                displayUnit(g, unit);
+
+                g.setTransform(baseTransform);
+            });
+
+        // Display the colony names, if needed
+        if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
+            final Player player = freeColClient.getMyPlayer();
+            FontLibrary fontLibrary = new FontLibrary(lib.getScaleFactor());
+            Font font = fontLibrary.createScaledFont(
+                FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER,
+                Font.BOLD);
+            Font italicFont = fontLibrary.createScaledFont(
+                FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER,
+                Font.BOLD | Font.ITALIC);
+            Font productionFont = fontLibrary.createScaledFont(
+                FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY,
+                Font.BOLD);
+
+            map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+                (Tile tile) -> {
+                    Settlement settlement = tile.getSettlement();
+                    if(settlement == null)
+                        return;
+
+                    final int x = tile.getX();
+                    final int y = tile.getY();
+                    g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
+                                (y-y0) * halfHeight);
+
+                    displaySettlementLabels(g, settlement, player, colonyLabels,
+                                            font, italicFont, productionFont);
+
+                    g.setTransform(baseTransform);
+                });
+        }
+
+        // Restore original transform to allow for more drawing
         g.setTransform(originTransform);
 
-        /*
-        PART 4
-        ======
-        Display goto path
-        */
+        // Display goto path
         if (currentPath != null) {
             displayPath(g, currentPath);
         }
         if (gotoPath != null) {
             displayPath(g, gotoPath);
         }
+    }
 
+    private void displaySettlementLabels(Graphics2D g, Settlement settlement,
+                                         Player player, int colonyLabels,
+                                         Font font, Font italicFont,
+                                         Font productionFont) {
+        if (settlement.isDisposed()) {
+            logger.warning("Settlement display race detected: "
+                           + settlement.getName());
+            return;
+        }
+        String name = Messages.message(settlement.getLocationLabelFor(player));
+        if (name == null) return;
+
+        Color backgroundColor = settlement.getOwner().getNationColor();
+        if (backgroundColor == null) backgroundColor = Color.WHITE;
+        // int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
+        int yOffset = tileHeight;
+        switch (colonyLabels) {
+        case ClientOptions.COLONY_LABELS_CLASSIC:
+            Image img = lib.getStringImage(g, name, backgroundColor, font);
+            g.drawImage(img, (tileWidth - img.getWidth(null))/2 + 1,
+                        yOffset, null);
+            break;
+
+        case ClientOptions.COLONY_LABELS_MODERN:
+        default:
+            backgroundColor = new Color(backgroundColor.getRed(),
+                                        backgroundColor.getGreen(),
+                                        backgroundColor.getBlue(), 128);
+            TextSpecification[] specs = new TextSpecification[1];
+            if (settlement instanceof Colony
+                && settlement.getOwner() == player) {
+                Colony colony = (Colony) settlement;
+                BuildableType buildable = colony.getCurrentlyBuilding();
+                if (buildable != null) {
+                    specs = new TextSpecification[2];
+                    String t = Messages.getName(buildable) + " " +
+                        Turn.getTurnsText(colony.getTurnsToComplete(buildable));
+                    specs[1] = new TextSpecification(t, productionFont);
+                }
+            }
+            specs[0] = new TextSpecification(name, font);
+
+            Image nameImage = createLabel(g, specs, backgroundColor);
+            if (nameImage != null) {
+                int spacing = 3;
+                Image leftImage = null;
+                Image rightImage = null;
+                if (settlement instanceof Colony) {
+                    Colony colony = (Colony)settlement;
+                    String string = Integer.toString(
+                        colony.getDisplayUnitCount());
+                    leftImage = createLabel(g, string,
+                        ((colony.getPreferredSizeChange() > 0)
+                            ? italicFont : font),
+                        backgroundColor);
+                    if (player.owns(settlement)) {
+                        int bonusProduction = colony.getProductionBonus();
+                        if (bonusProduction != 0) {
+                            String bonus = (bonusProduction > 0)
+                                ? "+" + bonusProduction
+                                : Integer.toString(bonusProduction);
+                            rightImage = createLabel(g, bonus, font,
+                                                     backgroundColor);
+                        }
+                    }
+                } else if (settlement instanceof IndianSettlement) {
+                    IndianSettlement is = (IndianSettlement) settlement;
+                    if (is.getType().isCapital()) {
+                        leftImage = createCapitalLabel(
+                            nameImage.getHeight(null), 5, backgroundColor);
+                    }
+
+                    Unit missionary = is.getMissionary();
+                    if (missionary != null) {
+                        boolean expert = missionary.hasAbility(
+                            Ability.EXPERT_MISSIONARY);
+                        backgroundColor = missionary.getOwner()
+                                                    .getNationColor();
+                        backgroundColor = new Color(
+                            backgroundColor.getRed(),
+                            backgroundColor.getGreen(),
+                            backgroundColor.getBlue(), 128);
+                        rightImage = createReligiousMissionLabel(
+                            nameImage.getHeight(null), 5,
+                            backgroundColor, expert);
+                    }
+                }
+
+                int width = (int)((nameImage.getWidth(null)
+                        * lib.getScaleFactor())
+                    + ((leftImage != null)
+                        ? (leftImage.getWidth(null)
+                            * lib.getScaleFactor()) + spacing
+                        : 0)
+                    + ((rightImage != null)
+                        ? (rightImage.getWidth(null)
+                            * lib.getScaleFactor()) + spacing
+                        : 0));
+                int labelOffset = (tileWidth - width)/2;
+                yOffset -= (nameImage.getHeight(null)
+                    * lib.getScaleFactor())/2;
+                if (leftImage != null) {
+                    g.drawImage(leftImage, labelOffset, yOffset, null);
+                    labelOffset += (leftImage.getWidth(null)
+                        * lib.getScaleFactor()) + spacing;
+                }
+                g.drawImage(nameImage, labelOffset, yOffset, null);
+                if (rightImage != null) {
+                    labelOffset += (nameImage.getWidth(null)
+                        * lib.getScaleFactor()) + spacing;
+                    g.drawImage(rightImage, labelOffset, yOffset, null);
+                }
+                break;
+            }
+        }
     }
 
     /**
@@ -2196,14 +2235,13 @@ public final class MapViewer {
     }
 
     /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Show tile names,
-     * coordinates and colony values.
+     * Displays the Tile text for a Tile.
+     * Shows tile names, coordinates and colony values.
      *
-     * @param g The Graphics2D object on which to draw the Tile.
-     * @param tile The Tile to draw.
+     * @param g The Graphics2D object on which the text gets drawn.
+     * @param tile The Tile to draw the text on.
      */
-    private void displayOptionalTileTextAndRegionBorder(Graphics2D g, Tile tile) {
+    private void displayOptionalTileText(Graphics2D g, Tile tile) {
         String text = null;
         int op = freeColClient.getClientOptions()
             .getInteger(ClientOptions.DISPLAY_TILE_TEXT);
@@ -2225,7 +2263,6 @@ public final class MapViewer {
                     text = Messages.message(tile.getRegion().getLabel());
                 }
             }
-            displayTerritorialBorders(g, tile, BorderType.REGION, true);
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_EMPTY:
             break;
@@ -2415,11 +2452,6 @@ public final class MapViewer {
     private void displayUnit(Graphics2D g, Unit unit) {
         final Player player = freeColClient.getMyPlayer();
 
-        // Draw the 'selected unit' image if needed.
-        if (viewMode == GUI.MOVE_UNITS_MODE && unit == activeUnit
-                && (cursor.isActive() || unit.getMovesLeft() <= 0))
-            displayCursor(g);
-
         // Draw the unit.
         // If unit is sentry, draw in grayscale
         boolean fade = (unit.getState() == Unit.UnitState.SENTRY)
@@ -2571,14 +2603,13 @@ public final class MapViewer {
             Stroke oldStroke = g.getStroke();
             g.setStroke(borderStroke);
             Color oldColor = g.getColor();
-            Color newColor = Color.WHITE;
-            if (type == BorderType.COUNTRY) {
-                Color c = owner.getNationColor();
-                if (c != null) {
-                    newColor = new Color(c.getRed(), c.getGreen(), c.getBlue(),
-                                         (opaque) ? 255 : 100);
-                }
-            }
+            Color c = null;
+            if (type == BorderType.COUNTRY)
+                c = owner.getNationColor();
+            if (c == null)
+                c = Color.WHITE;
+            Color newColor = new Color(c.getRed(), c.getGreen(), c.getBlue(),
+                                 (opaque) ? 255 : 100);
             g.setColor(newColor);
             GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
             path.moveTo(borderPoints.get(Direction.longSides.get(0)).x,
