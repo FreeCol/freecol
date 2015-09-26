@@ -885,10 +885,7 @@ public final class ImageLibrary {
                                       JComponent c, Insets insets) {
         int width = c.getWidth();
         int height = c.getHeight();
-        BufferedImage image = ResourceManager.hasImageResource(resource)
-            ? ResourceManager.getImage(resource) : null;
-        int dx, dy, xmin, ymin;
-
+        int xmin, ymin;
         if (insets == null) {
             xmin = 0;
             ymin = 0;
@@ -898,11 +895,13 @@ public final class ImageLibrary {
             width -= insets.left + insets.right;
             height -= insets.top + insets.bottom;
         }
-        if (image != null && (dx = image.getWidth()) > 0
-            && (dy = image.getHeight()) > 0) {
-            int xmax, ymax;
-            xmax = xmin + width;
-            ymax = ymin + height;
+
+        if (ResourceManager.hasImageResource(resource)) {
+            BufferedImage image = ResourceManager.getImage(resource);
+            int dx = image.getWidth();
+            int dy = image.getHeight();
+            int xmax = xmin + width;
+            int ymax = ymin + height;
             for (int x = xmin; x < xmax; x += dx) {
                 for (int y = ymin; y < ymax; y += dy) {
                     g.drawImage(image, x, y, null);
