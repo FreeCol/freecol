@@ -76,7 +76,6 @@ import static net.sf.freecol.common.util.StringUtils.*;
  * 
  * This class is responsible for drawing the map/background on the
  * <code>Canvas</code>.
- * It is also used to draw map tiles for some GUI-panels.
  * In addition, the graphical state of the map (focus, active unit..)
  * is currently handled by this class.
  */
