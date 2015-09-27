@@ -966,12 +966,7 @@ public class SimpleMapGenerator implements MapGenerator {
             lb.add("Could not find a debug colony site.\n");
             return;
         }
-        for (TileType t : spec.getTileTypeList()) {
-            if (!t.isWater()) {
-                colonyTile.setType(t);
-                break;
-            }
-        }
+        colonyTile.setType(find(spec.getTileTypeList(), t -> !t.isWater()));
         unitType = spec.getUnitType("model.unit.expertFarmer");
         Unit buildColonyUnit = new ServerUnit(game, colonyTile,
                                               player, unitType);

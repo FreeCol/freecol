@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -463,13 +464,9 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     public UnitTypeChange getUnitTypeChange(ChangeType changeType,
                                             Player player) {
-        for (UnitTypeChange change : getTypeChanges()) {
-            if (change.asResultOf(changeType) && change.appliesTo(player)) {
-                UnitType result = change.getNewUnitType();
-                if (result.isAvailableTo(player)) return change;
-            }
-        }
-        return null;
+        return find(getTypeChanges(),
+            c -> c.asResultOf(changeType) && c.appliesTo(player)
+                && c.getNewUnitType().isAvailableTo(player));
     }
 
     /**
@@ -479,10 +476,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The type change, or null if impossible.
      */
     public UnitTypeChange getUnitTypeChange(UnitType newType) {
-        for (UnitTypeChange change : getTypeChanges()) {
-            if (change.getNewUnitType() == newType) return change;
-        }
-        return null;
+        return find(getTypeChanges(), c -> c.getNewUnitType() == newType);
     }
 
     /**
@@ -528,15 +522,10 @@ public final class UnitType extends BuildableType implements Consumer {
      *     maximum.
      */
     public UnitType getEducationUnit(int maximumSkill) {
-        for (UnitTypeChange change : getTypeChanges()) {
-            if (change.canBeTaught()) {
-                UnitType unitType = change.getNewUnitType();
-                if (unitType.hasSkill() && unitType.getSkill() <= maximumSkill) {
-                    return unitType;
-                }
-            }
-        }
-        return null;
+        return find(getTypeChanges().stream()
+                .filter(c -> c.canBeTaught())
+                .map(UnitTypeChange::getNewUnitType),
+            ut -> ut.hasSkill() && ut.getSkill() <= maximumSkill, null);
     }
 
     /**
@@ -547,14 +536,10 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The number of turns, or UNDEFINED if impossible.
      */
     public int getEducationTurns(UnitType unitType) {
-        for (UnitTypeChange change : getTypeChanges()) {
-            if (change.asResultOf(UnitTypeChange.ChangeType.EDUCATION)) {
-                if (unitType == change.getNewUnitType()) {
-                    return change.getTurnsToLearn();
-                }
-            }
-        }
-        return UNDEFINED;
+        UnitTypeChange utc = find(getTypeChanges(),
+            c -> c.asResultOf(UnitTypeChange.ChangeType.EDUCATION)
+                && unitType == c.getNewUnitType());
+        return (utc == null) ? UNDEFINED : utc.getTurnsToLearn();
     }
 
     /**

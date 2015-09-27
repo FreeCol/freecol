@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -213,8 +214,7 @@ public class SettlementType extends FreeColGameObjectType {
      */
     public final RandomRange getPlunderRange(Unit unit) {
         return (plunder == null) ? null
-            : plunder.stream()
-                .filter(p -> p.appliesTo(unit)).findFirst().orElse(null);
+            : find(plunder, p -> p.appliesTo(unit));
     }
 
     /**
@@ -225,8 +225,7 @@ public class SettlementType extends FreeColGameObjectType {
      */
     public final RandomRange getGifts(Unit unit) {
         return (gifts == null) ? null
-            : gifts.stream()
-                .filter(g -> g.appliesTo(unit)).findFirst().orElse(null);
+            : find(gifts, g -> g.appliesTo(unit));
     }
 
 

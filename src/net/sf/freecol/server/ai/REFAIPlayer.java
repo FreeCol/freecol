@@ -258,13 +258,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final Random aiRandom = getAIRandom();
         // Find a representative offensive land unit to use to search
         // for the initial target.
-        AIUnit aiUnit = null;
-        for (AIUnit aiu : getAIUnits()) {
-            if (!aiu.getUnit().isNaval() && aiu.getUnit().isOffensiveUnit()) {
-                aiUnit = aiu;
-                break;
-            }
-        }
+        AIUnit aiUnit = find(getAIUnits(), aiu -> !aiu.getUnit().isNaval()
+            && aiu.getUnit().isOffensiveUnit());
         if (aiUnit == null) {
             logger.warning("REF has no army?!?");
             return false;

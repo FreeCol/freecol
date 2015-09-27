@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -58,6 +59,7 @@ import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.TextOption;
 import net.sf.freecol.common.option.UnitListOption;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -1303,22 +1305,18 @@ public final class Specification {
      * @return The free colonist unit type.
      */
     public UnitType getDefaultUnitType(NationType nationType) {
-        for (UnitType ut : defaultUnitTypes) {
-            if (nationType == null) { // European is default
-                if (!ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                    && !ut.hasAbility(Ability.REF_UNIT)) return ut;
-            } else if (nationType.isIndian()) {
-                if (ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                    && !ut.hasAbility(Ability.REF_UNIT)) return ut;
-            } else if (nationType.isREF()) {
-                if (!ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                    && ut.hasAbility(Ability.REF_UNIT)) return ut;
-            } else { // European
-                if (!ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                    && !ut.hasAbility(Ability.REF_UNIT)) return ut;
-            }
-        }
-        return getDefaultUnitType();
+        Predicate<UnitType> p = (nationType == null)
+            ? ut -> !ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                && !ut.hasAbility(Ability.REF_UNIT)
+            : (nationType.isIndian())
+            ? ut -> ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                && !ut.hasAbility(Ability.REF_UNIT)
+            : (nationType.isREF())
+            ? ut -> !ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                && ut.hasAbility(Ability.REF_UNIT)
+            : ut -> !ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                && !ut.hasAbility(Ability.REF_UNIT);
+        return find(defaultUnitTypes, p, getDefaultUnitType());
     }
     
     /**
@@ -1564,11 +1562,7 @@ public final class Specification {
      *     ability, or null if none found.
      */
     public Role getRoleWithAbility(String id, List<Role> roles) {
-        if (roles == null) roles = getRoles();
-        for (Role r : roles) {
-            if (r.hasAbility(id)) return r;
-        }
-        return null;
+        return find(getRoles(), r -> r.hasAbility(id));
     }
 
     /**

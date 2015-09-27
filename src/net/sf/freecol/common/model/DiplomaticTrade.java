@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Stance;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 import org.w3c.dom.Element;
@@ -323,12 +324,8 @@ public class DiplomaticTrade extends FreeColObject {
      * @return The <code>Stance</code> offered in this trade, or null if none.
      */
     public Stance getStance() {
-        for (TradeItem ti : items) {
-            if (ti instanceof StanceTradeItem) {
-                return ti.getStance();
-            }
-        }
-        return null;
+        TradeItem ti = find(items, i -> i instanceof StanceTradeItem);
+        return (ti == null) ? null : ti.getStance();
     }
 
     /**
@@ -353,12 +350,9 @@ public class DiplomaticTrade extends FreeColObject {
      * @return The gold offered in this trade.
      */
     public int getGoldGivenBy(Player player) {
-        for (TradeItem ti : items) {
-            if (ti instanceof GoldTradeItem && player == ti.getSource()) {
-                return ti.getGold();
-            }
-        }
-        return -1;
+        TradeItem ti = find(items, i -> i instanceof GoldTradeItem
+            && player == i.getSource());
+        return (ti == null) ? -1 : ti.getGold();
     }
 
     /**
@@ -382,12 +376,8 @@ public class DiplomaticTrade extends FreeColObject {
      * @return The <code>Player</code> to be incited against.
      */
     public Player getVictim() {
-        for (TradeItem ti : items) {
-            if (ti instanceof InciteTradeItem) {
-                return ti.getVictim();
-            }
-        }
-        return null;
+        TradeItem ti = find(items, i -> i instanceof InciteTradeItem);
+        return (ti == null) ? null : ti.getVictim();
     }
 
     /**

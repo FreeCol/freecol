@@ -20,6 +20,7 @@
 package net.sf.freecol.common.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,8 +31,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -359,5 +362,88 @@ public class CollectionUtils {
     public static <T> boolean contains(Collection<T> collection,
                                        Predicate<T> predicate) {
         return collection.stream().filter(predicate).findFirst().isPresent();
+    }
+
+    /**
+     * Simple stream search for the first item that matches a predicate.
+     *
+     * @param array The array to search.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @return The item found, or fail if not found.
+     */
+    public static <T> T find(T[] array, Predicate<T> predicate, T fail) {
+        return find(Arrays.stream(array), predicate, fail);
+    }
+
+    /**
+     * Simple stream search for the first item that matches a predicate.
+     *
+     * @param collection The <code>Collection</code> to search.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @return The item found, or fail if not found.
+     */
+    public static <T> T find(Collection<T> collection, Predicate<T> predicate) {
+        return find(collection, predicate, (T)null);
+    }
+
+    /**
+     * Simple stream search for the first item that matches a predicate.
+     *
+     * @param collection The <code>Collection</code> to search.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param fail The value to return if nothing is found.
+     * @return The item found, or fail if not found.
+     */
+    public static <T> T find(Collection<T> collection, Predicate<T> predicate,
+                             T fail) {
+        return find(collection.stream(), predicate, fail);
+    }
+
+    /**
+     * Simple stream search for the first item that matches a predicate.
+     *
+     * @param stream A <code>Stream</code> to search.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @return The item found, or null if not found.
+     */
+    public static <T> T find(Stream<T> stream, Predicate<T> predicate) {
+        return find(stream, predicate, null);
+    }
+
+    /**
+     * Simple stream search for the first item that matches a predicate.
+     *
+     * @param stream A <code>Stream</code> to search.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param fail The value to return if nothing is found.
+     * @return The item found, or fail if not found.
+     */
+    public static <T> T find(Stream<T> stream, Predicate<T> predicate,
+                             T fail) {
+        return stream.filter(predicate).findFirst().orElse(fail);
+    }
+
+    /**
+     * Create a stream from an array and an immediate mapping transform.
+     *
+     * @param array The array to search.
+     * @param mapper A mapping <code>Function</code> to apply.
+     * @return The resulting <code>Stream</code>.
+     */
+    public static <T,R> Stream<R> map(T[] array,
+        Function<? super T,? extends R> mapper) {
+        return Arrays.stream(array).map(mapper);
+    }
+
+    /**
+     * Create a stream from a collection and an immediate mapping transform.
+     *
+     * @param collection The <code>Collection</code> to search.
+     * @param mapper A mapping <code>Function</code> to apply.
+     * @return The resulting <code>Stream</code>.
+     */
+    public static <T,R> Stream<R> map(Collection<T> collection,
+        Function<? super T,? extends R> mapper) {
+        return collection.stream().map(mapper);
     }
 }

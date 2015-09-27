@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -145,10 +146,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
      * @return The mixer wrapper with the name given, or null if none.
      */
     private MixerWrapper getMixerWrapperByName(String name) {
-        for (MixerWrapper mw : audioMixers) {
-            if (mw.getKey().equals(name)) return mw;
-        }
-        return null;
+        return find(audioMixers, mw -> mw.getKey().equals(name));
     }
 
     /**

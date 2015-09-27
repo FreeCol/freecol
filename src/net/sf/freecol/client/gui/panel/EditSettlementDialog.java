@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -152,11 +153,9 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     }
 
     private Player getOwnerPlayer() {
-        Nation n = getOwnerNation();
-        for (Player player : settlement.getGame().getLivePlayers(null)) {
-            if (player.getNationId().equals(n.getId())) return player;
-        }
-        return null;
+        final Nation n = getOwnerNation();
+        return find(settlement.getGame().getLivePlayers(null),
+            p -> p.getNationId().equals(n.getId()));
     }
 
     private SettlementType getSettlementType() {

@@ -31,6 +31,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
@@ -160,24 +161,16 @@ public class ManageMissionariesGoal extends Goal {
 
 
     private IndianSettlement findSettlement(Tile tile) {
-        if (tile == null) {
+        return (tile == null)
             //FIXME: We're in europe - let's deal with it.
-            return null;
-        } else {
+            ? null
             //Possible FIXME: Slightly randomize findings?
             //Otherwise, missionaries starting from the same position will find
             //the same settlement.
-
-            for (Tile t : tile.getSurroundingTiles(MAX_SEARCH_RADIUS)) {
-                IndianSettlement is = t.getIndianSettlement();
-                if (is != null && !is.hasMissionary(player.getPlayer())) {
-                    //FIXME: Check if this settlement is reachable
-                    return is;
-                }
-            }
-        }
-        //FIXME: We didn't find a settlement in range - what now?
-        return null;
+            : find(map(tile.getSurroundingTiles(1, MAX_SEARCH_RADIUS),
+                    t -> t.getIndianSettlement()),
+                is -> is != null && !is.hasMissionary(player.getPlayer()),
+                null);
     }
 
 

@@ -72,6 +72,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders.MultipleAdjacentDecider;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -194,13 +195,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                         Unit up = (unit.getType().canBeUpgraded(sk,
                                 ChangeType.NATIVES)) ? unit : null;
                         if (unit.isCarrier()) {
-                            for (Unit u : unit.getUnitList()) {
-                                if (u.getType().canBeUpgraded(sk,
-                                        ChangeType.NATIVES)) {
-                                    up = u;
-                                    break;
-                                }
-                            }
+                            up = find(unit.getUnitList(),
+                                u -> u.getType().canBeUpgraded(sk, ChangeType.NATIVES));
                         }
                         if (up != null) {
                             lb.add("[", Messages.getName(sk), "]");

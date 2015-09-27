@@ -64,8 +64,8 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
-
 import static net.sf.freecol.common.util.StringUtils.*;
 
 import net.sf.freecol.server.FreeColServer;
@@ -329,10 +329,8 @@ public class DebugUtils {
 
         Unit carrier = null, sCarrier = null;
         if (!sTile.isLand() && !unitChoice.isNaval()) {
-            sCarrier = sTile.getUnitList().stream()
-                .filter(u -> u.isNaval()
-                    && u.getSpaceLeft() >= unitChoice.getSpaceTaken())
-                .findFirst().orElse(null);
+            sCarrier = find(sTile.getUnitList(), u -> u.isNaval()
+                && u.getSpaceLeft() >= unitChoice.getSpaceTaken());
         }
         Location loc = (sCarrier != null) ? sCarrier : sTile;
         ServerUnit sUnit = new ServerUnit(sGame, loc, sPlayer,

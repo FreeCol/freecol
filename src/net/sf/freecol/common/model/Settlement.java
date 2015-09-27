@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -412,10 +413,8 @@ public abstract class Settlement extends GoodsLocation
 
         // To succeed, there must exist an available role for the unit
         // where the extra equipment for the role is present.
-        for (Role r : unit.getAvailableRoles(military)) {
-            if (canProvideGoods(unit.getGoodsDifference(r, 1))) return r;
-        }
-        return null;
+        return find(unit.getAvailableRoles(military),
+            r -> canProvideGoods(unit.getGoodsDifference(r, 1)));
     }
 
 

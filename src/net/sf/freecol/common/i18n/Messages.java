@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.StringTemplate.TemplateType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -415,13 +416,9 @@ public class Messages {
     }
 
     public static String getBestDescription(String id) {
-        for (String suffix : DESCRIPTION_KEYS) {
-            String key = id + suffix;
-            if (containsKey(key)) {
-                return message(key);
-            }
-        }
-        return id;
+        String key = find(map(DESCRIPTION_KEYS, s -> id + s),
+            k -> containsKey(k), null);
+        return (key == null) ? id : message(key);
     }
 
     /**

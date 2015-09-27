@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -246,10 +247,8 @@ public class ColonyPlan {
      * @return The best current <code>BuildableType</code>.
      */
     public BuildableType getBestBuildableType() {
-        for (BuildPlan b : buildPlans) {
-            if (colony.canBuild(b.type)) return b.type;
-        }
-        return null;
+        BuildPlan bp = find(buildPlans, p -> colony.canBuild(p.type));
+        return (bp == null) ? null : bp.type;
     }
 
     /**
@@ -596,10 +595,7 @@ public class ColonyPlan {
      * @return A <code>BuildPlan</code> with this type, or null if not found.
      */
     private BuildPlan findBuildPlan(BuildableType type) {
-        for (BuildPlan bp : buildPlans) {
-            if (bp.type == type) return bp;
-        }
-        return null;
+        return find(buildPlans, bp -> bp.type == type);
     }
 
     /**
@@ -1030,10 +1026,7 @@ public class ColonyPlan {
      */
     private WorkLocationPlan findPlan(GoodsType goodsType,
                                       List<WorkLocationPlan> plans) {
-        for (WorkLocationPlan wlp : plans) {
-            if (wlp.getGoodsType() == goodsType) return wlp;
-        }
-        return null;
+        return find(plans, wlp -> wlp.getGoodsType() == goodsType);
     }
 
     /**

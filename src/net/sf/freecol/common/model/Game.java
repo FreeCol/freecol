@@ -510,10 +510,7 @@ public class Game extends FreeColGameObject {
      *     not found.
      */
     public Player getPlayerByNationId(String nationId) {
-        for (Player player : players) {
-            if (player.getNationId().equals(nationId)) return player;
-        }
-        return null;
+        return find(players, p -> p.getNationId().equals(nationId));
     }
 
     /**
@@ -614,10 +611,7 @@ public class Game extends FreeColGameObject {
      * @return The <code>Player</code> or null if none found.
      */
     public Player getPlayerByName(String name) {
-        for (Player player : players) {
-            if (player.getName().equals(name)) return player;
-        }
-        return null;
+        return find(players, p -> p.getName().equals(name));
     }
 
     /**
@@ -793,13 +787,10 @@ public class Game extends FreeColGameObject {
      * @return A vacant <code>Nation</code> or null if none found.
      */
     public Nation getVacantNation() {
-        for (Entry<Nation, NationState> entry
-                 : nationOptions.getNations().entrySet()) {
-            if (entry.getValue() == NationState.AVAILABLE) {
-                return entry.getKey();
-            }
-        }
-        return null;
+        Entry<Nation,NationState> entry
+            = find(nationOptions.getNations().entrySet(),
+                e -> e.getValue() == NationState.AVAILABLE, null);
+        return (entry == null) ? null : entry.getKey();
     }
 
     /**

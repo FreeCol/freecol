@@ -38,8 +38,8 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Direction;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
-
 import static net.sf.freecol.common.util.RandomUtils.*;
 
 
@@ -1390,10 +1390,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The most defensible adjacent land <code>Tile</code>.
      */
     public Tile getBestDisembarkTile(Player player) {
-        for (Tile t : getSafestSurroundingLandTiles(player)) {
-            if (t.isHighSeasConnected()) return t;
-        }
-        return null;
+        return find(getSafestSurroundingLandTiles(player),
+            Tile::isHighSeasConnected);
     }
 
     /**
@@ -2092,13 +2090,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (getOwningSettlement() != null) {
             owner = getOwningSettlement().getOwner();
         }
-        if (owner != null && unit != null && unit.getOwner() != owner
-            && unit.getOwner().atWarWith(owner)) {
-            for (Unit enemyUnit : getUnitList()) {
-                if (enemyUnit.isOffensiveUnit()) return enemyUnit;
-            }
-        }
-        return null;
+        return (owner != null && unit != null && unit.getOwner() != owner
+            && unit.getOwner().atWarWith(owner))
+            ? find(getUnitList(), Unit::isOffensiveUnit)
+            : null;
     }
 
     /**

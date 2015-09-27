@@ -63,6 +63,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.NetworkConstants;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -1064,14 +1065,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public void requireGoodsWish(GoodsType type, int amount, int value,
                                  LogBuilder lb) {
-        GoodsWish gw = null;
-        for (Wish w : wishes) {
-            if (w instanceof GoodsWish
-                && ((GoodsWish)w).getGoodsType() == type) {
-                gw = (GoodsWish)w;
-                break;
-            }
-        }
+        GoodsWish gw = (GoodsWish)find(wishes, w -> w instanceof GoodsWish
+            && ((GoodsWish)w).getGoodsType() == type);
         if (gw != null) {
             gw.update(type, amount, gw.getValue() + 1);
             lb.add(", update ", gw);
@@ -1094,14 +1089,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public void requireWorkerWish(UnitType type, boolean expertNeeded,
                                   int value, LogBuilder lb) {
-        WorkerWish ww = null;
-        for (Wish w : wishes) {
-            if (w instanceof WorkerWish
-                && ((WorkerWish)w).getUnitType() == type) {
-                ww = (WorkerWish)w;
-                break;
-            }
-        }
+        WorkerWish ww = (WorkerWish)find(wishes, w -> w instanceof WorkerWish
+            && ((WorkerWish)w).getUnitType() == type);
         if (ww != null) {
             ww.update(type, expertNeeded, ww.getValue() + 1);
             lb.add(", update ", ww);
@@ -1349,10 +1338,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     private TileImprovementPlan getPlanFor(Tile tile,
                                            List<TileImprovementPlan> plans) {
-        for (TileImprovementPlan tip : plans) {
-            if (tip.getTarget() == tile) return tip;
-        }
-        return null;
+        return find(plans, tip -> tip.getTarget() == tile);
     }
 
     /**

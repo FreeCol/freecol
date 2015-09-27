@@ -69,6 +69,7 @@ import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -588,12 +589,7 @@ public final class QuickActionMenu extends JPopupMenu {
             change = need.get(0);
             break;
         default:
-            for (AbstractGoods ag : need) {
-                if (ag.getAmount() > 0) {
-                    change = ag;
-                    break;
-                }
-            }
+            change = find(need, ag -> ag.getAmount() > 0);
             break;
         }
         Icon icon = (change == null) ? null : new ImageIcon(

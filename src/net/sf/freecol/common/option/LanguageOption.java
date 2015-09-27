@@ -35,6 +35,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Specification;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -230,10 +231,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      * @return The corresponding language, or null if none found.
      */
     private Language getLanguage(String key) {
-        for (Language l : languages) {
-            if (key.equals(l.getKey())) return l;
-        }
-        return null;
+        return find(languages, l -> key.equals(l.getKey()));
     }
 
     /**

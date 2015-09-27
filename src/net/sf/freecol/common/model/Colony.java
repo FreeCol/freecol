@@ -218,10 +218,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The corresponding <code>ColonyTile</code>, or null if not found.
      */
     public ColonyTile getColonyTile(Tile t) {
-        for (ColonyTile c : colonyTiles) {
-            if (c.getWorkTile() == t) return c;
-        }
-        return null;
+        return find(colonyTiles, ct -> ct.getWorkTile() == t);
     }
 
     /**
@@ -595,7 +592,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public Building getBuildingForProducing(final GoodsType goodsType) {
         for (Building b : buildingMap.values()) {
-            if (AbstractGoods.containsType(goodsType, b.getOutputs())) return b;
+            if (AbstractGoods.findByType(goodsType, b.getOutputs()) != null)
+                return b;
         }
         return null;
     }
@@ -857,10 +855,15 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 satisfied++;
                 continue;
             }
-            int production = productionCache.getNetProductionOf(type)
-                + ((info == null) ? 0
+            int production = productionCache.getNetProductionOf(type);
+            if (info != null) {
+                AbstractGoods consumption = AbstractGoods.findByType(type,
+                    info.getConsumption());
+                if (consumption != null) {
                     // add the amount the build queue itself will consume
-                    : AbstractGoods.getCount(type, info.getConsumption()));
+                    production += consumption.getAmount();
+                }
+            }
             if (production <= 0) {
                 failing++;
                 if (needed != null) {

@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
@@ -542,13 +543,10 @@ public abstract class WorkLocation extends UnitLocation
     public UnitType getExpertUnitType() {
         final Specification spec = getSpecification();
         ProductionType pt = getBestProductionType(false, null);
-        if (pt != null) {
-            for (AbstractGoods goods : pt.getOutputs()) {
-                UnitType expert = spec.getExpertForProducing(goods.getType());
-                if (expert != null) return expert;
-            }
-        }
-        return null;
+        return (pt == null) ? null
+            : find(map(pt.getOutputs(),
+                    ag -> spec.getExpertForProducing(ag.getType())),
+                ut -> ut != null, null);
     }
 
     /**

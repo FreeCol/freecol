@@ -1657,16 +1657,13 @@ public class Player extends FreeColGameObject implements Nameable {
     public StringTemplate checkDeclareIndependence() {
         if (getPlayerType() != PlayerType.COLONIAL)
             return StringTemplate.template("model.player.colonialIndependence");
-        Event event = getSpecification()
+        final Event event = getSpecification()
             .getEvent("model.event.declareIndependence");
-        for (Limit limit : event.getLimits()) {
-            if (!limit.evaluate(this)) {
-                return StringTemplate.template(limit.getDescriptionKey())
-                    .addAmount("%limit%",
-                        limit.getRightHandSide().getValue(getGame()));
-            }
-        }
-        return null;
+        Limit limit = find(event.getLimits(), l -> !l.evaluate(this));
+        return (limit == null) ? null
+            : StringTemplate.template(limit.getDescriptionKey())
+                .addAmount("%limit%", limit.getRightHandSide()
+                    .getValue(getGame()));
     }
 
     /**
@@ -2021,10 +2018,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The unit with the given name, or null if none found.
      */
     public Unit getUnitByName(String name) {
-        for (Unit u : units) {
-            if (name.equals(u.getName())) return u;
-        }
-        return null;
+        return find(units, u -> name.equals(u.getName()));
     }
 
     /**
@@ -2223,10 +2217,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param name The trade route name.
      */
     public TradeRoute getTradeRouteByName(String name) {
-        for (TradeRoute t : tradeRoutes) {
-            if (t.getName().equals(name)) return t;
-        }
-        return null;
+        return find(tradeRoutes, t -> t.getName().equals(name));
     }
 
     /**
@@ -2378,10 +2369,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *     not found.
      */
     public Colony getColonyByName(String name) {
-        for (Colony colony : getColonies()) {
-            if (colony.getName().equals(name)) return colony;
-        }
-        return null;
+        return find(getColonies(), c -> c.getName().equals(name));
     }
 
     /**
@@ -2392,10 +2380,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *     or null if not found.
      */
     public IndianSettlement getIndianSettlementByName(String name) {
-        for (IndianSettlement settlement : getIndianSettlements()) {
-            if (settlement.getName().equals(name)) return settlement;
-        }
-        return null;
+        return find(getIndianSettlements(), is -> is.getName().equals(name));
     }
 
     /**

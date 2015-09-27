@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 
 import org.apache.commons.cli.CommandLine;
@@ -917,14 +918,10 @@ public final class FreeCol {
      * @return The type of advantages set, or null if none.
      */
     private static Advantages selectAdvantages(String advantages) {
-        for (Advantages a : Advantages.values()) {
-            String msg = Messages.getName(a);
-            if (msg.equals(advantages)) {
-                setAdvantages(a);
-                return a;
-            }
-        }
-        return null;
+        Advantages adv = find(Advantages.values(),
+            a -> Messages.getName(a).equals(advantages), null);
+        if (adv != null) setAdvantages(adv);
+        return adv;
     }
 
     /**
@@ -965,15 +962,10 @@ public final class FreeCol {
      * @return The name of the selected difficulty, or null if none.
      */
     public static String selectDifficulty(String arg) {
-        for (String d : DIFFICULTIES) {
-            String key = "model.difficulty." + d;
-            String value = Messages.getName(key);
-            if (value.equals(arg)) {
-                setDifficulty(key);
-                return key;
-            }
-        }
-        return null;
+        String difficulty = find(map(DIFFICULTIES, d -> "model.difficulty."+d),
+            k -> Messages.getName(k).equals(arg), null);
+        if (difficulty != null) setDifficulty(difficulty);
+        return difficulty;
     }
 
     /**

@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 // @compat 0.10.x
 import net.sf.freecol.server.generator.TerrainGenerator;
@@ -201,11 +202,8 @@ public class Map extends FreeColGameObject implements Location {
          * @return The <code>Direction</code>, or null if not adjacent.
          */
         public Direction getDirection(Position other) {
-            for (Direction d : Direction.values()) {
-                Position step = d.step(x, y);
-                if (step.x == other.x && step.y == other.y) return d;
-            }
-            return null;
+            return find(Direction.values(),
+                d -> new Position(this, d).equals(other), null);
         }
 
         // Override Object
@@ -502,11 +500,8 @@ public class Map extends FreeColGameObject implements Location {
      * @return The region with the given name key, or null if not found.
      */
     public Region getRegionByKey(final String key) {
-        if (key == null) return null;
-        for (Region r : regions) {
-            if (key.equals(r.getKey())) return r;
-        }
-        return null;
+        return (key == null) ? null
+            : find(getRegions(), r -> key.equals(r.getKey()));
     }
 
     /**
@@ -517,11 +512,8 @@ public class Map extends FreeColGameObject implements Location {
      *     not found.
      */
     public Region getRegionByName(final String name) {
-        if (name == null) return null;
-        for (Region r : regions) {
-            if (name.equals(r.getName())) return r;
-        }
-        return null;
+        return (name == null) ? null
+            : find(getRegions(), r -> name.equals(r.getName()));
     }
 
     /**

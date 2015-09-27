@@ -68,6 +68,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.OptionGroup;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
@@ -1263,11 +1264,8 @@ public final class FreeColServer {
      * @return The player.
      */
     public ServerPlayer getPlayer(Connection connection) {
-        for (Player p : game.getPlayers()) {
-            ServerPlayer serverPlayer = (ServerPlayer)p;
-            if (serverPlayer.getConnection() == connection) return serverPlayer;
-        }
-        return null;
+        return (ServerPlayer)find(game.getPlayers(),
+            p -> ((ServerPlayer)p).getConnection() == connection);
     }
 
     /**
