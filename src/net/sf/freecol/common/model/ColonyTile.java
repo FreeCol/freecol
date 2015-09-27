@@ -243,29 +243,20 @@ public class ColonyTile extends WorkLocation {
             return food;
         }
 
-        // Units are at work here.  Find out what work is being done.
-        GoodsType work = null;
-        UnitType type = null;
-        for (Unit u : getUnitList()) {
-            if (u != null && (type = u.getType()) != null
-                && (work = u.getWorkType()) != null) break;
-        }
-        if (work == null) return 0; // No work, no reason to improve.
-            
-        if (newType != null) { // Tile type change
-            // Return the production impact on the work being done.
-            int diff = newType.getPotentialProduction(work, type);
-            if (resource == null) {
-                diff -= oldType.getPotentialProduction(work, type);
-            } else {
-                diff -= resource.applyBonus(work, type,
-                    oldType.getPotentialProduction(work, type));
-            }
-            return diff;
-        }
-
-        // Otherwise return any new bonus that impacts the current work.
-        return ti.getBonus(work);
+        // Units are present, see what the change would do to their work.
+        final GoodsType work = getCurrentWorkType();
+        final UnitType unitType = getFirstUnit().getType();
+        return (work == null) // No work, improvement does nothing
+            ? 0
+            : (newType == null) // No tile change, but return the new bonus
+            ? ti.getBonus(work)
+            : (resource == null) // The tile change impact on the work
+            ? newType.getPotentialProduction(work, unitType)
+                - oldType.getPotentialProduction(work, unitType)
+            // The production impact with the new resource in place
+            : newType.getPotentialProduction(work, unitType)
+                - resource.applyBonus(work, unitType,
+                    oldType.getPotentialProduction(work, unitType));
     }
         
     /**

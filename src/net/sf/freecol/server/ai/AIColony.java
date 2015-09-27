@@ -1384,7 +1384,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 }
             } else {
                 if (colonyTile.isEmpty()) continue;
-                goodsType = colonyTile.getUnitList().get(0).getWorkType();
+                goodsType = colonyTile.getCurrentWorkType();
             }
             if (goodsType == null) continue;
 

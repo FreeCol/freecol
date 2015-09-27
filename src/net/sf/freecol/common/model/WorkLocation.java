@@ -168,14 +168,28 @@ public abstract class WorkLocation extends UnitLocation
     }
 
     /**
+     * Get the current work type of any unit present.
+     *
+     * This assumes that all units in a work location are doing the same
+     * work, which is true for now.
+     *
+     * @return The current <code>GoodsType</code> being produced, or
+     *     null if none.
+     */
+    public GoodsType getCurrentWorkType() {
+        Unit unit = getFirstUnit();
+        return (unit != null && unit.getType() != null) ? unit.getWorkType()
+            : null;
+    }
+
+    /**
      * Update production type on the basis of the current work
      * location type (which might change due to an upgrade) and the
      * work type of units present.
      */
     public void updateProductionType() {
-        Unit unit = getFirstUnit();
-        GoodsType workType = (unit == null) ? null : unit.getWorkType();
-        setProductionType(getBestProductionType(unit == null, workType));
+        setProductionType(getBestProductionType(isEmpty(),
+                getCurrentWorkType()));
     }
 
     /**
@@ -560,17 +574,15 @@ public abstract class WorkLocation extends UnitLocation
      * @return The maximum return from this unit.
      */
     public int getUnitProduction(Unit unit, GoodsType goodsType) {
-        if (unit == null) return 0;
+        if (unit == null || unit.getWorkType() != goodsType) return 0;
         final UnitType unitType = unit.getType();
-        if (unit.getWorkType() != goodsType) return 0;
         final Turn turn = getGame().getTurn();
         int bestAmount = 0;
         for (AbstractGoods output : getOutputs()) {
             if (output.getType() != goodsType) continue;
-            int amount = getBaseProduction(getProductionType(), goodsType,
-                                           unitType);
-            amount = (int)applyModifiers(amount, turn,
-                getProductionModifiers(goodsType, unitType));
+            int amount = (int)applyModifiers(getBaseProduction(getProductionType(),
+                    goodsType, unitType),
+                turn, getProductionModifiers(goodsType, unitType));
             if (bestAmount < amount) bestAmount = amount;
         }
         return bestAmount;
