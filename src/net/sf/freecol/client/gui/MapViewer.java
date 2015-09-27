@@ -19,10 +19,8 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -39,8 +37,6 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -54,33 +50,23 @@ import javax.swing.JLayeredPane;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
-import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovement;
-import net.sf.freecol.common.model.TileItem;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.common.util.Utils;
 
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -100,7 +86,6 @@ public final class MapViewer {
 
     private static enum BorderType { COUNTRY, REGION }
 
-
     private static class TextSpecification {
 
         public final String text;
@@ -112,46 +97,6 @@ public final class MapViewer {
         }
     }
 
-    private static class SortableImage implements Comparable<SortableImage> {
-
-        public final Image image;
-        public final int index;
-
-        public SortableImage(Image image, int index) {
-            this.image = image;
-            this.index = index;
-        }
-
-        // Implement Comparable<SortableImage>
-
-        @Override
-        public int compareTo(SortableImage other) {
-            return other.index - this.index;
-        }
-
-        // Override Object
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean equals(Object other) {
-            if (other instanceof SortableImage) {
-                return this.compareTo((SortableImage)other) == 0;
-            }
-            return super.equals(other);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int hashCode() {
-            int hash = super.hashCode();
-            hash = 37 * hash + Utils.hashCode(image);
-            return 37 * hash + index;
-        }
-    }
 
     private final FreeColClient freeColClient;
 
@@ -162,7 +107,7 @@ public final class MapViewer {
     /** Scaled ImageLibrary only used for map painting. */
     private ImageLibrary lib;
 
-    private RoadPainter rp;
+    private final TileViewer tv;
 
     private TerrainCursor cursor;
     private volatile boolean blinkingMarqueeEnabled;
@@ -220,14 +165,10 @@ public final class MapViewer {
 
     // The height offset to paint a Unit at (in pixels).
     private static final int UNIT_OFFSET = 20,
-        STATE_OFFSET_X = 25,
-        STATE_OFFSET_Y = 10,
         OTHER_UNITS_OFFSET_X = -5, // Relative to the state indicator.
         OTHER_UNITS_OFFSET_Y = 1,
         OTHER_UNITS_WIDTH = 3,
         MAX_OTHER_UNITS = 10;
-
-    private final GeneralPath fog = new GeneralPath();
 
     private final java.util.Map<Unit, Integer> unitsOutForAnimation;
     private final java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
@@ -254,6 +195,7 @@ public final class MapViewer {
         this.gui = (SwingGUI)freeColClient.getGUI();
         this.size = null;
 
+        tv = new TileViewer(freeColClient);
         setImageLibraryAndUpdateData(new ImageLibrary());
 
         cursor = null;
@@ -422,220 +364,6 @@ public final class MapViewer {
     }
 
     /**
-     * Returns the scaled terrain-image for a terrain type (and position 0, 0).
-     *
-     * @param type The type of the terrain-image to return.
-     * @param scale The scale of the terrain image to return.
-     * @return The terrain-image
-     */
-    static BufferedImage createTileImageWithOverlayAndForest(
-            TileType type, float scale) {
-        BufferedImage terrainImage = ImageLibrary.getTerrainImage(
-            type, 0, 0, scale);
-        BufferedImage overlayImage = ImageLibrary.getOverlayImage(
-            type, type.getId(), scale);
-        BufferedImage forestImage = type.isForested()
-            ? ImageLibrary.getForestImage(type, scale)
-            : null;
-        if (overlayImage == null && forestImage == null) {
-            return terrainImage;
-        } else {
-            int width = terrainImage.getWidth();
-            int height = terrainImage.getHeight();
-            if (overlayImage != null) {
-                height = Math.max(height, overlayImage.getHeight());
-            }
-            if (forestImage != null) {
-                height = Math.max(height, forestImage.getHeight());
-            }
-            BufferedImage compositeImage = new BufferedImage(width, height,
-                BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = compositeImage.createGraphics();
-            g.drawImage(terrainImage, 0, height - terrainImage.getHeight(), null);
-            if (overlayImage != null) {
-                g.drawImage(overlayImage, 0, height - overlayImage.getHeight(), null);
-            }
-            if (forestImage != null) {
-                g.drawImage(forestImage, 0, height - forestImage.getHeight(), null);
-            }
-            g.dispose();
-            return compositeImage;
-        }
-    }
-
-    /**
-     * Create a <code>BufferedImage</code> and draw a <code>Tile</code> on it.
-     * Draws the terrain and improvements.
-     *
-     * @param tile The Tile to draw.
-     * @return The image.
-     */
-    BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
-        if (!tile.isExplored())
-            return lib.getTerrainImage(null, tile.getX(), tile.getY());
-        final TileType tileType = tile.getType();
-        Dimension terrainTileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
-        BufferedImage overlayImage = lib.getOverlayImage(tile);
-        final int compoundHeight = (overlayImage != null)
-            ? overlayImage.getHeight()
-            : tileType.isForested()
-                ? lib.scaleDimension(ImageLibrary.TILE_FOREST_SIZE).height
-                : terrainTileSize.height;
-        BufferedImage image = new BufferedImage(
-            terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = image.createGraphics();
-        g.translate(0, compoundHeight - terrainTileSize.height);
-        displayTileWithBeachAndBorder(g, lib, tile);
-        displayTileItems(g, tile, overlayImage);
-        g.dispose();
-        return image;
-    }
-
-    /**
-     * Create a <code>BufferedImage</code> and draw a <code>Tile</code> on it.
-     *
-     * @param tile The <code>Tile</code> to draw.
-     * @return The image.
-     */
-    BufferedImage createTileImage(Tile tile) {
-        final TileType tileType = tile.getType();
-        Dimension terrainTileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
-        BufferedImage overlayImage = lib.getOverlayImage(tile);
-        final int compoundHeight = (overlayImage != null)
-            ? overlayImage.getHeight()
-            : tileType.isForested()
-                ? lib.scaleDimension(ImageLibrary.TILE_FOREST_SIZE).height
-                : terrainTileSize.height;
-        BufferedImage image = new BufferedImage(
-            terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = image.createGraphics();
-        g.translate(0, compoundHeight - terrainTileSize.height);
-        displayTile(g, tile, overlayImage);
-        g.dispose();
-        return image;
-    }
-
-    /**
-     * Create a <code>BufferedImage</code> and draw a <code>Tile</code> on it.
-     * The visualization of the <code>Tile</code> also includes information
-     * from the corresponding <code>ColonyTile</code> of the given
-     * <code>Colony</code>.
-     *
-     * @param tile The <code>Tile</code> to draw.
-     * @param colony The <code>Colony</code> to create the visualization
-     *      of the <code>Tile</code> for. This object is also used to
-     *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
-     * @return The image.
-     */
-    BufferedImage createColonyTileImage(Tile tile, Colony colony) {
-        final TileType tileType = tile.getType();
-        Dimension terrainTileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
-        BufferedImage overlayImage = lib.getOverlayImage(tile);
-        final int compoundHeight = (overlayImage != null)
-            ? overlayImage.getHeight()
-            : tileType.isForested()
-                ? lib.scaleDimension(ImageLibrary.TILE_FOREST_SIZE).height
-                : terrainTileSize.height;
-        BufferedImage image = new BufferedImage(
-            terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = image.createGraphics();
-        g.translate(0, compoundHeight - terrainTileSize.height);
-        displayColonyTile(g, tile, colony, overlayImage);
-        g.dispose();
-        return image;
-    }
-
-    /**
-     * Displays the 3x3 tiles for the TilesPanel in ColonyPanel.
-     * 
-     * @param g The <code>Graphics2D</code> object on which to draw
-     *      the <code>Tile</code>.
-     * @param tiles The array containing the <code>Tile</code> objects to draw.
-     * @param colony The <code>Colony</code> to create the visualization
-     *      of the <code>Tile</code> objects for.
-     */
-    void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
-        Set<String> overlayCache = ImageLibrary.createOverlayCache();
-        Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
-        for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 3; y++) {
-                if (tiles[x][y] != null) {
-                    int xx = (((2 - x) + y) * tileSize.width) / 2;
-                    int yy = ((x + y) * tileSize.height) / 2;
-                    g.translate(xx, yy);
-                    Image overlayImage = lib.getOverlayImage(tiles[x][y], overlayCache);
-                    displayColonyTile(g, tiles[x][y], colony, overlayImage);
-                    g.translate(-xx, -yy);
-                }
-            }
-        }
-    }
-
-    /**
-     * Displays the given colony tile.
-     * The visualization of the <code>Tile</code> also includes information
-     * from the corresponding <code>ColonyTile</code> from the given
-     * <code>Colony</code>.
-     *
-     * @param g The <code>Graphics2D</code> on which to draw.
-     * @param tile The <code>Tile</code> to draw.
-     * @param colony The <code>Colony</code> to create the visualization
-     *      of the <code>Tile</code> for. This object is also used to
-     *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
-     * @param overlayImage The Image of the tile overlay.
-     */
-    private void displayColonyTile(Graphics2D g, Tile tile, Colony colony,
-                                  Image overlayImage) {
-        displayTile(g, tile, overlayImage);
-
-        ColonyTile colonyTile = colony.getColonyTile(tile);
-        switch (colonyTile.getNoWorkReason()) {
-        case NONE: case COLONY_CENTER: case CLAIM_REQUIRED:
-            break;
-        default:
-            g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN),
-                        0, 0, null);
-        }
-        int price = colony.getOwner().getLandPrice(tile);
-        if (price > 0 && !tile.hasSettlement()) {
-            Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
-            displayCenteredImage(g, image, tileWidth, tileHeight);
-        }
-
-        Unit unit = colonyTile.getOccupyingUnit();
-        if (unit != null) {
-            BufferedImage image = lib.getSmallerUnitImage(unit);
-            g.drawImage(image,
-                        tileWidth/4 - image.getWidth() / 2,
-                        halfHeight - image.getHeight() / 2, null);
-            // Draw an occupation and nation indicator.
-            Player owner = freeColClient.getMyPlayer();
-            String text = Messages.message(unit.getOccupationLabel(owner, false));
-            g.drawImage(lib.getOccupationIndicatorChip(g, unit, text),
-                        (int)(STATE_OFFSET_X * lib.getScaleFactor()),
-                        0, null);
-        }
-    }
-
-    /**
-     * Displays the given <code>Tile</code>.
-     *
-     * @param g The Graphics2D on which to draw the <code>Tile</code>.
-     * @param tile The <code>Tile</code> to draw.
-     * @param overlayImage The Image for the tile overlay.
-     */
-    private void displayTile(Graphics2D g, Tile tile, Image overlayImage) {
-        displayTileWithBeachAndBorder(g, lib, tile);
-        if (tile.isExplored()) {
-            displayTileItems(g, tile, overlayImage);
-            displaySettlementWithChipsOrPopulationNumber(freeColClient, lib,
-                g, tile, tileWidth, tileHeight, false);
-            displayFogOfWar(freeColClient, fog, g, tile);
-            displayOptionalTileText(g, tile);
-        }
-    }
-
-    /**
      * Run some code with the given unit made invisible.  You can nest
      * several of these method calls in order to hide multiple
      * units.  There are no problems related to nested calls with the
@@ -645,9 +373,9 @@ public final class MapViewer {
      * @param sourceTile The source <code>Tile</code>.
      * @param r The code to be executed.
      */
-    public void executeWithUnitOutForAnimation(final Unit unit,
-                                               final Tile sourceTile,
-                                               final OutForAnimationCallback r) {
+    void executeWithUnitOutForAnimation(final Unit unit,
+                                        final Tile sourceTile,
+                                        final OutForAnimationCallback r) {
         final JLabel unitLabel = enterUnitOutForAnimation(unit, sourceTile);
         try {
             r.executeWithUnitOutForAnimation(unitLabel);
@@ -1507,9 +1235,9 @@ public final class MapViewer {
      */
     private void setImageLibraryAndUpdateData(ImageLibrary lib) {
         this.lib = lib;
+        tv.setImageLibraryAndUpdateData(lib);
         // ATTENTION: we assume that all base tiles have the same size
         Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
-        rp = new RoadPainter(tileSize);
         tileHeight = tileSize.height;
         tileWidth = tileSize.width;
         halfHeight = tileHeight/2;
@@ -1542,13 +1270,6 @@ public final class MapViewer {
 
         borderStroke = new BasicStroke(dy);
         gridStroke = new BasicStroke(lib.getScaleFactor());
-
-        fog.reset();
-        fog.moveTo(halfWidth, 0);
-        fog.lineTo(tileWidth, halfHeight);
-        fog.lineTo(halfWidth, tileHeight);
-        fog.lineTo(0, halfHeight);
-        fog.closePath();
     }
 
     /**
@@ -1606,15 +1327,8 @@ public final class MapViewer {
                 g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
                             (y-y0) * halfHeight);
 
-                displayTileWithBeachAndBorder(g, lib, tile);
-                for (Direction direction : Direction.values()) {
-                    Tile borderingTile = tile.getNeighbourOrNull(direction);
-                    if (borderingTile != null && !borderingTile.isExplored()) {
-                        g.drawImage(lib.getBorderImage(
-                                null, direction, tile.getX(), tile.getY()),
-                            0, 0, null);
-                    }
-                }
+                TileViewer.displayTileWithBeachAndBorder(g, lib, tile);
+                TileViewer.displayUnknownTileBorder(g, lib, tile);
 
                 g.setTransform(baseTransform);
             });
@@ -1689,11 +1403,12 @@ public final class MapViewer {
                             (y-y0) * halfHeight);
 
                 Image overlayImage = lib.getOverlayImage(tile, overlayCache);
-                displayTileItems(g, tile, overlayImage);
-                displaySettlementWithChipsOrPopulationNumber(freeColClient,
-                    lib, g, tile, tileWidth, tileHeight, withNumbers);
-                displayFogOfWar(freeColClient, fog, g, tile);
-                displayOptionalTileText(g, tile);
+                tv.displayTileItems(g, tile, overlayImage);
+                TileViewer.displaySettlementWithChipsOrPopulationNumber(
+                    freeColClient, lib, g,
+                    tile, tileWidth, tileHeight, withNumbers);
+                tv.displayFogOfWar(g, tile);
+                tv.displayOptionalTileText(g, tile);
 
                 g.setTransform(baseTransform);
             });
@@ -1765,7 +1480,8 @@ public final class MapViewer {
                 if (unit.isUndead()) {
                     // Rescale dark halo only in rare case its needed!
                     Image darkness = lib.getMiscImage(ImageLibrary.DARKNESS);
-                    displayCenteredImage(g, darkness, tileWidth, tileHeight);
+                    TileViewer.displayCenteredImage(g, darkness,
+                                                    tileWidth, tileHeight);
                 }
                 displayUnit(g, unit);
 
@@ -1934,24 +1650,10 @@ public final class MapViewer {
     }
 
     /**
-     * Centers the given Image on the tile.
-     *
-     * @param g a <code>Graphics2D</code>
-     * @param image an <code>Image</code>
-     */
-    private static void displayCenteredImage(Graphics2D g, Image image,
-                                    int tileWidth, int tileHeight) {
-        g.drawImage(image,
-                    (tileWidth - image.getWidth(null))/2,
-                    (tileHeight - image.getHeight(null))/2,
-                    null);
-    }
-
-    /**
      * Draws the pentagram indicating a native capital.
      */
     private static BufferedImage createCapitalLabel(int extent, int padding,
-                                     Color backgroundColor) {
+                                                    Color backgroundColor) {
         // create path
         double deg2rad = Math.PI/180.0;
         double angle = -90.0 * deg2rad;
@@ -1981,7 +1683,6 @@ public final class MapViewer {
         g.dispose();
         return bi;
     }
-
 
     /**
      * Creates an BufferedImage that shows the given text centred on a
@@ -2105,105 +1806,6 @@ public final class MapViewer {
         return bi;
     }
 
-    /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Only base terrain will be drawn.
-     *
-     * @param g The Graphics2D object on which to draw the Tile.
-     * @param library The <code>ImageLibrary</code> to use.
-     * @param tile The Tile to draw.
-     */
-    private static void displayTileWithBeachAndBorder(Graphics2D g,
-                                                      ImageLibrary library,
-                                                      Tile tile) {
-        if (tile != null) {
-            int x = tile.getX();
-            int y = tile.getY();
-            // ATTENTION: we assume that all base tiles have the same size
-            g.drawImage(library.getTerrainImage(tile.getType(), x, y),
-                        0, 0, null);
-            if (tile.isExplored()) {
-                if (!tile.isLand() && tile.getStyle() > 0) {
-                    int edgeStyle = tile.getStyle() >> 4;
-                    if (edgeStyle > 0) {
-                        g.drawImage(library.getBeachEdgeImage(edgeStyle, x, y),
-                                    0, 0, null);
-                    }
-                    int cornerStyle = tile.getStyle() & 15;
-                    if (cornerStyle > 0) {
-                        g.drawImage(library.getBeachCornerImage(cornerStyle, x, y),
-                                    0, 0, null);
-                    }
-                }
-
-                List<SortableImage> imageBorders = new ArrayList<>(8);
-                SortableImage si;
-                for (Direction direction : Direction.values()) {
-                    Tile borderingTile = tile.getNeighbourOrNull(direction);
-                    if (borderingTile != null && borderingTile.isExplored()) {
-                        if (tile.getType() == borderingTile.getType()) {
-                            // Equal tiles, no need to draw border
-                        } else if (tile.isLand() && !borderingTile.isLand()) {
-                            // The beach borders are drawn on the side of water tiles only
-                        } else if (!tile.isLand() && borderingTile.isLand()) {
-                            // If there is a Coast image (eg. beach) defined, use it, otherwise skip
-                            // Draw the grass from the neighboring tile, spilling over on the side of this tile
-                            si = new SortableImage(library.getBorderImage(borderingTile.getType(), direction, x, y),
-                                                   borderingTile.getType().getIndex());
-                            imageBorders.add(si);
-                            TileImprovement river = borderingTile.getRiver();
-                            if (river != null && river.isConnectedTo(direction.getReverseDirection())) {
-                                si = new SortableImage(library.getRiverMouthImage(direction, borderingTile
-                                                                                  .getRiver().getMagnitude(), x, y),
-                                                       -1);
-                                imageBorders.add(si);
-                            }
-                        } else {
-                            if (library.getTerrainImage(tile.getType(), 0, 0)
-                                .equals(library.getTerrainImage(borderingTile.getType(), 0, 0))) {
-                                // Do not draw limit between tile that share same graphics (ocean & great river)
-                            } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
-                                // Draw land terrain with bordering land type, or ocean/high seas limit
-                                si = new SortableImage(library.getBorderImage(borderingTile.getType(), direction,
-                                                                              x, y), borderingTile.getType().getIndex());
-                                imageBorders.add(si);
-                            }
-                        }
-                    }
-                }
-                Collections.sort(imageBorders);
-                for (SortableImage sorted : imageBorders) {
-                    g.drawImage(sorted.image, 0, 0, null);
-                }
-            }
-        }
-    }
-
-    /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates.  Fog of war will be
-     * drawn.
-     *
-     * @param g The <code>Graphics2D</code> object on which to draw
-     *     the <code>Tile</code>.
-     * @param tile The <code>Tile</code> to draw.
-     */
-    private static void displayFogOfWar(FreeColClient freeColClient,
-            GeneralPath fog, Graphics2D g, Tile tile) {
-        if (freeColClient.getGame() != null
-            && freeColClient.getGame().getSpecification()
-                .getBoolean(GameOptions.FOG_OF_WAR)
-            && freeColClient.getMyPlayer() != null
-            && !freeColClient.getMyPlayer().canSee(tile)) {
-            g.setColor(Color.BLACK);
-            Composite oldComposite = g.getComposite();
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-                                                      0.2f));
-            g.fill(fog);
-            g.setComposite(oldComposite);
-        }
-    }
-
 
     /**
      * Display a path.
@@ -2249,219 +1851,14 @@ public final class MapViewer {
                 g.setColor(Color.BLACK);
                 g.drawOval(halfWidth, halfHeight, 10, 10);
             } else {
-                displayCenteredImage(g, image, tileWidth, tileHeight);
-                if (turns != null)
-                    displayCenteredImage(g, turns, tileWidth, tileHeight);
+                TileViewer.displayCenteredImage(g, image,
+                                                tileWidth, tileHeight);
+                if (turns != null) {
+                    TileViewer.displayCenteredImage(g, turns,
+                                                    tileWidth, tileHeight);
+                }
             }
             g.translate(-point.x, -point.y);
-        }
-    }
-
-    /**
-     * Displays the Tile text for a Tile.
-     * Shows tile names, coordinates and colony values.
-     *
-     * @param g The Graphics2D object on which the text gets drawn.
-     * @param tile The Tile to draw the text on.
-     */
-    private void displayOptionalTileText(Graphics2D g, Tile tile) {
-        String text = null;
-        int op = freeColClient.getClientOptions()
-            .getInteger(ClientOptions.DISPLAY_TILE_TEXT);
-        switch (op) {
-        case ClientOptions.DISPLAY_TILE_TEXT_NAMES:
-            text = Messages.getName(tile);
-            break;
-        case ClientOptions.DISPLAY_TILE_TEXT_OWNERS:
-            if (tile.getOwner() != null) {
-                text = Messages.message(tile.getOwner().getNationLabel());
-            }
-            break;
-        case ClientOptions.DISPLAY_TILE_TEXT_REGIONS:
-            if (tile.getRegion() != null) {
-                if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
-                    && tile.getRegion().getName() == null) {
-                    text = tile.getRegion().getSuffix();
-                } else {
-                    text = Messages.message(tile.getRegion().getLabel());
-                }
-            }
-            break;
-        case ClientOptions.DISPLAY_TILE_TEXT_EMPTY:
-            break;
-        default:
-            logger.warning("displayTileText option " + op + " out of range");
-            break;
-        }
-
-        g.setColor(Color.BLACK);
-        g.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, lib.getScaleFactor()));
-        if (text != null) {
-            int b = getBreakingPoint(text);
-            if (b == -1) {
-                g.drawString(text,
-                    (tileWidth - g.getFontMetrics().stringWidth(text)) / 2,
-                    (tileHeight - g.getFontMetrics().getAscent()) / 2);
-            } else {
-                g.drawString(text.substring(0, b),
-                    (tileWidth - g.getFontMetrics().stringWidth(text.substring(0, b)))/2,
-                    halfHeight - (g.getFontMetrics().getAscent()*2)/3);
-                g.drawString(text.substring(b+1),
-                    (tileWidth - g.getFontMetrics().stringWidth(text.substring(b+1)))/2,
-                    halfHeight + (g.getFontMetrics().getAscent()*2)/3);
-            }
-        }
-
-        if (FreeColDebugger.debugDisplayCoordinates()) {
-            String posString = tile.getX() + ", " + tile.getY();
-            if (tile.getHighSeasCount() >= 0) {
-                posString += "/" + Integer.toString(tile.getHighSeasCount());
-            }
-            g.drawString(posString,
-                (tileWidth - g.getFontMetrics().stringWidth(posString)) / 2,
-                (tileHeight - g.getFontMetrics().getAscent()) / 2);
-        }
-        String value = DebugUtils.getColonyValue(tile);
-        if (value != null) {
-            g.drawString(value,
-                (tileWidth - g.getFontMetrics().stringWidth(value)) / 2,
-                (tileHeight - g.getFontMetrics().getAscent()) / 2);
-        }
-    }
-
-    /**
-     * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Settlements and Lost
-     * City Rumours will be shown.
-     *
-     * @param g The Graphics2D object on which to draw the Tile.
-     * @param tile The Tile to draw.
-     * @param withNumber Whether to display the number of units present.
-     */
-    private static void displaySettlementWithChipsOrPopulationNumber(
-            FreeColClient freeColClient, ImageLibrary lib, Graphics2D g,
-            Tile tile, int tileWidth, int tileHeight, boolean withNumber) {
-        final Player player = freeColClient.getMyPlayer();
-        final Settlement settlement = tile.getSettlement();
-
-        if (settlement != null) {
-            if (settlement instanceof Colony) {
-                Colony colony = (Colony)settlement;
-
-                // Draw image of colony in center of the tile.
-                Image colonyImage = lib.getSettlementImage(settlement);
-                displayCenteredImage(g, colonyImage, tileWidth, tileHeight);
-
-                if (withNumber) {
-                    String populationString = Integer.toString(
-                        colony.getDisplayUnitCount());
-                    int bonus = colony.getProductionBonus();
-                    Color theColor = ResourceManager.getColor(
-                        "color.map.productionBonus." + bonus);
-                    // if government admits even more units, use
-                    // italic and bigger number icon
-                    Font font = (colony.getPreferredSizeChange() > 0)
-                        ? FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                            FontLibrary.FontSize.SMALLER, Font.BOLD | Font.ITALIC,
-                            lib.getScaleFactor())
-                        : FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                            FontLibrary.FontSize.TINY, Font.BOLD,
-                            lib.getScaleFactor());
-                    Image stringImage = lib.getStringImage(g,
-                        populationString, theColor, font);
-                    displayCenteredImage(g, stringImage, tileWidth, tileHeight);
-                }
-
-            } else if (settlement instanceof IndianSettlement) {
-                IndianSettlement is = (IndianSettlement)settlement;
-                Image settlementImage = lib.getSettlementImage(settlement);
-
-                // Draw image of indian settlement in center of the tile.
-                displayCenteredImage(g, settlementImage, tileWidth, tileHeight);
-
-                Image chip;
-                float xOffset = STATE_OFFSET_X * lib.getScaleFactor();
-                float yOffset = STATE_OFFSET_Y * lib.getScaleFactor();
-                final int colonyLabels = freeColClient.getClientOptions()
-                    .getInteger(ClientOptions.COLONY_LABELS);
-                if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
-                    // Draw the settlement chip
-                    chip = lib.getIndianSettlementChip(g, is);
-                    g.drawImage(chip, (int)xOffset, (int)yOffset, null);
-                    xOffset += chip.getWidth(null) + 2;
-
-                    // Draw the mission chip if needed.
-                    Unit missionary = is.getMissionary();
-                    if (missionary != null) {
-                        boolean expert
-                            = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
-                        g.drawImage(lib.getMissionChip(g, missionary.getOwner(),
-                                                       expert),
-                                    (int)xOffset, (int)yOffset, null);
-                        xOffset += chip.getWidth(null) + 2;
-                    }
-                }
-
-                // Draw the alarm chip if needed.
-                if ((chip = lib.getAlarmChip(g, is, player)) != null) {
-                    g.drawImage(chip, (int)xOffset, (int)yOffset, null);
-                }
-            } else {
-                logger.warning("Bogus settlement: " + settlement);
-            }
-        }
-    }
-
-    /**
-     * Displays the given tile's items onto the given Graphics2D object.
-     * Additions and improvements to Tile will be drawn.
-     * Only works for explored tiles.
-     *
-     * @param g The Graphics2D object on which to draw the Tile.
-     * @param tile The Tile to draw.
-     * @param overlayImage The Image for the tile overlay.
-     */
-    private void displayTileItems(Graphics2D g, Tile tile, Image overlayImage) {
-        // ATTENTION: we assume that only overlays and forests
-        // might be taller than a tile.
-
-        // layer additions and improvements according to zIndex
-        List<TileItem> tileItems = (tile.getTileItemContainer() != null)
-            ? tile.getTileItemContainer().getTileItems()
-            : new ArrayList<TileItem>();
-        int startIndex = 0;
-        for (int index = startIndex; index < tileItems.size(); index++) {
-            if (tileItems.get(index).getZIndex() < Tile.OVERLAY_ZINDEX) {
-                displayTileItem(g, tile, tileItems.get(index));
-                startIndex = index + 1;
-            } else {
-                startIndex = index;
-                break;
-            }
-        }
-        // Tile Overlays (eg. hills and mountains)
-        if (overlayImage != null) {
-            g.drawImage(overlayImage, 0, (tileHeight - overlayImage.getHeight(null)), null);
-        }
-        for (int index = startIndex; index < tileItems.size(); index++) {
-            if (tileItems.get(index).getZIndex() < Tile.FOREST_ZINDEX) {
-                displayTileItem(g, tile, tileItems.get(index));
-                startIndex = index + 1;
-            } else {
-                startIndex = index;
-                break;
-            }
-        }
-        // Forest
-        if (tile.isForested()) {
-            Image forestImage = lib.getForestImage(tile.getType(), tile.getRiverStyle());
-            g.drawImage(forestImage, 0, (tileHeight - forestImage.getHeight(null)), null);
-        }
-
-        // draw all remaining items
-        for (TileItem ti : tileItems.subList(startIndex, tileItems.size())) {
-            displayTileItem(g, tile, ti);
         }
     }
 
@@ -2487,7 +1884,7 @@ public final class MapViewer {
         // Draw an occupation and nation indicator.
         String text = Messages.message(unit.getOccupationLabel(player, false));
         g.drawImage(lib.getOccupationIndicatorChip(g, unit, text),
-                    (int)(STATE_OFFSET_X * lib.getScaleFactor()), 0,
+                    (int)(TileViewer.STATE_OFFSET_X * lib.getScaleFactor()), 0,
                     null);
 
         // Draw one small line for each additional unit (like in civ3).
@@ -2502,9 +1899,9 @@ public final class MapViewer {
         if (unitsOnTile > 1) {
             g.setColor(Color.WHITE);
             int unitLinesY = OTHER_UNITS_OFFSET_Y;
-            int x1 = (int)((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X)
+            int x1 = (int)((TileViewer.STATE_OFFSET_X + OTHER_UNITS_OFFSET_X)
                 * lib.getScaleFactor());
-            int x2 = (int)((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X
+            int x2 = (int)((TileViewer.STATE_OFFSET_X + OTHER_UNITS_OFFSET_X
                     + OTHER_UNITS_WIDTH) * lib.getScaleFactor());
             for (int i = 0; i < unitsOnTile && i < MAX_OTHER_UNITS; i++) {
                 g.drawLine(x1, unitLinesY, x2, unitLinesY);
@@ -2551,57 +1948,6 @@ public final class MapViewer {
     private void displayCursor(Graphics2D g) {
         Image cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
         g.drawImage(cursorImage, 0, 0, null);
-    }
-
-    /**
-     * Draws the given TileItem on the given Tile.
-     */
-    private void displayTileItem(Graphics2D g, Tile tile, TileItem item) {
-        if (item instanceof Resource) {
-            displayResourceTileItem(g, lib, (Resource) item, tileWidth, tileHeight);
-        } else if (item instanceof LostCityRumour) {
-            displayLostCityRumour(g, lib, tileWidth, tileHeight);
-        } else {
-            displayTileImprovement(g, lib, rp, tile, (TileImprovement)item);
-        }
-    }
-
-    private static void displayResourceTileItem(Graphics2D g, ImageLibrary lib,
-                                         Resource item,
-                                         int tileWidth, int tileHeight) {
-        Image bonusImage = lib.getMiscImage("image.tileitem." + item.getType().getId());
-        displayCenteredImage(g, bonusImage, tileWidth, tileHeight);
-    }
-
-    private static void displayLostCityRumour(Graphics2D g, ImageLibrary lib,
-                                           int tileWidth, int tileHeight) {
-        displayCenteredImage(g, lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
-            tileWidth, tileHeight);
-    }
-
-    private static void displayTileImprovement(Graphics2D g, ImageLibrary lib,
-                                               RoadPainter rp,
-                                               Tile tile, TileImprovement  ti) {
-        if (ti.isComplete()) {
-            if (ti.isRoad()) {
-                rp.displayRoad(g, tile);
-            } else if (ti.isRiver()
-                    && ti.getMagnitude() < TileImprovement.FJORD_RIVER) {
-                // @compat 0.10.5
-                // America_large had some bogus rivers in 0.10.5
-                if (ti.getStyle() != null)
-                // end @compat 0.10.5
-                    g.drawImage(lib.getRiverImage(ti.getStyle()), 0, 0, null);
-            } else {
-                String key = "image.tile." + ti.getType().getId();
-                if (ResourceManager.hasImageResource(key)) {
-                    // Has its own Overlay Image in Misc, use it
-                    Image overlay = ResourceManager.getImage(key,
-                        lib.scaleDimension(ImageLibrary.TILE_SIZE));
-                    g.drawImage(overlay, 0, 0, null);
-                }
-            }
-        }
     }
 
     /**

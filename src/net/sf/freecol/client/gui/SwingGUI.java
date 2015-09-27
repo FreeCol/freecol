@@ -115,11 +115,11 @@ public class SwingGUI extends GUI {
     private final GraphicsDevice graphicsDevice;
 
     /**
-     * This is the MapViewer instance used to paint the map tiles
+     * This is the TileViewer instance used to paint the map tiles
      * in the ColonyPanel and other panels.  It should not be scaled
      * along with the default MapViewer.
      */
-    private MapViewer tileMapViewer;
+    private TileViewer tileViewer;
 
     /**
      * The MapViewer instance used by canvas to paint the main map.
@@ -155,7 +155,7 @@ public class SwingGUI extends GUI {
     }
 
     public ImageLibrary getTileImageLibrary() {
-        return tileMapViewer.getImageLibrary();
+        return tileViewer.getImageLibrary();
     }
 
     @Override
@@ -406,7 +406,7 @@ public class SwingGUI extends GUI {
         this.mapViewer = new MapViewer(freeColClient);
         this.canvas = new Canvas(freeColClient, graphicsDevice, this,
                                  desiredWindowSize, mapViewer);
-        this.tileMapViewer = new MapViewer(freeColClient);
+        this.tileViewer = new TileViewer(freeColClient);
 
         // Now that there is a canvas, prepare for language changes.
         LanguageOption o = (LanguageOption)freeColClient.getClientOptions()
@@ -1613,27 +1613,27 @@ public class SwingGUI extends GUI {
         mapViewer.toggleViewMode();
     }
 
-    // Forwarding to tileMapViewer
+    // Forwarding to tileViewer
 
     public static BufferedImage createTileImageWithOverlayAndForest(
             TileType type, float scale) {
-        return MapViewer.createTileImageWithOverlayAndForest(type, scale);
+        return TileViewer.createTileImageWithOverlayAndForest(type, scale);
     }
 
     public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
-        return tileMapViewer.createTileImageWithBeachBorderAndItems(tile);
+        return tileViewer.createTileImageWithBeachBorderAndItems(tile);
     }
 
     public BufferedImage createTileImage(Tile tile) {
-        return tileMapViewer.createTileImage(tile);
+        return tileViewer.createTileImage(tile);
     }
 
     public BufferedImage createColonyTileImage(Tile tile, Colony colony) {
-        return tileMapViewer.createColonyTileImage(tile, colony);
+        return tileViewer.createColonyTileImage(tile, colony);
     }
 
     public void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
-        tileMapViewer.displayColonyTiles(g, tiles, colony);
+        tileViewer.displayColonyTiles(g, tiles, colony);
     }
 
 }
