@@ -91,7 +91,7 @@ public final class TilePanel extends FreeColPanel {
         add(Utility.localizedLabel(template), "span, center");
 
         final ImageLibrary lib = getImageLibrary();
-        BufferedImage image = getGUI().createColonyTileImage(tile, null);
+        BufferedImage image = getGUI().createTileImage(tile);
         add(new JLabel(new ImageIcon(image)), "span, center");
 
         if (tile.getRegion() != null) {

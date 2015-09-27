@@ -493,6 +493,30 @@ public final class MapViewer {
 
     /**
      * Create a <code>BufferedImage</code> and draw a <code>Tile</code> on it.
+     *
+     * @param tile The <code>Tile</code> to draw.
+     * @return The image.
+     */
+    BufferedImage createTileImage(Tile tile) {
+        final TileType tileType = tile.getType();
+        Dimension terrainTileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+        BufferedImage overlayImage = lib.getOverlayImage(tile);
+        final int compoundHeight = (overlayImage != null)
+            ? overlayImage.getHeight()
+            : tileType.isForested()
+                ? lib.scaleDimension(ImageLibrary.TILE_FOREST_SIZE).height
+                : terrainTileSize.height;
+        BufferedImage image = new BufferedImage(
+            terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        g.translate(0, compoundHeight - terrainTileSize.height);
+        displayTile(g, tile, overlayImage);
+        g.dispose();
+        return image;
+    }
+
+    /**
+     * Create a <code>BufferedImage</code> and draw a <code>Tile</code> on it.
      * The visualization of the <code>Tile</code> also includes information
      * from the corresponding <code>ColonyTile</code> of the given
      * <code>Colony</code>.
@@ -548,56 +572,37 @@ public final class MapViewer {
     }
 
     /**
-     * Displays the given <code>Tile</code> onto the given
-     * <code>Graphics2D</code> object at the location specified
-     * by the coordinates. The visualization of the <code>Tile</code>
-     * also includes information from the corresponding
-     * <code>ColonyTile</code> from the given <code>Colony</code>.
+     * Displays the given colony tile.
+     * The visualization of the <code>Tile</code> also includes information
+     * from the corresponding <code>ColonyTile</code> from the given
+     * <code>Colony</code>.
      *
-     * @param g The <code>Graphics2D</code> object on which to draw
-     *      the <code>Tile</code>.
+     * @param g The <code>Graphics2D</code> on which to draw.
      * @param tile The <code>Tile</code> to draw.
      * @param colony The <code>Colony</code> to create the visualization
      *      of the <code>Tile</code> for. This object is also used to
      *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
-     * @param overlayImage The Image for the tile overlay.
+     * @param overlayImage The Image of the tile overlay.
      */
     private void displayColonyTile(Graphics2D g, Tile tile, Colony colony,
                                   Image overlayImage) {
-        boolean tileCannotBeWorked = false;
-        Unit unit = null;
-        int price = 0;
-        if (colony != null) {
-            ColonyTile colonyTile = colony.getColonyTile(tile);
-            unit = colonyTile.getOccupyingUnit();
-            price = colony.getOwner().getLandPrice(tile);
-            switch (colonyTile.getNoWorkReason()) {
-            case NONE: case COLONY_CENTER: case CLAIM_REQUIRED:
-                break;
-            default:
-                tileCannotBeWorked = true;
-            }
-        }
+        displayTile(g, tile, overlayImage);
 
-        displayTileWithBeachAndBorder(g, lib, tile);
-        if (tile != null && tile.isExplored()) {
-            displayTileItems(g, tile, overlayImage);
-            displaySettlementWithChipsOrPopulationNumber(freeColClient, lib,
-                g, tile, tileWidth, tileHeight, false);
-            displayFogOfWar(freeColClient, fog, g, tile);
-            displayOptionalTileText(g, tile);
-        }
-
-        if (tileCannotBeWorked) {
+        ColonyTile colonyTile = colony.getColonyTile(tile);
+        switch (colonyTile.getNoWorkReason()) {
+        case NONE: case COLONY_CENTER: case CLAIM_REQUIRED:
+            break;
+        default:
             g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN),
                         0, 0, null);
         }
-
-        if (price > 0 && tile != null && !tile.hasSettlement()) {
+        int price = colony.getOwner().getLandPrice(tile);
+        if (price > 0 && !tile.hasSettlement()) {
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
             displayCenteredImage(g, image, tileWidth, tileHeight);
         }
 
+        Unit unit = colonyTile.getOccupyingUnit();
         if (unit != null) {
             BufferedImage image = lib.getSmallerUnitImage(unit);
             g.drawImage(image,
@@ -609,6 +614,24 @@ public final class MapViewer {
             g.drawImage(lib.getOccupationIndicatorChip(g, unit, text),
                         (int)(STATE_OFFSET_X * lib.getScaleFactor()),
                         0, null);
+        }
+    }
+
+    /**
+     * Displays the given <code>Tile</code>.
+     *
+     * @param g The Graphics2D on which to draw the <code>Tile</code>.
+     * @param tile The <code>Tile</code> to draw.
+     * @param overlayImage The Image for the tile overlay.
+     */
+    private void displayTile(Graphics2D g, Tile tile, Image overlayImage) {
+        displayTileWithBeachAndBorder(g, lib, tile);
+        if (tile.isExplored()) {
+            displayTileItems(g, tile, overlayImage);
+            displaySettlementWithChipsOrPopulationNumber(freeColClient, lib,
+                g, tile, tileWidth, tileHeight, false);
+            displayFogOfWar(freeColClient, fog, g, tile);
+            displayOptionalTileText(g, tile);
         }
     }
 

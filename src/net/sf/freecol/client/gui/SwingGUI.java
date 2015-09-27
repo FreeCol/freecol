@@ -1624,6 +1624,10 @@ public class SwingGUI extends GUI {
         return tileMapViewer.createTileImageWithBeachBorderAndItems(tile);
     }
 
+    public BufferedImage createTileImage(Tile tile) {
+        return tileMapViewer.createTileImage(tile);
+    }
+
     public BufferedImage createColonyTileImage(Tile tile, Colony colony) {
         return tileMapViewer.createColonyTileImage(tile, colony);
     }
