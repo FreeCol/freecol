@@ -1370,7 +1370,7 @@ public final class MapViewer {
         // Paint full region borders
         if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) ==
                 ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
-            map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+            map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
                 (Tile tile) -> {
                     final int x = tile.getX();
                     final int y = tile.getY();
@@ -1382,7 +1382,7 @@ public final class MapViewer {
         }
 
         // Paint full country borders
-        map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+        map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
             (Tile tile) -> {
                 final int x = tile.getX();
                 final int y = tile.getY();
@@ -1423,7 +1423,7 @@ public final class MapViewer {
         // Paint transparent region borders
         if (options.getInteger(ClientOptions.DISPLAY_TILE_TEXT) ==
                 ClientOptions.DISPLAY_TILE_TEXT_REGIONS) {
-            map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+            map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
                 (Tile tile) -> {
                     final int x = tile.getX();
                     final int y = tile.getY();
@@ -1435,7 +1435,7 @@ public final class MapViewer {
         }
 
         // Paint transparent country borders
-        map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+        map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
             (Tile tile) -> {
                 final int x = tile.getX();
                 final int y = tile.getY();
@@ -1507,7 +1507,10 @@ public final class MapViewer {
                 FontLibrary.FontType.NORMAL, FontLibrary.FontSize.TINY,
                 Font.BOLD);
 
-            map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+            /* For settlement names and territorial borders 1 extra row needs
+               to be drawn in north to prevent missing parts on partial redraws,
+               as they can reach below their tiles, see BR#2580 */
+            map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
                 (Tile tile) -> {
                     Settlement settlement = tile.getSettlement();
                     if(settlement == null)
