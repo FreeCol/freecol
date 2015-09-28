@@ -118,8 +118,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private void buildList() {
         final Specification spec = getSpecification();
         List<TileType> tileList = spec.getTileTypeList();
+        Dimension terrainSize = ImageLibrary.scaleDimension(ImageLibrary.TILE_OVERLAY_SIZE, 0.5f);
         for (TileType type : tileList) {
-            listPanel.add(buildButton(SwingGUI.createTileImageWithOverlayAndForest(type, 0.5f),
+            listPanel.add(buildButton(SwingGUI.createTileImageWithOverlayAndForest(type, terrainSize),
                                       Messages.getName(type),
                                       new TileTypeTransform(type)));
         }

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -74,11 +75,8 @@ public class TerrainDetailPanel
             = new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(),
                                          getName(), null));
         for (TileType t : getSpecification().getTileTypeList()) {
-            // FIXME: Use different method supporting a direct request of an
-            //        image of fixed ICON_SIZE.
-            final float maxTileImageHeight = ImageLibrary.TILE_OVERLAY_SIZE.height;
             Image tile = SwingGUI.createTileImageWithOverlayAndForest(t,
-                ImageLibrary.ICON_SIZE.height / maxTileImageHeight);
+                new Dimension(-1, ImageLibrary.ICON_SIZE.height));
             BufferedImage image = new BufferedImage(tile.getWidth(null),
                 ImageLibrary.ICON_SIZE.height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.createGraphics();
@@ -111,7 +109,8 @@ public class TerrainDetailPanel
         panel.add(nameLabel, "span, align center");
 
         panel.add(Utility.localizedLabel("colopedia.terrain.terrainImage"), "spany 3");
-        Image terrainImage = SwingGUI.createTileImageWithOverlayAndForest(tileType, 1);
+        Image terrainImage = SwingGUI.createTileImageWithOverlayAndForest(
+            tileType, ImageLibrary.TILE_OVERLAY_SIZE);
         panel.add(new JLabel(new ImageIcon(terrainImage)), "spany 3");
 
         List<ResourceType> resourceList = tileType.getResourceTypes();

@@ -153,20 +153,23 @@ public final class TileViewer {
      * Returns the scaled terrain-image for a terrain type (and position 0, 0).
      *
      * @param type The type of the terrain-image to return.
-     * @param scale The scale of the terrain image to return.
+     * @param size The maximum size of the terrain image to return.
      * @return The terrain-image
      */
     static BufferedImage createTileImageWithOverlayAndForest(
-            TileType type, float scale) {
+            TileType type, Dimension size) {
+        Dimension size2 = new Dimension(
+            (size.width > 0) ? size.width
+                             : (2*ImageLibrary.TILE_SIZE.width*size.height +
+                                   (ImageLibrary.TILE_OVERLAY_SIZE.height+1)) /
+                               (2*ImageLibrary.TILE_OVERLAY_SIZE.height),
+            -1);
         BufferedImage terrainImage = ImageLibrary.getTerrainImage(
-            type, 0, 0,
-            ImageLibrary.scaleDimension(ImageLibrary.TILE_SIZE, scale));
+            type, 0, 0, size2);
         BufferedImage overlayImage = ImageLibrary.getOverlayImage(
-            type, type.getId(),
-            ImageLibrary.scaleDimension(ImageLibrary.TILE_OVERLAY_SIZE, scale));
+            type, type.getId(), size2);
         BufferedImage forestImage = type.isForested()
-            ? ImageLibrary.getForestImage(type,
-                ImageLibrary.scaleDimension(ImageLibrary.TILE_FOREST_SIZE, scale))
+            ? ImageLibrary.getForestImage(type, size2)
             : null;
         if (overlayImage == null && forestImage == null) {
             return terrainImage;

@@ -1616,8 +1616,8 @@ public class SwingGUI extends GUI {
     // Forwarding to tileViewer
 
     public static BufferedImage createTileImageWithOverlayAndForest(
-            TileType type, float scale) {
-        return TileViewer.createTileImageWithOverlayAndForest(type, scale);
+            TileType type, Dimension size) {
+        return TileViewer.createTileImageWithOverlayAndForest(type, size);
     }
 
     public BufferedImage createTileImageWithBeachBorderAndItems(Tile tile) {
