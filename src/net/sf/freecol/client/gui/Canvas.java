@@ -963,6 +963,7 @@ public final class Canvas extends JDesktopPane {
      * for the presence of other dialogs.
      */
     private void restartBlinking() {
+        if (mapViewer.getViewMode() != GUI.MOVE_UNITS_MODE) return;
         for (FreeColDialog<?> f : dialogs) {
             if (f.isModal()) return;
         }
@@ -973,7 +974,6 @@ public final class Canvas extends JDesktopPane {
      * Stop blinking on the map.
      */
     private void stopBlinking() {
-        if (mapViewer.getViewMode() != GUI.MOVE_UNITS_MODE) return;
         mapViewer.stopBlinking();
     }
 

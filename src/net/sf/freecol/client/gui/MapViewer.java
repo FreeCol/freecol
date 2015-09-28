@@ -109,7 +109,6 @@ public final class MapViewer {
     private final TileViewer tv;
 
     private TerrainCursor cursor;
-    private volatile boolean blinkingMarqueeEnabled;
 
     private Tile selectedTile;
     private Tile focus = null;
@@ -198,7 +197,6 @@ public final class MapViewer {
         setImageLibraryAndUpdateData(new ImageLibrary());
 
         cursor = null;
-        blinkingMarqueeEnabled = false;
 
         unitsOutForAnimation = new HashMap<>();
         unitsOutForAnimationLabels = new HashMap<>();
@@ -240,6 +238,18 @@ public final class MapViewer {
             logger.fine("Changed to " + ((newViewMode == GUI.MOVE_UNITS_MODE)
                     ? "Move Units" : "View Terrain") + " mode");
             viewMode = newViewMode;
+            if(viewMode == GUI.MOVE_UNITS_MODE)
+                restartBlinking();
+            else
+                stopBlinking();
+            if(activeUnit != null) {
+                Tile tile = activeUnit.getTile();
+                if(isTileVisible(tile))
+                    gui.refreshTile(tile);
+                if(selectedTile != tile && isTileVisible(selectedTile))
+                    gui.refreshTile(selectedTile);
+            } else if(isTileVisible(selectedTile))
+                gui.refreshTile(selectedTile);
             gui.updateMapControls();
         }
     }
@@ -547,11 +557,8 @@ public final class MapViewer {
      * Starts the unit-selection-cursor blinking animation.
      */
     void startCursorBlinking() {
-        blinkingMarqueeEnabled = true;
-
         cursor = new TerrainCursor();
         cursor.addActionListener((ActionEvent ae) -> {
-                if (!blinkingMarqueeEnabled) return;
                 Unit unit = activeUnit;
                 if (unit != null) {
                     Tile tile = unit.getTile();
@@ -562,11 +569,11 @@ public final class MapViewer {
     }
 
     void stopBlinking() {
-        blinkingMarqueeEnabled = false;
+        cursor.stopBlinking();
     }
 
     void restartBlinking() {
-        blinkingMarqueeEnabled = true;
+        cursor.startBlinking();
     }
 
     /**
