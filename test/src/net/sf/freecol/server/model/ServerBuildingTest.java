@@ -254,24 +254,26 @@ public class ServerBuildingTest extends FreeColTestCase {
         // prevent starvation
         colony.addGoods(foodType, 100);
 
+        Building townHall = colony.getBuilding(townHallType);
+        Building lumberMill = colony.getBuilding(lumberMillType);
         Building college = colony.getBuilding(collegeType);
         Iterator<Unit> units = colony.getUnitIterator();
 
+        clearWorkLocation(townHall);
         Unit colonist1 = units.next();
         colonist1.setType(freeColonistType);
-        colonist1.setLocation(colony.getBuilding(townHallType));
-
+        colonist1.setLocation(townHall);
         Unit colonist2 = units.next();
         colonist2.setType(freeColonistType);
-        colonist2.setLocation(colony.getBuilding(townHallType));
+        colonist2.setLocation(townHall);
 
+        clearWorkLocation(lumberMill);
         Unit colonist3 = units.next();
         colonist3.setType(freeColonistType);
-        colonist3.setLocation(colony.getBuilding(lumberMillType));
-
+        colonist3.setLocation(lumberMill);
         Unit colonist4 = units.next();
         colonist4.setType(freeColonistType);
-        colonist4.setLocation(colony.getBuilding(lumberMillType));
+        colonist4.setLocation(lumberMill);
 
         Unit lumberjack = units.next();
         lumberjack.setType(expertLumberJackType);
@@ -285,22 +287,23 @@ public class ServerBuildingTest extends FreeColTestCase {
         Unit ore = units.next();
         ore.setType(expertOreMinerType);
 
-        blacksmith.setLocation(college);
+        clearWorkLocation(college);
         lumberjack.setLocation(college);
-        assertNotNull(blacksmith.getStudent());
         assertNotNull(lumberjack.getStudent());
-
+        blacksmith.setLocation(college);
+        assertNotNull(blacksmith.getStudent());
+        
         assertEquals(4, getUnitList(colony, freeColonistType).size());
-        assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
         assertEquals(1, getUnitList(colony, expertLumberJackType).size());
+        assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
 
         while (4 == getUnitList(colony, freeColonistType).size()) {
             ServerTestHelper.newTurn();
         }
 
         assertEquals(3, getUnitList(colony, freeColonistType).size());
-        assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
         assertEquals(2, getUnitList(colony, expertLumberJackType).size());
+        assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
 
         lumberjack.setLocation(colony.getWorkLocationFor(lumberjack,
                                                          grainType));
