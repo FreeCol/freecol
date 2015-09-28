@@ -159,11 +159,14 @@ public final class TileViewer {
     static BufferedImage createTileImageWithOverlayAndForest(
             TileType type, float scale) {
         BufferedImage terrainImage = ImageLibrary.getTerrainImage(
-            type, 0, 0, scale);
+            type, 0, 0,
+            ImageLibrary.scaleDimension(ImageLibrary.TILE_SIZE, scale));
         BufferedImage overlayImage = ImageLibrary.getOverlayImage(
-            type, type.getId(), scale);
+            type, type.getId(),
+            ImageLibrary.scaleDimension(ImageLibrary.TILE_OVERLAY_SIZE, scale));
         BufferedImage forestImage = type.isForested()
-            ? ImageLibrary.getForestImage(type, scale)
+            ? ImageLibrary.getForestImage(type,
+                ImageLibrary.scaleDimension(ImageLibrary.TILE_FOREST_SIZE, scale))
             : null;
         if (overlayImage == null && forestImage == null) {
             return terrainImage;

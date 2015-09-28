@@ -304,20 +304,22 @@ public final class ImageLibrary {
      * @return The image at the given index.
      */
     public BufferedImage getForestImage(TileType type) {
-        return getForestImage(type, scaleFactor);
+        return getForestImage(type, tileForestSize);
     }
 
-    public BufferedImage getForestImage(TileType type, TileImprovementStyle riverStyle) {
-        return getForestImage(type, riverStyle, scaleFactor);
-    }
-
-    public static BufferedImage getForestImage(TileType type, float scale) {
+    public static BufferedImage getForestImage(TileType type, Dimension size) {
         return ResourceManager.getImage("image.tileforest." + type.getId(),
-                                        scaleDimension(TILE_FOREST_SIZE, scale));
+                                        size);
     }
 
-    public static BufferedImage getForestImage(TileType type, TileImprovementStyle riverStyle, float scale) {
-        Dimension size = scaleDimension(TILE_FOREST_SIZE, scale);
+    public BufferedImage getForestImage(TileType type,
+                                        TileImprovementStyle riverStyle) {
+        return getForestImage(type, riverStyle, tileForestSize);
+    }
+
+    public static BufferedImage getForestImage(TileType type,
+                                               TileImprovementStyle riverStyle,
+                                               Dimension size) {
         if (riverStyle != null) {
             String key = "image.tileforest." + type.getId() + ".s" + riverStyle.getMask();
             // @compat 0.10.6
@@ -522,7 +524,7 @@ public final class ImageLibrary {
      * @return A pseudo-random terrain image.
      */
     public BufferedImage getOverlayImage(Tile tile) {
-        return getOverlayImage(tile.getType(), tile.getId(), scaleFactor);
+        return getOverlayImage(tile.getType(), tile.getId(), tileOverlaySize);
     }
 
     /**
@@ -531,13 +533,14 @@ public final class ImageLibrary {
      *
      * @param type The type of the terrain-image to return.
      * @param id A string used to get a random image.
-     * @param scale The scale of the image to return.
+     * @param size The size of the image to return.
      * @return The terrain-image at the given index.
      */
-    public static BufferedImage getOverlayImage(TileType type, String id, float scale) {
+    public static BufferedImage getOverlayImage(TileType type, String id,
+                                                Dimension size) {
         String prefix = "image.tileoverlay." + type.getId();
         List<String> keys = ResourceManager.getImageKeys(prefix);
-        return getRandomizedImage(keys, id, scale);
+        return getRandomizedImage(keys, id, size);
     }
 
     public static Set<String> createOverlayCache() {
@@ -545,32 +548,32 @@ public final class ImageLibrary {
     }
 
     public BufferedImage getOverlayImage(Tile tile, Set<String> overlayCache) {
-        return getOverlayImage(tile.getType(), tile.getId(), scaleFactor,
+        return getOverlayImage(tile.getType(), tile.getId(), tileOverlaySize,
                                overlayCache);
     }
 
-    public static BufferedImage getOverlayImage(TileType type, String id, float scale,
-                                        Set<String> overlayCache) {
+    public static BufferedImage getOverlayImage(TileType type, String id,
+                                                Dimension size,
+                                                Set<String> overlayCache) {
         final String prefix = "image.tileoverlay." + type.getId() + ".r";
         final List<String> keys = overlayCache.stream()
             .filter(k -> k.startsWith(prefix))
             .collect(Collectors.toList());
-        return getRandomizedImage(keys, id, scale);
+        return getRandomizedImage(keys, id, size);
     }
 
-    private static BufferedImage getRandomizedImage(List<String> keys, String id, float scale) {
+    private static BufferedImage getRandomizedImage(List<String> keys,
+                                                    String id, Dimension size) {
         int count = keys.size();
         switch(count) {
             case 0:
                 return null;
             case 1:
-                return ResourceManager.getImage(keys.get(0),
-                    scaleDimension(TILE_OVERLAY_SIZE, scale));
+                return ResourceManager.getImage(keys.get(0), size);
             default:
                 Collections.sort(keys);
                 return ResourceManager.getImage(
-                    keys.get(Math.abs(id.hashCode() % count)),
-                    scaleDimension(TILE_OVERLAY_SIZE, scale));
+                    keys.get(Math.abs(id.hashCode() % count)), size);
         }
     }
 
@@ -625,31 +628,19 @@ public final class ImageLibrary {
      * @return The image with the given style.
      */
     public BufferedImage getRiverImage(TileImprovementStyle style) {
-        return getRiverImage(style, scaleFactor);
+        return getRiverImage(style.getString(), tileSize);
     }
 
     /**
      * Returns the river image with the given style.
      *
-     * @param style a <code>TileImprovementStyle</code> value
-     * @param scale a <code>double</code> value
+     * @param style the style code
+     * @param size the image size
      * @return The image with the given style.
      */
-    public static BufferedImage getRiverImage(TileImprovementStyle style, float scale) {
-        return getRiverImage(style.getString(), scale);
-    }
-
-    /**
-     * Returns the river image with the given style.
-     *
-     * @param style a <code>String</code> value
-     * @param scale a <code>double</code> value
-     * @return The image with the given style.
-     */
-    public static BufferedImage getRiverImage(String style, float scale) {
+    public static BufferedImage getRiverImage(String style, Dimension size) {
         return ResourceManager.getImage(
-            "image.tile.model.improvement.river.s" + style,
-            scaleDimension(TILE_SIZE, scale));
+            "image.tile.model.improvement.river.s" + style, size);
     }
 
     /**
@@ -727,13 +718,14 @@ public final class ImageLibrary {
      * @return The terrain-image at the given index.
      */
     public BufferedImage getTerrainImage(TileType type, int x, int y) {
-        return getTerrainImage(type, x, y, scaleFactor);
+        return getTerrainImage(type, x, y, tileSize);
     }
 
-    public static BufferedImage getTerrainImage(TileType type, int x, int y, float scale) {
+    public static BufferedImage getTerrainImage(TileType type, int x, int y,
+                                                Dimension size) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
         return ResourceManager.getImage("image.tile." + key + ".center.r"
-            + (isEven(x, y) ? "0" : "1"), scaleDimension(TILE_SIZE, scale));
+            + (isEven(x, y) ? "0" : "1"), size);
     }
 
     public BufferedImage getSmallerUnitImage(Unit unit) {

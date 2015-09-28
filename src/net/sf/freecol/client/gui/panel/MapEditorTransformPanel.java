@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -122,10 +123,11 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                       Messages.getName(type),
                                       new TileTypeTransform(type)));
         }
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("0101", 0.5f),
+        Dimension riverSize = ImageLibrary.scaleDimension(ImageLibrary.TILE_SIZE, 0.5f);
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("0101", riverSize),
                                   Messages.message("mapEditorTransformPanel.minorRiver"),
                                   new RiverTransform(TileImprovement.SMALL_RIVER)));
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", 0.5f),
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", riverSize),
                                   Messages.message("mapEditorTransformPanel.majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
         listPanel.add(buildButton(ImageLibrary.getMiscImage("image.tileitem."
