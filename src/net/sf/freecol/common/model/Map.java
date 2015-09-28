@@ -119,14 +119,10 @@ public class Map extends FreeColGameObject implements Location {
          * @param direction An optional <code>Direction</code> to step.
          */
         public Position(Position start, Direction direction) {
-            int xx = start.x, yy = start.y;
-            if (direction != null) {
-                Position step = direction.step(xx, yy);
-                xx = step.x;
-                yy = step.y;
-            }
-            this.x = xx;
-            this.y = yy;
+            Position step = (direction == null) ? start
+                : direction.step(start.x, start.y);
+            this.x = step.x;
+            this.y = step.y;
         }
 
 
@@ -591,12 +587,8 @@ public class Map extends FreeColGameObject implements Location {
      *      specified tiles are not neighbours.
      */
     public Direction getDirection(Tile t1, Tile t2) {
-        for (Direction d : Direction.values()) {
-            Position step = d.step(t1.getX(), t1.getY());
-            if (step.x == t2.getX()
-                && step.y == t2.getY()) return d;
-        }
-        return null;
+        return (t1 == null || t2 == null) ? null
+            : new Position(t1).getDirection(new Position(t2));
     }
 
     /**
@@ -626,8 +618,7 @@ public class Map extends FreeColGameObject implements Location {
      *     direction, or null if invalid.
      */
     public Tile getAdjacentTile(int x, int y, Direction direction) {
-        Position step = direction.step(x, y);
-        return getTile(step.x, step.y);
+        return getTile(direction.step(x, y));
     }
 
     /**
