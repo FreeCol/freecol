@@ -1326,8 +1326,8 @@ public final class MapViewer {
                 g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
                             (y-y0) * halfHeight);
 
-                TileViewer.displayTileWithBeachAndBorder(g, lib, tile);
-                TileViewer.displayUnknownTileBorder(g, lib, tile);
+                tv.displayTileWithBeachAndBorder(g, tile);
+                tv.displayUnknownTileBorder(g, tile);
 
                 g.setTransform(baseTransform);
             });
@@ -1403,9 +1403,8 @@ public final class MapViewer {
 
                 Image overlayImage = lib.getOverlayImage(tile, overlayCache);
                 tv.displayTileItems(g, tile, overlayImage);
-                TileViewer.displaySettlementWithChipsOrPopulationNumber(
-                    freeColClient, lib, g,
-                    tile, tileWidth, tileHeight, withNumbers);
+                tv.displaySettlementWithChipsOrPopulationNumber(
+                    g, tile, withNumbers);
                 tv.displayFogOfWar(g, tile);
                 tv.displayOptionalTileText(g, tile);
 

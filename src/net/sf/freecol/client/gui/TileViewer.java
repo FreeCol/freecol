@@ -213,7 +213,7 @@ public final class TileViewer {
             terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
         g.translate(0, compoundHeight - terrainTileSize.height);
-        displayTileWithBeachAndBorder(g, lib, tile);
+        displayTileWithBeachAndBorder(g, tile);
         displayTileItems(g, tile, overlayImage);
         g.dispose();
         return image;
@@ -353,11 +353,10 @@ public final class TileViewer {
      * @param overlayImage The Image for the tile overlay.
      */
     private void displayTile(Graphics2D g, Tile tile, Image overlayImage) {
-        displayTileWithBeachAndBorder(g, lib, tile);
+        displayTileWithBeachAndBorder(g, tile);
         if (tile.isExplored()) {
             displayTileItems(g, tile, overlayImage);
-            displaySettlementWithChipsOrPopulationNumber(freeColClient, lib,
-                g, tile, tileWidth, tileHeight, false);
+            displaySettlementWithChipsOrPopulationNumber(g, tile, false);
             displayFogOfWar(g, tile);
             displayOptionalTileText(g, tile);
         }
@@ -406,28 +405,25 @@ public final class TileViewer {
      * location specified by the coordinates. Only base terrain will be drawn.
      *
      * @param g The Graphics2D object on which to draw the Tile.
-     * @param library The <code>ImageLibrary</code> to use.
      * @param tile The Tile to draw.
      */
-    static void displayTileWithBeachAndBorder(Graphics2D g,
-                                              ImageLibrary library,
-                                              Tile tile) {
+    void displayTileWithBeachAndBorder(Graphics2D g, Tile tile) {
         if (tile != null) {
             int x = tile.getX();
             int y = tile.getY();
             // ATTENTION: we assume that all base tiles have the same size
-            g.drawImage(library.getTerrainImage(tile.getType(), x, y),
+            g.drawImage(lib.getTerrainImage(tile.getType(), x, y),
                         0, 0, null);
             if (tile.isExplored()) {
                 if (!tile.isLand() && tile.getStyle() > 0) {
                     int edgeStyle = tile.getStyle() >> 4;
                     if (edgeStyle > 0) {
-                        g.drawImage(library.getBeachEdgeImage(edgeStyle, x, y),
+                        g.drawImage(lib.getBeachEdgeImage(edgeStyle, x, y),
                                     0, 0, null);
                     }
                     int cornerStyle = tile.getStyle() & 15;
                     if (cornerStyle > 0) {
-                        g.drawImage(library.getBeachCornerImage(cornerStyle, x, y),
+                        g.drawImage(lib.getBeachCornerImage(cornerStyle, x, y),
                                     0, 0, null);
                     }
                 }
@@ -444,24 +440,27 @@ public final class TileViewer {
                         } else if (!tile.isLand() && borderingTile.isLand()) {
                             // If there is a Coast image (eg. beach) defined, use it, otherwise skip
                             // Draw the grass from the neighboring tile, spilling over on the side of this tile
-                            si = new SortableImage(library.getBorderImage(borderingTile.getType(), direction, x, y),
-                                                   borderingTile.getType().getIndex());
+                            si = new SortableImage(
+                                lib.getBorderImage(borderingTile.getType(), direction, x, y),
+                                borderingTile.getType().getIndex());
                             imageBorders.add(si);
                             TileImprovement river = borderingTile.getRiver();
                             if (river != null && river.isConnectedTo(direction.getReverseDirection())) {
-                                si = new SortableImage(library.getRiverMouthImage(direction, borderingTile
-                                                                                  .getRiver().getMagnitude(), x, y),
-                                                       -1);
+                                si = new SortableImage(
+                                    lib.getRiverMouthImage(direction,
+                                        borderingTile.getRiver().getMagnitude(), x, y),
+                                    -1);
                                 imageBorders.add(si);
                             }
                         } else {
-                            if (library.getTerrainImage(tile.getType(), 0, 0)
-                                .equals(library.getTerrainImage(borderingTile.getType(), 0, 0))) {
+                            if (lib.getTerrainImage(tile.getType(), 0, 0)
+                                .equals(lib.getTerrainImage(borderingTile.getType(), 0, 0))) {
                                 // Do not draw limit between tile that share same graphics (ocean & great river)
                             } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
                                 // Draw land terrain with bordering land type, or ocean/high seas limit
-                                si = new SortableImage(library.getBorderImage(borderingTile.getType(), direction,
-                                                                              x, y), borderingTile.getType().getIndex());
+                                si = new SortableImage(
+                                    lib.getBorderImage(borderingTile.getType(), direction, x, y),
+                                    borderingTile.getType().getIndex());
                                 imageBorders.add(si);
                             }
                         }
@@ -475,8 +474,7 @@ public final class TileViewer {
         }
     }
 
-    static void displayUnknownTileBorder(Graphics2D g, ImageLibrary lib,
-                                         Tile tile) {
+    void displayUnknownTileBorder(Graphics2D g, Tile tile) {
         for (Direction direction : Direction.values()) {
             Tile borderingTile = tile.getNeighbourOrNull(direction);
             if (borderingTile != null && !borderingTile.isExplored()) {
@@ -593,9 +591,8 @@ public final class TileViewer {
      * @param tile The Tile to draw.
      * @param withNumber Whether to display the number of units present.
      */
-    static void displaySettlementWithChipsOrPopulationNumber(
-            FreeColClient freeColClient, ImageLibrary lib, Graphics2D g,
-            Tile tile, int tileWidth, int tileHeight, boolean withNumber) {
+    void displaySettlementWithChipsOrPopulationNumber(
+            Graphics2D g, Tile tile, boolean withNumber) {
         final Player player = freeColClient.getMyPlayer();
         final Settlement settlement = tile.getSettlement();
 
@@ -724,30 +721,26 @@ public final class TileViewer {
      */
     private void displayTileItem(Graphics2D g, Tile tile, TileItem item) {
         if (item instanceof Resource) {
-            displayResourceTileItem(g, lib, (Resource) item, tileWidth, tileHeight);
+            displayResourceTileItem(g, (Resource) item);
         } else if (item instanceof LostCityRumour) {
-            displayLostCityRumour(g, lib, tileWidth, tileHeight);
+            displayLostCityRumour(g);
         } else {
-            displayTileImprovement(g, lib, rp, tile, (TileImprovement)item);
+            displayTileImprovement(g, tile, (TileImprovement)item);
         }
     }
 
-    private static void displayResourceTileItem(Graphics2D g, ImageLibrary lib,
-                                         Resource item,
-                                         int tileWidth, int tileHeight) {
+    private void displayResourceTileItem(Graphics2D g, Resource item) {
         Image bonusImage = lib.getMiscImage("image.tileitem." + item.getType().getId());
         displayCenteredImage(g, bonusImage, tileWidth, tileHeight);
     }
 
-    private static void displayLostCityRumour(Graphics2D g, ImageLibrary lib,
-                                           int tileWidth, int tileHeight) {
+    private void displayLostCityRumour(Graphics2D g) {
         displayCenteredImage(g, lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
             tileWidth, tileHeight);
     }
 
-    private static void displayTileImprovement(Graphics2D g, ImageLibrary lib,
-                                               RoadPainter rp,
-                                               Tile tile, TileImprovement  ti) {
+    private void displayTileImprovement(Graphics2D g,
+                                        Tile tile, TileImprovement  ti) {
         if (ti.isComplete()) {
             if (ti.isRoad()) {
                 rp.displayRoad(g, tile);
