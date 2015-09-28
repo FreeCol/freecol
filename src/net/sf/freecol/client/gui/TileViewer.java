@@ -202,12 +202,12 @@ public final class TileViewer {
         if (!tile.isExplored())
             return lib.getTerrainImage(null, tile.getX(), tile.getY());
         final TileType tileType = tile.getType();
-        Dimension terrainTileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+        Dimension terrainTileSize = lib.tileSize;
         BufferedImage overlayImage = lib.getOverlayImage(tile);
         final int compoundHeight = (overlayImage != null)
             ? overlayImage.getHeight()
             : tileType.isForested()
-                ? lib.scaleDimension(ImageLibrary.TILE_FOREST_SIZE).height
+                ? lib.tileForestSize.height
                 : terrainTileSize.height;
         BufferedImage image = new BufferedImage(
             terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
@@ -227,12 +227,12 @@ public final class TileViewer {
      */
     BufferedImage createTileImage(Tile tile) {
         final TileType tileType = tile.getType();
-        Dimension terrainTileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+        Dimension terrainTileSize = lib.tileSize;
         BufferedImage overlayImage = lib.getOverlayImage(tile);
         final int compoundHeight = (overlayImage != null)
             ? overlayImage.getHeight()
             : tileType.isForested()
-                ? lib.scaleDimension(ImageLibrary.TILE_FOREST_SIZE).height
+                ? lib.tileForestSize.height
                 : terrainTileSize.height;
         BufferedImage image = new BufferedImage(
             terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
@@ -257,12 +257,12 @@ public final class TileViewer {
      */
     BufferedImage createColonyTileImage(Tile tile, Colony colony) {
         final TileType tileType = tile.getType();
-        Dimension terrainTileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+        Dimension terrainTileSize = lib.tileSize;
         BufferedImage overlayImage = lib.getOverlayImage(tile);
         final int compoundHeight = (overlayImage != null)
             ? overlayImage.getHeight()
             : tileType.isForested()
-                ? lib.scaleDimension(ImageLibrary.TILE_FOREST_SIZE).height
+                ? lib.tileForestSize.height
                 : terrainTileSize.height;
         BufferedImage image = new BufferedImage(
             terrainTileSize.width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
@@ -284,7 +284,7 @@ public final class TileViewer {
      */
     void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
-        Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+        Dimension tileSize = lib.tileSize;
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 if (tiles[x][y] != null) {
@@ -372,7 +372,7 @@ public final class TileViewer {
     void setImageLibraryAndUpdateData(ImageLibrary lib) {
         this.lib = lib;
         // ATTENTION: we assume that all base tiles have the same size
-        Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+        Dimension tileSize = lib.tileSize;
         rp = new RoadPainter(tileSize);
         tileHeight = tileSize.height;
         tileWidth = tileSize.width;
@@ -763,7 +763,7 @@ public final class TileViewer {
                 if (ResourceManager.hasImageResource(key)) {
                     // Has its own Overlay Image in Misc, use it
                     Image overlay = ResourceManager.getImage(key,
-                        lib.scaleDimension(ImageLibrary.TILE_SIZE));
+                        lib.tileSize);
                     g.drawImage(overlay, 0, 0, null);
                 }
             }

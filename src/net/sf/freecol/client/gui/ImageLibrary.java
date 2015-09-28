@@ -150,6 +150,8 @@ public final class ImageLibrary {
      */
     private final float scaleFactor;
 
+    final Dimension tileSize, tileOverlaySize, tileForestSize;
+
     private final HashMap<String,BufferedImage> stringImageCache;
 
     /**
@@ -174,6 +176,9 @@ public final class ImageLibrary {
      */
     public ImageLibrary(float scaleFactor) {
         this.scaleFactor = scaleFactor;
+        tileSize = scaleDimension(TILE_SIZE, scaleFactor);
+        tileOverlaySize = scaleDimension(TILE_OVERLAY_SIZE, scaleFactor);
+        tileForestSize = scaleDimension(TILE_FOREST_SIZE, scaleFactor);
         stringImageCache = new HashMap<>();
     }
 
@@ -256,7 +261,7 @@ public final class ImageLibrary {
     public BufferedImage getBeachCornerImage(int index, int x, int y) {
         return ResourceManager.getImage("image.tile.model.tile.beach.corner" + index
                                         + ".r" + ((isEven(x, y)) ? "0" : "1"),
-                                        scaleDimension(TILE_SIZE));
+                                        tileSize);
     }
 
     /**
@@ -270,7 +275,7 @@ public final class ImageLibrary {
     public BufferedImage getBeachEdgeImage(int index, int x, int y) {
         return ResourceManager.getImage("image.tile.model.tile.beach.edge" + index
                                         + ".r"+ ((isEven(x, y)) ? "0" : "1"),
-                                        scaleDimension(TILE_SIZE));
+                                        tileSize);
     }
 
     /**
@@ -289,7 +294,7 @@ public final class ImageLibrary {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
         return ResourceManager.getImage("image.tile." + key + ".border." + direction
                                         + ".r" + ((isEven(x, y)) ?  "0" : "1"),
-                                        scaleDimension(TILE_SIZE));
+                                        tileSize);
     }
 
     /**
@@ -662,7 +667,7 @@ public final class ImageLibrary {
                                     int x, int y) {
         String key = "image.tile.model.tile.delta." + direction
             + (magnitude == 1 ? ".small" : ".large");
-        return ResourceManager.getImage(key, scaleDimension(TILE_SIZE));
+        return ResourceManager.getImage(key, tileSize);
     }
 
     public BufferedImage getSmallSettlementImage(Settlement settlement) {

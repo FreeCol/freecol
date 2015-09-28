@@ -1236,7 +1236,7 @@ public final class MapViewer {
         this.lib = lib;
         tv.setImageLibraryAndUpdateData(lib);
         // ATTENTION: we assume that all base tiles have the same size
-        Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+        Dimension tileSize = lib.tileSize;
         tileHeight = tileSize.height;
         tileWidth = tileSize.width;
         halfHeight = tileHeight/2;
