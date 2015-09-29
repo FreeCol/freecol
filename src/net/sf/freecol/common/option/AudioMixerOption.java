@@ -144,7 +144,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
      * @param name The mixer wrapper name.
      * @return The mixer wrapper with the name given, or null if none.
      */
-    public MixerWrapper getMixerWrapper(String name) {
+    private MixerWrapper getMixerWrapperByName(String name) {
         for (MixerWrapper mw : audioMixers) {
             if (mw.getKey().equals(name)) return mw;
         }
@@ -205,10 +205,10 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     protected void setValue(String valueString, String defaultValueString) {
         MixerWrapper mw = null;
         if (mw == null && valueString != null) {
-            mw = getMixerWrapper(valueString);
+            mw = getMixerWrapperByName(valueString);
         }
         if (mw == null && defaultValueString != null) {
-            mw = getMixerWrapper(defaultValueString);
+            mw = getMixerWrapperByName(defaultValueString);
         }
         if (mw == null) mw = DEFAULT_MIXER_WRAPPER;
         setValue(mw);
