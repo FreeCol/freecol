@@ -1285,7 +1285,8 @@ public final class MapViewer {
      */
     void displayMap(Graphics2D g) {
         final ClientOptions options = freeColClient.getClientOptions();
-        Map map = freeColClient.getGame().getMap();
+        Game game = freeColClient.getGame();
+        Map map = game.getMap();
 
         // Remember transform
         AffineTransform originTransform = g.getTransform();
@@ -1470,28 +1471,50 @@ public final class MapViewer {
 
         // Display units
         g.setColor(Color.BLACK);
-        map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
-            (Tile tile) -> {
-                // check for units
-                Unit unit = findUnitInFront(tile);
-                if (unit == null || isOutForAnimation(unit))
-                    return;
+        if(!game.isInRevengeMode()) {
+            map.forSubMap(x0, y0, lastColumn-firstColumn+1, lastRow-firstRow+1,
+                (Tile tile) -> {
+                    // check for units
+                    Unit unit = findUnitInFront(tile);
+                    if (unit == null || isOutForAnimation(unit))
+                        return;
 
-                final int x = tile.getX();
-                final int y = tile.getY();
-                g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
-                            (y-y0) * halfHeight);
+                    final int x = tile.getX();
+                    final int y = tile.getY();
+                    g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
+                                (y-y0) * halfHeight);
 
-                if (unit.isUndead()) {
-                    // Rescale dark halo only in rare case its needed!
-                    Image darkness = lib.getMiscImage(ImageLibrary.DARKNESS);
-                    TileViewer.displayCenteredImage(g, darkness,
-                                                    tileWidth, tileHeight);
-                }
-                displayUnit(g, unit);
+                    displayUnit(g, unit);
 
-                g.setTransform(baseTransform);
-            });
+                    g.setTransform(baseTransform);
+                });
+        } else {
+            /* Add extra rows and colums, as the dark halo is huge to enable
+               a very slow fade into transparency, see BR#2580 */
+            map.forSubMap(x0-2, y0-4, lastColumn-firstColumn+1+4, lastRow-firstRow+1+8,
+                (Tile tile) -> {
+                    // check for units
+                    Unit unit = findUnitInFront(tile);
+                    if (unit == null)
+                        return;
+
+                    final int x = tile.getX();
+                    final int y = tile.getY();
+                    g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
+                                (y-y0) * halfHeight);
+
+                    if (unit.isUndead()) {
+                        // Rescale dark halo only in rare case its needed!
+                        Image darkness = lib.getMiscImage(ImageLibrary.DARKNESS);
+                        TileViewer.displayCenteredImage(g, darkness,
+                                                        tileWidth, tileHeight);
+                    }
+                    if (!isOutForAnimation(unit))
+                        displayUnit(g, unit);
+
+                    g.setTransform(baseTransform);
+                });
+        }
 
         // Display the colony names, if needed
         if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
