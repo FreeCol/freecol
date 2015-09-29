@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.util.CachingFunction;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -326,11 +327,13 @@ public class NativeAIPlayer extends AIPlayer {
         // Also favour units native to the settlement.
         final int homeBonus = 3;
         final Tile isTile = is.getTile();
-        final ToIntFunction<Unit> scoreHome = u -> {
-            final Tile t = u.getTile();
-            return t.getDistanceTo(isTile)
-                - ((u.getHomeIndianSettlement() == is) ? homeBonus : 0);
-        };
+        final ToIntFunction<Unit> scoreHome = u ->
+            new CachingFunction<Unit, Integer>(unit -> {
+                    final Tile t = unit.getTile();
+                    return t.getDistanceTo(isTile)
+                        - ((unit.getHomeIndianSettlement() == is) ? homeBonus
+                            : 0);
+                }).apply(u);
         final Comparator<Unit> isComparator
             = Comparator.comparingInt(scoreHome);
 

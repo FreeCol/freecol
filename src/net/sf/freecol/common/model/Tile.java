@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.ToDoubleFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -38,6 +39,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.util.CachingFunction;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -201,10 +203,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * null in clients.
      */
     private final java.util.Map<Player, IndianSettlementInternals> playerIndianSettlements;
-
-    /** A comparator to sort by descending defence value. */
-    private final Comparator<Tile> defenceValueComparator
-        = Comparator.comparingDouble(Tile::getDefenceValue).reversed();
 
 
     /**
@@ -1384,10 +1382,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of land <code>Tile</code>s.
      */
     public List<Tile> getSafestSurroundingLandTiles(Player player) {
+        final ToDoubleFunction<Tile> safeness = t ->
+            new CachingFunction<Tile, Double>(Tile::getDefenceValue).apply(t);
         return getSurroundingTiles(0, 1).stream()
             .filter(t -> t.isLand()
                 && (!t.hasSettlement() || player.owns(t.getSettlement())))
-            .sorted(defenceValueComparator).collect(Collectors.toList());
+            .sorted(Comparator.comparingDouble(safeness).reversed())
+            .collect(Collectors.toList());
     }
                     
     /**

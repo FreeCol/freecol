@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.util.CachingFunction;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -2781,8 +2782,10 @@ public class Unit extends GoodsLocation
      * @return The nearest <code>Colony</code>, or null if none found.
      */
     public Colony getClosestColony(Stream<Colony> colonies) {
-        ToIntFunction<Colony> closeness = c -> (c == null) ? MANY_TURNS-1
-            : this.getTurnsToReach(c);
+        ToIntFunction<Colony> closeness = c ->
+            new CachingFunction<Colony, Integer>(col ->
+                (col == null) ? MANY_TURNS-1 : this.getTurnsToReach(col))
+            .apply(c);
         return Stream.concat(Stream.of((Colony)null), colonies)
             .collect(Collectors.minBy(Comparator.comparingInt(closeness)))
             .orElse(null);
