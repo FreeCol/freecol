@@ -708,6 +708,16 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Is this game in revenge mode?
+     *
+     * @return True if an undead player is present.
+     */
+    public boolean isInRevengeMode() {
+        return getPlayers().stream()
+            .filter(p -> p.isUndead()).findFirst().isPresent();
+    }
+
+    /**
      * Gets the current player.
      *
      * @return The current player.
