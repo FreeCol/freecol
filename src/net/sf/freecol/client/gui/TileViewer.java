@@ -25,7 +25,6 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -73,10 +72,10 @@ public final class TileViewer {
 
     private static class SortableImage implements Comparable<SortableImage> {
 
-        public final Image image;
+        public final BufferedImage image;
         public final int index;
 
-        public SortableImage(Image image, int index) {
+        public SortableImage(BufferedImage image, int index) {
             this.image = image;
             this.index = index;
         }
@@ -297,7 +296,8 @@ public final class TileViewer {
                     int xx = (((2 - x) + y) * tileSize.width) / 2;
                     int yy = ((x + y) * tileSize.height) / 2;
                     g.translate(xx, yy);
-                    Image overlayImage = lib.getOverlayImage(tiles[x][y], overlayCache);
+                    BufferedImage overlayImage = lib.getOverlayImage(
+                        tiles[x][y], overlayCache);
                     displayColonyTile(g, tiles[x][y], colony, overlayImage);
                     g.translate(-xx, -yy);
                 }
@@ -316,10 +316,10 @@ public final class TileViewer {
      * @param colony The <code>Colony</code> to create the visualization
      *      of the <code>Tile</code> for. This object is also used to
      *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
-     * @param overlayImage The Image of the tile overlay.
+     * @param overlayImage The BufferedImage of the tile overlay.
      */
     private void displayColonyTile(Graphics2D g, Tile tile, Colony colony,
-                                  Image overlayImage) {
+                                  BufferedImage overlayImage) {
         displayTile(g, tile, overlayImage);
 
         ColonyTile colonyTile = colony.getColonyTile(tile);
@@ -332,8 +332,9 @@ public final class TileViewer {
         }
         int price = colony.getOwner().getLandPrice(tile);
         if (price > 0 && !tile.hasSettlement()) {
-            Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
-            displayCenteredImage(g, image, tileWidth, tileHeight);
+            BufferedImage image = lib.getMiscImage(
+                ImageLibrary.TILE_OWNED_BY_INDIANS);
+            displayCenteredImage(g, image);
         }
 
         Unit unit = colonyTile.getOccupyingUnit();
@@ -356,9 +357,9 @@ public final class TileViewer {
      *
      * @param g The Graphics2D on which to draw the <code>Tile</code>.
      * @param tile The <code>Tile</code> to draw.
-     * @param overlayImage The Image for the tile overlay.
+     * @param overlayImage The BufferedImage for the tile overlay.
      */
-    private void displayTile(Graphics2D g, Tile tile, Image overlayImage) {
+    private void displayTile(Graphics2D g, Tile tile, BufferedImage overlayImage) {
         displayTileWithBeachAndBorder(g, tile);
         if (tile.isExplored()) {
             displayTileItems(g, tile, overlayImage);
@@ -396,13 +397,12 @@ public final class TileViewer {
      * Centers the given Image on the tile.
      *
      * @param g a <code>Graphics2D</code>
-     * @param image an <code>Image</code>
+     * @param image the BufferedImage
      */
-    static void displayCenteredImage(Graphics2D g, Image image,
-                                     int tileWidth, int tileHeight) {
+    void displayCenteredImage(Graphics2D g, BufferedImage image) {
         g.drawImage(image,
-                    (tileWidth - image.getWidth(null))/2,
-                    (tileHeight - image.getHeight(null))/2,
+                    (tileWidth - image.getWidth())/2,
+                    (tileHeight - image.getHeight())/2,
                     null);
     }
 
@@ -411,7 +411,7 @@ public final class TileViewer {
      * over tiles south of it.
      *
      * @param g a <code>Graphics2D</code>
-     * @param image the image
+     * @param image the BufferedImage
      */
     void displayLargeCenteredImage(Graphics2D g, BufferedImage image) {
         int y = tileHeight - image.getHeight();
@@ -639,19 +639,19 @@ public final class TileViewer {
                         : FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
                             FontLibrary.FontSize.TINY, Font.BOLD,
                             lib.getScaleFactor());
-                    Image stringImage = lib.getStringImage(g,
+                    BufferedImage stringImage = lib.getStringImage(g,
                         populationString, theColor, font);
-                    displayCenteredImage(g, stringImage, tileWidth, tileHeight);
+                    displayCenteredImage(g, stringImage);
                 }
 
             } else if (settlement instanceof IndianSettlement) {
                 IndianSettlement is = (IndianSettlement)settlement;
-                Image settlementImage = lib.getSettlementImage(settlement);
+                BufferedImage settlementImage = lib.getSettlementImage(settlement);
 
                 // Draw image of indian settlement in center of the tile.
-                displayCenteredImage(g, settlementImage, tileWidth, tileHeight);
+                displayCenteredImage(g, settlementImage);
 
-                Image chip;
+                BufferedImage chip;
                 float xOffset = STATE_OFFSET_X * lib.getScaleFactor();
                 float yOffset = STATE_OFFSET_Y * lib.getScaleFactor();
                 final int colonyLabels = freeColClient.getClientOptions()
@@ -660,7 +660,7 @@ public final class TileViewer {
                     // Draw the settlement chip
                     chip = lib.getIndianSettlementChip(g, is);
                     g.drawImage(chip, (int)xOffset, (int)yOffset, null);
-                    xOffset += chip.getWidth(null) + 2;
+                    xOffset += chip.getWidth() + 2;
 
                     // Draw the mission chip if needed.
                     Unit missionary = is.getMissionary();
@@ -670,7 +670,7 @@ public final class TileViewer {
                         g.drawImage(lib.getMissionChip(g, missionary.getOwner(),
                                                        expert),
                                     (int)xOffset, (int)yOffset, null);
-                        xOffset += chip.getWidth(null) + 2;
+                        xOffset += chip.getWidth() + 2;
                     }
                 }
 
@@ -691,9 +691,9 @@ public final class TileViewer {
      *
      * @param g The Graphics2D object on which to draw the Tile.
      * @param tile The Tile to draw.
-     * @param overlayImage The Image for the tile overlay.
+     * @param overlayImage The BufferedImage for the tile overlay.
      */
-    void displayTileItems(Graphics2D g, Tile tile, Image overlayImage) {
+    void displayTileItems(Graphics2D g, Tile tile, BufferedImage overlayImage) {
         // ATTENTION: we assume that only overlays and forests
         // might be taller than a tile.
 
@@ -713,7 +713,8 @@ public final class TileViewer {
         }
         // Tile Overlays (eg. hills and mountains)
         if (overlayImage != null) {
-            g.drawImage(overlayImage, 0, (tileHeight - overlayImage.getHeight(null)), null);
+            g.drawImage(overlayImage,
+                0, (tileHeight - overlayImage.getHeight()), null);
         }
         for (int index = startIndex; index < tileItems.size(); index++) {
             if (tileItems.get(index).getZIndex() < Tile.FOREST_ZINDEX) {
@@ -726,8 +727,10 @@ public final class TileViewer {
         }
         // Forest
         if (tile.isForested()) {
-            Image forestImage = lib.getForestImage(tile.getType(), tile.getRiverStyle());
-            g.drawImage(forestImage, 0, (tileHeight - forestImage.getHeight(null)), null);
+            BufferedImage forestImage = lib.getForestImage(
+                tile.getType(), tile.getRiverStyle());
+            g.drawImage(forestImage,
+                0, (tileHeight - forestImage.getHeight()), null);
         }
 
         // draw all remaining items
@@ -750,13 +753,14 @@ public final class TileViewer {
     }
 
     private void displayResourceTileItem(Graphics2D g, Resource item) {
-        Image bonusImage = lib.getMiscImage("image.tileitem." + item.getType().getId());
-        displayCenteredImage(g, bonusImage, tileWidth, tileHeight);
+        BufferedImage bonusImage = lib.getMiscImage(
+            "image.tileitem." + item.getType().getId());
+        displayCenteredImage(g, bonusImage);
     }
 
     private void displayLostCityRumour(Graphics2D g) {
-        displayCenteredImage(g, lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
-            tileWidth, tileHeight);
+        displayCenteredImage(g,
+            lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR));
     }
 
     private void displayTileImprovement(Graphics2D g,
@@ -775,7 +779,7 @@ public final class TileViewer {
                 String key = "image.tile." + ti.getType().getId();
                 if (ResourceManager.hasImageResource(key)) {
                     // Has its own Overlay Image in Misc, use it
-                    Image overlay = ResourceManager.getImage(key,
+                    BufferedImage overlay = ResourceManager.getImage(key,
                         lib.tileSize);
                     g.drawImage(overlay, 0, 0, null);
                 }

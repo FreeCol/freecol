@@ -24,7 +24,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -443,15 +442,15 @@ public final class MapViewer {
      * @return A JLabel object with the unit's image.
      */
     private JLabel createUnitLabel(Unit unit) {
-        final Image unitImg = lib.getUnitImage(unit);
-        final int width = halfWidth + unitImg.getWidth(null)/2;
-        final int height = unitImg.getHeight(null);
+        final BufferedImage unitImg = lib.getUnitImage(unit);
+        final int width = halfWidth + unitImg.getWidth()/2;
+        final int height = unitImg.getHeight();
 
         BufferedImage img = new BufferedImage(width, height,
                                               BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = img.createGraphics();
 
-        final int unitX = (width - unitImg.getWidth(null)) / 2;
+        final int unitX = (width - unitImg.getWidth()) / 2;
         g.drawImage(unitImg, unitX, 0, null);
 
         Player player = freeColClient.getMyPlayer();
@@ -1409,7 +1408,7 @@ public final class MapViewer {
                 g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
                             (y-y0) * halfHeight);
 
-                Image overlayImage = lib.getOverlayImage(tile, overlayCache);
+                BufferedImage overlayImage = lib.getOverlayImage(tile, overlayCache);
                 tv.displayTileItems(g, tile, overlayImage);
                 tv.displaySettlementWithChipsOrPopulationNumber(
                     g, tile, withNumbers);
@@ -1505,9 +1504,8 @@ public final class MapViewer {
 
                     if (unit.isUndead()) {
                         // Rescale dark halo only in rare case its needed!
-                        Image darkness = lib.getMiscImage(ImageLibrary.DARKNESS);
-                        TileViewer.displayCenteredImage(g, darkness,
-                                                        tileWidth, tileHeight);
+                        BufferedImage darkness = lib.getMiscImage(ImageLibrary.DARKNESS);
+                        tv.displayCenteredImage(g, darkness);
                     }
                     if (!isOutForAnimation(unit))
                         displayUnit(g, unit);
@@ -1577,12 +1575,12 @@ public final class MapViewer {
 
         Color backgroundColor = settlement.getOwner().getNationColor();
         if (backgroundColor == null) backgroundColor = Color.WHITE;
-        // int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
+        // int yOffset = lib.getSettlementImage(settlement).getHeight() + 1;
         int yOffset = tileHeight;
         switch (colonyLabels) {
         case ClientOptions.COLONY_LABELS_CLASSIC:
-            Image img = lib.getStringImage(g, name, backgroundColor, font);
-            g.drawImage(img, (tileWidth - img.getWidth(null))/2 + 1,
+            BufferedImage img = lib.getStringImage(g, name, backgroundColor, font);
+            g.drawImage(img, (tileWidth - img.getWidth())/2 + 1,
                         yOffset, null);
             break;
 
@@ -1605,11 +1603,11 @@ public final class MapViewer {
             }
             specs[0] = new TextSpecification(name, font);
 
-            Image nameImage = createLabel(g, specs, backgroundColor);
+            BufferedImage nameImage = createLabel(g, specs, backgroundColor);
             if (nameImage != null) {
                 int spacing = 3;
-                Image leftImage = null;
-                Image rightImage = null;
+                BufferedImage leftImage = null;
+                BufferedImage rightImage = null;
                 if (settlement instanceof Colony) {
                     Colony colony = (Colony)settlement;
                     String string = Integer.toString(
@@ -1632,7 +1630,7 @@ public final class MapViewer {
                     IndianSettlement is = (IndianSettlement) settlement;
                     if (is.getType().isCapital()) {
                         leftImage = createCapitalLabel(
-                            nameImage.getHeight(null), 5, backgroundColor);
+                            nameImage.getHeight(), 5, backgroundColor);
                     }
 
                     Unit missionary = is.getMissionary();
@@ -1646,32 +1644,32 @@ public final class MapViewer {
                             backgroundColor.getGreen(),
                             backgroundColor.getBlue(), 128);
                         rightImage = createReligiousMissionLabel(
-                            nameImage.getHeight(null), 5,
+                            nameImage.getHeight(), 5,
                             backgroundColor, expert);
                     }
                 }
 
-                int width = (int)((nameImage.getWidth(null)
+                int width = (int)((nameImage.getWidth()
                         * lib.getScaleFactor())
                     + ((leftImage != null)
-                        ? (leftImage.getWidth(null)
+                        ? (leftImage.getWidth()
                             * lib.getScaleFactor()) + spacing
                         : 0)
                     + ((rightImage != null)
-                        ? (rightImage.getWidth(null)
+                        ? (rightImage.getWidth()
                             * lib.getScaleFactor()) + spacing
                         : 0));
                 int labelOffset = (tileWidth - width)/2;
-                yOffset -= (nameImage.getHeight(null)
+                yOffset -= (nameImage.getHeight()
                     * lib.getScaleFactor())/2;
                 if (leftImage != null) {
                     g.drawImage(leftImage, labelOffset, yOffset, null);
-                    labelOffset += (leftImage.getWidth(null)
+                    labelOffset += (leftImage.getWidth()
                         * lib.getScaleFactor()) + spacing;
                 }
                 g.drawImage(nameImage, labelOffset, yOffset, null);
                 if (rightImage != null) {
-                    labelOffset += (nameImage.getWidth(null)
+                    labelOffset += (nameImage.getWidth()
                         * lib.getScaleFactor()) + spacing;
                     g.drawImage(rightImage, labelOffset, yOffset, null);
                 }
@@ -1856,13 +1854,13 @@ public final class MapViewer {
             Point point = calculateTilePosition(tile);
             if (point == null) continue;
 
-            Image image = (p.isOnCarrier())
+            BufferedImage image = (p.isOnCarrier())
                 ? ImageLibrary.getPathImage(ImageLibrary.PathType.NAVAL)
                 : (activeUnit != null)
                 ? ImageLibrary.getPathImage(activeUnit)
                 : null;
 
-            Image turns = (p.getTurns() <= 0) ? null
+            BufferedImage turns = (p.getTurns() <= 0) ? null
                 : lib.getStringImage(g, Integer.toString(p.getTurns()),
                                       Color.WHITE, font);
             g.setColor((turns == null) ? Color.GREEN : Color.RED);
@@ -1882,11 +1880,9 @@ public final class MapViewer {
                 g.setColor(Color.BLACK);
                 g.drawOval(halfWidth, halfHeight, 10, 10);
             } else {
-                TileViewer.displayCenteredImage(g, image,
-                                                tileWidth, tileHeight);
+                tv.displayCenteredImage(g, image);
                 if (turns != null) {
-                    TileViewer.displayCenteredImage(g, turns,
-                                                    tileWidth, tileHeight);
+                    tv.displayCenteredImage(g, turns);
                 }
             }
             g.translate(-point.x, -point.y);
@@ -1908,7 +1904,7 @@ public final class MapViewer {
         boolean fade = (unit.getState() == Unit.UnitState.SENTRY)
             || (unit.hasTile()
                 && player != null && !player.canSee(unit.getTile()));
-        Image image = lib.getUnitImage(unit, fade);
+        BufferedImage image = lib.getUnitImage(unit, fade);
         Point p = calculateUnitImagePositionInTile(image);
         g.drawImage(image, p.x, p.y, null);
 
@@ -1968,16 +1964,16 @@ public final class MapViewer {
      * @param unitImage The unit's image
      * @return The coordinates where the unit should be drawn onscreen
      */
-    private Point calculateUnitImagePositionInTile(Image unitImage) {
-        int unitX = (tileWidth - unitImage.getWidth(null)) / 2;
-        int unitY = (tileHeight - unitImage.getHeight(null)) / 2 -
+    private Point calculateUnitImagePositionInTile(BufferedImage unitImage) {
+        int unitX = (tileWidth - unitImage.getWidth()) / 2;
+        int unitY = (tileHeight - unitImage.getHeight()) / 2 -
                     (int) (UNIT_OFFSET * lib.getScaleFactor());
 
         return new Point(unitX, unitY);
     }
 
     private void displayCursor(Graphics2D g) {
-        Image cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
+        BufferedImage cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
         g.drawImage(cursorImage, 0, 0, null);
     }
 
