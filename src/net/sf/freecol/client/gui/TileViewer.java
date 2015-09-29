@@ -743,12 +743,12 @@ public final class TileViewer {
      * Draws the given TileItem on the given Tile.
      */
     private void displayTileItem(Graphics2D g, Tile tile, TileItem item) {
-        if (item instanceof Resource) {
-            displayResourceTileItem(g, (Resource) item);
+        if (item instanceof TileImprovement) {
+            displayTileImprovement(g, tile, (TileImprovement)item);
         } else if (item instanceof LostCityRumour) {
             displayLostCityRumour(g);
         } else {
-            displayTileImprovement(g, tile, (TileImprovement)item);
+            displayResourceTileItem(g, (Resource) item);
         }
     }
 
