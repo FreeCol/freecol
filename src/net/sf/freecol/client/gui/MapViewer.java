@@ -1330,13 +1330,14 @@ public final class MapViewer {
             (Tile tile) -> {
                 final int x = tile.getX();
                 final int y = tile.getY();
-                g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
-                            (y-y0) * halfHeight);
+                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                final int yt = (y-y0) * halfHeight;
+                g.translate(xt, yt);
 
                 tv.displayTileWithBeachAndBorder(g, tile);
                 tv.displayUnknownTileBorder(g, tile);
 
-                g.setTransform(baseTransform);
+                g.translate(-xt, -yt);
             });
 
         // Draw the grid, if needed
@@ -1374,10 +1375,11 @@ public final class MapViewer {
                 (Tile tile) -> {
                     final int x = tile.getX();
                     final int y = tile.getY();
-                    g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
-                                (y-y0) * halfHeight);
+                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                    final int yt = (y-y0) * halfHeight;
+                    g.translate(xt, yt);
                     displayTerritorialBorders(g, tile, BorderType.REGION, true);
-                    g.setTransform(baseTransform);
+                    g.translate(-xt, -yt);
                 });
         }
 
@@ -1386,10 +1388,11 @@ public final class MapViewer {
             (Tile tile) -> {
                 final int x = tile.getX();
                 final int y = tile.getY();
-                g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
-                            (y-y0) * halfHeight);
+                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                final int yt = (y-y0) * halfHeight;
+                g.translate(xt, yt);
                 displayTerritorialBorders(g, tile, BorderType.COUNTRY, true);
-                g.setTransform(baseTransform);
+                g.translate(-xt, -yt);
             });
 
         // Display the Tile overlays
@@ -1405,8 +1408,9 @@ public final class MapViewer {
 
                 final int x = tile.getX();
                 final int y = tile.getY();
-                g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
-                            (y-y0) * halfHeight);
+                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                final int yt = (y-y0) * halfHeight;
+                g.translate(xt, yt);
 
                 BufferedImage overlayImage = lib.getOverlayImage(tile, overlayCache);
                 tv.displayTileItems(g, tile, overlayImage);
@@ -1415,7 +1419,7 @@ public final class MapViewer {
                 tv.displayFogOfWar(g, tile);
                 tv.displayOptionalTileText(g, tile);
 
-                g.setTransform(baseTransform);
+                g.translate(-xt, -yt);
             });
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);
@@ -1427,10 +1431,11 @@ public final class MapViewer {
                 (Tile tile) -> {
                     final int x = tile.getX();
                     final int y = tile.getY();
-                    g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
-                                (y-y0) * halfHeight);
+                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                    final int yt = (y-y0) * halfHeight;
+                    g.translate(xt, yt);
                     displayTerritorialBorders(g, tile, BorderType.REGION, false);
-                    g.setTransform(baseTransform);
+                    g.translate(-xt, -yt);
                 });
         }
 
@@ -1439,10 +1444,11 @@ public final class MapViewer {
             (Tile tile) -> {
                 final int x = tile.getX();
                 final int y = tile.getY();
-                g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
-                            (y-y0) * halfHeight);
+                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                final int yt = (y-y0) * halfHeight;
+                g.translate(xt, yt);
                 displayTerritorialBorders(g, tile, BorderType.COUNTRY, false);
-                g.setTransform(baseTransform);
+                g.translate(-xt, -yt);
             });
 
         // Display cursor for selected tile or active unit
@@ -1461,10 +1467,11 @@ public final class MapViewer {
             final int x = cursorTile.getX();
             final int y = cursorTile.getY();
             if(x >= x0 && y >= y0 && x <= lastColumn && y <= lastRow) {
-                g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
-                            (y-y0) * halfHeight);
+                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                final int yt = (y-y0) * halfHeight;
+                g.translate(xt, yt);
                 displayCursor(g);
-                g.setTransform(baseTransform);
+                g.translate(-xt, -yt);
             }
         }
 
@@ -1480,12 +1487,13 @@ public final class MapViewer {
 
                     final int x = tile.getX();
                     final int y = tile.getY();
-                    g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
-                                (y-y0) * halfHeight);
+                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                    final int yt = (y-y0) * halfHeight;
+                    g.translate(xt, yt);
 
                     displayUnit(g, unit);
 
-                    g.setTransform(baseTransform);
+                    g.translate(-xt, -yt);
                 });
         } else {
             /* Add extra rows and colums, as the dark halo is huge to enable
@@ -1499,8 +1507,9 @@ public final class MapViewer {
 
                     final int x = tile.getX();
                     final int y = tile.getY();
-                    g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
-                                (y-y0) * halfHeight);
+                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                    final int yt = (y-y0) * halfHeight;
+                    g.translate(xt, yt);
 
                     if (unit.isUndead()) {
                         // Rescale dark halo only in rare case its needed!
@@ -1510,7 +1519,7 @@ public final class MapViewer {
                     if (!isOutForAnimation(unit))
                         displayUnit(g, unit);
 
-                    g.setTransform(baseTransform);
+                    g.translate(-xt, -yt);
                 });
         }
 
@@ -1539,13 +1548,14 @@ public final class MapViewer {
 
                     final int x = tile.getX();
                     final int y = tile.getY();
-                    g.translate((x-x0) * tileWidth + (y&1) * halfWidth,
-                                (y-y0) * halfHeight);
+                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                    final int yt = (y-y0) * halfHeight;
+                    g.translate(xt, yt);
 
                     displaySettlementLabels(g, settlement, player, colonyLabels,
                                             font, italicFont, productionFont);
 
-                    g.setTransform(baseTransform);
+                    g.translate(-xt, -yt);
                 });
         }
 
