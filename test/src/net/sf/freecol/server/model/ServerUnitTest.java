@@ -110,7 +110,7 @@ public class ServerUnitTest extends FreeColTestCase {
     public void testToggleHorses() {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));
 
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = game.getMap().getTile(5, 8);
         tile1.setExplored(dutch, true);
         ServerUnit scout = new ServerUnit(game, tile1, dutch, colonistType);
@@ -140,7 +140,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Tile plain = game.getMap().getTile(5, 8);
         plain.setExplored(dutch, true);
         plain.setOwner(dutch);
@@ -184,7 +184,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Map map = game.getMap();
         map.getTile(5, 8).setExplored(dutch, true);
         map.getTile(6, 8).setExplored(dutch, true);
@@ -268,7 +268,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(savannahForest));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Map map = game.getMap();
         Tile tile = map.getTile(5, 8);
         map.getTile(5, 8).setExplored(dutch, true);
@@ -428,7 +428,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(savannahForest));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Map map = game.getMap();
         Tile tile = map.getTile(5, 8);
         tile.setOwner(dutch);

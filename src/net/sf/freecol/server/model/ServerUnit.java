@@ -125,7 +125,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      */
     public ServerUnit(Game game, Location location, Unit template) {
         this(game, location,
-            game.getPlayer(template.getOwner().getNationId()),
+            game.getPlayerByNationId(template.getOwner().getNationId()),
             game.getSpecification().getUnitType(template.getType().getId()),
             game.getSpecification().getDefaultRole());
 

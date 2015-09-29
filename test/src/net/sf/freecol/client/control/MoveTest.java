@@ -59,7 +59,7 @@ public class MoveTest extends FreeColTestCase {
             client = ClientTestHelper
                 .startClient(ServerTestHelper.getServer());
 
-            Player dutch = game.getPlayer("model.nation.dutch");
+            Player dutch = game.getPlayerByNationId("model.nation.dutch");
             Tile plain1 = map.getTile(5, 8);
             plain1.setExplored(dutch, true);
             Tile plain2 = map.getTile(5, 7);

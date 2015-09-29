@@ -267,7 +267,7 @@ public class SimpleMapGenerator implements MapGenerator {
         int nSettlements = 0;
         
         for (Player player : importGame.getLiveNativePlayers(null)) {
-            Player indian = game.getPlayer(player.getNationId());
+            Player indian = game.getPlayerByNationId(player.getNationId());
             if (indian == null) {
                 Nation nation = spec.getNation(player.getNationId());
                 if (nation == null) {
@@ -287,7 +287,7 @@ public class SimpleMapGenerator implements MapGenerator {
         for (Tile tile : importGame.getMap().getAllTiles()) {
             IndianSettlement is = tile.getIndianSettlement();
             if (is == null) continue;
-            Player indian = game.getPlayer(is.getOwner().getNationId());
+            Player indian = game.getPlayerByNationId(is.getOwner().getNationId());
             ServerIndianSettlement settlement
                 = new ServerIndianSettlement(game, indian, is.getName(),
                     map.getTile(tile.getX(), tile.getY()), is.isCapital(),
@@ -331,8 +331,8 @@ public class SimpleMapGenerator implements MapGenerator {
         if (nSettlements > 0) {
             for (Tile t : importGame.getMap().getAllTiles()) {
                 if (t.getOwner() == null) continue;
-                String nationId = t.getOwner().getNationId();
-                Player owner = game.getPlayer(nationId);
+                Player owner = game.getPlayerByNationId(t.getOwner()
+                    .getNationId());
                 if (owner == null) continue;
                 Tile tile = map.getTile(t.getX(), t.getY());
                 if (tile == null) continue;

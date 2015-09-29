@@ -1167,7 +1167,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Player getREFPlayer() {
         Nation ref = getNation().getREFNation();
-        return (ref == null) ? null : getGame().getPlayer(ref.getId());
+        return (ref == null) ? null : getGame().getPlayerByNation(ref);
     }
 
     /**

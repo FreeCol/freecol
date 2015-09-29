@@ -752,7 +752,7 @@ public class TileTest extends FreeColTestCase {
         Map map = getCoastTestMap(plains, true);
         game.setMap(map);
 
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile settlementTile = map.getTile(9, 2);
         FreeColTestUtils.getColonyBuilder().player(dutch)
             .colonyTile(settlementTile).build();

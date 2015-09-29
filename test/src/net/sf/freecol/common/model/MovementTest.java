@@ -65,7 +65,7 @@ public class MovementTest extends FreeColTestCase {
     public void testMoveFromPlainsToPlains() throws Exception {
 
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap(plains);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
@@ -94,7 +94,7 @@ public class MovementTest extends FreeColTestCase {
     public void testMoveFromPlainsToHills() throws Exception {
 
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap(plains);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
@@ -115,7 +115,7 @@ public class MovementTest extends FreeColTestCase {
     public void testMoveAlongRoad() throws Exception {
 
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap(plains);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
@@ -150,7 +150,7 @@ public class MovementTest extends FreeColTestCase {
     public void testMoveAlongRiver() throws Exception {
 
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap(plains);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
@@ -211,9 +211,9 @@ public class MovementTest extends FreeColTestCase {
         Map map = getTestMap(true);
         game.setMap(map);
 
-        Player french = game.getPlayer("model.nation.french");
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player iroquois = game.getPlayer("model.nation.iroquois");
+        Player french = game.getPlayerByNationId("model.nation.french");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player iroquois = game.getPlayerByNationId("model.nation.iroquois");
 
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
@@ -262,9 +262,9 @@ public class MovementTest extends FreeColTestCase {
         Map map = getTestMap(plains);
         game.setMap(map);
 
-        Player french = game.getPlayer("model.nation.french");
-        Player inca = game.getPlayer("model.nation.inca");
-        Player iroquois = game.getPlayer("model.nation.iroquois");
+        Player french = game.getPlayerByNationId("model.nation.french");
+        Player inca = game.getPlayerByNationId("model.nation.inca");
+        Player iroquois = game.getPlayerByNationId("model.nation.iroquois");
 
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);

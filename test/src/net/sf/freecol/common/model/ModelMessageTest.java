@@ -87,7 +87,7 @@ public class ModelMessageTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
     	
-        Player player = game.getPlayer("model.nation.dutch");
+        Player player = game.getPlayerByNationId("model.nation.dutch");
         String realMessageId = "player"; // Must exist
         String fakeMessageId = "no.such.messageId"; // Must no exist
         ModelMessage mm1 = new ModelMessage(MessageType.WAREHOUSE_CAPACITY,

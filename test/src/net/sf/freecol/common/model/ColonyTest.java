@@ -334,7 +334,7 @@ public class ColonyTest extends FreeColTestCase {
         }
         assertEquals(nativeTile.getOwner(), indianPlayer);
 
-        Player french = game.getPlayer("model.nation.french");
+        Player french = game.getPlayerByNationId("model.nation.french");
         Colony frenchColony = getStandardColony(3, 9, 8);
         frenchColony.changeOwner(french);
         assertEquals(frenchColony.getTile().getType(), plainsTileType);
@@ -432,7 +432,7 @@ public class ColonyTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
         Colony colony = getStandardColony(5);
         Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
-        Player iroquois = game.getPlayer("model.nation.iroquois");
+        Player iroquois = game.getPlayerByNationId("model.nation.iroquois");
 
         assertFalse("No enemy units present.", colony.isUnderSiege());
 

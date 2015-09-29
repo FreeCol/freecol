@@ -48,7 +48,7 @@ public class LimitTest extends FreeColTestCase {
     public void testWagonTrainLimit() {
 
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap();
         game.setMap(map);
 
@@ -78,7 +78,7 @@ public class LimitTest extends FreeColTestCase {
 
     public void testIndependenceLimits() {
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap();
         game.setMap(map);
 
@@ -145,7 +145,7 @@ public class LimitTest extends FreeColTestCase {
     public void testSuccessionLimits() {
 
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap();
         game.setMap(map);
 

@@ -148,7 +148,7 @@ public class RoleTest extends FreeColTestCase {
         expectedRoles.add(soldier);
         expectedRoles.add(scout);
         List<Role> colonialRoles
-            = Role.getAvailableRoles(game.getPlayer("model.nation.dutch"),
+            = Role.getAvailableRoles(game.getPlayerByNationId("model.nation.dutch"),
                                      colonistType, military);
         assertTrue(expectedRoles.equals(colonialRoles));
 
@@ -156,7 +156,7 @@ public class RoleTest extends FreeColTestCase {
         expectedRoles.add(cavalry);
         expectedRoles.add(infantry);
         List<Role> royalRoles
-            = Role.getAvailableRoles(game.getPlayer("model.nation.dutchREF"),
+            = Role.getAvailableRoles(game.getPlayerByNationId("model.nation.dutchREF"),
                                      kingsRegularType, military);
         assertTrue(expectedRoles.equals(royalRoles));
 
@@ -165,7 +165,7 @@ public class RoleTest extends FreeColTestCase {
         expectedRoles.add(armedBrave);
         expectedRoles.add(mountedBrave);
         List<Role> nativeRoles
-            = Role.getAvailableRoles(game.getPlayer("model.nation.inca"),
+            = Role.getAvailableRoles(game.getPlayerByNationId("model.nation.inca"),
                                      braveType, military);
         assertTrue(expectedRoles.equals(nativeRoles));
     }

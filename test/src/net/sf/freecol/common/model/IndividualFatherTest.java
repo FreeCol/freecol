@@ -129,7 +129,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
     public void testBrebeuf() {
         Game game = getGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         String ability = Ability.EXPERT_MISSIONARY;
 
         assertTrue(jeanDeBrebeuf.hasAbility(ability));
@@ -148,7 +148,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
     public void testBrewster() {
         Game game = getGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
 
         String ability = Ability.CAN_RECRUIT_UNIT;
         assertTrue(dutch.hasAbility(ability));
@@ -224,8 +224,8 @@ public class IndividualFatherTest extends FreeColTestCase {
 
     public void testDeWitt() {
         Game game = getGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player french = game.getPlayerByNationId("model.nation.french");
         dutch.getMarket().setArrears(musketsType, 1);
 
         assertFalse(dutch.canTrade(musketsType, Market.Access.EUROPE));
@@ -284,7 +284,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         Unit unit = colony.getUnitList().get(0);
         Player player = colony.getOwner();
-        Player iroquois = getGame().getPlayer("model.nation.iroquois");
+        Player iroquois = getGame().getPlayerByNationId("model.nation.iroquois");
         Tile colonyCenterTile = colony.getTile();
         Tile disputedTile = colonyCenterTile.getNeighbourOrNull(Direction.N);
         Tile settlementTile = disputedTile.getNeighbourOrNull(Direction.N);

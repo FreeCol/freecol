@@ -491,6 +491,31 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Get a <code>Player</code> identified by its nation.
+     *
+     * @param nation The <code>Nation</code> to search for.
+     * @return The <code>Player</code> of the given nation, or null if
+     *     not found.
+     */
+    public Player getPlayerByNation(Nation nation) {
+        return getPlayerByNationId(nation.getId());
+    }
+
+    /**
+     * Get a <code>Player</code> identified by its nation identifier.
+     *
+     * @param nationId The nation identifier to search for.
+     * @return The <code>Player</code> of the given nation, or null if
+     *     not found.
+     */
+    public Player getPlayerByNationId(String nationId) {
+        for (Player player : players) {
+            if (player.getNationId().equals(nationId)) return player;
+        }
+        return null;
+    }
+
+    /**
      * Get live players in the game.
      *
      * @param other An optional <code>Player</code> to omit.
@@ -538,20 +563,6 @@ public class Game extends FreeColGameObject {
             .filter(p -> !p.isUnknownEnemy() && !p.isDead() && p != other
                 && p.isIndian())
             .collect(Collectors.toList());
-    }
-
-    /**
-     * Get a <code>Player</code> identified by its nation identifier.
-     *
-     * @param nationId The nation identifier to search for.
-     * @return The <code>Player</code> of the given nation, or null if
-     *     not found.
-     */
-    public Player getPlayer(String nationId) {
-        for (Player player : players) {
-            if (player.getNationId().equals(nationId)) return player;
-        }
-        return null;
     }
 
     /**

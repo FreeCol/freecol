@@ -567,8 +567,8 @@ public class FreeColTestCase extends TestCase {
             }
 
             // indianPlayer not set, get default
-            if(indianPlayer == null){
-                indianPlayer = game.getPlayer(defaultIndianPlayer);
+            if (indianPlayer == null) {
+                indianPlayer = game.getPlayerByNationId(defaultIndianPlayer);
                 if(indianPlayer == null){
                     throw new IllegalArgumentException("Default Indian player " + defaultIndianPlayer + " not in game");
                 }

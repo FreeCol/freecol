@@ -92,8 +92,8 @@ public class CombatTest extends FreeColTestCase {
     public void testColonistAttackedByVeteran() throws Exception {
         Game game = getStandardGame();
         CombatModel combatModel = game.getCombatModel();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player french = game.getPlayerByNationId("model.nation.french");
         Map map = getTestMap(plains);
         game.setMap(map);
         FreeColTestCase.spec();
@@ -157,8 +157,8 @@ public class CombatTest extends FreeColTestCase {
     public void testGalleonAttackedByPrivateer() throws Exception {
         Game game = getStandardGame();
         CombatModel combatModel = game.getCombatModel();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player french = game.getPlayerByNationId("model.nation.french");
         Map map = getTestMap(ocean);
         game.setMap(map);
         FreeColTestCase.spec();
@@ -259,8 +259,8 @@ public class CombatTest extends FreeColTestCase {
         game.setMap(map);
 
         Colony colony = getStandardColony();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player inca = game.getPlayer("model.nation.inca");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player inca = game.getPlayerByNationId("model.nation.inca");
 
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
@@ -285,8 +285,8 @@ public class CombatTest extends FreeColTestCase {
         game.setMap(map);
 
         final SimpleCombatModel combatModel = new SimpleCombatModel();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player inca = game.getPlayer("model.nation.inca");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player inca = game.getPlayerByNationId("model.nation.inca");
         Colony colony = getStandardColony();
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
@@ -319,8 +319,8 @@ public class CombatTest extends FreeColTestCase {
         game.setMap(map);
 
         SimpleCombatModel combatModel = new SimpleCombatModel();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player inca = game.getPlayer("model.nation.inca");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player inca = game.getPlayerByNationId("model.nation.inca");
 
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
@@ -350,8 +350,8 @@ public class CombatTest extends FreeColTestCase {
 
     public void testAttackIgnoresMovementPoints() throws Exception {
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player french = game.getPlayerByNationId("model.nation.french");
         Map map = getTestMap(plains, true);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
@@ -381,9 +381,9 @@ public class CombatTest extends FreeColTestCase {
 
     public void testSpanishAgainstNatives() throws Exception {
         final Game game = getStandardGame();
-        final Player spanish = game.getPlayer("model.nation.spanish");
-        final Player dutch = game.getPlayer("model.nation.dutch");
-        Player tupi = game.getPlayer("model.nation.tupi");
+        final Player spanish = game.getPlayerByNationId("model.nation.spanish");
+        final Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player tupi = game.getPlayerByNationId("model.nation.tupi");
         Map map = getTestMap(plains, true);
         game.setMap(map);
 
@@ -434,8 +434,8 @@ public class CombatTest extends FreeColTestCase {
 
     public void testAttackShipWithLandUnit() {
         Game game = getStandardGame();
-        Player spanish = game.getPlayer("model.nation.spanish");
-        Player tupi = game.getPlayer("model.nation.tupi");
+        Player spanish = game.getPlayerByNationId("model.nation.spanish");
+        Player tupi = game.getPlayerByNationId("model.nation.tupi");
         Map map = getTestMap(plains, true);
         game.setMap(map);
 
@@ -470,7 +470,7 @@ public class CombatTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains, true));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         french.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
         ServerPlayer refPlayer = igc.createREFPlayer(french);
 
@@ -546,8 +546,8 @@ public class CombatTest extends FreeColTestCase {
         CombatModel combatModel = game.getCombatModel();
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer inca = (ServerPlayer)game.getPlayer("model.nation.inca");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer inca = (ServerPlayer)game.getPlayerByNationId("model.nation.inca");
         dutch.setStance(inca, Stance.WAR);
         inca.setStance(dutch, Stance.WAR);
 

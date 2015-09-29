@@ -1136,7 +1136,7 @@ public final class FreeColServer {
                  : game.getNationOptions().getNations().entrySet()) {
             if (entry.getKey().isUnknownEnemy()) continue;
             if (entry.getValue() != NationState.NOT_AVAILABLE
-                && game.getPlayer(entry.getKey().getId()) == null) {
+                && game.getPlayerByNation(entry.getKey()) == null) {
                 newAI.add(makeAIPlayer(entry.getKey()));
             }
         }

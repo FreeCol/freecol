@@ -89,7 +89,7 @@ public class ServerColonyTest extends FreeColTestCase {
 
     public void testFoodConsumption() {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         // Setting test colony and colonist
         Colony colony = FreeColTestUtils.getColonyBuilder()
             .colonyTile(game.getMap().getTile(5, 8)).build();

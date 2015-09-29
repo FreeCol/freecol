@@ -33,7 +33,7 @@ public class MonarchTest extends FreeColTestCase {
 
     public void testSerialize() {
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
 
         try {
             StringWriter sw = new StringWriter();
@@ -52,7 +52,7 @@ public class MonarchTest extends FreeColTestCase {
     public void testTaxActionChoices() {
         Game game = getStandardGame();
         game.setMap(getTestMap());
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
 
         // grace period has not yet expired
         List<RandomChoice<MonarchAction>> choices

@@ -261,7 +261,7 @@ public class Nation extends FreeColGameObjectType {
         for (int index = 0; index < nations; index++) {
             String nationId = "model.nation."
                 + EUROPEAN_NATIONS.get((start + index) % nations);
-            if (game.getPlayer(nationId) == null) {
+            if (game.getPlayerByNationId(nationId) == null) {
                 return Messages.nameKey(nationId);
             }
         }

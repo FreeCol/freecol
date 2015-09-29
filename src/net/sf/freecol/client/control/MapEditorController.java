@@ -247,7 +247,7 @@ public final class MapEditorController {
     public void requireNativeNations(Game game) {
         final Specification spec = game.getSpecification();
         for (Nation n : spec.getIndianNations()) {
-            Player p = game.getPlayer(n.getId());
+            Player p = game.getPlayerByNation(n);
             if (p == null) {
                 p = new ServerPlayer(game, false, n, null, null);
                 game.addPlayer(p);

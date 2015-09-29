@@ -52,7 +52,7 @@ public class SettlementTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder =
             new FreeColTestCase.IndianSettlementBuilder(game);
 
-        Player arawak = game.getPlayer("model.nation.arawak");
+        Player arawak = game.getPlayerByNationId("model.nation.arawak");
         builder.player(arawak);
         IndianSettlement settlement = builder.build();
         assertEquals(1, arawak.getNationType().getSettlementType(false).getClaimableRadius());
@@ -65,7 +65,7 @@ public class SettlementTest extends FreeColTestCase {
         assertEquals(2, settlement.getType().getClaimableRadius());
         settlement.dispose();
 
-        Player inca = game.getPlayer("model.nation.inca");
+        Player inca = game.getPlayerByNationId("model.nation.inca");
         builder.player(inca);
         builder.capital(false);
         settlement = builder.build();
@@ -186,7 +186,7 @@ public class SettlementTest extends FreeColTestCase {
         assertNull(colony.canImproveUnitMilitaryRole(colonist));
 
         // Repeat previous tests for natives
-        Player arawak = game.getPlayer("model.nation.arawak");
+        Player arawak = game.getPlayerByNationId("model.nation.arawak");
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game)
             .player(arawak).initialBravesInCamp(4);
