@@ -407,6 +407,20 @@ public final class TileViewer {
     }
 
     /**
+     * Centers the given Image on the tile, ensuring it is not drawing
+     * over tiles south of it.
+     *
+     * @param g a <code>Graphics2D</code>
+     * @param image the image
+     */
+    void displayLargeCenteredImage(Graphics2D g, BufferedImage image) {
+        int y = tileHeight - image.getHeight();
+        if(y > 0)
+            y /= 2;
+        g.drawImage(image, (tileWidth - image.getWidth())/2, y, null);
+    }
+
+    /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Only base terrain will be drawn.
      *
@@ -607,8 +621,8 @@ public final class TileViewer {
                 Colony colony = (Colony)settlement;
 
                 // Draw image of colony in center of the tile.
-                Image colonyImage = lib.getSettlementImage(settlement);
-                displayCenteredImage(g, colonyImage, tileWidth, tileHeight);
+                BufferedImage colonyImage = lib.getSettlementImage(settlement);
+                displayLargeCenteredImage(g, colonyImage);
 
                 if (withNumber) {
                     String populationString = Integer.toString(
