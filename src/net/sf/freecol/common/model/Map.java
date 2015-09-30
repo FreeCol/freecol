@@ -390,7 +390,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The width of this map.
      */
     public int getWidth() {
-        return (tiles == null) ? 0 : tiles.length;
+        return tiles.length;
     }
 
     /**
@@ -399,7 +399,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The height of this map.
      */
     public int getHeight() {
-        return (tiles == null) ? 0 : tiles[0].length;
+        return tiles[0].length;
     }
 
     public final Layer getLayer() {
