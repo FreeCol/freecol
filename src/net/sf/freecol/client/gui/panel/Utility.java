@@ -194,7 +194,7 @@ public final class Utility {
         Player player, FreeColGameObject source) {
         FreeColGameObject link = null;
         if ("%colony%".equals(key) || key.endsWith("Colony%")) {
-            Settlement settlement = player.getGame().getSettlement(val);
+            Settlement settlement = player.getGame().getSettlementByName(val);
             link = (settlement == null) ? null
                 : (player.owns(settlement)) ? settlement
                 : settlement.getTile();

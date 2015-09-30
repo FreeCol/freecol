@@ -319,15 +319,12 @@ public class Operand extends Scope {
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o instanceof Operand) {
-            Operand op = (Operand)o;
-            return operandType == op.operandType
-                && scopeLevel == op.scopeLevel
-                && Utils.equals(value, op.value)
-                && super.equals(o);
-        }
-        return false;
+        return this == o
+            || (o instanceof Operand
+                && operandType == ((Operand)o).operandType
+                && scopeLevel == ((Operand)o).scopeLevel
+                && Utils.equals(value, ((Operand)o).value)
+                && super.equals(o));
     }
 
 

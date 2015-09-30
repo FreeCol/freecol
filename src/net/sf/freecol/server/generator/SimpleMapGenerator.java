@@ -339,7 +339,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 tile.setOwner(owner);
                 if (tile.getOwningSettlement() != null) {
                     String name = tile.getOwningSettlement().getName();
-                    Settlement is = game.getSettlement(name);
+                    Settlement is = game.getSettlementByName(name);
                     tile.setOwningSettlement(is);
                 }
             }

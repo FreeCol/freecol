@@ -626,10 +626,7 @@ public class Game extends FreeColGameObject {
      * @return True if the name is already in use.
      */
     public boolean playerNameInUse(String name) {
-        for (Player player : players) {
-            if (player.getName().equals(name)) return true;
-        }
-        return false;
+        return getPlayerByName(name) != null;
     }
 
     /**
@@ -980,7 +977,7 @@ public class Game extends FreeColGameObject {
      *     if there is no known <code>Settlement</code> with the
      *     specified name (the settlement might not be visible to a client).
      */
-    public Settlement getSettlement(String name) {
+    public Settlement getSettlementByName(String name) {
         for (Player p : getLivePlayers(null)) {
             for (Settlement s : p.getSettlements()) {
                 if (name.equals(s.getName())) return s;

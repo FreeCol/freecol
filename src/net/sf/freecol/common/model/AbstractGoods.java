@@ -183,9 +183,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      */
     public static AbstractGoods findByType(GoodsType type,
                                            Collection<AbstractGoods> goods) {
-        for (AbstractGoods ag : goods) {
-            if (ag.getType() == type) return ag;
-        }
+        for (AbstractGoods ag : goods) if (ag.getType() == type) return ag;
         return null;
     }
 

@@ -2020,7 +2020,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param name The name of the unit.
      * @return The unit with the given name, or null if none found.
      */
-    public Unit getUnit(String name) {
+    public Unit getUnitByName(String name) {
         for (Unit u : units) {
             if (name.equals(u.getName())) return u;
         }
@@ -2222,7 +2222,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @param name The trade route name.
      */
-    public TradeRoute getTradeRoute(String name) {
+    public TradeRoute getTradeRouteByName(String name) {
         for (TradeRoute t : tradeRoutes) {
             if (t.getName().equals(name)) return t;
         }
