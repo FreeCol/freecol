@@ -429,10 +429,11 @@ public final class TileViewer {
      */
     void displayTileWithBeachAndBorder(Graphics2D g, Tile tile) {
         if (tile != null) {
+            TileType tileType = tile.getType();
             int x = tile.getX();
             int y = tile.getY();
             // ATTENTION: we assume that all base tiles have the same size
-            g.drawImage(lib.getTerrainImage(tile.getType(), x, y),
+            g.drawImage(lib.getTerrainImage(tileType, x, y),
                         0, 0, null);
             if (tile.isExplored()) {
                 if (!tile.isLand() && tile.getStyle() > 0) {
@@ -453,35 +454,33 @@ public final class TileViewer {
                 for (Direction direction : Direction.values()) {
                     Tile borderingTile = tile.getNeighbourOrNull(direction);
                     if (borderingTile != null && borderingTile.isExplored()) {
-                        if (tile.getType() == borderingTile.getType()) {
-                            // Equal tiles, no need to draw border
-                        } else if (tile.isLand() && !borderingTile.isLand()) {
-                            // The beach borders are drawn on the side of water tiles only
-                        } else if (!tile.isLand() && borderingTile.isLand()) {
-                            // If there is a Coast image (eg. beach) defined, use it, otherwise skip
-                            // Draw the grass from the neighboring tile, spilling over on the side of this tile
-                            si = new SortableImage(
-                                lib.getBorderImage(borderingTile.getType(), direction, x, y),
-                                borderingTile.getType().getIndex());
-                            imageBorders.add(si);
-                            TileImprovement river = borderingTile.getRiver();
-                            if (river != null && river.isConnectedTo(direction.getReverseDirection())) {
+                        TileType borderingTileType = borderingTile.getType();
+                        if (borderingTileType != tileType) {
+                            if (!tile.isLand() && borderingTile.isLand()) {
+                                // If there is a Coast image (eg. beach) defined, use it, otherwise skip
+                                // Draw the grass from the neighboring tile, spilling over on the side of this tile
                                 si = new SortableImage(
-                                    lib.getRiverMouthImage(direction,
-                                        borderingTile.getRiver().getMagnitude(), x, y),
-                                    -1);
+                                    lib.getBorderImage(borderingTileType, direction, x, y),
+                                    borderingTileType.getIndex());
                                 imageBorders.add(si);
-                            }
-                        } else {
-                            if (lib.getTerrainImage(tile.getType(), 0, 0)
-                                .equals(lib.getTerrainImage(borderingTile.getType(), 0, 0))) {
-                                // Do not draw limit between tile that share same graphics (ocean & great river)
-                            } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
-                                // Draw land terrain with bordering land type, or ocean/high seas limit
-                                si = new SortableImage(
-                                    lib.getBorderImage(borderingTile.getType(), direction, x, y),
-                                    borderingTile.getType().getIndex());
-                                imageBorders.add(si);
+                                TileImprovement river = borderingTile.getRiver();
+                                if (river != null && river.isConnectedTo(direction.getReverseDirection())) {
+                                    si = new SortableImage(
+                                        lib.getRiverMouthImage(direction,
+                                            borderingTile.getRiver().getMagnitude(), x, y),
+                                        -1);
+                                    imageBorders.add(si);
+                                }
+                            } else if (!tile.isLand() || borderingTile.isLand()) {
+                                if (borderingTileType.getIndex() < tileType.getIndex() &&
+                                        !lib.getTerrainImage(tileType, 0, 0).equals(lib.getTerrainImage(borderingTileType, 0, 0))) {
+                                    // Draw land terrain with bordering land type, or ocean/high seas limit,
+                                    // if the tiles do not share same graphics (ocean & great river)
+                                    si = new SortableImage(
+                                            lib.getBorderImage(borderingTileType, direction, x, y),
+                                            borderingTileType.getIndex());
+                                    imageBorders.add(si);
+                                }
                             }
                         }
                     }
