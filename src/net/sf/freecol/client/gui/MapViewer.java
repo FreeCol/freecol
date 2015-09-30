@@ -1384,16 +1384,18 @@ public final class MapViewer {
         }
 
         // Paint full country borders
-        map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
-            (Tile tile) -> {
-                final int x = tile.getX();
-                final int y = tile.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
-                g.translate(xt, yt);
-                displayTerritorialBorders(g, tile, BorderType.COUNTRY, true);
-                g.translate(-xt, -yt);
-            });
+        if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
+            map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
+                (Tile tile) -> {
+                    final int x = tile.getX();
+                    final int y = tile.getY();
+                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                    final int yt = (y-y0) * halfHeight;
+                    g.translate(xt, yt);
+                    displayTerritorialBorders(g, tile, BorderType.COUNTRY, true);
+                    g.translate(-xt, -yt);
+                });
+        }
 
         // Display the Tile overlays
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
@@ -1440,16 +1442,18 @@ public final class MapViewer {
         }
 
         // Paint transparent country borders
-        map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
-            (Tile tile) -> {
-                final int x = tile.getX();
-                final int y = tile.getY();
-                final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
-                final int yt = (y-y0) * halfHeight;
-                g.translate(xt, yt);
-                displayTerritorialBorders(g, tile, BorderType.COUNTRY, false);
-                g.translate(-xt, -yt);
-            });
+        if (options.getBoolean(ClientOptions.DISPLAY_BORDERS)) {
+            map.forSubMap(x0, y0-1, lastColumn-firstColumn+1, lastRow-firstRow+1+1,
+                (Tile tile) -> {
+                    final int x = tile.getX();
+                    final int y = tile.getY();
+                    final int xt = (x-x0) * tileWidth + (y&1) * halfWidth;
+                    final int yt = (y-y0) * halfHeight;
+                    g.translate(xt, yt);
+                    displayTerritorialBorders(g, tile, BorderType.COUNTRY, false);
+                    g.translate(-xt, -yt);
+                });
+        }
 
         // Display cursor for selected tile or active unit
         Tile cursorTile = null;
@@ -1997,11 +2001,6 @@ public final class MapViewer {
      * @param opaque a <code>boolean</code>
      */
     private void displayTerritorialBorders(Graphics2D g, Tile tile, BorderType type, boolean opaque) {
-        if (tile == null ||
-            (type == BorderType.COUNTRY
-             && !freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_BORDERS))) {
-            return;
-        }
         Player owner = tile.getOwner();
         Region region = tile.getRegion();
         if ((type == BorderType.COUNTRY && owner != null)
