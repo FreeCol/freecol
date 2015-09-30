@@ -31,8 +31,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -95,20 +97,23 @@ public final class RoadPainter {
         Color oldColor = g.getColor();
         g.setColor(ResourceManager.getColor("color.map.road"));
         g.setStroke(roadStroke);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                           RenderingHints.VALUE_ANTIALIAS_ON);
         GeneralPath path = new GeneralPath();
+        Map map = tile.getMap();
+        int x = tile.getX();
+        int y = tile.getY();
         List<Point2D.Float> points = new ArrayList<>(8);
-        List<Direction> directions = new ArrayList<>(8);
-        for (Direction direction : Direction.values()) {
-            Tile borderingTile = tile.getNeighbourOrNull(direction);
-            TileImprovement r;
-            if (borderingTile != null
-                && (r = borderingTile.getRoad()) != null
-                && r.isComplete()) {
-                points.add(corners.get(direction));
-                directions.add(direction);
-            }
-        }
+        List<Direction> directions = Direction.allDirections.stream()
+            .filter((Direction direction) -> {
+                    Tile borderingTile = map.getTile(direction.step(x, y));
+                    TileImprovement r;
+                    return (borderingTile != null
+                        && (r = borderingTile.getRoad()) != null
+                        && r.isComplete());
+                })
+            .peek((Direction direction) -> points.add(corners.get(direction)))
+            .collect(Collectors.toList());
 
         switch(points.size()) {
         case 0:
