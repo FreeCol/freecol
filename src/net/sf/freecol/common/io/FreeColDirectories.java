@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -432,52 +434,6 @@ public class FreeColDirectories {
     }
 
     /**
-     * Copy files/directories from one path to another.
-     *
-     * FIXME: Use Java7 copyFile and copyDirectory routines
-     *
-     * @param src The source directory.
-     * @param dst The destination directory.
-     * @return True if the copy succeeded.
-     */
-    private static boolean copyDir(File src, File dst) {
-        if (!dst.mkdir()) return false;
-        for (String f : src.list()) {
-            File srcFile = new File(src, f);
-            File dstFile = new File(dst, f);
-            if (srcFile.isDirectory()) {
-                if (!copyDir(srcFile, dstFile)) return false;
-            } else if (srcFile.isFile()) {
-                if (!copyFile(srcFile, dstFile)) return false;
-            } else {
-                // do not copy other objects
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Copy a file.
-     *
-     * @param src The source <code>File</code>.
-     * @param dst The destination <code>File</code>.
-     * @return True if the copy succeeded.
-     */
-    private static boolean copyFile(File src, File dst) {
-        byte[] buf = new byte[16384];
-        int len;
-    		try (
-            FileInputStream in = new FileInputStream(src);
-            FileOutputStream out = new FileOutputStream(dst);
-        ) {
-            while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
-        } catch (IOException ioe) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * Copy directory with given name under an old directory to a new
      * directory.
      *
@@ -489,7 +445,13 @@ public class FreeColDirectories {
         File src = new File(oldDir, name);
         File dst = new File(newDir, name);
         if (src.exists() && src.isDirectory() && !dst.exists()) {
-            copyDir(src, dst);
+            try {
+                Files.copy(src.toPath(), dst.toPath(),
+                    StandardCopyOption.COPY_ATTRIBUTES);
+            } catch (IOException ioe) {
+                System.err.println("Could not copy " + src.toString() + " to "
+                    + dst.toString() + ": " + ioe.getMessage());
+            }
         }
     }
 
