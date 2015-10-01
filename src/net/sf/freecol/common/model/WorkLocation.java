@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -368,8 +369,7 @@ public abstract class WorkLocation extends UnitLocation
                     ok = true;
                 } else if (colony.getTotalProductionOf(goodsType) == 0
                     && (bt = colony.getCurrentlyBuilding()) != null
-                    && AbstractGoods.findByType(goodsType,
-                        bt.getRequiredGoods()) != null) {
+                    && AbstractGoods.containsType(goodsType, bt.getRequiredGoods())) {
                     ok = true;
                 }
             }
@@ -439,7 +439,7 @@ public abstract class WorkLocation extends UnitLocation
      *     given <code>GoodsType</code>.
      */
     public boolean produces(GoodsType goodsType) {
-        return AbstractGoods.findByType(goodsType, getOutputs()) != null;
+        return AbstractGoods.containsType(goodsType, getOutputs());
     }
 
     /**
@@ -597,11 +597,8 @@ public abstract class WorkLocation extends UnitLocation
      */
     public int getProductionOf(Unit unit, GoodsType goodsType) {
         if (unit == null) throw new IllegalArgumentException("Null unit.");
-
-        final UnitType unitType = unit.getType();
-        AbstractGoods goods = AbstractGoods.findByType(goodsType, getOutputs());
-        return (goods == null) ? 0
-            : Math.max(0, getPotentialProduction(goodsType, unitType));
+        return (!produces(goodsType)) ? 0
+            : Math.max(0, getPotentialProduction(goodsType, unit.getType()));
     }
 
     /**

@@ -290,8 +290,7 @@ public class ProductionType extends FreeColObject {
     public static boolean canProduce(GoodsType goodsType,
                                      Collection<ProductionType> types) {
         return types.stream()
-            .anyMatch(pt -> AbstractGoods.findByType(goodsType,
-                                                     pt.getOutputs()) != null);
+            .anyMatch(pt -> AbstractGoods.containsType(goodsType, pt.getOutputs()));
     }
 
     /**

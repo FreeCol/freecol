@@ -42,6 +42,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -721,8 +722,7 @@ public class Game extends FreeColGameObject {
      * @return True if an undead player is present.
      */
     public boolean isInRevengeMode() {
-        return getPlayers().stream()
-            .filter(p -> p.isUndead()).findFirst().isPresent();
+        return contains(getPlayers(), Player::isUndead);
     }
 
     /**

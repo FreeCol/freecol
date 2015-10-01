@@ -348,4 +348,16 @@ public class CollectionUtils {
             .sorted((e1, e2) -> comparator.compare(e1.getValue(), e2.getValue()))
             .collect(Collectors.toList());
     }
+
+    /**
+     * Does a collection contain at least one element that matches a predicate?
+     *
+     * @param collection The <code>Collection</code> to search.
+     * @param predicate A <code>Predicate</code> to test with.
+     * @return True if the predicate ever succeeds.
+     */
+    public static <T> boolean contains(Collection<T> collection,
+                                       Predicate<T> predicate) {
+        return collection.stream().filter(predicate).findFirst().isPresent();
+    }
 }

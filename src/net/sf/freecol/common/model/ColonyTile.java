@@ -228,10 +228,8 @@ public class ColonyTile extends WorkLocation {
                 if (goodsType.isFoodType()) {
                     food -= ag.getAmount();
                 } else if (colony.isConsuming(goodsType)) {
-                    int change = -ag.getAmount();
-                    AbstractGoods ng
-                        = AbstractGoods.findByType(goodsType, newProd);
-                    change += (ng == null) ? 0 : ng.getAmount();
+                    int change = -ag.getAmount()
+                        + AbstractGoods.getCount(goodsType, newProd);
                     if (change < 0
                         && change + colony.getNetProductionOf(goodsType) < 0) {
                         // The change drives the net production (more?)

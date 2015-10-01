@@ -205,7 +205,7 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
 
         // Look for goods to unload.
         if (unit.getCompactGoodsList().stream()
-            .filter(ag -> AbstractGoods.findByType(ag.getType(), stopGoods) == null)
+            .filter(ag -> !AbstractGoods.containsType(ag.getType(), stopGoods))
             .anyMatch(ag -> getImportAmount(ag.getType(), turns) > 0))
             return true;
 

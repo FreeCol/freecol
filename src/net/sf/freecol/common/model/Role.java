@@ -31,7 +31,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -387,7 +386,7 @@ public class Role extends BuildableType {
                 }
             }
             for (AbstractGoods ag : fromGoods) {
-                if (AbstractGoods.findByType(ag.getType(), toGoods) == null) {
+                if (!AbstractGoods.containsType(ag.getType(), toGoods)) {
                     result.add(new AbstractGoods(ag.getType(), -ag.getAmount()));
                 }
             }

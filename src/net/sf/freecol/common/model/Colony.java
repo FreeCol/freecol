@@ -595,8 +595,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public Building getBuildingForProducing(final GoodsType goodsType) {
         for (Building b : buildingMap.values()) {
-            if (AbstractGoods.findByType(goodsType, b.getOutputs()) != null)
-                return b;
+            if (AbstractGoods.containsType(goodsType, b.getOutputs())) return b;
         }
         return null;
     }
@@ -858,15 +857,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 satisfied++;
                 continue;
             }
-            int production = productionCache.getNetProductionOf(type);
-            if (info != null) {
-                AbstractGoods consumption = AbstractGoods.findByType(type,
-                    info.getConsumption());
-                if (consumption != null) {
+            int production = productionCache.getNetProductionOf(type)
+                + ((info == null) ? 0
                     // add the amount the build queue itself will consume
-                    production += consumption.getAmount();
-                }
-            }
+                    : AbstractGoods.getCount(type, info.getConsumption()));
             if (production <= 0) {
                 failing++;
                 if (needed != null) {
@@ -1988,8 +1982,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                                                          populationQueue }) {
             ProductionInfo info = productionCache.getProductionInfo(queue);
             if (info != null) {
-                AbstractGoods goods = AbstractGoods.findByType(goodsType, info.getConsumption());
-                if (goods != null) result += goods.getAmount();
+                result += AbstractGoods.getCount(goodsType,
+                    info.getConsumption());
             }
         }
         return result;

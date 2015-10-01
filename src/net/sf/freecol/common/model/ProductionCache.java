@@ -218,8 +218,7 @@ public class ProductionCache {
     public boolean isProducing(GoodsType goodsType) {
         update();
         return productionAndConsumption.values().stream()
-            .anyMatch(pi -> AbstractGoods.findByType(goodsType,
-                    pi.getProduction()) != null);
+            .anyMatch(pi -> AbstractGoods.containsType(goodsType, pi.getProduction()));
     }
 
     /**
@@ -231,8 +230,7 @@ public class ProductionCache {
     public boolean isConsuming(GoodsType goodsType) {
         update();
         return productionAndConsumption.values().stream()
-            .anyMatch(pi -> AbstractGoods.findByType(goodsType,
-                    pi.getConsumption()) != null);
+            .anyMatch(pi -> AbstractGoods.containsType(goodsType, pi.getConsumption()));
     }
     
     /**
