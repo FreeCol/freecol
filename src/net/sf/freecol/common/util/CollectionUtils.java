@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BinaryOperator;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -36,6 +38,14 @@ import java.util.stream.Collectors;
  * Collection of small static helper methods using Collections.
  */
 public class CollectionUtils {
+
+    /** Trivial integer accumulator. */
+    public static final BinaryOperator<Integer> integerAccumulator
+        = (i1, i2) -> i1 + i2;
+
+    /** Trivial double accumulator. */
+    public static final BinaryOperator<Double> doubleAccumulator
+        = (d1, d2) -> d1 + d2;
 
     /** Useful comparators for mapEntriesBy* */
     public static final Comparator<Integer> descendingIntegerComparator
@@ -117,36 +127,17 @@ public class CollectionUtils {
         }
     }
 
-    public abstract static class Accumulator<T> {
-        public abstract T accumulate(T t1, T t2);
-    };
-
-    /** Trivial integer accumulator. */
-    public static Accumulator<Integer> integerAccumulator
-        = new Accumulator<Integer>() {
-            public Integer accumulate(Integer i1, Integer i2) {
-                return i1 + i2;
-            }
-        };
-    /** Trivial double accumulator. */
-    public static Accumulator<Double> doubleAccumulator
-        = new Accumulator<Double>() {
-            public Double accumulate(Double d1, Double d2) {
-                return d1 + d2;
-            }
-        };
-
     public static <K,V> void accumulateToMap(Map<K,V> map, K key, V value,
-                                             Accumulator<V> accumulator) {
+                                             BinaryOperator<V> accumulator) {
         if (map.containsKey(key)) {
-            map.put(key, accumulator.accumulate(map.get(key), value));
+            map.put(key, accumulator.apply(map.get(key), value));
         } else {
             map.put(key, value);
         }
     }
 
     public static <K,V> void accumulateMap(Map<K,V> map1, Map<K,V> map2,
-                                           Accumulator<V> accumulator) {
+                                           BinaryOperator<V> accumulator) {
         for (Entry<K,V> e : map2.entrySet()) {
             accumulateToMap(map1, e.getKey(), e.getValue(), accumulator);
         }

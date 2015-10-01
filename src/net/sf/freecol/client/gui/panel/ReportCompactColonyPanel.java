@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BinaryOperator;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -68,8 +69,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.WorkLocation.Suggestion;
 import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.common.util.CollectionUtils.Accumulator;
-
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -96,21 +95,18 @@ public final class ReportCompactColonyPanel extends ReportPanel
             CONSUMPTION, // Positive production but could consume more
         };
 
-        public static Accumulator<GoodsProduction> goodsProductionAccumulator
-            = new Accumulator<GoodsProduction>() {
-                    public GoodsProduction accumulate(GoodsProduction g1,
-                                                      GoodsProduction g2) {
-                        g1.amount += g2.amount;
-                        g1.status = (g1.status == ProductionStatus.NONE
-                            && g2.status == ProductionStatus.NONE)
-                            ? ProductionStatus.NONE
-                            : (g1.amount < 0) ? ProductionStatus.BAD
-                            : (g1.amount > 0) ? ProductionStatus.GOOD
-                            : ProductionStatus.ZERO;
-                        g1.extra = 0;
-                        return g1;
-                    }
-                };
+        public static BinaryOperator<GoodsProduction> goodsProductionAccumulator
+            = (g1, g2) -> {
+                g1.amount += g2.amount;
+                g1.status = (g1.status == ProductionStatus.NONE
+                        && g2.status == ProductionStatus.NONE)
+                    ? ProductionStatus.NONE
+                    : (g1.amount < 0) ? ProductionStatus.BAD
+                    : (g1.amount > 0) ? ProductionStatus.GOOD
+                    : ProductionStatus.ZERO;
+                g1.extra = 0;
+                return g1;
+            };
 
         /** Container class for goods production. */
         public static class GoodsProduction {
@@ -120,7 +116,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             public int extra;
 
             public GoodsProduction(int amount, ProductionStatus status,
-                int extra) {
+                                   int extra) {
                 this.amount = amount;
                 this.status = status;
                 this.extra = extra;
