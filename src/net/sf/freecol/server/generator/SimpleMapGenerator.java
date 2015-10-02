@@ -445,8 +445,7 @@ public class SimpleMapGenerator implements MapGenerator {
         for (Tile tile : allTiles) {
             if (!tile.isPolar()
                 && suitableForNativeSettlement(tile)
-                && settlementTiles.stream()
-                    .noneMatch(t -> t.getDistanceTo(tile) < minDistance))
+                && none(settlementTiles, t -> t.getDistanceTo(tile) < minDistance))
                 settlementTiles.add(tile);
         }
         randomShuffle(logger, "Settlement tiles", settlementTiles, random);

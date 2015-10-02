@@ -1141,7 +1141,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *     world or a nation is in rebellion against us.
      */
     public boolean isWorkForREF() {
-        return (getUnits().stream().anyMatch(Unit::hasTile))
+        return (any(getUnits(), Unit::hasTile))
             ? true // Work to do still if there exists a unit in the new world
             : !getRebels().isEmpty();
     }
@@ -1801,8 +1801,8 @@ public class Player extends FreeColGameObject implements Nameable {
             || (access == Market.Access.CUSTOM_HOUSE
                 && (getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
                     || (hasAbility(Ability.CUSTOM_HOUSE_TRADES_WITH_FOREIGN_COUNTRIES)
-                        && getGame().getLiveEuropeanPlayers(this).stream()
-                            .anyMatch(p -> getStance(p) == Stance.PEACE
+                        && any(getGame().getLiveEuropeanPlayers(this),
+                            p -> getStance(p) == Stance.PEACE
                                 || getStance(p) == Stance.ALLIANCE))));
     }
 
@@ -2115,8 +2115,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player owns at least one of the specified unit type.
      */
     public boolean hasUnitType(String typeId) {
-        return getUnits().stream()
-            .anyMatch(u -> typeId.equals(u.getType().getId()));
+        return any(getUnits(), u -> typeId.equals(u.getType().getId()));
     }
 
     /**
@@ -2976,8 +2975,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player is at war with any other.
      */
     public boolean isAtWar() {
-        return getGame().getLivePlayers(null).stream()
-            .anyMatch(p -> atWarWith(p));
+        return any(getGame().getLivePlayers(null), p -> atWarWith(p));
     }
 
     /**
@@ -2996,8 +2994,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this <code>Player</code> has contacted any Europeans.
      */
     public boolean hasContactedEuropeans() {
-        return getGame().getLiveEuropeanPlayers(this).stream()
-            .anyMatch(p -> hasContacted(p));
+        return any(getGame().getLiveEuropeanPlayers(this),
+            p -> hasContacted(p));
     }
 
     /**
@@ -3006,8 +3004,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this <code>Player</code> has contacted any natives.
      */
     public boolean hasContactedIndians() {
-        return getGame().getLiveNativePlayers(this).stream()
-            .anyMatch(p -> hasContacted(p));
+        return any(getGame().getLiveNativePlayers(this),
+            p -> hasContacted(p));
     }
 
     /**
@@ -3176,8 +3174,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The reason why/not the tile can be owned by this player.
      */
     private NoClaimReason canOwnTileReason(Tile tile) {
-        return (tile.getUnitList().stream()
-            .anyMatch(u -> u.getOwner() != this && u.isOffensiveUnit()))
+        return (any(tile.getUnitList(),
+                u -> u.getOwner() != this && u.isOffensiveUnit()))
             ? NoClaimReason.OCCUPIED // The tile is held against us
             : (isEuropean())
             ? ((tile.hasLostCityRumour())

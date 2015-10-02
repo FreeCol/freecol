@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
+
 
 /**
  * A rule consists of any number of relations combined with "and" and
@@ -59,9 +61,8 @@ public class Rule {
      * @return True if the number matches this rule.
      */
     public boolean matches(double number) {
-        return conditions.stream()
-            .anyMatch(andConditions ->
-                andConditions.stream().allMatch(r -> r.matches(number)));
+        return any(conditions,
+            andConditions -> all(andConditions, r -> r.matches(number)));
     }
 
     /**

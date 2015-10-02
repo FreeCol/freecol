@@ -615,8 +615,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final Specification spec = getSpecification();
         final Tile tile = colony.getTile();
         final Player player = colony.getOwner();
-        boolean hasDefender = tile.getUnitList().stream()
-            .anyMatch(u -> u.isDefensiveUnit()
+        boolean hasDefender = any(tile.getUnitList(),
+            u -> u.isDefensiveUnit()
                 && getAIUnit(u).getMission(DefendSettlementMission.class) != null);
         if (!hasDefender) return;
 

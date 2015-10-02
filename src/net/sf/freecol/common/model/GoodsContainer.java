@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.w3c.dom.Element;
 
@@ -330,9 +331,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public boolean hasReachedCapacity(int amount) {
         synchronized (storedGoods) {
-            return storedGoods.keySet().stream()
-                .anyMatch(gt -> gt.isStorable() && !gt.limitIgnored()
-                    && storedGoods.get(gt) > amount);
+            return any(storedGoods.keySet(), gt -> gt.isStorable()
+                && !gt.limitIgnored() && storedGoods.get(gt) > amount);
         }
     }
 
@@ -437,8 +437,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @return True if the contents have changed.
      */
     public boolean hasChanged() {
-        return getSpecification().getGoodsTypeList().stream()
-            .anyMatch(gt -> getOldGoodsCount(gt) != getGoodsCount(gt));
+        return any(getSpecification().getGoodsTypeList(),
+            gt -> getOldGoodsCount(gt) != getGoodsCount(gt));
     }
 
     /**

@@ -1843,8 +1843,7 @@ public final class Specification {
                                           String... abilities) {
         return allTypes.values().stream()
             .filter(type -> resultType.isInstance(type)
-                    && Arrays.stream(abilities)
-                        .anyMatch(a -> type.hasAbility(a)))
+                && any(abilities, a -> type.hasAbility(a)))
             .map(type -> resultType.cast(type))
             .collect(Collectors.toList());
     }
@@ -1861,8 +1860,7 @@ public final class Specification {
                                              String... abilities) {
         return allTypes.values().stream()
             .filter(type -> resultType.isInstance(type)
-                    && Arrays.stream(abilities)
-                        .noneMatch(a -> type.hasAbility(a)))
+                && none(abilities, a -> type.hasAbility(a)))
             .map(type -> resultType.cast(type))
             .collect(Collectors.toList());
     }

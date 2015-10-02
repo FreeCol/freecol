@@ -45,10 +45,9 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
-
 import static net.sf.freecol.common.util.RandomUtils.*;
-
 import net.sf.freecol.server.model.ServerRegion;
 
 
@@ -481,14 +480,12 @@ public class TerrainGenerator {
                 
                 // Not too close to a mountain range as this would
                 // defeat the purpose of adding random hills
-                && tile.getSurroundingTiles(1, 3).stream()
-                    .noneMatch(t -> t.getType() == mountains)
+                && none(tile.getSurroundingTiles(1, 3), t -> t.getType() == mountains)
 
                 // Do not add hills too close to the ocean/lake, as
                 // this helps with good locations for building
                 // colonies on shore.
-                && tile.getSurroundingTiles(1, 1).stream()
-                    .noneMatch(t -> !t.isLand())) {
+                && none(tile.getSurroundingTiles(1, 1), t -> !t.isLand())) {
                 return tile;
             }
         }
@@ -613,8 +610,8 @@ public class TerrainGenerator {
                 if (!riverType.isTileTypeAllowed(tile.getType())) continue;
 
                 // check the river source/spring is not too close to the ocean
-                if (!tile.getSurroundingTiles(1, 2).stream()
-                    .allMatch(Tile::isLand)) continue;
+                if (!all(tile.getSurroundingTiles(1, 2),
+                        Tile::isLand)) continue;
 
                 if (riverMap.get(tile) == null) {
                     // no river here yet

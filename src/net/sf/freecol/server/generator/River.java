@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.server.model.ServerRegion;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
 
@@ -229,8 +230,8 @@ public class River {
      * @return true if the given tile is next to this river.
      */
     public boolean isNextToSelf(Tile tile) {
-        return Direction.longSides.stream()
-            .anyMatch(d -> this.contains(tile.getNeighbourOrNull(d)));
+        return any(Direction.longSides,
+            d -> this.contains(tile.getNeighbourOrNull(d)));
     }
 
     /**
@@ -240,11 +241,11 @@ public class River {
      * @return true if the given tile is next to a river, lake or sea.
      */
     public boolean isNextToWater(Tile tile) {
-        return Direction.longSides.stream()
-            .anyMatch(d -> {
-                    Tile t = tile.getNeighbourOrNull(d);
-                    return t != null && (!t.isLand() || t.hasRiver());
-                });
+        return any(Direction.longSides,
+            d -> {
+                Tile t = tile.getNeighbourOrNull(d);
+                return t != null && (!t.isLand() || t.hasRiver());
+            });
     }
 
     /**
@@ -254,8 +255,7 @@ public class River {
      * @return true if this river already contains the given tile.
      */
     public boolean contains(Tile tile) {
-        return getSections().stream()
-            .anyMatch(rs -> rs.getTile() == tile);
+        return any(getSections(), rs -> rs.getTile() == tile);
     }
 
     /**

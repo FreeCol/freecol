@@ -299,8 +299,8 @@ public abstract class Settlement extends GoodsLocation
      * @return True if the settlement is connected to the high seas.
      */
     public boolean isConnectedPort() {
-        return getTile().getSurroundingTiles(1, 1).stream()
-            .anyMatch(t -> !t.isLand() && t.isHighSeasConnected());
+        return any(getTile().getSurroundingTiles(1, 1),
+            t -> !t.isLand() && t.isHighSeasConnected());
     }
 
     /**
@@ -363,7 +363,7 @@ public abstract class Settlement extends GoodsLocation
      * @return True if the settlement can provide the equipment.
      */
     public boolean canProvideGoods(List<AbstractGoods> goods) {
-        return goods.stream().allMatch(ag -> {
+        return all(goods, ag -> {
                 int available = getGoodsCount(ag.getType());
                 int breedingNumber = ag.getType().getBreedingNumber();
                 if (breedingNumber != GoodsType.INFINITY) {
@@ -569,8 +569,8 @@ public abstract class Settlement extends GoodsLocation
      */
     @Override
     public int priceGoods(List<AbstractGoods> goods) {
-        return (goods.stream()
-            .anyMatch(ag -> getGoodsCount(ag.getType()) < ag.getAmount())) ? -1
+        return (any(goods,
+                ag -> getGoodsCount(ag.getType()) < ag.getAmount())) ? -1
             : 0;
     }
 

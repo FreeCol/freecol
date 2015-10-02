@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
 
@@ -155,7 +156,7 @@ public class RandomRange {
      */
     public boolean appliesTo(FreeColObject fco) {
         List<Scope> scs = getScopes();
-        return scs.isEmpty() || scs.stream().anyMatch(s -> s.appliesTo(fco));
+        return scs.isEmpty() || any(scs, s -> s.appliesTo(fco));
     }
     
     /**

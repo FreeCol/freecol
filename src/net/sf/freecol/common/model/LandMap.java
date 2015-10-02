@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.SelectOption;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
 
@@ -286,11 +287,10 @@ public class LandMap {
      */
     private boolean isSingleTile(int x, int y) {
         final Position p = new Position(x, y);
-        return Arrays.stream(Direction.values())
-            .noneMatch(d -> {
-                    Position n = new Position(p, d);
-                    return n.isValid(width, height) && map[n.getX()][n.getY()];
-                });
+        return none(Direction.values(), d -> {
+                Position n = new Position(p, d);
+                return n.isValid(width, height) && map[n.getX()][n.getY()];
+            });
     }
 
     /**

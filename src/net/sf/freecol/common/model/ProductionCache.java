@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
+
 
 /**
  * The <code>ProductionCache</code> is contains all relevant
@@ -217,8 +219,8 @@ public class ProductionCache {
      */
     public boolean isProducing(GoodsType goodsType) {
         update();
-        return productionAndConsumption.values().stream()
-            .anyMatch(pi -> AbstractGoods.containsType(goodsType, pi.getProduction()));
+        return any(productionAndConsumption.values(),
+            pi -> AbstractGoods.containsType(goodsType, pi.getProduction()));
     }
 
     /**
@@ -229,8 +231,8 @@ public class ProductionCache {
      */
     public boolean isConsuming(GoodsType goodsType) {
         update();
-        return productionAndConsumption.values().stream()
-            .anyMatch(pi -> AbstractGoods.containsType(goodsType, pi.getConsumption()));
+        return any(productionAndConsumption.values(),
+            pi -> AbstractGoods.containsType(goodsType, pi.getConsumption()));
     }
     
     /**

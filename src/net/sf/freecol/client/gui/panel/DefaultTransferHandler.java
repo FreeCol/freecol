@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -279,8 +280,7 @@ public final class DefaultTransferHandler extends TransferHandler {
     @Override
     public boolean canImport(JComponent comp, DataFlavor[] flavor) {
         return (comp instanceof JPanel || comp instanceof JLabel)
-            && Arrays.stream(flavor)
-                .anyMatch(f -> f.equals(DefaultTransferHandler.flavor));
+            && any(flavor, f -> f.equals(DefaultTransferHandler.flavor));
     }
 
     /**

@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 import org.w3c.dom.Element;
@@ -229,9 +230,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @see Unit#isCarrier
      */
     public boolean hasCarrierWithSpace(int space) {
-        return getUnitList().stream()
-            .anyMatch(u -> u.isCarrier() && !u.isDamaged()
-                && u.getSpaceLeft() >= space);
+        return any(getUnitList(),
+            u -> u.isCarrier() && !u.isDamaged() && u.getSpaceLeft() >= space);
     }
 
     /**

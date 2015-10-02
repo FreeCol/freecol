@@ -25,8 +25,10 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.w3c.dom.Element;
 
@@ -139,8 +141,9 @@ public class ImprovementMission extends AbstractMission {
      * @return false
      */
     public static boolean isValidFor(Unit unit) {
-        return unit.getGame().getSpecification().getTileImprovementTypeList().stream()
-            .anyMatch(ti -> ti.isWorkerAllowed(unit));
+        final Specification spec = unit.getGame().getSpecification();
+        return any(spec.getTileImprovementTypeList(),
+            ti -> ti.isWorkerAllowed(unit));
     }
 
 

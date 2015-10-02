@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -156,8 +157,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             }
 
             List<IndianNationType> nations = spec.getIndianNationTypes().stream()
-                .filter(nt -> nt.getSkills().stream()
-                    .anyMatch(ut -> ut.getObject() == type))
+                .filter(nt -> any(nt.getSkills(), ut -> ut.getObject() == type))
                 .collect(Collectors.toList());
             if (!nations.isEmpty()) {
                 panel.add(Utility.localizedLabel("colopedia.unit.natives"), "newline");

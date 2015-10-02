@@ -43,7 +43,7 @@ import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceMapper;
 import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.common.util.LogBuilder;
-
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -285,7 +285,7 @@ public class FreeColDataFile {
                 ? false
                 : (requiredFile != null && f.isDirectory())
                 ? new File(f, requiredFile).exists()
-                : Arrays.stream(endings).anyMatch(e -> name.endsWith("." + e)
+                : any(endings, e -> name.endsWith("." + e)
                     && name.length() > e.length());
         };
     }

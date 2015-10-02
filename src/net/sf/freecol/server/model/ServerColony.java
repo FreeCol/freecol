@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -512,9 +513,8 @@ public class ServerColony extends Colony implements ServerModelObject {
         List<BuildableType> buildables = new ArrayList<>();
         buildables.addAll(spec.getBuildingTypeList());
         buildables.addAll(spec.getUnitTypesWithoutAbility(Ability.PERSON));
-        return buildables.stream()
-            .anyMatch(bt -> canBuild(bt)
-                && AbstractGoods.containsType(goodsType, bt.getRequiredGoods()));
+        return any(buildables, bt -> canBuild(bt)
+            && AbstractGoods.containsType(goodsType, bt.getRequiredGoods()));
     }
 
     /**

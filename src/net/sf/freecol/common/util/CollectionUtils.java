@@ -352,6 +352,48 @@ public class CollectionUtils {
             .collect(Collectors.toList());
     }
 
+    public static <T> boolean all(T[] array, Predicate<T> predicate) {
+        return all(Arrays.stream(array), predicate);
+    }
+
+    public static <T> boolean any(T[] array, Predicate<T> predicate) {
+        return any(Arrays.stream(array), predicate);
+    }
+
+    public static <T> boolean none(T[] array, Predicate<T> predicate) {
+        return none(Arrays.stream(array), predicate);
+    }
+
+    public static <T> boolean all(Collection<T> collection,
+                                  Predicate<T> predicate) {
+        return all(collection.stream(), predicate);
+    }
+
+    public static <T> boolean any(Collection<T> collection,
+                                  Predicate<T> predicate) {
+        return any(collection.stream(), predicate);
+    }
+
+    public static <T> boolean none(Collection<T> collection,
+                                   Predicate<T> predicate) {
+        return none(collection.stream(), predicate);
+    }
+
+    public static <T> boolean all(Stream<T> stream,
+                                  Predicate<T> predicate) {
+        return stream.allMatch(predicate);
+    }
+
+    public static <T> boolean any(Stream<T> stream,
+                                  Predicate<T> predicate) {
+        return stream.anyMatch(predicate);
+    }
+
+    public static <T> boolean none(Stream<T> stream,
+                                   Predicate<T> predicate) {
+        return stream.noneMatch(predicate);
+    }
+
     /**
      * Does a collection contain at least one element that matches a predicate?
      *

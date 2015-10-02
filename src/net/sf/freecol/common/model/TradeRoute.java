@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.w3c.dom.Element;
 
@@ -264,8 +265,8 @@ public class TradeRoute extends FreeColGameObject
         }
 
         // Check that the name is unique
-        if (owner.getTradeRoutes().stream()
-            .anyMatch(tr -> tr != this && tr.getName().equals(name))) {
+        if (any(owner.getTradeRoutes(),
+                tr -> tr != this && tr.getName().equals(name))) {
             return StringTemplate.template("model.tradeRoute.duplicateName")
                 .addName("%name%", name);
         }

@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.StringTemplate;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -135,9 +136,8 @@ public abstract class BuildableType extends FreeColGameObjectType {
      */
     public boolean isAvailableTo(FreeColObject... fco) {
         return (requiredAbilities == null) ? true
-            : requiredAbilities.entrySet().stream()
-                .allMatch(e -> e.getValue() == Arrays.stream(fco)
-                    .anyMatch(o -> o.hasAbility(e.getKey())));
+            : all(requiredAbilities.entrySet(),
+                e -> e.getValue() == any(fco, o -> o.hasAbility(e.getKey())));
     }
 
     /**

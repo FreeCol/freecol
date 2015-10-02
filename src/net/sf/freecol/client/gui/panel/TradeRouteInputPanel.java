@@ -69,6 +69,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRouteStop;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -224,8 +225,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
         @Override
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
-            return Arrays.stream(flavors)
-                .anyMatch(f -> f.equals(DefaultTransferHandler.flavor));
+            return any(flavors, f -> f.equals(DefaultTransferHandler.flavor));
         }
     }
 
@@ -342,7 +342,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
          */
         @Override
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
-            return Arrays.stream(flavors).anyMatch(f -> f.equals(STOP_FLAVOR));
+            return any(flavors, f -> f.equals(STOP_FLAVOR));
         }
 
         /**

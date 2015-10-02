@@ -86,7 +86,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.UnitType;
-
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -165,8 +165,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
              */
             @Override
             public boolean isDataFlavorSupported(DataFlavor flavor) {
-                return Arrays.stream(supportedFlavors)
-                    .anyMatch(f -> f.equals(flavor));
+                return any(supportedFlavors, f -> f.equals(flavor));
             }
         }
 
@@ -337,8 +336,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
          */
         @Override
         public boolean canImport(JComponent comp, DataFlavor[] flavors) {
-            return flavors != null && Arrays.stream(flavors)
-                .anyMatch(f -> f.equals(BUILD_LIST_FLAVOR));
+            return flavors != null
+                && any(flavors, f -> f.equals(BUILD_LIST_FLAVOR));
         }
 
         /**

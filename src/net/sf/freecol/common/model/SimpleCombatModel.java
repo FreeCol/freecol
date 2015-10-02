@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-
 import static net.sf.freecol.common.util.RandomUtils.*;
 
 
@@ -509,8 +509,8 @@ public class SimpleCombatModel extends CombatModel {
      * @return True if a strong defence bonus is present.
      */
     private boolean hasStrongDefenceModifier(FreeColObject fco) {
-        return fco.getDefenceModifiers().stream()
-            .anyMatch(m -> m.getType() == ModifierType.PERCENTAGE
+        return any(fco.getDefenceModifiers(),
+            m -> m.getType() == ModifierType.PERCENTAGE
                 && m.getValue() >= STRONG_DEFENCE_THRESHOLD);
     }
 
@@ -799,8 +799,8 @@ public class SimpleCombatModel extends CombatModel {
                             lose++;
                         }
                     } else if (r >= 1.0 - winner.getBurnProbability()) {
-                        if (loserPlayer.getIndianSettlements().stream()
-                            .anyMatch(s -> s.hasMissionary(winnerPlayer))) {
+                        if (any(loserPlayer.getIndianSettlements(),
+                                s -> s.hasMissionary(winnerPlayer))) {
                             crs.add(CombatResult.BURN_MISSIONS);
                         }
                     }

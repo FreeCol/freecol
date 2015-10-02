@@ -285,7 +285,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * @return True if improvement is possible.
      */
     public boolean isTileTypeAllowed(TileType tileType) {
-        return getScopes().stream().allMatch(s -> s.appliesTo(tileType));
+        return all(getScopes(), s -> s.appliesTo(tileType));
     }
 
     public int getBonus(GoodsType goodsType) {
@@ -353,8 +353,8 @@ public final class TileImprovementType extends FreeColGameObjectType {
      */
     public boolean changeContainsTarget(TileType tileType) {
         return (tileTypeChanges == null) ? false
-            : tileTypeChanges.values().stream()
-                .anyMatch(change -> change.getTo() == tileType);
+            : any(tileTypeChanges.values(),
+                change -> change.getTo() == tileType);
     }
 
     /**

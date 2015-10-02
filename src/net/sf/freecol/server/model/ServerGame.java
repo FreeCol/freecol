@@ -119,7 +119,7 @@ public class ServerGame extends Game implements ServerModelObject {
         return getLivePlayers(null).stream()
             .map(p -> (ServerPlayer)p)
             .filter(sp -> sp.isConnected()
-                && Arrays.stream(serverPlayers).noneMatch(s -> s == sp))
+                && none(serverPlayers, s -> s == sp))
             .collect(Collectors.toList());
     }
 

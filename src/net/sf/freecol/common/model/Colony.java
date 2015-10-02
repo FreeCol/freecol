@@ -665,8 +665,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public List<WorkLocation> getWorkLocationsForConsuming(GoodsType goodsType) {
         return getCurrentWorkLocations().stream()
-            .filter(wl -> wl.getInputs().stream()
-                .anyMatch(ag -> ag.getType() == goodsType))
+            .filter(wl -> any(wl.getInputs(), ag -> ag.getType() == goodsType))
             .collect(Collectors.toList());
     }
 
@@ -679,8 +678,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public List<WorkLocation> getWorkLocationsForProducing(GoodsType goodsType) {
         return getCurrentWorkLocations().stream()
-            .filter(wl -> wl.getOutputs().stream()
-                .anyMatch(ag -> ag.getType() == goodsType))
+            .filter(wl -> any(wl.getOutputs(), ag -> ag.getType() == goodsType))
             .collect(Collectors.toList());
     }
 
@@ -955,12 +953,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             && !getTile().isCoastland()) {
             return NoBuildReason.COASTAL;
         } else {
-            if (!buildableType.getRequiredAbilities().entrySet().stream()
-                .allMatch(e -> e.getValue() == hasAbility(e.getKey()))) {
+            if (!all(buildableType.getRequiredAbilities().entrySet(),
+                    e -> e.getValue() == hasAbility(e.getKey()))) {
                 return NoBuildReason.MISSING_ABILITY;
             }
-            if (!buildableType.getLimits().stream()
-                .allMatch(l -> l.evaluate(this))) {
+            if (!all(buildableType.getLimits(), l -> l.evaluate(this))) {
                 return NoBuildReason.LIMIT_EXCEEDED;
             }
         }
@@ -991,9 +988,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             // Non-person units need a BUILD ability, present or assumed.
             if (!buildableType.hasAbility(Ability.PERSON)
                 && !hasAbility(Ability.BUILD, buildableType)
-                && assumeBuilt.stream()
-                    .noneMatch(bt -> bt.hasAbility(Ability.BUILD,
-                                                   buildableType))) {
+                && none(assumeBuilt, bt -> bt.hasAbility(Ability.BUILD,
+                        buildableType))) {
                 return NoBuildReason.MISSING_BUILD_ABILITY;
             }
         }
@@ -1749,8 +1745,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public boolean canTrain(UnitType unitType) {
         return hasAbility(Ability.TEACH)
-            && buildingMap.values().stream()
-                .anyMatch(b -> b.canTeach() && b.canAddType(unitType));
+            && any(buildingMap.values(),
+                b -> b.canTeach() && b.canAddType(unitType));
     }
 
     /**
@@ -2035,10 +2031,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
             // Is there a work location that can produce the goods, with
             // positive generic production potential and all inputs satisfied?
-            : getWorkLocationsForProducing(goodsType).stream()
-                .anyMatch(wl -> wl.getGenericPotential(goodsType) > 0
-                    && wl.getInputs().stream()
-                        .allMatch(ag -> canProduce(ag.getType())));
+            : any(getWorkLocationsForProducing(goodsType),
+                wl -> wl.getGenericPotential(goodsType) > 0
+                    && all(wl.getInputs(),ag -> canProduce(ag.getType())));
     }
 
   
@@ -2480,8 +2475,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     @Override
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
-            return getAvailableWorkLocations().stream()
-                .anyMatch(wl -> wl.contains(locatable));
+            return any(getAvailableWorkLocations(),
+                wl -> wl.contains(locatable));
         }
         return super.contains(locatable);
     }

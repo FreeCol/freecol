@@ -32,6 +32,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -160,8 +161,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @return True if there are any child <code>OptionGroup</code>s present.
      */
     public boolean hasOptionGroup() {
-        return options.stream()
-            .anyMatch(o -> o instanceof OptionGroup);
+        return any(options, o -> o instanceof OptionGroup);
     }
 
     /**

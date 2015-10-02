@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -278,7 +279,7 @@ public class FoundingFather extends FreeColGameObjectType {
     public boolean isAvailableTo(Player player) {
         return (!player.isEuropean()) ? false
             : (scopes == null) ? true
-            : scopes.stream().anyMatch(s -> s.appliesTo(player));
+            : any(scopes, s -> s.appliesTo(player));
     }
 
 
