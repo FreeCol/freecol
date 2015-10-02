@@ -77,6 +77,18 @@ public class Scope extends FreeColObject {
 
 
     /**
+     * Get a key to display this scope with.
+     *
+     * @return A suitable key, or null if none found.
+     */
+    public String getKey() {
+        return (getType() != null) ? getType()
+            : (getAbilityId() != null) ? getAbilityId()
+            : (getMethodName() != null) ? "scope.method." + getMethodName()
+            : null;
+    }
+
+    /**
      * Does this scope match null?
      *
      * @return True if this scope matches null.

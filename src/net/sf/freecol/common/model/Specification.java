@@ -1905,10 +1905,11 @@ public final class Specification {
             logger.log(Level.WARNING, "Failed to load remedial roles.", e);
             return;
         }
-        List<String> roles = new ArrayList<>();
-        for (Role r : getRoles()) roles.add(r.getId());
+
         logger.info("Loading role backward compatibility fragment: "
-            + ROLES_COMPAT_FILE_NAME + " with roles: " + join(" ", roles));
+            + ROLES_COMPAT_FILE_NAME + " with roles: "
+            + getRoles().stream()
+                .map(Role::getId).collect(Collectors.joining()));
     }
     // end @compat 0.10.x
 

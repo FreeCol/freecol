@@ -28,12 +28,14 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.JarURLConnection;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 import net.sf.freecol.client.ClientOptions;
@@ -939,11 +941,8 @@ public final class FreeCol {
      * @return A list of advantage types.
      */
     private static String getValidAdvantages() {
-        String ret = "";
-        for (Advantages a : Advantages.values()) {
-            ret += "," + Messages.getName(a);
-        }
-        return ret.substring(1);
+        return Arrays.stream(Advantages.values())
+            .map(a -> Messages.getName(a)).collect(Collectors.joining(","));
     }
 
     /**
@@ -993,13 +992,9 @@ public final class FreeCol {
      * @return The valid difficulty levels, comma separated.
      */
     public static String getValidDifficulties() {
-        String s = "";
-        for (String d : DIFFICULTIES) {
-            String key = "model.difficulty." + d;
-            String value = Messages.getName(key);
-            s += "," + value;
-        }
-        return s.substring(1);
+        return Arrays.stream(DIFFICULTIES)
+            .map(d -> Messages.getName("model.difficulty." + d))
+            .collect(Collectors.joining(","));
     }
 
     /**

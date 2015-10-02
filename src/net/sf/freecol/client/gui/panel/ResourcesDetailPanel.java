@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -37,7 +38,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Scope;
-
+import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -89,17 +90,12 @@ public class ResourcesDetailPanel
         for (Modifier modifier : type.getModifiers()) {
             String text = ModifierFormat.getModifierAsString(modifier);
             if (modifier.hasScope()) {
-                ArrayList<String> scopeStrings = new ArrayList<>();
-                for (Scope scope : modifier.getScopes()) {
-                    if (scope.getType() != null) {
-                        FreeColGameObjectType fcgot = getSpecification()
-                            .findType(scope.getType());
-                        scopeStrings.add(Messages.getName(fcgot));
-                    }
-                }
-                if (!scopeStrings.isEmpty()) {
-                    text += " (" + join(", ", scopeStrings) + ")";
-                }
+                final Specification spec = getSpecification();
+                String scopeStrings = modifier.getScopes().stream()
+                    .filter(s -> s.getType() != null)
+                    .map(s -> Messages.getName(spec.findType(s.getType())))
+                    .collect(Collectors.joining(", "));
+                if (!scopeStrings.isEmpty()) text += " (" + scopeStrings + ")";
             }
 
             GoodsType goodsType = getSpecification().getGoodsType(modifier.getId());
