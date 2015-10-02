@@ -21,16 +21,18 @@ package net.sf.freecol.common.io;
 
 import java.io.File;
 import java.io.IOException;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.io.FreeColModFile;
-import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -50,21 +52,10 @@ public class Mods {
      * @param directory The directory to load from.
      */
     private static void loadModDirectory(File directory) {
-        if (directory != null && directory.isDirectory()) {
-            LogBuilder lb = new LogBuilder(64);
-            lb.add("In ", directory.getPath(), " found mod:");
-            lb.mark();
-            for (File f : directory.listFiles(FreeColModFile.getFileFilter())) {
-                try {
-                    FreeColModFile fcmf = new FreeColModFile(f);
-                    allMods.put(fcmf.getId(), fcmf);
-                    lb.add(" ", fcmf.getId());
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "Bad mod in " + f.getPath(), e);
-                }
-            }
-            if (lb.grew()) lb.log(logger, Level.INFO);
-        }
+        if (directory == null || !directory.isDirectory()) return;
+        Arrays.stream(directory.listFiles(FreeColModFile.getFileFilter()))
+            .map(FreeColModFile::make)
+            .forEach(fcmf -> allMods.put(fcmf.getId(), fcmf));
     }
 
     /**
@@ -74,6 +65,7 @@ public class Mods {
      * User mods are loaded after standard mods to allow user override.
      */
     public static void loadMods() {
+        allMods.clear();
         loadModDirectory(FreeColDirectories.getStandardModsDirectory());
         loadModDirectory(FreeColDirectories.getUserModsDirectory());
     }
@@ -115,15 +107,10 @@ public class Mods {
      * @return A list of <code>FreeColModFile</code>s containing rulesets.
      */
     public static List<FreeColTcFile> getRuleSets() {
-        List<FreeColTcFile> result = new ArrayList<>();
-        File directory = FreeColDirectories.getRulesDirectory();
-        for (File f : directory.listFiles(FreeColTcFile.getFileFilter())) {
-            try {
-                result.add(new FreeColTcFile(f));
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Failed to load rule set " + f, ioe);
-            }
-        }
-        return result;
+        return Arrays.stream(FreeColDirectories.getRulesDirectory()
+            .listFiles(FreeColTcFile.getFileFilter()))
+            .map(FreeColTcFile::make)
+            .filter(tc -> tc != null)
+            .collect(Collectors.toList());
     }
 }

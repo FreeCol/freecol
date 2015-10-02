@@ -27,6 +27,9 @@ import java.io.InputStream;
 
 import javax.xml.stream.XMLStreamException;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.model.Specification;
 
@@ -35,6 +38,8 @@ import net.sf.freecol.common.model.Specification;
  * A wrapped for a file containing a FreeCol modification (mod).
  */
 public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
+
+    private static final Logger logger = Logger.getLogger(FreeColModFile.class.getName());
 
     protected static final String SPECIFICATION_FILE = "specification.xml";
     protected static final String MOD_DESCRIPTOR_FILE = "mod.xml";
@@ -146,5 +151,20 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
      */
     public static FileFilter getFileFilter() {
         return fileFilter;
+    }
+
+    /**
+     * Helper to make a mod file from a given file, logging the exception.
+     *
+     * @param f The <code>File</code> to try to make the mod from.
+     * @return A new <code>FreeColModFile</code>, or null on error.
+     */
+    public static FreeColModFile make(File f) {
+        try {
+            return new FreeColModFile(f);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Failed to load mod from: " + f, ioe);
+        }
+        return null;
     }
 }

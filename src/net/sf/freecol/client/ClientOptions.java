@@ -26,10 +26,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -621,17 +623,13 @@ public class ClientOptions extends OptionGroup {
      * @return A list of active mods.
      */
     public List<FreeColModFile> getActiveMods() {
-        List<FreeColModFile> active = new ArrayList<>();
         ModListOption option = (ModListOption)getOption(ClientOptions.USER_MODS);
-        if (option != null) {
-            for (FreeColModFile modInfo : option.getOptionValues()) {
-                if (modInfo != null && modInfo.getId() != null) {
-                    FreeColModFile f = Mods.getFreeColModFile(modInfo.getId());
-                    if (f != null) active.add(f);
-                }
-            }
-        }
-        return active;
+        return (option == null) ? Collections.<FreeColModFile>emptyList()
+            : option.getOptionValues().stream()
+                .map(m -> (m == null || m.getId() == null) ? null
+                    : Mods.getFreeColModFile(m.getId()))
+                .filter(f -> f != null)
+                .collect(Collectors.toList());
     }
 
     /**

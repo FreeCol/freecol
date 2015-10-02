@@ -22,6 +22,8 @@ package net.sf.freecol.common.io;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.resources.ResourceMapping;
 
@@ -30,6 +32,8 @@ import net.sf.freecol.common.resources.ResourceMapping;
  * A Total Conversion (TC).  Rules are TCs.
  */
 public class FreeColTcFile extends FreeColModFile {
+
+    private static final Logger logger = Logger.getLogger(FreeColTcFile.class.getName());
 
     /** A file filter to select TCs. */
     private static final FileFilter fileFilter
@@ -87,5 +91,20 @@ public class FreeColTcFile extends FreeColModFile {
      */
     public static FileFilter getFileFilter() {
         return fileFilter;
+    }
+
+    /**
+     * Helper to make a TC file from a given file, logging the exception.
+     *
+     * @param f The <code>File</code> to try to make the TC from.
+     * @return A new <code>FreeColTcFile</code>, or null on error.
+     */
+    public static FreeColTcFile make(File f) {
+        try {
+            return new FreeColTcFile(f);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Failed to load TC from: " + f, ioe);
+        }
+        return null;
     }
 }

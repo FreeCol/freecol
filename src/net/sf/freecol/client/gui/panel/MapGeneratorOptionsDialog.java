@@ -25,9 +25,11 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -67,7 +69,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      * @param editable Whether the options may be edited.
      */
     public MapGeneratorOptionsDialog(FreeColClient freeColClient, JFrame frame,
-            boolean editable) {
+                                     boolean editable) {
         super(freeColClient, frame, editable,
             freeColClient.getGame().getMapGeneratorOptions(),
             MapGeneratorOptions.getXMLElementTagName(),
@@ -78,20 +80,13 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             loadDefaultOptions();
             // FIXME: The update should be solved by PropertyEvent.
             File mapDirectory = FreeColDirectories.getMapsDirectory();
-            if (mapDirectory.isDirectory()) {
-                File[] files = mapDirectory.listFiles(FreeColSavegameFile.getFileFilter());
-                Arrays.sort(files, new Comparator<File>() {
-                        @Override
-                        public int compare(File f1, File f2) {
-                            return f1.getName().compareTo(f2.getName());
-                        }
-                    });
+            if (mapDirectory != null && mapDirectory.isDirectory()) {
                 JPanel mapPanel = new JPanel();
-                for (final File file : files) {
-                    JButton mapButton = makeMapButton(file);
+                for (File f : loadMapFiles(mapDirectory)) {
+                    JButton mapButton = makeMapButton(f);
                     if (mapButton == null) continue;
                     mapButton.addActionListener((ActionEvent ae) -> {
-                            updateFile(file);
+                            updateFile(f);
                         });
                     mapPanel.add(mapButton);
                 }
@@ -103,13 +98,27 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                 scrollPane.getViewport().setOpaque(false);
                 // FIXME: find out how to do this properly
                 scrollPane.setMinimumSize(new Dimension(400, 110));
-
                 panel.add(scrollPane);
             }
         }
         initialize(frame);
     }
 
+    /**
+     * Load any map files in a directory.
+     *
+     * For now we are relying on the directory only containing save
+     * games that happen to be valid maps.
+     *
+     * @param directory The directory to load from.
+     * @return A list of potential map files.
+     */
+    private List<File> loadMapFiles(File directory) {
+        return Arrays.stream(directory
+            .listFiles(FreeColSavegameFile.getFileFilter()))
+            .sorted(Comparator.comparing(File::getName))
+            .collect(Collectors.toList());
+    }
 
     /**
      * Update the selected map file.
