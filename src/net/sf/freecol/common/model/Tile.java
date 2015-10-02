@@ -1170,7 +1170,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     <code>Tile</code>.
      */
     public boolean isAdjacent(Tile tile) {
-        return (tile == null) ? false : this.getDistanceTo(tile) == 1;
+        return (tile == null) ? false
+            : any(getSurroundingTiles(1, 1), t -> t == tile);
     }
 
     /**
