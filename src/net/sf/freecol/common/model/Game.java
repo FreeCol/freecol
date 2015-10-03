@@ -1141,15 +1141,19 @@ public class Game extends FreeColGameObject {
         Iterator<FreeColGameObject> iterator = getFreeColGameObjectIterator();
         while (iterator.hasNext()) {
             FreeColGameObject fcgo = iterator.next();
-            if (fcgo.isUninitialized()) {
+            if (fcgo == null) {
+                lb.add(" null-fcgo");
+            } else if (fcgo.isUninitialized()) {
                 lb.add(" ", fcgo.getId(),
                     "(", lastPart(fcgo.getClass().getName(), "."), ")");
-                if (fix) {
-                    iterator.remove();
-                    result = Math.min(result, 0);
-                } else {
-                    result = -1;
-                }
+            } else {
+                continue;
+            }
+            if (fix) {
+                iterator.remove();
+                result = Math.min(result, 0);
+            } else {
+                result = -1;
             }
         }
         if (lb.grew()) {
