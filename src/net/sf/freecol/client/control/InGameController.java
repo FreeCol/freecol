@@ -583,7 +583,8 @@ public final class InGameController implements NetworkConstants {
         final Turn turn = game.getTurn();
         return (/* player.getName() + "_" */ gid
             + "_" + Messages.message(player.getNationLabel())
-            + "_" + turn.getSaveGameSuffix())
+            + "_" + turn.getSaveGameSuffix()
+            + "." + FreeCol.FREECOL_SAVE_EXTENSION)
             .replaceAll(" ", "_");
     }
 
@@ -619,8 +620,7 @@ public final class InGameController implements NetworkConstants {
         int saveGamePeriod = options.getInteger(ClientOptions.AUTOSAVE_PERIOD);
         int turnNumber = game.getTurn().getNumber();
         if (saveGamePeriod >= 1 && turnNumber % saveGamePeriod == 0) {
-            String fileName = prefix + "-" + getSaveGameString(game)
-                + "." + FreeCol.FREECOL_SAVE_EXTENSION;
+            String fileName = prefix + "-" + getSaveGameString(game);
             saveGame(new File(autoSaveDir, fileName));
         }
     }
@@ -4386,7 +4386,6 @@ public final class InGameController implements NetworkConstants {
         File file = gui.showSaveDialog(FreeColDirectories.getSaveDirectory(),
                                        fileName);
         if (file == null) return false;
-        
         final boolean confirm = freeColClient.getClientOptions()
             .getBoolean(ClientOptions.CONFIRM_SAVE_OVERWRITE);
         if (!confirm
