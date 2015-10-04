@@ -112,7 +112,7 @@ public final class FreeCol {
     private static final int    EUROPEANS_DEFAULT = 4;
     private static final int    EUROPEANS_MIN = 1;
     private static final Level  LOGLEVEL_DEFAULT = Level.INFO;
-    private static final String JAVA_VERSION_MIN = "1.7";
+    private static final String JAVA_VERSION_MIN = "1.8";
     private static final int    MEMORY_MIN = 128; // Mbytes
     private static final int    PORT_DEFAULT = 3541;
     private static final String SPLASH_DEFAULT = "splash.jpg";
