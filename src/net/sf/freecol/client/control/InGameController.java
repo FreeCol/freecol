@@ -329,6 +329,7 @@ public final class InGameController implements NetworkConstants {
         } else if (updateActiveUnit(tile)) {
             ; // setActiveUnit will update the menu bar
         } else {
+            gui.updateMapControls();
             gui.updateMenuBar();
         }
     }

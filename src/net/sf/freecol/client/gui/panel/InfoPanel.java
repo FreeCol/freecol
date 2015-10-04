@@ -267,8 +267,8 @@ public final class InfoPanel extends FreeColPanel {
                     if (gc != null) gc.addPropertyChangeListener(this);
                 }
                 this.unit = unit;
-                update();
             }
+            update();
         }
 
         /**
