@@ -2541,7 +2541,7 @@ public final class Specification {
             Option op = level.getOption(gr);
             if (op instanceof OptionGroup) {
                 OptionGroup og = (OptionGroup)op;
-                if ((op = og.getOption(id)) != null) return null;
+                if (og.getOption(id) instanceof UnitListOption) continue;
                 if (ulo == null) ulo = new UnitListOption(id, this);
                 og.add(ulo);
             }
