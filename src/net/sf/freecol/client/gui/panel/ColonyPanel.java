@@ -1072,6 +1072,8 @@ public final class ColonyPanel extends PortPanel
             updateInPortPanel();
             updatePopulationPanel();
             updateWarehousePanel();// Role change changes equipment goods
+        } else if (Unit.MOVE_CHANGE.equals(property)) {
+            updateOutsideColonyPanel();
         } else {
             // ColonyTiles and Buildings now have their own
             // propertyChangeListeners so {ColonyTile,Building}.UNIT_CHANGE
