@@ -1190,7 +1190,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean isLandLocked() {
         return (!isLand()) ? false
-            : all(getSurroundingTiles(0, 1), Tile::isLand);
+            : all(getSurroundingTiles(1, 1), Tile::isLand);
     }
 
     /**
@@ -1203,8 +1203,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if this <code>Tile</code> is on the shore.
      */
     public boolean isShore() {
-        return any(getSurroundingTiles(0, 1),
-            t -> t.isLand() != this.isLand());
+        return any(getSurroundingTiles(1, 1), t -> t.isLand() != this.isLand());
     }
 
 
