@@ -1386,21 +1386,20 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             } else {
                 if (!plan.update(goodsType)) plan = null;
             }
-            if (plan != null) {
-                // Defend against clearing the last forested tile, but
-                // otherwise add the plan.
-                TileType change = plan.getType().getChange(workTile.getType());
-                if (change != null && !change.isForested()) {
-                    int forest = 0;
-                    for (WorkLocation f : colony.getAvailableWorkLocations()) {
-                        if (f instanceof ColonyTile
-                            && ((ColonyTile)f).getWorkTile().isForested())
-                            forest++;
-                    }
-                    if (forest <= FOREST_MINIMUM) continue;
-                }
-                newPlans.add(plan);
-            }
+            if (plan == null) continue;
+
+            // Defend against clearing the last forested tile.
+            TileType change = plan.getType().getChange(workTile.getType());
+            if (change != null
+                && !change.isForested()
+                && !colonyTile.isColonyCenterTile()
+                && colony.getAvailableWorkLocations().stream()
+                    .filter(ct -> ct instanceof ColonyTile
+                        && !((ColonyTile)ct).isColonyCenterTile()
+                        && ((ColonyTile)ct).getWorkTile().isForested())
+                    .count() <= FOREST_MINIMUM) continue;
+
+            newPlans.add(plan); // Otherwise add the plan.
         }
         tileImprovementPlans.clear();
         tileImprovementPlans.addAll(newPlans);
