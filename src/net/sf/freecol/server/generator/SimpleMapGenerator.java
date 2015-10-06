@@ -557,7 +557,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // For each missing skill...
         while (!expertsNeeded.isEmpty()) {
             UnitType neededSkill = expertsNeeded.remove(0);
-            Collections.sort(isList, listLengthComparator);
+            Collections.sort(isList, descendingListLengthComparator);
             List<IndianSettlement> extras = isList.remove(0);
             UnitType extraSkill = extras.get(0).getLearnableSkill();
             List<RandomChoice<IndianSettlement>> choices = new ArrayList<>();

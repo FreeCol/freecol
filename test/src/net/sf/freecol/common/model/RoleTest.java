@@ -47,7 +47,7 @@ public class RoleTest extends FreeColTestCase {
         = spec().getRole("model.role.dragoon");
     private static final Role pioneer
         = spec().getRole("model.role.pioneer");
-    private static final Role missionary
+    private static final Role mission
         = spec().getRole("model.role.missionary");
     private static final Role infantry
         = spec().getRole("model.role.infantry");
@@ -68,48 +68,46 @@ public class RoleTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.kingsRegular");
 
 
-    public void testComparators() {
+    public void testRoleComparator() {
         List<Role> roles = new ArrayList<>();
         roles.add(soldier);
         roles.add(dragoon);
-        roles.add(missionary);
+        roles.add(mission);
         Collections.sort(roles);
         assertEquals(dragoon, roles.get(0));
         assertEquals(soldier, roles.get(1));
-        assertEquals(missionary, roles.get(2));
+        assertEquals(mission, roles.get(2));
 
-        assertEquals(0, Role.defensiveComparator.compare(soldier, soldier));
-        assertEquals(0, Role.defensiveComparator.compare(dragoon, dragoon));
-        assertEquals(0, Role.defensiveComparator.compare(missionary, missionary));
-
-        assertEquals(1, Role.defensiveComparator.compare(dragoon, soldier));
-        assertEquals(-1, Role.defensiveComparator.compare(soldier, dragoon));
-
-        assertEquals(-1,  Role.defensiveComparator.compare(missionary, soldier));
-        assertEquals(-1,  Role.defensiveComparator.compare(missionary, dragoon));
+        assertEquals(0,  Role.militaryComparator.compare(soldier, soldier));
+        assertEquals(0,  Role.militaryComparator.compare(dragoon, dragoon));
+        assertEquals(0,  Role.militaryComparator.compare(mission, mission));
+        assertEquals(-1, Role.militaryComparator.compare(dragoon, soldier));
+        assertEquals(1,  Role.militaryComparator.compare(soldier, dragoon));
+        assertEquals(1,  Role.militaryComparator.compare(mission, soldier));
+        assertEquals(-1, Role.militaryComparator.compare(dragoon, mission));
     }
 
     public void testCompatibleRoles() {
         assertFalse(soldier.isCompatibleWith(none));
         assertFalse(soldier.isCompatibleWith(pioneer));
-        assertFalse(soldier.isCompatibleWith(missionary));
+        assertFalse(soldier.isCompatibleWith(mission));
         assertTrue(soldier.isCompatibleWith(soldier));
         assertFalse(soldier.isCompatibleWith(scout));
         assertTrue(soldier.isCompatibleWith(dragoon));
 
-        assertFalse(missionary.isCompatibleWith(none));
-        assertFalse(missionary.isCompatibleWith(pioneer));
-        assertTrue(missionary.isCompatibleWith(missionary));
-        assertFalse(missionary.isCompatibleWith(soldier));
-        assertFalse(missionary.isCompatibleWith(scout));
-        assertFalse(missionary.isCompatibleWith(dragoon));
+        assertFalse(mission.isCompatibleWith(none));
+        assertFalse(mission.isCompatibleWith(pioneer));
+        assertTrue(mission.isCompatibleWith(mission));
+        assertFalse(mission.isCompatibleWith(soldier));
+        assertFalse(mission.isCompatibleWith(scout));
+        assertFalse(mission.isCompatibleWith(dragoon));
     }
 
     public void testGoodsDifference() {
         assertTrue(Role.getGoodsDifference(null, 1, none, 1).isEmpty());
         assertTrue(Role.getGoodsDifference(none, 1, none, 1).isEmpty());
-        assertTrue(Role.getGoodsDifference(none, 1, missionary, 1).isEmpty());
-        assertTrue(Role.getGoodsDifference(missionary, 1, none, 1).isEmpty());
+        assertTrue(Role.getGoodsDifference(none, 1, mission, 1).isEmpty());
+        assertTrue(Role.getGoodsDifference(mission, 1, none, 1).isEmpty());
 
         List<AbstractGoods> goods
             = Role.getGoodsDifference(none, 1, soldier, 1);
@@ -120,7 +118,7 @@ public class RoleTest extends FreeColTestCase {
         checkGoods("soldier->dragoon", goods,
             new AbstractGoods(horses, 50));
 
-        goods = Role.getGoodsDifference(missionary, 1, dragoon, 1);
+        goods = Role.getGoodsDifference(mission, 1, dragoon, 1);
         checkGoods("missionary->dragoon", goods,
             new AbstractGoods(horses, 50),
             new AbstractGoods(muskets, 50));

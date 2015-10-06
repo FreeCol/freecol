@@ -32,12 +32,9 @@ import java.util.Set;
  */
 public interface Consumer {
 
-    public static final Comparator<Consumer> COMPARATOR = new Comparator<Consumer>() {
-        @Override
-        public int compare(Consumer c1, Consumer c2) {
-            return c2.getPriority() - c1.getPriority();
-        }
-    };
+    /** Compare consumers by descending priority. */
+    public static final Comparator<Consumer> COMPARATOR
+        = Comparator.comparingInt(Consumer::getPriority).reversed();
 
     /**
      * Default consumption priority for the Colony when producing new

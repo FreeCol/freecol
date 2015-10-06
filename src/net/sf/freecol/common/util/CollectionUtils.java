@@ -51,39 +51,18 @@ public class CollectionUtils {
         = (d1, d2) -> d1 + d2;
 
     /** Useful comparators for mapEntriesBy* */
-    public static final Comparator<Integer> descendingIntegerComparator
-        = new Comparator<Integer>() {
-            public int compare(Integer i1, Integer i2) {
-                return i2 - i1;
-            }
-        };
     public static final Comparator<Integer> ascendingIntegerComparator
-        = new Comparator<Integer>() {
-            public int compare(Integer i1, Integer i2) {
-                return i1 - i2;
-            }
-        };
-    public static final Comparator<Double> descendingDoubleComparator
-        = new Comparator<Double>() {
-            public int compare(Double d1, Double d2) {
-                return (d2 > d1) ? 1 : (d2 < d1) ? -1 : 0;
-            }
-        };
+        = Comparator.comparingInt(i -> i);
+    public static final Comparator<Integer> descendingIntegerComparator
+        = ascendingIntegerComparator.reversed();
     public static final Comparator<Double> ascendingDoubleComparator
-        = new Comparator<Double>() {
-            public int compare(Double d1, Double d2) {
-                return (d1 > d2) ? 1 : (d1 < d2) ? -1 : 0;
-            }
-        };
-
-    /** Comparator to order lists by decreasing length. */
-    public static final Comparator<List<?>> listLengthComparator
-        = new Comparator<List<?>>() {
-            @Override
-            public int compare(List<?> l1, List<?> l2) {
-                return l2.size() - l1.size();
-            }
-        };
+        = Comparator.comparingDouble(d -> d);
+    public static final Comparator<Double> descendingDoubleComparator
+        = ascendingDoubleComparator.reversed();
+    public static final Comparator<List<?>> ascendingListLengthComparator
+        = Comparator.comparingInt(l -> l.size());
+    public static final Comparator<List<?>> descendingListLengthComparator
+        = ascendingListLengthComparator.reversed();
 
     /**
      * Make an unmodifiable set with specified members.

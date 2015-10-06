@@ -54,7 +54,7 @@ public class NewUnitPanel extends FreeColPanel {
     /** The unit types corresponding to the buttons. */
     private final List<UnitType> units = new ArrayList<>();
 
-    /** A comparator for unit prices. */
+    /** A comparator by ascending unit price. */
     private final Comparator<UnitType> priceComparator;
 
     /** Is there at least one available unit? */
@@ -73,16 +73,11 @@ public class NewUnitPanel extends FreeColPanel {
                         String label, List<UnitType> units) {
         super(freeColClient, layout);
 
-        final Europe europe = getMyPlayer().getEurope();
-
         this.question = new JLabel(label);
         this.units.addAll(units);
-        this.priceComparator = new Comparator<UnitType>() {
-            @Override
-            public int compare(final UnitType u1, final UnitType u2) {
-                return europe.getUnitPrice(u1) - europe.getUnitPrice(u2);
-            }
-        };
+        final Europe europe = getMyPlayer().getEurope();
+        this.priceComparator = Comparator.comparingInt((UnitType ut) ->
+            europe.getUnitPrice(ut));
 
         okButton.setText(Messages.message("close"));
 

@@ -64,42 +64,8 @@ public class Role extends BuildableType {
      * effectiveness.
      */
     public static final Comparator<Role> militaryComparator
-        = new Comparator<Role>() {
-            @Override
-            public int compare(Role role1, Role role2) {
-                double amount1 = role1.getOffence() + role1.getDefence();
-                double amount2 = role2.getOffence() + role2.getDefence();
-                return (amount1 < amount2) ? 1
-                    : (amount1 > amount2) ? -1
-                    : 0;
-            }
-        };
-
-    /** A comparator to sort roles by descending defensive power. */
-    public static final Comparator<Role> defensiveComparator
-        = new Comparator<Role>() {
-            @Override
-            public int compare(Role role1, Role role2) {
-                double defence1 = role1.getDefence();
-                double defence2 = role2.getDefence();
-                return (defence1 > defence2) ? 1
-                    : (defence1 < defence2) ? -1
-                    : 0;
-            }
-        };
-
-    /** A comparator to sort roles by descending offensive power. */
-    public static final Comparator<Role> offensiveComparator
-        = new Comparator<Role>() {
-            @Override
-            public int compare(Role role1, Role role2) {
-                double offence1 = role1.getOffence();
-                double offence2 = role2.getOffence();
-                return (offence1 > offence2) ? 1
-                    : (offence1 < offence2) ? -1
-                    : 0;
-            }
-        };
+        = Comparator.comparingDouble((Role r) ->
+            r.getOffence() + r.getDefence()).reversed();
 
     /**
      * The Role to downgrade to after losing a battle. Defaults to

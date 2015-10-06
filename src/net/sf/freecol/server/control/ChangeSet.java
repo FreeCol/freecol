@@ -59,6 +59,10 @@ import org.w3c.dom.NamedNodeMap;
  */
 public class ChangeSet {
 
+    /** Compare changes by ascending priority. */
+    private static final Comparator<Change> changeComparator
+        = Comparator.comparingInt(Change::getPriority);
+
     // Convenient way to specify the relative priorities of the fixed
     // change types in one place.
     public static enum ChangePriority {
@@ -86,13 +90,6 @@ public class ChangeSet {
 
     private final ArrayList<Change> changes;
 
-    private static final Comparator<Change> changeComparator
-        = new Comparator<Change>() {
-            @Override
-            public int compare(final Change c1, final Change c2) {
-                return c1.getPriority() - c2.getPriority();
-            }
-        };
 
     /**
      * Class to control the visibility of a change.

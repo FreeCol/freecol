@@ -62,12 +62,7 @@ public final class TradeRoutePanel extends FreeColPanel {
 
     /** Compare trade routes by name. */
     private static final Comparator<TradeRoute> tradeRouteComparator
-        = new Comparator<TradeRoute>() {
-            @Override
-            public int compare(TradeRoute r1, TradeRoute r2) {
-                return r1.getName().compareTo(r2.getName());
-            }
-        };
+        = Comparator.comparing(TradeRoute::getName);
 
     /** The unit to assign/deassign trade routes for. */
     private final Unit unit;
