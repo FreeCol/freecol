@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -103,21 +104,17 @@ public final class ReportClassicColonyPanel extends ReportPanel
             JPanel colonistsPanel
                 = new JPanel(new GridLayout(0, COLONISTS_PER_ROW));
             colonistsPanel.setOpaque(false);
-            List<Unit> unitList = colony.getUnitList();
-            Collections.sort(unitList, getUnitTypeComparator());
-            for (Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit,
-                    true, true);
-                colonistsPanel.add(unitLabel);
+            for (Unit u : colony.getUnitList().stream()
+                     .sorted(Unit.typeRoleComparator).collect(Collectors.toList())) {
+                colonistsPanel.add(new UnitLabel(getFreeColClient(), u,
+                                                 true, true));
             }
             JPanel unitsPanel = new JPanel(new GridLayout(0, UNITS_PER_ROW));
             unitsPanel.setOpaque(false);
-            unitList = colony.getTile().getUnitList();
-            Collections.sort(unitList, getUnitTypeComparator());
-            for (Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit,
-                    true, true);
-                unitsPanel.add(unitLabel);
+            for (Unit u : colony.getTile().getUnitList().stream()
+                     .sorted(Unit.typeRoleComparator).collect(Collectors.toList())) {
+                unitsPanel.add(new UnitLabel(getFreeColClient(), u,
+                                             true, true));
             }
             if (buildableLabel != null
                 && spec.getUnitTypeList().contains(currentType)) {

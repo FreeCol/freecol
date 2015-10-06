@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -200,11 +201,10 @@ public final class TilePopup extends JPopupMenu {
         int maxUnits = UNIT_LINES_IN_FIRST_MENU;
         Container currentMenu = this;
         boolean moreUnits = false;
-        List<Unit> units = tile.getUnitList();
         Unit firstUnit = tile.getFirstUnit();
-        Collections.sort(units, ReportPanel.getUnitTypeComparator());
-        for (final Unit currentUnit : units) {
-
+        for (Unit u : tile.getUnitList().stream()
+                 .sorted(Unit.typeRoleComparator)
+                 .collect(Collectors.toList())) {
             if (lineCount > maxUnits) {
                 JMenu more = Utility.localizedMenu("more");
                 more.setFont(more.getFont().deriveFont(Font.ITALIC));
@@ -215,9 +215,7 @@ public final class TilePopup extends JPopupMenu {
                 lineCount = 0;
                 maxUnits = UNIT_LINES_IN_OTHER_MENUS;
             }
-
-            lineCount += addUnit(currentMenu, currentUnit,
-                !currentUnit.isDamaged(), false);
+            lineCount += addUnit(currentMenu, u, !u.isDamaged(), false);
         }
 
         if (tile.getUnitCount() > 1 && player.owns(firstUnit)) {

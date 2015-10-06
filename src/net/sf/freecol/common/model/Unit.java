@@ -108,7 +108,6 @@ public class Unit extends GoodsLocation
         }
     }
 
-
     /** The individual name of this unit, not of the unit type. */
     protected String name = null;
 

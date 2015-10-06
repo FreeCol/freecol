@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -184,17 +185,18 @@ public abstract class ReportUnitPanel extends ReportPanel {
         if (unitList == null || unitList.isEmpty()) {
             reportPanel.add(Utility.localizedLabel("none"), "sg");
         } else {
-            Collections.sort(unitList, ReportPanel.getUnitTypeComparator());
-            for (Unit unit : unitList) {
-                JButton unitButton = getUnitButton(unit);
-                if (unit.isCarrier()) {
+            for (Unit u : unitList.stream()
+                     .sorted(Unit.typeRoleComparator).collect(Collectors.toList())) {
+                JButton unitButton = getUnitButton(u);
+                if (u.isCarrier()) {
                     reportPanel.add(unitButton, "newline, sg");
-                    for (Goods goods : unit.getGoodsList()) {
+                    for (Goods goods : u.getGoodsList()) {
                         GoodsLabel goodsLabel = new GoodsLabel(getGUI(), goods);
                         reportPanel.add(goodsLabel);
                     }
-                    for (Unit unitLoaded : unit.getUnitList()) {
-                        UnitLabel unitLoadedLabel = new UnitLabel(getFreeColClient(), unitLoaded, true);
+                    for (Unit unitLoaded : u.getUnitList()) {
+                        UnitLabel unitLoadedLabel
+                            = new UnitLabel(getFreeColClient(), unitLoaded, true);
                         reportPanel.add(unitLoadedLabel);
                     }
                 } else {
