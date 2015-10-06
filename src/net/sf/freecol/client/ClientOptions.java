@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
@@ -430,67 +431,30 @@ public class ClientOptions extends OptionGroup {
         = "clientOptions.mods.userMods";
 
 
-    /**
-     * Comparators for sorting colonies.
-     */
+    // Comparators for sorting colonies.
+    /** Compare by ascending age. */
     private static final Comparator<Colony> colonyAgeComparator
-        = new Comparator<Colony>() {
-            @Override
-            public int compare(Colony s1, Colony s2) {
-                return s1.getEstablished().getNumber()
-                    - s2.getEstablished().getNumber();
-            }
-        };
+        = Comparator.comparingInt(c -> c.getEstablished().getNumber());
 
+    /** Compare by name. */
     private static final Comparator<Colony> colonyNameComparator
-        = new Comparator<Colony>() {
-            @Override
-            public int compare(Colony s1, Colony s2) {
-                return s1.getName().compareTo(s2.getName());
-            }
-        };
+        = Comparator.comparing(Colony::getName);
 
+    /** Compare by descending size then liberty. */
     private static final Comparator<Colony> colonySizeComparator
-        = new Comparator<Colony>() {
-            @Override
-            public int compare(Colony s1, Colony s2) {
-                // sort size descending, then SoL descending
-                int dsize = s2.getUnitCount() - s1.getUnitCount();
-                if (dsize == 0) {
-                    return s2.getSoL() - s1.getSoL();
-                } else {
-                    return dsize;
-                }
-            }
-        };
+        = Comparator.comparingInt(Colony::getUnitCount)
+            .thenComparingInt(Colony::getSoL)
+            .reversed();
 
+    /** Compare by descending liberty then size. */
     private static final Comparator<Colony> colonySoLComparator
-        = new Comparator<Colony>() {
-            @Override
-            public int compare(Colony s1, Colony s2) {
-                // sort SoL descending, then size descending
-                int dsol = s2.getSoL() - s1.getSoL();
-                if (dsol == 0) {
-                    return s2.getUnitCount() - s1.getUnitCount();
-                } else {
-                    return dsol;
-                }
-            }
-        };
+        = Comparator.comparingInt(Colony::getSoL)
+            .thenComparingInt(Colony::getUnitCount)
+            .reversed();
 
+    /** Compare by position on the map. */
     private static final Comparator<Colony> colonyPositionComparator
-        = new Comparator<Colony>() {
-            @Override
-            public int compare(Colony s1, Colony s2) {
-                // sort north to south, then west to east
-                int dy = s1.getTile().getY() - s2.getTile().getY();
-                if (dy == 0) {
-                    return s1.getTile().getX() - s2.getTile().getX();
-                } else {
-                    return dy;
-                }
-            }
-       };
+        = Comparator.comparingInt(c -> Location.getRank(c));
 
 
     private class MessageSourceComparator implements Comparator<ModelMessage> {
@@ -539,13 +503,8 @@ public class ClientOptions extends OptionGroup {
 
     /** Compare messages by type. */
     private static final Comparator<ModelMessage> messageTypeComparator
-        = new Comparator<ModelMessage>() {
-            @Override
-            public int compare(ModelMessage message1, ModelMessage message2) {
-                return message1.getMessageType().ordinal()
-                    - message2.getMessageType().ordinal();
-            }
-        };
+        = (m1, m2) -> m1.getMessageType().ordinal()
+                    - m2.getMessageType().ordinal();
 
 
     /**
