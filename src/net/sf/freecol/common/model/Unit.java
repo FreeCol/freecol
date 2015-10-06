@@ -1876,23 +1876,6 @@ public class Unit extends GoodsLocation
         return (best != null) ? best : player.getEurope();
     }
 
-    /**
-     * Get a comparator to order units by military strength.
-     *
-     * @param cm The <code>CombatModel</code> to assess strength with.
-     * @return A suitable <code>Comparator</code>.
-     */
-    public static final Comparator<Unit> getMilitaryStrengthComparator(final CombatModel cm) {
-        return new Comparator<Unit>() {
-                @Override
-                public int compare(Unit u1, Unit u2) {
-                    double cmp = cm.calculateCombatOdds(u1, u2).win
-                        - cm.calculateCombatOdds(u2, u1).win;
-                    return (cmp < 0.5) ? -1 : (cmp > 0.5) ? 1 : 0;
-                }
-            };
-    }
-
 
     // Movement handling
 

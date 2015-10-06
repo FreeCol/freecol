@@ -226,7 +226,7 @@ public class NativeAIPlayer extends AIPlayer {
 
         // Prioritize promoting partially equipped units to full dragoon
         Collections.sort(units,
-            Unit.getMilitaryStrengthComparator(getGame().getCombatModel()));
+            getGame().getCombatModel().getMilitaryStrengthComparator());
 
         boolean moreHorses = true, moreMuskets = true;
         for (Unit u : units) {

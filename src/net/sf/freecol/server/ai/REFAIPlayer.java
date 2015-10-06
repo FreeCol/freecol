@@ -432,8 +432,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
 
         // Attack naval targets.
-        Comparator<Unit> militaryStrength
-            = Unit.getMilitaryStrengthComparator(getGame().getCombatModel());
+        final Comparator<Unit> militaryStrength
+            = getGame().getCombatModel().getMilitaryStrengthComparator();
         Collections.sort(rebelNavy, militaryStrength);
         Iterator<Unit> ui = rebelNavy.iterator();
         List<Tile> entries = new ArrayList<>();
