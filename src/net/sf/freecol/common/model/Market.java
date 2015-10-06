@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -413,6 +414,16 @@ public final class Market extends FreeColGameObject implements Ownable {
     public void update(GoodsType goodsType) {
         MarketData data = requireMarketData(goodsType);
         if (data != null) data.update();
+    }
+
+    /**
+     * Get a sale price comparator for this market.
+     *
+     * @return A suitable <code>Comparator</code>.
+     */
+    public <T extends AbstractGoods> Comparator<T> getSalePriceComparator() {
+        return Comparator.comparingInt((T t)
+            -> getSalePrice(t.getType(), t.getAmount())).reversed();
     }
 
     /**

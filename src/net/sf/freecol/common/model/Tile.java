@@ -1742,23 +1742,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Get a comparator to order a list of goods by potential sale value
-     * in a market.
-     *
-     * @param market The <code>Market</code> to evaluate against.
-     * @return A comparator.
-     */
-    public Comparator<AbstractGoods> getMarketGoodsComparator(final Market market) {
-        return new Comparator<AbstractGoods>() {
-            @Override
-            public int compare(AbstractGoods o, AbstractGoods p) {
-                return market.getSalePrice(p.getType(), p.getAmount())
-                    - market.getSalePrice(o.getType(), o.getAmount());
-            }
-        };
-    }
-
-    /**
      * Sort possible goods types according to potential.
      *
      * @param unitType The <code>UnitType</code> to do the work.
@@ -1782,7 +1765,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             Collections.sort(goodsTypeList,
                 (owner == null || owner.getMarket() == null)
                 ? AbstractGoods.abstractGoodsComparator
-                : getMarketGoodsComparator(owner.getMarket()));
+                : owner.getMarket().getSalePriceComparator());
         }
         return goodsTypeList;
     }
