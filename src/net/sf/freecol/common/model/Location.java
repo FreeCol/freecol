@@ -32,6 +32,13 @@ import net.sf.freecol.common.ObjectWithId;
  */
 public interface Location extends ObjectWithId {
 
+    // "Rank" constants for location ordering.
+    // Tile ranks are distinct and non-negative.
+    // Other locations devolve to {europe,highseas,tile} rank.
+    public static final int LOCATION_RANK_NOWHERE = -3;
+    public static final int LOCATION_RANK_EUROPE = -2;
+    public static final int LOCATION_RANK_HIGHSEAS = -1;
+    
     /**
      * Gets the identifier of this <code>Location</code>.
      *
@@ -164,6 +171,14 @@ public interface Location extends ObjectWithId {
     public Location up();
 
     /**
+     * Get a integer for this location, for the benefit of location
+     * comparators.
+     *
+     * @return A suitable integer.
+     */
+    public int getRank();
+        
+    /**
      * Get a short description of this location.
      *
      * @return A short description.
@@ -179,5 +194,15 @@ public interface Location extends ObjectWithId {
      */
     public static Location upLoc(Location loc) {
         return (loc == null) ? null : loc.up();
+    }
+
+    /**
+     * Static front end to getRank.
+     *
+     * @param loc A <code>Location</code> to check.
+     * @return The integer rank of the given location.
+     */
+    public static int getRank(Location loc) {
+        return (loc == null) ? Location.LOCATION_RANK_NOWHERE : loc.getRank();
     }
 }

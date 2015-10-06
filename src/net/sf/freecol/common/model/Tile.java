@@ -2235,6 +2235,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
+    public int getRank() {
+        return getX() + getY() * getMap().getWidth();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         StringBuilder sb = new StringBuilder(16);
         TileType type = getType();

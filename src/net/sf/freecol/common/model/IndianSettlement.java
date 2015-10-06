@@ -1093,6 +1093,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     //   UnitLocation.getUnitCount
     //   UnitLocation.getUnitList
     //   Settlement.getSettlement
+    //   final Settlement.getRank
 
     /**
      * {@inheritDoc}

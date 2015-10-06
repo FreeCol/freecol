@@ -538,6 +538,15 @@ public abstract class Settlement extends GoodsLocation
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final int getRank() {
+        return Location.getRank(getTile());
+    }
+
+
     // Interface UnitLocation
     // Inherits
     //   UnitLocation.getSpaceTaken

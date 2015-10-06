@@ -288,6 +288,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     // Interface Location
     // Inheriting
     //   FreeColObject.getId()
+    // Does not implement getRank()
 
     /**
      * {@inheritDoc}
@@ -545,7 +546,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
 
     // Serialization
-
 
     /**
      * {@inheritDoc}

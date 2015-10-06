@@ -141,6 +141,14 @@ public class HighSeas extends UnitLocation {
      * {@inheritDoc}
      */
     @Override
+    public int getRank() {
+        return Location.LOCATION_RANK_HIGHSEAS;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         return "HighSeas";
     }

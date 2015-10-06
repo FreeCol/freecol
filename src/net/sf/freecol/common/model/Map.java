@@ -2427,6 +2427,14 @@ public class Map extends FreeColGameObject implements Location {
      * {@inheritDoc}
      */
     @Override
+    public int getRank() {
+        return Location.LOCATION_RANK_NOWHERE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         return "Map";
     }

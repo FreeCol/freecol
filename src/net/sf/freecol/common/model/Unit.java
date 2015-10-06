@@ -3949,6 +3949,14 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
+    public int getRank() {
+        return Location.getRank(getLocation());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append(getId()).append("-").append(getType().getSuffix());

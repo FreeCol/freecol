@@ -285,6 +285,7 @@ public class ColonyTile extends WorkLocation {
     //   UnitLocation.getGoodsContainer
     //   final WorkLocation getSettlement
     //   final WorkLocation getColony
+    //   final int getRank
 
     /**
      * {@inheritDoc}

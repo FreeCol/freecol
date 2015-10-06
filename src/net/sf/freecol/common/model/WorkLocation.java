@@ -736,7 +736,15 @@ public abstract class WorkLocation extends UnitLocation
         return colony;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final int getRank() {
+        return Location.getRank(getTile());
+    }
 
+    
     // Interface UnitLocation
     // Inherits:
     //   UnitLocation.getSpaceTaken

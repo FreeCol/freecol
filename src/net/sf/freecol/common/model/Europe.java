@@ -329,6 +329,14 @@ public class Europe extends UnitLocation
      * {@inheritDoc}
      */
     @Override
+    public int getRank() {
+        return Location.LOCATION_RANK_EUROPE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         return "Europe";
     }

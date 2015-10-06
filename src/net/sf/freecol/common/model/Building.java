@@ -381,8 +381,9 @@ public class Building extends WorkLocation
     //   final UnitLocation.getUnitIterator
     //   UnitLocation.getUnitList
     //   UnitLocation.getGoodsContainer
-    //   final WorkLocation getSettlement
-    //   final WorkLocation getColony
+    //   final WorkLocation.getSettlement
+    //   final WorkLocation.getColony
+    //   final WorkLocation.getRank
 
     /**
      * {@inheritDoc}
