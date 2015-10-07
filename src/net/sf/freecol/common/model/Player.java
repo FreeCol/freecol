@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -43,10 +44,8 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.OptionGroup;
-
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
-
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -114,61 +113,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
     }
 
-    /**
-     * A predicate that can be applied to a unit.
-     */
-    public abstract class UnitPredicate {
-        public abstract boolean obtains(Unit unit);
-    }
-
-    /**
-     * A predicate for determining active units.
-     */
-    public class ActivePredicate extends UnitPredicate {
-
-        /**
-         * Is the unit active and going nowhere, and thus available to
-         * be moved by the player?
-         *
-         * @return True if the unit can be moved.
-         */
-        @Override
-        public boolean obtains(Unit unit) {
-            return unit.couldMove()
-                && unit.getState() != Unit.UnitState.SKIPPED;
-        }
-    }
-
-    /**
-     * A predicate for determining units going somewhere.
-     */
-    public class GoingToPredicate extends UnitPredicate {
-
-        private final Player player;
-
-
-        /**
-         * Creates a new going-to predicate.
-         *
-         * @param player The owning <code>Player</code>.
-         */
-        public GoingToPredicate(Player player) {
-            this.player = player;
-        }
-
-        /**
-         * Does this unit have orders to go somewhere?
-         *
-         * @return True if the unit has orders to go somewhere.
-         */
-        @Override
-        public boolean obtains(Unit unit) {
-            return unit.isReadyToMove()
-                && unit.getOwner() == player
-                && unit.getDestination() != null;
-        }
-    }
-
+    
     /**
      * An <code>Iterator</code> of {@link Unit}s that can be made active.
      */
@@ -176,7 +121,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         private final Player owner;
 
-        private final UnitPredicate predicate;
+        private final Predicate<Unit> predicate;
 
         private final List<Unit> units = new ArrayList<>();
 
@@ -184,12 +129,13 @@ public class Player extends FreeColGameObject implements Nameable {
         /**
          * Creates a new <code>UnitIterator</code>.
          *
-         * @param owner The <code>Player</code> that needs an iterator of it's
-         *            units.
-         * @param predicate An object for deciding whether a <code>Unit</code>
-         *            should be included in the <code>Iterator</code> or not.
+         * @param owner The <code>Player</code> that needs an iterator
+         *     of it's units.
+         * @param predicate A <code>Predicate</code> for deciding
+         *     whether a <code>Unit</code> should be included in the
+         *     <code>Iterator</code> or not.
          */
-        public UnitIterator(Player owner, UnitPredicate predicate) {
+        public UnitIterator(Player owner, Predicate<Unit> predicate) {
             this.owner = owner;
             this.predicate = predicate;
             update();
@@ -203,7 +149,7 @@ public class Player extends FreeColGameObject implements Nameable {
         private final void update() {
             units.clear();
             units.addAll(owner.getUnits().stream()
-                .filter(u -> predicate.obtains(u))
+                .filter(u -> predicate.test(u))
                 .sorted(Unit.locComparator).collect(Collectors.toList()));
         }
 
@@ -214,7 +160,7 @@ public class Player extends FreeColGameObject implements Nameable {
          * @return True if the operation succeeds.
          */
         public boolean setNext(Unit unit) {
-            if (predicate.obtains(unit)) { // Of course, it has to be valid...
+            if (predicate.test(unit)) { // Of course, it has to be valid...
                 Unit first = (units.isEmpty()) ? null : units.get(0);
                 while (!units.isEmpty()) {
                     if (units.get(0) == unit) return true;
@@ -256,7 +202,7 @@ public class Player extends FreeColGameObject implements Nameable {
         public boolean hasNext() {
             // Try to find a unit that still satisfies the predicate.
             while (!units.isEmpty()) {
-                if (predicate.obtains(units.get(0))) {
+                if (predicate.test(units.get(0))) {
                     return true; // Still valid
                 }
                 units.remove(0);
@@ -457,11 +403,11 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /** An iterator for the player units that are still active this turn. */
     private final UnitIterator nextActiveUnitIterator
-        = new UnitIterator(this, new ActivePredicate());
+        = new UnitIterator(this, Unit::couldMove);
 
     /** An iterator for the player units that have a destination to go to. */
     private final UnitIterator nextGoingToUnitIterator
-        = new UnitIterator(this, new GoingToPredicate(this));
+        = new UnitIterator(this, Unit::goingToDestination);
 
     /**
      * The HighSeas is a Location that enables Units to travel between

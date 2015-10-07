@@ -2497,26 +2497,62 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Basic checks for whether a unit is usable ATM.
+     *
+     * @return True if the unit might be useful at present.
+     */
+    private boolean readyAndAble() {
+        return !isDisposed()
+            && !isDamaged()
+            && !isAtSea()
+            && !isOnCarrier()
+            && !isInColony()
+            && getState() == UnitState.ACTIVE
+            && getMovesLeft() > 0;
+    }
+    
+    /**
      * Is this unit a suitable `next active unit', that is, the unit
      * needs to be currently movable by the player.
+     *
+     * Used as a predicate in Player.nextActiveUnitIterator.
      *
      * @return True if this unit could still be moved by the player.
      */
     public boolean couldMove() {
-        return !isDisposed()
-            && getState() == UnitState.ACTIVE
-            && getMovesLeft() > 0
-            && destination == null // Can not reach next tile
-            && tradeRoute == null
-            && !isDamaged()
-            && !isAtSea()
-            && !isOnCarrier()
-            // this should never happen anyway, since these units
-            // should have state IN_COLONY, but better safe than sorry
-            && !isInColony();
+        return readyAndAble()
+            && getDestination() == null
+            && getTradeRoute() == null;
     }
 
+    /**
+     * Is this unit a suitable `going-to unit', that is, the unit
+     * needs have a valid destination and be able to progress towards it.
+     *
+     * Used as a predicate in Player.nextGoingToUnitIterator.
+     *
+     * @return True if this unit can go to its destination.
+     */
+    public boolean goingToDestination() {
+        return readyAndAble()
+            && getTradeRoute() == null
+            && getDestination() != null;
+    }
 
+    /**
+     * Is this unit available to move along a trade route?
+     *
+     * Used as a predicate in Player.nextTradeRouteUnitIterator.
+     *
+     * @return True if this unit can follow a trade route.
+     */
+    public boolean followingTradeRoute() {
+        return readyAndAble()
+            && getTradeRoute() != null;
+            // Trade route code might set destination
+    }
+
+    
     // Map support routines
 
     /**
