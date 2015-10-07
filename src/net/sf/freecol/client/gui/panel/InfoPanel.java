@@ -266,6 +266,14 @@ public final class InfoPanel extends FreeColPanel {
                     GoodsContainer gc = unit.getGoodsContainer();
                     if (gc != null) gc.addPropertyChangeListener(this);
                 }
+                logger.info("Switching UnitInfoPanel from " +
+                    (this.unit == null ? "null" :
+                        (this.unit.getId() + " " + this.unit.getDescription() +
+                        " " + this.unit.getMovesAsString())) +
+                     " to " +
+                    (unit == null ? "null" :
+                        (unit.getId() + " " + unit.getDescription() +
+                        " " + unit.getMovesAsString())));
                 this.unit = unit;
             }
             update();
@@ -506,6 +514,8 @@ public final class InfoPanel extends FreeColPanel {
             logger.warning("Inconsistent InfoPanel status");
         }
         if (this.mode != newMode) {
+            logger.info("Switching InfoPanel mode from " + mode +
+                        " to " + newMode);
             switch (this.mode = newMode) {
             case END:
                 this.mapEditorPanel.setVisible(false);
