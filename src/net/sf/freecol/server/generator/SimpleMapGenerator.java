@@ -96,22 +96,7 @@ public class SimpleMapGenerator implements MapGenerator {
      */
     private static final float MIN_DISTANCE_FROM_POLE = 0.30f;
 
-    /** Comparator to sort tiles by increasing distance from the edge. */
-    private static final Comparator<Tile> tileEdgeComparator
-        = new Comparator<Tile>() {
-            @Override
-            public int compare(Tile tile1, Tile tile2) {
-                final Map map = tile1.getMap();
-                int distance1 = Math.min(Math.min(tile1.getX(),
-                        map.getWidth() - tile1.getX()),
-                    Math.min(tile1.getY(), map.getHeight() - tile1.getY()));
-                int distance2 = Math.min(Math.min(tile2.getX(),
-                        map.getWidth() - tile2.getX()),
-                    Math.min(tile2.getY(), map.getHeight() - tile2.getY()));
-                return distance1 - distance2;
-            }
-        };
-    
+   
     private static class Territory {
         public ServerRegion region;
         public Tile tile;
@@ -490,7 +475,7 @@ public class SimpleMapGenerator implements MapGenerator {
         }
 
         // Sort tiles from the edges of the map inward
-        Collections.sort(settlementTiles, tileEdgeComparator);
+        Collections.sort(settlementTiles, Tile.edgeDistanceComparator);
 
         // Now place other settlements
         while (!settlementTiles.isEmpty() && !territories.isEmpty()) {

@@ -52,6 +52,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
+    /** Comparator to sort tiles by increasing distance from the edge. */
+    public static final Comparator<Tile> edgeDistanceComparator
+        = Comparator.comparingInt(Tile::getEdgeDistance);
+
     /**
      * Information that is internal to the native settlements, and only
      * updated on close contact.
@@ -527,6 +531,17 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return true;
     }
 
+    /**
+     * Get the minimum distance in tiles from this tile to the map edge.
+     *
+     * @return The distance to the edge.
+     */
+    private int getEdgeDistance() {
+        final Map map = getMap();
+        final int x = getX(), y = getY();
+        return Math.min(Math.min(x, map.getWidth() - x),
+                        Math.min(y, map.getHeight() - y));
+    }
 
     /**
      * Get the style value.
