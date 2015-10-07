@@ -214,10 +214,9 @@ public class Player extends FreeColGameObject implements Nameable {
          */
         private final void update() {
             units.clear();
-            for (Unit u : owner.getUnits()) {
-                if (predicate.obtains(u)) units.add(u);
-            }
-            Collections.sort(units, xyComparator);
+            units.addAll(owner.getUnits().stream()
+                .filter(u -> predicate.obtains(u))
+                .sorted(Unit.locComparator).collect(Collectors.toList()));
         }
 
         /**
@@ -301,24 +300,6 @@ public class Player extends FreeColGameObject implements Nameable {
     //
     // Constants
     //
-
-    /**
-     * A comparator to compare units by position, top to bottom,
-     * left to right.
-     */
-    private static final Comparator<Unit> xyComparator
-        = new Comparator<Unit>() {
-            @Override
-            public int compare(Unit unit1, Unit unit2) {
-                Tile tile1 = unit1.getTile();
-                Tile tile2 = unit2.getTile();
-                int cmp = ((tile1 == null) ? 0 : tile1.getY())
-                    - ((tile2 == null) ? 0 : tile2.getY());
-                return (cmp != 0 || tile1 == null || tile2 == null) ? cmp
-                    : (tile1.getX() - tile2.getX());
-            }
-        };
-
 
     /** A comparator for ordering players. */
     public static final Comparator<Player> playerComparator

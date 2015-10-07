@@ -68,20 +68,22 @@ public class Unit extends GoodsLocation
      */
     public static final int MANY_TURNS = 10000;
 
-    /** A comparator to order units by skill level. */
-    private static final Comparator<Unit> skillLevelComp
-        = new Comparator<Unit>() {
-            @Override
-            public int compare(Unit u1, Unit u2) {
-                return u1.getSkillLevel() - u2.getSkillLevel();
-            }
-        };
-
-
     public static final String CARGO_CHANGE = "CARGO_CHANGE";
     public static final String MOVE_CHANGE = "MOVE_CHANGE";
     public static final String ROLE_CHANGE = "ROLE_CHANGE";
 
+    /**
+     * A comparator to compare units by position, top to bottom,
+     * left to right.
+     */
+    public static final Comparator<Unit> locComparator
+        = Comparator.comparingInt(u -> Location.getRank(u));
+
+    /** A comparator to compare units by type then role. */
+    public static final Comparator<Unit> typeRoleComparator
+        = Comparator.comparing(Unit::getType)
+            .thenComparing(Comparator.comparing(Unit::getRole));
+    
     /** A state a Unit can have. */
     public static enum UnitState {
         ACTIVE,
@@ -3457,15 +3459,6 @@ public class Unit extends GoodsLocation
      */
     public static int getSkillLevel(UnitType unitType) {
         return (unitType.hasSkill()) ? unitType.getSkill() : 0;
-    }
-
-    /**
-     * Get a Comparator that compares the skill levels of given units.
-     *
-     * @return skill Comparator
-     */
-    public static Comparator<Unit> getSkillLevelComparator() {
-        return skillLevelComp;
     }
 
     /**
