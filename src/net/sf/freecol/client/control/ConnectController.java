@@ -628,16 +628,16 @@ public final class ConnectController {
             } catch (FileNotFoundException e) {
                 err = StringTemplate.key("server.fileNotFound");
                 logger.log(Level.WARNING, "Can not find file.", e);
-            } catch (FreeColException e) {
-                err = StringTemplate.name(e.getMessage());
-                logger.log(Level.WARNING, "FreeCol error.", e);
             } catch (IOException e) {
                 err = StringTemplate.key("server.initialize");
                 logger.log(Level.WARNING, "Error starting game.", e);
             } catch (XMLStreamException e) {
                 err = FreeCol.badLoad(theFile);
                 logger.log(Level.WARNING, "Stream error.", e);
-            }
+            } catch (Exception e) {
+                err = StringTemplate.name(e.getMessage());
+                logger.log(Level.WARNING, "FreeCol error.", e);
+            }                
             if (err != null) {
                 // If this is a debug run, fail hard.
                 if (freeColClient.isHeadless()

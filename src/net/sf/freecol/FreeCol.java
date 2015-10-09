@@ -561,12 +561,15 @@ public final class FreeCol {
                           .create());
         options.addOption(OptionBuilder.withLongOpt("server")
                           .withDescription(Messages.message("cli.server"))
-                          .withArgName(Messages.message("cli.arg.port"))
-                          .hasOptionalArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("server-name")
                           .withDescription(Messages.message("cli.server-name"))
                           .withArgName(Messages.message("cli.arg.name"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("server-port")
+                          .withDescription(Messages.message("cli.server-port"))
+                          .withArgName(Messages.message("cli.arg.port"))
                           .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("splash")
@@ -765,15 +768,17 @@ public final class FreeCol {
             }
 
             if (line.hasOption("server")) {
-                String arg = line.getOptionValue("server");
-                if (!setServerPort(arg)) {
-                    fatal(StringTemplate.template("cli.error.serverPort")
-                        .addName("%string%", arg));
-                }
                 standAloneServer = true;
             }
             if (line.hasOption("server-name")) {
                 serverName = line.getOptionValue("server-name");
+            }
+            if (line.hasOption("server-port")) {
+                String arg = line.getOptionValue("server-port");
+                if (!setServerPort(arg)) {
+                    fatal(StringTemplate.template("cli.error.serverPort")
+                        .addName("%string%", arg));
+                }
             }
 
             if (line.hasOption("seed")) {
