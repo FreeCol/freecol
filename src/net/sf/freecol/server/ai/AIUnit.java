@@ -376,7 +376,9 @@ public class AIUnit extends TransportableAIObject {
         WorkInsideColonyMission wic
             = getMission(WorkInsideColonyMission.class);
         if (wic == null) {
-            if (((EuropeanAIPlayer)getAIOwner())
+            AIPlayer aiPlayer = getAIOwner();
+            if (!(aiPlayer instanceof EuropeanAIPlayer) ||
+                    ((EuropeanAIPlayer)aiPlayer)
                     .getWorkInsideColonyMission(this, aiColony) == null) {
                 return false; 
             }
@@ -389,12 +391,15 @@ public class AIUnit extends TransportableAIObject {
     public boolean tryPioneeringMission(LogBuilder lb) {
         Mission m = getMission();
         Location oldTarget = (m == null) ? null : m.getTarget();
-        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer)getAIOwner();
+        AIPlayer aiPlayer = getAIOwner();
 
-        if (aiPlayer.getPioneeringMission(this, null) != null) {
-            lb.add(", ", getMission());
-            aiPlayer.updateTransport(this, oldTarget, lb);
-            return true;
+        if(aiPlayer instanceof EuropeanAIPlayer) {
+            EuropeanAIPlayer euaiPlayer = (EuropeanAIPlayer)getAIOwner();
+            if (euaiPlayer.getPioneeringMission(this, null) != null) {
+                lb.add(", ", getMission());
+                euaiPlayer.updateTransport(this, oldTarget, lb);
+                return true;
+            }
         }
         return false;
     }
@@ -409,23 +414,27 @@ public class AIUnit extends TransportableAIObject {
             || m instanceof UnitSeekAndDestroyMission)
             return true;
         Location oldTarget = (m == null) ? null : m.getTarget();
-        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer)getAIOwner();
+        AIPlayer aiPlayer = getAIOwner();
 
-        if (unit.hasAbility(Ability.SPEAK_WITH_CHIEF)
-            && (m = aiPlayer.getScoutingMission(this)) != null) {
-            lb.add(", ", m);
-            aiPlayer.updateTransport(this, oldTarget, lb);
-            return true;
-        } else if (unit.isDefensiveUnit()
-            && (m = aiPlayer.getDefendSettlementMission(this, colony)) != null) {
-            lb.add(", ", m);
-            aiPlayer.updateTransport(this, oldTarget, lb);
-            return true;
-        } else if (unit.hasAbility(Ability.ESTABLISH_MISSION)
-            && (m = aiPlayer.getMissionaryMission(this)) != null) {
-            lb.add(", ", m);
-            aiPlayer.updateTransport(this, oldTarget, lb);
-            return true;
+        if(aiPlayer instanceof EuropeanAIPlayer) {
+            EuropeanAIPlayer euaiPlayer = (EuropeanAIPlayer)getAIOwner();
+
+            if (unit.hasAbility(Ability.SPEAK_WITH_CHIEF)
+                && (m = euaiPlayer.getScoutingMission(this)) != null) {
+                lb.add(", ", m);
+                euaiPlayer.updateTransport(this, oldTarget, lb);
+                return true;
+            } else if (unit.isDefensiveUnit()
+                && (m = euaiPlayer.getDefendSettlementMission(this, colony)) != null) {
+                lb.add(", ", m);
+                euaiPlayer.updateTransport(this, oldTarget, lb);
+                return true;
+            } else if (unit.hasAbility(Ability.ESTABLISH_MISSION)
+                && (m = euaiPlayer.getMissionaryMission(this)) != null) {
+                lb.add(", ", m);
+                euaiPlayer.updateTransport(this, oldTarget, lb);
+                return true;
+            }
         }
         return false;
     }
