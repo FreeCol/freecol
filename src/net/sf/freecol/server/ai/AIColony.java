@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.w3c.dom.Element;
+
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
@@ -47,7 +49,6 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
@@ -63,8 +64,8 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.NetworkConstants;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.CachingFunction;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -77,8 +78,7 @@ import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
-
-import org.w3c.dom.Element;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -125,13 +125,37 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     private static final Set<GoodsType> fullExport = new HashSet<>();
     private static final Set<GoodsType> partExport = new HashSet<>();
 
-    /** Comparator to choose the best pioneers. */
+    /**
+     * Comparator to favour expert pioneers, then units in that role,
+     * then least skillful.
+     */
     private static final Comparator<Unit> pioneerComparator
-        = Comparator.comparingInt(Unit::getPioneerScore).reversed();
+        = new Comparator<Unit>() {
+            private int score(Unit unit) {
+                return (unit == null) ? -1000 : unit.getPioneerScore();
+            }
 
-    /** Comparator to choose the best scouts. */
+            @Override
+            public int compare(Unit u1, Unit u2) {
+                return score(u2) - score(u1);
+            }
+        };
+
+    /**
+     * Comparator to favour expert scouts, then units in that role,
+     * then least skillful.
+     */
     private static final Comparator<Unit> scoutComparator
-        = Comparator.comparingInt(Unit::getScoutScore).reversed();
+        = new Comparator<Unit>() {
+            private int score(Unit unit) {
+                return (unit == null) ? -1000 : unit.getScoutScore();
+            }
+
+            @Override
+            public int compare(Unit u1, Unit u2) {
+                return score(u2) - score(u1);
+            }
+        };
 
 
     /**
@@ -324,22 +348,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         List<Unit> workers = colony.getUnitList();
         List<UnitWas> was = new ArrayList<>();
         for (Unit u : workers) {
-            Location loc = u.getLocation();
             was.add(new UnitWas(u));
         }
         for (Unit u : tile.getUnitList()) {
             if (!u.isPerson() || u.hasAbility(Ability.REF_UNIT)
                 || getAIUnit(u) == null) continue;
-            Mission m = getAIUnit(u).getMission();
-            if (m == null
-                || (m instanceof BuildColonyMission
-                    && (Map.isSameLocation(m.getTarget(), tile)
-                        || colony.getUnitCount() <= 1))
-                // FIXME: drop this when the AI stops building excessive armies
-                || m instanceof DefendSettlementMission
-                || m instanceof IdleAtSettlementMission
-                || m instanceof WorkInsideColonyMission
-                ) {
+            if (getAIUnit(u).isAvailableForWork(colony)) {
                 workers.add(u);
                 was.add(new UnitWas(u));
             }
@@ -411,16 +425,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Return any units with the wrong mission
         for (Unit u : colony.getUnitList()) {
             final AIUnit aiu = getAIUnit(u);
-            WorkInsideColonyMission wic
-                = aiu.getMission(WorkInsideColonyMission.class);
-            if (wic == null) {
-                if (aiPlayer.getWorkInsideColonyMission(aiu, this) == null) {
-                    result.add(aiu); 
-                } else {
-                    lb.add(", ", aiu.getMission());
-                    aiu.dropTransport();
-                }
-            }
+            if(!aiu.tryWorkInsideColonyMission(this, lb))
+                result.add(aiu); 
         }
 
         // Allocate pioneers if possible.
@@ -433,45 +439,16 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             Collections.sort(pioneers, pioneerComparator);
             for (Unit u : pioneers) {
                 final AIUnit aiu = getAIUnit(u);
-                Mission m = aiu.getMission();
-                Location oldTarget = (m == null) ? null : m.getTarget();
-
-                if ((m = aiPlayer.getPioneeringMission(aiu, null)) != null) {
-                    lb.add(", ", aiu.getMission());
-                    aiPlayer.updateTransport(aiu, oldTarget, lb);
+                if (aiu.tryPioneeringMission(lb)) {
                     if (--tipSize <= 0) break;
                 }
             }
         }
-                
+
         for (Unit u : tile.getUnitList()) {
             final AIUnit aiu = getAIUnit(u);
-            Mission m = aiu.getMission();
-            if (m instanceof BuildColonyMission
-                || m instanceof DefendSettlementMission
-                || m instanceof MissionaryMission
-                || m instanceof PioneeringMission
-                || m instanceof ScoutingMission
-                || m instanceof UnitSeekAndDestroyMission) continue;
-            Location oldTarget = (m == null) ? null : m.getTarget();
-
-            if (u.hasAbility(Ability.SPEAK_WITH_CHIEF)
-                && (m = aiPlayer.getScoutingMission(aiu)) != null) {
-                lb.add(", ", m);
-                aiPlayer.updateTransport(aiu, oldTarget, lb);
-                continue;
-            } else if (u.isDefensiveUnit()
-                && (m = aiPlayer.getDefendSettlementMission(aiu, colony)) != null) {
-                lb.add(", ", m);
-                aiPlayer.updateTransport(aiu, oldTarget, lb);
-                continue;
-            } else if (u.hasAbility(Ability.ESTABLISH_MISSION)
-                && (m = aiPlayer.getMissionaryMission(aiu)) != null) {
-                lb.add(", ", m);
-                aiPlayer.updateTransport(aiu, oldTarget, lb);
-                continue;
-            }
-            result.add(aiu);
+            if (!aiu.trySomeUsefulMission(colony, lb))
+                result.add(aiu);
         }
 
         // Log the changes.
@@ -594,7 +571,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final Player player = colony.getOwner();
         boolean hasDefender = any(tile.getUnitList(),
             u -> u.isDefensiveUnit()
-                && getAIUnit(u).getMission(DefendSettlementMission.class) != null);
+                && getAIUnit(u).hasDefendSettlementMission());
         if (!hasDefender) return;
 
         // What goods are really needed?
@@ -625,8 +602,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 double s = needed.stream()
                         .mapToInt(gt -> t.getPotentialProduction(gt, unitType)).sum()
                     + spec.getFoodGoodsTypeList().stream()
-                        .mapToDouble(ft ->
-                            0.1 * t.getPotentialProduction(ft, unitType)).sum();
+                        .mapToDouble(ft -> 0.1 * t.getPotentialProduction(ft, unitType)).sum();
                 if (s > score) {
                     score = s;
                     steal = t;
@@ -771,11 +747,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param ag The <code>AIGoods</code> to drop.
      */
     private void dropExportGoods(AIGoods ag) {
-        TransportMission tm;
-        if (ag.getTransport() != null
-            && (tm = ag.getTransport().getMission(TransportMission.class)) != null) {
-            tm.removeTransportable(ag);
-        }
+        AIUnit transport = ag.getTransport();
+        if (transport != null)
+            transport.removeTransportable(ag);
         removeExportGoods(ag);
         ag.dispose();
     }
@@ -979,18 +953,16 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             return completeWish((Goods)t.getTransportLocatable(), lb);
         } else if (t instanceof AIUnit) {
             AIUnit aiUnit = (AIUnit)t;
-            WishRealizationMission wm
-                = aiUnit.getMission(WishRealizationMission.class);
-            if (wm != null && Map.isSameLocation(wm.getTarget(), colony)) {
+            if (aiUnit.isCompleteWishRealizationMission(colony)) {
                 lb.add(", at wish-target");
                 completeWish(aiUnit.getUnit(), lb);
-                aiUnit.changeMission(null);
+                aiUnit.removeMission();
                 return true;
             }
         }
         return false;
     }
-            
+
     /**
      * Gets the wishes this colony has.
      *

@@ -27,22 +27,25 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.w3c.dom.Element;
+
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitLocation;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.goal.Goal;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
@@ -62,8 +65,6 @@ import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.ai.mission.UnitWanderMission;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -330,17 +331,112 @@ public class AIUnit extends TransportableAIObject {
     public Mission changeMission(Mission mission) {
         if (this.mission == mission) return this.mission;
 
-        if (this.mission != null) {
-            this.mission.dispose();
-            this.mission = null;
-        }
-       
+        removeMission();
         setMission(mission);
         if (mission != null) {
             setTransportPriority(mission.getBaseTransportPriority());
         }
         return this.mission;
     }
+
+    public void removeMission() {
+        if (this.mission != null) {
+            this.mission.dispose();
+            this.mission = null;
+        }
+    }
+
+
+    // Helper methods for AIColony
+
+    public boolean hasDefendSettlementMission() {
+        return hasMission(DefendSettlementMission.class);
+    }
+
+    public boolean isCompleteWishRealizationMission(Colony colony) {
+        WishRealizationMission wm
+            = getMission(WishRealizationMission.class);
+        return (wm != null && Map.isSameLocation(wm.getTarget(), colony));
+    }
+
+    public boolean isAvailableForWork(Colony colony) {
+        Mission m = getMission();
+        return (m == null
+            || (m instanceof BuildColonyMission
+                && (Map.isSameLocation(m.getTarget(), colony.getTile())
+                    || colony.getUnitCount() <= 1))
+            // FIXME: drop this when the AI stops building excessive armies
+            || m instanceof DefendSettlementMission
+            || m instanceof IdleAtSettlementMission
+            || m instanceof WorkInsideColonyMission
+            );
+    }
+
+    public boolean tryWorkInsideColonyMission(AIColony aiColony, LogBuilder lb) {
+        WorkInsideColonyMission wic
+            = getMission(WorkInsideColonyMission.class);
+        if (wic == null) {
+            if (((EuropeanAIPlayer)getAIOwner())
+                    .getWorkInsideColonyMission(this, aiColony) == null) {
+                return false; 
+            }
+            lb.add(", ", getMission());
+            dropTransport();
+        }
+        return true;
+    }
+
+    public boolean tryPioneeringMission(LogBuilder lb) {
+        Mission m = getMission();
+        Location oldTarget = (m == null) ? null : m.getTarget();
+        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer)getAIOwner();
+
+        if (aiPlayer.getPioneeringMission(this, null) != null) {
+            lb.add(", ", getMission());
+            aiPlayer.updateTransport(this, oldTarget, lb);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean trySomeUsefulMission(Colony colony, LogBuilder lb) {
+        Mission m = getMission();
+        if (m instanceof BuildColonyMission
+            || m instanceof DefendSettlementMission
+            || m instanceof MissionaryMission
+            || m instanceof PioneeringMission
+            || m instanceof ScoutingMission
+            || m instanceof UnitSeekAndDestroyMission)
+            return true;
+        Location oldTarget = (m == null) ? null : m.getTarget();
+        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer)getAIOwner();
+
+        if (unit.hasAbility(Ability.SPEAK_WITH_CHIEF)
+            && (m = aiPlayer.getScoutingMission(this)) != null) {
+            lb.add(", ", m);
+            aiPlayer.updateTransport(this, oldTarget, lb);
+            return true;
+        } else if (unit.isDefensiveUnit()
+            && (m = aiPlayer.getDefendSettlementMission(this, colony)) != null) {
+            lb.add(", ", m);
+            aiPlayer.updateTransport(this, oldTarget, lb);
+            return true;
+        } else if (unit.hasAbility(Ability.ESTABLISH_MISSION)
+            && (m = aiPlayer.getMissionaryMission(this)) != null) {
+            lb.add(", ", m);
+            aiPlayer.updateTransport(this, oldTarget, lb);
+            return true;
+        }
+        return false;
+    }
+
+    public void removeTransportable(AIGoods ag) {
+        TransportMission tm = getMission(TransportMission.class);
+        if (tm != null) {
+            tm.removeTransportable(ag);
+        }
+    }
+
 
     /**
      * Moves a unit to the new world.
