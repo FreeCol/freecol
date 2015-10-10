@@ -46,13 +46,16 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.util.LogBuilder;
+
 import static net.sf.freecol.common.util.StringUtils.*;
+
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
+import net.sf.freecol.server.ai.MissionAIPlayer;
 import net.sf.freecol.server.ai.TransportableAIObject;
 
 
@@ -157,8 +160,8 @@ public abstract class Mission extends AIObject {
      *
      * @return The <code>AIPlayer</code>.
      */
-    protected final AIPlayer getAIPlayer() {
-        return getAIMain().getAIPlayer(getUnit().getOwner());
+    protected final MissionAIPlayer getAIPlayer() {
+        return (MissionAIPlayer)getAIMain().getAIPlayer(getUnit().getOwner());
     }
 
     /**

@@ -41,6 +41,7 @@ import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.MissionAIPlayer;
 
 
 /**
@@ -118,8 +119,8 @@ public class DefendSettlementMission extends Mission {
     public static int scorePath(AIUnit aiUnit, PathNode path) {
         final Location loc = extractTarget(aiUnit, path);
         return (loc instanceof Settlement)
-            ? aiUnit.getAIOwner().adjustMission(aiUnit, path,
-                DefendSettlementMission.class,
+            ? ((MissionAIPlayer)aiUnit.getAIOwner()).adjustMission(
+                aiUnit, path, DefendSettlementMission.class,
                 (int)(1000 * ((Settlement)loc).getDefenceRatio()
                     / (path.getTotalTurns() + 1)))
             : Integer.MIN_VALUE;

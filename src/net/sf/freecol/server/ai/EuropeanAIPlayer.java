@@ -105,7 +105,7 @@ import net.sf.freecol.server.model.ServerPlayer;
  * The method {@link #startWorking} gets called by the
  * {@link AIInGameInputHandler} when it is this player's turn.
  */
-public class EuropeanAIPlayer extends AIPlayer {
+public class EuropeanAIPlayer extends MissionAIPlayer {
 
     private static final Logger logger = Logger.getLogger(EuropeanAIPlayer.class.getName());
 

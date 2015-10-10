@@ -42,6 +42,7 @@ import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.MissionAIPlayer;
 
 
 /**
@@ -157,8 +158,8 @@ public class UnitSeekAndDestroyMission extends Mission {
             Tension tension = is.getAlarm(unit.getOwner());
             if (tension != null) value += tension.getValue() / 2;
         }
-        return aiUnit.getAIOwner().adjustMission(aiUnit, path, 
-            UnitSeekAndDestroyMission.class, value);
+        return ((MissionAIPlayer)aiUnit.getAIOwner()).adjustMission(
+            aiUnit, path, UnitSeekAndDestroyMission.class, value);
     }
 
     /**
@@ -197,8 +198,8 @@ public class UnitSeekAndDestroyMission extends Mission {
             if (defender.hasAbility(Ability.EXPERT_SOLDIER)
                 && !defender.isArmed()) value += 100;
         }
-        return aiUnit.getAIOwner().adjustMission(aiUnit, path,
-            UnitSeekAndDestroyMission.class, value);
+        return ((MissionAIPlayer)aiUnit.getAIOwner()).adjustMission(
+            aiUnit, path, UnitSeekAndDestroyMission.class, value);
     }
 
     /**
