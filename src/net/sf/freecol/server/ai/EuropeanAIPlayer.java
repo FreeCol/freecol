@@ -1315,6 +1315,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * @param w The <code>Wish</code> to complete.
      */
+    @Override
     public void completeWish(Wish w) {
         if (w instanceof WorkerWish) {
             WorkerWish ww = (WorkerWish)w;
@@ -1429,6 +1430,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * @return The desired number of scouts for this player.
      */
+    @Override
     public int scoutsNeeded() {
         return 3 - (getGame().getTurn().getNumber() / 100);
     }

@@ -22,10 +22,8 @@ package net.sf.freecol.server.ai;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -36,28 +34,15 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Stance;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.util.LogBuilder;
-import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
-import net.sf.freecol.server.ai.mission.Mission;
-import net.sf.freecol.server.ai.mission.DefendSettlementMission;
-import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
-import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
-import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 
@@ -399,6 +384,20 @@ public abstract class AIPlayer extends AIObject {
      */
     public FoundingFather selectFoundingFather(List<FoundingFather> ffs) {
         return null;
+    }
+
+
+    // European players need to implement these for AIColony
+
+    public int getNeededWagons(Tile tile) {
+        return 0;
+    }
+
+    public int scoutsNeeded() {
+        return 0;
+    }
+
+    public void completeWish(Wish w) {
     }
 
 

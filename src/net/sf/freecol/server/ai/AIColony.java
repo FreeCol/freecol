@@ -360,7 +360,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Assign the workers according to the colony plan.
         // ATM we just accept this assignment unless it failed, in
         // which case restore original state.
-        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer)getAIOwner();
+        AIPlayer aiPlayer = getAIOwner();
         LogBuilder aw = new LogBuilder(256);
         boolean preferScouts = aiPlayer.scoutsNeeded() > 0;
         Colony scratch = colonyPlan.assignWorkers(new ArrayList<>(workers),
@@ -885,7 +885,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             lb.add(", ", reason, " not wished for at ", colony.getName());
             return false;
         }
-        ((EuropeanAIPlayer)getAIOwner()).completeWish(wish);
+        getAIOwner().completeWish(wish);
         lb.add(", ", reason, " fulfills at ", colony.getName());
         wish.dispose();
         requestRearrange();

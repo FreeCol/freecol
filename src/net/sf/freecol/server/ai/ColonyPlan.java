@@ -662,7 +662,7 @@ public class ColonyPlan {
      * Updates the build plans for this colony.
      */
     private void updateBuildableTypes() {
-        final EuropeanAIPlayer euaip = (EuropeanAIPlayer)getAIMain()
+        final AIPlayer euaip = getAIMain()
             .getAIPlayer(colony.getOwner());
         String advantage = euaip.getAIAdvantage();
         buildPlans.clear();
