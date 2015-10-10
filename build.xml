@@ -633,7 +633,7 @@
              export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
         -->
         <junit printsummary="on" errorProperty="error.junit"
-               failureProperty="error.junit" fork="yes" maxmemory="64M">
+               failureProperty="error.junit" fork="yes" maxmemory="96M">
             <classpath refid="test.run.classpath"/>
             <formatter type="xml" />
 
