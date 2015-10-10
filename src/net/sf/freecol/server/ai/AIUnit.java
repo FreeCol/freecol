@@ -132,7 +132,7 @@ public class AIUnit extends TransportableAIObject {
     public AIUnit(AIMain aiMain, Element element) {
         super(aiMain, element);
 
-        uninitialized = getUnit() == null;
+        uninitialized = unit == null;
     }
 
     /**
@@ -148,7 +148,7 @@ public class AIUnit extends TransportableAIObject {
                   FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = getUnit() == null;
+        uninitialized = unit == null;
     }
 
 
@@ -229,7 +229,7 @@ public class AIUnit extends TransportableAIObject {
      * consistent.
      */
     private void takeTransport() {
-        Unit carrier = getUnit().getCarrier();
+        Unit carrier = unit.getCarrier();
         AIUnit aiCarrier = (carrier == null) ? null
             : getAIMain().getAIUnit(carrier);
         AIUnit transport = getTransport();
@@ -561,8 +561,8 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public Location getTransportSource() {
-        return (getUnit() == null || getUnit().isDisposed()) ? null
-            : getUnit().getLocation();
+        return (unit == null || unit.isDisposed()) ? null
+            : unit.getLocation();
     }
 
     /**
@@ -570,7 +570,7 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public Location getTransportDestination() {
-        return (getUnit() == null || getUnit().isDisposed() || !hasMission())
+        return (unit == null || unit.isDisposed() || !hasMission())
             ? null
             : mission.getTransportDestination();
     }
@@ -627,7 +627,7 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public boolean carriableBy(Unit carrier) {
-        return carrier.couldCarry(getUnit());
+        return carrier.couldCarry(unit);
     }
 
     /**
@@ -635,7 +635,7 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public boolean canMove() {
-        return getUnit().getMovesLeft() > 0;
+        return unit.getMovesLeft() > 0;
     }
 
     /**
@@ -643,7 +643,6 @@ public class AIUnit extends TransportableAIObject {
      */
     @Override
     public boolean leaveTransport() {
-        final Unit unit = getUnit();
         if (!unit.isOnCarrier()) return true; // Harmless error
 
         // Just leave at once if in Europe
@@ -853,7 +852,7 @@ public class AIUnit extends TransportableAIObject {
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         super.readChildren(xr);
 
-        if (getUnit() != null) uninitialized = false;
+        if (unit != null) uninitialized = false;
     }
 
     /**

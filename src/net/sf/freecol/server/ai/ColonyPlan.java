@@ -1521,7 +1521,6 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
      */
     @Override
     public String toString() {
-        final Tile tile = colony.getTile();
         LogBuilder lb = new LogBuilder(256);
         lb.add("ColonyPlan: ", colony,
             " ", colony.getTile(),

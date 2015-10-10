@@ -608,9 +608,7 @@ public class TransportMission extends Mission {
     private boolean queueCargo(Cargo cargo, boolean requireMatch,
                                LogBuilder lb) {
         final Unit carrier = getUnit();
-        final int maxHolds = carrier.getCargoCapacity();
         final List<Cargo> ts = tCopy();
-        final int newSpace = cargo.getNewSpace();
         int candidate = -1;
 
         if (ts.isEmpty() // Trivial case
@@ -621,11 +619,11 @@ public class TransportMission extends Mission {
         }
 
         if (candidate < 0) { // Match an existing target?
-            outer: for (int i = 0; i < ts.size(); i++) {
+            for (int i = 0; i < ts.size(); i++) {
                 Cargo tr = ts.get(i);
                 if (Map.isSameLocation(tr.getCarrierTarget(),
                                        cargo.getCarrierTarget())) {
-                    if (!cargo.canQueueAt(carrier, i, ts)) continue outer;
+                    if (!cargo.canQueueAt(carrier, i, ts)) continue;
                     candidate = i;
                     break;
                 }

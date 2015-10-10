@@ -231,7 +231,6 @@ public class CashInTreasureTrainMission extends Mission {
         final Unit carrier = unit.getCarrier();
         final CostDecider standardCd
             = CostDeciders.avoidSettlementsAndBlockingUnits();
-        PathNode path;
 
         if (player.getNumberOfSettlements() <= 0 || start == null) {
             // No settlements or not on the map, so go straight to

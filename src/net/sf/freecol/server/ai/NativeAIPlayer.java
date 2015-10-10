@@ -136,7 +136,6 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * @param lb A <code>LogBuilder</code>  to log to.
      */
     private void initializeMissions(LogBuilder lb) {
-        final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
         lb.add("\n  Initialize");
 
@@ -220,8 +219,6 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     public void equipBraves(IndianSettlement is, LogBuilder lb) {
-        final Specification spec = getSpecification();
-
         // Find all the units
         List<Unit> units = is.getUnitList();
         units.addAll(is.getTile().getUnitList());
@@ -230,7 +227,6 @@ public class NativeAIPlayer extends MissionAIPlayer {
         Collections.sort(units,
             getGame().getCombatModel().getMilitaryStrengthComparator());
 
-        boolean moreHorses = true, moreMuskets = true;
         for (Unit u : units) {
             Role r = is.canImproveUnitMilitaryRole(u);
             if (r != null) {
@@ -400,10 +396,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     private void giveNormalMissions(LogBuilder lb) {
-        final AIMain aiMain = getAIMain();
         final Player player = getPlayer();
-        final Specification spec = getSpecification();
-        final int turnNumber = getGame().getTurn().getNumber();
         List<AIUnit> aiUnits = getAIUnits();
 
         lb.mark();
@@ -412,7 +405,6 @@ public class NativeAIPlayer extends MissionAIPlayer {
         for (AIUnit aiUnit : aiUnits) {
             final Unit unit = aiUnit.getUnit();
             Mission m = aiUnit.getMission();
-            String reason = null;
 
             if (unit.isUninitialized() || unit.isDisposed()) {
                 reasons.put(unit, "Invalid");

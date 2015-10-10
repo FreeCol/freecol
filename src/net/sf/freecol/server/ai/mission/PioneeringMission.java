@@ -61,6 +61,7 @@ public class PioneeringMission extends Mission {
     private static final String tag = "AI pioneer";
 
 
+    // FIXME: This is unused, delete?
     /**
      * Default distance in turns to a threatening unit.
      */
@@ -708,7 +709,7 @@ public class PioneeringMission extends Mission {
         if (!player.owns(tile)) {
             // FIXME: Better choice whether to pay or steal.
             // Currently always pay if we can, steal if we can not.
-            boolean fail = false;
+            boolean fail;
             int price = player.getLandPrice(tile);
             if (price < 0) {
                 fail = true;

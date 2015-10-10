@@ -52,7 +52,6 @@ import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIObject;
-import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.MissionAIPlayer;
@@ -592,7 +591,7 @@ public abstract class Mission extends AIObject {
      */
     protected void moveRandomlyTurn(String logMe) {
         Direction direction = null;
-        while ((direction = moveRandomly(logMe, direction)) != null);
+        while ((direction = moveRandomly(logMe, direction)) != null) {}
         getUnit().setMovesLeft(0);
     }
 
@@ -666,7 +665,6 @@ public abstract class Mission extends AIObject {
             throw new IllegalStateException("Target neither Europe nor Tile");
         }
         final Unit unit = getUnit();
-        final AIUnit aiUnit = getAIUnit();
         AIUnit aiCarrier = aiUnit.getTransport();
         final Map map = unit.getGame().getMap();
         PathNode path = null;
@@ -864,7 +862,6 @@ public abstract class Mission extends AIObject {
      */
     private MoveType followMapPath(PathNode path, LogBuilder lb) {
         final Unit unit = getUnit();
-        final AIUnit aiUnit = getAIUnit();
         final Location target = path.getLastNode().getLocation();
 
         for (; path != null; path = path.next) {

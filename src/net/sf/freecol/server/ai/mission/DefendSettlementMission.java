@@ -54,6 +54,7 @@ public class DefendSettlementMission extends Mission {
     /** The tag for this mission. */
     private final String tag = "AI defender";
 
+    // FIXME: This is unused, delete?
     /** Maximum number of turns to travel to the settlement. */
     private static final int MAX_TURNS = 20;
 

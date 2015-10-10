@@ -792,7 +792,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 if (tip == null || tip.isComplete()) {
                     aic.removeTileImprovementPlan(tip);
                 } else if (tip.getPioneer() != null) {
-                    ; // Do nothing, remove when complete
+                    // Do nothing, remove when complete
                 } else if (!tip.validate()) {
                     aic.removeTileImprovementPlan(tip);
                     tip.dispose();
@@ -2481,12 +2481,12 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     public TradeStatus acceptDiplomaticTrade(DiplomaticTrade agreement) {
         final Player player = getPlayer();
         final Player other = agreement.getOtherPlayer(player);
-        final Market market = player.getMarket();
+        // final Market market = player.getMarket();
         final boolean franklin
             = other.hasAbility(Ability.ALWAYS_OFFERED_PEACE);
         final java.util.Map<TradeItem, Integer> scores = new HashMap<>();
         TradeItem peace = null;
-        TradeItem cash = null;
+        // TradeItem cash = null;
         LogBuilder lb = new LogBuilder(64);
         lb.add("Evaluate trade offer from ", other.getName());
         TradeStatus result = null;
@@ -2498,7 +2498,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             }                    
             int value = item.evaluateFor(player);
             if (item instanceof GoldTradeItem) {
-                cash = item;
+                // cash = item;
             } else if (item instanceof StanceTradeItem) {
                 // Handle some special cases
                 switch (item.getStance()) {

@@ -137,10 +137,9 @@ public class IndianDemandMission extends Mission {
             int value = 0;
             for (Goods currentGoods : target.getCompactGoods()) {
                 int goodsValue = market.getSalePrice(currentGoods);
-                if (currentGoods.getType().isFoodType()
-                    || currentGoods.getType().isMilitaryGoods()) {
-                    continue;
-                } else if (goodsValue > value) {
+                if (!currentGoods.getType().isFoodType()
+                    && !currentGoods.getType().isMilitaryGoods()
+                    && (goodsValue > value)) {
                     value = goodsValue;
                     goods = currentGoods;
                 }
