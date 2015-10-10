@@ -78,7 +78,6 @@ import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
