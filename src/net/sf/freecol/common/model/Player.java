@@ -2552,12 +2552,13 @@ public class Player extends FreeColGameObject implements Nameable {
      * Add the tutorial message for the start of the game.
      */
     public void addStartGameMessage() {
-        Direction sailDirection = (getNation().startsOnEastCoast())
-            ? Direction.W
-            : Direction.E;
+        Tile tile = getEntryLocation().getTile();
+        String sailTag = (tile == null) ? "unknown"
+            : (tile.getX() < tile.getMap().getWidth() / 2) ? "east"
+            : "west";
         addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
                                          "model.player.startGame", this)
-            .addNamed("%direction%", sailDirection));
+            .add("%direction%", sailTag));
     }
 
     /**
