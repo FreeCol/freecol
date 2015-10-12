@@ -209,49 +209,6 @@ public class HistoryEvent extends StringTemplate {
     }
 
 
-    // Override StringTemplate routines to return HistoryEvents
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public HistoryEvent add(String key, String value) {
-        return (HistoryEvent)super.add(key, value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public HistoryEvent addName(String key, String value) {
-        return (HistoryEvent)super.addName(key, value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public HistoryEvent addNamed(String key, Named value) {
-        return (HistoryEvent)super.addNamed(key, value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public HistoryEvent addAmount(String key, Number amount) {
-        return (HistoryEvent)super.addAmount(key, amount);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public HistoryEvent addStringTemplate(String key, StringTemplate template) {
-        return (HistoryEvent)super.addStringTemplate(key, template);
-    }
-
-
     // Interface Object
 
     /**

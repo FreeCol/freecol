@@ -49,6 +49,7 @@ import javax.swing.text.StyleContext;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Player;
@@ -445,13 +446,13 @@ public final class Utility {
     }
 
     /**
-     * Get a JLabel with a named object.
+     * Get a JLabel for a FreeColGameObjectType.
      *
-     * @param named The <code>Named</code> to use.
+     * @param fcgot The <code>FreeColGameObjectType</code> to use.
      * @return The <code>JLabel</code>.
      */
-    public static JLabel localizedLabel(Named named) {
-        return localizedLabel(named.getNameKey());
+    public static JLabel localizedLabel(FreeColGameObjectType fcgot) {
+        return localizedLabel(fcgot.getNameKey());
     }
 
     /**

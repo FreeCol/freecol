@@ -84,7 +84,7 @@ public final class ReportExplorationPanel extends ReportPanel {
                 .filter(r -> r.getDiscoveredIn() != null)
                 .sorted(regionComparator))) {
             reportPanel.add(new JLabel(region.getName()));
-            reportPanel.add(Utility.localizedLabel(region.getType()));
+            reportPanel.add(Utility.localizedLabel(region.getType().getNameKey()));
             reportPanel.add(Utility.localizedLabel(region.getDiscoveredIn()
                     .getLabel()));
             reportPanel.add(Utility.localizedLabel(region.getDiscoveredBy()
