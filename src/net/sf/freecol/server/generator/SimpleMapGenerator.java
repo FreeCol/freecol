@@ -602,7 +602,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 lb.add("  0 x <none>");
             } else {
                 lb.add("  ", iss.size(),
-                    " x ", iss.get(0).getLearnableSkill());
+                    " x ", iss.get(0).getLearnableSkill().getSuffix());
             }
         }
         lb.add("\nCreated ", settlementsPlaced,
@@ -721,7 +721,7 @@ public class SimpleMapGenerator implements MapGenerator {
                                          capital, skill, null);
         player.addSettlement(settlement);
         lb.add("Generated skill for ", settlement.getName(),
-            ": ", settlement.getLearnableSkill());
+            ": ", settlement.getLearnableSkill().getSuffix(), "\n");
 
         settlement.placeSettlement(true);
         settlement.addRandomGoods(random);
