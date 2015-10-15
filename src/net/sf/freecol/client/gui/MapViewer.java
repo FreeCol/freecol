@@ -918,7 +918,6 @@ public final class MapViewer {
      * Gets the selected tile.
      *
      * @return The <code>Tile</code> selected.
-     * @see #setSelectedTile(Tile, boolean)
      */
     Tile getSelectedTile() {
         return selectedTile;
@@ -1064,12 +1063,8 @@ public final class MapViewer {
     /**
      * Sets the active unit.
      *
-     * Invokes {@link #setSelectedTile(Tile, boolean)} if the selected
-     * tile is another tile than where the <code>activeUnit</code> is located.
-     *
      * @param activeUnit The new active <code>Unit</code>.
      * @return True if the focus was set.
-     * @see #setSelectedTile(Tile, boolean)
      */
     boolean setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm
