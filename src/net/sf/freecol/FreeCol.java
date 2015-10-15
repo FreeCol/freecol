@@ -77,7 +77,7 @@ public final class FreeCol {
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
     /** The FreeCol release version number. */
-    private static final String FREECOL_VERSION = "0.11.5";
+    private static final String FREECOL_VERSION = "0.11.6";
 
     /** The difficulty levels. */
     public static final String[] DIFFICULTIES = {
