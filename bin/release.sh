@@ -27,12 +27,14 @@ exit
 EOF
 cd ..
 
-if ant manual javadoc ; then
+if ant manual devmanual javadoc ; then
     cd doc
     {
         echo "cd /home/project-web/freecol/htdocs"
         echo "put FreeCol.pdf docs/"
         echo "put FreeCol.html docs/"
+        echo "put developer.pdf docs/"
+        echo "put developer.html docs/"
         echo "put images/* docs/images"
         find javadoc/ -printf "put %p %p\n"
     } | sftp $USERNAME,freecol@web.sf.net
